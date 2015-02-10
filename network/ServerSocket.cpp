@@ -38,13 +38,12 @@ int ServerSocket::_send(char *buf,int len) {
 }
 
 int ServerSocket::_recv(char *buf,int *len) {
-    int actLen = 0;
-    if ( (actLen = recv(_connection, buf,strlen(buf)+1,0))!=SOCKET_ERROR ) {
+    if ( (*len = recv(_connection, buf, 128, 0))!=SOCKET_ERROR ) {
         _log(RECV,buf,*len);
     }
-    return actLen;
+    return *len;
 }
 
 void ServerSocket::_log(int dir,char *buf,int len) {
-    printf("%s : %s\n", (dir==SEND)?"SEND":"RECV", buf);
+    printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
 }

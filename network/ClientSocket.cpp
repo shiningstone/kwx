@@ -40,5 +40,5 @@ int ClientSocket::_recv(char *buf,int *len) {
 }
 
 void ClientSocket::_log(int dir,char *buf,int len) {
-    printf("%s : %s\n", (dir==SEND)?"SEND":"RECV", buf);
+    printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
 }
