@@ -5,6 +5,11 @@
 
 #include "./CTestCase.h"
 
+CTestCase::CTestCase() {
+	memset( _buff, 0, SOCK_BUFF_LEN );
+	_buffLen = 0;
+}
+
 void CTestCase::Start() {
     int err;
     WORD versionRequired;

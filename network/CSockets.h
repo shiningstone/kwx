@@ -4,6 +4,8 @@
 
 #include <WINSOCK2.H>
 
+#define SOCK_BUFF_LEN 128
+
 class CSocket {
 public:
     virtual void Start() = 0;

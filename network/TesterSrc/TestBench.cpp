@@ -5,42 +5,39 @@
 #include "./../CSockets.h"
 #include "./CTestCase.h"
 
-class TestSingle : public CTestCase {
-	virtual void ServerActions() ;
-	virtual void ClientActions() ;
+class TestSingleSendAndRecv : public CTestCase {
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send("1",strlen("1"));
+
+		SERVER.Recv(_buff,&_buffLen);
+		assert(!strcmp(_buff,"2"));
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		CLIENT.Start();
+
+		CLIENT.Recv(_buff,&_buffLen);
+		assert( !strcmp(_buff,"1") );
+
+		CLIENT.Send("2",strlen("2"));
+
+		CLIENT.Stop();
+	}
 };
 
-void TestSingle::ServerActions() {
-	SERVER.Start();
-
-	char recvBuf[100] = {0};
-    int recvLen = 0;
-
-    SERVER.Send("1",strlen("1"));
-
-    SERVER.Recv(recvBuf,&recvLen);
-	assert(!strcmp(recvBuf,"2"));
-
-	SERVER.Stop();
-}
-
-void TestSingle::ClientActions() {
-	CLIENT.Start();
-
-	char buf[128] = {0};
-    int  len = 0;
-
-    CLIENT.Recv(buf,&len);
-	assert( !strcmp(buf,"1") );
-
-	CLIENT.Send("2",strlen("2"));
-
-	CLIENT.Stop();
-}
+class TestEmpty : public CTestCase {
+	virtual void ServerActions() {
+	}
+	virtual void ClientActions() {
+	}
+};
 
 void startRun() {
-	TestSingle aCase;
-
+	TestSingleSendAndRecv aCase;
 	aCase.Start();
 	aCase.Execute();
 	aCase.Stop();
