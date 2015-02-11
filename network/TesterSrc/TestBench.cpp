@@ -1,33 +1,48 @@
 #include <thread>
 #include <WINSOCK2.H>
 #pragma comment(lib,"ws2_32.lib")
+#include <assert.h>
+#include "./../CSockets.h"
+#include "./CTestCase.h"
 
-extern void VirtualServer();
-extern void VirtualClient();
+class TestSingle : public CTestCase {
+	virtual void ServerActions() ;
+	virtual void ClientActions() ;
+};
 
-void enableSocket() {
-    int err;
-    WORD versionRequired;
-    WSADATA wsaData;
-    versionRequired=MAKEWORD(1,1);
-    err=WSAStartup(versionRequired,&wsaData);//协议库的版本信息
-    if (!err)
-    {
-        printf("嵌套字已经打开!\n");
-    }
-    else
-    {
-        printf("嵌套字打开失败!\n");
-        return;//结束
-    }
+void TestSingle::ServerActions() {
+	SERVER.Start();
+
+	char recvBuf[100] = {0};
+    int recvLen = 0;
+
+    SERVER.Send("1",strlen("1"));
+
+    SERVER.Recv(recvBuf,&recvLen);
+	assert(!strcmp(recvBuf,"2"));
+
+	SERVER.Stop();
+}
+
+void TestSingle::ClientActions() {
+	CLIENT.Start();
+
+	char buf[128] = {0};
+    int  len = 0;
+
+    CLIENT.Recv(buf,&len);
+	assert( !strcmp(buf,"1") );
+
+	CLIENT.Send("2",strlen("2"));
+
+	CLIENT.Stop();
 }
 
 void startRun() {
-    enableSocket();
+	TestSingle aCase;
 
-    std::thread server(VirtualServer);
-    std::thread client(VirtualClient);
-
-    server.join();
-    client.join();
+	aCase.Start();
+	aCase.Execute();
+	aCase.Stop();
 }
+
