@@ -1,4 +1,5 @@
 #include "./../CSockets.h"
+#include "./../GameSocket.h"
 
 class CTestCase {
 public:
@@ -14,6 +15,7 @@ public:
 protected:
 	ServerSocket SERVER;
 	ClientSocket CLIENT;
+	CGameSocket  GAME_CLIENT;
 
 	virtual void ServerActions() = 0;
 	virtual void ClientActions() = 0;

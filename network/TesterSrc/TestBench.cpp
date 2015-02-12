@@ -3,6 +3,7 @@
 #pragma comment(lib,"ws2_32.lib")
 #include <assert.h>
 #include "./../CSockets.h"
+#include "./../GameSocket.h"
 #include "./CTestCase.h"
 
 class TestSingleSendAndRecv : public CTestCase {
@@ -29,17 +30,46 @@ class TestSingleSendAndRecv : public CTestCase {
 	}
 };
 
+class TestGameSocket : public CTestCase {
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send("ABCDEFGH",4);
+		SERVER.Recv(_buff,&_buffLen);
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		CGameSocket client;
+		client.Create(_SERVER_IP, 6000);
+		
+		client.ForceSend("abcdefg",8);
+
+		_buffLen = 2;
+		memset(_buff,0,8);
+		client.ForceRecv(_buff,_buffLen);
+	}
+};
+
 class TestEmpty : public CTestCase {
 	virtual void ServerActions() {
 	}
+
 	virtual void ClientActions() {
 	}
 };
 
 void startRun() {
-	TestSingleSendAndRecv aCase;
-	aCase.Start();
-	aCase.Execute();
-	aCase.Stop();
+	CTestCase *aCase;
+	aCase = new TestSingleSendAndRecv();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+	aCase = new TestGameSocket();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
 }
 

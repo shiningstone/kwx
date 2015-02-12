@@ -2,21 +2,6 @@
 #include "stdio.h"
 #include "CSockets.h"
 
-void CSocket::Start() {
-    SOCKET serSocket=socket(AF_INET,SOCK_STREAM,0);
-
-    SOCKADDR_IN addr;
-    addr.sin_family=AF_INET;
-    addr.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
-    addr.sin_port=htons(6000);
-  
-    bind( serSocket, (SOCKADDR*)&addr, sizeof(SOCKADDR) );
-    listen( serSocket, 5 );
-  
-    int len=sizeof(SOCKADDR);
-    _connection=accept( serSocket, (SOCKADDR*)&_client, &len );
-}
-
 void CSocket::Stop() {
     closesocket(_connection);
 }
@@ -43,33 +28,57 @@ int CSocket::_recv(char *buf,int *len) {
     return *len;
 }
 
+void CSocket::_log(const char *fmt,...) {
+    va_list arg;
+
+    va_start(arg,fmt);
+    printf(fmt,arg);
+    va_end(arg);
+}
+
 void CSocket::_log(int dir,char *buf,int len) {
     printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
 }
 
-
+/******************************************************
+	ServerSocket
+******************************************************/
 void ServerSocket::Start() {
     SOCKET serSocket=socket(AF_INET,SOCK_STREAM,0);
 
-    SOCKADDR_IN addr;
-    addr.sin_family=AF_INET;
-    addr.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
-    addr.sin_port=htons(6000);
+    SOCKADDR_IN local;
+    local.sin_family=AF_INET;
+    local.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
+    local.sin_port=htons(6000);
   
-    bind( serSocket, (SOCKADDR*)&addr, sizeof(SOCKADDR) );
-    listen( serSocket, 5 );
+	if ( bind( serSocket, (SOCKADDR*)&local, sizeof(SOCKADDR) ) == 0 ) {
+	    listen( serSocket, 5 );
+	} else {
+		_log("%s : bind() error!\n",__FUNCTION__);
+	}
   
-    int len=sizeof(SOCKADDR);
-    _connection=accept( serSocket, (SOCKADDR*)&_client, &len );
+	SOCKADDR client = {0};
+    int      len=sizeof(SOCKADDR);
+    _connection = accept( serSocket, (SOCKADDR*)&client, &len );
+	if( _connection==INVALID_SOCKET ) {
+		_log("%s : accept() error!\n",__FUNCTION__);
+	}
 }
 
+/******************************************************
+	ClientSocket
+******************************************************/
 void ClientSocket::Start() {
     _connection = socket(AF_INET,SOCK_STREAM,0);
 
-    SOCKADDR_IN _client;
-    _client.sin_addr.S_un.S_addr=inet_addr(_SERVER_IP);
-    _client.sin_family=AF_INET;
-    _client.sin_port=htons(6000);
+    SOCKADDR_IN server;
+    server.sin_addr.S_un.S_addr=inet_addr(_SERVER_IP);
+    server.sin_family=AF_INET;
+    server.sin_port=htons(6000);
 
-    connect( _connection, (SOCKADDR*)&_client, sizeof(SOCKADDR) );
+	if ( connect( _connection, (SOCKADDR*)&server, sizeof(SOCKADDR) )== 0 ) {
+		return;
+	} else {
+		_log("%s : connect() error!\n",__FUNCTION__);
+  	}
 }

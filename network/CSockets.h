@@ -15,10 +15,10 @@ public:
     int Recv(char *buf,int *len);
 protected:
     SOCKET _connection;
-    SOCKADDR_IN _client;
 
     int _send(char *buf,int len);
     int _recv(char *buf,int *len);
+    void _log(const char *fmt,...);
     void _log(int dir,char *buf,int len);
 
     static const int SEND = 0;
