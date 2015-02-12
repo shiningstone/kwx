@@ -44,9 +44,9 @@ int CSocket::_send(char *buf,int len) {
 }
 
 int CSocket::_recv(char *buf,int *len) {
-    if ( (*len = recv(_connection, buf, 128, 0))!=SOCKET_ERROR ) {
-        _log(RECV,buf,*len);
+    while ( (*len = recv(_connection, buf, 128, 0))==SOCKET_ERROR ) {
     }
+    _log(RECV,buf,*len);
     return *len;
 }
 
@@ -61,6 +61,20 @@ void CSocket::_log(const char *fmt,...) {
 void CSocket::_log(int dir,char *buf,int len) {
     printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
 }
+
+bool CSocket::hasError()  
+{  
+#ifdef WIN32   
+    if(WSAGetLastError() != WSAEWOULDBLOCK) {  
+#else   
+    if(errno != EINPROGRESS && errno != EAGAIN) {  
+#endif   
+        return true;  
+    }  
+  
+    return false;  
+}  
+  
 
 /******************************************************
 	ServerSocket
@@ -95,15 +109,60 @@ void ServerSocket::Start() {
 void ClientSocket::Start() {
 	Init();
 
-	_connection = socket(AF_INET,SOCK_STREAM,0);
+	_keepAlive   = false;
+	_blockSecond = BLOCKSECONDS;
 
-    SOCKADDR_IN server;
+	_connection = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);  
+    if(_connection == INVALID_SOCKET) {  
+        Stop();  
+    }  
+
+	// 设置SOCKET为KEEPALIVE
+    if(_keepAlive) {
+        int optval=1;  
+        if(setsockopt(_connection, SOL_SOCKET, SO_KEEPALIVE, (char *) &optval, sizeof(optval))) {  
+            Stop();  
+        }  
+    }  
+
+	// 设置为非阻塞方式   
+#ifdef WIN32   
+    DWORD nMode = 1;  
+    if (ioctlsocket(_connection, FIONBIO, &nMode) == SOCKET_ERROR) {  
+        Stop();  
+    }  
+#else   
+    fcntl(_connection, F_SETFL, O_NONBLOCK);  
+#endif   
+
+	SOCKADDR_IN server;
     server.sin_addr.S_un.S_addr=inet_addr(_SERVER_IP);
     server.sin_family=AF_INET;
     server.sin_port=htons(SOCKET_PORT);
 
-	if ( connect( _connection, (SOCKADDR*)&server, sizeof(SOCKADDR) )== 0 ) {
-		return;
+	int result = connect( _connection, (SOCKADDR*)&server, sizeof(SOCKADDR) );
+	if ( result==SOCKET_ERROR ) {
+        if (hasError()) {  
+            Stop();  
+        }  else  {// WSAWOLDBLOCK   
+            timeval timeout;  
+            timeout.tv_sec  = _blockSecond;  
+            timeout.tv_usec = 0;  
+            fd_set writeset, exceptset;  
+            FD_ZERO(&writeset);  
+            FD_ZERO(&exceptset);  
+            FD_SET(_connection, &writeset);  
+            FD_SET(_connection, &exceptset);  
+  
+            int ret = select(FD_SETSIZE, NULL, &writeset, &exceptset, &timeout);  
+            if (ret == 0 || ret < 0) {  
+                Stop();  
+            } else  {  
+                if( FD_ISSET(_connection, &exceptset) ) {    // or (!FD_ISSET(m_sockClient, &writeset)   
+                    Stop();  
+                }  
+            }  
+        }  
 	} else {
 		_log("%s : connect() error!\n",__FUNCTION__);
   	}

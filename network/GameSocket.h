@@ -13,7 +13,6 @@
 #define SOCKET int   
 #define SOCKET_ERROR -1   
 #define INVALID_SOCKET -1   
-  
 #endif   
 
 #define _MAX_MSGSIZE 16 * 1024       // 暂定一个消息最大为16k   

@@ -9,9 +9,13 @@ public:
 	void Stop();
 	int Execute();
 
-	char _buff[SOCK_BUFF_LEN];
-	int  _buffLen;
+	char _clientBuff[SOCK_BUFF_LEN];
+	int  _clientBuffLen;
+	char _serverBuff[SOCK_BUFF_LEN];
+	int  _serverBuffLen;
 
+	void ClearClientBuf();
+	void ClearServerBuf();
 protected:
 	ServerSocket SERVER;
 	ClientSocket CLIENT;

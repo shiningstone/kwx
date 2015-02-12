@@ -5,9 +5,19 @@
 
 #include "./CTestCase.h"
 
+void CTestCase::ClearClientBuf() {
+	memset( _clientBuff, 0, SOCK_BUFF_LEN );
+	_clientBuffLen = 0;
+}
+
+void CTestCase::ClearServerBuf() {
+	memset( _serverBuff, 0, SOCK_BUFF_LEN );
+	_serverBuffLen = 0;
+}
+
 CTestCase::CTestCase() {
-	memset( _buff, 0, SOCK_BUFF_LEN );
-	_buffLen = 0;
+	ClearClientBuf();
+	ClearServerBuf();
 }
 
 void CTestCase::Start() {

@@ -141,13 +141,10 @@ void CGameSocket::ForceSend(void* pBuf, int nSize) {
 }
 
 void CGameSocket::ForceRecv(void* pBuf, int nSize) {
-	while(1) {
-		recv(m_sockClient, (char *)pBuf, nSize, 0); 
-		if(((char *)pBuf)[0]!=0) {
-			_log(RECV,(char *)pBuf,0);
-			memset(pBuf,0,8);
-		}
-	}
+	int len = 0;
+	while ( (len=recv(m_sockClient, (char *)pBuf, nSize, 0))==SOCKET_ERROR  ){
+    }
+    _log(RECV,(char *)pBuf,len);
 }
 
 bool CGameSocket::SendMsg(void* pBuf, int nSize)  

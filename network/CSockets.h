@@ -2,8 +2,24 @@
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
 
-#include <WINSOCK2.H>
+#pragma once   
+  
+#ifdef WIN32   
+#include <windows.h>   
+#include <WinSock.h>   
+#else   
+#include <sys/socket.h>   
+#include <fcntl.h>   
+#include <errno.h>   
+#include <netinet/in.h>   
+#include <arpa/inet.h>   
+  
+#define SOCKET int   
+#define SOCKET_ERROR -1   
+#define INVALID_SOCKET -1   
+#endif   
 
+#define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCK_BUFF_LEN 128
 
 class CSocket {
@@ -13,11 +29,14 @@ public:
 
 	static void Init();
 	static void Quit();
+	static bool hasError();
 
     int Send(char *buf,int len);
     int Recv(char *buf,int *len);
 protected:
     SOCKET _connection;
+	bool   _keepAlive;
+	int    _blockSecond;
 
 	static bool gInited;
 

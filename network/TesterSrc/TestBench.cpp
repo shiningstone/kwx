@@ -10,10 +10,11 @@ class TestSingleSendAndRecv : public CTestCase {
 	virtual void ServerActions() {
 		SERVER.Start();
 
-		SERVER.Send("1",strlen("1"));
+		SERVER.Send("to client",strlen("to client"));
 
-		SERVER.Recv(_buff,&_buffLen);
-		assert(!strcmp(_buff,"2"));
+		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		assert(!strcmp(_serverBuff,"to server"));
+		ClearServerBuf();
 
 		SERVER.Stop();
 	}
@@ -21,10 +22,11 @@ class TestSingleSendAndRecv : public CTestCase {
 	virtual void ClientActions() {
 		CLIENT.Start();
 
-		CLIENT.Recv(_buff,&_buffLen);
-		assert( !strcmp(_buff,"1") );
+		CLIENT.Recv(_clientBuff,&_clientBuffLen);
+		assert( !strcmp(_clientBuff,"to client") );
+		ClearClientBuf();
 
-		CLIENT.Send("2",strlen("2"));
+		CLIENT.Send("to server",strlen("to server"));
 
 		CLIENT.Stop();
 	}
@@ -34,8 +36,11 @@ class TestGameSocket : public CTestCase {
 	virtual void ServerActions() {
 		SERVER.Start();
 
-		SERVER.Send("ABCDEFGH",8);
-		SERVER.Recv(_buff,&_buffLen);
+		_serverBuffLen = 10;
+		memset(_serverBuff,0,8);
+		SERVER.Send("to client",strlen("to client"));
+		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		ClearServerBuf();
 
 		SERVER.Stop();
 	}
@@ -44,11 +49,11 @@ class TestGameSocket : public CTestCase {
 		CGameSocket client;
 		client.Create(_SERVER_IP, 6000);
 		
-		client.ForceSend("abcdefgh",8);
+		client.ForceSend("to server",strlen("to client"));
 
-		_buffLen = 8;
-		memset(_buff,0,8);
-		client.ForceRecv(_buff,_buffLen);
+		_clientBuffLen = 10;
+		client.ForceRecv(_clientBuff,_clientBuffLen);
+		ClearClientBuf();
 	}
 };
 
@@ -72,5 +77,7 @@ void startRun() {
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
+
+	while(1);
 }
 
