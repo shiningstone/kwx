@@ -34,7 +34,7 @@ class TestGameSocket : public CTestCase {
 	virtual void ServerActions() {
 		SERVER.Start();
 
-		SERVER.Send("ABCDEFGH",4);
+		SERVER.Send("ABCDEFGH",8);
 		SERVER.Recv(_buff,&_buffLen);
 
 		SERVER.Stop();
@@ -44,9 +44,9 @@ class TestGameSocket : public CTestCase {
 		CGameSocket client;
 		client.Create(_SERVER_IP, 6000);
 		
-		client.ForceSend("abcdefg",8);
+		client.ForceSend("abcdefgh",8);
 
-		_buffLen = 2;
+		_buffLen = 8;
 		memset(_buff,0,8);
 		client.ForceRecv(_buff,_buffLen);
 	}

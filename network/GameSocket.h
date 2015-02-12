@@ -16,10 +16,6 @@
   
 #endif   
 
-#ifndef CHECKF
-#define CHECKF(x) 
-#endif
-
 #define _MAX_MSGSIZE 16 * 1024       // 暂定一个消息最大为16k   
 #define BLOCKSECONDS 30              // INIT函数阻塞时间   
 #define INBUFSIZE    (3)       //? 具体尺寸根据剖面报告调整   接收数据的缓存   
@@ -30,7 +26,7 @@ public:
     CGameSocket(void);  
     bool    Create(const char* pszServerIP, int nServerPort, int nBlockSec = BLOCKSECONDS, bool bKeepAlive = false);  
     bool    SendMsg(void* pBuf, int nSize);  
-    bool    ReceiveMsg(void* pBuf, int* nSize);  
+    bool    ReceiveMsg(void* pBuf, int &nSize);  
     bool    Flush(void);  
     bool    Check(void);  
     void    Destroy(void);  

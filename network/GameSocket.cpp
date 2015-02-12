@@ -1,6 +1,25 @@
 #include "GameSocket.h"   
 #include "stdio.h"
 
+#define CHECK_VALID_SOCKET(x) do { \
+    if ((x) == INVALID_SOCKET) { \
+        return false; \
+    } \
+} while(0)
+
+#define CHECK_VALID_BUFF(buf,size) do { \
+    if((buf) == 0 || (size) <= 0) { \
+        return false; \
+    } \
+} while(0)
+
+#define CHECKF(x) do { \
+	if( !(x) ) { \
+		printf("CHECKF FAIL! %s %s",#x,__FILE__,__LINE__); \
+		return 0; \
+	} \
+} while(0)
+
 CGameSocket::CGameSocket()  
 {   
     memset(m_bufOutput, 0, sizeof(m_bufOutput));  
@@ -133,39 +152,28 @@ void CGameSocket::ForceRecv(void* pBuf, int nSize) {
 
 bool CGameSocket::SendMsg(void* pBuf, int nSize)  
 {  
-    if(pBuf == 0 || nSize <= 0) {  
-        return false;  
-    }  
+	CHECK_VALID_SOCKET(m_sockClient);
+	CHECK_VALID_BUFF(pBuf,nSize);
   
-    if (m_sockClient == INVALID_SOCKET) {  
-        return false;  
-    }  
-  
-	//m_nOutbufLen += nSize;
-    // 检测BUF溢出   
-    if(m_nOutbufLen > OUTBUFSIZE) {  
-        Flush();  
-        if(m_nOutbufLen > OUTBUFSIZE) {  
+    if(m_nOutbufLen + nSize > OUTBUFSIZE) {           // BUF满
+        Flush();                                      // 立即发送OUTBUF中的数据，以清空OUTBUF。   
+        if(m_nOutbufLen + nSize > OUTBUFSIZE) {       // 出错了   
             Destroy();  
             return false;  
         }  
     }  
-    // 数据添加到BUF尾   
-    memcpy(m_bufOutput + m_nOutbufLen, pBuf, nSize);  
+    
+    memcpy(m_bufOutput + m_nOutbufLen, pBuf, nSize);  // 数据添加到BUF尾   
     m_nOutbufLen += nSize;  
+
     return true;  
 }  
   
-bool CGameSocket::ReceiveMsg(void* pBuf, int* nSize)  
+bool CGameSocket::ReceiveMsg(void* pBuf, int& nSize)  
 {  
-    if(pBuf == NULL || *nSize <= 0) {  
-        return false;  
-    }  
+	CHECK_VALID_SOCKET(m_sockClient);
+	CHECK_VALID_BUFF(pBuf,nSize);
       
-    if (m_sockClient == INVALID_SOCKET) {  
-        return false;  
-    }  
-  
     // 检查是否有一个消息(小于2则无法获取到消息长度)   
     if(m_nInbufLen < 2) {  
         //  如果没有请求成功  或者   如果没有数据则直接返回   
@@ -202,11 +210,11 @@ bool CGameSocket::ReceiveMsg(void* pBuf, int* nSize)
   
         // 再拷贝环形缓冲区头部的剩余部分   
         memcpy((unsigned char *)pBuf + copylen, m_bufInput, packsize - copylen);  
-        *nSize = packsize;  
+        nSize = packsize;  
     } else {  
         // 消息没有回卷，可以一次拷贝出去   
         memcpy(pBuf, m_bufInput + m_nInbufStart, packsize);  
-        *nSize = packsize;  
+        nSize = packsize;  
     }  
   
     // 重新计算环形缓冲区头部位置   
@@ -236,24 +244,23 @@ bool CGameSocket::recvFromSock(void)
     }  
   
     // 接收第一段数据   
-    int savelen, savepos;           // 数据要保存的长度和位置   
-    if(m_nInbufStart + m_nInbufLen < INBUFSIZE)  {   // INBUF中的剩余空间有回绕   
+    int savelen, savepos;                                           // 数据要保存的长度和位置   
+    if(m_nInbufStart + m_nInbufLen < INBUFSIZE)  {                  // INBUF中的剩余空间有回绕   
         savelen = INBUFSIZE - (m_nInbufStart + m_nInbufLen);        // 后部空间长度，最大接收数据的长度   
     } else {  
-        savelen = INBUFSIZE - m_nInbufLen;  
+        savelen = INBUFSIZE - m_nInbufLen;                          // jiangbo : 前部空间
     }  
   
     // 缓冲区数据的末尾   
     savepos = (m_nInbufStart + m_nInbufLen) % INBUFSIZE;  
     CHECKF(savepos + savelen <= INBUFSIZE);  
+
     int inlen = recv(m_sockClient, m_bufInput + savepos, savelen, 0);  
-    if(inlen > 0) {  
+    if(inlen > 0) {                                                 // 有接收到数据   
 		_log(RECV, m_bufInput + savepos, inlen);
 
-        // 有接收到数据   
         m_nInbufLen += inlen;  
-          
-        if (m_nInbufLen > INBUFSIZE) {  
+        if (m_nInbufLen > INBUFSIZE) {                              //jiangbo : 不可能发生的情况：因为 inlen<=savelen
             return false;  
         }  
   
@@ -262,9 +269,11 @@ bool CGameSocket::recvFromSock(void)
             int savelen = INBUFSIZE - m_nInbufLen;  
             int savepos = (m_nInbufStart + m_nInbufLen) % INBUFSIZE;  
             CHECKF(savepos + savelen <= INBUFSIZE);  
+
             inlen = recv(m_sockClient, m_bufInput + savepos, savelen, 0);  
             if(inlen > 0) {  
 				_log(RECV, m_bufInput + savepos, inlen);
+
                 m_nInbufLen += inlen;  
                 if (m_nInbufLen > INBUFSIZE) {  
                     return false;  
@@ -296,23 +305,19 @@ bool CGameSocket::recvFromSock(void)
   
 bool CGameSocket::Flush(void)       //? 如果 OUTBUF > SENDBUF 则需要多次SEND（）   
 {  
-    if (m_sockClient == INVALID_SOCKET) {  
-        return false;  
-    }  
+	CHECK_VALID_SOCKET(m_sockClient);
   
     if(m_nOutbufLen <= 0) {  
         return true;  
     }  
       
     // 发送一段数据   
-    int outsize;  
-    outsize = send(m_sockClient, m_bufOutput, m_nOutbufLen, 0);  
-    
+    int outsize = send(m_sockClient, m_bufOutput, m_nOutbufLen, 0);  
 	if(outsize > 0) {  
 		_log(SEND,m_bufOutput,m_nOutbufLen);
         // 删除已发送的部分   
-        if(m_nOutbufLen - outsize > 0) {  
-            memcpy(m_bufOutput, m_bufOutput + outsize, m_nOutbufLen - outsize);  
+        if(m_nOutbufLen - outsize > 0) {                                           //jiangbo : outsize可能大于m_nOutbufLen？
+            memcpy(m_bufOutput, m_bufOutput + outsize, m_nOutbufLen - outsize);    //jiangbo : 效率？
         }  
   
         m_nOutbufLen -= outsize;  
@@ -332,9 +337,7 @@ bool CGameSocket::Flush(void)       //? 如果 OUTBUF > SENDBUF 则需要多次SEND（）
   
 bool CGameSocket::Check(void)  
 {  
-    if (m_sockClient == INVALID_SOCKET) {  
-        return false;  
-    }  
+	CHECK_VALID_SOCKET(m_sockClient);
   
     char buf[1];  
     int ret = recv(m_sockClient, buf, 1, MSG_PEEK);  
