@@ -20,6 +20,10 @@
 	} \
 } while(0)
 
+void CGameSocket::_log(int dir,char *buf,int len) {
+    printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
+}
+
 CGameSocket::CGameSocket()  
 {   
     memset(m_bufOutput, 0, sizeof(m_bufOutput));  
@@ -35,10 +39,6 @@ void CGameSocket::closeSocket()
     close(m_sockClient);  
 #endif   
 }  
-  
-void CGameSocket::_log(int dir,char *buf,int len) {
-    printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
-}
 
 bool CGameSocket::Create(const char* pszServerIP, int nServerPort, int nBlockSec, bool bKeepAlive /*= FALSE*/)  
 {  
@@ -48,7 +48,7 @@ bool CGameSocket::Create(const char* pszServerIP, int nServerPort, int nBlockSec
   
 #ifdef WIN32   
     WSADATA wsaData;  
-    WORD    version = MAKEWORD(2, 0);  
+    WORD    version = MAKEWORD(2, 0);
     if (WSAStartup(version, &wsaData) != 0) {  
         return false;  
     }  
@@ -311,7 +311,6 @@ bool CGameSocket::Flush(void)       //? 如果 OUTBUF > SENDBUF 则需要多次SEND（）
         return true;  
     }  
       
-    // 发送一段数据   
     int outsize = send(m_sockClient, m_bufOutput, m_nOutbufLen, 0);  
 	if(outsize > 0) {  
 		_log(SEND,m_bufOutput,m_nOutbufLen);

@@ -62,6 +62,7 @@ class TestEmpty : public CTestCase {
 
 void startRun() {
 	CTestCase *aCase;
+
 	aCase = new TestSingleSendAndRecv();
 	aCase->Start();
 	aCase->Execute();

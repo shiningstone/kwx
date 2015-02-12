@@ -2,6 +2,28 @@
 #include "stdio.h"
 #include "CSockets.h"
 
+bool CSocket::gInited = false;
+
+void CSocket::Init() {
+	if(!gInited) {
+		WORD    versionRequired = MAKEWORD(2,0);
+		WSADATA wsaData;
+
+		if (!WSAStartup(versionRequired,&wsaData)) {
+			printf("WSAStartup successfully!\n");
+			gInited = true;
+		} else {
+			printf("WSAStartup failed!\n");
+			gInited = false;
+		}
+	}
+}
+
+void CSocket::Quit() {
+    WSACleanup();
+	gInited = false;
+}
+
 void CSocket::Stop() {
     closesocket(_connection);
 }
@@ -44,12 +66,14 @@ void CSocket::_log(int dir,char *buf,int len) {
 	ServerSocket
 ******************************************************/
 void ServerSocket::Start() {
+	Init();
+
     SOCKET serSocket=socket(AF_INET,SOCK_STREAM,0);
 
     SOCKADDR_IN local;
     local.sin_family=AF_INET;
     local.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
-    local.sin_port=htons(6000);
+    local.sin_port=htons(SOCKET_PORT);
   
 	if ( bind( serSocket, (SOCKADDR*)&local, sizeof(SOCKADDR) ) == 0 ) {
 	    listen( serSocket, 5 );
@@ -69,12 +93,14 @@ void ServerSocket::Start() {
 	ClientSocket
 ******************************************************/
 void ClientSocket::Start() {
-    _connection = socket(AF_INET,SOCK_STREAM,0);
+	Init();
+
+	_connection = socket(AF_INET,SOCK_STREAM,0);
 
     SOCKADDR_IN server;
     server.sin_addr.S_un.S_addr=inet_addr(_SERVER_IP);
     server.sin_family=AF_INET;
-    server.sin_port=htons(6000);
+    server.sin_port=htons(SOCKET_PORT);
 
 	if ( connect( _connection, (SOCKADDR*)&server, sizeof(SOCKADDR) )== 0 ) {
 		return;

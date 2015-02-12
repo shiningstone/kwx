@@ -11,10 +11,15 @@ public:
     virtual void Start() = 0;
     void Stop();
 
+	static void Init();
+	static void Quit();
+
     int Send(char *buf,int len);
     int Recv(char *buf,int *len);
 protected:
     SOCKET _connection;
+
+	static bool gInited;
 
     int _send(char *buf,int len);
     int _recv(char *buf,int *len);
@@ -23,6 +28,7 @@ protected:
 
     static const int SEND = 0;
     static const int RECV = 1;
+	static const int SOCKET_PORT = 6000;
 };
 
 class ServerSocket : public CSocket {

@@ -11,24 +11,11 @@ CTestCase::CTestCase() {
 }
 
 void CTestCase::Start() {
-    int err;
-    WORD versionRequired;
-    WSADATA wsaData;
-    versionRequired=MAKEWORD(1,1);
-    err=WSAStartup(versionRequired,&wsaData);
-    if (!err)
-    {
-        printf("嵌套字已经打开!\n");
-    }
-    else
-    {
-        printf("嵌套字打开失败!\n");
-        return;//结束
-    }
+	CSocket::Init();
 }
 
 void CTestCase::Stop() {
-    WSACleanup();
+    CSocket::Quit();
 }
 
 int CTestCase::Execute() {
