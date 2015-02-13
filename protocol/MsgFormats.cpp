@@ -57,6 +57,8 @@ int UpHeader::Serialize(INT8U *output) {
 }
 
 int UpHeader::Deserialize(const INT8U *input) {
+    memcpy(_pchc,input,3);
+
 	_protocol     = input[PROTOCOL];
 	_userId       = _ntohl( *(INT32U *)(input+USER_ID) );
     _language     = *(input+LANGUAGE);
@@ -68,5 +70,28 @@ int UpHeader::Deserialize(const INT8U *input) {
     _size         = _ntohs( *(INT16U *)(input+SIZE) );
 
     return UP_HEADER_LEN; 
+}
+
+const INT8U DnHeader::PCHC[3] = {'K','W','X',};
+
+int DnHeader::Serialize(INT8U *output) {
+    memcpy(output,PCHC,3);
+    *((INT16U *)(output+REQUEST_CODE)) = _ntohs(_requestCode);
+    output[LEVEL] = _level;
+    *((INT16U *)(output+SIZE)) = _ntohs(_size);
+
+    memset(output+8,0,DN_HEADER_LEN-8);
+
+    return DN_HEADER_LEN;
+}
+
+int DnHeader::Deserialize(const INT8U *input) {
+    memcpy(_pchc,input,3);
+
+    _requestCode  = _ntohs( *(INT16U *)(input+REQUEST_CODE) );
+    _level        = *(input+LEVEL);
+    _size         = _ntohs( *(INT16U *)(input+SIZE) );
+
+    return DN_HEADER_LEN; 
 }
 

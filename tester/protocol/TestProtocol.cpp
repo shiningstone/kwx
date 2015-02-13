@@ -58,11 +58,52 @@ public:
     }
 };
 
+class TestDnHeader : public CTestCase {
+public:
+    virtual int Execute() {
+		//解包测试
+        const INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
+            'K','W','X',           //KWX
+            0x01,0x02,             //request code
+            0x03,                  //level
+            0x04,0x05,             //package size
+            0,                     //reserved
+        };
+        DnHeader aHeader;
+
+		aHeader.Deserialize(msgInNetwork);
+		assert(aHeader._requestCode==0x0102);
+		assert(aHeader._level==0x03);
+		assert(aHeader._size==0x0405);
+		
+		//组包测试
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DnHeader bHeader;
+		bHeader._requestCode=0x0102;
+        bHeader._level=0x03;
+        bHeader._size=0x0405;
+
+        len = bHeader.Serialize(buf);
+
+        assert(len==20);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
 /********************************************************************
 	Main entrance
 *********************************************************************/
 void startRun() {
     CTestCase *aCase = new TestUpHeader();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestDnHeader();
     aCase->Start();
     aCase->Execute();
     aCase->Stop();

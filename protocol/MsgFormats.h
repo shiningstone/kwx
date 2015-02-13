@@ -41,5 +41,25 @@ private:
 	static const int SIZE          = REQUEST_CODE + 2;
 };
 
+class DnHeader {
+public:
+    int Serialize(INT8U *output);
+    int Deserialize(const INT8U *input);
+
+    INT8U    _pchc[3];
+    INT16U   _requestCode;
+    INT8U    _level;
+    INT16U   _size;
+
+    static const int DN_HEADER_LEN     = 20;
+private:
+    static INT8U _reference[]; 
+
+    static const INT8U PCHC[3];
+	static const int REQUEST_CODE  = 3;
+    static const int LEVEL         = REQUEST_CODE + 2;
+	static const int SIZE          = LEVEL + 1;
+};
+
 
 #endif
