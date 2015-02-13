@@ -30,7 +30,7 @@ void CSocket::Stop() {
 
 int CSocket::Send(char *buf,int len) {
     int actLen = _send( buf, len );
-    _log(SEND,buf,len);
+    _log(SEND,buf,actLen);
     return actLen;
 }
 
@@ -39,7 +39,7 @@ int CSocket::Recv(char *buf,int *len) {
 }
 
 int CSocket::_send(char *buf,int len) {
-    int actLen = send(_connection, buf, strlen(buf)+1, 0 );
+    int actLen = send(_connection, buf, len, 0 );
     return actLen;
 }
 
@@ -58,8 +58,22 @@ void CSocket::_log(const char *fmt,...) {
     va_end(arg);
 }
 
+#include <ctype.h>
 void CSocket::_log(int dir,char *buf,int len) {
-    printf("%s (%d): %s\n", (dir==SEND)?"SEND":"RECV", len, buf);
+	printf("%s (%d): ", (dir==SEND)?"SEND":"RECV", len);
+
+	if( isalnum(buf[0]) ) {
+	    printf("%s\n", buf);
+	} else {
+		printf("\n\t");
+		for(int i=0; i<len; i++) {
+			printf("%02x ",buf[i]);
+			if( (i+1)%16==0 ) {
+				printf("\n\t");
+			}
+		}
+		printf("\n");
+	}
 }
 
 bool CSocket::hasError()  

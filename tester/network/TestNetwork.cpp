@@ -2,11 +2,11 @@
 #include <WINSOCK2.H>
 #pragma comment(lib,"ws2_32.lib")
 #include <assert.h>
-#include "./../CSockets.h"
-#include "./../GameSocket.h"
-#include "./CTestCase.h"
+#include "./../../network/CSockets.h"
+#include "./../../network/GameSocket.h"
+#include "./CTestNetwork.h"
 
-class TestSingleSendAndRecv : public CTestCase {
+class TestSingleSendAndRecv : public CTestNetwork {
 	virtual void ServerActions() {
 		SERVER.Start();
 
@@ -32,7 +32,7 @@ class TestSingleSendAndRecv : public CTestCase {
 	}
 };
 
-class TestGameSocket : public CTestCase {
+class TestGameSocket : public CTestNetwork {
 	virtual void ServerActions() {
 		SERVER.Start();
 
@@ -57,7 +57,60 @@ class TestGameSocket : public CTestCase {
 	}
 };
 
-class TestEmpty : public CTestCase {
+class TestByteOrder : public CTestNetwork {
+	#pragma pack(1)
+	typedef struct {
+		char a[3];
+		int  b;
+		char c;
+		short d;
+	} tStruct;
+	#pragma pack()
+
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		int a = 0x01020304;
+		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		assert(!memcmp(_serverBuff,(char *)&a,sizeof(int)));
+		assert(_serverBuffLen==4);
+		ClearServerBuf();
+
+		tStruct t = {
+			{0xa,0xb,0xc},
+			0x01020304,
+			0x05,
+			0x06,
+		};
+		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		assert(!memcmp(_serverBuff,(char *)&t,sizeof(t)));
+		assert(_serverBuffLen==10);
+		ClearServerBuf();
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		CLIENT.Start();
+
+		//test int
+		int a = 0x01020304;
+		CLIENT.Send((char *)&a,sizeof(int));
+
+		//test struct
+		tStruct t = {
+			{0xa,0xb,0xc},
+			0x01020304,
+			0x05,
+			0x06,
+		};
+		CLIENT.Send((char *)&t,sizeof(t));
+
+		CLIENT.Stop();
+	}
+};
+
+class TestEmpty : public CTestNetwork {
 	virtual void ServerActions() {
 	}
 
@@ -73,7 +126,12 @@ void startRun() {
 	aCase->Execute();
 	aCase->Stop();
 
-	aCase = new TestGameSocket();
+	aCase = new TestByteOrder();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+	aCase = new TestGameSocket();   //这个case执行以后socket start失败
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();

@@ -1,13 +1,15 @@
-#include "./../CSockets.h"
-#include "./../GameSocket.h"
+#include "./../CTestCase.h"
 
-class CTestCase {
+#include "./../../network/CSockets.h"
+#include "./../../network/GameSocket.h"
+
+class CTestNetwork : public CTestCase {
 public:
-	CTestCase();
+	CTestNetwork();
 
-	void Start();
-	void Stop();
-	int Execute();
+	virtual void Start();
+	virtual void Stop();
+	virtual int Execute();
 
 	char _clientBuff[SOCK_BUFF_LEN];
 	int  _clientBuffLen;

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "CTestCase.h"
+#include "./CTestProtocol.h"
 
 #include <string.h>
 

@@ -2,15 +2,17 @@
 #ifndef __CTESTCASE__
 #define __CTESTCASE__
 
+#include "./../CTestCase.h"
+
 typedef enum {
     OK,
     FAIL
 };
 
-class CTestCase {
+class CTestProtocol : public CTestCase {
 public:
-	void Start();
-	void Stop();
+	virtual void Start();
+	virtual void Stop();
 	virtual int Execute() = 0;
 };
 
