@@ -8,11 +8,20 @@ typedef unsigned short INT16U;
 typedef int            INT32U;
 
 #define MSG_MAX_LEN    1024
+#define ITEM_BUF_LEN   128
 
-class UpHeader {
+const INT8U PCHC[3] = {'K','W','X'};
+
+class Msg {
 public:
-    int Serialize(INT8U *output);
-    int Deserialize(const INT8U *input);
+    virtual int Serialize(INT8U *output) = 0;
+    virtual int Deserialize(const INT8U *input) = 0;
+};
+
+class UpHeader : public Msg{
+public:
+    virtual int Serialize(INT8U *output);
+    virtual int Deserialize(const INT8U *input);
 
     INT8U    _pchc[3];
 	INT8U    _protocol;
@@ -27,9 +36,6 @@ public:
 
     static const int UP_HEADER_LEN     = 30;
 private:
-    static INT8U _reference[]; 
-
-    static const INT8U PCHC[3];
     static const int PROTOCOL      = 3;
 	static const int USER_ID       = PROTOCOL + 1;
 	static const int LANGUAGE      = USER_ID + 4;
@@ -41,10 +47,10 @@ private:
 	static const int SIZE          = REQUEST_CODE + 2;
 };
 
-class DnHeader {
+class DnHeader : public Msg{
 public:
-    int Serialize(INT8U *output);
-    int Deserialize(const INT8U *input);
+    virtual int Serialize(INT8U *output);
+    virtual int Deserialize(const INT8U *input);
 
     INT8U    _pchc[3];
     INT16U   _requestCode;
@@ -53,13 +59,19 @@ public:
 
     static const int DN_HEADER_LEN     = 20;
 private:
-    static INT8U _reference[]; 
-
-    static const INT8U PCHC[3];
 	static const int REQUEST_CODE  = 3;
     static const int LEVEL         = REQUEST_CODE + 2;
 	static const int SIZE          = LEVEL + 1;
 };
 
+class Item : public Msg {
+public:
+    virtual int Serialize(INT8U *output);
+    virtual int Deserialize(const INT8U *input);
 
+    INT8U    _id;
+    INT8U    _value;
+    INT8U    _bufLen;
+    INT8U    _buf[ITEM_BUF_LEN];
+};
 #endif

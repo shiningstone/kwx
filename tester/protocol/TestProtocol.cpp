@@ -94,6 +94,98 @@ public:
     }
 };
 
+class TestItemOnePureId : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            0,
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        Item aItem;
+
+		len = aItem.Deserialize(msgInNetwork);
+        assert(len==1);
+		assert(aItem._id==0);
+
+		//组包测试
+        Item bItem;
+		bItem._id=0;
+
+        len = bItem.Serialize(buf);
+
+        assert(len==1);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
+class TestItemOneIdPlusInt : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            50,51
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        Item aItem;
+
+		len = aItem.Deserialize(msgInNetwork);
+        assert(len==2);
+		assert(aItem._id==50);
+        assert(aItem._value=51);
+
+		//组包测试
+        Item bItem;
+		bItem._id=50;
+		bItem._value=51;
+
+        len = bItem.Serialize(buf);
+
+        assert(len==2);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
+class TestItemOneIdPlusBuf : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            128,1,0
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        Item aItem;
+
+		len = aItem.Deserialize(msgInNetwork);
+        assert(len==3);
+		assert(aItem._id==128);
+        assert(aItem._bufLen==1);
+        assert(!memcmp(aItem._buf,msgInNetwork+2,aItem._bufLen));
+
+		//组包测试
+        Item bItem;
+		bItem._id=128;
+        bItem._bufLen=1;
+        memset(bItem._buf,0,bItem._bufLen);
+
+        len = bItem.Serialize(buf);
+
+        assert(len==3);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
 /********************************************************************
 	Main entrance
 *********************************************************************/
@@ -104,6 +196,21 @@ void startRun() {
     aCase->Stop();
 
     aCase = new TestDnHeader();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestItemOnePureId();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestItemOneIdPlusInt();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestItemOneIdPlusBuf();
     aCase->Start();
     aCase->Execute();
     aCase->Stop();

@@ -24,21 +24,6 @@ INT16U _ntohs(INT16U n) {
     return *((INT16U *)ha);
 }
 
-const INT8U UpHeader::PCHC[3] = {'K','W','X',};
-
-INT8U UpHeader::_reference[] = {
-    'K','W','X',           //KWX
-    0x10,                  //protocol version
-    0x00,0x00,0x00,0x00,   //user id
-    0x01,                  //language id
-    0x01,                  //client platform
-    0x00,                  //client build number
-    0x00,0x00,             //customer id
-    0x00,0x00,             //product id
-    0x00,0x00,             //request code
-    0x00,0x12,             //package size
-};
-
 int UpHeader::Serialize(INT8U *output) {
     memcpy(output,PCHC,3);
     output[PROTOCOL] = _protocol;
@@ -72,8 +57,6 @@ int UpHeader::Deserialize(const INT8U *input) {
     return UP_HEADER_LEN; 
 }
 
-const INT8U DnHeader::PCHC[3] = {'K','W','X',};
-
 int DnHeader::Serialize(INT8U *output) {
     memcpy(output,PCHC,3);
     *((INT16U *)(output+REQUEST_CODE)) = _ntohs(_requestCode);
@@ -95,3 +78,32 @@ int DnHeader::Deserialize(const INT8U *input) {
     return DN_HEADER_LEN; 
 }
 
+int Item::Serialize(INT8U *output) {
+    output[0] = _id;
+    
+    if( _id<50 ) {
+        return 1;
+    } else if( _id>=50 && _id<128 ) {
+        output[1] = _value;
+        return 2;
+    } else {
+        output[1] = _bufLen;
+        output[2] = _buf[0];
+        return 3;
+    }
+}
+
+int Item::Deserialize(const INT8U *input) {
+    _id = input[0];
+
+    if( _id<50 ) {
+        return 1;
+    } else if( _id>=50 && _id<128 ) {
+        _value = input[1];
+        return 2;
+    } else {
+        _bufLen = input[1];
+        _buf[0] = input[2];
+        return 3;
+    }
+}
