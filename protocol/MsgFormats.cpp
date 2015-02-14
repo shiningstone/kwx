@@ -78,32 +78,44 @@ int DnHeader::Deserialize(const INT8U *input) {
     return DN_HEADER_LEN; 
 }
 
+int Item::_IdType(INT8U id) {
+    if( _id<50 ) {
+        return PURE_ID ;
+    } else if( _id>=50 && _id<128 ) {
+        return ID_WITH_INT ;
+    } else {
+        return ID_WITH_BUF ;
+    }
+}
+
 int Item::Serialize(INT8U *output) {
     output[0] = _id;
     
-    if( _id<50 ) {
-        return 1;
-    } else if( _id>=50 && _id<128 ) {
-        output[1] = _value;
-        return 2;
-    } else {
-        output[1] = _bufLen;
-        output[2] = _buf[0];
-        return 3;
+    switch( _IdType(_id) ) {
+        case PURE_ID:
+            return 1;
+        case ID_WITH_INT:
+            output[1] = _value;
+            return 2;
+        case ID_WITH_BUF:
+            output[1] = _bufLen;
+            memcpy(output+2, _buf, _bufLen);
+            return 2+_bufLen;
     }
 }
 
 int Item::Deserialize(const INT8U *input) {
     _id = input[0];
 
-    if( _id<50 ) {
-        return 1;
-    } else if( _id>=50 && _id<128 ) {
-        _value = input[1];
-        return 2;
-    } else {
-        _bufLen = input[1];
-        _buf[0] = input[2];
-        return 3;
+    switch( _IdType(_id) ) {
+        case PURE_ID:
+            return 1;
+        case ID_WITH_INT:
+            _value = input[1];
+            return 2;
+        case ID_WITH_BUF:
+            _bufLen = input[1];
+            memcpy(_buf, input+2, _bufLen);
+            return 2+_bufLen;
     }
 }

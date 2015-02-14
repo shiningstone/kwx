@@ -176,7 +176,7 @@ public:
         Item bItem;
 		bItem._id=128;
         bItem._bufLen=1;
-        memset(bItem._buf,0,bItem._bufLen);
+        memset(bItem._buf, 0, bItem._bufLen);
 
         len = bItem.Serialize(buf);
 
@@ -186,6 +186,41 @@ public:
 		return OK;
     }
 };
+
+class TestItemOneIdPlusLongBuf : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            128,2,0,1
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        Item aItem;
+
+		len = aItem.Deserialize(msgInNetwork);
+        assert(len==4);
+		assert(aItem._id==128);
+        assert(aItem._bufLen==2);
+        assert(!memcmp(aItem._buf,msgInNetwork+2,aItem._bufLen));
+
+		//组包测试
+        Item bItem;
+		bItem._id=128;
+        bItem._bufLen=2;
+        bItem._buf[0]=0;
+        bItem._buf[1]=1;
+
+        len = bItem.Serialize(buf);
+
+        assert(len==4);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
 /********************************************************************
 	Main entrance
 *********************************************************************/
@@ -211,6 +246,11 @@ void startRun() {
     aCase->Stop();
 
     aCase = new TestItemOneIdPlusBuf();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestItemOneIdPlusLongBuf();
     aCase->Start();
     aCase->Execute();
     aCase->Stop();

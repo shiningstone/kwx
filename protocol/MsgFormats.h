@@ -73,5 +73,11 @@ public:
     INT8U    _value;
     INT8U    _bufLen;
     INT8U    _buf[ITEM_BUF_LEN];
+protected:
+    const static int PURE_ID = 0;
+    const static int ID_WITH_INT = 1;
+    const static int ID_WITH_BUF = 2;
+
+    int _IdType(INT8U id);
 };
 #endif
