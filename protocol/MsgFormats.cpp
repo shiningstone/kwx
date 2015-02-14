@@ -134,29 +134,24 @@ MsgBody::~MsgBody() {
 
 int MsgBody::Serialize(INT8U *output) {
     output[0] = _itemNum;
-    if (_itemNum==1) {
-        output[1] = _items[0]->_id;
-        return 2;
-    } else {
-        output[1] = _items[0]->_id;
-        output[2] = _items[1]->_id;
-        return 3;
+
+    int bodyLen = 1;
+
+    for( int i=0; i<_itemNum; i++ ) {
+        bodyLen += _items[i]->Serialize(output+bodyLen);
     }
+
+    return bodyLen;
 }
 
 int MsgBody::Deserialize(const INT8U *input) {
     _itemNum = input[0];
+    int bodyLen = 1;
 
-    if (_itemNum==1 ) {
-        _items[0] = new Item();
-        _items[0]->_id = input[1];
-        return 2;
-    } else {
-        _items[0] = new Item();
-        _items[0]->_id = input[1];
-
-        _items[1] = new Item();
-        _items[1]->_id = input[2];
-        return 3;
+    for( int i=0; i<_itemNum; i++ ) {
+        _items[i] = new Item();
+        bodyLen += _items[i]->Deserialize(input+bodyLen);
     }
+
+    return bodyLen;
 }

@@ -293,6 +293,102 @@ public:
     }
 };
 
+class TestItemOnePureIdTwoWithValue : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            2,
+            0,
+            50,2
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        MsgBody aBody;
+
+		len = aBody.Deserialize(msgInNetwork);
+        assert(len==4);
+        assert(aBody._itemNum==2);
+		    assert(aBody._items[0]->_id==0);
+		    assert(aBody._items[1]->_id==50);
+		    assert(aBody._items[1]->_value==2);
+
+		//组包测试
+        MsgBody bBody;
+        bBody._itemNum=2;
+
+            Item *aItem = new Item();
+		    aItem->_id=0;
+            bBody._items[0] = aItem;
+
+            Item *bItem = new Item();
+		    bItem->_id=50;
+		    bItem->_value=2;
+            bBody._items[1] = bItem;
+
+        len = bBody.Serialize(buf);
+
+        assert(len==4);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
+class TestItemOneWithBufTwoWithValueThreePureId : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            3,
+            128,4,0,1,2,3,
+            50,4,
+            0
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        MsgBody aBody;
+
+		len = aBody.Deserialize(msgInNetwork);
+        assert(len==sizeof(msgInNetwork));
+        assert(aBody._itemNum==3);
+		    assert(aBody._items[0]->_id==128);
+		    assert(aBody._items[0]->_bufLen==4);
+		    assert( !memcmp(aBody._items[0]->_buf,msgInNetwork+3,4) );
+		    
+            assert(aBody._items[1]->_id==50);
+		    assert(aBody._items[1]->_value==4);
+
+            assert(aBody._items[2]->_id==0);
+		//组包测试
+        MsgBody bBody;
+        bBody._itemNum=3;
+
+            bBody._items[0] = new Item();
+		    bBody._items[0]->_id=128;
+            bBody._items[0]->_bufLen=4;
+            bBody._items[0]->_buf[0]=0;
+            bBody._items[0]->_buf[1]=1;
+            bBody._items[0]->_buf[2]=2;
+            bBody._items[0]->_buf[3]=3;
+
+            bBody._items[1] = new Item();
+		    bBody._items[1]->_id=50;
+		    bBody._items[1]->_value=4;
+
+            bBody._items[2] = new Item();
+		    bBody._items[2]->_id=0;
+
+        len = bBody.Serialize(buf);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( !memcmp(msgInNetwork,buf,len) );
+
+		return OK;
+    }
+};
 /********************************************************************
 	Main entrance
 *********************************************************************/
@@ -337,5 +433,14 @@ void startRun() {
     aCase->Execute();
     aCase->Stop();
 
+    aCase = new TestItemOnePureIdTwoWithValue();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestItemOneWithBufTwoWithValueThreePureId();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
 }
 
