@@ -1,6 +1,6 @@
 
 #include <string.h>
-#include "KwxMsg.h"
+#include "MsgFormats.h"
 
 INT32U _ntohl(INT32U n) {
     char *p = (char *)&n;
@@ -158,41 +158,4 @@ int MsgBody::Deserialize(const INT8U *inMsg) {
     }
 
     return bodyLen;
-}
-
-KwxMsg::KwxMsg(int dir) {
-    if (dir==UP_STREAM) {
-        _header = new UpHeader();
-    } else {
-        _header = new DnHeader();
-    }
-
-    _body = new MsgBody();
-}
-
-KwxMsg::~KwxMsg() {
-    delete _header;
-    delete _body;
-}
-
-int KwxMsg::Serialize(INT8U *outMsg) {
-    int len = 0;
-
-    len += _header->Serialize(outMsg);
-    len += _body->Serialize(outMsg+len);
-
-    return len;
-}
-
-int KwxMsg::Deserialize(const INT8U *inMsg) {
-    int len = 0;
-
-    if (memcmp(inMsg,Header::PCHC,3)) {
-        return KWX_INVALID_PCHC;
-    }
-
-    len += _header->Deserialize(inMsg);
-    len += _body->Deserialize(inMsg+len);
-
-    return len;
 }

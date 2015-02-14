@@ -1,4 +1,5 @@
 
+#include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/KwxMsg.h"
 
 /********************************************************************
