@@ -9,6 +9,7 @@ typedef int            INT32U;
 
 #define MSG_MAX_LEN    1024
 #define ITEM_BUF_LEN   128
+#define ITEM_MAX_NUM   128
 
 const INT8U PCHC[3] = {'K','W','X'};
 
@@ -80,4 +81,17 @@ protected:
 
     int _IdType(INT8U id);
 };
+
+class MsgBody : public Msg {
+public:
+    MsgBody();
+    ~MsgBody();
+
+    virtual int Serialize(INT8U *output);
+    virtual int Deserialize(const INT8U *input);
+
+    INT8U    _itemNum;
+    Item     *_items[ITEM_MAX_NUM];
+};
+
 #endif

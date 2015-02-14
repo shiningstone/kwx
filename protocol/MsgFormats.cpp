@@ -119,3 +119,44 @@ int Item::Deserialize(const INT8U *input) {
             return 2+_bufLen;
     }
 }
+
+MsgBody::MsgBody() {
+    for(int i=0;i<ITEM_MAX_NUM;i++) {
+        _items[i] = NULL;
+    }
+}
+
+MsgBody::~MsgBody() {
+    for(int i=0;i<_itemNum;i++) {
+        delete _items[i];
+    }
+}
+
+int MsgBody::Serialize(INT8U *output) {
+    output[0] = _itemNum;
+    if (_itemNum==1) {
+        output[1] = _items[0]->_id;
+        return 2;
+    } else {
+        output[1] = _items[0]->_id;
+        output[2] = _items[1]->_id;
+        return 3;
+    }
+}
+
+int MsgBody::Deserialize(const INT8U *input) {
+    _itemNum = input[0];
+
+    if (_itemNum==1 ) {
+        _items[0] = new Item();
+        _items[0]->_id = input[1];
+        return 2;
+    } else {
+        _items[0] = new Item();
+        _items[0]->_id = input[1];
+
+        _items[1] = new Item();
+        _items[1]->_id = input[2];
+        return 3;
+    }
+}

@@ -221,6 +221,78 @@ public:
     }
 };
 
+class TestMsgBody : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            1,0,
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        MsgBody aBody;
+
+		len = aBody.Deserialize(msgInNetwork);
+        assert(len==2);
+        assert(aBody._itemNum==1);
+		assert(aBody._items[0]->_id==0);
+
+		//组包测试
+        MsgBody bBody;
+        bBody._itemNum=1;
+        Item *aItem = new Item();
+		aItem->_id=0;
+        bBody._items[0] = aItem;
+
+        len = bBody.Serialize(buf);
+
+        assert(len==2);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
+class TestItemTwoPureId : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            2,0,1
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        //解包测试
+        MsgBody aBody;
+
+		len = aBody.Deserialize(msgInNetwork);
+        assert(len==3);
+        assert(aBody._itemNum==2);
+		    assert(aBody._items[0]->_id==0);
+		    assert(aBody._items[1]->_id==1);
+
+		//组包测试
+        MsgBody bBody;
+        bBody._itemNum=2;
+
+            Item *aItem = new Item();
+		    aItem->_id=0;
+            bBody._items[0] = aItem;
+
+            Item *bItem = new Item();
+		    bItem->_id=1;
+            bBody._items[1] = bItem;
+
+        len = bBody.Serialize(buf);
+
+        assert(len==3);
+        assert(!memcmp(msgInNetwork,buf,len));
+
+		return OK;
+    }
+};
+
 /********************************************************************
 	Main entrance
 *********************************************************************/
@@ -254,5 +326,16 @@ void startRun() {
     aCase->Start();
     aCase->Execute();
     aCase->Stop();
+
+    aCase = new TestMsgBody();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
+    aCase = new TestItemTwoPureId();
+    aCase->Start();
+    aCase->Execute();
+    aCase->Stop();
+
 }
 
