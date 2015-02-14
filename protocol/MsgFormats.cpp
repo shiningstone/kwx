@@ -1,6 +1,6 @@
 
 #include <string.h>
-#include "MsgFormats.h"
+#include "KwxMsg.h"
 
 INT32U _ntohl(INT32U n) {
     char *p = (char *)&n;
@@ -123,6 +123,8 @@ int Item::Deserialize(const INT8U *inMsg) {
 }
 
 MsgBody::MsgBody() {
+    _itemNum = 0;
+
     for(int i=0;i<ITEM_MAX_NUM;i++) {
         _items[i] = NULL;
     }
@@ -158,17 +160,22 @@ int MsgBody::Deserialize(const INT8U *inMsg) {
     return bodyLen;
 }
 
-Msg::Msg() {
-    _header = new UpHeader();
+KwxMsg::KwxMsg(int dir) {
+    if (dir==UP_STREAM) {
+        _header = new UpHeader();
+    } else {
+        _header = new DnHeader();
+    }
+
     _body = new MsgBody();
 }
 
-Msg::~Msg() {
+KwxMsg::~KwxMsg() {
     delete _header;
     delete _body;
 }
 
-int Msg::Serialize(INT8U *outMsg) {
+int KwxMsg::Serialize(INT8U *outMsg) {
     int len = 0;
 
     len += _header->Serialize(outMsg);
@@ -177,9 +184,13 @@ int Msg::Serialize(INT8U *outMsg) {
     return len;
 }
 
-int Msg::Deserialize(const INT8U *inMsg) {
+int KwxMsg::Deserialize(const INT8U *inMsg) {
     int len = 0;
-    
+
+    if (memcmp(inMsg,Header::PCHC,3)) {
+        return KWX_INVALID_PCHC;
+    }
+
     len += _header->Deserialize(inMsg);
     len += _body->Deserialize(inMsg+len);
 

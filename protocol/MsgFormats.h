@@ -2,7 +2,6 @@
 #ifndef __MSG_FORMATS__
 #define __MSG_FORMATS__
 
-
 typedef unsigned char  INT8U;
 typedef unsigned short INT16U;
 typedef int            INT32U;
@@ -96,18 +95,6 @@ public:
 
     INT8U    _itemNum;
     Item     *_items[ITEM_MAX_NUM];
-};
-
-class Msg : public MsgIntf {
-public:
-    Msg();
-    ~Msg();
-
-    virtual int Serialize(INT8U *outMsg);
-    virtual int Deserialize(const INT8U *inMsg);
-
-    UpHeader *_header;
-    MsgBody  *_body;
 };
 
 #endif
