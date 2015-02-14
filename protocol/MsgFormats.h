@@ -11,20 +11,29 @@ typedef int            INT32U;
 #define ITEM_BUF_LEN   128
 #define ITEM_MAX_NUM   128
 
-const INT8U PCHC[3] = {'K','W','X'};
-
-class Msg {
+class MsgIntf {
 public:
-    virtual int Serialize(INT8U *output) = 0;
-    virtual int Deserialize(const INT8U *input) = 0;
+    virtual int Serialize(INT8U *outMsg) = 0;
+    virtual int Deserialize(const INT8U *inMsg) = 0;
 };
 
-class UpHeader : public Msg{
+class Header : public MsgIntf {
 public:
-    virtual int Serialize(INT8U *output);
-    virtual int Deserialize(const INT8U *input);
+    virtual int Serialize(INT8U *outMsg) = 0;
+    virtual int Deserialize(const INT8U *inMsg) = 0;
 
     INT8U    _pchc[3];
+    INT16U   _requestCode;
+    INT16U   _size;
+
+    static const INT8U PCHC[3];
+};
+
+class UpHeader : public Header {
+public:
+    virtual int Serialize(INT8U *outMsg);
+    virtual int Deserialize(const INT8U *inMsg);
+
 	INT8U    _protocol;
 	INT32U   _userId;
     INT8U    _language;
@@ -32,8 +41,6 @@ public:
     INT8U    _buildNo;
     INT16U   _customerId;
     INT16U   _productId;
-    INT16U   _requestCode;
-    INT16U   _size;
 
     static const int UP_HEADER_LEN     = 30;
 private:
@@ -48,15 +55,12 @@ private:
 	static const int SIZE          = REQUEST_CODE + 2;
 };
 
-class DnHeader : public Msg{
+class DnHeader : public Header{
 public:
-    virtual int Serialize(INT8U *output);
-    virtual int Deserialize(const INT8U *input);
+    virtual int Serialize(INT8U *outMsg);
+    virtual int Deserialize(const INT8U *inMsg);
 
-    INT8U    _pchc[3];
-    INT16U   _requestCode;
     INT8U    _level;
-    INT16U   _size;
 
     static const int DN_HEADER_LEN     = 20;
 private:
@@ -65,10 +69,10 @@ private:
 	static const int SIZE          = LEVEL + 1;
 };
 
-class Item : public Msg {
+class Item : public MsgIntf {
 public:
-    virtual int Serialize(INT8U *output);
-    virtual int Deserialize(const INT8U *input);
+    virtual int Serialize(INT8U *outMsg);
+    virtual int Deserialize(const INT8U *inMsg);
 
     INT8U    _id;
     INT8U    _value;
@@ -82,16 +86,28 @@ protected:
     int _IdType(INT8U id);
 };
 
-class MsgBody : public Msg {
+class MsgBody : public MsgIntf {
 public:
     MsgBody();
     ~MsgBody();
 
-    virtual int Serialize(INT8U *output);
-    virtual int Deserialize(const INT8U *input);
+    virtual int Serialize(INT8U *outMsg);
+    virtual int Deserialize(const INT8U *inMsg);
 
     INT8U    _itemNum;
     Item     *_items[ITEM_MAX_NUM];
+};
+
+class Msg : public MsgIntf {
+public:
+    Msg();
+    ~Msg();
+
+    virtual int Serialize(INT8U *outMsg);
+    virtual int Deserialize(const INT8U *inMsg);
+
+    UpHeader *_header;
+    MsgBody  *_body;
 };
 
 #endif

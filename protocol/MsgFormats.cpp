@@ -24,56 +24,58 @@ INT16U _ntohs(INT16U n) {
     return *((INT16U *)ha);
 }
 
-int UpHeader::Serialize(INT8U *output) {
-    memcpy(output,PCHC,3);
-    output[PROTOCOL] = _protocol;
-    *((INT32U *)(output+USER_ID)) = _ntohl(_userId);    
-    output[LANGUAGE] = _language;
-    output[PLATFORM] = _platform;
-    output[BUILD_NO] = _buildNo;
-    *((INT16U *)(output+CUSTOMER_ID)) = _ntohs(_customerId);
-    *((INT16U *)(output+PRODUCT_ID)) = _ntohs(_productId);
-    *((INT16U *)(output+REQUEST_CODE)) = _ntohs(_requestCode);
-    *((INT16U *)(output+SIZE)) = _ntohs(_size);
+const INT8U Header::PCHC[3] = {'K','W','X'};
 
-    memset(output+19,0,UP_HEADER_LEN-19);
+int UpHeader::Serialize(INT8U *outMsg) {
+    memcpy(outMsg,PCHC,3);
+    outMsg[PROTOCOL] = _protocol;
+    *((INT32U *)(outMsg+USER_ID)) = _ntohl(_userId);    
+    outMsg[LANGUAGE] = _language;
+    outMsg[PLATFORM] = _platform;
+    outMsg[BUILD_NO] = _buildNo;
+    *((INT16U *)(outMsg+CUSTOMER_ID)) = _ntohs(_customerId);
+    *((INT16U *)(outMsg+PRODUCT_ID)) = _ntohs(_productId);
+    *((INT16U *)(outMsg+REQUEST_CODE)) = _ntohs(_requestCode);
+    *((INT16U *)(outMsg+SIZE)) = _ntohs(_size);
+
+    memset(outMsg+19,0,UP_HEADER_LEN-19);
 
     return UP_HEADER_LEN;
 }
 
-int UpHeader::Deserialize(const INT8U *input) {
-    memcpy(_pchc,input,3);
+int UpHeader::Deserialize(const INT8U *inMsg) {
+    memcpy(_pchc,inMsg,3);
 
-	_protocol     = input[PROTOCOL];
-	_userId       = _ntohl( *(INT32U *)(input+USER_ID) );
-    _language     = *(input+LANGUAGE);
-    _platform     = *(input+PLATFORM);
-    _buildNo      = *(input+BUILD_NO);
-    _customerId   = _ntohs( *(INT16U *)(input+CUSTOMER_ID) );
-    _productId    = _ntohs( *(INT16U *)(input+PRODUCT_ID) );
-    _requestCode  = _ntohs( *(INT16U *)(input+REQUEST_CODE) );
-    _size         = _ntohs( *(INT16U *)(input+SIZE) );
+	_protocol     = inMsg[PROTOCOL];
+	_userId       = _ntohl( *(INT32U *)(inMsg+USER_ID) );
+    _language     = *(inMsg+LANGUAGE);
+    _platform     = *(inMsg+PLATFORM);
+    _buildNo      = *(inMsg+BUILD_NO);
+    _customerId   = _ntohs( *(INT16U *)(inMsg+CUSTOMER_ID) );
+    _productId    = _ntohs( *(INT16U *)(inMsg+PRODUCT_ID) );
+    _requestCode  = _ntohs( *(INT16U *)(inMsg+REQUEST_CODE) );
+    _size         = _ntohs( *(INT16U *)(inMsg+SIZE) );
 
     return UP_HEADER_LEN; 
 }
 
-int DnHeader::Serialize(INT8U *output) {
-    memcpy(output,PCHC,3);
-    *((INT16U *)(output+REQUEST_CODE)) = _ntohs(_requestCode);
-    output[LEVEL] = _level;
-    *((INT16U *)(output+SIZE)) = _ntohs(_size);
+int DnHeader::Serialize(INT8U *outMsg) {
+    memcpy(outMsg,PCHC,3);
+    *((INT16U *)(outMsg+REQUEST_CODE)) = _ntohs(_requestCode);
+    outMsg[LEVEL] = _level;
+    *((INT16U *)(outMsg+SIZE)) = _ntohs(_size);
 
-    memset(output+8,0,DN_HEADER_LEN-8);
+    memset(outMsg+8,0,DN_HEADER_LEN-8);
 
     return DN_HEADER_LEN;
 }
 
-int DnHeader::Deserialize(const INT8U *input) {
-    memcpy(_pchc,input,3);
+int DnHeader::Deserialize(const INT8U *inMsg) {
+    memcpy(_pchc,inMsg,3);
 
-    _requestCode  = _ntohs( *(INT16U *)(input+REQUEST_CODE) );
-    _level        = *(input+LEVEL);
-    _size         = _ntohs( *(INT16U *)(input+SIZE) );
+    _requestCode  = _ntohs( *(INT16U *)(inMsg+REQUEST_CODE) );
+    _level        = *(inMsg+LEVEL);
+    _size         = _ntohs( *(INT16U *)(inMsg+SIZE) );
 
     return DN_HEADER_LEN; 
 }
@@ -88,34 +90,34 @@ int Item::_IdType(INT8U id) {
     }
 }
 
-int Item::Serialize(INT8U *output) {
-    output[0] = _id;
+int Item::Serialize(INT8U *outMsg) {
+    outMsg[0] = _id;
     
     switch( _IdType(_id) ) {
         case PURE_ID:
             return 1;
         case ID_WITH_INT:
-            output[1] = _value;
+            outMsg[1] = _value;
             return 2;
         case ID_WITH_BUF:
-            output[1] = _bufLen;
-            memcpy(output+2, _buf, _bufLen);
+            outMsg[1] = _bufLen;
+            memcpy(outMsg+2, _buf, _bufLen);
             return 2+_bufLen;
     }
 }
 
-int Item::Deserialize(const INT8U *input) {
-    _id = input[0];
+int Item::Deserialize(const INT8U *inMsg) {
+    _id = inMsg[0];
 
     switch( _IdType(_id) ) {
         case PURE_ID:
             return 1;
         case ID_WITH_INT:
-            _value = input[1];
+            _value = inMsg[1];
             return 2;
         case ID_WITH_BUF:
-            _bufLen = input[1];
-            memcpy(_buf, input+2, _bufLen);
+            _bufLen = inMsg[1];
+            memcpy(_buf, inMsg+2, _bufLen);
             return 2+_bufLen;
     }
 }
@@ -132,26 +134,54 @@ MsgBody::~MsgBody() {
     }
 }
 
-int MsgBody::Serialize(INT8U *output) {
-    output[0] = _itemNum;
+int MsgBody::Serialize(INT8U *outMsg) {
+    outMsg[0] = _itemNum;
 
     int bodyLen = 1;
 
     for( int i=0; i<_itemNum; i++ ) {
-        bodyLen += _items[i]->Serialize(output+bodyLen);
+        bodyLen += _items[i]->Serialize(outMsg+bodyLen);
     }
 
     return bodyLen;
 }
 
-int MsgBody::Deserialize(const INT8U *input) {
-    _itemNum = input[0];
+int MsgBody::Deserialize(const INT8U *inMsg) {
+    _itemNum = inMsg[0];
     int bodyLen = 1;
 
     for( int i=0; i<_itemNum; i++ ) {
         _items[i] = new Item();
-        bodyLen += _items[i]->Deserialize(input+bodyLen);
+        bodyLen += _items[i]->Deserialize(inMsg+bodyLen);
     }
 
     return bodyLen;
+}
+
+Msg::Msg() {
+    _header = new UpHeader();
+    _body = new MsgBody();
+}
+
+Msg::~Msg() {
+    delete _header;
+    delete _body;
+}
+
+int Msg::Serialize(INT8U *outMsg) {
+    int len = 0;
+
+    len += _header->Serialize(outMsg);
+    len += _body->Serialize(outMsg+len);
+
+    return len;
+}
+
+int Msg::Deserialize(const INT8U *inMsg) {
+    int len = 0;
+    
+    len += _header->Deserialize(inMsg);
+    len += _body->Deserialize(inMsg+len);
+
+    return len;
 }
