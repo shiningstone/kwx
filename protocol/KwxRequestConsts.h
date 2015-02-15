@@ -25,10 +25,9 @@ typedef enum {
     REQ_GAME_SEND_SHOW_CARD = 48,      /*  THIS HAS NOT BEEN UNDETERMINED YET*/
 
     REQ_GAME_RECV_ACTION = 49,
-    REQ_GAME_SEND_DIST = 50,
-    /*REQ_GAME_RECV_LEAVE = 50,        THIS HAS NOT BEEN UNDETERMINED YET  */
+    REQ_GAME_SEND_DIST = 50,           /*REQ_GAME_RECV_LEAVE = 50, THIS HAS NOT BEEN UNDETERMINED YET  */
     REQ_GAME_RECV_SEAT_DOWN = 51,
-    REQ_GAME_RECV_CARDS = 52,
+    REQ_GAME_SEND_UPDATELIST = 52,     /*REQ_GAME_RECV_CARDS = 52, THIS HAS NOT BEEN UNDETERMINED YET  */
     REQ_GAME_RECV_WINNER = 53,
     REQ_GAME_TIMEOUT_BACK = 54,
     REQ_GAME_RECV_READYTIME = 55,
@@ -55,7 +54,7 @@ typedef enum {
     GANG,
     GUO,
     HU,
-}ActionId_t;
+}ActionId_t;/*ARRAY_ACTION???*/
 
 typedef enum {
 	SeatId   = 60,
@@ -64,6 +63,7 @@ typedef enum {
 	RoomPath = 131,
 	RoomId   = 132,
 	TableId  = 133,
+    CardList = 135,
 }Item_t;
 
 #endif

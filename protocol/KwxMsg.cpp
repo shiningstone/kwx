@@ -93,6 +93,19 @@ int KwxMsg::AddShowCard(CardType_t card) {
     return _add_item( new Item(CardKind,card) );
 }
 
+int KwxMsg::AddCards(CARD *cards,int num) {
+    INT8U buf[MAX_HANDIN_NUM*4] = {0};
+
+    for(int i=0;i<num;i++) {
+        buf[i*4+1] = cards[i].kind;
+        buf[i*4+2] = cards[i].status;
+        buf[i*4+3] = cards[i].can_play;
+    }
+
+    return _add_item( new Item(CardList,num*4,buf) );
+;
+}
+
 /**********************************************************
 	Interfaces
 ***********************************************************/
@@ -132,6 +145,19 @@ int KwxMsg::SetRequestDistribute() {
     AddRoomId(seat->_roomId);
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
+
+    return 0;
+}
+
+int KwxMsg::SetUpdateCardList(CARD *cards,int num) {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_UPDATELIST);
+    AddRoomPath(seat->_roomPath);
+    AddRoomId(seat->_roomId);
+    AddTableId(seat->_tableId);
+    AddSeatId(seat->_seatId);
+    AddCards(cards,num);
 
     return 0;
 }

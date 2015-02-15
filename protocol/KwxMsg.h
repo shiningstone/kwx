@@ -2,6 +2,8 @@
 #ifndef __KWX_MSG__
 #define __KWX_MSG__
 
+#include "./../RaceType.h"
+
 #include "MsgBasic.h"
 #include "KwxRequestConsts.h"
 
@@ -23,6 +25,7 @@ public:
     int SetAction(ActionId_t code);
     int SetShowCard(CardType_t code);
     int SetRequestDistribute();
+    int SetUpdateCardList(CARD *cards,int cardNum);
 
     int SetRequestCode(RequestId_t code);
     int AddRoomPath(RoomPath_t code);
@@ -31,6 +34,7 @@ public:
     int AddSeatId(INT8U code);
     int AddAction(ActionId_t code);
     int AddShowCard(CardType_t card);
+    int AddCards(CARD *cards,int num);
 
     Header   *_header;
     MsgBody  *_body;
