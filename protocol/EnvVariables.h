@@ -26,4 +26,27 @@ private:
 	static EnvVariable *_instance;
 };
 
+/*******************************************************************************
+	NOTE:
+        if a player is allowed to join more than one table in the meantime,
+        getInstance should be called with the param "threadInfo"
+********************************************************************************/
+#include "KwxRequestConsts.h"
+
+class SeatInfo {
+public:
+    static SeatInfo *getInstance(int threadInfo=0);
+    int Set(RoomPath_t path,RoomId_t room,TableId_t table,SeatId_t seat);
+
+    RoomPath_t _roomPath;
+    RoomId_t   _roomId;
+    TableId_t  _tableId;
+    SeatId_t   _seatId;
+private:
+    static const int MAX_JOINABLE_TABLE = 1;
+
+    SeatInfo();
+    static SeatInfo *_instance[MAX_JOINABLE_TABLE];
+};
+
 #endif

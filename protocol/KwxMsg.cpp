@@ -92,3 +92,46 @@ int KwxMsg::AddAction(ActionId_t code) {
 int KwxMsg::AddShowCard(CardType_t card) {
     return _add_item( new Item(CardKind,card) );
 }
+
+/**********************************************************
+	Interfaces
+***********************************************************/
+#include "EnvVariables.h"
+
+int KwxMsg::SetAction(ActionId_t code) {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_ACTION);
+    AddRoomPath(seat->_roomPath);
+    AddRoomId(seat->_roomId);
+    AddTableId(seat->_tableId);
+    AddSeatId(seat->_seatId);
+    AddAction(code);
+
+    return 0;
+}
+
+int KwxMsg::SetShowCard(CardType_t code) {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_SHOW_CARD);
+    AddRoomPath(seat->_roomPath);
+    AddRoomId(seat->_roomId);
+    AddTableId(seat->_tableId);
+    AddSeatId(seat->_seatId);
+    AddShowCard(code);
+
+    return 0;
+}
+
+int KwxMsg::SetRequestDistribute() {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_DIST);
+    AddRoomPath(seat->_roomPath);
+    AddRoomId(seat->_roomId);
+    AddTableId(seat->_tableId);
+    AddSeatId(seat->_seatId);
+
+    return 0;
+}

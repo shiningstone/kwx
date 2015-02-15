@@ -1,6 +1,7 @@
 
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/KwxMsg.h"
+#include "./../../protocol/EnvVariables.h"
 
 /********************************************************************
 	TestCases
@@ -34,13 +35,11 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetRequestCode(REQ_GAME_SEND_ACTION);
-        aMsg.AddRoomPath(0x00010203);
-        aMsg.AddRoomId(0x04050607);
-        aMsg.AddTableId(0x08090a0b);
-        aMsg.AddSeatId(1);
-        aMsg.AddAction(PENG);
+        aMsg.SetAction(PENG);
 
         len = aMsg.Serialize(buf);
 
@@ -77,13 +76,11 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetRequestCode(REQ_GAME_SEND_SHOW_CARD);
-        aMsg.AddRoomPath(0x00010203);
-        aMsg.AddRoomId(0x04050607);
-        aMsg.AddTableId(0x08090a0b);
-        aMsg.AddSeatId(1);
-        aMsg.AddShowCard(0);
+        aMsg.SetShowCard(0);
 
         len = aMsg.Serialize(buf);
 
@@ -119,12 +116,11 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetRequestCode(REQ_GAME_SEND_DIST);
-        aMsg.AddRoomPath(0x00010203);
-        aMsg.AddRoomId(0x04050607);
-        aMsg.AddTableId(0x08090a0b);
-        aMsg.AddSeatId(1);
+        aMsg.SetRequestDistribute();
 
         len = aMsg.Serialize(buf);
 

@@ -20,6 +20,10 @@ public:
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
+    int SetAction(ActionId_t code);
+    int SetShowCard(CardType_t code);
+    int SetRequestDistribute();
+
     int SetRequestCode(RequestId_t code);
     int AddRoomPath(RoomPath_t code);
     int AddRoomId(RoomId_t code);
