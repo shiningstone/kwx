@@ -26,6 +26,7 @@ public:
     int AddTableId(TableId_t code);
     int AddSeatId(INT8U code);
     int AddAction(ActionId_t code);
+    int AddShowCard(CardType_t card);
 
     Header   *_header;
     MsgBody  *_body;

@@ -89,3 +89,6 @@ int KwxMsg::AddAction(ActionId_t code) {
 	return _add_item( new Item(ActionId,code) );
 }
 
+int KwxMsg::AddShowCard(CardType_t card) {
+    return _add_item( new Item(CardKind,card) );
+}

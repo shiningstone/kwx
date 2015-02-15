@@ -22,9 +22,11 @@ typedef enum {
     REQ_GAME_SEND_SEAT_ACTION = 45,
     REQ_GAME_SEND_MSG = 46,
     REQ_GAME_SEND_ACTION = 47,
+    REQ_GAME_SEND_SHOW_CARD = 48,      /*  THIS HAS NOT BEEN UNDETERMINED YET*/
 
     REQ_GAME_RECV_ACTION = 49,
-    REQ_GAME_RECV_LEAVE = 50,
+    REQ_GAME_SEND_DIST = 50,
+    /*REQ_GAME_RECV_LEAVE = 50,        THIS HAS NOT BEEN UNDETERMINED YET  */
     REQ_GAME_RECV_SEAT_DOWN = 51,
     REQ_GAME_RECV_CARDS = 52,
     REQ_GAME_RECV_WINNER = 53,
@@ -45,6 +47,8 @@ typedef INT32U RoomPath_t;
 typedef INT32U RoomId_t;
 typedef INT32U TableId_t;
 
+typedef INT8U  CardType_t;/*this type could reference to other modules*/
+
 typedef enum {
     PENG = 1,
     GANG,
@@ -54,6 +58,7 @@ typedef enum {
 
 typedef enum {
 	SeatId   = 60,
+    CardKind = 65,
 	ActionId = 67,
 	RoomPath = 131,
 	RoomId   = 132,
