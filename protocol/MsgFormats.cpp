@@ -1,6 +1,7 @@
 
 #include <string.h>
 #include "MsgFormats.h"
+#include "EnvVariables.h"
 
 INT32U _ntohl(INT32U n) {
     char *p = (char *)&n;
@@ -35,13 +36,15 @@ INT16U _htons(INT16U n) {
 const INT8U Header::PCHC[3] = {'K','W','X'};
 
 UpHeader::UpHeader() {
-	_protocol = 16;
-	_userId   = 0x01020304;
-	_language = 5;
-	_platform = 6;
-	_buildNo  = 7;
-	_customerId = 0x0809;
-	_productId  = 0x0a0b;
+	EnvVariable *env = EnvVariable::getInstance();
+
+	_protocol   = env->_protocol;
+	_userId     = env->_userId;
+	_language   = env->_language;
+	_platform   = env->_platform;
+	_buildNo    = env->_buildNo;
+	_customerId = env->_customerId;
+	_productId  = env->_productId;
 }
 
 int UpHeader::Serialize(INT8U *outMsg) {
@@ -101,12 +104,12 @@ int DnHeader::Deserialize(const INT8U *inMsg) {
 Item::Item() {
 }
 
-Item::Item(INT16U itemId, INT8U value) {
+Item::Item(Item_t itemId, INT8U value) {
 	_id       = itemId;
 	_value    = value;
 }
 
-Item::Item(INT16U itemId, INT16U bufLen,INT8U *buf) {
+Item::Item(Item_t itemId, INT8U bufLen,INT8U *buf) {
 	_id       = itemId;
 	_bufLen   = bufLen;
 	memcpy(_buf,buf,bufLen);
@@ -135,11 +138,13 @@ int Item::Serialize(INT8U *outMsg) {
             outMsg[1] = _bufLen;
             memcpy(outMsg+2, _buf, _bufLen);
             return 2+_bufLen;
+		default:
+			return -1;
     }
 }
 
 int Item::Deserialize(const INT8U *inMsg) {
-    _id = inMsg[0];
+    _id = (Item_t)inMsg[0];
 
     switch( _IdType(_id) ) {
         case PURE_ID:
@@ -151,6 +156,8 @@ int Item::Deserialize(const INT8U *inMsg) {
             _bufLen = inMsg[1];
             memcpy(_buf, inMsg+2, _bufLen);
             return 2+_bufLen;
+		default:
+			return -1;
     }
 }
 

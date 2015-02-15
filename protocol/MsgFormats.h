@@ -3,6 +3,7 @@
 #define __MSG_FORMATS__
 
 #include "MsgBasic.h"
+#include "KwxRequestConsts.h"
 
 class Header : public MsgIntf {
 public:
@@ -63,13 +64,13 @@ public:
 class Item : public MsgIntf {
 public:
 	Item();
-	Item(INT16U itemId, INT8U value);
-	Item(INT16U itemId, INT16U bufLen,INT8U *buf);
+	Item(Item_t itemId, INT8U value);
+	Item(Item_t itemId, INT8U bufLen,INT8U *buf);
 
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
-    INT8U    _id;
+    Item_t   _id;
     INT8U    _value;
     INT8U    _bufLen;
     INT8U    _buf[ITEM_BUF_LEN];

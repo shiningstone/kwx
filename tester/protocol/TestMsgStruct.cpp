@@ -113,7 +113,7 @@ public:
 
 		//组包测试
         Item bItem;
-		bItem._id=0;
+		bItem._id=(Item_t)0;
 
         len = bItem.Serialize(buf);
 
@@ -143,7 +143,7 @@ public:
 
 		//组包测试
         Item bItem;
-		bItem._id=50;
+		bItem._id=(Item_t)50;
 		bItem._value=51;
 
         len = bItem.Serialize(buf);
@@ -175,7 +175,7 @@ public:
 
 		//组包测试
         Item bItem;
-		bItem._id=128;
+		bItem._id=(Item_t)128;
         bItem._bufLen=1;
         memset(bItem._buf, 0, bItem._bufLen);
 
@@ -208,7 +208,7 @@ public:
 
 		//组包测试
         Item bItem;
-		bItem._id=128;
+		bItem._id=(Item_t)128;
         bItem._bufLen=2;
         bItem._buf[0]=0;
         bItem._buf[1]=1;
@@ -243,7 +243,7 @@ public:
         MsgBody bBody;
         bBody._itemNum=1;
         Item *aItem = new Item();
-		aItem->_id=0;
+		aItem->_id=(Item_t)0;
         bBody._items[0] = aItem;
 
         len = bBody.Serialize(buf);
@@ -278,11 +278,11 @@ public:
         bBody._itemNum=2;
 
             Item *aItem = new Item();
-		    aItem->_id=0;
+		    aItem->_id=(Item_t)0;
             bBody._items[0] = aItem;
 
             Item *bItem = new Item();
-		    bItem->_id=1;
+		    bItem->_id=(Item_t)1;
             bBody._items[1] = bItem;
 
         len = bBody.Serialize(buf);
@@ -320,11 +320,11 @@ public:
         bBody._itemNum=2;
 
             Item *aItem = new Item();
-		    aItem->_id=0;
+		    aItem->_id=(Item_t)0;
             bBody._items[0] = aItem;
 
             Item *bItem = new Item();
-		    bItem->_id=50;
+		    bItem->_id=(Item_t)50;
 		    bItem->_value=2;
             bBody._items[1] = bItem;
 
@@ -368,7 +368,7 @@ public:
         bBody._itemNum=3;
 
             bBody._items[0] = new Item();
-		    bBody._items[0]->_id=128;
+		    bBody._items[0]->_id=(Item_t)128;
             bBody._items[0]->_bufLen=4;
             bBody._items[0]->_buf[0]=0;
             bBody._items[0]->_buf[1]=1;
@@ -376,11 +376,11 @@ public:
             bBody._items[0]->_buf[3]=3;
 
             bBody._items[1] = new Item();
-		    bBody._items[1]->_id=50;
+		    bBody._items[1]->_id=(Item_t)50;
 		    bBody._items[1]->_value=4;
 
             bBody._items[2] = new Item();
-		    bBody._items[2]->_id=0;
+		    bBody._items[2]->_id=(Item_t)0;
 
         len = bBody.Serialize(buf);
 
@@ -456,7 +456,7 @@ public:
         MsgBody *bBody = bMsg._body;
         bBody->_itemNum=3;
             bBody->_items[0] = new Item();
-		    bBody->_items[0]->_id=128;
+		    bBody->_items[0]->_id=(Item_t)128;
             bBody->_items[0]->_bufLen=4;
             bBody->_items[0]->_buf[0]=0;
             bBody->_items[0]->_buf[1]=1;
@@ -464,11 +464,11 @@ public:
             bBody->_items[0]->_buf[3]=3;
 
             bBody->_items[1] = new Item();
-		    bBody->_items[1]->_id=50;
+		    bBody->_items[1]->_id=(Item_t)50;
 		    bBody->_items[1]->_value=4;
 
             bBody->_items[2] = new Item();
-		    bBody->_items[2]->_id=0;
+		    bBody->_items[2]->_id=(Item_t)0;
 
         len = bMsg.Serialize(buf);
 
@@ -527,7 +527,7 @@ public:
         MsgBody *bBody = bMsg._body;
         bBody->_itemNum=3;
             bBody->_items[0] = new Item();
-		    bBody->_items[0]->_id=128;
+		    bBody->_items[0]->_id=(Item_t)128;
             bBody->_items[0]->_bufLen=4;
             bBody->_items[0]->_buf[0]=0;
             bBody->_items[0]->_buf[1]=1;
@@ -535,11 +535,11 @@ public:
             bBody->_items[0]->_buf[3]=3;
 
             bBody->_items[1] = new Item();
-		    bBody->_items[1]->_id=50;
+		    bBody->_items[1]->_id=(Item_t)50;
 		    bBody->_items[1]->_value=4;
 
             bBody->_items[2] = new Item();
-		    bBody->_items[2]->_id=0;
+		    bBody->_items[2]->_id=(Item_t)0;
 
         len = bMsg.Serialize(buf);
 
