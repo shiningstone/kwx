@@ -16,4 +16,9 @@ public:
     virtual int Deserialize(const INT8U *inMsg) = 0;
 };
 
+extern INT32U _ntohl(INT32U n);
+extern INT32U _htonl(INT32U n);
+extern INT16U _ntohs(INT16U n);
+extern INT16U _htons(INT16U n);
+
 #endif

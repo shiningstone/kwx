@@ -14,6 +14,10 @@ INT32U _ntohl(INT32U n) {
     return *((INT32U *)ha);
 }
 
+INT32U _htonl(INT32U n) {
+    return _ntohl(n);
+}
+
 INT16U _ntohs(INT16U n) {
     char *p = (char *)&n;
     char ha[2] = {0};
@@ -24,7 +28,21 @@ INT16U _ntohs(INT16U n) {
     return *((INT16U *)ha);
 }
 
+INT16U _htons(INT16U n) {
+    return _ntohs(n);
+}
+
 const INT8U Header::PCHC[3] = {'K','W','X'};
+
+UpHeader::UpHeader() {
+	_protocol = 16;
+	_userId   = 0x01020304;
+	_language = 5;
+	_platform = 6;
+	_buildNo  = 7;
+	_customerId = 0x0809;
+	_productId  = 0x0a0b;
+}
 
 int UpHeader::Serialize(INT8U *outMsg) {
     memcpy(outMsg,PCHC,3);
@@ -78,6 +96,20 @@ int DnHeader::Deserialize(const INT8U *inMsg) {
     _size         = _ntohs( *(INT16U *)(inMsg+SIZE) );
 
     return DN_HEADER_LEN; 
+}
+
+Item::Item() {
+}
+
+Item::Item(INT16U itemId, INT8U value) {
+	_id       = itemId;
+	_value    = value;
+}
+
+Item::Item(INT16U itemId, INT16U bufLen,INT8U *buf) {
+	_id       = itemId;
+	_bufLen   = bufLen;
+	memcpy(_buf,buf,bufLen);
 }
 
 int Item::_IdType(INT8U id) {

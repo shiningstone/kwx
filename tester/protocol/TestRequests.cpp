@@ -35,11 +35,11 @@ public:
 
         KwxMsg aMsg(UP_STREAM);
         aMsg.SetRequestCode(REQ_GAME_SEND_ACTION);
-        aMsg.SetRoomPath(0x00010203);
-        aMsg.SetRoomId(0x04050607);
-        aMsg.SetTableId(0x08090a0b);
-        aMsg.SetSeatId(1);
-        aMsg.SetAction(PENG);
+        aMsg.AddRoomPath(0x00010203);
+        aMsg.AddRoomId(0x04050607);
+        aMsg.AddTableId(0x08090a0b);
+        aMsg.AddSeatId(1);
+        aMsg.AddAction(PENG);
 
         len = aMsg.Serialize(buf);
 

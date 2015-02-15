@@ -20,14 +20,18 @@ public:
     virtual int Deserialize(const INT8U *inMsg);
 
     int SetRequestCode(RequestId_t code);
-    int SetRoomPath(RoomPath_t code);
-    int SetRoomId(RoomId_t code);
-    int SetTableId(TableId_t code);
-    int SetSeatId(INT32U code);
-    int SetAction(ActionId_t code);
+    int AddRoomPath(RoomPath_t code);
+    int AddRoomId(RoomId_t code);
+    int AddTableId(TableId_t code);
+    int AddSeatId(INT32U code);
+    int AddAction(ActionId_t code);
 
     Header   *_header;
     MsgBody  *_body;
+protected:
+	const int   _dir;
+
+	void _set_size(INT8U *buf,INT16U len);
 };
 
 #define KWX_INVALID_PCHC          -1

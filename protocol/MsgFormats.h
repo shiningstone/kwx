@@ -18,6 +18,8 @@ public:
 
 class UpHeader : public Header {
 public:
+	UpHeader();
+
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
@@ -29,7 +31,7 @@ public:
     INT16U   _customerId;
     INT16U   _productId;
 
-    static const int UP_HEADER_LEN     = 30;
+    static const int UP_HEADER_LEN = 30;
 private:
     static const int PROTOCOL      = 3;
 	static const int USER_ID       = PROTOCOL + 1;
@@ -39,6 +41,7 @@ private:
 	static const int CUSTOMER_ID   = BUILD_NO + 1;
 	static const int PRODUCT_ID    = CUSTOMER_ID + 2;
 	static const int REQUEST_CODE  = PRODUCT_ID + 2;
+public:
 	static const int SIZE          = REQUEST_CODE + 2;
 };
 
@@ -53,11 +56,16 @@ public:
 private:
 	static const int REQUEST_CODE  = 3;
     static const int LEVEL         = REQUEST_CODE + 2;
+public:
 	static const int SIZE          = LEVEL + 1;
 };
 
 class Item : public MsgIntf {
 public:
+	Item();
+	Item(INT16U itemId, INT8U value);
+	Item(INT16U itemId, INT16U bufLen,INT8U *buf);
+
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 

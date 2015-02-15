@@ -404,7 +404,7 @@ public:
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x0c,0x0d,             //request code
-            0x0e,0x0f,             //package size
+            0x00,0x28,             //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
             3,
             128,4,0,1,2,3,
@@ -426,7 +426,7 @@ public:
 		assert(aHeader->_customerId==0x0809);
 		assert(aHeader->_productId==0x0a0b);
 		assert(aHeader->_requestCode==0x0c0d);
-        assert(aHeader->_size==0x0e0f);
+        assert(aHeader->_size==40);
 
         MsgBody *aBody = aMsg._body;
         assert(aBody->_itemNum==3);
@@ -451,7 +451,7 @@ public:
 		bHeader->_customerId=0x0809;
 		bHeader->_productId=0x0a0b;
 		bHeader->_requestCode=0x0c0d;
-        bHeader->_size=0x0e0f;
+        bHeader->_size=40;
         
         MsgBody *bBody = bMsg._body;
         bBody->_itemNum=3;
