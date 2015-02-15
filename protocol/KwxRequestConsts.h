@@ -52,4 +52,12 @@ typedef enum {
     HU,
 }ActionId_t;
 
+typedef enum {
+	SeatId   = 60,
+	ActionId = 67,
+	RoomPath = 131,
+	RoomId   = 132,
+	TableId  = 133,
+}Item_t;
+
 #endif

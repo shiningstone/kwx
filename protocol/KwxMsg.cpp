@@ -46,7 +46,7 @@ int KwxMsg::Deserialize(const INT8U *inMsg) {
 }
 
 /**********************************************************
-	
+	UpStream
 ***********************************************************/
 void KwxMsg::_set_size(INT8U *buf,INT16U len) {
 	if (_dir==UP_STREAM) {
@@ -60,44 +60,32 @@ int KwxMsg::SetRequestCode(RequestId_t code) {
     return 0;
 }
 
+int KwxMsg::_add_item(Item *item) {
+	_body->_items[_body->_itemNum] = item;
+	_body->_itemNum++;
+	return 0;
+}
+
 int KwxMsg::AddRoomPath(RoomPath_t code) {
 	INT32U value = _htonl(code);
-
-	_body->_items[_body->_itemNum] = new Item(131,4,(INT8U *)&value);
-	_body->_itemNum++;
-
-	return 0;
+	return _add_item( new Item(RoomPath,4,(INT8U *)&value) );
 }
 
 int KwxMsg::AddRoomId(RoomId_t code) {
 	INT32U value = _htonl(code);
-
-	_body->_items[_body->_itemNum] = new Item(132,4,(INT8U *)&value);
-	_body->_itemNum++;
-
-    return 0;
+	return _add_item( new Item(RoomId,4,(INT8U *)&value) );
 }
 
 int KwxMsg::AddTableId(TableId_t code) {
 	INT32U value = _htonl(code);
-
-	_body->_items[_body->_itemNum] = new Item(133,4,(INT8U *)&value);
-	_body->_itemNum++;
-
-    return 0;
+	return _add_item( new Item(TableId,4,(INT8U *)&value) );
 }
 
-int KwxMsg::AddSeatId(INT32U code) {
-	_body->_items[_body->_itemNum] = new Item(60,code);
-	_body->_itemNum++;
-
-	return 0;
+int KwxMsg::AddSeatId(INT8U code) {
+	return _add_item( new Item(SeatId,code) );
 }
 
 int KwxMsg::AddAction(ActionId_t code) {
-	_body->_items[_body->_itemNum] = new Item(67,code);
-	_body->_itemNum++;
-
-    return 0;
+	return _add_item( new Item(ActionId,code) );
 }
 

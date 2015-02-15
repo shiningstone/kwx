@@ -10,6 +10,7 @@
 
 class Header;
 class MsgBody;
+class Item;
 
 class KwxMsg : public MsgIntf {
 public:
@@ -23,7 +24,7 @@ public:
     int AddRoomPath(RoomPath_t code);
     int AddRoomId(RoomId_t code);
     int AddTableId(TableId_t code);
-    int AddSeatId(INT32U code);
+    int AddSeatId(INT8U code);
     int AddAction(ActionId_t code);
 
     Header   *_header;
@@ -32,6 +33,7 @@ protected:
 	const int   _dir;
 
 	void _set_size(INT8U *buf,INT16U len);
+	int  _add_item(Item *item);
 };
 
 #define KWX_INVALID_PCHC          -1
