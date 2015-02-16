@@ -25,7 +25,8 @@ void CSocket::Quit() {
 }
 
 void CSocket::Stop() {
-    closesocket(_connection);
+	_keepListen = false;
+	closesocket(_connection);
 }
 
 int CSocket::Send(char *buf,int len) {
@@ -34,8 +35,13 @@ int CSocket::Send(char *buf,int len) {
     return actLen;
 }
 
+#include <thread>
 int CSocket::Recv(char *buf,int *len) {
-    return _recv(buf, len);
+	std::thread listener(&CSocket::_recv,this,buf,len);
+	listener.detach();
+	_keepListen = true;
+
+	return 0;
 }
 
 int CSocket::_send(char *buf,int len) {
@@ -44,10 +50,12 @@ int CSocket::_send(char *buf,int len) {
 }
 
 int CSocket::_recv(char *buf,int *len) {
-    while ( (*len = recv(_connection, buf, 128, 0))==SOCKET_ERROR ) {
-    }
-    _log(RECV,buf,*len);
-    return *len;
+	while(_keepListen) {
+		while ( (*len = recv(_connection, buf, 128, 0))<=0 ) {
+		}
+		_log(RECV,buf,*len);
+	}
+	return 0;
 }
 
 void CSocket::_log(const char *fmt,...) {

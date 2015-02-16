@@ -37,6 +37,7 @@ protected:
     SOCKET _connection;
 	bool   _keepAlive;
 	int    _blockSecond;
+	bool   _keepListen;
 
 	static bool gInited;
 

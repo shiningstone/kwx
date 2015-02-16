@@ -6,6 +6,8 @@
 #include "./../../network/GameSocket.h"
 #include "./CTestNetwork.h"
 
+#define DELAY 100
+
 class TestSingleSendAndRecv : public CTestNetwork {
 	virtual void ServerActions() {
 		SERVER.Start();
@@ -13,6 +15,7 @@ class TestSingleSendAndRecv : public CTestNetwork {
 		SERVER.Send("to client",strlen("to client"));
 
 		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		Sleep(DELAY);
 		assert(!strcmp(_serverBuff,"to server"));
 		ClearServerBuf();
 
@@ -23,6 +26,7 @@ class TestSingleSendAndRecv : public CTestNetwork {
 		CLIENT.Start();
 
 		CLIENT.Recv(_clientBuff,&_clientBuffLen);
+		Sleep(DELAY);
 		assert( !strcmp(_clientBuff,"to client") );
 		ClearClientBuf();
 
@@ -40,6 +44,7 @@ class TestGameSocket : public CTestNetwork {
 		memset(_serverBuff,0,8);
 		SERVER.Send("to client",strlen("to client"));
 		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		Sleep(DELAY);
 		ClearServerBuf();
 
 		SERVER.Stop();
@@ -53,6 +58,7 @@ class TestGameSocket : public CTestNetwork {
 
 		_clientBuffLen = 10;
 		client.ForceRecv(_clientBuff,_clientBuffLen);
+		Sleep(DELAY);
 		ClearClientBuf();
 	}
 };
@@ -72,6 +78,7 @@ class TestByteOrder : public CTestNetwork {
 
 		int a = 0x01020304;
 		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		Sleep(DELAY);
 		assert(!memcmp(_serverBuff,(char *)&a,sizeof(int)));
 		assert(_serverBuffLen==4);
 		ClearServerBuf();
@@ -83,6 +90,7 @@ class TestByteOrder : public CTestNetwork {
 			0x06,
 		};
 		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		Sleep(DELAY);
 		assert(!memcmp(_serverBuff,(char *)&t,sizeof(t)));
 		assert(_serverBuffLen==10);
 		ClearServerBuf();
@@ -110,6 +118,50 @@ class TestByteOrder : public CTestNetwork {
 	}
 };
 
+class TestMultipleSendAndRecv : public CTestNetwork {
+	virtual void ServerActions() {
+		char buf[32] = {0};
+		int i        = 0;
+
+		SERVER.Start();
+
+		SERVER.Recv(_serverBuff,&_serverBuffLen);
+		Sleep(DELAY);
+		//assert(!strcmp(_serverBuff,"to server"));
+		ClearServerBuf();
+
+		sprintf_s(buf,"to client %d",i++);
+		SERVER.Send(buf,strlen(buf));
+
+		sprintf_s(buf,"to client %d",i++);
+		SERVER.Send(buf,strlen(buf));
+
+		while(1);
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		char buf[32] = {0};
+		int i        = 0;
+
+		CLIENT.Start();
+
+		CLIENT.Recv(_clientBuff,&_clientBuffLen);
+		Sleep(DELAY);
+		//assert( !strcmp(_clientBuff,"to client") );
+		ClearClientBuf();
+
+		sprintf_s(buf,"to server %d",i++);
+		SERVER.Send(buf,strlen(buf));
+
+		sprintf_s(buf,"to server %d",i++);
+		SERVER.Send(buf,strlen(buf));
+
+		while(1);
+		CLIENT.Stop();
+	}
+};
+
 class TestEmpty : public CTestNetwork {
 	virtual void ServerActions() {
 	}
@@ -120,7 +172,7 @@ class TestEmpty : public CTestNetwork {
 
 void startRun() {
 	CTestCase *aCase;
-
+#if 1
 	aCase = new TestSingleSendAndRecv();
 	aCase->Start();
 	aCase->Execute();
@@ -130,12 +182,19 @@ void startRun() {
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
-
-	aCase = new TestGameSocket();   //这个case执行以后socket start失败
+#endif
+	aCase = new TestMultipleSendAndRecv();
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
 
+#if 0
+	aCase = new TestGameSocket();   //这个case执行以后socket start失败
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+#endif
+	printf("------------test end---------------\n");
 	while(1);
 }
 
