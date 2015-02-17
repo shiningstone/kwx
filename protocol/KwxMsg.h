@@ -22,14 +22,16 @@ public:
     /* upstream */
     int SetAction(ActionId_t code);
     int SetShowCard(CardType_t code);
+    int SetReaction(ActionId_t code);
     int SetRequestDistribute();
     int SetUpdateCardList(CARD *cards,int cardNum);
     
     /* downstream*/
-    int         Construct(DistributeResponse_t &response,const INT8U *inMsg);
-    int         Construct(OthersAction_t &actionInfo,const INT8U *inMsg);
     RequestId_t GetRequestCode();
     int         GetLevel();
+    int         Construct(DistributeResponse_t &response,const INT8U *inMsg);
+    int         Construct(OthersAction_t &actionInfo,const INT8U *inMsg);
+    int         Construct(OthersShowCard_t &cardInfo,const INT8U *inMsg);
 
 /* the following items should be only referenced by test*/
 /*

@@ -136,6 +136,19 @@ int KwxMsg::SetShowCard(CardType_t code) {
     return 0;
 }
 
+int KwxMsg::SetReaction(ActionId_t code) {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_RESPONSE);
+    AddRoomPath(seat->_roomPath);
+    AddRoomId(seat->_roomId);
+    AddTableId(seat->_tableId);
+    AddSeatId(seat->_seatId);
+    AddAction(code);
+
+    return 0;
+}
+
 int KwxMsg::SetRequestDistribute() {
     SeatInfo *seat = SeatInfo::getInstance();
 
@@ -183,7 +196,16 @@ int KwxMsg::Construct(OthersAction_t &actionInfo,const INT8U *inMsg) {
     int len = Deserialize(inMsg);
 
     actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
-    actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67*/
+    actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
+
+    return len;
+}
+
+int KwxMsg::Construct(OthersShowCard_t &cardInfo,const INT8U *inMsg) {
+    int len = Deserialize(inMsg);
+
+    cardInfo.seat     = _body->_items[0]->_value;            /*id==60*/
+    cardInfo.cardKind = (CardType_t)_body->_items[1]->_value;/*id==67*/
 
     return len;
 }

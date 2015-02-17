@@ -105,4 +105,10 @@ typedef struct _othersAction {
     INT8U         seat;
     ActionId_t    action;
 }OthersAction_t;
+
+typedef struct _OthersShowCard {
+    INT8U         seat;
+    CardType_t    cardKind;
+}OthersShowCard_t;
+
 #endif

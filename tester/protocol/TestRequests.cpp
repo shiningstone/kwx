@@ -92,6 +92,47 @@ public:
     }
 };
 
+class TestGameSendReaction : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,49,               //request code(发送玩家反应)
+            0x00,53,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            5,
+            131,4,0,1,2,3,         //roomPath:0x00010203
+            132,4,4,5,6,7,         //roomId:  0x04050607
+            133,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                  //site:    1
+            67,1,                  //act:     1(碰)
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
+        KwxMsg aMsg(UP_STREAM);
+        aMsg.SetReaction(PENG);
+
+        len = aMsg.Serialize(buf);
+
+        assert(len==sizeof(msgInNetwork));
+        assert(!memcmp(buf,msgInNetwork,len));
+
+        return 0;
+    }
+};
+
 class TestGameSendDistributeRequest : public CTestCase {
 public:
     virtual int Execute() {
@@ -219,7 +260,7 @@ public:
     }
 };
 
-class TestGameRecvAction : public CTestCase {
+class TestGameRecvOthersAction : public CTestCase {
 public:
     virtual int Execute() {
         const INT8U msgInNetwork[] = {
@@ -251,11 +292,80 @@ public:
     }
 };
 
+
+class TestGameRecvOthersShowCard : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,75,               //request code(下发其他玩家出牌)
+            7,                     //package level
+            0x00,25,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,1,                  //seatId
+            65,2,                  //card kind
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxMsg aMsg(DOWN_STREAM);
+        OthersShowCard_t cardInfo = {0};
+
+        len = aMsg.Construct(cardInfo,msgInNetwork);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_SHOWCARD );
+        assert( aMsg.GetLevel()==7 );
+        assert( cardInfo.seat==1 );
+        assert( cardInfo.cardKind==2 );
+
+        return 0;
+    }
+};
+
+
+class TestGameRecvOthersReaction : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,76,               //request code(下发其他玩家反应)
+            7,                     //package level
+            0x00,25,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,1,                  //seatId
+            65,2,                  //reaction
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxMsg aMsg(DOWN_STREAM);
+        OthersAction_t actionInfo = {0};
+
+        len = aMsg.Construct(actionInfo,msgInNetwork);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_RESPONSE );
+        assert( aMsg.GetLevel()==7 );
+        assert( actionInfo.seat==1 );
+        assert( actionInfo.action==2 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
     CTestCase *aCase = new TestGameSendAction();
     aCase->Execute();
 
     aCase = new TestGameSendShowCard();
+    aCase->Execute();
+
+    aCase = new TestGameSendReaction();
     aCase->Execute();
 
     aCase = new TestGameSendDistributeRequest();
@@ -267,6 +377,12 @@ void testRequests() {
     aCase = new TestGameSendUpdateList();
     aCase->Execute();
 
-    aCase = new TestGameRecvAction();
+    aCase = new TestGameRecvOthersAction();
+    aCase->Execute();
+
+    aCase = new TestGameRecvOthersShowCard();
+    aCase->Execute();
+
+    aCase = new TestGameRecvOthersReaction();
     aCase->Execute();
 }
