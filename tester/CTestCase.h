@@ -3,6 +3,8 @@
 
 class CTestCase {
 public:
+	static int count;
+
 	CTestCase();
 
 	virtual void Start();

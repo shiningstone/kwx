@@ -5,7 +5,7 @@ NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
 	_keepListen = false;
 
-	memset(_pktBuf,0,BUFF_SIZE);
+	memset(_pkgBuf,0,BUFF_SIZE);
 	_usedStart = 0;
 	_usedLen   = 0;
 }
@@ -27,20 +27,12 @@ int NetMessenger::Send(const INT8U *buf,int len) {
 	return _socket->Send((char *)buf,len);
 }
 
-int NetMessenger::Recv(INT8U *pkg,int *pkgLen) {
-    if(_usedStart + _usedLen > BUFF_SIZE) {  
-        int copylen = BUFF_SIZE - _usedStart;  
-        memcpy(pkg, _pktBuf + _usedStart, copylen);  
-        memcpy((INT8U *)(pkg+copylen), _pktBuf, _usedLen-copylen);  
-    } else {  
-        memcpy(pkg, _pktBuf+_usedStart, _usedLen);  
-    }
-	*pkgLen = _usedLen;
-  
-    _usedStart = (_usedStart + _usedLen) % BUFF_SIZE;  
-    _usedLen   = 0;
-
-	return *pkgLen;
+bool NetMessenger::Recv(INT8U *pkg,int *pkgLen) {
+	if( !_is_pkg_exists() ) {
+		return false;
+	} else {
+		return _get_pkg_from_buff(pkg,pkgLen);
+	}
 }
 
 NetMessenger * NetMessenger::_instance = 0;
@@ -69,8 +61,37 @@ void NetMessenger::_listen() {
 		}  
   
 		int inLen = 0;
-		if ( _socket->Recv((char *)_pktBuf+availStart, &inLen, availLen)>0 ) {
+		if ( _socket->Recv((char *)_pkgBuf+availStart, &inLen, availLen)>0 ) {
 			_usedLen += inLen;
 		}
 	}
+}
+
+bool  NetMessenger::_get_pkg_from_buff(INT8U *pkg,int *pkgLen) {
+	if(_usedStart + _usedLen > BUFF_SIZE) {  
+		int copylen = BUFF_SIZE - _usedStart;  
+		memcpy(pkg, _pkgBuf + _usedStart, copylen);  
+		memcpy((INT8U *)(pkg+copylen), _pkgBuf, _usedLen-copylen);  
+	} else {  
+		memcpy(pkg, _pkgBuf+_usedStart, _usedLen);  
+	}
+	*pkgLen = _usedLen;
+  
+	_usedStart = (_usedStart + _usedLen) % BUFF_SIZE;  
+	_usedLen   = 0;
+
+	return true;
+}
+
+#include <string.h>
+/*this function is only practicable for downstream packages currently*/
+bool  NetMessenger::_is_pkg_exists() {
+	if ( strstr((char *)_pkgBuf,"KWX") ) {
+		if ( _usedLen>DnHeader::DN_HEADER_LEN )	{
+			if ( _usedLen==_ntohs((*(INT16U *)(_pkgBuf+DnHeader::SIZE))) )
+				return true;
+		}	
+	}
+
+	return false;
 }

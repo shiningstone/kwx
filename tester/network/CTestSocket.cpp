@@ -9,7 +9,7 @@ CTestSocket::CTestSocket() {
 }
 
 void CTestSocket::Start() {
-	printf("test start *************************************************\n");
+	printf("test %d start *************************************************\n",count);
 	ClearClientBuf();
 	ClearServerBuf();
 

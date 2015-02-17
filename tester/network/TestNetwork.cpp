@@ -212,7 +212,7 @@ void testBasicSocket() {
 #endif
 }
 
-class TestNetMessengerRecvOnePackage : public CTestMessenger {
+class TestNetMessengerRecvOneFullPackage : public CTestMessenger {
 	INT8U MESSAGE[MSG_MAX_LEN];
 	int   MESSAGE_LEN;
 
@@ -221,14 +221,15 @@ class TestNetMessengerRecvOnePackage : public CTestMessenger {
 
         const INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x01,0x02,             //request code
-            0x03,                  //level
-            0x04,0x05,             //package size
-            0,0,0,0,0,0,0,0,0,0,0,0,//reserved
+            0x00,50,               //request code(发送发牌请求)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
             3,
-            128,4,0,1,2,3,
-            50,4,
-            0
+            60,1,                  //roomId
+            61,2,                  //seat
+            70,0,                  //card kind
         };
 
 		MESSAGE_LEN = sizeof(msgInNetwork);
@@ -246,21 +247,70 @@ class TestNetMessengerRecvOnePackage : public CTestMessenger {
 	virtual void ClientActions() {
 		MESSENGER->Start();
 
-		Sleep(DELAY);
-		MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen);
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen) ) {
+			Sleep(DELAY);
+		}
+
 		assert( !memcmp(_clientBuff,MESSAGE,MESSAGE_LEN) );
 		ClearClientBuf();
+	}
+};
+
+class TestNetMessengerRecvOnePartialPackage : public CTestMessenger {
+	INT8U MESSAGE[MSG_MAX_LEN];
+	int   MESSAGE_LEN;
+
+	virtual void Start() {
+		CTestMessenger::Start();
+
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code(发送发牌请求)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            //60,1,                  //roomId
+            //61,2,                  //seat
+            //70,0,                  //card kind
+        };
+
+		MESSAGE_LEN = sizeof(msgInNetwork);
+		memcpy( MESSAGE,msgInNetwork,MESSAGE_LEN );
+	}
+
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		MESSENGER->Start();
+
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen) ) {
+			Sleep(DELAY);
+		}
+
+		assert( false );
 	}
 };
 
 void testMessenger() {
 	CTestCase *aCase;
 
-	aCase = new TestNetMessengerRecvOnePackage();
+	aCase = new TestNetMessengerRecvOneFullPackage();
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
 
+	aCase = new TestNetMessengerRecvOnePartialPackage();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
 }
 
 void startRun() {
