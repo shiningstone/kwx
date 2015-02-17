@@ -19,6 +19,9 @@
 #define INVALID_SOCKET -1   
 #endif   
 
+#define SERVER_IP    "127.0.0.1"
+#define SOCKET_PORT  6000
+
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCK_BUFF_LEN 128
 
@@ -39,16 +42,15 @@ protected:
 	int    _blockSecond;
 	bool   _keepListen;
 
-	static bool gInited;
-
-    int _send(char *buf,int len);
-    int _recv(char *buf,int *len);
     void _log(const char *fmt,...);
     void _log(int dir,char *buf,int len);
 
     static const int SEND = 0;
     static const int RECV = 1;
-	static const int SOCKET_PORT = 6000;
+
+#ifdef WIN32
+	static bool gWSAInited;
+#endif
 };
 
 class ServerSocket : public CSocket {
@@ -56,11 +58,9 @@ public:
 	virtual void Start();
 };
 
-#define _SERVER_IP "127.0.0.1"
 class ClientSocket : public CSocket {
 public:
 	virtual void Start();
 };
-
 
 #endif

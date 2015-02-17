@@ -2,101 +2,58 @@
 #include "stdio.h"
 #include "CSockets.h"
 
-bool CSocket::gInited = false;
+/*
+	windows下调用socket需要启动Windows Sockets Asynchronous
+*/
+#ifdef WIN32
+bool CSocket::gWSAInited = false;
+#endif
 
 void CSocket::Init() {
-	if(!gInited) {
+#ifdef WIN32
+	if(!gWSAInited) {
 		WORD    versionRequired = MAKEWORD(2,0);
 		WSADATA wsaData;
 
 		if (!WSAStartup(versionRequired,&wsaData)) {
 			printf("WSAStartup successfully!\n");
-			gInited = true;
+			gWSAInited = true;
 		} else {
 			printf("WSAStartup failed!\n");
-			gInited = false;
 		}
 	}
+#endif
 }
 
 void CSocket::Quit() {
+#ifdef WIN32
     WSACleanup();
-	gInited = false;
+	gWSAInited = false;
+#endif
 }
 
 void CSocket::Stop() {
-	_keepListen = false;
+#ifdef WIN32
 	closesocket(_connection);
+#else
+	close(_connection);
+#endif
 }
 
 int CSocket::Send(char *buf,int len) {
-    int actLen = _send( buf, len );
+    int actLen = send(_connection, buf, len, 0 );;
     _log(SEND,buf,actLen);
     return actLen;
 }
 
 #include <thread>
 int CSocket::Recv(char *buf,int *len) {
-	std::thread listener(&CSocket::_recv,this,buf,len);
-	listener.detach();
-	_keepListen = true;
-
-	return 0;
-}
-
-int CSocket::_send(char *buf,int len) {
-    int actLen = send(_connection, buf, len, 0 );
-    return actLen;
-}
-
-int CSocket::_recv(char *buf,int *len) {
-	while(_keepListen) {
-		while ( (*len = recv(_connection, buf, 128, 0))<=0 ) {
-		}
-		_log(RECV,buf,*len);
+	while ( (*len = recv(_connection, buf, SOCK_BUFF_LEN, 0))<=0 ) {
 	}
-	return 0;
+	_log(RECV,buf,*len);
+
+	return *len;
 }
-
-void CSocket::_log(const char *fmt,...) {
-    va_list arg;
-
-    va_start(arg,fmt);
-    printf(fmt,arg);
-    va_end(arg);
-}
-
-#include <ctype.h>
-void CSocket::_log(int dir,char *buf,int len) {
-	printf("%s (%d): ", (dir==SEND)?"SEND":"RECV", len);
-
-	if( isalnum(buf[0]) ) {
-	    printf("%s\n", buf);
-	} else {
-		printf("\n\t");
-		for(int i=0; i<len; i++) {
-			printf("%02x ",buf[i]);
-			if( (i+1)%16==0 ) {
-				printf("\n\t");
-			}
-		}
-		printf("\n");
-	}
-}
-
-bool CSocket::hasError()  
-{  
-#ifdef WIN32   
-    if(WSAGetLastError() != WSAEWOULDBLOCK) {  
-#else   
-    if(errno != EINPROGRESS && errno != EAGAIN) {  
-#endif   
-        return true;  
-    }  
-  
-    return false;  
-}  
-  
 
 /******************************************************
 	ServerSocket
@@ -158,7 +115,7 @@ void ClientSocket::Start() {
 #endif   
 
 	SOCKADDR_IN server;
-    server.sin_addr.S_un.S_addr=inet_addr(_SERVER_IP);
+    server.sin_addr.S_un.S_addr=inet_addr(SERVER_IP);
     server.sin_family=AF_INET;
     server.sin_port=htons(SOCKET_PORT);
 
@@ -188,4 +145,46 @@ void ClientSocket::Start() {
 	} else {
 		_log("%s : connect() error!\n",__FUNCTION__);
   	}
+}
+
+bool CSocket::hasError()  
+{  
+#ifdef WIN32   
+    if(WSAGetLastError() != WSAEWOULDBLOCK) {  
+#else   
+    if(errno != EINPROGRESS && errno != EAGAIN) {  
+#endif   
+        return true;  
+    }  
+  
+    return false;  
+}  
+  
+/***************************************************
+				辅助函数
+***************************************************/
+void CSocket::_log(const char *fmt,...) {
+    va_list arg;
+
+    va_start(arg,fmt);
+    printf(fmt,arg);
+    va_end(arg);
+}
+
+#include <ctype.h>
+void CSocket::_log(int dir,char *buf,int len) {
+	printf("%s (%d): ", (dir==SEND)?"SEND":"RECV", len);
+
+	if( isalnum(buf[0]) ) {
+	    printf("%s\n", buf);
+	} else {
+		printf("\n\t");
+		for(int i=0; i<len; i++) {
+			printf("%02x ",buf[i]);
+			if( (i+1)%16==0 ) {
+				printf("\n\t");
+			}
+		}
+		printf("\n");
+	}
 }

@@ -9,6 +9,7 @@ CTestNetwork::CTestNetwork() {
 }
 
 void CTestNetwork::Start() {
+	printf("test start *************************************************\n");
 	ClearClientBuf();
 	ClearServerBuf();
 
@@ -17,6 +18,7 @@ void CTestNetwork::Start() {
 
 void CTestNetwork::Stop() {
     CSocket::Quit();
+	printf("*************************************************** test end\n\n");
 }
 
 void CTestNetwork::ClearClientBuf() {
