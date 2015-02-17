@@ -15,9 +15,9 @@ public:
 	virtual void Stop();
 	virtual int  Execute();
 
-	char _clientBuff[SOCK_BUFF_LEN];
+	char _clientBuff[SOCKET_BUFF_SIZE];
 	int  _clientBuffLen;
-	char _serverBuff[SOCK_BUFF_LEN];
+	char _serverBuff[SOCKET_BUFF_SIZE];
 	int  _serverBuffLen;
 
 	void ClearClientBuf();

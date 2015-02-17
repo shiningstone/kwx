@@ -23,7 +23,7 @@
 #define SOCKET_PORT  6000
 
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
-#define SOCK_BUFF_LEN 128
+#define SOCKET_BUFF_SIZE 128
 
 class CSocket {
 public:
@@ -35,7 +35,7 @@ public:
 	static bool hasError();
 
     int Send(char *buf,int len);
-    int Recv(char *buf,int *len);
+    int Recv(char *buf,int *len,int bufSize=SOCKET_BUFF_SIZE);
 protected:
     SOCKET _connection;
 	bool   _keepAlive;

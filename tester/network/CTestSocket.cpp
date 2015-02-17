@@ -22,12 +22,12 @@ void CTestSocket::Stop() {
 }
 
 void CTestSocket::ClearClientBuf() {
-	memset( _clientBuff, 0, SOCK_BUFF_LEN );
+	memset( _clientBuff, 0, SOCKET_BUFF_SIZE );
 	_clientBuffLen = 0;
 }
 
 void CTestSocket::ClearServerBuf() {
-	memset( _serverBuff, 0, SOCK_BUFF_LEN );
+	memset( _serverBuff, 0, SOCKET_BUFF_SIZE );
 	_serverBuffLen = 0;
 }
 

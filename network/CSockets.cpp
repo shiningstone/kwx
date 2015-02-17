@@ -47,11 +47,11 @@ int CSocket::Send(char *buf,int len) {
 }
 
 #include <thread>
-int CSocket::Recv(char *buf,int *len) {
-	while ( (*len = recv(_connection, buf, SOCK_BUFF_LEN, 0))<=0 ) {
+int CSocket::Recv(char *buf,int *len,int bufSize) {
+	while ( (*len = recv(_connection, buf, bufSize, 0))<=0 ) {
 	}
-	_log(RECV,buf,*len);
 
+	_log(RECV,buf,*len);
 	return *len;
 }
 

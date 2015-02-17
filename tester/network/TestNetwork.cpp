@@ -246,6 +246,7 @@ class TestNetMessengerRecvOnePackage : public CTestMessenger {
 	virtual void ClientActions() {
 		MESSENGER->Start();
 
+		Sleep(DELAY);
 		MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen);
 		assert( !memcmp(_clientBuff,MESSAGE,MESSAGE_LEN) );
 		ClearClientBuf();
