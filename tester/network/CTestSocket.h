@@ -1,15 +1,19 @@
+
+#ifndef __TEST_SOCKET__
+#define __TEST_SOCKET__
+
 #include "./../CTestCase.h"
 
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"
 
-class CTestNetwork : public CTestCase {
+class CTestSocket : public CTestCase {
 public:
-	CTestNetwork();
+	CTestSocket();
 
 	virtual void Start();
 	virtual void Stop();
-	virtual int Execute();
+	virtual int  Execute();
 
 	char _clientBuff[SOCK_BUFF_LEN];
 	int  _clientBuffLen;
@@ -26,3 +30,16 @@ protected:
 	virtual void ServerActions() = 0;
 	virtual void ClientActions() = 0;
 };
+
+#include "./../../network/NetMessenger.h"
+class CTestMessenger : public CTestSocket {
+public:
+	CTestMessenger();
+protected:
+	NetMessenger    *MESSENGER;
+
+	virtual void ServerActions() = 0;
+	virtual void ClientActions() = 0;
+};
+
+#endif

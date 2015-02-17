@@ -4,11 +4,11 @@
 #include <assert.h>
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"
-#include "./CTestNetwork.h"
+#include "./CTestSocket.h"
 
 #define DELAY 100
 
-class TestSingleSendAndRecv : public CTestNetwork {
+class TestSingleSendAndRecv : public CTestSocket {
 	virtual void ServerActions() {
 		SERVER.Start();
 
@@ -34,7 +34,7 @@ class TestSingleSendAndRecv : public CTestNetwork {
 	}
 };
 
-class TestGameSocket : public CTestNetwork {
+class TestGameSocket : public CTestSocket {
 	virtual void ServerActions() {
 		SERVER.Start();
 
@@ -61,7 +61,7 @@ class TestGameSocket : public CTestNetwork {
 	}
 };
 
-class TestByteOrder : public CTestNetwork {
+class TestByteOrder : public CTestSocket {
 	#pragma pack(1)
 	typedef struct {
 		char a[3];
@@ -114,7 +114,7 @@ class TestByteOrder : public CTestNetwork {
 	}
 };
 
-class TestMultipleSendAndRecv : public CTestNetwork {
+class TestMultipleSendAndRecv : public CTestSocket {
 	virtual void ServerActions() {
 		char buf[32] = {0};
 		int i        = 0;
@@ -178,7 +178,7 @@ class TestMultipleSendAndRecv : public CTestNetwork {
 	}
 };
 
-class TestEmpty : public CTestNetwork {
+class TestEmpty : public CTestSocket {
 	virtual void ServerActions() {
 	}
 
@@ -186,7 +186,7 @@ class TestEmpty : public CTestNetwork {
 	}
 };
 
-void startRun() {
+void testBasicSocket() {
 	CTestCase *aCase;
 
 	aCase = new TestSingleSendAndRecv();
@@ -204,11 +204,66 @@ void startRun() {
 	aCase->Execute();
 	aCase->Stop();
 
-#if 1
+#if 0
 	aCase = new TestGameSocket();   //这个case执行以后socket start失败
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
 #endif
+}
+
+class TestNetMessengerRecvOnePackage : public CTestMessenger {
+	INT8U MESSAGE[MSG_MAX_LEN];
+	int   MESSAGE_LEN;
+
+	virtual void Start() {
+		CTestMessenger::Start();
+
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x01,0x02,             //request code
+            0x03,                  //level
+            0x04,0x05,             //package size
+            0,0,0,0,0,0,0,0,0,0,0,0,//reserved
+            3,
+            128,4,0,1,2,3,
+            50,4,
+            0
+        };
+
+		MESSAGE_LEN = sizeof(msgInNetwork);
+		memcpy( MESSAGE,msgInNetwork,MESSAGE_LEN );
+	}
+
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		MESSENGER->Start();
+
+		MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen);
+		assert( !memcmp(_clientBuff,MESSAGE,MESSAGE_LEN) );
+		ClearClientBuf();
+	}
+};
+
+void testMessenger() {
+	CTestCase *aCase;
+
+	aCase = new TestNetMessengerRecvOnePackage();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+}
+
+void startRun() {
+	testBasicSocket();
+	testMessenger();
 }
 

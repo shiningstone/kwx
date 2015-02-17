@@ -3,12 +3,12 @@
 #pragma comment(lib,"ws2_32.lib")
 #include <assert.h>
 
-#include "./CTestNetwork.h"
+#include "./CTestSocket.h"
 
-CTestNetwork::CTestNetwork() {
+CTestSocket::CTestSocket() {
 }
 
-void CTestNetwork::Start() {
+void CTestSocket::Start() {
 	printf("test start *************************************************\n");
 	ClearClientBuf();
 	ClearServerBuf();
@@ -16,27 +16,31 @@ void CTestNetwork::Start() {
 	CSocket::Init();
 }
 
-void CTestNetwork::Stop() {
+void CTestSocket::Stop() {
     CSocket::Quit();
 	printf("*************************************************** test end\n\n");
 }
 
-void CTestNetwork::ClearClientBuf() {
+void CTestSocket::ClearClientBuf() {
 	memset( _clientBuff, 0, SOCK_BUFF_LEN );
 	_clientBuffLen = 0;
 }
 
-void CTestNetwork::ClearServerBuf() {
+void CTestSocket::ClearServerBuf() {
 	memset( _serverBuff, 0, SOCK_BUFF_LEN );
 	_serverBuffLen = 0;
 }
 
-int CTestNetwork::Execute() {
-    std::thread Tserver( &CTestNetwork::ServerActions,this );
-    std::thread Tclient( &CTestNetwork::ClientActions,this );
+int CTestSocket::Execute() {
+    std::thread Tserver( &CTestSocket::ServerActions,this );
+    std::thread Tclient( &CTestSocket::ClientActions,this );
 
     Tserver.join();
     Tclient.join();
 
 	return 0;
+}
+
+CTestMessenger::CTestMessenger() {
+	MESSENGER = NetMessenger::getInstance();
 }
