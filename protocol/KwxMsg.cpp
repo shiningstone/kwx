@@ -103,7 +103,6 @@ int KwxMsg::AddCards(CARD *cards,int num) {
     }
 
     return _add_item( new Item(CardList,num*4,buf) );
-;
 }
 
 /**********************************************************
@@ -160,4 +159,31 @@ int KwxMsg::SetUpdateCardList(CARD *cards,int num) {
     AddCards(cards,num);
 
     return 0;
+}
+
+RequestId_t KwxMsg::GetRequestCode() {
+    return (RequestId_t)_header->_requestCode;
+}
+
+int KwxMsg::GetLevel() {
+    DnHeader *header = static_cast<DnHeader *>(_header);
+    return header->_level;
+}
+int KwxMsg::Construct(DistributeResponse_t &response,const INT8U *inMsg) {
+    int len = Deserialize(inMsg);
+
+    response.room = _body->_items[0]->_value;    /*id==60*/
+    response.seat = _body->_items[1]->_value;    /*id==61*/
+    response.cardKind = _body->_items[2]->_value;/*id==70*/
+
+    return len;
+}
+
+int KwxMsg::Construct(OthersAction_t &actionInfo,const INT8U *inMsg) {
+    int len = Deserialize(inMsg);
+
+    actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
+    actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67*/
+
+    return len;
 }

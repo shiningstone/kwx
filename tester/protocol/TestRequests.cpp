@@ -132,43 +132,6 @@ public:
     }
 };
 
-class TestGameRecvDistributeResponse : public CTestCase {
-public:
-    virtual int Execute() {
-        const INT8U msgInNetwork[] = {
-            'K','W','X',           //KWX
-            0x00,50,               //request code(发送发牌请求)
-            7,                     //package level
-            0x00,27,               //package size
-            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
-
-            3,
-            60,1,                  //roomId
-            61,2,                  //seat
-            70,0,                  //card kind
-        };
-        INT8U buf[MSG_MAX_LEN] = {0};
-        int   len = 0;
-
-        KwxMsg aMsg(DOWN_STREAM);
-        len = aMsg.Deserialize(msgInNetwork);
-
-        DnHeader *aHeader = static_cast<DnHeader *>(aMsg._header);        
-        assert(len==sizeof(msgInNetwork));
-        assert(aHeader->_requestCode==REQ_GAME_SEND_DIST);
-        assert(aHeader->_level==7);
-        assert(aMsg._body->_itemNum==3);
-            assert(aMsg._body->_items[0]->_id==60);
-            assert(aMsg._body->_items[0]->_value==1);
-            assert(aMsg._body->_items[1]->_id==61);
-            assert(aMsg._body->_items[1]->_value==2);
-            assert(aMsg._body->_items[2]->_id==70);
-            assert(aMsg._body->_items[2]->_value==0);
-
-        return 0;
-    }
-};
-
 class TestGameSendUpdateList : public CTestCase {
 public:
     virtual int Execute() {
@@ -221,6 +184,73 @@ public:
     }
 };
 
+class TestGameRecvDistributeResponse : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code(发送发牌请求)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            60,1,                  //roomId
+            61,2,                  //seat
+            70,0,                  //card kind
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxMsg aMsg(DOWN_STREAM);
+        DistributeResponse_t response = {0};
+
+        len = aMsg.Construct(response,msgInNetwork);
+
+        assert( len==sizeof(msgInNetwork) );
+        assert( aMsg.GetRequestCode()==REQ_GAME_SEND_DIST );
+        assert( aMsg.GetLevel()==7 );
+
+        assert( response.room==1 );
+        assert( response.seat==2 );
+        assert( response.cardKind==0 );
+        
+        return 0;
+    }
+};
+
+class TestGameRecvAction : public CTestCase {
+public:
+    virtual int Execute() {
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,74,               //request code(下发其他玩家动作)
+            7,                     //package level
+            0x00,25,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,1,                  //seatId
+            67,2,                  //action
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxMsg aMsg(DOWN_STREAM);
+        OthersAction_t actionInfo = {0};
+
+        len = aMsg.Construct(actionInfo,msgInNetwork);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_ACTION );
+        assert( aMsg.GetLevel()==7 );
+        assert( actionInfo.seat==1 );
+        assert( actionInfo.action==2 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
     CTestCase *aCase = new TestGameSendAction();
     aCase->Execute();
@@ -235,5 +265,8 @@ void testRequests() {
     aCase->Execute();
 
     aCase = new TestGameSendUpdateList();
+    aCase->Execute();
+
+    aCase = new TestGameRecvAction();
     aCase->Execute();
 }

@@ -94,4 +94,15 @@ public:
     Item     *_items[ITEM_MAX_NUM];
 };
 
+
+typedef struct _distributeResponse {
+    INT8U         room;
+    INT8U         seat;
+    CardType_t    cardKind;
+}DistributeResponse_t;
+
+typedef struct _othersAction {
+    INT8U         seat;
+    ActionId_t    action;
+}OthersAction_t;
 #endif
