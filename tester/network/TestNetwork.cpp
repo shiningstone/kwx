@@ -247,7 +247,7 @@ class TestNetMessengerRecvOneFullPackage : public CTestMessenger {
 	virtual void ClientActions() {
 		MESSENGER->Start();
 
-		while( !MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen) ) {
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) ) {
 			Sleep(DELAY);
 		}
 
@@ -291,7 +291,7 @@ class TestNetMessengerRecvOnePartialPackage : public CTestMessenger {
 	virtual void ClientActions() {
 		MESSENGER->Start();
 
-		while( !MESSENGER->Recv((INT8U *)_clientBuff,&_clientBuffLen) ) {
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) ) {
 			Sleep(DELAY);
 		}
 
@@ -299,10 +299,64 @@ class TestNetMessengerRecvOnePartialPackage : public CTestMessenger {
 	}
 };
 
+class TestNetMessengerRecvOneFullPackagePlusExtraData : public CTestMessenger {
+	INT8U MESSAGE[MSG_MAX_LEN];
+	int   MESSAGE_LEN;
+
+	virtual void Start() {
+		CTestMessenger::Start();
+
+        const INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code(发送发牌请求)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            60,1,                  //roomId
+            61,2,                  //seat
+            70,0,                  //card kind
+
+		    'K','W','X',           //KWX
+            0x00,50,               //request code(发送发牌请求)
+		};
+
+		MESSAGE_LEN = sizeof(msgInNetwork);
+		memcpy( MESSAGE,msgInNetwork,MESSAGE_LEN );
+	}
+
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+		MESSENGER->Start();
+
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) ) {
+			Sleep(DELAY);
+		}
+
+		assert( _clientBuffLen==(MESSAGE_LEN-5) );
+		assert( !memcmp(_clientBuff,MESSAGE,_clientBuffLen) );
+		assert( memcmp(_clientBuff,MESSAGE,MESSAGE_LEN) );
+		ClearClientBuf();
+	}
+};
+
 void testMessenger() {
 	CTestCase *aCase;
 
 	aCase = new TestNetMessengerRecvOneFullPackage();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+	aCase = new TestNetMessengerRecvOneFullPackagePlusExtraData();
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();

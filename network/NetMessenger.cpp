@@ -27,12 +27,30 @@ int NetMessenger::Send(const INT8U *buf,int len) {
 	return _socket->Send((char *)buf,len);
 }
 
-bool NetMessenger::Recv(INT8U *pkg,int *pkgLen) {
-	if( !_is_pkg_exists() ) {
-		return false;
-	} else {
-		return _get_pkg_from_buff(pkg,pkgLen);
+void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
+	if(_usedStart + pkgLen > BUFF_SIZE) {  
+		int copylen = BUFF_SIZE - _usedStart;  
+		memcpy(pkg, _pkgBuf + _usedStart, copylen);  
+		memcpy((INT8U *)(pkg+copylen), _pkgBuf, pkgLen-copylen);  
+	} else {  
+		memcpy(pkg, _pkgBuf+_usedStart, pkgLen);  
 	}
+  
+	_usedStart = (_usedStart + pkgLen) % BUFF_SIZE;  
+	_usedLen   -= pkgLen;
+}
+
+bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
+	if ( _is_pkg_header_exists() ) {
+		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+DnHeader::SIZE)));
+
+		if ( _is_pkg_body_completed(pkgLen) ) {
+			_get_pkg_from_buffer(pkg,pkgLen);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 NetMessenger * NetMessenger::_instance = 0;
@@ -45,7 +63,6 @@ NetMessenger * NetMessenger::getInstance() {
 	return _instance;
 }
 
-#include <stdio.h>
 void NetMessenger::_listen() {
 	_keepListen = true;
 
@@ -67,31 +84,18 @@ void NetMessenger::_listen() {
 	}
 }
 
-bool  NetMessenger::_get_pkg_from_buff(INT8U *pkg,int *pkgLen) {
-	if(_usedStart + _usedLen > BUFF_SIZE) {  
-		int copylen = BUFF_SIZE - _usedStart;  
-		memcpy(pkg, _pkgBuf + _usedStart, copylen);  
-		memcpy((INT8U *)(pkg+copylen), _pkgBuf, _usedLen-copylen);  
-	} else {  
-		memcpy(pkg, _pkgBuf+_usedStart, _usedLen);  
+bool NetMessenger::_is_pkg_header_exists() {
+	if ( strstr((char *)_pkgBuf,"KWX") && _usedLen>DnHeader::DN_HEADER_LEN ) {
+		return true;
+	} else {
+		return false;
 	}
-	*pkgLen = _usedLen;
-  
-	_usedStart = (_usedStart + _usedLen) % BUFF_SIZE;  
-	_usedLen   = 0;
-
-	return true;
 }
 
-#include <string.h>
-/*this function is only practicable for downstream packages currently*/
-bool  NetMessenger::_is_pkg_exists() {
-	if ( strstr((char *)_pkgBuf,"KWX") ) {
-		if ( _usedLen>DnHeader::DN_HEADER_LEN )	{
-			if ( _usedLen==_ntohs((*(INT16U *)(_pkgBuf+DnHeader::SIZE))) )
-				return true;
-		}	
+bool NetMessenger::_is_pkg_body_completed(int pkgLen) {
+	if ( _usedLen>=pkgLen ) {
+		return true;
+	} else {
+		return false;
 	}
-
-	return false;
 }
