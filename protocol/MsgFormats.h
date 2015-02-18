@@ -8,7 +8,7 @@
 class Header : public MsgIntf {
 public:
     virtual int Serialize(INT8U *outMsg) = 0;
-    virtual int Deserialize(const INT8U *inMsg) = 0;
+    virtual int Deserialize(INT8U *inMsg) = 0;
 
     INT8U    _pchc[3];
     INT16U   _requestCode;
@@ -22,7 +22,7 @@ public:
 	UpHeader();
 
     virtual int Serialize(INT8U *outMsg);
-    virtual int Deserialize(const INT8U *inMsg);
+    virtual int Deserialize(INT8U *inMsg);
 
 	INT8U    _protocol;
 	INT32U   _userId;
@@ -49,7 +49,7 @@ public:
 class DnHeader : public Header{
 public:
     virtual int Serialize(INT8U *outMsg);
-    virtual int Deserialize(const INT8U *inMsg);
+    virtual int Deserialize(INT8U *inMsg);
 
     INT8U    _level;
 
@@ -68,7 +68,7 @@ public:
 	Item(Item_t itemId, INT8U bufLen,INT8U *buf);
 
     virtual int Serialize(INT8U *outMsg);
-    virtual int Deserialize(const INT8U *inMsg);
+    virtual int Deserialize(INT8U *inMsg);
 
     Item_t   _id;
     INT8U    _value;
@@ -88,7 +88,7 @@ public:
     ~MsgBody();
 
     virtual int Serialize(INT8U *outMsg);
-    virtual int Deserialize(const INT8U *inMsg);
+    virtual int Deserialize(INT8U *inMsg);
 
     INT8U    _itemNum;
     Item     *_items[ITEM_MAX_NUM];

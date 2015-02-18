@@ -12,7 +12,7 @@ class TestUpHeader : public CTestCase {
 public:
     virtual int Execute() {
 		//解包测试
-        const INT8U msgInNetwork[UpHeader::UP_HEADER_LEN] = {
+        INT8U msgInNetwork[UpHeader::UP_HEADER_LEN] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -63,7 +63,7 @@ class TestDnHeader : public CTestCase {
 public:
     virtual int Execute() {
 		//解包测试
-        const INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
+        INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
             'K','W','X',           //KWX
             0x01,0x02,             //request code
             0x03,                  //level
@@ -98,7 +98,7 @@ public:
 class TestItemOnePureId : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             0,
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -127,7 +127,7 @@ public:
 class TestItemOneIdPlusInt : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             50,51
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -158,7 +158,7 @@ public:
 class TestItemOneIdPlusBuf : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             128,1,0
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -191,7 +191,7 @@ public:
 class TestItemOneIdPlusLongBuf : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             128,2,0,1
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -225,7 +225,7 @@ public:
 class TestMsgBody : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             1,0,
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -258,7 +258,7 @@ public:
 class TestItemTwoPureId : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             2,0,1
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -297,7 +297,7 @@ public:
 class TestItemOnePureIdTwoWithValue : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             2,
             0,
             50,2
@@ -340,7 +340,7 @@ public:
 class TestItemOneWithBufTwoWithValueThreePureId : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             3,
             128,4,0,1,2,3,
             50,4,
@@ -394,7 +394,7 @@ public:
 class TestFullUpMsg : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -483,7 +483,7 @@ class TestFullDnMsg : public CTestCase {
 public:
     virtual int Execute() {
 		//解包测试
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x01,0x02,             //request code
             0x03,                  //level

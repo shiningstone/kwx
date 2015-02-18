@@ -12,7 +12,7 @@ class TestNonKwxMsg : public CTestCase {
 public:
     virtual int Execute() {
 
-        const INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
+        INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
             0,                     //reserved
         };
         KwxMsg aMsg(DOWN_STREAM);

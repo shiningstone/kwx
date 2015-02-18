@@ -13,7 +13,7 @@ typedef int            INT32U;
 class MsgIntf {
 public:
     virtual int Serialize(INT8U *outMsg) = 0;
-    virtual int Deserialize(const INT8U *inMsg) = 0;
+    virtual int Deserialize(INT8U *inMsg) = 0;
 };
 
 extern INT32U _ntohl(INT32U n);

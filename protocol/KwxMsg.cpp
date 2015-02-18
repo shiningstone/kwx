@@ -5,6 +5,8 @@
 #include "MsgFormats.h"
 #include "KwxMsg.h"
 
+#include "./../network/NetMessenger.h"
+
 KwxMsg::KwxMsg(int dir)
 :_dir(dir) {
 	if (_dir==UP_STREAM) {
@@ -14,6 +16,8 @@ KwxMsg::KwxMsg(int dir)
     }
 
     _body = new MsgBody();
+
+    _messenger = NetMessenger::getInstance();
 }
 
 KwxMsg::~KwxMsg() {
@@ -26,14 +30,17 @@ int KwxMsg::Serialize(INT8U *outMsg) {
 
     len += _header->Serialize(outMsg);
     len += _body->Serialize(outMsg+len);
-
 	_set_size(outMsg,len);
+
+    _messenger->Send(outMsg,len);
 
     return len;
 }
 
-int KwxMsg::Deserialize(const INT8U *inMsg) {
+int KwxMsg::Deserialize(INT8U *inMsg) {
     int len = 0;
+
+    _messenger->Recv(inMsg,len);
 
     if (memcmp(inMsg,Header::PCHC,3)) {
         return KWX_INVALID_PCHC;
@@ -110,7 +117,7 @@ int KwxMsg::AddCards(CARD *cards,int num) {
 ***********************************************************/
 #include "EnvVariables.h"
 
-int KwxMsg::SetAction(ActionId_t code) {
+int KwxMsg::SetAction(INT8U *buf,ActionId_t code) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_ACTION);
@@ -120,10 +127,10 @@ int KwxMsg::SetAction(ActionId_t code) {
     AddSeatId(seat->_seatId);
     AddAction(code);
 
-    return 0;
+    return Serialize(buf);
 }
 
-int KwxMsg::SetShowCard(CardType_t code) {
+int KwxMsg::SetShowCard(INT8U *buf,CardType_t code) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_SHOW_CARD);
@@ -133,10 +140,10 @@ int KwxMsg::SetShowCard(CardType_t code) {
     AddSeatId(seat->_seatId);
     AddShowCard(code);
 
-    return 0;
+    return Serialize(buf);
 }
 
-int KwxMsg::SetReaction(ActionId_t code) {
+int KwxMsg::SetReaction(INT8U *buf,ActionId_t code) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_RESPONSE);
@@ -146,10 +153,10 @@ int KwxMsg::SetReaction(ActionId_t code) {
     AddSeatId(seat->_seatId);
     AddAction(code);
 
-    return 0;
+    return Serialize(buf);
 }
 
-int KwxMsg::SetRequestDistribute() {
+int KwxMsg::SetRequestDistribute(INT8U *buf) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_DIST);
@@ -158,10 +165,10 @@ int KwxMsg::SetRequestDistribute() {
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
 
-    return 0;
+    return Serialize(buf);
 }
 
-int KwxMsg::SetUpdateCardList(CARD *cards,int num) {
+int KwxMsg::SetUpdateCardList(INT8U *buf,CARD *cards,int num) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_UPDATELIST);
@@ -171,7 +178,7 @@ int KwxMsg::SetUpdateCardList(CARD *cards,int num) {
     AddSeatId(seat->_seatId);
     AddCards(cards,num);
 
-    return 0;
+    return Serialize(buf);
 }
 
 RequestId_t KwxMsg::GetRequestCode() {
@@ -182,7 +189,7 @@ int KwxMsg::GetLevel() {
     DnHeader *header = static_cast<DnHeader *>(_header);
     return header->_level;
 }
-int KwxMsg::Construct(DistributeResponse_t &response,const INT8U *inMsg) {
+int KwxMsg::Construct(DistributeResponse_t &response,INT8U *inMsg) {
     int len = Deserialize(inMsg);
 
     response.room = _body->_items[0]->_value;    /*id==60*/
@@ -192,7 +199,7 @@ int KwxMsg::Construct(DistributeResponse_t &response,const INT8U *inMsg) {
     return len;
 }
 
-int KwxMsg::Construct(OthersAction_t &actionInfo,const INT8U *inMsg) {
+int KwxMsg::Construct(OthersAction_t &actionInfo,INT8U *inMsg) {
     int len = Deserialize(inMsg);
 
     actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
@@ -201,7 +208,7 @@ int KwxMsg::Construct(OthersAction_t &actionInfo,const INT8U *inMsg) {
     return len;
 }
 
-int KwxMsg::Construct(OthersShowCard_t &cardInfo,const INT8U *inMsg) {
+int KwxMsg::Construct(OthersShowCard_t &cardInfo,INT8U *inMsg) {
     int len = Deserialize(inMsg);
 
     cardInfo.seat     = _body->_items[0]->_value;            /*id==60*/

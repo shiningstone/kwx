@@ -219,7 +219,7 @@ class TestNetMessengerRecvOneFullPackage : public CTestMessenger {
 	virtual void Start() {
 		CTestMessenger::Start();
 
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,50,               //request code(发送发牌请求)
             7,                     //package level
@@ -263,7 +263,7 @@ class TestNetMessengerRecvOnePartialPackage : public CTestMessenger {
 	virtual void Start() {
 		CTestMessenger::Start();
 
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,50,               //request code(发送发牌请求)
             7,                     //package level
@@ -306,7 +306,7 @@ class TestNetMessengerRecvOneFullPackagePlusExtraData : public CTestMessenger {
 	virtual void Start() {
 		CTestMessenger::Start();
 
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,50,               //request code(发送发牌请求)
             7,                     //package level

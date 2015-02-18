@@ -34,7 +34,7 @@ int UpHeader::Serialize(INT8U *outMsg) {
     return UP_HEADER_LEN;
 }
 
-int UpHeader::Deserialize(const INT8U *inMsg) {
+int UpHeader::Deserialize(INT8U *inMsg) {
     memcpy(_pchc,inMsg,3);
 
 	_protocol     = inMsg[PROTOCOL];
@@ -61,7 +61,7 @@ int DnHeader::Serialize(INT8U *outMsg) {
     return DN_HEADER_LEN;
 }
 
-int DnHeader::Deserialize(const INT8U *inMsg) {
+int DnHeader::Deserialize(INT8U *inMsg) {
     memcpy(_pchc,inMsg,3);
 
     _requestCode  = _ntohs( *(INT16U *)(inMsg+REQUEST_CODE) );
@@ -113,7 +113,7 @@ int Item::Serialize(INT8U *outMsg) {
     }
 }
 
-int Item::Deserialize(const INT8U *inMsg) {
+int Item::Deserialize(INT8U *inMsg) {
     _id = (Item_t)inMsg[0];
 
     switch( _IdType(_id) ) {
@@ -157,7 +157,7 @@ int MsgBody::Serialize(INT8U *outMsg) {
     return bodyLen;
 }
 
-int MsgBody::Deserialize(const INT8U *inMsg) {
+int MsgBody::Deserialize(INT8U *inMsg) {
     _itemNum = inMsg[0];
     int bodyLen = 1;
 

@@ -13,7 +13,7 @@
 class TestGameSendAction : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -40,9 +40,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetAction(PENG);
-
-        len = aMsg.Serialize(buf);
+        len = aMsg.SetAction(buf,PENG);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));
@@ -54,7 +52,7 @@ public:
 class TestGameSendShowCard : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -81,9 +79,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetShowCard(0);
-
-        len = aMsg.Serialize(buf);
+        len = aMsg.SetShowCard(buf,0);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));
@@ -95,7 +91,7 @@ public:
 class TestGameSendReaction : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -122,9 +118,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetReaction(PENG);
-
-        len = aMsg.Serialize(buf);
+        len = aMsg.SetReaction(buf,PENG);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));
@@ -136,7 +130,7 @@ public:
 class TestGameSendDistributeRequest : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -162,9 +156,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetRequestDistribute();
-
-        len = aMsg.Serialize(buf);
+        len = aMsg.SetRequestDistribute(buf);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));
@@ -176,7 +168,7 @@ public:
 class TestGameSendUpdateList : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x10,                  //protocol version
             0x01,0x02,0x03,0x04,   //user id
@@ -214,9 +206,7 @@ public:
             cards[1].can_play  = cps_NO;
 
         KwxMsg aMsg(UP_STREAM);
-        aMsg.SetUpdateCardList(cards,sizeof(cards)/sizeof(CARD));
-
-        len = aMsg.Serialize(buf);
+        len = aMsg.SetUpdateCardList(buf,cards,sizeof(cards)/sizeof(CARD));
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));
@@ -228,7 +218,7 @@ public:
 class TestGameRecvDistributeResponse : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,50,               //request code(发送发牌请求)
             7,                     //package level
@@ -263,7 +253,7 @@ public:
 class TestGameRecvOthersAction : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,74,               //request code(下发其他玩家动作)
             7,                     //package level
@@ -296,7 +286,7 @@ public:
 class TestGameRecvOthersShowCard : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,75,               //request code(下发其他玩家出牌)
             7,                     //package level
@@ -329,7 +319,7 @@ public:
 class TestGameRecvOthersReaction : public CTestCase {
 public:
     virtual int Execute() {
-        const INT8U msgInNetwork[] = {
+        INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
             0x00,76,               //request code(下发其他玩家反应)
             7,                     //package level

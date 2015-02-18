@@ -13,6 +13,7 @@
 class Header;
 class MsgBody;
 class Item;
+class NetMessenger;
 
 class KwxMsg : public MsgIntf {
 public:
@@ -20,26 +21,27 @@ public:
     ~KwxMsg();
     
     /* upstream */
-    int SetAction(ActionId_t code);
-    int SetShowCard(CardType_t code);
-    int SetReaction(ActionId_t code);
-    int SetRequestDistribute();
-    int SetUpdateCardList(CARD *cards,int cardNum);
+    int SetAction(INT8U *buf,ActionId_t code);
+    int SetShowCard(INT8U *buf,CardType_t code);
+    int SetReaction(INT8U *buf,ActionId_t code);
+    int SetRequestDistribute(INT8U *buf);
+    int SetUpdateCardList(INT8U *buf,CARD *cards,int cardNum);
     
     /* downstream*/
     RequestId_t GetRequestCode();
     int         GetLevel();
-    int         Construct(DistributeResponse_t &response,const INT8U *inMsg);
-    int         Construct(OthersAction_t &actionInfo,const INT8U *inMsg);
-    int         Construct(OthersShowCard_t &cardInfo,const INT8U *inMsg);
+    int         Construct(DistributeResponse_t &response,INT8U *inMsg);
+    int         Construct(OthersAction_t &actionInfo,INT8U *inMsg);
+    int         Construct(OthersShowCard_t &cardInfo,INT8U *inMsg);
 
 /* the following items should be only referenced by test*/
 /*
 protected:
 */
     virtual int Serialize(INT8U *outMsg);
-    virtual int Deserialize(const INT8U *inMsg);
+    virtual int Deserialize(INT8U *inMsg);
 
+    NetMessenger    *_messenger;
     Header   *_header;
     MsgBody  *_body;
 protected:
