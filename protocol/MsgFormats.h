@@ -54,10 +54,8 @@ public:
     INT8U    _level;
 
     static const int DN_HEADER_LEN     = 20;
-private:
 	static const int REQUEST_CODE  = 3;
     static const int LEVEL         = REQUEST_CODE + 2;
-public:
 	static const int SIZE          = LEVEL + 1;
 };
 

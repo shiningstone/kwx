@@ -19,8 +19,10 @@ NetMessenger::~NetMessenger() {
 #include <thread>
 void NetMessenger::Start() {
 	_socket->Start();
-	std::thread listener(&NetMessenger::_listen,this);
-	listener.detach();
+    if(!_keepListen) {
+	    std::thread listener(&NetMessenger::_listen,this);
+	    listener.detach();
+    }
 }
 
 int NetMessenger::Send(const INT8U *buf,int len) {
@@ -35,7 +37,7 @@ void NetMessenger::ClearRecvBuf() {
 
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
 	if ( _is_pkg_header_exists() ) {
-		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+DnHeader::SIZE)));
+		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
 
 		if ( _is_pkg_body_completed(pkgLen) ) {
 			_get_pkg_from_buffer(pkg,pkgLen);
@@ -48,11 +50,15 @@ bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
 
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen,RequestId_t request) {
 	if ( _is_pkg_header_exists() ) {
-		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+DnHeader::SIZE)));
+		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
 
 		if ( _is_pkg_body_completed(pkgLen) ) {
 			_get_pkg_from_buffer(pkg,pkgLen);
-			return true;
+            if( request==_ntohs(*(INT16U *)(pkg+DnHeader::REQUEST_CODE)) ) {
+    			return true;
+            } else {
+                return Recv(pkg,pkgLen,request);
+            }
 		}
 	}
 
@@ -60,16 +66,19 @@ bool NetMessenger::Recv(INT8U *pkg,int &pkgLen,RequestId_t request) {
 }
 
 void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
-	if(_outStart + pkgLen > BUFF_SIZE) {  
+	if(_outStart+pkgLen > BUFF_SIZE) {  
 		int copylen = BUFF_SIZE - _outStart;  
-		memcpy(pkg, _pkgBuf + _outStart, copylen);  
+		memcpy(pkg, _pkgBuf+_outStart, copylen);  
 		memcpy((INT8U *)(pkg+copylen), _pkgBuf, pkgLen-copylen);  
+
+        memset(_pkgBuf+_outStart,0,copylen);
+        memset(_pkgBuf,0,pkgLen-copylen);
 	} else {  
 		memcpy(pkg, _pkgBuf+_outStart, pkgLen);  
+        memset(_pkgBuf+_outStart,0,pkgLen);
 	}
   
 	_outStart = (_outStart + pkgLen) % BUFF_SIZE;  
-    printf("fetch %d bytes: _outStart move to %d ,used length %d\n",pkgLen,_outStart,_usedLen());
 }
 
 void NetMessenger::_listen() {
@@ -87,10 +96,11 @@ void NetMessenger::_listen() {
         if(!_keepListen) {
             return;
         }
+
 		int inLen = 0;
-		if ( _socket->Recv((char *)_pkgBuf+_inStart, &inLen, availLen)>0 ) {
+        /* 这里最好能够使用互斥量 */
+        if ( _socket->Recv((char *)(_pkgBuf + _inStart), &inLen, availLen)>0 ) {
             _inStart = (_inStart+inLen) % BUFF_SIZE;
-            printf("put   %d bytes : _inStart move to %d\n",inLen,_inStart);
         }
 	}
 }
