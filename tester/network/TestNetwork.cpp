@@ -383,7 +383,7 @@ class TestNetMessengerRecvDesignatedPackage : public CTestMessenger {
 
 	virtual void ClientActions() {
 		MESSENGER->Start();
-		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) ) {
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen,(RequestId_t)75) ) {
 			Sleep(DELAY);
 		}
 		assert( !memcmp(_clientBuff,MESSAGE+25,25) );
