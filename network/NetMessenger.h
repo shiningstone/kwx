@@ -13,6 +13,8 @@ public:
 	void Start();
 	bool Recv(INT8U *buf,int &len);
 	int  Send(const INT8U *buf,int len);
+
+    void ClearRecvBuf();
 protected:
 	NetMessenger();
 	~NetMessenger();

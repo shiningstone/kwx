@@ -5,9 +5,7 @@ NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
 	_keepListen = false;
 
-	memset(_pkgBuf,0,BUFF_SIZE);
-	_usedStart = 0;
-	_usedLen   = 0;
+	ClearRecvBuf();
 }
 
 NetMessenger::~NetMessenger() {
@@ -29,6 +27,12 @@ int NetMessenger::Send(const INT8U *buf,int len) {
 	return _socket->Send((char *)buf,len);
 }
 
+void NetMessenger::ClearRecvBuf() {
+	memset(_pkgBuf,0,BUFF_SIZE);
+	_usedStart = 0;
+	_usedLen   = 0;
+}
+
 void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
 	if(_usedStart + pkgLen > BUFF_SIZE) {  
 		int copylen = BUFF_SIZE - _usedStart;  
@@ -40,6 +44,7 @@ void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
   
 	_usedStart = (_usedStart + pkgLen) % BUFF_SIZE;  
 	_usedLen   -= pkgLen;
+    printf("decrease: start %d - len %d\n",_usedStart,_usedLen);
 }
 
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
@@ -92,12 +97,13 @@ void NetMessenger::_listen() {
 		int inLen = 0;
 		if ( _socket->Recv((char *)_pkgBuf+availStart, &inLen, availLen)>0 ) {
 			_usedLen += inLen;
+            printf("increase: start %d(new start %d) - len %d(new len %d)\n",_usedStart,availStart,_usedLen,inLen);
         }
 	}
 }
 
 bool NetMessenger::_is_pkg_header_exists() {
-	if ( strstr((char *)_pkgBuf,"KWX") && _usedLen>DnHeader::DN_HEADER_LEN ) {
+	if ( strstr((char *)_pkgBuf+_usedStart,"KWX") && _usedLen>DnHeader::DN_HEADER_LEN ) {
 		return true;
 	} else {
 		return false;
