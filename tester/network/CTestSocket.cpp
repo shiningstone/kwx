@@ -47,9 +47,6 @@ void CTestMessenger::Start() {
 }
 
 void CTestMessenger::Stop() {
-/*
-    销毁instance并不能及时停止listen thread，由于测试用例采取thread而不是process的形式
-*/
 #if 0
     NetMessenger::destroyInstance();
     MESSENGER = 0;

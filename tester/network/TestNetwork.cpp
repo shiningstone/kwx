@@ -456,7 +456,7 @@ void testMessenger() {
 	aCase->Execute();
 	aCase->Stop();
 
-    /*这个测试用例会导致阻塞，因为始终收不到包*/
+    /*因为始终收不到包，这个测试用例会导致阻塞，所以要放在最后*/
     aCase = new TestNetMessengerRecvOneFrontPartialPackage();
 	aCase->Start();
 	aCase->Execute();

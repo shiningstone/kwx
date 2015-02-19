@@ -35,34 +35,39 @@ void NetMessenger::ClearRecvBuf() {
     _inStart   = 0;
 }
 
-bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
-	if ( _is_pkg_header_exists() ) {
-		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
-
-		if ( _is_pkg_body_completed(pkgLen) ) {
-			_get_pkg_from_buffer(pkg,pkgLen);
-			return true;
+int NetMessenger::_get_available_pkg_len() {
+    int usedLen = _usedLen();
+    
+	if ( strstr((char *)_pkgBuf+_outStart,"KWX") && usedLen>DnHeader::DN_HEADER_LEN  ) {
+		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
+		if ( usedLen>=pkgLen ) {
+			return pkgLen;
 		}
 	}
 
-	return false;
+	return 0;
+}
+
+bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
+    if ( (pkgLen=_get_available_pkg_len()) > 0 ) {
+        _get_pkg_from_buffer(pkg,pkgLen);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen,RequestId_t request) {
-	if ( _is_pkg_header_exists() ) {
-		pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
-
-		if ( _is_pkg_body_completed(pkgLen) ) {
-			_get_pkg_from_buffer(pkg,pkgLen);
-            if( request==_ntohs(*(INT16U *)(pkg+DnHeader::REQUEST_CODE)) ) {
-    			return true;
-            } else {
-                return Recv(pkg,pkgLen,request);
-            }
-		}
-	}
-
-	return false;
+    if ( (pkgLen=_get_available_pkg_len()) > 0 ) {
+        _get_pkg_from_buffer(pkg,pkgLen);
+        if( request==_ntohs(*(INT16U *)(pkg+DnHeader::REQUEST_CODE)) ) {
+            return true;
+        } else {
+            return Recv(pkg,pkgLen,request);
+        }
+    } else {
+        return false;
+    }
 }
 
 void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
@@ -105,6 +110,14 @@ void NetMessenger::_listen() {
 	}
 }
 
+int NetMessenger::_usedLen() {
+    if (_inStart>=_outStart) {
+        return (_inStart-_outStart);
+    } else {
+        return (_inStart+BUFF_SIZE-_outStart);
+    }
+}
+
 NetMessenger * NetMessenger::_instance = 0;
 bool           NetMessenger::_keepListen = false;
 CSocket      * NetMessenger::_socket   = 0;
@@ -122,26 +135,3 @@ void NetMessenger::destroyInstance() {
     _instance = 0;
 }
 
-bool NetMessenger::_is_pkg_header_exists() {
-	if ( strstr((char *)_pkgBuf+_outStart,"KWX") && _usedLen()>DnHeader::DN_HEADER_LEN ) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-int NetMessenger::_usedLen() {
-    if (_inStart>=_outStart) {
-        return (_inStart-_outStart);
-    } else {
-        return (_inStart+BUFF_SIZE-_outStart);
-    }
-}
-
-bool NetMessenger::_is_pkg_body_completed(int pkgLen) {
-	if ( _usedLen()>=pkgLen ) {
-		return true;
-	} else {
-		return false;
-	}
-}
