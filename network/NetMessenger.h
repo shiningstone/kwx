@@ -8,6 +8,7 @@
 class NetMessenger {
 public:
 	static NetMessenger *getInstance();
+	static void          destroyInstance();
 
 	void Start();
 	bool Recv(INT8U *buf,int &len);
@@ -17,11 +18,11 @@ protected:
 	~NetMessenger();
 
 	static NetMessenger *_instance;
+	static bool         _keepListen;
 	static CSocket      *_socket;
 private:
 	const static int BUFF_SIZE = SOCKET_BUFF_SIZE;
 
-	bool _keepListen;
 	void _listen();
 
 	INT8U _pkgBuf[BUFF_SIZE];   /* 环形接收缓冲  */

@@ -9,8 +9,6 @@
 
 class CTestSocket : public CTestCase {
 public:
-	CTestSocket();
-
 	virtual void Start();
 	virtual void Stop();
 	virtual int  Execute();
@@ -34,7 +32,9 @@ protected:
 #include "./../../network/NetMessenger.h"
 class CTestMessenger : public CTestSocket {
 public:
-	CTestMessenger();
+    virtual void Start();
+	virtual void Stop();
+
 protected:
 	NetMessenger    *MESSENGER;
 

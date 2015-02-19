@@ -5,12 +5,10 @@
 
 #include "./CTestSocket.h"
 
-CTestSocket::CTestSocket() {
-}
-
 void CTestSocket::Start() {
-	printf("test %d start *************************************************\n",count);
-	ClearClientBuf();
+    CTestCase::Start();
+
+    ClearClientBuf();
 	ClearServerBuf();
 
 	CSocket::Init();
@@ -18,7 +16,8 @@ void CTestSocket::Start() {
 
 void CTestSocket::Stop() {
     CSocket::Quit();
-	printf("*************************************************** test end\n\n");
+
+    CTestCase::Stop();
 }
 
 void CTestSocket::ClearClientBuf() {
@@ -41,6 +40,15 @@ int CTestSocket::Execute() {
 	return 0;
 }
 
-CTestMessenger::CTestMessenger() {
-	MESSENGER = NetMessenger::getInstance();
+void CTestMessenger::Start() {
+    CTestSocket::Start();
+
+    MESSENGER = NetMessenger::getInstance();
+}
+
+void CTestMessenger::Stop() {
+    NetMessenger::destroyInstance();
+    MESSENGER = 0;
+
+    CTestSocket::Stop();
 }

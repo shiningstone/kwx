@@ -252,7 +252,6 @@ class TestNetMessengerRecvOneFullPackage : public CTestMessenger {
 		}
 
 		assert( !memcmp(_clientBuff,MESSAGE,MESSAGE_LEN) );
-		ClearClientBuf();
 	}
 };
 

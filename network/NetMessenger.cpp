@@ -11,9 +11,11 @@ NetMessenger::NetMessenger() {
 }
 
 NetMessenger::~NetMessenger() {
-	_keepListen = false;
 	_socket->Stop();
 	delete _socket;
+    _socket = 0;
+
+    _keepListen = false;
 }
 
 #include <thread>
@@ -54,6 +56,7 @@ bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
 }
 
 NetMessenger * NetMessenger::_instance = 0;
+bool           NetMessenger::_keepListen = false;
 CSocket      * NetMessenger::_socket   = 0;
 NetMessenger * NetMessenger::getInstance() {
 	if(_instance==0) {
@@ -61,6 +64,12 @@ NetMessenger * NetMessenger::getInstance() {
 	}
 
 	return _instance;
+}
+
+void NetMessenger::destroyInstance() {
+    _keepListen = false;
+    delete _instance;
+    _instance = 0;
 }
 
 void NetMessenger::_listen() {
@@ -77,10 +86,13 @@ void NetMessenger::_listen() {
 			availLen   = BUFF_SIZE - _usedLen;
 		}  
   
+        if(!_keepListen) {
+            return;
+        }
 		int inLen = 0;
 		if ( _socket->Recv((char *)_pkgBuf+availStart, &inLen, availLen)>0 ) {
 			_usedLen += inLen;
-		}
+        }
 	}
 }
 
