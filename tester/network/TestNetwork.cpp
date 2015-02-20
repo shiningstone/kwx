@@ -436,6 +436,57 @@ class TestNetMessengerRecvOneFrontPartialPackage : public CTestMessenger {
 	}
 };
 
+class TestNetMessengerSendOutNotification : public CTestMessenger {
+	INT8U MESSAGE[MSG_MAX_LEN];
+	int   MESSAGE_LEN;
+
+	virtual void Start() {
+		CTestMessenger::Start();
+
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code(·¢ËÍ·¢ÅÆÇëÇó)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            60,1,                  //roomId
+            61,2,                  //seat
+            70,0,                  //card kind
+        };
+
+		MESSAGE_LEN = sizeof(msgInNetwork);
+		memcpy( MESSAGE,msgInNetwork,MESSAGE_LEN );
+	}
+
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
+
+		SERVER.Stop();
+	}
+
+    static INT8U RecvBuf[256];
+    static void MsgHandler(const INT8U *msg,int len) {
+        memcpy(RecvBuf,msg,len);
+        NetMessenger::SetHandler(0);
+    }
+
+	virtual void ClientActions() {
+        memset(RecvBuf,0,256);
+
+        MESSENGER->SetHandler((MsgHandler_t)&TestNetMessengerSendOutNotification::MsgHandler);
+		MESSENGER->Start();
+        while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) );
+
+        assert( !memcmp(RecvBuf,MESSAGE,MESSAGE_LEN) );
+    }
+};
+
+INT8U TestNetMessengerSendOutNotification::RecvBuf[256] = {0};
+
 void testMessenger() {
 	CTestCase *aCase;
 
@@ -455,6 +506,11 @@ void testMessenger() {
 	aCase->Stop();
 
     aCase = new TestNetMessengerRecvDesignatedPackage();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+    aCase = new TestNetMessengerSendOutNotification();
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();

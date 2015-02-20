@@ -5,9 +5,12 @@
 #include "CSockets.h"
 #include "./../utils/UtilBasic.h"
 
+typedef void (*MsgHandler_t )(const INT8U *msg,int len);
+
 class NetMessenger {
 public:
 	static NetMessenger *getInstance();
+    static void          SetHandler(MsgHandler_t func);
 	static void          destroyInstance();
 
 	void Start();
@@ -23,6 +26,7 @@ protected:
 	static NetMessenger *_instance;
 	static bool         _keepListen;
 	static CSocket      *_socket;
+    static MsgHandler_t _handle_msg;
 private:
     /*** 报文格式识别   ***/
     int   _get_available_pkg_len();

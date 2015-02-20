@@ -4,6 +4,7 @@
 NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
 	_keepListen = false;
+    _handle_msg = 0;
 
 	ClearRecvBuf();
 }
@@ -14,6 +15,11 @@ NetMessenger::~NetMessenger() {
     _socket = 0;
 
     _keepListen = false;
+    _handle_msg = 0;
+}
+
+void NetMessenger::SetHandler(MsgHandler_t func) {
+    _handle_msg = func;
 }
 
 #include <thread>
@@ -38,6 +44,9 @@ void NetMessenger::ClearRecvBuf() {
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
     if ( (pkgLen=_get_available_pkg_len()) > 0 ) {
         _get_pkg_from_buffer(pkg,pkgLen);
+        if(_handle_msg!=0) {
+            (*_handle_msg)(pkg,pkgLen);
+        }
         return true;
     } else {
         return false;
@@ -105,9 +114,14 @@ int NetMessenger::_usedLen() {
     }
 }
 
-NetMessenger * NetMessenger::_instance = 0;
+/*******************************************************
+        单例模式 
+*******************************************************/
+NetMessenger * NetMessenger::_instance   = 0;
 bool           NetMessenger::_keepListen = false;
-CSocket      * NetMessenger::_socket   = 0;
+CSocket      * NetMessenger::_socket     = 0;
+MsgHandler_t   NetMessenger::_handle_msg = 0;
+
 NetMessenger * NetMessenger::getInstance() {
 	if(_instance==0) {
 		_instance = new NetMessenger();
@@ -122,6 +136,9 @@ void NetMessenger::destroyInstance() {
     _instance = 0;
 }
 
+/*******************************************************
+        报文格式处理 
+*******************************************************/
 #include "./../protocol/MsgFormats.h"
 
 int NetMessenger::_get_available_pkg_len() {
