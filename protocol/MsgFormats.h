@@ -2,8 +2,19 @@
 #ifndef __MSG_FORMATS__
 #define __MSG_FORMATS__
 
-#include "MsgBasic.h"
+#include "./../utils/UtilBasic.h"
 #include "KwxRequestConsts.h"
+
+#define MSG_MAX_LEN    1024
+#define ITEM_BUF_LEN   128
+#define ITEM_MAX_NUM   128
+
+
+class MsgIntf {
+public:
+    virtual int Serialize(INT8U *outMsg) = 0;
+    virtual int Deserialize(INT8U *inMsg) = 0;
+};
 
 class Header : public MsgIntf {
 public:

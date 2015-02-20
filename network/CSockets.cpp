@@ -163,28 +163,37 @@ bool CSocket::hasError()
 /***************************************************
 				¸¨Öúº¯Êý
 ***************************************************/
+#include "./../utils/LogManager.h"
+
+CSocket::CSocket() {
+    _logger = LogManager::GetInstance()->Recruit("CSocket");
+}
+
+CSocket::~CSocket() {
+    LogManager::GetInstance()->Dismiss(_logger);
+}
+
 void CSocket::_log(const char *fmt,...) {
     va_list arg;
 
     va_start(arg,fmt);
-    printf(fmt,arg);
+    _logger->Write(fmt,arg);
     va_end(arg);
 }
 
-#include <ctype.h>
 void CSocket::_log(int dir,char *buf,int len) {
-	printf("%s (%d): ", (dir==SEND)?"SEND":"RECV", len);
+    char temp[256] = {0};
+    int usedBytes  = 0;
 
-	if( isalnum(buf[0]) ) {
-	    printf("%s\n", buf);
-	} else {
-		printf("\n\t");
-		for(int i=0; i<len; i++) {
-			printf("%02x ",buf[i]);
-			if( (i+1)%16==0 ) {
-				printf("\n\t");
-			}
-		}
-		printf("\n");
-	}
+    sprintf(temp, "%s (%03d): ", (dir==0)?"SEND":"RECV", len);
+    usedBytes = strlen(" (): ")+4+3;
+
+    if( isalpha(buf[0]) && strcmp(buf,"KWX") ) {
+        sprintf(temp+usedBytes,"%s\n",buf);
+        _logger->Write( temp );
+    } else {
+        sprintf(temp+usedBytes,"\n");
+        _logger->Write( temp );
+        _logger->WritePackage( buf, len );
+    }
 }

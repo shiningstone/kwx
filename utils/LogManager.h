@@ -13,7 +13,9 @@ public :
     Logger(const char *name);
     
     int  Write(const char * format, ...);
+    int  WritePackage(char *buf,int len);
     void Set(bool enable);
+    bool IsEnabled();
 
     char _owner[MODULE_NAME_LEN];
     bool _isEnabled;
@@ -31,7 +33,7 @@ private :
     LogManager();
 
     static LogManager *_instance;
-    static Logger *_employees[MAX_MODULES];
+    static Logger     *_employees[MAX_MODULES];
 
     static Logger *Find(const char *moduleName);
     static int Register(Logger *l);

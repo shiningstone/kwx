@@ -2,8 +2,11 @@
 #include <WINSOCK2.H>
 #pragma comment(lib,"ws2_32.lib")
 #include <assert.h>
+
+#include "./../../protocol/MsgFormats.h"
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"
+
 #include "./CTestSocket.h"
 
 #define DELAY 100
@@ -383,7 +386,7 @@ class TestNetMessengerRecvDesignatedPackage : public CTestMessenger {
 
 	virtual void ClientActions() {
 		MESSENGER->Start();
-		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen,(RequestId_t)75) ) {
+		while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen,75) ) {
 			Sleep(DELAY);
 		}
 		assert( !memcmp(_clientBuff,MESSAGE+25,25) );

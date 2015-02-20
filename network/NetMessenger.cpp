@@ -35,19 +35,6 @@ void NetMessenger::ClearRecvBuf() {
     _inStart   = 0;
 }
 
-int NetMessenger::_get_available_pkg_len() {
-    int usedLen = _usedLen();
-    
-	if ( strstr((char *)_pkgBuf+_outStart,"KWX") && usedLen>DnHeader::DN_HEADER_LEN  ) {
-		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
-		if ( usedLen>=pkgLen ) {
-			return pkgLen;
-		}
-	}
-
-	return 0;
-}
-
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
     if ( (pkgLen=_get_available_pkg_len()) > 0 ) {
         _get_pkg_from_buffer(pkg,pkgLen);
@@ -57,10 +44,10 @@ bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
     }
 }
 
-bool NetMessenger::Recv(INT8U *pkg,int &pkgLen,RequestId_t request) {
+bool NetMessenger::Recv(INT8U *pkg,int &pkgLen,INT16U request) {
     if ( (pkgLen=_get_available_pkg_len()) > 0 ) {
         _get_pkg_from_buffer(pkg,pkgLen);
-        if( request==_ntohs(*(INT16U *)(pkg+DnHeader::REQUEST_CODE)) ) {
+        if( request==_get_request_id(pkg) ) {
             return true;
         } else {
             return Recv(pkg,pkgLen,request);
@@ -135,3 +122,21 @@ void NetMessenger::destroyInstance() {
     _instance = 0;
 }
 
+#include "./../protocol/MsgFormats.h"
+
+int NetMessenger::_get_available_pkg_len() {
+    int usedLen = _usedLen();
+    
+	if ( strstr((char *)_pkgBuf+_outStart,"KWX") && usedLen>DnHeader::DN_HEADER_LEN  ) {
+		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
+		if ( usedLen>=pkgLen ) {
+			return pkgLen;
+		}
+	}
+
+	return 0;
+}
+
+INT16U NetMessenger::_get_request_id(const INT8U *pkg) {
+    return (_ntohs(*(INT16U *)(pkg+DnHeader::REQUEST_CODE)));
+}

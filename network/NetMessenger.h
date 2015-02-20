@@ -3,7 +3,7 @@
 #define __NET_MESSENGER__
 
 #include "CSockets.h"
-#include "./../protocol/MsgFormats.h"
+#include "./../utils/UtilBasic.h"
 
 class NetMessenger {
 public:
@@ -12,7 +12,7 @@ public:
 
 	void Start();
 	bool Recv(INT8U *buf,int &len);
-    bool Recv(INT8U *pkg,int &pkgLen,RequestId_t request);
+    bool Recv(INT8U *pkg,int &pkgLen,INT16U request);
 	int  Send(const INT8U *buf,int len);
 
     void ClearRecvBuf();
@@ -25,7 +25,8 @@ protected:
 	static CSocket      *_socket;
 private:
     /*** 报文格式识别   ***/
-    int   _get_available_pkg_len();      
+    int   _get_available_pkg_len();
+    INT16U _get_request_id(const INT8U *pkg);
 
     /*** 环形接收缓冲区 ***/
 	void _listen();

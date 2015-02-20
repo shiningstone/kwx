@@ -27,8 +27,12 @@
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCKET_BUFF_SIZE 128
 
+class Logger;
 class CSocket {
 public:
+    CSocket();
+    ~CSocket();
+
     virtual void Start() = 0;
     void Stop();
 
@@ -43,6 +47,8 @@ protected:
 	bool   _keepAlive;
 	int    _blockSecond;
 	bool   _keepListen;
+
+    Logger *_logger;
 
     void _log(const char *fmt,...);
     void _log(int dir,char *buf,int len);

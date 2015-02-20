@@ -1,5 +1,7 @@
 
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "LogManager.h"
 
@@ -16,6 +18,9 @@ void Logger::Set(bool value) {
     _isEnabled = value;
 }
 
+#ifdef WIN32
+#define log(x) printf(x)
+#else
 /*************************************
     use cocos2d log function
 *************************************/
@@ -24,19 +29,54 @@ USING_NS_CC;
 #include "ui/CocosGUI.h"
 USING_NS_CC;
 using namespace ui;
+#endif
+
+/******************************************************
+    WINDOWS下需要设置C/C++宏定义： _CRT_SECURE_NO_WARNINGS
+    不知道为什么在代码中用“#define”不起作用
+******************************************************/
+bool Logger::IsEnabled() {
+    return _isEnabled;
+}
 
 int Logger::Write(const char * format, ...) {
     if ( _isEnabled ) {
-        char buf[128] = {0};
-        sprintf(buf,"[%s]: ", _owner);
+        char buf[256] = {0};
+
+        sprintf(buf, "[%s]: ", _owner);
 
         va_list args;
         va_start(args, format);
-        vsprintf(buf+strlen(_owner)+strlen("[]:"), format, args);
+        vsprintf( buf+strlen(_owner)+strlen("[]: "), format, args );
         va_end(args);
 
         log(buf);
     }
+
+    return RET_OK;
+}
+
+#include <ctype.h>
+int Logger::WritePackage(char *pkg,int len) {
+    char buf[256] = {0};
+    int usedBytes  = 0;
+
+	sprintf(buf+usedBytes, "\t");
+    usedBytes += 1;
+
+	for(int i=0; i<len; i++) {
+		sprintf(buf+usedBytes, "%02x ",pkg[i]);
+        usedBytes += 3;
+
+		if( (i+1)%16==0 ) {
+			sprintf(buf+usedBytes, "\n\t");
+            usedBytes += 2;
+		}
+	}
+	
+    sprintf(buf+usedBytes, "\n");
+
+    log(buf);
 
     return RET_OK;
 }
