@@ -53,7 +53,7 @@ class TestGameSocket : public CTestSocket {
 
 	virtual void ClientActions() {
 		CGameSocket client;
-		client.Create(SERVER_IP, SOCKET_PORT);
+		client.Create(DEF_SERVER_IP, DEF_SOCKET_PORT);
 		
 		client.ForceSend("to server",strlen("to client"));
 

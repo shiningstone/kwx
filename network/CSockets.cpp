@@ -58,7 +58,7 @@ int CSocket::Recv(char *buf,int *len,int bufSize) {
 /******************************************************
 	ServerSocket
 ******************************************************/
-void ServerSocket::Start() {
+void ServerSocket::Start(const char *serverIp,int port) {
 	Init();
 
     SOCKET serSocket=socket(AF_INET,SOCK_STREAM,0);
@@ -66,7 +66,7 @@ void ServerSocket::Start() {
     SOCKADDR_IN local;
     local.sin_family=AF_INET;
     local.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
-    local.sin_port=htons(SOCKET_PORT);
+    local.sin_port=htons(port);
   
 	if ( bind( serSocket, (SOCKADDR*)&local, sizeof(SOCKADDR) ) == 0 ) {
 	    listen( serSocket, 5 );
@@ -85,7 +85,7 @@ void ServerSocket::Start() {
 /******************************************************
 	ClientSocket
 ******************************************************/
-void ClientSocket::Start() {
+void ClientSocket::Start(const char *serverIp,int port) {
 	Init();
 
 	_keepAlive   = false;
@@ -115,9 +115,9 @@ void ClientSocket::Start() {
 #endif   
 
 	SOCKADDR_IN server;
-    server.sin_addr.S_un.S_addr=inet_addr(SERVER_IP);
+    server.sin_addr.S_un.S_addr=inet_addr(serverIp);
     server.sin_family=AF_INET;
-    server.sin_port=htons(SOCKET_PORT);
+    server.sin_port=htons(port);
 
 	int result = connect( _connection, (SOCKADDR*)&server, sizeof(SOCKADDR) );
 	if ( result==SOCKET_ERROR ) {

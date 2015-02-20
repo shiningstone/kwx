@@ -21,8 +21,8 @@
 #define INVALID_SOCKET -1   
 #endif   
 
-#define SERVER_IP    "127.0.0.1"
-#define SOCKET_PORT  6000
+#define DEF_SERVER_IP    "127.0.0.1"
+#define DEF_SOCKET_PORT  6000
 
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCKET_BUFF_SIZE 128
@@ -33,7 +33,7 @@ public:
     CSocket();
     ~CSocket();
 
-    virtual void Start() = 0;
+    virtual void Start(const char *serverIp=DEF_SERVER_IP,int port=DEF_SOCKET_PORT) = 0;
     void Stop();
 
 	static void Init();
@@ -63,12 +63,12 @@ protected:
 
 class ServerSocket : public CSocket {
 public:
-	virtual void Start();
+	virtual void Start(const char *serverIp=DEF_SERVER_IP,int port=DEF_SOCKET_PORT);
 };
 
 class ClientSocket : public CSocket {
 public:
-	virtual void Start();
+	virtual void Start(const char *serverIp=DEF_SERVER_IP,int port=DEF_SOCKET_PORT);
 };
 
 #endif

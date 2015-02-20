@@ -1,11 +1,11 @@
 
 #include <string.h>
 
-#include "MsgBasic.h"
+#include "./../utils/UtilBasic.h"
+#include "./../network/NetMessenger.h"
+
 #include "MsgFormats.h"
 #include "KwxMsg.h"
-
-#include "./../network/NetMessenger.h"
 
 KwxMsg::KwxMsg(int dir)
 :_dir(dir) {
