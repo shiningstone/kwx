@@ -2,6 +2,7 @@
 #ifndef __KWX_MSG__
 #define __KWX_MSG__
 
+
 #include "./../RaceType.h"
 
 #include "./../utils/UtilBasic.h"
@@ -15,16 +16,21 @@ class MsgBody;
 class Item;
 class NetMessenger;
 
+/**********************************************************************
+关于下行包接收：
+    用户可以自行创建一个线程，将接收到的报文交给Deserialize/Construct依次处理；
+    或者
+    使用StartReceiving()启动自动接收处理模式，处理函数为_HANDLE_DS_PACKAGES。
+**********************************************************************/
 class KwxMsg : public MsgIntf {
 public:
     KwxMsg(int dir);
     ~KwxMsg();
     
     /* auto receive */
-    void StartReceiving(MsgHandler_t handle);
-    void StartReceiving();
-    static void _handle_downstream_packages(const INT8U *pkg,int &len);
-    void StopReceiving();
+    static void StartReceiving();
+    static void StopReceiving();
+    void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
 
     /* upstream */
     int SetAction(INT8U *buf,ActionId_t code);
@@ -33,10 +39,6 @@ public:
     int SetRequestDistribute(INT8U *buf);
     int SetUpdateCardList(INT8U *buf,CARD *cards,int cardNum);
     
-/* the following items should be only referenced by test */
-/*
-protected:
-*/
     /* downstream*/
     RequestId_t GetRequestCode();
     int         GetLevel();
@@ -44,12 +46,16 @@ protected:
     int         Construct(OthersAction_t &actionInfo);
     int         Construct(OthersShowCard_t &cardInfo);
 
+/* the following items should be only referenced by test */
+/*
+protected:
+*/
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
-    NetMessenger    *_messenger;
     Header          *_header;
     MsgBody         *_body;
+    static NetMessenger    *_messenger;
 protected:
 	const int   _dir;
 

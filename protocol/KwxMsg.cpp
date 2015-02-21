@@ -7,6 +7,8 @@
 #include "MsgFormats.h"
 #include "KwxMsg.h"
 
+NetMessenger *KwxMsg::_messenger = 0;
+
 KwxMsg::KwxMsg(int dir)
 :_dir(dir) {
 	if (_dir==UP_STREAM) {
@@ -31,13 +33,12 @@ void KwxMsg::StartReceiving(MsgHandler_t handle) {
 }
 
 void KwxMsg::StartReceiving() {
-    _messenger->SetHandler(KwxMsg::_handle_downstream_packages);
-    _messenger->Start();
-}
+    if(_messenger==0) {
+        _messenger = NetMessenger::getInstance();
+    }
 
-#include <stdio.h>
-void KwxMsg::_handle_downstream_packages(const INT8U *, int &len) {
-    printf("_handle_downstream_packages");
+    _messenger->SetHandler(_HANDLE_DS_PACKAGES);
+    _messenger->Start();
 }
 
 void KwxMsg::StopReceiving() {
@@ -232,3 +233,33 @@ int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
 void KwxMsg::_handle_downsteam_packages(const INT8U *pkg,int &len) {
     Deserialize(pkg);
 }
+
+#ifdef WIN32
+#include <stdio.h>
+#endif
+int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
+    KwxMsg aMsg(DOWN_STREAM);
+
+    aMsg.Deserialize(pkg);
+    switch(aMsg.GetRequestCode()) {
+        case REQ_GAME_SEND_DIST:
+            
+            #ifdef WIN32
+            printf("REQ_GAME_SEND_DIST\n");
+            #endif
+            return 0;
+
+        case REQ_GAME_RECV_ACTION:
+            return 0;
+
+        case REQ_GAME_RECV_SHOWCARD:
+            return 0;
+
+        case REQ_GAME_RECV_RESPONSE:
+            return 0;
+
+        default:
+            return 1;
+    }
+}
+

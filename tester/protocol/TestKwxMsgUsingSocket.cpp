@@ -44,8 +44,9 @@ class TestKwxAutoRecv : public CTestMessenger {
 	}
 
     static INT8U RecvBuf[256];
-    static void MsgHandler(const INT8U *msg,int &len) {
+    static int MsgHandler(const INT8U *msg,int &len) {
         memcpy(RecvBuf,msg,len);
+        return 0;
     }
 
 	virtual void ClientActions() {
@@ -97,11 +98,9 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
 	}
 
 	virtual void ClientActions() {
-        KwxMsg aMsg(DOWN_STREAM);
-        aMsg.StartReceiving();
+        KwxMsg::StartReceiving();
         Sleep(DELAY);
-
-        aMsg.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        KwxMsg::StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 };
 
