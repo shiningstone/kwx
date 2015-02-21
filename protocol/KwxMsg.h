@@ -6,6 +6,8 @@
 #include "./../RaceType.h"
 
 #include "./../utils/UtilBasic.h"
+#include "./../utils/LogManager.h"
+
 #include "KwxRequestConsts.h"
 #include "KwxRequestTypes.h"
 
@@ -72,6 +74,8 @@ protected:
     int AddAction(ActionId_t code);
     int AddShowCard(CardType_t card);
     int AddCards(CARD *cards,int num);
+
+    static Logger   *_logger;
 };
 
 #define KWX_INVALID_PCHC          -1

@@ -10,6 +10,7 @@
 static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
 
 NetMessenger *KwxMsg::_messenger = 0;
+Logger *KwxMsg::_logger = 0;
 
 KwxMsg::KwxMsg(int dir)
 :_dir(dir) {
@@ -18,15 +19,16 @@ KwxMsg::KwxMsg(int dir)
     } else {
         _header = new DnHeader();
     }
-
     _body = new MsgBody();
-
     _messenger = NetMessenger::getInstance();
+
+    _logger = LogManager::GetInstance()->Recruit("KwxMsg");
 }
 
 KwxMsg::~KwxMsg() {
     delete _header;
     delete _body;
+    LogManager::GetInstance()->Dismiss(_logger);
 }
 
 void KwxMsg::StartReceiving(MsgHandler_t handle) {
@@ -39,12 +41,17 @@ void KwxMsg::StartReceiving() {
         _messenger = NetMessenger::getInstance();
     }
 
+    if (_logger==0) {
+        _logger = LogManager::GetInstance()->Recruit("KwxMsg");
+    }
+
     _messenger->SetHandler(_HANDLE_DS_PACKAGES);
     _messenger->Start();
 }
 
 void KwxMsg::StopReceiving() {
     _messenger->SetHandler(0);
+    LogManager::GetInstance()->Dismiss(_logger);
 }
 
 int KwxMsg::Serialize(INT8U *outMsg) {
@@ -147,6 +154,8 @@ int KwxMsg::SetAction(INT8U *buf,ActionId_t code) {
     AddSeatId(seat->_seatId);
     AddAction(code);
 
+    _logger->Write("%s : %d\n",__FUNCTION__,code);
+
     return Serialize(buf);
 }
 
@@ -159,6 +168,8 @@ int KwxMsg::SetShowCard(INT8U *buf,CardType_t code) {
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
     AddShowCard(code);
+
+    _logger->Write("%s : %d\n",__FUNCTION__,code);
 
     return Serialize(buf);
 }
@@ -173,6 +184,8 @@ int KwxMsg::SetReaction(INT8U *buf,ActionId_t code) {
     AddSeatId(seat->_seatId);
     AddAction(code);
 
+    _logger->Write("%s : %d\n",__FUNCTION__,code);
+
     return Serialize(buf);
 }
 
@@ -184,6 +197,8 @@ int KwxMsg::SetRequestDistribute(INT8U *buf) {
     AddRoomId(seat->_roomId);
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
+
+    _logger->Write("%s\n",__FUNCTION__);
 
     return Serialize(buf);
 }
@@ -197,6 +212,8 @@ int KwxMsg::SetUpdateCardList(INT8U *buf,CARD *cards,int num) {
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
     AddCards(cards,num);
+
+    _logger->Write("%s\n",__FUNCTION__);
 
     return Serialize(buf);
 }
@@ -232,19 +249,15 @@ int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
     return 0;
 }
 
-#ifdef WIN32
-#include <stdio.h>
-#endif
 int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
     KwxMsg aMsg(DOWN_STREAM);
+    Logger *_logger = LogManager::GetInstance()->Recruit("KwxMsg");
 
     aMsg.Deserialize(pkg);
+
+    _logger->Write("%s : %d\n",__FUNCTION__,aMsg.GetRequestCode());
     switch(aMsg.GetRequestCode()) {
         case REQ_GAME_SEND_DIST:
-            
-            #ifdef WIN32
-            printf("REQ_GAME_SEND_DIST\n");
-            #endif
             return 0;
 
         case REQ_GAME_RECV_ACTION:
@@ -259,5 +272,7 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
         default:
             return KWX_INVALID_PCHC;
     }
+
+    LogManager::GetInstance()->Dismiss(_logger);
 }
 
