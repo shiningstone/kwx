@@ -11,8 +11,6 @@ RaceLayer::RaceLayer()
 	player[0]=NULL;
 	player[1]=NULL;
 	player[2]=NULL;
-
-    _logger = LogManager::GetInstance()->Recruit("RaceLayer");
 }
 RaceLayer::~RaceLayer()
 {
@@ -47,8 +45,6 @@ RaceLayer::~RaceLayer()
 		delete player[2];
 	//SimpleAudioEngine::sharedEngine()->end();
 	_eventDispatcher->removeAllEventListeners();
-
-    LogManager::GetInstance()->Dismiss(_logger);
 }
 
 bool RaceLayer::init()
@@ -2366,8 +2362,6 @@ void RaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_
 }
 void RaceLayer::waitfor_MyShowCardInstruct()
 {
-    _logger->Write("%s","waitfor_MyShowCardInstruct");
-    
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	if(g_server==0)
 	{
@@ -2405,8 +2399,6 @@ void RaceLayer::waitfor_MyShowCardInstruct()
 }
 void RaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
-    CCLog("%s\n",typeid(*this));
-
 	if(player[1]->get_parter()->get_ting_status()==0&&!ifTuoGuan)
 	{
 		auto listener=EventListenerTouchOneByOne::create();

@@ -1,5 +1,5 @@
 
-#define __DISABLE_LOGGER__
+//#define __DISABLE_LOGGER__
 #ifdef __DISABLE_LOGGER__
 
 #define Logger void

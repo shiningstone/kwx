@@ -9,8 +9,6 @@
 #include "Resources.h"
 using namespace CocosDenshion;
 
-#include "LogManager.h"
-
 class RaceLayer : public cocos2d::Layer
 {
 public:
@@ -228,7 +226,5 @@ public:
 	void QiangGangHuJudge();
 	void TingHintBarListener();
 	void delete_NnnecessaryResource();
-
-    Logger *_logger;
 };
 #endif //	 __RACE_LAYER_H__

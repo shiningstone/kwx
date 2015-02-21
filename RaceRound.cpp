@@ -7,8 +7,6 @@ RRound::RRound()
 	card_list=NULL;
 	hu_len=0;
 	kind_hu=0;
-
-    _logger = LogManager::GetInstance()->Recruit("RRound");
 }
 
 RRound::~RRound()
@@ -17,8 +15,6 @@ RRound::~RRound()
 		delete card_list;
 	if(out_card_list)
 		delete out_card_list;
-
-    LogManager::GetInstance()->Dismiss(_logger);
 }
 
 int RRound::card_delete(unsigned int from,unsigned int len)
@@ -933,8 +929,6 @@ unsigned char RRound::ActiontodoCheckAgain()
 
 unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
-    _logger->Write("hand_in");
-
 	int num = 0;
 	unsigned char res = 0x0;
 	card_list->data[card_list->len].kind=kind;
@@ -1028,8 +1022,6 @@ unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned cha
 /*if ting place=card_list->len*/
 CARD_KIND RRound::hand_out(unsigned int place)
 {
-    _logger->Write("hand_out");
-
 	CARD_KIND l_kind;
 	CARD tail_card;
 	tail_card.kind = card_list->data[card_list->len-1].kind;
