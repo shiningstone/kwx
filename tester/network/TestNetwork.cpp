@@ -469,9 +469,9 @@ class TestNetMessengerSendOutNotification : public CTestMessenger {
 	}
 
     static INT8U RecvBuf[256];
-    static void MsgHandler(const INT8U *msg,int len) {
+    static void MsgHandler(const INT8U *msg,int &len) {
         memcpy(RecvBuf,msg,len);
-        NetMessenger::SetHandler(0);
+        NetMessenger::SetHandler(0);        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 
 	virtual void ClientActions() {
@@ -479,7 +479,8 @@ class TestNetMessengerSendOutNotification : public CTestMessenger {
 
         MESSENGER->SetHandler((MsgHandler_t)&TestNetMessengerSendOutNotification::MsgHandler);
 		MESSENGER->Start();
-        while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) );
+        //while( !MESSENGER->Recv((INT8U *)_clientBuff,_clientBuffLen) );
+        Sleep(DELAY);
 
         assert( !memcmp(RecvBuf,MESSAGE,MESSAGE_LEN) );
     }

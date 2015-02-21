@@ -25,9 +25,15 @@ void NetMessenger::SetHandler(MsgHandler_t func) {
 #include <thread>
 void NetMessenger::Start() {
 	_socket->Start();
+
     if(!_keepListen) {
-	    std::thread listener(&NetMessenger::_listen,this);
-	    listener.detach();
+	    std::thread t1(&NetMessenger::_collect_bytes,this);
+	    t1.detach();
+    }
+
+    if(_handle_msg) {
+	    std::thread autoDetect(&NetMessenger::_collect_packages,this);
+	    autoDetect.detach();
     }
 }
 
@@ -44,9 +50,6 @@ void NetMessenger::ClearRecvBuf() {
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
     if ( (pkgLen=_get_available_pkg_len()) > 0 ) {
         _get_pkg_from_buffer(pkg,pkgLen);
-        if(_handle_msg!=0) {
-            (*_handle_msg)(pkg,pkgLen);
-        }
         return true;
     } else {
         return false;
@@ -82,7 +85,7 @@ void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
 	_outStart = (_outStart + pkgLen) % BUFF_SIZE;  
 }
 
-void NetMessenger::_listen() {
+void NetMessenger::_collect_bytes() {
 	_keepListen = true;
 
 	while(_keepListen) {
@@ -99,7 +102,6 @@ void NetMessenger::_listen() {
         }
 
 		int inLen = 0;
-        /* 这里最好能够使用互斥量 */
         if ( _socket->Recv((char *)(_pkgBuf + _inStart), &inLen, availLen)>0 ) {
             _inStart = (_inStart+inLen) % BUFF_SIZE;
         }
@@ -132,6 +134,7 @@ NetMessenger * NetMessenger::getInstance() {
 
 void NetMessenger::destroyInstance() {
     _keepListen = false;
+    _handle_msg = false;
     delete _instance;
     _instance = 0;
 }
@@ -156,4 +159,17 @@ int NetMessenger::_get_available_pkg_len() {
 
 INT16U NetMessenger::_get_request_id(const INT8U *pkg) {
     return (_ntohs(*(INT16U *)(pkg+DnHeader::REQUEST_CODE)));
+}
+
+void NetMessenger::_collect_packages() {
+    while(_keepListen && _handle_msg) {
+        INT8U msg[MSG_MAX_LEN] = {0};
+        int   msgLen = 0;
+
+        while( Recv(msg, msgLen) ) {
+            if(_handle_msg!=0) {
+                _handle_msg(msg,msgLen);
+            }
+        }
+    }
 }

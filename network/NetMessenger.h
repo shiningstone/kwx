@@ -2,10 +2,19 @@
 #ifndef __NET_MESSENGER__
 #define __NET_MESSENGER__
 
+/*******************************************************
+    NetMessenger
+
+        Recv接口：  
+            用于直接接收message供调用者使用；
+        SetHandler接口：   
+            用于启动一个进程，收到message时触发回调函数。
+*******************************************************/
+
 #include "CSockets.h"
 #include "./../utils/UtilBasic.h"
 
-typedef void (*MsgHandler_t )(const INT8U *msg,int len);
+typedef void (*MsgHandler_t )(const INT8U *msg,int &len);
 
 class NetMessenger {
 public:
@@ -24,16 +33,19 @@ protected:
 	~NetMessenger();
 
 	static NetMessenger *_instance;
-	static bool         _keepListen;
 	static CSocket      *_socket;
+	static bool         _keepListen;
     static MsgHandler_t _handle_msg;
 private:
+    /*** 报文自动接收   ***/
+    void _collect_packages();
+
     /*** 报文格式识别   ***/
     int   _get_available_pkg_len();
     INT16U _get_request_id(const INT8U *pkg);
 
     /*** 环形接收缓冲区 ***/
-	void _listen();
+	void _collect_bytes();
 
     const static int BUFF_SIZE = SOCKET_BUFF_SIZE;
 
