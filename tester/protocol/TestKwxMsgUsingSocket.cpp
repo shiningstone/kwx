@@ -52,12 +52,12 @@ class TestKwxAutoRecv : public CTestMessenger {
         memset(RecvBuf,0,256);
 
         KwxMsg aMsg(DOWN_STREAM);
-        aMsg.SetHandler((MsgHandler_t)&TestKwxAutoRecv::MsgHandler);
+        aMsg.StartReceiving((MsgHandler_t)&TestKwxAutoRecv::MsgHandler);
         Sleep(DELAY);
 
         assert( !memcmp(RecvBuf,MESSAGE,MESSAGE_LEN) );
 
-        aMsg.SetHandler(0);        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        aMsg.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 };
 

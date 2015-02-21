@@ -236,7 +236,8 @@ public:
         KwxMsg aMsg(DOWN_STREAM);
         DistributeResponse_t response = {0};
 
-        len = aMsg.Construct(response,msgInNetwork);
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(response);
 
         assert( len==sizeof(msgInNetwork) );
         assert( aMsg.GetRequestCode()==REQ_GAME_SEND_DIST );
@@ -270,7 +271,8 @@ public:
         KwxMsg aMsg(DOWN_STREAM);
         OthersAction_t actionInfo = {0};
 
-        len = aMsg.Construct(actionInfo,msgInNetwork);
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(actionInfo);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg.GetRequestCode()==REQ_GAME_RECV_ACTION );
@@ -303,7 +305,8 @@ public:
         KwxMsg aMsg(DOWN_STREAM);
         OthersShowCard_t cardInfo = {0};
 
-        len = aMsg.Construct(cardInfo,msgInNetwork);
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(cardInfo);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg.GetRequestCode()==REQ_GAME_RECV_SHOWCARD );
@@ -336,7 +339,8 @@ public:
         KwxMsg aMsg(DOWN_STREAM);
         OthersAction_t actionInfo = {0};
 
-        len = aMsg.Construct(actionInfo,msgInNetwork);
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(actionInfo);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg.GetRequestCode()==REQ_GAME_RECV_RESPONSE );

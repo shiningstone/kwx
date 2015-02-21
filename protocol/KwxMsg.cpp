@@ -25,9 +25,13 @@ KwxMsg::~KwxMsg() {
     delete _body;
 }
 
-void KwxMsg::SetHandler(MsgHandler_t handle) {
+void KwxMsg::StartReceiving(MsgHandler_t handle) {
     _messenger->SetHandler(handle);
     _messenger->Start();
+}
+
+void KwxMsg::StopReceiving() {
+    _messenger->SetHandler(0);
 }
 
 int KwxMsg::Serialize(INT8U *outMsg) {
@@ -42,10 +46,8 @@ int KwxMsg::Serialize(INT8U *outMsg) {
     return len;
 }
 
-int KwxMsg::Deserialize(INT8U *inMsg) {
+int KwxMsg::Deserialize(const INT8U *inMsg) {
     int len = 0;
-
-    _messenger->Recv(inMsg,len);
 
     if (memcmp(inMsg,Header::PCHC,3)) {
         return KWX_INVALID_PCHC;
@@ -195,30 +197,28 @@ int KwxMsg::GetLevel() {
     return header->_level;
 }
 
-int KwxMsg::Construct(DistributeResponse_t &response,INT8U *inMsg) {
-    int len = Deserialize(inMsg);
-
+int KwxMsg::Construct(DistributeResponse_t &response) {
     response.room = _body->_items[0]->_value;    /*id==60*/
     response.seat = _body->_items[1]->_value;    /*id==61*/
     response.cardKind = _body->_items[2]->_value;/*id==70*/
 
-    return len;
+    return 0;
 }
 
-int KwxMsg::Construct(OthersAction_t &actionInfo,INT8U *inMsg) {
-    int len = Deserialize(inMsg);
-
+int KwxMsg::Construct(OthersAction_t &actionInfo) {
     actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
     actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
 
-    return len;
+    return 0;
 }
 
-int KwxMsg::Construct(OthersShowCard_t &cardInfo,INT8U *inMsg) {
-    int len = Deserialize(inMsg);
-
+int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
     cardInfo.seat     = _body->_items[0]->_value;            /*id==60*/
     cardInfo.cardKind = (CardType_t)_body->_items[1]->_value;/*id==67*/
 
-    return len;
+    return 0;
+}
+
+void KwxMsg::_handle_downsteam_packages(const INT8U *pkg,int &len) {
+    Deserialize(pkg);
 }
