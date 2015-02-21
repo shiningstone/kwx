@@ -20,13 +20,14 @@
 #define INVALID_SOCKET -1   
 #endif   
 
+#include "./../utils/LogManager.h"
+
 #define DEF_SERVER_IP    "127.0.0.1"
 #define DEF_SOCKET_PORT  6000
 
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCKET_BUFF_SIZE 128
 
-class Logger;
 class CSocket {
 public:
     CSocket();
@@ -49,7 +50,6 @@ protected:
 
     Logger *_logger;
 
-    void _log(const char *fmt,...);
     void _log(int dir,char *buf,int len);
 
     static const int SEND = 0;

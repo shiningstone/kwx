@@ -1,9 +1,14 @@
 
+#include "LogManager.h"
+
+#ifdef __DISABLE_LOGGER__
+
+//BLANK INTENTIONALLY
+
+#else
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
-
-#include "LogManager.h"
 
 //////////////////////////////////////////////////
 //              Logger
@@ -169,3 +174,4 @@ void LogManager::DestroyInstance() {
     _instance = NULL;
 }
 
+#endif/*function control macro*/

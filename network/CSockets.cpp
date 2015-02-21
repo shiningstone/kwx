@@ -71,14 +71,14 @@ void ServerSocket::Start(const char *serverIp,int port) {
 	if ( bind( serSocket, (SOCKADDR*)&local, sizeof(SOCKADDR) ) == 0 ) {
 	    listen( serSocket, 5 );
 	} else {
-		_log("%s : bind() error!\n",__FUNCTION__);
+		LOGGER_WRITE("%s : bind() error!\n",__FUNCTION__);
 	}
   
 	SOCKADDR client = {0};
     int      len=sizeof(SOCKADDR);
     _connection = accept( serSocket, (SOCKADDR*)&client, &len );
 	if( _connection==INVALID_SOCKET ) {
-		_log("%s : accept() error!\n",__FUNCTION__);
+		LOGGER_WRITE("%s : accept() error!\n",__FUNCTION__);
 	}
 }
 
@@ -143,7 +143,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
             }  
         }  
 	} else {
-		_log("%s : connect() error!\n",__FUNCTION__);
+		LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
   	}
 }
 
@@ -163,25 +163,17 @@ bool CSocket::hasError()
 /***************************************************
 				¸¨Öúº¯Êý
 ***************************************************/
-#include "./../utils/LogManager.h"
-
 CSocket::CSocket() {
-    _logger = LogManager::GetInstance()->Recruit("CSocket");
+    _logger = LOGGER_REGISTER("CSocket");
 }
 
 CSocket::~CSocket() {
-    LogManager::GetInstance()->Dismiss(_logger);
-}
-
-void CSocket::_log(const char *fmt,...) {
-    va_list arg;
-
-    va_start(arg,fmt);
-    _logger->Write(fmt,arg);
-    va_end(arg);
+    LOGGER_DEREGISTER(_logger);
 }
 
 void CSocket::_log(int dir,char *buf,int len) {
+#ifdef __DISABLE_LOGGER__
+#else
     char temp[256] = {0};
     int usedBytes  = 0;
 
@@ -190,10 +182,11 @@ void CSocket::_log(int dir,char *buf,int len) {
 
     if( isalpha(buf[0]) && strcmp(buf,"KWX") ) {
         sprintf(temp+usedBytes,"%s\n",buf);
-        _logger->Write( temp );
+        LOGGER_WRITE( temp );
     } else {
         sprintf(temp+usedBytes,"\n");
-        _logger->Write( temp );
+        LOGGER_WRITE( temp );
         _logger->WritePackage( buf, len );
     }
+#endif
 }

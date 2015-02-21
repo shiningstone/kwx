@@ -1,4 +1,15 @@
 
+#define __DISABLE_LOGGER__
+#ifdef __DISABLE_LOGGER__
+
+#define Logger void
+
+#define LOGGER_REGISTER(x)   0
+#define LOGGER_DEREGISTER   
+#define LOGGER_WRITE(fmt,...)
+
+#else
+
 #ifndef __LOG_MANAGER__
 #define __LOG_MANAGER__
 
@@ -7,6 +18,10 @@
 
 #define RET_OK              0
 #define RET_ERROR           1
+
+#define LOGGER_REGISTER(x)     LogManager::GetInstance()->Recruit(x)
+#define LOGGER_DEREGISTER(x)   LogManager::GetInstance()->Dismiss(x)
+#define LOGGER_WRITE(fmt,...)      _logger->Write(fmt,##__VA_ARGS__)
 
 class Logger {
 public :
@@ -40,4 +55,5 @@ private :
     static int Deregister(Logger *l);
 };
 
-#endif
+#endif/*header macro*/
+#endif/*function control macro*/
