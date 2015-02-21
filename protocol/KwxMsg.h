@@ -7,6 +7,7 @@
 
 #include "./../utils/UtilBasic.h"
 #include "KwxRequestConsts.h"
+#include "KwxRequestTypes.h"
 
 #define UP_STREAM     0
 #define DOWN_STREAM   1
@@ -61,9 +62,6 @@ protected:
 
 	void _set_size(INT8U *buf,INT16U len);
 	int  _add_item(Item *item);
-
-    /* downstream */
-    virtual void _handle_downsteam_packages(const INT8U *pkg,int &len);
 
     /* upstream */
     int SetRequestCode(RequestId_t code);

@@ -7,6 +7,8 @@
 #include "MsgFormats.h"
 #include "KwxMsg.h"
 
+static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
+
 NetMessenger *KwxMsg::_messenger = 0;
 
 KwxMsg::KwxMsg(int dir)
@@ -230,10 +232,6 @@ int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
     return 0;
 }
 
-void KwxMsg::_handle_downsteam_packages(const INT8U *pkg,int &len) {
-    Deserialize(pkg);
-}
-
 #ifdef WIN32
 #include <stdio.h>
 #endif
@@ -259,7 +257,7 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
             return 0;
 
         default:
-            return 1;
+            return KWX_INVALID_PCHC;
     }
 }
 

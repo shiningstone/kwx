@@ -32,6 +32,7 @@ private:
         getInstance should be called with the param "threadInfo"
 ********************************************************************************/
 #include "KwxRequestConsts.h"
+#include "KwxRequestTypes.h"
 
 class SeatInfo {
 public:

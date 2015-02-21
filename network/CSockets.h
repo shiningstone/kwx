@@ -7,7 +7,6 @@
 #ifdef WIN32   
 #include <windows.h>   
 #include <WinSock.h>   
-//#include <WINSOCK2.H>
 #pragma comment(lib,"ws2_32.lib")
 #else   
 #include <sys/socket.h>   

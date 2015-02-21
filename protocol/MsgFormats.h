@@ -9,7 +9,6 @@
 #define ITEM_BUF_LEN   128
 #define ITEM_MAX_NUM   128
 
-
 class MsgIntf {
 public:
     virtual int Serialize(INT8U *outMsg) = 0;
@@ -102,22 +101,5 @@ public:
     INT8U    _itemNum;
     Item     *_items[ITEM_MAX_NUM];
 };
-
-
-typedef struct _distributeResponse {
-    INT8U         room;
-    INT8U         seat;
-    CardType_t    cardKind;
-}DistributeResponse_t;
-
-typedef struct _othersAction {
-    INT8U         seat;
-    ActionId_t    action;
-}OthersAction_t;
-
-typedef struct _OthersShowCard {
-    INT8U         seat;
-    CardType_t    cardKind;
-}OthersShowCard_t;
 
 #endif

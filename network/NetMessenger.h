@@ -17,12 +17,12 @@
 class NetMessenger {
 public:
 	static NetMessenger *getInstance();
-    static void          SetHandler(MsgHandler_t func);
 	static void          destroyInstance();
+    static void          SetHandler(MsgHandler_t func);
 
 	void Start();
 	bool Recv(INT8U *buf,int &len);
-    bool Recv(INT8U *pkg,int &pkgLen,INT16U request);
+    bool Recv(INT8U *buf,int &len,INT16U request);
 	int  Send(const INT8U *buf,int len);
 
     void ClearRecvBuf();
