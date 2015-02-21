@@ -30,6 +30,16 @@ void KwxMsg::StartReceiving(MsgHandler_t handle) {
     _messenger->Start();
 }
 
+void KwxMsg::StartReceiving() {
+    _messenger->SetHandler(KwxMsg::_handle_downstream_packages);
+    _messenger->Start();
+}
+
+#include <stdio.h>
+void KwxMsg::_handle_downstream_packages(const INT8U *, int &len) {
+    printf("_handle_downstream_packages");
+}
+
 void KwxMsg::StopReceiving() {
     _messenger->SetHandler(0);
 }

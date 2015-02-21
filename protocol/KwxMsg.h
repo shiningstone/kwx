@@ -22,6 +22,8 @@ public:
     
     /* auto receive */
     void StartReceiving(MsgHandler_t handle);
+    void StartReceiving();
+    static void _handle_downstream_packages(const INT8U *pkg,int &len);
     void StopReceiving();
 
     /* upstream */

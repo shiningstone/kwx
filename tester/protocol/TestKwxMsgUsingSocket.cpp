@@ -64,6 +64,48 @@ class TestKwxAutoRecv : public CTestMessenger {
 INT8U TestKwxAutoRecv::RecvBuf[256] = {0};
 
 
+class TestKwxAutoHandleMsg : public CTestMessenger {
+	INT8U MESSAGE[MSG_MAX_LEN];
+	int   MESSAGE_LEN;
+
+	virtual void Start() {
+		CTestMessenger::Start();
+
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code(发送发牌请求)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            60,1,                  //roomId
+            61,2,                  //seat
+            70,0,                  //card kind
+        };
+
+		MESSAGE_LEN = sizeof(msgInNetwork);
+		memcpy( MESSAGE,msgInNetwork,MESSAGE_LEN );
+	}
+
+	virtual void ServerActions() {
+		SERVER.Start();
+
+		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+        KwxMsg aMsg(DOWN_STREAM);
+        aMsg.StartReceiving();
+        Sleep(DELAY);
+
+        aMsg.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+    }
+};
+
+
 void testKwxMsgUsingSocket() {
 	CTestCase *aCase;
 
@@ -71,4 +113,11 @@ void testKwxMsgUsingSocket() {
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
+
+	aCase = new TestKwxAutoHandleMsg();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+    while(1);
 }
