@@ -14,8 +14,6 @@
 #include "CSockets.h"
 #include "./../utils/UtilBasic.h"
 
-typedef void (*MsgHandler_t )(const INT8U *msg,int &len);
-
 class NetMessenger {
 public:
 	static NetMessenger *getInstance();

@@ -7,6 +7,8 @@
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"
 
+#define DELAY 100
+
 class CTestSocket : public CTestCase {
 public:
 	virtual void Start();

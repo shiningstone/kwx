@@ -20,6 +20,9 @@ public:
     KwxMsg(int dir);
     ~KwxMsg();
     
+    /* auto receive */
+    void SetHandler(MsgHandler_t handle);
+
     /* upstream */
     int SetAction(INT8U *buf,ActionId_t code);
     int SetShowCard(INT8U *buf,CardType_t code);
@@ -34,7 +37,7 @@ public:
     int         Construct(OthersAction_t &actionInfo,INT8U *inMsg);
     int         Construct(OthersShowCard_t &cardInfo,INT8U *inMsg);
 
-/* the following items should be only referenced by test*/
+/* the following items should be only referenced by test */
 /*
 protected:
 */

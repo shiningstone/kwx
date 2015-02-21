@@ -9,8 +9,6 @@
 
 #include "./CTestSocket.h"
 
-#define DELAY 100
-
 class TestSingleSendAndRecv : public CTestSocket {
 	virtual void ServerActions() {
 		SERVER.Start();

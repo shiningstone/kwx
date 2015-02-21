@@ -25,6 +25,11 @@ KwxMsg::~KwxMsg() {
     delete _body;
 }
 
+void KwxMsg::SetHandler(MsgHandler_t handle) {
+    _messenger->SetHandler(handle);
+    _messenger->Start();
+}
+
 int KwxMsg::Serialize(INT8U *outMsg) {
     int len = 0;
 
@@ -189,6 +194,7 @@ int KwxMsg::GetLevel() {
     DnHeader *header = static_cast<DnHeader *>(_header);
     return header->_level;
 }
+
 int KwxMsg::Construct(DistributeResponse_t &response,INT8U *inMsg) {
     int len = Deserialize(inMsg);
 
