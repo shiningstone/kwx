@@ -1,7 +1,7 @@
-#include "RaceRound.h"
+#include "NetRaceRound.h"
 USING_NS_CC;
 
-RRound::RRound()
+NetRRound::NetRRound()
 {
 	out_card_list=NULL;
 	card_list=NULL;
@@ -11,7 +11,7 @@ RRound::RRound()
     _logger = LOGGER_REGISTER("RaceRound");
 }
 
-RRound::~RRound()
+NetRRound::~NetRRound()
 {
 	if(card_list)
 		delete card_list;
@@ -21,7 +21,7 @@ RRound::~RRound()
     LOGGER_DEREGISTER(_logger);
 }
 
-int RRound::card_delete(unsigned int from,unsigned int len)
+int NetRRound::card_delete(unsigned int from,unsigned int len)
 {
 	int i;
 
@@ -39,7 +39,7 @@ int RRound::card_delete(unsigned int from,unsigned int len)
 	return 0;
 }
 
-void RRound::card_insert(CARD data,int times)
+void NetRRound::card_insert(CARD data,int times)
 {
 	int i;
 	if(data.status!=c_FREE)
@@ -121,7 +121,7 @@ void RRound::card_insert(CARD data,int times)
 	card_list->len += times;
 }
 
-long RRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
+long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
 	int i;
 	unsigned char color;
@@ -332,7 +332,7 @@ long RRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,un
 	return score;
 }
 
-int RRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
+int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 {
 	int i;
 	unsigned char color;
@@ -473,7 +473,7 @@ int RRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 	return score;
 }
 
-int RRound::pattern_match(CARD_KIND data[],int len)
+int NetRRound::pattern_match(CARD_KIND data[],int len)
 {
 	int i=0;
 	int zhong_num,fa_num,bai_num;
@@ -554,7 +554,7 @@ int RRound::pattern_match(CARD_KIND data[],int len)
 	return 0;
 }
 
-int RRound::cards_stable(CARD_KIND clist[],int len)
+int NetRRound::cards_stable(CARD_KIND clist[],int len)
 {
 	CARD_KIND temp_list2[MAX_HANDIN_NUM-2];
 	int i=0;
@@ -578,13 +578,13 @@ int RRound::cards_stable(CARD_KIND clist[],int len)
 	return 0;
 }
 
-void RRound::task_check(unsigned int flag)
+void NetRRound::task_check(unsigned int flag)
 {
 	if( !(flag&rr_aim) )
 		rr_aim=0;
 }
 
-int RRound::hu_check(CARD_KIND data_kind)
+int NetRRound::hu_check(CARD_KIND data_kind)
 {
 	CARD_KIND temp_list[MAX_HANDIN_NUM];
 	CARD_KIND temp_kind=data_kind;
@@ -623,7 +623,7 @@ int RRound::hu_check(CARD_KIND data_kind)
 	return res;
 }
 
-void RRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[])
+void NetRRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[])
 {
 	int i,j;
 	CARD_KIND temp_kind;
@@ -648,7 +648,7 @@ void RRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND 
 	}
 }
 
-void RRound::array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[])
+void NetRRound::array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[])
 {
 	int i,j;
 	CARD_KIND temp_kind;
@@ -674,7 +674,7 @@ void RRound::array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND ki
 		}
 	}
 }
-unsigned int RRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
+unsigned int NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
 {
 	int active=card_list->atcvie_place;
 	int len=card_list->len-card_list->atcvie_place;
@@ -686,7 +686,7 @@ unsigned int RRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND 
 	return 0;
 }
 
-int RRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex)
+int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex)
 {
 	CARD temp_list[MAX_HANDIN_NUM];
 	CARD_KIND temp_list2[MAX_HANDIN_NUM];
@@ -738,7 +738,7 @@ int RRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex)
 	}
 	return 0;
 }
-//void RRound::kou_check(CARD_KIND river_list[],int river_len,CARD_KIND list[],int *len)
+//void NetRRound::kou_check(CARD_KIND river_list[],int river_len,CARD_KIND list[],int *len)
 //{
 //	int same_num=0;
 //	if(list==NULL)
@@ -770,25 +770,25 @@ int RRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex)
 //		}
 //	}
 //}
-void RRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
+void NetRRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
 {
 	for(int a=0;a<MAX_HANDIN_NUM;a++)
 		for(int b=0;b<9;b++)
 			curArray[a][b]=hu_cards[a][b];
 }
-void RRound::get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9])
+void NetRRound::get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9])
 {
 	for(int a=0;a<MAX_HANDIN_NUM;a++)
 		for(int b=0;b<9;b++)
 			curArray[a][b]=huTiemsForEveryOne[a][b]*2;
 }
-void RRound::get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM])
+void NetRRound::get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM])
 {
 	for(int a=0;a<MAX_HANDIN_NUM;a++)
 			//curArray[a]=hu_NumForEveryCard[a];
 			curArray[a]=hu_cards_num[a];
 }
-void RRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
+void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 {
 	int temp=0;
 	for(int a=0;a<MAX_HANDIN_NUM;a++)
@@ -811,7 +811,7 @@ void RRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 		}
 	}
 }
-unsigned int RRound::ming_check()
+unsigned int NetRRound::ming_check()
 {
 	unsigned int res =0;
 	CARD_KIND cur_card/*,last_card*/;
@@ -866,7 +866,7 @@ unsigned int RRound::ming_check()
 	return res;
 }
 
-unsigned char RRound::init(int card_array[],int len,int aim)
+unsigned char NetRRound::init(int card_array[],int len,int aim)
 {
 	int i;
 
@@ -908,7 +908,7 @@ unsigned char RRound::init(int card_array[],int len,int aim)
 	}
 	return ac;
 }
-unsigned char RRound::ActiontodoCheckAgain()
+unsigned char NetRRound::ActiontodoCheckAgain()
 {
 	unsigned char res = 0x0;
 	int card_num;
@@ -931,7 +931,7 @@ unsigned char RRound::ActiontodoCheckAgain()
 	return res;
 }
 
-unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
+unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
     LOGGER_WRITE("%x %s : kind %d,who_give %d,tingStatus %d,is_last_one %d",
         (int)this,__FUNCTION__,kind,who_give,tingStatus,is_last_one);
@@ -1027,7 +1027,7 @@ unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned cha
 	return res;
 }
 /*if ting place=card_list->len*/
-CARD_KIND RRound::hand_out(unsigned int place)
+CARD_KIND NetRRound::hand_out(unsigned int place)
 {
 
 	CARD_KIND l_kind;
@@ -1065,14 +1065,14 @@ CARD_KIND RRound::hand_out(unsigned int place)
 		return l_kind;
 }
 
-void RRound::action1()
+void NetRRound::action1()
 {
 	for (int i=0;i<=card_list->len-1;i++)
 	{
 		card_list->data[i].can_play=cps_NO;
 	}
 }
-void RRound::MingCancel()
+void NetRRound::MingCancel()
 {
 	for(int a=0;a<card_list->len;a++)
 	{
@@ -1082,7 +1082,7 @@ void RRound::MingCancel()
 			card_list->data[a].can_play=cps_YES;
 	}
 }
-ACT_RES RRound::action(unsigned char who_give,ARRAY_ACTION act)
+ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 {
     LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
 
@@ -1262,17 +1262,17 @@ ACT_RES RRound::action(unsigned char who_give,ARRAY_ACTION act)
 	return ar_DONE;
 }
 
-unsigned int RRound::get_aim()
+unsigned int NetRRound::get_aim()
 {
 	return rr_aim;
 }
 
-unsigned int RRound::get_ming_indexes()
+unsigned int NetRRound::get_ming_indexes()
 {
 	return archive_ming_indexes;
 }
 
-int *RRound::get_ming_reserved_cards_num(outCardList *river_list)
+int *NetRRound::get_ming_reserved_cards_num(outCardList *river_list)
 {
 	int i;	
 	memset(hu_residueForEvery,0,sizeof(int)*MAX_HANDIN_NUM*9);
@@ -1299,12 +1299,12 @@ int *RRound::get_ming_reserved_cards_num(outCardList *river_list)
 	return hu_reserved_num;
 }
 
-void RRound::set_ming_indexes(unsigned int indexesFlag)
+void NetRRound::set_ming_indexes(unsigned int indexesFlag)
 {
 	archive_ming_indexes=indexesFlag;
 }
 
-void RRound::set_ting_status(unsigned char flag)
+void NetRRound::set_ting_status(unsigned char flag)
 {
 	rr_ting_flag=flag;
 	hu_len=0;
@@ -1313,44 +1313,44 @@ void RRound::set_ting_status(unsigned char flag)
 			hucards[hu_len++]=CARD_KIND(i);
 }
 
-void RRound::get_hu_cards(CARD_KIND c_list[],int *len)
+void NetRRound::get_hu_cards(CARD_KIND c_list[],int *len)
 {
 	*len=hu_len;
 	for(int k=0;k<hu_len;k++)
 		c_list[k]=hucards[k];
 }
 
-unsigned char RRound::get_ting_status()
+unsigned char NetRRound::get_ting_status()
 {
 	return rr_ting_flag;
 }
 
-long RRound::get_card_score()
+long NetRRound::get_card_score()
 {
 	return card_score;
 }
 
-void RRound::update_score(long score)
+void NetRRound::update_score(long score)
 {
 	total_score += score;
 }
-CARD_ARRAY* RRound::get_card_list()
+CARD_ARRAY* NetRRound::get_card_list()
 {
 	return card_list;
 }
 
-outCardList* RRound::getOutCardList()
+outCardList* NetRRound::getOutCardList()
 {
 	return out_card_list;
 }
 
-bool RRound::get_Hu_Flag(unsigned int *hu_kind)
+bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)
 {
 	*hu_kind=kind_hu;
 	return true;
 }
 
-bool RRound::get_ming_check_result(MRES *res)
+bool NetRRound::get_ming_check_result(MRES *res)
 {
 	//unsigned int result;
 	if(hu_places_num!=0)
@@ -1368,11 +1368,11 @@ bool RRound::get_ming_check_result(MRES *res)
 	else
 		return false;
 }
-void RRound::set_role_type(RT type)
+void NetRRound::set_role_type(RT type)
 {
 	role_type=type;
 }
-RT RRound::get_role_type()
+RT NetRRound::get_role_type()
 {
 	return role_type;
 }

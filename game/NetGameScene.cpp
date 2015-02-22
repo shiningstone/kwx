@@ -1,27 +1,28 @@
-#include "GameScene.h"
-#include "stdio.h"
+
+#include "NetGameScene.h"
+#include <stdio.h>
 using namespace std;
 
-GameScene::GameScene():RaceLayer()
+NetGameScene::NetGameScene():NetRaceLayer()
 {
-    _logger = LOGGER_REGISTER("RaceLayer");
+    _logger = LOGGER_REGISTER("NetRaceLayer");
 }
 
-GameScene::~GameScene()
+NetGameScene::~NetGameScene()
 {
     LOGGER_DEREGISTER(_logger);
 }
 
-bool GameScene::init()
+bool NetGameScene::init()
 {
-	if(!RaceLayer::init())
+	if(!NetRaceLayer::init())
 	{
 		return false;
 	}
 	init_race_sequence();
 	return true;
 }
-void GameScene::distribute_card_event()
+void NetGameScene::distribute_card_event()
 {
 	DCI scard;
 	if(dist_card_no<TOTAL_CARD_NUM)
@@ -38,7 +39,7 @@ void GameScene::distribute_card_event()
     }   
 }
 
-void GameScene::race_start_again()
+void NetGameScene::race_start_again()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
@@ -89,7 +90,7 @@ void GameScene::race_start_again()
 
 }
 
-void GameScene::init_race_sequence()
+void NetGameScene::init_race_sequence()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 

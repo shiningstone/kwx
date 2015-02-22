@@ -1,6 +1,6 @@
 
 //#define __DISABLE_LOGGER__
-#define __UNIT_TEST__
+//#define __UNIT_TEST__
 
 #ifdef __DISABLE_LOGGER__
 
