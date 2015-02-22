@@ -6,10 +6,12 @@ using namespace std;
 NetGameScene::NetGameScene():NetRaceLayer()
 {
     _logger = LOGGER_REGISTER("NetRaceLayer");
+    _roundManager = new RoundManager();
 }
 
 NetGameScene::~NetGameScene()
 {
+    delete _roundManager;
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -46,38 +48,12 @@ void NetGameScene::race_start_again()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
-
-		for(int j=0;j<2;j++)//伪随机数列生成
-		{
-			for(int i=0;i<TOTAL_CARD_NUM;i++)
-			{
-				int tmp=card_seq[i];
-				int cur=rand()%TOTAL_CARD_NUM;
-				card_seq[i]=card_seq[cur];
-				card_seq[cur]=tmp;
-			}
-		}
-        
         LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
-        char buf[1024] = {0};
-        int usedBytes  = 0;
-	    sprintf(buf+usedBytes, "\t");
-        usedBytes += 1;
-	    for(int i=0; i<TOTAL_CARD_NUM; i++) {
-		    sprintf(buf+usedBytes, "%02d ",(card_seq[i])%TOTAL_CARD_KIND);
-            usedBytes += 3;
 
-		    if( (i+1)%16==0 ) {
-			    sprintf(buf+usedBytes, "\n\t");
-                usedBytes += 2;
-		    }
-	    }
-        sprintf(buf+usedBytes, "\n");
-        log(buf);
-
+        _roundManager->Shuffle(card_seq);
         set_cards_sequence(card_seq);
 		set_aims_sequence(aim);
-		set_winner_no(get_last_winner_no());
+		set_winner_no( _roundManager->GetLastWinner() );
 
 		dist_card_no=40;
 	});
@@ -85,7 +61,6 @@ void NetGameScene::race_start_again()
 	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);
 
 	auto _calldistributeListener = EventListenerCustom::create(DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
-
 			distribute_card_event();
 		});
 	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
@@ -103,7 +78,6 @@ void NetGameScene::init_race_sequence()
 		card_seq[i]=i;
 	}
 
-    LOGGER_WRITE("NETWORK: Request(last winner) not defined");
 	set_winner_no( _roundManager->GetLastWinner() );
 
 	race_role[0]=new NetPlayer();

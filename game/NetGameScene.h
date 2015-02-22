@@ -7,7 +7,6 @@
 #include "Me.h"
 
 #include "NetPlayer.h"
-#include "RoundManager.h"
 #include "./../utils/LogManager.h"
 
 USING_NS_CC;
@@ -20,7 +19,6 @@ public:
 	virtual ~NetGameScene();
 private:
     Logger        *_logger;
-    RoundManager  *_roundManager;
 
 	int card_seq[TOTAL_CARD_NUM];
 	int dist_card_no;

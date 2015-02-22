@@ -7068,7 +7068,7 @@ void NetRaceLayer::distribute_card()
 }
 void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    _roundManager->NotifyStart();
 
 	auto curButton=(Button*)pSender;
 	auto VoiceEffect=CallFunc::create([=](){
@@ -7170,8 +7170,6 @@ void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType
 }
 void NetRaceLayer::start_callback()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tileImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
 	if(!ifResourcePrepared)
@@ -7251,28 +7249,14 @@ void NetRaceLayer::start_callback()
 	OtherOneForDouble=-1;
 	QiangGangTarget=-1;
 	FirstMingNo=-1;
+
+    LOGGER_WRITE("NETWORK : !!! %s a little messed up",__FUNCTION__);
 	ready_indicate(1);//准备状态
-	bool left_status=get_ready_status(0);
-	bool right_status=get_ready_status(2);
+    _roundManager->NotifyStart();
+    _roundManager->WaitUntilAllReady();
 	race_begin_prepare();//牌局开始效果
-	if(left_status&&right_status)
-	{
-		race_begin_prepare();
-	}
-	/*add codes for waitfor other player ready*/
-	else if(!left_status)
-	{
 
-	}
-	else if(!right_status)
-	{
-
-	}
-	else 
-	{
-
-	}
-	action_todo=player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化
+    action_todo=player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化
 	if(action_todo!=a_TIMEOUT)
 	{
 		player[(last_winner_no+1)%3]->init(&card_seq[14],13,aim[(last_winner_no+1)%3]);

@@ -8,6 +8,7 @@
 #include "Resources.h"
 using namespace CocosDenshion;
 
+#include "RoundManager.h"
 #include "./../utils/LogManager.h"
 
 class NetRaceLayer : public cocos2d::Layer
@@ -15,6 +16,8 @@ class NetRaceLayer : public cocos2d::Layer
 public:
 	NetRaceLayer();
 	virtual ~NetRaceLayer();
+protected:
+    RoundManager  *_roundManager;
 private:
     Logger *_logger;
     
