@@ -10,12 +10,16 @@
 USING_NS_CC;
 using namespace cocos2d::ui;
 
+#include "utils/LogManager.h"
+
 class  GameScene:public RaceLayer
 {
 public:
 	GameScene();
 	virtual~GameScene();
 private:
+    Logger *_logger;
+
 	int card_seq[TOTAL_CARD_NUM];
 	int dist_card_no;
 	int aim[3];

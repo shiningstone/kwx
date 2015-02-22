@@ -11,7 +11,10 @@ RaceLayer::RaceLayer()
 	player[0]=NULL;
 	player[1]=NULL;
 	player[2]=NULL;
+
+    _logger = LOGGER_REGISTER("RaceLayer");
 }
+
 RaceLayer::~RaceLayer()
 {
 	g_my_free->release();
@@ -45,6 +48,8 @@ RaceLayer::~RaceLayer()
 		delete player[2];
 	//SimpleAudioEngine::sharedEngine()->end();
 	_eventDispatcher->removeAllEventListeners();
+
+    LOGGER_DEREGISTER(_logger);
 }
 
 bool RaceLayer::init()
@@ -72,6 +77,7 @@ const std::string GirlsActionPath[4]={"Music/g_peng.ogg","Music/g_gang.ogg","Mus
 //const std::string BACKCHOOSE_LISTENER_ID="BACKCHOOSE_LISTENER_ID";
 void RaceLayer::distribute_event(const std::string event_type,void* val)
 {
+    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
 	_eventDispatcher->dispatchCustomEvent(event_type,val);
 }
 void RaceLayer::tuoGuanCancelFunc(Ref* pSender,ui::Widget::TouchEventType type)
@@ -116,7 +122,9 @@ void RaceLayer::tuoGuanCancelFunc(Ref* pSender,ui::Widget::TouchEventType type)
 }
 void RaceLayer::robot_callback(Ref* pSender,ui::Widget::TouchEventType type)
 {
-	auto curButton=(Button*)pSender;
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+    auto curButton=(Button*)pSender;
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -343,6 +351,8 @@ void RaceLayer::back_callback(Ref* pSender,cocos2d::ui::Widget::TouchEventType t
 }
 void RaceLayer::update_residue_cards(int no)
 {
+    LOGGER_WRITE("%s : %d",__FUNCTION__,no);
+
 	if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID))
 		residue_card_bkg->removeChildByTag(RESERVED_BKG_CHILD_TAG_ID,true);
 	if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+1))
@@ -419,6 +429,8 @@ void RaceLayer::update_residue_cards(int no)
 }
 void RaceLayer::create_race()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 
@@ -1456,6 +1468,8 @@ bool RaceLayer::resource_prepare()
 
 void RaceLayer::ready_indicate(int direction)
 {
+    LOGGER_WRITE("%s : %d",__FUNCTION__,direction);
+
 	auto Ready=Sprite::createWithSpriteFrameName("zhunbei.png");
 	Ready->setAnchorPoint(Vec2(0.5,1));
 	Ready->setScale(0.8);
@@ -1565,6 +1579,8 @@ void RaceLayer::startParticleSystem(float delta)
 
 void RaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	switch (type)
 	{
@@ -1597,6 +1613,8 @@ void RaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEv
 
 void RaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	action_todo=a_HU;
 	auto curButton=(Button*)pSender;
 	int no=pSender->_ID;
@@ -1656,6 +1674,8 @@ void RaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEven
 
 void RaceLayer::gang_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	switch (type)
 	{
@@ -1698,6 +1718,8 @@ void RaceLayer::gang_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEv
 
 void RaceLayer::qi_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	switch (type)
 	{
@@ -1724,6 +1746,8 @@ void RaceLayer::qi_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEven
 
 void RaceLayer::delete_ActionRemind()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	for(int i=0;i<17;i++)
 	{
@@ -1733,6 +1757,8 @@ void RaceLayer::delete_ActionRemind()
 }
 void RaceLayer::delete_ActionEffect()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	for(int i=0;i<31;i++)
 	{
@@ -1745,6 +1771,8 @@ void RaceLayer::delete_NnnecessaryResource()
 }
 void RaceLayer::delete_act_tip()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 
 	for(int i=0;i<17;i++)
@@ -2057,6 +2085,8 @@ BezierTo* RaceLayer::OthersBizerMove(int no,outCardList* outCard)
 
 void RaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	memset(res,0,sizeof(HAH));
 	res->reserved_card_num=total_reserved_card_num;
 	CARD s_card;
@@ -2082,6 +2112,8 @@ void RaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2
 }
 void RaceLayer::TingHintBarListener()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto TingListener = EventListenerTouchOneByOne::create();
 	TingListener->setSwallowTouches(false);
 	TingListener->onTouchBegan=[=](Touch* touch, Event* event)
@@ -2122,6 +2154,8 @@ void RaceLayer::TingHintBarListener()
 }
 void RaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
+    LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
+
 	//ifMyTime=false;
 	if(ifMingTime)
 	{
@@ -2262,6 +2296,8 @@ void RaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 
 void RaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_in_list,Touch* touch,int time)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	//ifMyTime=false;
 	if(ifMingTime)
 	{
@@ -2362,6 +2398,8 @@ void RaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_
 }
 void RaceLayer::waitfor_MyShowCardInstruct()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	if(g_server==0)
 	{
@@ -2399,6 +2437,8 @@ void RaceLayer::waitfor_MyShowCardInstruct()
 }
 void RaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	if(player[1]->get_parter()->get_ting_status()==0&&!ifTuoGuan)
 	{
 		auto listener=EventListenerTouchOneByOne::create();
@@ -2748,6 +2788,8 @@ void RaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非�
 }
 void RaceLayer::waitfor_ShowCardWithoutTouch()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	Vec2 v;
 	if(cur_player==0)
@@ -2919,17 +2961,23 @@ void RaceLayer::waitfor_ShowCardWithoutTouch()
 }
 void RaceLayer::peng_update(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	g_server=1;
 	player[no]->get_parter()->action(g_server,a_PENG);
 }
 void RaceLayer::minggang_update(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	player[no]->get_parter()->action(g_server,a_MING_GANG);
 }
 void RaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	continue_gang_times=0;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -3340,6 +3388,8 @@ void RaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 }
 void RaceLayer::angang_update(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	if(action_todo&a_AN_GANG)
 		player[no]->get_parter()->action(g_server,a_AN_GANG);
@@ -3348,6 +3398,8 @@ void RaceLayer::angang_update(Node *psender)
 }
 void RaceLayer::an_gang_tip_effect(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	continue_gang_times++;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -3936,6 +3988,8 @@ void RaceLayer::an_gang_tip_effect(Node *psender)
 }
 void RaceLayer::QiangGangHuJudge()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	g_server=1;
 	int no=(cur_player+1)%3;
 	unsigned char curTingStatus=player[cur_player]->get_parter()->get_ting_status();
@@ -4018,6 +4072,8 @@ void RaceLayer::QiangGangHuJudge()
 }
 void RaceLayer::ming_gang_tip_effect(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	continue_gang_times++;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -4746,6 +4802,8 @@ void RaceLayer::ming_gang_tip_effect(Node *psender)
 }
 void RaceLayer::qi_tip_effect(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int no=psender->_ID;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=1;
@@ -4819,6 +4877,8 @@ void RaceLayer::qi_tip_effect(Node *psender)
 }
 void RaceLayer::update_residue_TingCards(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	player[no]->get_parter()->get_ming_reserved_cards_num(river_list);
 	//int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
@@ -4879,6 +4939,8 @@ void RaceLayer::update_residue_TingCards(int no)
 }
 void RaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	Vec2 curPos;
 	if(curNo==0)
 		curPos=Vec2(origin.x+visibleSize.width*266/1218,origin.y+visibleSize.height*0.65);//0.69 0.23
@@ -5009,6 +5071,8 @@ void RaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 }
 void RaceLayer::tingHintCreate(Point curPos,int CardPlace)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	player[1]->get_parter()->get_ming_reserved_cards_num(river_list);
 	Hu_cardOut_place=CardPlace;
@@ -5134,6 +5198,8 @@ void RaceLayer::tingHintCreate(Point curPos,int CardPlace)
 }
 void RaceLayer::card_list_update(int no)
 {
+    LOGGER_WRITE("%s : %d",__FUNCTION__,no);
+
 	float x,y;
 	Sprite *p_list[MAX_HANDIN_NUM];
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -5708,6 +5774,8 @@ void RaceLayer::update_card_list(Node *psender)
 
 void RaceLayer::update_card_in_river_list(Node* sender)
 {
+    LOGGER_WRITE("%s : %x",__FUNCTION__,(int)sender);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 
 	outCardList* outCard=player[sender->_ID]->get_parter()->getOutCardList();
@@ -5834,6 +5902,8 @@ void RaceLayer::update_card_in_river_list(Node* sender)
 
 void RaceLayer::race_begin_prepare()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/lanpai.ogg");	
 
 	int i,j,temp;
@@ -5913,6 +5983,8 @@ void RaceLayer::race_begin_prepare()
 }
 void RaceLayer::KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	switch (type)
 	{
@@ -5953,6 +6025,8 @@ void RaceLayer::KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventT
 }
 void RaceLayer::KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -5994,6 +6068,8 @@ void RaceLayer::KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventT
 }
 void RaceLayer::MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -6032,6 +6108,8 @@ void RaceLayer::MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEvent
 }
 void RaceLayer::KouCardsCheck(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int a,b,c,num;
 	CARD_ARRAY *list=player[no]->get_parter()->get_card_list();
 	for(a=0;a<4;a++)
@@ -6092,6 +6170,8 @@ void RaceLayer::KouCardsCheck(int no)
 }
 void RaceLayer::ming_kou_Choose(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	if(no==1)
 	{
@@ -6288,6 +6368,8 @@ void RaceLayer::ming_kou_Choose(int no)
 }
 void RaceLayer::ming_tip_effect(Node *psender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	action_todo=a_MING;
 	//continue_gang_times=0;
@@ -6332,6 +6414,8 @@ void RaceLayer::ming_tip_effect(Node *psender)
 
 void RaceLayer::ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	curButton->_ID=1;
 	auto callfunc=CallFuncN::create(this,callfuncN_selector(RaceLayer::ming_tip_effect));
@@ -6400,6 +6484,8 @@ void RaceLayer::ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEv
 }
 void RaceLayer::first_response(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
@@ -6414,6 +6500,8 @@ void RaceLayer::first_response(int no)
 }
 void RaceLayer::waitfor_myaction(int no)
 {
+    LOGGER_WRITE("%s : %d",__FUNCTION__,no);
+
 	float x,y;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	//_eventDispatcher->removeEventListenersForTarget(myframe,true);//????
@@ -6534,6 +6622,8 @@ void RaceLayer::waitfor_myaction(int no)
 
 void RaceLayer::waitfor_otheraction(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
 	
@@ -6572,6 +6662,8 @@ void RaceLayer::waitfor_otheraction(int no)
 
 void RaceLayer::waitfor_response(Node* sender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
 	unsigned char curTingStatus=player[sender->_ID]->get_parter()->get_ting_status();
@@ -6786,6 +6878,8 @@ void RaceLayer::waitfor_response(Node* sender)
 
 void RaceLayer::distribute_card_effect()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	auto list=player[cur_player]->get_parter()->get_card_list();
 	Sprite *list_last_one;
@@ -6851,10 +6945,15 @@ void RaceLayer::distribute_card_effect()
 
 void RaceLayer::call_distribute_card()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
 void RaceLayer::distribute_card()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+    LOGGER_WRITE("\tadd listener to %s",DISTRIBUTE_DONE_EVENT_TYPE);
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DCI*>(event->getUserData());
 		g_show_card=userData->card;
@@ -6868,6 +6967,7 @@ void RaceLayer::distribute_card()
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 
+    LOGGER_WRITE("\tadd listener to %s",NOONE_WIN_EVENT_TYPE);
 	auto _noonewinListener = EventListenerCustom::create(NOONE_WIN_EVENT_TYPE, [this](EventCustom * event){
 
 		((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
@@ -6910,6 +7010,8 @@ void RaceLayer::distribute_card()
 }
 void RaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	auto VoiceEffect=CallFunc::create([=](){
 		SimpleAudioEngine::sharedEngine()->playEffect("Music/anniu.ogg");	
@@ -6945,6 +7047,8 @@ void RaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type
 
 void RaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto curButton=(Button*)pSender;
 	auto VoiceEffect=CallFunc::create([=](){
 		SimpleAudioEngine::sharedEngine()->playEffect("Music/anniu.ogg");	
@@ -7008,6 +7112,8 @@ void RaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType ty
 }
 void RaceLayer::start_callback()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tileImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
 	if(!ifResourcePrepared)
@@ -7120,6 +7226,8 @@ void RaceLayer::start_callback()
 	
 void RaceLayer::start_dealCardsDelete()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	for(int a=0;a<3;a++)
 	{
@@ -7132,6 +7240,8 @@ void RaceLayer::start_dealCardsDelete()
 }
 void RaceLayer::effect_Distribute_Card(int zhuang)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto VoiceEffect=CallFunc::create([=](){VoiceId=SimpleAudioEngine::sharedEngine()->playEffect("Music/sort.ogg");});	
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	float timeXH[3];
@@ -7592,10 +7702,14 @@ void RaceLayer::effect_Distribute_Card(int zhuang)
 
 void RaceLayer:: display_callback(cocos2d::Ref* pSender)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 
 }
 void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	int PropertyOfPlayer;
 	std::string PhotoOfPlayer;
 	std::string NickNameOfPlayer;
@@ -7855,6 +7969,8 @@ void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 }
 void RaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	//float x=origin.x+visibleSize.width*0.17;
 	float x=162;
 	float y=origin.y+visibleSize.height*0.1256-10;
@@ -8342,6 +8458,8 @@ void RaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 }
 void RaceLayer::raceAccount(float delta)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
 	show_card_indicator->setVisible(false);
 	while(this->getChildByTag(GAME_BACK_BAR))
@@ -8522,6 +8640,8 @@ void RaceLayer::raceAccount(float delta)
 
 void  RaceLayer::showall()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	update_clock(false,0,0);
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	float x,y;
@@ -8774,6 +8894,8 @@ void  RaceLayer::showall()
 
 Spawn* RaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
 	bgOfGang->setPosition(v);
@@ -8816,6 +8938,8 @@ Spawn* RaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 
 void RaceLayer::hu_effect_tip(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
 	if(this->getChildByTag(ROBOT_TUO_GUAN))
 		this->removeChildByTag(ROBOT_TUO_GUAN,true);
@@ -9070,14 +9194,20 @@ void RaceLayer::hu_tip_effect(Node *psender)
 
 int RaceLayer::get_winner_no()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	return winner_no;
 }
 int RaceLayer::get_last_winner_no()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	return last_winner_no;
 }
 void RaceLayer::set_winner_no(int no)
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	//if(no!=3)
 	//{
 		winner_no=no;
@@ -9100,6 +9230,8 @@ void RaceLayer::set_winner_no(int no)
 //}
 void RaceLayer::init_role(Role *s_p[],Raction *p_parter[])
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	for(int j=0;j<3;j++)
 	{
 		player[j]=s_p[j];

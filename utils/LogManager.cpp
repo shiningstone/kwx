@@ -23,7 +23,7 @@ void Logger::Set(bool value) {
     _isEnabled = value;
 }
 
-#ifdef WIN32
+#ifdef __UNIT_TEST__
 #define log(x) printf(x)
 #else
 /*************************************
@@ -62,8 +62,8 @@ int Logger::Write(const char * format, ...) {
 }
 
 #include <ctype.h>
-int Logger::WritePackage(char *pkg,int len) {
-    char buf[256] = {0};
+int Logger::WriteArray(char *pkg,int len) {
+    char buf[1024] = {0};
     int usedBytes  = 0;
 
 	sprintf(buf+usedBytes, "\t");

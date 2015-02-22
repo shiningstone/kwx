@@ -186,7 +186,7 @@ void CSocket::_log(int dir,char *buf,int len) {
     } else {
         sprintf(temp+usedBytes,"\n");
         LOGGER_WRITE( temp );
-        _logger->WritePackage( buf, len );
+        _logger->WriteArray( buf, len );
     }
 #endif
 }

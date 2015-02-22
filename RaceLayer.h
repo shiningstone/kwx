@@ -9,13 +9,17 @@
 #include "Resources.h"
 using namespace CocosDenshion;
 
+#include "utils/LogManager.h"
+
 class RaceLayer : public cocos2d::Layer
 {
 public:
 	RaceLayer();
 	virtual ~RaceLayer();
 private:
-	CARD_KIND RototHandOutIndex;
+    Logger *_logger;
+    
+    CARD_KIND RototHandOutIndex;
 	float s_scale;
 	int s_no;
 	volatile CARD_KIND g_show_card;

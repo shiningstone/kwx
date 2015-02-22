@@ -1,5 +1,7 @@
 
 //#define __DISABLE_LOGGER__
+#define __UNIT_TEST__
+
 #ifdef __DISABLE_LOGGER__
 
 #define Logger void
@@ -7,6 +9,7 @@
 #define LOGGER_REGISTER(x)   0
 #define LOGGER_DEREGISTER   
 #define LOGGER_WRITE(fmt,...)
+#define LOGGER_WRITE_ARRAY(p,len)
 
 #else
 
@@ -22,13 +25,14 @@
 #define LOGGER_REGISTER(x)     LogManager::GetInstance()->Recruit(x)
 #define LOGGER_DEREGISTER(x)   LogManager::GetInstance()->Dismiss(x)
 #define LOGGER_WRITE(fmt,...)      _logger->Write(fmt,##__VA_ARGS__)
+#define LOGGER_WRITE_ARRAY(p,len)  _logger->WriteArray(p,len)
 
 class Logger {
 public :
     Logger(const char *name);
     
     int  Write(const char * format, ...);
-    int  WritePackage(char *buf,int len);
+    int  WriteArray(char *buf,int len);
     void Set(bool enable);
     bool IsEnabled();
 

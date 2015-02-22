@@ -5,12 +5,17 @@
 #include "Raction.h"
 //#include "cocos2d.h"
 
+#include "./utils/LogManager.h"
+
 class RRound:public Raction
 {
 public:
 	RRound();
     virtual ~RRound();
+
 private:
+    Logger *_logger;
+
     unsigned int  rr_aim;
     unsigned char rr_ting_flag;
     unsigned int  archive_ming_indexes;

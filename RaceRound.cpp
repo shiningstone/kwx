@@ -7,6 +7,8 @@ RRound::RRound()
 	card_list=NULL;
 	hu_len=0;
 	kind_hu=0;
+
+    _logger = LOGGER_REGISTER("RaceRound");
 }
 
 RRound::~RRound()
@@ -15,6 +17,8 @@ RRound::~RRound()
 		delete card_list;
 	if(out_card_list)
 		delete out_card_list;
+
+    LOGGER_DEREGISTER(_logger);
 }
 
 int RRound::card_delete(unsigned int from,unsigned int len)
@@ -929,6 +933,9 @@ unsigned char RRound::ActiontodoCheckAgain()
 
 unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
+    LOGGER_WRITE("%x %s : kind %x,who_give %d,tingStatus %d,is_last_one %d",
+        (int)this,__FUNCTION__,kind,who_give,tingStatus,is_last_one);
+
 	int num = 0;
 	unsigned char res = 0x0;
 	card_list->data[card_list->len].kind=kind;
@@ -1022,6 +1029,7 @@ unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned cha
 /*if ting place=card_list->len*/
 CARD_KIND RRound::hand_out(unsigned int place)
 {
+
 	CARD_KIND l_kind;
 	CARD tail_card;
 	tail_card.kind = card_list->data[card_list->len-1].kind;
@@ -1032,6 +1040,7 @@ CARD_KIND RRound::hand_out(unsigned int place)
 		return ck_NOT_DEFINED;
 	}
 	l_kind=card_list->data[place].kind;
+    LOGGER_WRITE("%x %s : %x",this,__FUNCTION__,l_kind);
 
 	out_card_list->insertItem(card_list->data[place]);
 
@@ -1075,6 +1084,8 @@ void RRound::MingCancel()
 }
 ACT_RES RRound::action(unsigned char who_give,ARRAY_ACTION act)
 {
+    LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
+
 	CARD temp_data;
 	InsertPlaceForMG=-1;
 

@@ -4,10 +4,12 @@ using namespace std;
 
 GameScene::GameScene():RaceLayer()
 {
+    _logger = LOGGER_REGISTER("RaceLayer");
 }
 
 GameScene::~GameScene()
 {
+    LOGGER_DEREGISTER(_logger);
 }
 
 bool GameScene::init()
@@ -27,13 +29,19 @@ void GameScene::distribute_card_event()
 		scard.card=CARD_KIND(card_seq[dist_card_no++]/4);
 		scard.num=dist_card_no;
 		_eventDispatcher->dispatchCustomEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
+        LOGGER_WRITE("%s : %s",__FUNCTION__,DISTRIBUTE_DONE_EVENT_TYPE);
 	}
 	else
+    {
 		_eventDispatcher->dispatchCustomEvent(NOONE_WIN_EVENT_TYPE,NULL);
+        LOGGER_WRITE("%s : %s",__FUNCTION__,NOONE_WIN_EVENT_TYPE);
+    }   
 }
 
 void GameScene::race_start_again()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
 
 		for(int j=0;j<2;j++)//伪随机数列生成
@@ -46,7 +54,16 @@ void GameScene::race_start_again()
 				card_seq[cur]=tmp;
 			}
 		}
-		set_cards_sequence(card_seq);
+        
+        char p[TOTAL_CARD_NUM] = {0};
+        for(int i=0;i<TOTAL_CARD_NUM;i++)
+        {
+            p[i] = card_seq[i]%TOTAL_CARD_KIND;
+        }
+        LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
+        LOGGER_WRITE_ARRAY( p,TOTAL_CARD_NUM );
+
+        set_cards_sequence(card_seq);
 		set_aims_sequence(aim);
 		set_winner_no(get_last_winner_no());
 
@@ -65,6 +82,8 @@ void GameScene::race_start_again()
 
 void GameScene::init_race_sequence()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	memset(aim,0,sizeof(int)*3);
 
 	for(int i=0;i<TOTAL_CARD_NUM;i++)
