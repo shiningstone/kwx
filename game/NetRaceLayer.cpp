@@ -566,6 +566,7 @@ void NetRaceLayer::create_race()
 	{
 		set_user_default();//重新写入UserDefault
 	}
+
 	int RobotNum=0;
 	char bufferCash[80];
 	std::string nameOfPlayer;
@@ -2810,6 +2811,12 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		int len2;
 		if(player[cur_player]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
 		{
+			collect_resources(s_res,list1,list2,&len1,&len2);
+			player[cur_player]->set_robot_hu_target(s_res->target);
+		}
+		if(player[cur_player]->get_parter()->get_role_type()==INTERNET_PLAYER)
+		{
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			collect_resources(s_res,list1,list2,&len1,&len2);
 			player[cur_player]->set_robot_hu_target(s_res->target);
 		}
@@ -6707,6 +6714,23 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				if(!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
 					action_todo=a_JUMP;
 		}
+		if(player[sender->_ID]->get_parter()->get_role_type()==INTERNET_PLAYER)
+		{
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+			if(player[sender->_ID]->get_robot_hu_target()==SAME_TIAO_TARGET)
+			{
+				if(g_show_card/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+					action_todo=a_JUMP;
+			}
+			else if(player[sender->_ID]->get_robot_hu_target()==SAME_TONG_TARGET)
+			{
+				if(g_show_card/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+					action_todo=a_JUMP;
+			}
+			else if(player[sender->_ID]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+				if(!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+					action_todo=a_JUMP;
+		}
 		if(sender->_ID==1)
 		{
 			if(player[1]->get_parter()->get_ting_status()==1&&(action_todo&a_HU))
@@ -6757,6 +6781,23 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
 					action1=a_JUMP;
 		}
+		if(player[no]->get_parter()->get_role_type()==INTERNET_PLAYER)
+		{
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+			if(player[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
+			{
+				if(g_show_card/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+					action1 = a_JUMP;
+			}
+			else if(player[no]->get_robot_hu_target()==SAME_TONG_TARGET)
+			{
+				if(g_show_card/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+					action1 = a_JUMP;
+			}
+			else if(player[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+				if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+					action1=a_JUMP;
+		}
 		int no1=(sender->_ID+2)%3;
 		unsigned char action2=player[no1]->get_parter()->hand_in(g_show_card,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(no1==1&&ifTuoGuan)
@@ -6768,6 +6809,23 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		if(player[no1]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
 		{
+			if(player[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
+			{
+				if(g_show_card/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+					action2 = a_JUMP;
+			}
+			else if(player[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
+			{
+				if(g_show_card/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+					action2 = a_JUMP;
+			}
+			else if(player[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+				if(!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+					action2=a_JUMP;
+		}
+		if(player[no1]->get_parter()->get_role_type()==INTERNET_PLAYER)
+		{
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			if(player[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
 				if(g_show_card/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
@@ -9249,12 +9307,14 @@ int NetRaceLayer::get_reserved_num()
 
 void NetRaceLayer::set_cards_sequence(const int list[])
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
 	for(int i=0;i<INIT_CARDS_NUM;i++)
 		card_seq[i]=list[i];
 }
 
 void NetRaceLayer::set_aims_sequence(const int p_aim[])
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
 	for(int i=0;i<3;i++)
 		aim[i]=p_aim[i];
 }

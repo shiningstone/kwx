@@ -15,6 +15,7 @@ NetGameScene::~NetGameScene()
 
 bool NetGameScene::init()
 {
+    LOGGER_WRITE("%s",__FUNCTION__);
 	if(!NetRaceLayer::init())
 	{
 		return false;
@@ -22,6 +23,7 @@ bool NetGameScene::init()
 	init_race_sequence();
 	return true;
 }
+
 void NetGameScene::distribute_card_event()
 {
 	DCI scard;
@@ -100,21 +102,23 @@ void NetGameScene::init_race_sequence()
 	{
 		card_seq[i]=i;
 	}
-	set_winner_no(1);
 
-	race_role[0]=new Robot();
+    LOGGER_WRITE("NETWORK: Request(last winner) not defined");
+	set_winner_no( _roundManager->GetLastWinner() );
+
+	race_role[0]=new NetPlayer();
 	race_role[1]=new Me();
-	race_role[2]=new Robot();
+	race_role[2]=new NetPlayer();
 
-	race_action[0]=new RRound();
-	race_action[1]=new RRound();
-	race_action[2]=new RRound();
+	race_action[0]=new NetRRound();
+	race_action[1]=new NetRRound();
+	race_action[2]=new NetRRound();
 
 	init_role(race_role,race_action);
 
-	race_role[0]->get_parter()->set_role_type(SINGLE_BOARD_ROBOT);
+	race_role[0]->get_parter()->set_role_type(INTERNET_PLAYER);
 	race_role[1]->get_parter()->set_role_type(SINGLE_BOADR_ME);
-	race_role[2]->get_parter()->set_role_type(SINGLE_BOARD_ROBOT);
+	race_role[2]->get_parter()->set_role_type(INTERNET_PLAYER);
 
 	create_race();
 

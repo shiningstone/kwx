@@ -5,8 +5,9 @@
 #include "cocos2d.h"
 #include "ui\CocosGUI.h"
 #include "Me.h"
-#include "Robot.h"
 
+#include "NetPlayer.h"
+#include "RoundManager.h"
 #include "./../utils/LogManager.h"
 
 USING_NS_CC;
@@ -18,7 +19,8 @@ public:
 	NetGameScene();
 	virtual ~NetGameScene();
 private:
-    Logger *_logger;
+    Logger        *_logger;
+    RoundManager  *_roundManager;
 
 	int card_seq[TOTAL_CARD_NUM];
 	int dist_card_no;
