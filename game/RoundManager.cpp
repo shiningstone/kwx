@@ -17,8 +17,8 @@ RoundManager::~RoundManager() {
 
 int RoundManager::GetLastWinner() {
     LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-
-    return 1;
+    _lastWinner = 1;
+    return _lastWinner;
 }
 
 int RoundManager::Shuffle(int *cardSeq) {
@@ -39,7 +39,7 @@ int RoundManager::Shuffle(int *cardSeq) {
 
     char p[TOTAL_CARD_NUM] = {0};
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        p[i] = (cardSeq[i])%TOTAL_CARD_KIND;
+        p[i] = (cardSeq[i])/4;
     }
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
 
@@ -63,4 +63,9 @@ bool RoundManager::WaitUntilAllReady() {
     }
 
     return true;
+}
+
+int RoundManager::AllowMovement() {
+    LOGGER_WRITE("enable reaction to player's movement",__FUNCTION__);
+    return 0;
 }

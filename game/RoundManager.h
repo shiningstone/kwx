@@ -13,9 +13,12 @@ public:
     int NotifyStart();
     bool GetReadyStatus(int tableId);
     bool WaitUntilAllReady();
+    int AllowMovement();
 
 private:
     Logger *_logger;
+
+    int _lastWinner;
 };
 
 #endif

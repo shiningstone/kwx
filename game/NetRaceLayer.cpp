@@ -2399,7 +2399,7 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 }
 void NetRaceLayer::waitfor_MyShowCardInstruct()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    LOGGER_WRITE("%s g_server=%d",__FUNCTION__,g_server);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	if(g_server==0)
@@ -2410,6 +2410,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 			Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
 			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
+            
 			river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
 			g_show_card=player[cur_player]->get_parter()->hand_out(last_one);
 			update_outcard(myframe,location,2);
@@ -2424,6 +2425,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 				Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
 				if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 					myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
+
 				river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
 				g_show_card=player[cur_player]->get_parter()->hand_out(last_one);
 				update_outcard(myframe,location,2);
@@ -2439,6 +2441,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
     LOGGER_WRITE("%s",__FUNCTION__);
+    _roundManager->AllowMovement();
 
 	if(player[1]->get_parter()->get_ting_status()==0&&!ifTuoGuan)
 	{
@@ -5203,6 +5206,7 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 	SignEnd->setPosition(Vec2(TingSignBar->getContentSize().width,0));
 	TingSignBar->addChild(SignEnd,1,k+3);
 }
+
 void NetRaceLayer::card_list_update(int no)
 {
     LOGGER_WRITE("%s : %d",__FUNCTION__,no);
@@ -6496,18 +6500,22 @@ void NetRaceLayer::first_response(int no)
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
+
 	waitfor_MyTouchShowCard();
+
 	ifGameStart=true;
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 	action_todo=player[no]->get_parter()->ActiontodoCheckAgain();
+
 	if(no==1)
 		waitfor_myaction(no);
 	else
 		waitfor_otheraction(no);
 }
+
 void NetRaceLayer::waitfor_myaction(int no)
 {
-    LOGGER_WRITE("%s : %d",__FUNCTION__,no);
+    LOGGER_WRITE("%s : %d, action_todo = %d",__FUNCTION__,no,action_todo);
 
 	float x,y;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -6527,6 +6535,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	auto act_ming = Sprite::createWithSpriteFrameName("ming.png");//明牌
 	auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
 	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
+
 	if(action_todo!=a_JUMP)
 	{
 		auto myact_qi=Button::create("qi.png","qi.png","qi.png",UI_TEX_TYPE_PLIST);
@@ -7251,14 +7260,16 @@ void NetRaceLayer::start_callback()
 	FirstMingNo=-1;
 
     LOGGER_WRITE("NETWORK : !!! %s a little messed up",__FUNCTION__);
-	ready_indicate(1);//准备状态
+	ready_indicate(1);                     //准备状态
     _roundManager->NotifyStart();
     _roundManager->WaitUntilAllReady();
-	race_begin_prepare();//牌局开始效果
+	race_begin_prepare();                  //牌局开始效果
 
-    action_todo=player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化
-	if(action_todo!=a_TIMEOUT)
-	{
+    LOGGER_WRITE("NETWORK : get cards from server %s %d ",__FILE__,__LINE__);
+    //_roundManager->Shuffle(card_seq);
+    
+    action_todo = player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化
+	if(action_todo!=a_TIMEOUT) {
 		player[(last_winner_no+1)%3]->init(&card_seq[14],13,aim[(last_winner_no+1)%3]);
 		player[(last_winner_no+2)%3]->init(&card_seq[27],13,aim[(last_winner_no+2)%3]);
 		//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/sort.ogg");
@@ -7280,6 +7291,7 @@ void NetRaceLayer::start_dealCardsDelete()
 		}
 	}
 }
+
 void NetRaceLayer::effect_Distribute_Card(int zhuang)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -7696,6 +7708,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 
 		}
 	}
+
 	auto callFunc0=CallFunc::create([=](){
 		card_list_update(0);
 		});
@@ -7706,6 +7719,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		card_list_update(2);
 		});	
 	auto update_lists_spa=Spawn::create(callFunc0,callFunc1,callFunc2,NULL);
+
 	myframe->_ID=zhuang;
 	g_server=0;
 

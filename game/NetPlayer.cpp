@@ -1,13 +1,16 @@
 
 #include "NetPlayer.h"
+
+#include "./../utils/LogManager.h"
+
 USING_NS_CC;
 
-NetPlayer::NetPlayer()
-{
-
+NetPlayer::NetPlayer() {
+    _logger = LOGGER_REGISTER("NetPlayer");
 }
-NetPlayer::~NetPlayer()
-{
+
+NetPlayer::~NetPlayer() {
+    LOGGER_DEREGISTER(_logger);
 }
 
 int NetPlayer::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
@@ -754,6 +757,7 @@ bool NetPlayer::get_nick_name(std::string & name)
 
 unsigned char NetPlayer::init(int card_array[],int len,int aim)
 {
+    LOGGER_WRITE("NETWROK : %s just need their result",__FUNCTION__);
 	return parter->init(card_array,len,aim);
 }
 

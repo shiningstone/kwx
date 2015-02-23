@@ -8,12 +8,15 @@
 #include "Raction.h"
 #include "RaceType.h"
 
+class Logger;
 class NetPlayer:public Role
 {
 	public:
 		NetPlayer();
 		virtual ~NetPlayer();
-private:
+    private:
+        Logger *_logger;
+
 		int property;
 		int idOfPlayer;
 		std::string nickName;
