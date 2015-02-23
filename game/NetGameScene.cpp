@@ -89,6 +89,7 @@ void NetGameScene::init_race_sequence()
 	race_action[2]=new NetRRound();
 
 	init_role(race_role,race_action);
+    _roundManager->SetPlayers(race_role);
 
 	race_role[0]->get_parter()->set_role_type(INTERNET_PLAYER);
 	race_role[1]->get_parter()->set_role_type(SINGLE_BOADR_ME);

@@ -2,10 +2,10 @@
 #include <stdlib.h>
 
 #include "RaceType.h"
+#include "Role.h"
+#include "Raction.h"
 
 #include "RoundManager.h"
-
-#include "./../utils/LogManager.h"
 
 RoundManager::RoundManager() {
     _logger = LOGGER_REGISTER("RoundManager");
@@ -15,6 +15,12 @@ RoundManager::~RoundManager() {
     LOGGER_DEREGISTER(_logger);
 }
 
+void RoundManager::SetPlayers(Role *players[]) {
+	for(int i=0;i<PLAYER_NUMBER;i++) {
+		_players[i] = players[i];
+	}
+}
+
 int RoundManager::GetLastWinner() {
     LOGGER_WRITE("NETWORK: Request(last winner) not defined");
     _lastWinner = 1;
@@ -22,7 +28,7 @@ int RoundManager::GetLastWinner() {
 }
 
 int RoundManager::Shuffle(int *cardSeq) {
-    LOGGER_WRITE("NETWORK: Shuffle should be executed at the server");
+    LOGGER_WRITE("NETWORK: Shuffle should be executed at the server, and it is more reasonable to hide the card sequence to clients");
 
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
 		cardSeq[i]=i;
@@ -47,7 +53,7 @@ int RoundManager::Shuffle(int *cardSeq) {
 }
 
 int RoundManager::NotifyStart() {
-    LOGGER_WRITE("NETWORK : send notification to server",__FUNCTION__);
+    LOGGER_WRITE("NETWORK %s : send notification to server",__FUNCTION__);
     return 0;
 }
 
@@ -69,3 +75,14 @@ int RoundManager::AllowMovement() {
     LOGGER_WRITE("enable reaction to player's movement",__FUNCTION__);
     return 0;
 }
+
+bool RoundManager::WaitForDistribute() {
+    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
+    return true;
+}
+
+bool RoundManager::WaitForAction() {
+    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
+    return true;
+}
+

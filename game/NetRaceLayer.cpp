@@ -2183,6 +2183,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	if(myframe->getChildByTag(MING_CANCEL))
 		myframe->removeChildByTag(MING_CANCEL,true);
 
+    LOGGER_WRITE("%s get out card list",__FUNCTION__);
 	outCardList* outCard=player[cur_player]->get_parter()->getOutCardList();
 	auto cardOut=Sprite::createWithTexture(g_my_out->getTexture());
 	auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[g_show_card]->getTexture());
@@ -2297,7 +2298,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 
 void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_in_list,Touch* touch,int time)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,ifMyActionHint);
 
 	//ifMyTime=false;
 	if(ifMingTime)
@@ -2311,11 +2312,13 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 		//action_todo=temp_actionToDo;
 		temp_actionToDo=a_JUMP;
 	}
+    
 	if(myframe->getChildByTag(MING_CANCEL))
 		myframe->removeChildByTag(MING_CANCEL,true);
 	if(myframe->getChildByTag(TING_SING_BAR))
 		myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-	if(card_in_list==list->len-1)//||time==1)
+
+    if(card_in_list==list->len-1)//||time==1)
 	{
 		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+card_in_list)->setScale(0);
 	}
@@ -2393,6 +2396,7 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
 			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
 	}
+    
 	river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[card_in_list]);
 	g_show_card=player[cur_player]->get_parter()->hand_out(card_in_list);
 	update_outcard(myframe,touch->getLocation(),time);
@@ -2795,13 +2799,15 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	Vec2 v;
+
+    Vec2 v;
 	if(cur_player==0)
 		v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
 	else if(cur_player==1)
 		v=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
 	else if(cur_player==2)
 		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
+    
 	if(cur_player!=1)
 	{
 		Sprite *cardOut;
@@ -2823,7 +2829,8 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			collect_resources(s_res,list1,list2,&len1,&len2);
 			player[cur_player]->set_robot_hu_target(s_res->target);
 		}
-		if(player[cur_player]->get_parter()->get_ting_status()==0)
+
+        if(player[cur_player]->get_parter()->get_ting_status()==0)
 		{
 			index = player[cur_player]->chose_card(s_res,total_reserved_card_num,list1,list2,len1,len2);
 			if(index==-1||index>player[cur_player]->get_parter()->get_card_list()->len-1)
@@ -5209,8 +5216,6 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 
 void NetRaceLayer::card_list_update(int no)
 {
-    LOGGER_WRITE("%s : %d",__FUNCTION__,no);
-
 	float x,y;
 	Sprite *p_list[MAX_HANDIN_NUM];
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -5224,9 +5229,12 @@ void NetRaceLayer::card_list_update(int no)
 	y=base_point[no].y+10;
 	int residualCardsNum=(list->len-list->atcvie_place)%3;
 	unsigned char ting_flag=player[no]->get_parter()->get_ting_status();
+    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
+    
 	if(ting_flag==1&&FirstMingNo==-1)
 		FirstMingNo=no;
-	for(int i=0;i<list->len;i++)
+
+    for(int i=0;i<list->len;i++)
 	{
 		if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
@@ -6495,7 +6503,8 @@ void NetRaceLayer::ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 }
 void NetRaceLayer::first_response(int no)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    LOGGER_WRITE("%s from zhuang(%d)",__FUNCTION__,no);
+    _roundManager->WaitForAction();
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
@@ -6638,7 +6647,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 
 void NetRaceLayer::waitfor_otheraction(int no)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,action_todo);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
@@ -7013,7 +7022,8 @@ void NetRaceLayer::distribute_card_effect()
 void NetRaceLayer::call_distribute_card()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-
+    _roundManager->WaitDistribute();
+    
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
 void NetRaceLayer::distribute_card()
@@ -7265,7 +7275,6 @@ void NetRaceLayer::start_callback()
     _roundManager->WaitUntilAllReady();
 	race_begin_prepare();                  //牌局开始效果
 
-    LOGGER_WRITE("NETWORK : get cards from server %s %d ",__FILE__,__LINE__);
     //_roundManager->Shuffle(card_seq);
     
     action_todo = player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化

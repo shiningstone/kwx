@@ -34,7 +34,10 @@ void test_client_console() {
     ClientSocket CLIENT;
     bool start = false;
     int  choice = STRING;
+    char serverIp[32] = {0};
 
+    printf("please input the IP address of the server:\n");
+    scanf("%s",&serverIp);
     printf("please select the message format(0-HEX, 1-String):\n");
     scanf_s("%d",&choice);
 
@@ -64,7 +67,7 @@ void test_client_console() {
 
         	CLIENT.Recv(_clientBuff,&_clientBuffLen);
         } else {
-        	CLIENT.Start();
+        	CLIENT.Start(serverIp);
             printf("client started\n");
             start = true;
         }

@@ -936,9 +936,6 @@ unsigned char NetRRound::ActiontodoCheckAgain()
 
 unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
-    LOGGER_WRITE("%x %s : kind %d,who_give %d,tingStatus %d,is_last_one %d",
-        (int)this,__FUNCTION__,kind,who_give,tingStatus,is_last_one);
-
 	int num = 0;
 	unsigned char res = 0x0;
 	card_list->data[card_list->len].kind=kind;
@@ -1027,6 +1024,9 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 				res |= a_MING;
 		}
 	}
+
+    LOGGER_WRITE("NETWORK : %x %s action %d: kind %d,who_give %d,tingStatus %d,is_last_one %d",
+        (int)this,__FUNCTION__,res,kind,who_give,tingStatus,is_last_one);
 	return res;
 }
 /*if ting place=card_list->len*/
@@ -1043,7 +1043,7 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 		return ck_NOT_DEFINED;
 	}
 	l_kind=card_list->data[place].kind;
-    LOGGER_WRITE("%x %s : %d",this,__FUNCTION__,l_kind);
+    LOGGER_WRITE("NETWORK : %x %s : %d",this,__FUNCTION__,l_kind);
 
 	out_card_list->insertItem(card_list->data[place]);
 
@@ -1075,6 +1075,7 @@ void NetRRound::action1()
 		card_list->data[i].can_play=cps_NO;
 	}
 }
+
 void NetRRound::MingCancel()
 {
 	for(int a=0;a<card_list->len;a++)
@@ -1325,7 +1326,6 @@ void NetRRound::get_hu_cards(CARD_KIND c_list[],int *len)
 
 unsigned char NetRRound::get_ting_status()
 {
-    LOGGER_WRITE("NETWORK : %s", __FUNCTION__);
 	return rr_ting_flag;
 }
 
@@ -1340,7 +1340,6 @@ void NetRRound::update_score(long score)
 }
 CARD_ARRAY* NetRRound::get_card_list()
 {
-    LOGGER_WRITE("NETWORK : %s ( !!!would server send all info of other players? )", __FUNCTION__);
 	return card_list;
 }
 
