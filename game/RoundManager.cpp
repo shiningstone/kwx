@@ -7,7 +7,10 @@
 
 #include "RoundManager.h"
 
+#define INVALID -1
+
 RoundManager::RoundManager() {
+    _lastWinner = INVALID;
     _logger = LOGGER_REGISTER("RoundManager");
 }
 
@@ -15,16 +18,23 @@ RoundManager::~RoundManager() {
     LOGGER_DEREGISTER(_logger);
 }
 
+
+int RoundManager::GetLastWinner() {
+    if( _lastWinner==INVALID ) {
+        LOGGER_WRITE("NETWORK: Request(last winner) not defined");
+        _lastWinner = 1;
+    }
+    return _lastWinner;
+}
+
+void RoundManager::SetWin(WinKind_t kind,int player) {
+    _lastWinner = player;
+}
+
 void RoundManager::SetPlayers(Role *players[]) {
 	for(int i=0;i<PLAYER_NUMBER;i++) {
 		_players[i] = players[i];
 	}
-}
-
-int RoundManager::GetLastWinner() {
-    LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-    _lastWinner = 1;
-    return _lastWinner;
 }
 
 int RoundManager::Shuffle(int *cardSeq) {

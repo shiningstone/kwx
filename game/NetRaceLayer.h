@@ -26,7 +26,6 @@ private:
 	int s_no;
 	volatile CARD_KIND g_show_card;
 	float residue_no_x,residue_no_y;
-	int last_winner_no;
 	int winner_no;
 	volatile int cur_player; //0 left,1 me,2 right, 3 server
 	int OtherOneForDouble;

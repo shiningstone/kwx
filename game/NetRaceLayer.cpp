@@ -493,7 +493,6 @@ void NetRaceLayer::create_race()
 	MyCardChoosedNum=-1;
 	ifInsertCardsTime=false;
 	ifInsertStopped=false;
-	last_winner_no=1;
 	ifResourcePrepared=false;
 	ifTuoGuan=false;
 	ifMingTime=false;
@@ -6010,25 +6009,25 @@ void NetRaceLayer::race_begin_prepare()
 	if(this>getChildByTag(SHOWCARD_INDICATOR_TAG_ID))
 		this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID)->setVisible(false);
 
-	if(last_winner_no==0)
-	{
-		last_winner->setAnchorPoint(Vec2(0.5,1));
-		last_winner->setPosition(lastwinner_point[0]);
-	}
-	else if(last_winner_no==1)
-	{
-		last_winner->setAnchorPoint(Vec2(0,0.5));
-		last_winner->setPosition(lastwinner_point[1]);
-	}
-	else if(last_winner_no==2)
-	{
-		last_winner->setAnchorPoint(Vec2(0.5,1));
-		last_winner->setPosition(lastwinner_point[2]);
-	}
+    int lastWinner = _roundManager->GetLastWinner();
+    switch(lastWinner) {
+        case 0:
+            last_winner->setAnchorPoint(Vec2(0.5,1));
+            last_winner->setPosition(lastwinner_point[0]);
+            break;
+        case 1:
+            last_winner->setAnchorPoint(Vec2(0,0.5));
+            last_winner->setPosition(lastwinner_point[1]);
+            break;
+        case 2:
+            last_winner->setAnchorPoint(Vec2(0.5,1));
+            last_winner->setPosition(lastwinner_point[2]);
+            break;
+    }
 	last_winner->runAction(Sequence::create(DelayTime::create(0.65),EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
 
 	auto MingSignForMe=(Sprite*)this->getChildByTag(MING_STATUS_PNG_1);
-	if(last_winner_no!=1)
+	if(lastWinner!=1)
 		MingSignForMe->setPosition(Vec2(origin.x+visibleSize.width*255/1218,origin.y+visibleSize.height*168/716));
 	else
 		MingSignForMe->setPosition(Vec2(origin.x+visibleSize.width*255/1218+last_winner->getTextureRect().size.width,origin.y+visibleSize.height*168/716));
@@ -7294,7 +7293,9 @@ void NetRaceLayer::start_callback()
 	last_action_WithGold=a_JUMP;
 	action_todo=a_JUMP;
 	continue_gang_times=0;
-	cur_player=last_winner_no;
+
+    int lastWinner = _roundManager->GetLastWinner();
+	cur_player=lastWinner;
 	RototHandOutIndex=ck_NOT_DEFINED;
 	ifQiangGangAsk=false;
 	ifDoubleAsk=false;
@@ -7310,12 +7311,12 @@ void NetRaceLayer::start_callback()
 
     //_roundManager->Shuffle(card_seq);
     
-    action_todo = player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化
+    action_todo = player[(lastWinner)%3]->init(&card_seq[0],14,aim[lastWinner]);//玩家手牌初始化
 	if(action_todo!=a_TIMEOUT) {
-		player[(last_winner_no+1)%3]->init(&card_seq[14],13,aim[(last_winner_no+1)%3]);
-		player[(last_winner_no+2)%3]->init(&card_seq[27],13,aim[(last_winner_no+2)%3]);
+		player[(lastWinner+1)%3]->init(&card_seq[14],13,aim[(lastWinner+1)%3]);
+		player[(lastWinner+2)%3]->init(&card_seq[27],13,aim[(lastWinner+2)%3]);
 		//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/sort.ogg");
-		effect_Distribute_Card(last_winner_no);//牌局开始发牌效果。
+		effect_Distribute_Card(lastWinner);//牌局开始发牌效果。
 	}
 }
 	
@@ -8614,16 +8615,19 @@ void NetRaceLayer::raceAccount(float delta)
 	AccountPlace[0]=Vec2(origin.x,origin.y+visibleSize.height*519.5/716);
 	AccountPlace[1]=Vec2(origin.x,origin.y+visibleSize.height*315.25/716);
 	AccountPlace[2]=Vec2(origin.x,origin.y+visibleSize.height*111/716);
-	raceAccoutLayer->getChildByTag(last_winner_no)->setPosition(AccountPlace[0]);
-	raceAccoutLayer->getChildByTag((last_winner_no+1)%3)->setPosition(AccountPlace[1]);
-	raceAccoutLayer->getChildByTag((last_winner_no+2)%3)->setPosition(AccountPlace[2]);
+
+    int lastWinner = _roundManager->GetLastWinner();
+	raceAccoutLayer->getChildByTag(lastWinner)->setPosition(AccountPlace[0]);
+	raceAccoutLayer->getChildByTag((lastWinner+1)%3)->setPosition(AccountPlace[1]);
+	raceAccoutLayer->getChildByTag((lastWinner+2)%3)->setPosition(AccountPlace[2]);
 
 	unsigned int num;
 	unsigned int numDoubule;
 	unsigned int winNo=get_winner_no();
 	if(winNo<3&&winNo>=0)
 	{
-		last_winner_no=winNo;
+        _roundManager->SetWin(SINGLE_WIN,winNo);
+        
 		player[winNo]->get_parter()->get_Hu_Flag(&num);
 		auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(winNo);	
 		auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((winNo+1)%3);
@@ -8642,7 +8646,8 @@ void NetRaceLayer::raceAccount(float delta)
 	}
 	else if(winNo==3)//双响
 	{
-		last_winner_no=cur_player;
+        _roundManager->SetWin(DOUBLE_WIN,cur_player);
+        
 		player[(cur_player+1)%3]->get_parter()->get_Hu_Flag(&num);
 		player[(cur_player+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
 		auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(cur_player);	
@@ -8662,7 +8667,8 @@ void NetRaceLayer::raceAccount(float delta)
 	{
 		if(FirstMingNo!=-1)
 		{
-			last_winner_no=FirstMingNo;
+            _roundManager->SetWin(NONE_WIN,FirstMingNo);
+
 			auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(FirstMingNo);	
 			auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((FirstMingNo+1)%3);
 			auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((FirstMingNo+2)%3);
@@ -8712,7 +8718,8 @@ void NetRaceLayer::raceAccount(float delta)
 		}
 		else
 		{
-			last_winner_no=cur_player;
+            _roundManager->SetWin(NONE_WIN,cur_player);
+
 			auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(cur_player);	
 			auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((cur_player+1)%3);
 			auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((cur_player+2)%3);
@@ -9296,12 +9303,7 @@ int NetRaceLayer::get_winner_no()
 
 	return winner_no;
 }
-int NetRaceLayer::get_last_winner_no()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
 
-	return last_winner_no;
-}
 void NetRaceLayer::set_winner_no(int no)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
