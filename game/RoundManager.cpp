@@ -12,13 +12,17 @@
 RoundManager::RoundManager() {
     _lastWin.player = INVALID;
     _river = NULL;
+    for(int i=0;i<PLAYER_NUMBER;i++) {
+        _players[i] = NULL;
+    }
     
     _logger = LOGGER_REGISTER("RoundManager");
 }
 
 RoundManager::~RoundManager() {
-    if(_river) {
-        delete _river;
+    delete _river;
+    for(int i=0;i<PLAYER_NUMBER;i++) {
+        delete _players[i];
     }
     
     LOGGER_DEREGISTER(_logger);
@@ -62,7 +66,6 @@ void RoundManager::RecordOutCard( Card card ) {
     LOGGER_WRITE_ARRAY(cards,i);
 }
 
-
 void RoundManager::RenewOutCard() {
     if(_river) {
         delete _river;
@@ -71,11 +74,20 @@ void RoundManager::RenewOutCard() {
 	_river = new outCardList;
 }
 
+/***********************************************
+        river information
+***********************************************/
+
 void RoundManager::SetPlayers(Role *players[]) {
 	for(int i=0;i<PLAYER_NUMBER;i++) {
 		_players[i] = players[i];
 	}
 }
+
+bool RoundManager::IsTing(int id) {
+    return _players[id]->get_parter()->get_ting_status();
+}
+
 
 int RoundManager::Shuffle(int *cardSeq) {
     LOGGER_WRITE("NETWORK: Shuffle should be executed at the server, and it is more reasonable to hide the card sequence to clients");

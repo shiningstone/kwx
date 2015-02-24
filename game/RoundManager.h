@@ -34,6 +34,7 @@ public:
     void RecordOutCard( Card card );
     void RenewOutCard();
 
+    bool IsTing(int player);
     
     int Shuffle(int *cardSeq);
     int NotifyStart();
@@ -46,9 +47,9 @@ public:
 private:
     Logger *_logger;
 
-    Role        *_players[PLAYER_NUMBER];
     WinInfo_t   _lastWin;
     outCardList *_river;
+    Role        *_players[PLAYER_NUMBER];
 };
 
 #endif
