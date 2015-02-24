@@ -10,7 +10,8 @@
 #define INVALID -1
 
 RoundManager::RoundManager() {
-    _lastWinner = INVALID;
+    _lastWin.player = INVALID;
+    
     _logger = LOGGER_REGISTER("RoundManager");
 }
 
@@ -20,15 +21,21 @@ RoundManager::~RoundManager() {
 
 
 int RoundManager::GetLastWinner() {
-    if( _lastWinner==INVALID ) {
+    if( _lastWin.player==INVALID ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-        _lastWinner = 1;
+        _lastWin.player = 1;
     }
-    return _lastWinner;
+    return _lastWin.player;
 }
 
 void RoundManager::SetWin(WinKind_t kind,int player) {
-    _lastWinner = player;
+    _lastWin.kind       = kind;
+    _lastWin.player     = player;
+}
+
+void RoundManager::GetWin(WinInfo_t &info) {
+    info.kind   = _lastWin.kind;
+    info.player = _lastWin.player;
 }
 
 void RoundManager::SetPlayers(Role *players[]) {
