@@ -232,5 +232,13 @@ public:
 	void QiangGangHuJudge();
 	void TingHintBarListener();
 	void delete_NnnecessaryResource();
+
+	int dist_card_no;
+	Role *race_role[3];
+	Raction *race_action[3];
+    void distribute_card_event();
+    void race_start_again();
+public:
+	CREATE_FUNC(NetRaceLayer);
 };
 #endif //	 __RACE_LAYER_H__

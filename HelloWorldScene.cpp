@@ -2,7 +2,7 @@
 #include "IMLoadScene.h"
 #include "EnterRoomScene.h"
 #include "GameScene.h"
-#include "game/NetGameScene.h"
+#include "game/NetRaceLayer.h"
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
 
@@ -115,7 +115,7 @@ void HelloWorld::enterRoomStandAlone()
 	auto scene = Scene::create();
 	SpriteFrameCache::getInstance()->removeSpriteFrames();
     TextureCache::sharedTextureCache()->removeAllTextures();
-	auto layer = NetGameScene::create();
+	auto layer = NetRaceLayer::create();
     scene->addChild(layer);
     Director::getInstance()->replaceScene(scene);
 }

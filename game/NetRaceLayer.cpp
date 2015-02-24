@@ -1,5 +1,9 @@
 ﻿#include "NetRaceLayer.h"
 #include "HelloWorldScene.h"
+
+#include "NetPlayer.h"
+#include "./../Me.h"
+
 using namespace cocos2d::ui;
 USING_NS_CC;
 
@@ -12,6 +16,7 @@ NetRaceLayer::NetRaceLayer()
 	player[1]=NULL;
 	player[2]=NULL;
 
+    _roundManager = new RoundManager();
     _logger = LOGGER_REGISTER("NetRaceLayer");
 }
 
@@ -49,6 +54,7 @@ NetRaceLayer::~NetRaceLayer()
 	//SimpleAudioEngine::sharedEngine()->end();
 	_eventDispatcher->removeAllEventListeners();
 
+    delete _roundManager;
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -59,8 +65,35 @@ bool NetRaceLayer::init()
 		return false;
 	}
 	srand(time(0));
+
+	for(int i=0;i<TOTAL_CARD_NUM;i++) {
+		card_seq[i]=i;
+	}
+
+	set_winner_no( _roundManager->GetLastWinner() );
+
+	race_role[0]=new NetPlayer();
+	race_role[1]=new Me();
+	race_role[2]=new NetPlayer();
+
+	race_action[0]=new NetRRound();
+	race_action[1]=new NetRRound();
+	race_action[2]=new NetRRound();
+
+	init_role(race_role,race_action);
+    _roundManager->SetPlayers(race_role);
+
+	race_role[0]->get_parter()->set_role_type(INTERNET_PLAYER);
+	race_role[1]->get_parter()->set_role_type(SINGLE_BOADR_ME);
+	race_role[2]->get_parter()->set_role_type(INTERNET_PLAYER);
+
+	create_race();
+
+	race_start_again();
+
 	return true;
 }
+
 const std::string BoysMusicPath[21]={"Music/1tiao.ogg","Music/2tiao.ogg","Music/3tiao.ogg","Music/4tiao.ogg","Music/5tiao.ogg",
 	"Music/6tiao.ogg","Music/7tiao.ogg","Music/8tiao.ogg","Music/9tiao.ogg","Music/1tong.ogg","Music/2tong.ogg","Music/3tong.ogg",
 	"Music/4tong.ogg","Music/5tong.ogg","Music/6tong.ogg","Music/7tong.ogg","Music/8tong.ogg","Music/9tong.ogg","Music/zhong.ogg",
@@ -7022,7 +7055,7 @@ void NetRaceLayer::distribute_card_effect()
 void NetRaceLayer::call_distribute_card()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-    _roundManager->WaitDistribute();
+    _roundManager->WaitForDistribute();
     
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
@@ -9357,3 +9390,41 @@ void NetRaceLayer::update_UserDefault(int no)
 	else
 		userDefault->setIntegerForKey(str_IdToKey.c_str(),propertyOfPlayer);
 }
+
+void NetRaceLayer::distribute_card_event()
+{
+	if(dist_card_no<TOTAL_CARD_NUM) {
+        DCI scard;
+		scard.card=CARD_KIND(card_seq[dist_card_no++]/4);
+		scard.num=dist_card_no;
+		_eventDispatcher->dispatchCustomEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
+        LOGGER_WRITE("%s : %s",__FUNCTION__,DISTRIBUTE_DONE_EVENT_TYPE);
+	}
+	else {
+		_eventDispatcher->dispatchCustomEvent(NOONE_WIN_EVENT_TYPE,NULL);
+        LOGGER_WRITE("%s : %s",__FUNCTION__,NOONE_WIN_EVENT_TYPE);
+    }   
+}
+
+void NetRaceLayer::race_start_again()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
+        LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
+
+        _roundManager->Shuffle(card_seq);
+        set_cards_sequence(card_seq);
+		set_winner_no( _roundManager->GetLastWinner() );
+
+		dist_card_no=40;
+	});
+
+	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);
+
+	auto _calldistributeListener = EventListenerCustom::create(DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
+			distribute_card_event();
+		});
+	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
+}
+
