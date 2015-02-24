@@ -55,10 +55,6 @@ bool NetRaceLayer::init()
 	}
 	srand(time(0));
 
-	for(int i=0;i<TOTAL_CARD_NUM;i++) {
-		card_seq[i]=i;
-	}
-
     _roundManager->InitPlayers();
 
 	create_race();
@@ -7311,12 +7307,12 @@ void NetRaceLayer::start_callback()
     _roundManager->WaitUntilAllReady();
 	race_begin_prepare();                  //牌局开始效果
 
-    //_roundManager->Shuffle(card_seq);
+    //_roundManager->Shuffle();
     
-    action_todo = _roundManager->_players[(lastWinner)%3]->init(&card_seq[0],14,aim[lastWinner]);//玩家手牌初始化
+    action_todo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unusedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
 	if(action_todo!=a_TIMEOUT) {
-		_roundManager->_players[(lastWinner+1)%3]->init(&card_seq[14],13,aim[(lastWinner+1)%3]);
-		_roundManager->_players[(lastWinner+2)%3]->init(&card_seq[27],13,aim[(lastWinner+2)%3]);
+		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unusedCards[14]),13,aim[(lastWinner+1)%3]);
+		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unusedCards[27]),13,aim[(lastWinner+2)%3]);
 		//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/sort.ogg");
 		effect_Distribute_Card(lastWinner);//牌局开始发牌效果。
 	}
@@ -9313,13 +9309,6 @@ int NetRaceLayer::get_reserved_num()
 	return total_reserved_card_num;
 }
 
-void NetRaceLayer::set_cards_sequence(const int list[])
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-	for(int i=0;i<INIT_CARDS_NUM;i++)
-		card_seq[i]=list[i];
-}
-
 void NetRaceLayer::set_aims_sequence(const int p_aim[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -9361,10 +9350,10 @@ void NetRaceLayer::update_UserDefault(int no)
 
 void NetRaceLayer::distribute_card_event()
 {
-	if(dist_card_no<TOTAL_CARD_NUM) {
+	if(_roundManager->_unusedNum<TOTAL_CARD_NUM) {
         DCI scard;
-		scard.card=CARD_KIND(card_seq[dist_card_no++]/4);
-		scard.num=dist_card_no;
+		scard.card=CARD_KIND(_roundManager->_unusedCards[_roundManager->_unusedNum++]/4);
+		scard.num=_roundManager->_unusedNum;
 		_eventDispatcher->dispatchCustomEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
         LOGGER_WRITE("%s : %s",__FUNCTION__,DISTRIBUTE_DONE_EVENT_TYPE);
 	}
@@ -9381,10 +9370,8 @@ void NetRaceLayer::race_start_again()
 	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
         LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
 
-        _roundManager->Shuffle(card_seq);
-        set_cards_sequence(card_seq);
-
-		dist_card_no=40;
+        _roundManager->Shuffle();
+		_roundManager->_unusedNum = 40;
 	});
 
 	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);

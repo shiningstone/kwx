@@ -98,7 +98,6 @@ private:
 	cocos2d::Size visibleSize;
 	cocos2d::Point origin;
 	int aim[3];
-	int card_seq[TOTAL_CARD_NUM];
 	CARD_KIND dist_card;
 private:
 	void AccountShows(LayerColor* BarOfPlayer,int no);
@@ -226,7 +225,6 @@ public:
 	void TingHintBarListener();
 	void delete_NnnecessaryResource();
 
-	int dist_card_no;
     void distribute_card_event();
     void race_start_again();
 public:

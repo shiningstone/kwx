@@ -33,11 +33,12 @@ public:
     void RecordOutCard( Card card );
     void RenewOutCard();
 
+
     void InitPlayers();
     bool IsTing(int player);
 
     
-    int Shuffle(int *cardSeq);
+    int Shuffle();
     int NotifyStart();
     bool GetReadyStatus(int tableId);
     bool WaitUntilAllReady();
@@ -49,8 +50,11 @@ private:
     Logger *_logger;
 
     WinInfo_t   _lastWin;
-    outCardList *_river;
     Role        *_players[PLAYER_NUMBER];
+
+    outCardList *_river;
+    int         _unusedCards[TOTAL_CARD_NUM];
+    int         _unusedNum;
 };
 
 #endif
