@@ -196,8 +196,6 @@ public:
 	void ready_indicate(int direction);
 	void set_user_default();
 	bool get_ready_status(int direction);
-	int get_winner_no();
-	int get_last_winner_no();
 	//int get_cur_player_no();
 	//void set_cur_player_no(int no);
 	void raceAccount(float delta);
@@ -229,8 +227,6 @@ public:
 	void delete_NnnecessaryResource();
 
 	int dist_card_no;
-	Role *race_role[3];
-	Raction *race_action[3];
     void distribute_card_event();
     void race_start_again();
 public:

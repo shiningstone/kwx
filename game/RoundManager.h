@@ -24,17 +24,18 @@ class RoundManager {
 public:
     RoundManager();
     ~RoundManager();
-
-    void SetPlayers(Role *players[]);
     
     int GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     void GetWin(WinInfo_t &info);
+    bool IsWinner(int no, int curPlayer, int FirstMingPlayer);
 
     void RecordOutCard( Card card );
     void RenewOutCard();
 
+    void InitPlayers();
     bool IsTing(int player);
+
     
     int Shuffle(int *cardSeq);
     int NotifyStart();

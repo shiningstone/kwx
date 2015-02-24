@@ -59,20 +59,7 @@ bool NetRaceLayer::init()
 		card_seq[i]=i;
 	}
 
-	race_role[0]=new NetPlayer();
-	race_role[1]=new Me();
-	race_role[2]=new NetPlayer();
-
-	race_action[0]=new NetRRound();
-	race_action[1]=new NetRRound();
-	race_action[2]=new NetRRound();
-
-	init_role(race_role,race_action);
-    _roundManager->SetPlayers(race_role);
-
-	race_role[0]->get_parter()->set_role_type(INTERNET_PLAYER);
-	race_role[1]->get_parter()->set_role_type(SINGLE_BOADR_ME);
-	race_role[2]->get_parter()->set_role_type(INTERNET_PLAYER);
+    _roundManager->InitPlayers();
 
 	create_race();
 
@@ -7937,8 +7924,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 	auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
 	signPlus->setAnchorPoint(Vec2(0,0.5));
 
-    int winner = _roundManager->GetLastWinner();
-	if((winner<3&&((winner==cur_player&&no!=winner)||(winner!=cur_player&&no!=winner&&no!=cur_player)))||(winner==4&&FirstMingNo!=-1&&no!=FirstMingNo))
+	if( _roundManager->IsWinner(no, cur_player, FirstMingNo) )
 		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
 	else
 		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
@@ -7947,7 +7933,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 
 	auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
 	signMinus->setAnchorPoint(Vec2(0,0.5));
-	if((winner<3&&((winner==cur_player&&no!=winner)||(winner!=cur_player&&no!=winner&&no!=cur_player)))||(winner==4&&FirstMingNo!=-1&&no!=FirstMingNo))
+	if( _roundManager->IsWinner(no, cur_player, FirstMingNo) )
 		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
 	else
 		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
@@ -7955,7 +7941,10 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 	BarOfPlayer->addChild(signMinus,2,ACCOUNT_MINUS_SYMBOL);
 
 	/*================================结算金钱========================================*/
-	if(!(winner==4&&FirstMingNo==-1))
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+
+	if( !(win.kind==NONE_WIN && FirstMingNo==-1) )
 	{
 		char char_AccoutnGold[80];
 		std::string str_AccountGold;
@@ -7967,14 +7956,16 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 			signPlus->setVisible(true);
 			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
 			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-			if((winner<3&&((winner==cur_player&&no!=winner)||(winner!=cur_player&&no!=winner&&no!=cur_player)))||(winner==4&&FirstMingNo!=-1&&no!=FirstMingNo))
+			if( _roundManager->IsWinner(no, cur_player, FirstMingNo)  )
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,BarOfPlayer->getContentSize().height/2));
 			else
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
+
 			if(GoldAccountImmediate[no]!=0)
 				propertyOfIncrease->setVisible(true);
 			else
 				propertyOfIncrease->setVisible(false);
+
 			BarOfPlayer->addChild(propertyOfIncrease,2,ACCOUNT_WINGOLD_NUM);
 		}
 		else if(GoldAccountImmediate[no]<0)
@@ -7982,7 +7973,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 			signMinus->setVisible(true);
 			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
 			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-			if((winner<3&&((winner==cur_player&&no!=winner)||(winner!=cur_player&&no!=winner&&no!=cur_player)))||(winner==4&&FirstMingNo!=-1&&no!=FirstMingNo))
+			if( _roundManager->IsWinner(no, cur_player, FirstMingNo)  )
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,BarOfPlayer->getContentSize().height/2));
 			else
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
@@ -8048,13 +8039,13 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 		}
 		else if(list->data[i].status==c_FREE)
 		{
-			if(winner<3&&winner==no&&winner==cur_player&&i==(list->len-2))
+			if( win.kind==SINGLE_WIN && win.player==no && win.player==cur_player && i==(list->len-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
-	if((winner<3&&winner==no)||(winner==3&&cur_player!=no))
+	if((win.kind==SINGLE_WIN && win.player==no) || (win.kind==DOUBLE_WIN &&cur_player!=no))
 	{
 		if(g_server!=0)
 		{
@@ -8075,7 +8066,9 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 	float Extra_y=origin.y+visibleSize.height*0.1256-10;
 	int tagNum=BarOfPlayer->getTag();
 	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
-	if(tingStatus==1&&((winner<3&&((winner==cur_player&&tagNum!=winner)||(winner!=cur_player&&tagNum==cur_player)))||(winner==3&&tagNum==cur_player)))
+	if(tingStatus==1&&
+        ((win.kind==SINGLE_WIN && ((win.player==cur_player&&tagNum!=win.player)||(win.player!=cur_player&&tagNum==cur_player)))||
+        (win.kind==DOUBLE_WIN && tagNum==cur_player)))
 	{
 		auto mingFlag=Sprite::createWithSpriteFrameName("result_mpbh.png");
 		mingFlag->setAnchorPoint(Vec2(0,0.5));
@@ -8094,8 +8087,11 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
 	auto curScore=_roundManager->_players[tagNum]->get_parter()->get_card_score();
 
-    int winner = _roundManager->GetLastWinner();
-	if((winner<3&&(winner==cur_player&&curScore==2)||(winner!=cur_player&&tagNum==winner&&curScore==1))||(winner==3&&tagNum!=cur_player&&curScore==1))
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+    
+	if((win.kind==SINGLE_WIN&&(win.player==cur_player&&curScore==2)||(win.player!=cur_player&&tagNum==win.player&&curScore==1))
+        ||(win.kind==DOUBLE_WIN&&tagNum!=cur_player&&curScore==1))
 	{
 		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -8122,7 +8118,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	}
 	if(num&RH_MING)
 	{
-		if(tingStatus==1&&((winner<3&&tagNum==winner)||(winner==3&&(tagNum!=cur_player))))
+		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.player)||(win.kind==DOUBLE_WIN&&(tagNum!=cur_player))))
 		{
 			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -8148,7 +8144,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 			}
 		}
 	}
-	if((num&RH_HAIDILAO)&&winner<=3)
+	if((num&RH_HAIDILAO)&&win.kind==SINGLE_WIN)
 	{
 		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -9307,16 +9303,7 @@ void NetRaceLayer::hu_tip_effect(Node *psender)
 //{
 //	cur_player=no;
 //}
-void NetRaceLayer::init_role(Role *s_p[],Raction *p_parter[])
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
 
-	for(int j=0;j<3;j++)
-	{
-		_roundManager->_players[j]=s_p[j];
-		_roundManager->_players[j]->set_parter(p_parter[j]);
-	}
-}
 void NetRaceLayer::set_reserved_num(int no)
 {
 	total_reserved_card_num=no;

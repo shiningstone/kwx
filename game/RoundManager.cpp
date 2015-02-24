@@ -49,6 +49,17 @@ void RoundManager::GetWin(WinInfo_t &info) {
     info.player = _lastWin.player;
 }
 
+bool RoundManager::IsWinner(int no, int curPlayer, int FirstMingPlayer) {
+	if((_lastWin.kind==SINGLE_WIN&&
+            ((_lastWin.player==curPlayer && _lastWin.player!=no)||
+            (_lastWin.player!=curPlayer && no!=_lastWin.player && no!=curPlayer)))
+        ||(_lastWin.kind==NONE_WIN && FirstMingPlayer!=-1 && no!=FirstMingPlayer)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 /***********************************************
         river information
 ***********************************************/
@@ -67,21 +78,27 @@ void RoundManager::RecordOutCard( Card card ) {
 }
 
 void RoundManager::RenewOutCard() {
-    if(_river) {
-        delete _river;
-    }
-
+    delete _river;
 	_river = new outCardList;
 }
 
 /***********************************************
-        river information
+        player information
 ***********************************************/
+#include "NetPlayer.h"
+#include "./../Me.h"
+void RoundManager::InitPlayers() {
+	_players[0] = new NetPlayer();
+	_players[1] = new Me();
+	_players[2] = new NetPlayer();
 
-void RoundManager::SetPlayers(Role *players[]) {
-	for(int i=0;i<PLAYER_NUMBER;i++) {
-		_players[i] = players[i];
-	}
+	_players[0]->set_parter( new NetRRound() );
+	_players[1]->set_parter( new NetRRound() );
+	_players[2]->set_parter( new NetRRound() );
+
+	_players[0]->get_parter()->set_role_type( INTERNET_PLAYER );
+	_players[1]->get_parter()->set_role_type( SINGLE_BOADR_ME );
+	_players[2]->get_parter()->set_role_type( INTERNET_PLAYER );
 }
 
 bool RoundManager::IsTing(int id) {
