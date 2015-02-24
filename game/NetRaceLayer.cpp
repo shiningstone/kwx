@@ -11,7 +11,7 @@ NetRaceLayer::NetRaceLayer()
 {
 	s_scale=1.189;
 	s_no=1;
-	river_list=NULL;
+
 	player[0]=NULL;
 	player[1]=NULL;
 	player[2]=NULL;
@@ -43,8 +43,7 @@ NetRaceLayer::~NetRaceLayer()
 		g_mid_card_kind[i]->release();
 		g_card_kind[i]->release();
 	}
-	if(river_list)
-		delete river_list;
+
 	if(player[0])
 		delete player[0];
 	if(player[1])
@@ -2131,7 +2130,8 @@ void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND targ
 	int jj=1;
 
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
-	while(river_list->getCard(s_card,jj++)==true)
+
+	while(_roundManager->_river->getCard(s_card,jj++)==true)
 		res->card_in_river[res->river_len++]=s_card.kind;
 
 	int k=(cur_player+1)%3;
@@ -2433,8 +2433,9 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
 			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
 	}
-    
-	river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[card_in_list]);
+
+    _roundManager->RecordOutCard(player[cur_player]->get_parter()->get_card_list()->data[card_in_list]);
+
 	g_show_card=player[cur_player]->get_parter()->hand_out(card_in_list);
 	update_outcard(myframe,touch->getLocation(),time);
 }
@@ -2452,7 +2453,8 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
             
-			river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
+            _roundManager->RecordOutCard(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
+
 			g_show_card=player[cur_player]->get_parter()->hand_out(last_one);
 			update_outcard(myframe,location,2);
 		}
@@ -2467,7 +2469,8 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 				if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 					myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
 
-				river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
+                _roundManager->RecordOutCard(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
+
 				g_show_card=player[cur_player]->get_parter()->hand_out(last_one);
 				update_outcard(myframe,location,2);
 			}
@@ -2884,7 +2887,9 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		}
 		else
 			index=player[cur_player]->get_parter()->get_card_list()->len-1;
-		river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[index]);
+
+        _roundManager->RecordOutCard(player[cur_player]->get_parter()->get_card_list()->data[index]);
+
 		g_show_card=player[cur_player]->get_parter()->hand_out(index);
 		auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[g_show_card]->getTexture());
 		float p_x,p_y;
@@ -3045,8 +3050,10 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 	{
 		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1);
 	}
-	river_list->insertItem(card);
-	river_list->insertItem(card);
+
+    _roundManager->RecordOutCard(card);
+    _roundManager->RecordOutCard(card);
+
 	cur_player=no;
 	Vec2 v;
 	if(no==0)
@@ -4156,16 +4163,17 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 		{
 			myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1);
 		}
-		river_list->insertItem(kind_out_card);
-		river_list->insertItem(kind_out_card);
-		river_list->insertItem(kind_out_card);
+
+        _roundManager->RecordOutCard(kind_out_card);
+        _roundManager->RecordOutCard(kind_out_card);
+        _roundManager->RecordOutCard(kind_out_card);
 	}
 	else
 	{
 		auto list=player[no]->get_parter()->get_card_list();
 		kind_out_card=list->data[list->len-1];
 
-		river_list->insertItem(kind_out_card);
+        _roundManager->RecordOutCard(kind_out_card);
 	}
 	CallFunc*GangVoice;
 	if(playerSex[no]=="Boy")
@@ -4892,7 +4900,9 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 					Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
 					if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 						myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
-					river_list->insertItem(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
+
+                    _roundManager->RecordOutCard(player[cur_player]->get_parter()->get_card_list()->data[last_one]);
+
 					g_show_card=player[cur_player]->get_parter()->hand_out(last_one);
 					update_outcard(myframe,location,2);
 				});
@@ -4933,8 +4943,8 @@ void NetRaceLayer::update_residue_TingCards(int no)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	player[no]->get_parter()->get_ming_reserved_cards_num(river_list);
+    player[no]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
+    
 	//int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
 	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
@@ -4947,6 +4957,7 @@ void NetRaceLayer::update_residue_TingCards(int no)
 
 	int cardNum=hu_NumForEveryCard[Hu_cardOut_place];
 
+	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	for(int k=0;k<cardNum;k++)
 	{
 		Sprite* curCardBar;
@@ -5001,7 +5012,7 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 	else
 		curPos=Vec2(origin.x+visibleSize.width*952/1218,origin.y+visibleSize.height*0.62);//0.77 0.66
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	//player[curNo]->get_parter()->get_ming_reserved_cards_num(river_list);
+
 	Hu_cardOut_place=CardPlace;
 	//int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
 	//int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
@@ -5128,7 +5139,8 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	player[1]->get_parter()->get_ming_reserved_cards_num(river_list);
+    
+	player[1]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
 	Hu_cardOut_place=CardPlace;
 	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
 	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
@@ -7265,11 +7277,10 @@ void NetRaceLayer::start_callback()
 		while(this->getChildByTag(GOLD_NUM_INSERT_JINBI+a))
 			this->removeChildByTag(GOLD_NUM_INSERT_JINBI+a,true);
 	}
-	if(river_list)
-		delete river_list;
-
-	river_list=new outCardList;
-	distribute_event(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
+    
+    _roundManager->RenewOutCard();
+    
+    distribute_event(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
 
 	//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/duijukaishi.ogg");
 

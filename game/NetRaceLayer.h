@@ -61,7 +61,6 @@ private:
 	//ifChosed=true;
 	int cardInList;
 	Role *player[3];
-	outCardList *river_list;
 	bool ready_status[3];
 	int total_reserved_card_num;
 	unsigned char last_action;

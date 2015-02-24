@@ -47,7 +47,6 @@ private:
     int cards_stable(CARD_KIND clist[],int len);
     long cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     int cal_times(CARD_KIND kind,CARD_KIND data[],int len);
-	//void kou_check(CARD_KIND river_list[],int river_len,CARD_KIND list[],int *len);
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
     int hu_check(CARD_KIND data_kind); //0:not 1:hu
@@ -64,7 +63,7 @@ public:
 	void action1();
     unsigned int get_aim();
 	unsigned int get_ming_indexes();
-	int *get_ming_reserved_cards_num(outCardList *river_list);
+	int *get_ming_reserved_cards_num(outCardList *list);
 	void set_ming_indexes(unsigned int indexesFlag);
 	unsigned char ActiontodoCheckAgain();
 	void set_ting_status(unsigned char flag);

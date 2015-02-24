@@ -20,6 +20,7 @@ typedef struct {
 }WinInfo_t;
 
 class RoundManager {
+    friend class NetRaceLayer;
 public:
     RoundManager();
     ~RoundManager();
@@ -29,6 +30,10 @@ public:
     int GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     void GetWin(WinInfo_t &info);
+
+    void RecordOutCard( Card card );
+    void RenewOutCard();
+
     
     int Shuffle(int *cardSeq);
     int NotifyStart();
@@ -41,8 +46,9 @@ public:
 private:
     Logger *_logger;
 
-    Role       *_players[PLAYER_NUMBER];
+    Role        *_players[PLAYER_NUMBER];
     WinInfo_t   _lastWin;
+    outCardList *_river;
 };
 
 #endif

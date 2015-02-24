@@ -11,15 +11,22 @@
 
 RoundManager::RoundManager() {
     _lastWin.player = INVALID;
+    _river = NULL;
     
     _logger = LOGGER_REGISTER("RoundManager");
 }
 
 RoundManager::~RoundManager() {
+    if(_river) {
+        delete _river;
+    }
+    
     LOGGER_DEREGISTER(_logger);
 }
 
-
+/***********************************************
+        winner information
+***********************************************/
 int RoundManager::GetLastWinner() {
     if( _lastWin.player==INVALID ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
@@ -36,6 +43,32 @@ void RoundManager::SetWin(WinKind_t kind,int player) {
 void RoundManager::GetWin(WinInfo_t &info) {
     info.kind   = _lastWin.kind;
     info.player = _lastWin.player;
+}
+
+/***********************************************
+        river information
+***********************************************/
+void RoundManager::RecordOutCard( Card card ) {
+    _river->insertItem(card);
+
+    LOGGER_WRITE("RIVER : ");
+    char cards[84] = {0};
+    int  i = 0;
+    outCardNode *p = _river->head;
+    while(p->pNext) {
+        cards[i++] = p->pNext->data.kind;
+        p = p->pNext;
+    }
+    LOGGER_WRITE_ARRAY(cards,i);
+}
+
+
+void RoundManager::RenewOutCard() {
+    if(_river) {
+        delete _river;
+    }
+
+	_river = new outCardList;
 }
 
 void RoundManager::SetPlayers(Role *players[]) {

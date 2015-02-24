@@ -738,38 +738,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex
 	}
 	return 0;
 }
-//void NetRRound::kou_check(CARD_KIND river_list[],int river_len,CARD_KIND list[],int *len)
-//{
-//	int same_num=0;
-//	if(list==NULL)
-//		return;
-//	for(int i=card_list->atcvie_place;i<card_list->len;i++)
-//	{
-//		same_num=0;
-//		for(int j=card_list->atcvie_place;j<card_list->len;j++)
-//			if(card_list->data[j].kind==card_list->data[i].kind)
-//				same_num++;
-//		if(same_num==3)
-//		{
-//			int m;
-//			for(m=0;m<river_len;m++)
-//				if(river_list[m]==card_list->data[i].kind)
-//					break;
-//			if(m==river_len)
-//			{
-//				int l;
-//				for(l=0;l<*len;l++)
-//					if(list[l]==card_list->data[i].kind)
-//						break;
-//				if(l==*len)
-//				{
-//					if(judge_kou_cards(card_list->data[i].kind)==1,no,int RototHandOutIndex)
-//						list[*len++]=card_list->data[i].kind;
-//				}
-//			}
-//		}
-//	}
-//}
+
 void NetRRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
 {
 	for(int a=0;a<MAX_HANDIN_NUM;a++)
@@ -1276,7 +1245,7 @@ unsigned int NetRRound::get_ming_indexes()
 	return archive_ming_indexes;
 }
 
-int *NetRRound::get_ming_reserved_cards_num(outCardList *river_list)
+int *NetRRound::get_ming_reserved_cards_num(outCardList *list)
 {
 	int i;	
 	memset(hu_residueForEvery,0,sizeof(int)*MAX_HANDIN_NUM*9);
@@ -1291,7 +1260,7 @@ int *NetRRound::get_ming_reserved_cards_num(outCardList *river_list)
 				{
 					int k=1;
 					int default_reserved_cards=4;
-					while(river_list->getCard(card,k++)==true)
+					while(list->getCard(card,k++)==true)
 					{
 						if(card.kind==hu_cards[i][j])
 							default_reserved_cards--;

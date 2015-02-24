@@ -17,6 +17,7 @@ outCardList::outCardList()
 	inital();
 }
 
+//mem leakage?
 outCardList::~outCardList()
 {
 	delete head;
@@ -47,7 +48,7 @@ bool outCardList::insertItem(const Card item)
 	}
 	currentPtr->pNext=new outCardNode(item,NULL);
 	length=length+1;
-	return true;
+    return true;
 }
 
 bool outCardList::deleteItem()
