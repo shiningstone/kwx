@@ -444,7 +444,8 @@ void NetRaceLayer::create_race()
 		sprite=Sprite::create("racetable2.png");
 
 	for(int k=0;k<3;k++)
-		ready_status[k]=false;
+        _roundManager->_ready[k] = false;
+    
 	sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 	sprite->setScaleX(s_scale);
 	sprite->setScaleY(s_scale);
@@ -1503,12 +1504,8 @@ void NetRaceLayer::ready_indicate(int direction)
 		Ready->setPosition(Vec2(right_player_bkg->getPosition().x-right_player_bkg->getContentSize().width/2,right_player_bkg->getPosition().y-right_player_bkg->getContentSize().height));
 		this->addChild(Ready,2,READY_INDICATE_RIGHT_TAG_ID);
 	}
-	ready_status[direction]=true;
-}
 
-bool NetRaceLayer::get_ready_status(int direction)
-{
-	return ready_status[direction];
+    _roundManager->_ready[direction]=true;
 }
 
 void NetRaceLayer::update_clock(bool visible,int time,int direction)

@@ -51,6 +51,7 @@ private:
 
     WinInfo_t   _lastWin;
     Role        *_players[PLAYER_NUMBER];
+    bool        _ready[PLAYER_NUMBER];
 
     outCardList *_river;
     int         _unusedCards[TOTAL_CARD_NUM];

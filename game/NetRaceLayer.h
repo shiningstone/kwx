@@ -60,7 +60,6 @@ private:
 	bool ifChosed;
 	//ifChosed=true;
 	int cardInList;
-	bool ready_status[3];
 	int total_reserved_card_num;
 	unsigned char last_action;
 	unsigned char last_action_WithGold;//´ø·Ö
