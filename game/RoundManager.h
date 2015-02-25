@@ -63,7 +63,7 @@ private:
 
     outCardList *_river;
     int         _unDistributedCards[TOTAL_CARD_NUM];
-    int         _unDistributedNum;
+    int         _distributedNum;
 };
 
 #endif

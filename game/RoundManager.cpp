@@ -16,7 +16,7 @@ RoundManager::RoundManager() {
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
 		_unDistributedCards[i]=i;
 	}
-    _unDistributedNum = TOTAL_CARD_NUM;
+    _distributedNum = 0;
 
     for(int i=0;i<PLAYER_NUMBER;i++) {
         _players[i] = NULL;
