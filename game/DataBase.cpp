@@ -18,7 +18,24 @@ Database::~Database() {
 
 }
 
-int  Database::getLanguage() {
+void Database::SetProperty(int id,int property) {
+    char title[32] = {0};
+    
+    if (id<17) {
+        sprintf(title,"PropertyOfRobot%d",id);
+    } else {
+        sprintf(title,"MyProperty");
+    }
+    
+    _userDefault->setIntegerForKey(title,property);
+}
+
+void Database::GetUserProfile(int id,UserProfile_t &profile) {
+    if (id<17) {
+        return _getRobotProfile(id,profile);
+    } else {
+        return _getMyProfile(id,profile);
+    }
 }
 
 void Database::_getRobotProfile(int id,UserProfile_t &profile) {
@@ -29,11 +46,11 @@ void Database::_getRobotProfile(int id,UserProfile_t &profile) {
     char sex[32]      = {0};
     char language[32] = "Language0";
     
-    sprintf(name,"Robot%d",i);
-    sprintf(property,"PropertyOfRobot%d",i);
-    sprintf(level,"LevelOfRobot%d",i);
-    sprintf(photo,"PhotoOfRobot%d",i);
-    sprintf(sex,"SexOfRobot%d",i);
+    sprintf(name,"Robot%d",id);
+    sprintf(property,"PropertyOfRobot%d",id);
+    sprintf(level,"LevelOfRobot%d",id);
+    sprintf(photo,"PhotoOfRobot%d",id);
+    sprintf(sex,"SexOfRobot%d",id);
 
     strcpy(profile.name, _userDefault->getStringForKey(name));
     profile.property = _userDefault->getIntegerForKey(property);
@@ -57,14 +74,6 @@ void Database::_getMyProfile(int id,UserProfile_t &profile) {
     strcpy(profile.photo, _userDefault->getStringForKey(photo));
     strcpy(profile.sex, _userDefault->getStringForKey(sex));
     strcpy(profile.language, _userDefault->getStringForKey(language));
-}
-
-void Database::getUserProfile(int id,UserProfile_t &profile) {
-    if (id<17) {
-        return _getRobotProfile(id,profile);
-    } else {
-        return _getMyProfile(id,profile);
-    }
 }
 
 void Database::_setDefaults() {

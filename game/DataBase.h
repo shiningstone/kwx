@@ -17,7 +17,8 @@ public:
     static Database *getInstance();
     static void destroyInstance();
 
-    void getUserProfile(int id,UserProfile_t &profile);
+    void GetUserProfile(int id,UserProfile_t &profile);
+    void SetProperty(int id,int property);
 protected:
     Database();
     ~Database();

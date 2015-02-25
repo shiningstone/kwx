@@ -451,7 +451,7 @@ void NetRaceLayer::_LoadPlayerInfo() {
         _roundManager->_players[i]->set_player_id( ids[i] );
 
         UserProfile_t user = {0};
-        database.getUserProfile(ids[i],user);
+        database.GetUserProfile(ids[i],user);
 
 		_roundManager->_players[i]->set_nick_name(user.name);
 		_roundManager->_players[i]->set_photo(user.photo);
@@ -713,6 +713,7 @@ void NetRaceLayer::create_race()
 	g_my_mask->retain();
 	g_my_kou=CCSpriteBatchNode::create("tileImage/ming-kou.png");
 	g_my_kou->retain();
+    
 	for(int i=0;i<TOTAL_CARD_KIND;i++)
 	{
 		g_small_card_kind[i]=CCSpriteBatchNode::create(String::createWithFormat("tileImage/tile_Up_%d.png",(int)(i+1))->getCString());
@@ -724,34 +725,6 @@ void NetRaceLayer::create_race()
 		g_mid_card_kind[i]->retain();
 		g_card_kind[i]->retain();
 	}
-}
-
-void NetRaceLayer::get_user_default()
-{
-	int i;
-	auto userDefault=UserDefault::getInstance();
-
-	for(i=0;i<15;i++)
-	{
-		char buffer[80];
-		sprintf(buffer,"Robot%d",i);
-		std::string robotName=buffer;
-		//CCLOG("robot %d name %s",i,userDefault->getStringForKey(robotName.c_str()).c_str());
-		sprintf(buffer,"PropertyOfRobot%d",i);
-		std::string robotProperty=buffer;
-		//CCLOG("robot %d property %d",i,userDefault->getIntegerForKey(robotProperty.c_str()));
-		sprintf(buffer,"LevelOfRobot%d",i);
-		std::string robotLevel=buffer;
-		//CCLOG("robot %d level %s",i,userDefault->getStringForKey(robotLevel.c_str()).c_str());
-		sprintf(buffer,"PhotoOfRobot%d",i);
-		std::string robotPhoto=buffer;
-		//CCLOG("robot %d photo %s",i,userDefault->getStringForKey(robotPhoto.c_str()).c_str());
-	}
-	//CCLOG("my name %s",userDefault->getStringForKey("MyNickName").c_str());
-	//CCLOG("my property %d",userDefault->getIntegerForKey("MyProperty"));
-	//CCLOG("my level %s",userDefault->getStringForKey("MyLevel").c_str());
-	//CCLOG("my photo %s",userDefault->getStringForKey("MyPhoto").c_str());
-	//CCLOG("my sex %s",userDefault->getStringForKey("MySex").c_str());
 }
 
 void NetRaceLayer::update_score(int direction,int score)
@@ -9239,34 +9212,21 @@ void NetRaceLayer::set_aims_sequence(const int p_aim[])
 
 void NetRaceLayer::updatePropertyImmediate(int GoldNum[3])
 {
+    Database *database = Database::getInstance();
+
 	for(int a=0;a<3;a++)
 	{
 		int PropretyOfPlayer;
-		_roundManager->_players[a]->get_property(PropretyOfPlayer);
+
+        _roundManager->_players[a]->get_property(PropretyOfPlayer);
 		PropretyOfPlayer+=GoldNum[a];
 		_roundManager->_players[a]->set_property(PropretyOfPlayer);
 		update_score(a,PropretyOfPlayer);
-		update_UserDefault(a);
+
+        int id = 0;
+		_roundManager->_players[a]->get_player_id(id);
+        database.SetProperty(id,PropretyOfPlayer);
 	}
-}
-void NetRaceLayer::update_UserDefault(int no)
-{
-	auto userDefault=UserDefault::getInstance();
-	int propertyOfPlayer;
-	_roundManager->_players[no]->get_property(propertyOfPlayer);
-
-	int PlayerForId;
-	_roundManager->_players[no]->get_player_id(PlayerForId);
-
-	char char_IdToKey[80];
-	std::string str_IdToKey;
-	sprintf(char_IdToKey,"PropertyOfRobot%d",PlayerForId);
-	str_IdToKey=char_IdToKey;
-
-	if(no==1)
-		userDefault->setIntegerForKey("MyProperty",propertyOfPlayer);
-	else
-		userDefault->setIntegerForKey(str_IdToKey.c_str(),propertyOfPlayer);
 }
 
 void NetRaceLayer::distribute_card_event()

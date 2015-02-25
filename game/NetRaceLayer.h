@@ -203,8 +203,6 @@ public:
 	void MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void KouCardsCheck(int no);
 	void updatePropertyImmediate(int GoldNum[3]);
-	void update_UserDefault(int no);
-	void get_user_default();
 	void ming_winCards_Hint(Point curPosition);
 	void update_residue_TingCards(int no);
 	void tingHintCreate(Point curPos,int CardPlace);
