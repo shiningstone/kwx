@@ -458,9 +458,6 @@ void NetRaceLayer::_LoadPlayerInfo() {
 		_roundManager->_players[i]->set_property(user.property);
 		_roundManager->_players[i]->set_sex(user.sex);
 		_roundManager->_players[i]->set_language(user.language);
-
-        _roundManager->_players[i]->get_sex(playerSex[i]);
-        _roundManager->_players[i]->get_language(playerLanguage[i]);
 	}
 }
 
@@ -2146,7 +2143,9 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	CallFunc* voiceCall;
 	voiceCall=CCCallFunc::create([=]()
 	{
-		if(playerSex[cur_player]=="Boy")
+        std::string sex;
+        _roundManager->_players[cur_player]->get_sex(sex);
+		if( sex=="Boy" )
 			SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[g_show_card].c_str());
 		else
 			SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[g_show_card].c_str());
@@ -2887,7 +2886,9 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		CallFunc* voiceCall;
 		voiceCall=CCCallFunc::create([=]()
 		{
-			if(playerSex[cur_player]=="Boy")
+            std::string sex;
+            _roundManager->_players[cur_player]->get_sex(sex);
+            if( sex=="Boy" )
 				SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[g_show_card].c_str());
 			else
 				SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[g_show_card].c_str());
@@ -2975,7 +2976,9 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 		}),l_del_outcard,NULL);
 
 	CallFunc* PengVoice;
-	if(playerSex[cur_player]=="Boy")
+    std::string sex;
+    _roundManager->_players[cur_player]->get_sex(sex);
+    if( sex=="Boy" )
 		PengVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[0].c_str());});
 	else
 		PengVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(GirlsActionPath[0].c_str());});
@@ -3391,7 +3394,9 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 	else if(no==2)
 		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);		
 	CallFunc*GangVoice;
-	if(playerSex[cur_player]=="Boy")
+    std::string sex;
+    _roundManager->_players[cur_player]->get_sex(sex);
+    if( sex=="Boy" )
 		GangVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[1].c_str());});
 	else
 		GangVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(GirlsActionPath[1].c_str());});
@@ -4078,7 +4083,9 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
         _roundManager->RecordOutCard(kind_out_card);
 	}
 	CallFunc*GangVoice;
-	if(playerSex[no]=="Boy")
+    std::string sex;
+    _roundManager->_players[cur_player]->get_sex(sex);
+    if( sex=="Boy" )
 		GangVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[1].c_str());});
 	else
 		GangVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(GirlsActionPath[1].c_str());});
@@ -8979,7 +8986,9 @@ void NetRaceLayer::hu_effect_tip(int no)
 		else if(no==2)
 			v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
 		CallFunc*HuVoice;
-		if(playerSex[no]=="Boy")
+        std::string sex;
+        _roundManager->_players[cur_player]->get_sex(sex);
+		if( sex=="Boy" )
 			HuVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[3].c_str());});
 		else
 			HuVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(GirlsActionPath[3].c_str());});

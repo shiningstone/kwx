@@ -149,8 +149,6 @@ public:
 	int KouCardsPlace[4][3];
 
 	unsigned int VoiceId;
-	std::string playerSex[3];
-	std::string playerLanguage[3];
 	virtual void init_race_sequence(){};
 	/*##############################
 	   everytime when enter game,first call init_role(player) 
