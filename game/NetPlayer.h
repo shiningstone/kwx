@@ -15,10 +15,11 @@ class NetPlayer:public Role
 {
 	public:
 		NetPlayer();
+        NetPlayer(int id);
 		virtual ~NetPlayer();
     private:
         Logger   *_logger;
-        Profile_t _profile;
+        //Profile_t _profile;
 
 		int property;
 		int idOfPlayer;

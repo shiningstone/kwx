@@ -7,7 +7,6 @@ USING_NS_CC;
 
 NetPlayer::NetPlayer() {
     _logger = LOGGER_REGISTER("NetPlayer");
-    memset(_profile,0,sizeof(_profile));
 }
 
 NetPlayer::NetPlayer(int id) {//this is for default settings ( robot ) 
