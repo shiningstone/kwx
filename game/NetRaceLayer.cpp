@@ -161,7 +161,7 @@ void NetRaceLayer::robot_callback(Ref* pSender,ui::Widget::TouchEventType type)
 			{
 				delete_act_tip();
 				_roundManager->_isWaitDecision=false;
-				temp_actionToDo=a_JUMP;
+				_roundManager->_tempActionToDo=a_JUMP;
 				if(g_server==1)
 				{
 					if(_roundManager->_isQiangGangAsking)
@@ -197,7 +197,7 @@ void NetRaceLayer::robot_callback(Ref* pSender,ui::Widget::TouchEventType type)
 				if(ifMyShowCardTime)
 				{
 					ifMyShowCardTime=false;
-					action_todo=a_JUMP;
+					_roundManager->_actionToDo=a_JUMP;
 					if(last_action==a_JUMP)
 						continue_gang_times=0;
 					last_action=a_JUMP;
@@ -1501,8 +1501,8 @@ void NetRaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 			if(_roundManager->_isWaitDecision)
 			{
 				_roundManager->_isWaitDecision = false;
-				action_todo=temp_actionToDo;
-				temp_actionToDo=a_JUMP;
+				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
+				_roundManager->_tempActionToDo = a_JUMP;
 			}
 			curButton->setTouchEnabled(false);
 			auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_tip_effect));
@@ -1522,7 +1522,7 @@ void NetRaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	action_todo=a_HU;
+	_roundManager->_actionToDo=a_HU;
 	auto curButton=(Button*)pSender;
 	int no=pSender->_ID;
 	switch(type)
@@ -1541,8 +1541,8 @@ void NetRaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 			if(_roundManager->_isWaitDecision)
 			{
 				_roundManager->_isWaitDecision = false;
-				action_todo=temp_actionToDo;
-				temp_actionToDo=a_JUMP;
+				_roundManager->_actionToDo=_roundManager->_tempActionToDo;
+				_roundManager->_tempActionToDo=a_JUMP;
 			}
 			if(_roundManager->_isQiangGangAsking)
 			{
@@ -1599,17 +1599,17 @@ void NetRaceLayer::gang_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 			if(_roundManager->_isWaitDecision)
 			{
 				_roundManager->_isWaitDecision=false;
-				action_todo=temp_actionToDo;
-				temp_actionToDo=a_JUMP;
+				_roundManager->_actionToDo=_roundManager->_tempActionToDo;
+				_roundManager->_tempActionToDo=a_JUMP;
 			}
 			curButton->setTouchEnabled(false);
 			curButton->_ID=1;
-			if(action_todo&a_AN_GANG||action_todo&a_SHOU_GANG)
+			if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG)
 			{
 				auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::an_gang_tip_effect));
 				curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc1,NULL));
 			}
-			else if(action_todo&a_MING_GANG)
+			else if(_roundManager->_actionToDo&a_MING_GANG)
 			{
 				auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_gang_tip_effect));
 				curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc1,NULL));
@@ -2077,13 +2077,13 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	if(_roundManager->_isWaitDecision)
 	{
 		_roundManager->_isWaitDecision=false;
-		//action_todo=temp_actionToDo;
-		temp_actionToDo=a_JUMP;
+		//_roundManager->_actionToDo=_roundManager->_tempActionToDo;
+		_roundManager->_tempActionToDo=a_JUMP;
 	}
-	if((action_todo&a_MING)&&(!ifMingMybeError))
+	if((_roundManager->_actionToDo&a_MING)&&(!ifMingMybeError))
 	{
 		ifMingMybeError=false;
-		action_todo=a_JUMP;
+		_roundManager->_actionToDo=a_JUMP;
 	}
 	if(myframe->getChildByTag(MING_CANCEL))
 		myframe->removeChildByTag(MING_CANCEL,true);
@@ -2127,7 +2127,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	});
 	Sequence* voiceEffect;
 	Spawn* allEffect=Spawn::create(NULL);
-	if(action_todo==a_MING && !_roundManager->IsTing(_roundManager->_curPlayer) )
+	if(_roundManager->_actionToDo==a_MING && !_roundManager->IsTing(_roundManager->_curPlayer) )
 	{
 		_eventDispatcher->removeEventListenersForTarget(myframe,true);
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
@@ -2222,8 +2222,8 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 	if(_roundManager->_isWaitDecision)
 	{
 		_roundManager->_isWaitDecision=false;
-		//action_todo=temp_actionToDo;
-		temp_actionToDo=a_JUMP;
+		//_roundManager->_actionToDo=_roundManager->_tempActionToDo;
+		_roundManager->_tempActionToDo=a_JUMP;
 	}
     
 	if(myframe->getChildByTag(MING_CANCEL))
@@ -2479,7 +2479,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 									{
 										loopCard->setScale(1.2);
 										loopCard->runAction(VoiceEffect);
-										if(action_todo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
+										if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
 										{
 											while(myframe->getChildByTag(TING_SING_BAR))
 												myframe->removeChildByTag(TING_SING_BAR);
@@ -2487,7 +2487,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 											tingHintCreate(appearPoint,k);//,list->data[k].kind);
 										}
 									}
-									else if(action_todo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
+									else if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
 									{
 										if(!myframe->getChildByTag(TING_SING_BAR))
 										{
@@ -2505,7 +2505,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 									{
 										loopCard->setScale(1.2);
 										loopCard->runAction(VoiceEffect);
-										if(action_todo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
+										if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
 										{
 											while(myframe->getChildByTag(TING_SING_BAR))
 												myframe->removeChildByTag(TING_SING_BAR);
@@ -2513,7 +2513,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 											tingHintCreate(appearPoint,k);//,list->data[k].kind);
 										}
 									}
-									else if(action_todo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
+									else if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
 									{
 										if(!myframe->getChildByTag(TING_SING_BAR))
 										{
@@ -2688,7 +2688,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 								loopCard->setScale(1.2);
 							}
 						}
-						if(action_todo==a_MING&&ifMingTime&&!_roundManager->_players[1]->get_parter()->get_ting_status())
+						if(_roundManager->_actionToDo==a_MING&&ifMingTime&&!_roundManager->_players[1]->get_parter()->get_ting_status())
 						{
 							while(myframe->getChildByTag(TING_SING_BAR)&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
 								myframe->removeChildByTag(TING_SING_BAR);
@@ -2754,7 +2754,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			{
 				index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 			}
-			if(s_res->hu_nums>=6&&action_todo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
+			if(s_res->hu_nums>=6&&_roundManager->_actionToDo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
 			{
 				RototHandOutIndex =_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
 				KouCardsCheck(_roundManager->_curPlayer);
@@ -2870,7 +2870,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 				SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
 		});
 		Sequence *voiceEffect;	
-		if(s_res->hu_nums>=6&&action_todo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
+		if(s_res->hu_nums>=6&&_roundManager->_actionToDo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
 		{
 			OtherTingHintBar(_roundManager->_curPlayer,index);
 			if(Kou_kindLen>0)
@@ -2965,7 +2965,7 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 		auto peng_action=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_update));
 		auto callFunc_update_list=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
 		auto actcheckagain=CCCallFunc::create([=](){
-			action_todo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+			_roundManager->_actionToDo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
 			if(no==1)
 				waitfor_myaction(no);
 			else
@@ -3304,7 +3304,7 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 			}
 		});
 		auto actcheckagain=CCCallFunc::create([=](){
-			action_todo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+			_roundManager->_actionToDo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
 			if(no==1)
 				waitfor_myaction(no);
 			else
@@ -3333,9 +3333,9 @@ void NetRaceLayer::angang_update(Node *psender)
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	int no=psender->_ID;
-	if(action_todo&a_AN_GANG)
+	if(_roundManager->_actionToDo&a_AN_GANG)
 		_roundManager->_players[no]->get_parter()->action(g_server,a_AN_GANG);
-	else if(action_todo&a_SHOU_GANG)
+	else if(_roundManager->_actionToDo&a_SHOU_GANG)
 		_roundManager->_players[no]->get_parter()->action(g_server,a_SHOU_GANG);
 }
 void NetRaceLayer::an_gang_tip_effect(Node *psender)
@@ -3347,15 +3347,15 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
 	last_actionSource=no;
-	if(action_todo&a_AN_GANG)
+	if(_roundManager->_actionToDo&a_AN_GANG)
 	{
-		action_todo=a_AN_GANG;
+		_roundManager->_actionToDo=a_AN_GANG;
 		last_action=a_AN_GANG;
 		last_action_WithGold=a_AN_GANG;
 	}
-	else if(action_todo&a_SHOU_GANG)
+	else if(_roundManager->_actionToDo&a_SHOU_GANG)
 	{
-		action_todo=a_SHOU_GANG;
+		_roundManager->_actionToDo=a_SHOU_GANG;
 		last_action=a_SHOU_GANG;
 		last_action_WithGold=a_SHOU_GANG;
 	}
@@ -3957,10 +3957,10 @@ void NetRaceLayer::QiangGangHuJudge()
 			_roundManager->_isDoubleHuAsking = true;
             
 			if(no==1) {
-				action_todo=action1;
+				_roundManager->_actionToDo=action1;
 				_roundManager->_otherOneForDouble = no1;
 			} else {
-				action_todo=action2;
+				_roundManager->_actionToDo=action2;
 				_roundManager->_otherOneForDouble = no;
 			}
             
@@ -3973,7 +3973,7 @@ void NetRaceLayer::QiangGangHuJudge()
 		update_clock(false,0,_roundManager->_curPlayer);
 		if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
 		{
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&action_todo&a_HU)
+			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&_roundManager->_actionToDo&a_HU)
 			{
 				last_action_WithGold=a_QIANG_GANG;
 				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -3985,9 +3985,9 @@ void NetRaceLayer::QiangGangHuJudge()
 			{
 				_roundManager->_isQiangGangAsking=true;
 				if(no==1)
-					action_todo=action1;
+					_roundManager->_actionToDo=action1;
 				else
-					action_todo=action2;
+					_roundManager->_actionToDo=action2;
 				waitfor_myaction(1);
 				return;
 			}
@@ -4022,7 +4022,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 	continue_gang_times++;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
-	action_todo=a_MING_GANG;
+	_roundManager->_actionToDo=a_MING_GANG;
 	last_action=a_MING_GANG;
 	last_action_WithGold=a_MING_GANG;
 	last_actionSource=no;
@@ -4757,12 +4757,12 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 	if(last_action==a_JUMP)
 		continue_gang_times=0;
 	last_action=a_JUMP;
-	action_todo=a_JUMP;
+	_roundManager->_actionToDo=a_JUMP;
 	if(_roundManager->_isWaitDecision)
 	{
 		_roundManager->_isWaitDecision=false;
-		//action_todo=temp_actionToDo;
-		temp_actionToDo=a_JUMP;
+		//_roundManager->_actionToDo=_roundManager->_tempActionToDo;
+		_roundManager->_tempActionToDo=a_JUMP;
 	}
 	auto shade_act=(Sprite*)myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID);
 	auto fadeOut=FadeOut::create(0.3);
@@ -5387,7 +5387,7 @@ void NetRaceLayer::card_list_update(int no)
 						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.4));
 						p_list[i]->addChild(s_card,1);						
 					}
-					if(ting_flag==1||(action_todo==a_MING&&ting_flag==0))
+					if(ting_flag==1||(_roundManager->_actionToDo==a_MING&&ting_flag==0))
 					{
 						if(list->data[i].can_play==cps_YES)
 						{
@@ -5663,7 +5663,7 @@ void NetRaceLayer::card_list_update(int no)
 				myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+no*20+i);
 			else if(no==2)
 				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
-			if(no==1&&action_todo==a_MING&&_roundManager->_players[1]->get_parter()->get_ting_status()!=1&&list->data[i].can_play==cps_YES)
+			if(no==1&&_roundManager->_actionToDo==a_MING&&_roundManager->_players[1]->get_parter()->get_ting_status()!=1&&list->data[i].can_play==cps_YES)
 				p_list[i]->setZOrder(30);
 			p_list[i]->_ID=1;
 			if(no==1&&MyCardChoosedNum==i)
@@ -6038,9 +6038,9 @@ void NetRaceLayer::MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEv
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
 			_roundManager->_players[1]->get_parter()->action(g_server,a_KOU_CANCEL);
-			action_todo=a_JUMP;
+			_roundManager->_actionToDo=a_JUMP;
 			auto callFunc2=CallFunc::create([=](){
-				action_todo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
+				_roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
 				waitfor_myaction(1);
 			});
 			_roundManager->_players[1]->get_parter()->MingCancel();
@@ -6324,7 +6324,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	action_todo=a_MING;
+	_roundManager->_actionToDo=a_MING;
 	//continue_gang_times=0;
 	//last_action=a_MING;
 	if(psender->_ID==1)
@@ -6385,8 +6385,8 @@ void NetRaceLayer::ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 			if(_roundManager->_isWaitDecision)
 			{
 				_roundManager->_isWaitDecision=false;
-				action_todo=temp_actionToDo;
-				temp_actionToDo=a_JUMP;
+				_roundManager->_actionToDo=_roundManager->_tempActionToDo;
+				_roundManager->_tempActionToDo=a_JUMP;
 			}
 			for(int NodeNum=0;NodeNum<3;NodeNum++)//PENG_EFFECT_NODE_ID
 			{
@@ -6449,7 +6449,7 @@ void NetRaceLayer::first_response(int no)
 	ifGameStart=true;
     
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
-	action_todo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();
+	_roundManager->_actionToDo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();
 
 	if(no==1)
 		waitfor_myaction(no);
@@ -6459,7 +6459,7 @@ void NetRaceLayer::first_response(int no)
 
 void NetRaceLayer::waitfor_myaction(int no)
 {
-    LOGGER_WRITE("%s : %d, action_todo = %d",__FUNCTION__,no,action_todo);
+    LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,no,_roundManager->_actionToDo);
 
 	float x,y;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -6480,7 +6480,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
 	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
 
-	if(action_todo!=a_JUMP)
+	if(_roundManager->_actionToDo!=a_JUMP)
 	{
 		auto myact_qi=Button::create("qi.png","qi.png","qi.png",UI_TEX_TYPE_PLIST);
 		myact_qi->_ID=no;
@@ -6497,7 +6497,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 		myframe->addChild(qi_act,34,QI_REMIND_ACT_BKG_TAG_ID);
 		x=x-act_qi->getContentSize().width/2-36;
 	}
-	if(action_todo&a_HU)//胡牌
+	if(_roundManager->_actionToDo&a_HU)//胡牌
 	{	
 		x=x-act_hu->getContentSize().width/2;
 		auto myact_hu=Button::create("hu1.png","hu1.png","hu1.png",UI_TEX_TYPE_PLIST);
@@ -6514,7 +6514,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 		myframe->addChild(hu1_act,34,HU_REMIND_ACT_BKG_TAG_ID);
 		x=x-act_hu->getContentSize().width/2-18;
 	}
-	if(action_todo&a_MING)//明牌
+	if(_roundManager->_actionToDo&a_MING)//明牌
 	{
 		x=x-act_ming->getContentSize().width/2;
 		auto myact_ming=Button::create("ming.png","ming.png","ming.png",UI_TEX_TYPE_PLIST);
@@ -6531,7 +6531,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 		myframe->addChild(ming_act,34,MING_REMIND_ACT_BKG_TAG_ID);
 		x=x-act_ming->getContentSize().width/2-18;
 	}
-	if(action_todo&a_AN_GANG || action_todo&a_MING_GANG||action_todo&a_SHOU_GANG)//暗杠和明杠,手杠
+	if(_roundManager->_actionToDo&a_AN_GANG || _roundManager->_actionToDo&a_MING_GANG||_roundManager->_actionToDo&a_SHOU_GANG)//暗杠和明杠,手杠
 	{
 		x=x-act_gang->getContentSize().width/2;
 		auto myact_gang=Button::create("gang1.png","gang1.png","gang1.png",UI_TEX_TYPE_PLIST);
@@ -6548,7 +6548,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 		myframe->addChild(gang1_act,34,GANG_REMING_ACT_BKG_TAG_ID);
 		x=x-act_gang->getContentSize().width/2-18;
 	}
-	if(action_todo&a_PENG)//碰牌
+	if(_roundManager->_actionToDo&a_PENG)//碰牌
 	{		
 		x=x-act_peng->getContentSize().width/2;
 		auto myact_peng=Button::create("peng1.png","peng1.png","peng1.png",UI_TEX_TYPE_PLIST);
@@ -6565,11 +6565,11 @@ void NetRaceLayer::waitfor_myaction(int no)
 		myframe->addChild(peng1_act,34,PENG_REMIND_ACT_BKG_TAG_ID);
 		x=x-act_peng->getContentSize().width/2-18;
 	}
-	if(action_todo!=a_JUMP)
+	if(_roundManager->_actionToDo!=a_JUMP)
 	{
 		_roundManager->_isWaitDecision = true;
-		temp_actionToDo=action_todo;
-		action_todo=a_JUMP;
+		_roundManager->_tempActionToDo=_roundManager->_actionToDo;
+		_roundManager->_actionToDo=a_JUMP;
 	}
 	if(g_server==0)//||(g_server==1&&last_action!=a_JUMP))
 	{
@@ -6582,36 +6582,36 @@ void NetRaceLayer::waitfor_myaction(int no)
 
 void NetRaceLayer::waitfor_otheraction(int no)
 {
-    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,action_todo);
+    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,_roundManager->_actionToDo);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
 	
-	if(action_todo&a_HU)
+	if(_roundManager->_actionToDo&a_HU)
 	{
 		hu_effect_tip(no);
 	}
-	else if(action_todo&a_AN_GANG||action_todo&a_SHOU_GANG)
+	else if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG)
 	{
 		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::an_gang_tip_effect));
 		myframe->runAction(callFunc);
 	}
-	else if(action_todo&a_MING_GANG)
+	else if(_roundManager->_actionToDo&a_MING_GANG)
 	{
 		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_gang_tip_effect));
 		myframe->runAction(callFunc);
 	}
-	else if(action_todo&a_MING)
+	else if(_roundManager->_actionToDo&a_MING)
 	{
 		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_tip_effect));
 		myframe->runAction(callFunc);
 	}
-	else if(action_todo&a_PENG)
+	else if(_roundManager->_actionToDo&a_PENG)
 	{
 		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_tip_effect));
 		myframe->runAction(callFunc);
 	}
-	else if(action_todo==a_JUMP)
+	else if(_roundManager->_actionToDo==a_JUMP)
 	{
 		if(last_action==a_JUMP)
 			continue_gang_times=0;
@@ -6634,7 +6634,18 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			isGangHua=true;
 		else
 			continue_gang_times=0;
-		action_todo=_roundManager->_players[sender->_ID]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+        
+		_roundManager->_actionToDo = 
+            _roundManager->_players[sender->_ID]->get_parter()->hand_in(
+                _roundManager->_lastHandedOutCard,
+                g_server,
+                curTingStatus,
+                (_roundManager->_distributedNum==TOTAL_CARD_NUM),
+                last_action_WithGold,
+                continue_gang_times,
+                isGangHua
+            );
+        
 		if(sender->_ID==1)
 		{
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -6655,38 +6666,38 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		{
 			if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(_roundManager->_lastHandedOutCard/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
-					action_todo=a_JUMP;
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
+					_roundManager->_actionToDo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(_roundManager->_lastHandedOutCard/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
-					action_todo=a_JUMP;
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
+					_roundManager->_actionToDo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-				if(!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
-					action_todo=a_JUMP;
+				if(!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
+					_roundManager->_actionToDo=a_JUMP;
 		}
 		if(_roundManager->_players[sender->_ID]->get_parter()->get_role_type()==INTERNET_PLAYER)
 		{
             LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(_roundManager->_lastHandedOutCard/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
-					action_todo=a_JUMP;
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
+					_roundManager->_actionToDo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(_roundManager->_lastHandedOutCard/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
-					action_todo=a_JUMP;
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
+					_roundManager->_actionToDo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-				if(!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
-					action_todo=a_JUMP;
+				if(!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
+					_roundManager->_actionToDo=a_JUMP;
 		}
 		if(sender->_ID==1)
 		{
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action_todo&a_HU))
+			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(_roundManager->_actionToDo&a_HU))
 			{
 				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 				myframe->_ID=sender->_ID;
@@ -6696,7 +6707,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			else
 			{
 				if(ifTuoGuan)
-					action_todo=a_JUMP;
+					_roundManager->_actionToDo=a_JUMP;
 				waitfor_myaction(sender->_ID);
 				return;
 			}
@@ -6710,7 +6721,17 @@ void NetRaceLayer::waitfor_response(Node* sender)
 	else
 	{
 		int no=(sender->_ID+1)%3;
-		unsigned char action1=_roundManager->_players[no]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		unsigned char action1 = 
+            _roundManager->_players[no]->get_parter()->hand_in(
+                _roundManager->_lastHandedOutCard,
+                g_server,
+                curTingStatus,
+                (_roundManager->_distributedNum==TOTAL_CARD_NUM),
+                last_action_WithGold,
+                continue_gang_times,
+                isGangHua
+            );
+        
 		if(no==1&&ifTuoGuan)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
@@ -6752,7 +6773,16 @@ void NetRaceLayer::waitfor_response(Node* sender)
 					action1=a_JUMP;
 		}
 		int no1=(sender->_ID+2)%3;
-		unsigned char action2=_roundManager->_players[no1]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		unsigned char action2=
+            _roundManager->_players[no1]->get_parter()->hand_in(
+                _roundManager->_lastHandedOutCard,
+                g_server,
+                curTingStatus,
+                (_roundManager->_distributedNum==TOTAL_CARD_NUM),
+                last_action_WithGold,
+                continue_gang_times,
+                isGangHua
+            );
 		if(no1==1&&ifTuoGuan)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
@@ -6807,12 +6837,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				if(no==1)
 				{
 					_roundManager->_otherOneForDouble = no1;
-					action_todo=action1;
+					_roundManager->_actionToDo=action1;
 				}
 				else
 				{
 					_roundManager->_otherOneForDouble = no;
-					action_todo=action2;
+					_roundManager->_actionToDo=action2;
 				}					
 				waitfor_myaction(1);
 				return;
@@ -6823,7 +6853,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			update_clock(false,0,_roundManager->_curPlayer);
 			if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
 			{
-				if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&action_todo&a_HU)
+				if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&_roundManager->_actionToDo&a_HU)
 				{
 					auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 					myframe->_ID=1;
@@ -6833,9 +6863,9 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				else
 				{
 					if(no==1)
-						action_todo=action1;
+						_roundManager->_actionToDo=action1;
 					else
-						action_todo=action2;
+						_roundManager->_actionToDo=action2;
 					waitfor_myaction(1);
 					return;
 				}
@@ -6847,7 +6877,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		else if(action1!=a_JUMP)//下家
 		{
-			action_todo=action1;
+			_roundManager->_actionToDo=action1;
 			if(no==1)
 			{
 				update_clock(true,0,no);
@@ -6863,7 +6893,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		else if(action2!=a_JUMP)//上家
 		{
-			action_todo=action2;
+			_roundManager->_actionToDo=action2;
 			if(no1==1)
 			{
 				update_clock(true,0,no1);
@@ -6879,7 +6909,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		else if(action1==action2&&action1==a_JUMP)
 		{
-			action_todo=action1;
+			_roundManager->_actionToDo=action1;
 			_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 			update_clock(true,0,_roundManager->_curPlayer);
 			call_distribute_card();
@@ -6969,13 +6999,9 @@ void NetRaceLayer::distribute_card()
     LOGGER_WRITE("\tadd listener to %s",DISTRIBUTE_DONE_EVENT_TYPE);
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DCI*>(event->getUserData());
-		_roundManager->_lastHandedOutCard=userData->card;
-		_roundManager->_distributedNum = userData->num;
-		if(_roundManager->_distributedNum==TOTAL_CARD_NUM)
-			is_last_one=true;
-		else
-			is_last_one=false;
-		g_server=0;
+		_roundManager->_lastHandedOutCard = userData->card;
+		_roundManager->_distributedNum    = userData->num;
+        g_server=0;
 		distribute_card_effect();
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
@@ -7191,10 +7217,9 @@ void NetRaceLayer::start_callback()
 	last_actionSource=-1;
 	ifTuoGuan=false;
 	isGangHua=false;
-	is_last_one=false;
 	last_action=a_JUMP;
 	last_action_WithGold=a_JUMP;
-	action_todo=a_JUMP;
+	_roundManager->_actionToDo=a_JUMP;
 	continue_gang_times=0;
 
     int lastWinner = _roundManager->GetLastWinner();
@@ -7210,8 +7235,8 @@ void NetRaceLayer::start_callback()
 
     //_roundManager->Shuffle();
     
-    action_todo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
-	if(action_todo!=a_TIMEOUT) {
+    _roundManager->_actionToDo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
+	if(_roundManager->_actionToDo!=a_TIMEOUT) {
 		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
 		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
 		//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/sort.ogg");
@@ -7691,7 +7716,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	auto seq=Sequence::create(StartDelay,HandFourSeq,HandFourSeq,HandFourSeq,HandFourSeq,
 		HandFourSeq,HandFourSeq,HandFourSeq,HandFourSeq,HandFourSeq,HandTwoSeq,HandOneSeq,HandOneSeq,NULL);
 	//DelayTime::create(3.1)
-	action_todo=a_JUMP;
+	_roundManager->_actionToDo=a_JUMP;
 	myframe->runAction(Sequence::create(seq,update_lists_spa,updateClock,CallFunc::create(this,callfunc_selector(NetRaceLayer::start_dealCardsDelete)),
 		CCCallFunc::create([=](){
 		first_response(zhuang);

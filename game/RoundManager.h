@@ -45,6 +45,8 @@ public:
     int  _otherOneForDouble;//this could be calculated via GetWin.
     CARD_KIND  _lastHandedOutCard;
     bool _isWaitDecision;
+    int  _tempActionToDo;
+    int  _actionToDo;
         
     int  Shuffle();
     int  NotifyStart();

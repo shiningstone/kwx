@@ -31,7 +31,6 @@ private:
 	int premiumLeast;//底
 	/************************自己手牌全局变量**************************/
 	/************************自己手牌全局变量**************************/
-	unsigned char temp_actionToDo;
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;
 	int MyCardChoosedNum;
@@ -48,7 +47,6 @@ private:
 	//bool ifMyTime;
 	bool ifGameStart;
 	bool ifResourcePrepared;
-	bool is_last_one;
 	int QiangGangTarget;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
@@ -59,7 +57,6 @@ private:
 	unsigned char last_action_WithGold;//带分
 	int last_actionSource;
 	bool isGangHua;
-	unsigned char action_todo;
 	unsigned int continue_gang_times;
 	int g_server;
 	cocos2d::Point base_point[3];
