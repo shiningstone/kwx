@@ -156,33 +156,35 @@ void NetRaceLayer::robot_callback(Ref* pSender,ui::Widget::TouchEventType type)
 			layer_color->setContentSize(Size(visibleSize.width,visibleSize.height*120/716));
 			layer_color->setOpacity(150);
 			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
-			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID)&&ifMyActionHint)
+            
+			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision)
 			{
 				delete_act_tip();
-				ifMyActionHint=false;
+				_roundManager->_isWaitDecision=false;
 				temp_actionToDo=a_JUMP;
 				if(g_server==1)
 				{
-					if(ifQiangGangAsk)
+					if(_roundManager->_isQiangGangAsking)
 					{
-						ifQiangGangAsk=false;
+						_roundManager->_isQiangGangAsking=false;
+                        
 						auto GoldAccount=CallFunc::create([=](){
-							GoldNumInsert(QiangGangTarget,2,cur_player);
+							GoldNumInsert(QiangGangTarget,2,_roundManager->_curPlayer);
 							QiangGangTarget=-1;
 						});
 						auto curFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 						auto curSeq=Sequence::create(GoldAccount,curFunc,NULL);
 						myframe->runAction(curSeq);
 					}
-					else if(ifDoubleAsk)
+					else if(_roundManager->_isDoubleHuAsking)
 					{
-						ifDoubleAsk=false;
-						auto huFunc=CallFunc::create([=](){hu_effect_tip(OtherOneForDouble);});
+						_roundManager->_isDoubleHuAsking = false;
+						auto huFunc=CallFunc::create([=](){hu_effect_tip(_roundManager->_otherOneForDouble);});
 						myframe->runAction(huFunc);
 					}
 					else
 					{
-						cur_player=(cur_player+1)%3;
+						_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 						auto curFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 						myframe->runAction(curFunc);
 					}
@@ -470,7 +472,6 @@ void NetRaceLayer::create_race()
 
     _roundManager->unDistributedNum = 84;
     
-	ifGangAsk=false;
 	ifGameStart=false;
 	ifUpdateDuringEffect=false;
 	ifMingMybeError=false;
@@ -647,7 +648,6 @@ void NetRaceLayer::create_race()
 	StartButton->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 	StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
 	this->addChild(StartButton,2,START_GAME_TAG_ID);
-
     
 	std::string buffer;
 	int score;
@@ -658,6 +658,7 @@ void NetRaceLayer::create_race()
 		_roundManager->_players[i]->get_nick_name(buffer);
 		update_nickname(i,buffer);
 		_roundManager->_players[i]->get_property(score);
+        
 		update_score(i,score);
 	}
     
@@ -1095,16 +1096,16 @@ void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
                 if(win.player==1)
                 {
                     Gold1=my_score*premiumLeast;
-                    if(cur_player==1)
+                    if(_roundManager->_curPlayer==1)
                     {
                         Gold2=-(Gold1/2);
                         Gold0=-(Gold1/2);
                     }
-                    else if(cur_player==2)
+                    else if(_roundManager->_curPlayer==2)
                     {
                         Gold2=-Gold1;
                     }
-                    else if(cur_player==0)
+                    else if(_roundManager->_curPlayer==0)
                     {
                         Gold0=-Gold1;
                     }
@@ -1115,16 +1116,16 @@ void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
                 else if(win.player==2)
                 {
                     Gold2=robot2_score*premiumLeast;
-                    if(cur_player==2)
+                    if(_roundManager->_curPlayer==2)
                     {
                         Gold1=-(Gold2/2);
                         Gold0=-(Gold2/2);
                     }
-                    else if(cur_player==1)
+                    else if(_roundManager->_curPlayer==1)
                     {
                         Gold1=-Gold2;
                     }
-                    else if(cur_player==0)
+                    else if(_roundManager->_curPlayer==0)
                     {
                         Gold0=-Gold2;
                     }
@@ -1135,16 +1136,16 @@ void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
                 else if(win.player==0)
                 {
                     Gold0=robot0_score*premiumLeast;
-                    if(cur_player==0)
+                    if(_roundManager->_curPlayer==0)
                     {
                         Gold1=-(Gold0/2);
                         Gold2=-(Gold0/2);
                     }
-                    else if(cur_player==1)
+                    else if(_roundManager->_curPlayer==1)
                     {
                         Gold1=-Gold0;
                     }
-                    else if(cur_player==2)
+                    else if(_roundManager->_curPlayer==2)
                     {
                         Gold2=-Gold0;
                     }
@@ -1497,9 +1498,9 @@ void NetRaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			if(ifMyActionHint)
+			if(_roundManager->_isWaitDecision)
 			{
-				ifMyActionHint=false;
+				_roundManager->_isWaitDecision = false;
 				action_todo=temp_actionToDo;
 				temp_actionToDo=a_JUMP;
 			}
@@ -1537,13 +1538,13 @@ void NetRaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
 			curButton->setTouchEnabled(false);
-			if(ifMyActionHint)
+			if(_roundManager->_isWaitDecision)
 			{
-				ifMyActionHint=false;
+				_roundManager->_isWaitDecision = false;
 				action_todo=temp_actionToDo;
 				temp_actionToDo=a_JUMP;
 			}
-			if(ifQiangGangAsk)
+			if(_roundManager->_isQiangGangAsking)
 			{
 				last_action_WithGold=a_QIANG_GANG;
 				curButton->_ID=pSender->_ID;
@@ -1551,7 +1552,7 @@ void NetRaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 				auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
 				curButton->runAction(Sequence::create(callFunc1,ScaleTo::create(0.1,1),callFunc,NULL));
 			}
-			else if(ifDoubleAsk)
+			else if(_roundManager->_isDoubleHuAsking)
 			{
 				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 				auto ButtonAct=TargetedAction::create(curButton,ScaleTo::create(0.1,1));
@@ -1592,11 +1593,12 @@ void NetRaceLayer::gang_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			if(ifGangAsk)
-				ifGangAsk=false;
-			if(ifMyActionHint)
+			if(_roundManager->_isGangAsking)//is this judgement neccessary?
+				_roundManager->_isGangAsking = false;
+            
+			if(_roundManager->_isWaitDecision)
 			{
-				ifMyActionHint=false;
+				_roundManager->_isWaitDecision=false;
 				action_todo=temp_actionToDo;
 				temp_actionToDo=a_JUMP;
 			}
@@ -2003,21 +2005,21 @@ void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND targ
 	while(_roundManager->_river->getCard(s_card,jj++)==true)
 		res->card_in_river[res->river_len++]=s_card.kind;
 
-	int k=(cur_player+1)%3;
+	int k=(_roundManager->_curPlayer+1)%3;
 	_roundManager->_players[k]->get_parter()->get_hu_cards(target1,len1);
     
-	k=(cur_player+2)%3;
+	k=(_roundManager->_curPlayer+2)%3;
 	_roundManager->_players[k]->get_parter()->get_hu_cards(target2,len2);
 
-    for(int i=_roundManager->_players[cur_player]->get_parter()->get_card_list()->atcvie_place;i<_roundManager->_players[cur_player]->get_parter()->get_card_list()->len;i++)
+    for(int i=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->atcvie_place;i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++)
 	{
-		int time=res->list[_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[i].kind].same_times++;
-		res->list[_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[i].kind].place[time]=i;
+		int time=res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].same_times++;
+		res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].place[time]=i;
 	}
 
 	/*init hu target*/
-	if( !_roundManager->IsTing(cur_player) ) {
-		_roundManager->_players[cur_player]->init_target(&res->target,*len1,*len2);
+	if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
+		_roundManager->_players[_roundManager->_curPlayer]->init_target(&res->target,*len1,*len2);
     }
 }
 void NetRaceLayer::TingHintBarListener()
@@ -2072,9 +2074,9 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		ifMingMybeError=true;
 		ifMingTime=false;
 	}
-	if(ifMyActionHint)
+	if(_roundManager->_isWaitDecision)
 	{
-		ifMyActionHint=false;
+		_roundManager->_isWaitDecision=false;
 		//action_todo=temp_actionToDo;
 		temp_actionToDo=a_JUMP;
 	}
@@ -2093,9 +2095,9 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		myframe->removeChildByTag(MING_CANCEL,true);
 
     LOGGER_WRITE("%s get out card list",__FUNCTION__);
-	outCardList* outCard=_roundManager->_players[cur_player]->get_parter()->getOutCardList();
+	outCardList* outCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
 	auto cardOut=Sprite::createWithTexture(g_my_out->getTexture());
-	auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[g_show_card]->getTexture());
+	auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 	show_card_kind->setPosition(Vec2(cardOut->getTextureRect().size.width/2,cardOut->getTextureRect().size.height*0.65));
 	cardOut->addChild(show_card_kind);
 	cardOut->setAnchorPoint(Vec2(0,1));
@@ -2117,21 +2119,21 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	voiceCall=CCCallFunc::create([=]()
 	{
         std::string sex;
-        _roundManager->_players[cur_player]->get_sex(sex);
+        _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
 		if( sex=="Boy" )
-			SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[g_show_card].c_str());
+			SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
 		else
-			SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[g_show_card].c_str());
+			SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
 	});
 	Sequence* voiceEffect;
 	Spawn* allEffect=Spawn::create(NULL);
-	if(action_todo==a_MING && !_roundManager->IsTing(cur_player) )
+	if(action_todo==a_MING && !_roundManager->IsTing(_roundManager->_curPlayer) )
 	{
 		_eventDispatcher->removeEventListenersForTarget(myframe,true);
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
 		//last_action=a_MING;
-		_roundManager->_players[cur_player]->get_parter()->action1();
-		_roundManager->_players[cur_player]->get_parter()->set_ting_status(1);
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action1();
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 
 		while(myframe->getChildByTag(MING_EFFECT_DAMING))
 			myframe->removeChildByTag(MING_EFFECT_DAMING);
@@ -2209,7 +2211,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 
 void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_in_list,Touch* touch,int time)
 {
-    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,ifMyActionHint);
+    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,_roundManager->_isWaitDecision);
 
 	//ifMyTime=false;
 	if(ifMingTime)
@@ -2217,9 +2219,9 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 		ifMingMybeError=true;
 		ifMingTime=false;
 	}
-	if(ifMyActionHint)
+	if(_roundManager->_isWaitDecision)
 	{
-		ifMyActionHint=false;
+		_roundManager->_isWaitDecision=false;
 		//action_todo=temp_actionToDo;
 		temp_actionToDo=a_JUMP;
 	}
@@ -2231,20 +2233,20 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 
     if(card_in_list==list->len-1)//||time==1)
 	{
-		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+card_in_list)->setScale(0);
+		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+card_in_list)->setScale(0);
 	}
 	else
 	{
 		for(int i=list->atcvie_place;i<list->len-1;i++)
 		{
-			auto card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+i);
+			auto card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+i);
 			auto curPos=card->getPosition();
 			auto cardSize=card->getTextureRect().size;
 			auto RightMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width,curPos.y));
 			auto LeftMove=MoveTo::create(0.3,Vec2(curPos.x-cardSize.width*1.2,curPos.y));
 
-			auto last_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+list->len-1);
-			auto sourcePos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+list->len-1)->getPosition();
+			auto last_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+list->len-1);
+			auto sourcePos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+list->len-1)->getPosition();
 			auto RightMoveAction1=MoveTo::create(0.06,Vec2(sourcePos.x,sourcePos.y+100));
 			auto RightMoveAction2=MoveTo::create(0.24,Vec2(curPos.x,sourcePos.y+100));
 			auto RightMoveAction3=MoveTo::create(0.06,Vec2(curPos));
@@ -2308,9 +2310,9 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
 	}
 
-    _roundManager->RecordOutCard(_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[card_in_list]);
+    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[card_in_list]);
 
-	g_show_card=_roundManager->_players[cur_player]->get_parter()->hand_out(card_in_list);
+	_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(card_in_list);
 	update_outcard(myframe,touch->getLocation(),time);
 }
 void NetRaceLayer::waitfor_MyShowCardInstruct()
@@ -2322,30 +2324,31 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 	{
 		if(ifTuoGuan)
 		{
-			int last_one=_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1;
+			int last_one=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 			Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
 			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
             
-            _roundManager->RecordOutCard(_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[last_one]);
+            _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
 
-			g_show_card=_roundManager->_players[cur_player]->get_parter()->hand_out(last_one);
+			_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
 			update_outcard(myframe,location,2);
 		}
-		else if( _roundManager->IsTing(cur_player) )
+		else if( _roundManager->IsTing(_roundManager->_curPlayer) )
 		{
-			if(myframe->getChildByTag(GANG_REMING_ACT_TAG_ID))
-				ifGangAsk=true;
+			if(myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) {
+				_roundManager->_isGangAsking = true;
+            }
 			else
 			{
-				int last_one=_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1;
+				int last_one=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 				Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
 				if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 					myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
 
-                _roundManager->RecordOutCard(_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[last_one]);
+                _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
 
-				g_show_card=_roundManager->_players[cur_player]->get_parter()->hand_out(last_one);
+				_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
 				update_outcard(myframe,location,2);
 			}
 		}
@@ -2715,14 +2718,14 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 
     Vec2 v;
-	if(cur_player==0)
+	if(_roundManager->_curPlayer==0)
 		v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-	else if(cur_player==1)
+	else if(_roundManager->_curPlayer==1)
 		v=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-	else if(cur_player==2)
+	else if(_roundManager->_curPlayer==2)
 		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
     
-	if(cur_player!=1)
+	if(_roundManager->_curPlayer!=1)
 	{
 		Sprite *cardOut;
 		BezierTo *baction;
@@ -2732,50 +2735,50 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		CARD_KIND list2[9];
 		int len1;
 		int len2;
-		if(_roundManager->_players[cur_player]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
+		if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
 		{
 			collect_resources(s_res,list1,list2,&len1,&len2);
-			_roundManager->_players[cur_player]->set_robot_hu_target(s_res->target);
+			_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
 		}
-		if(_roundManager->_players[cur_player]->get_parter()->get_role_type()==INTERNET_PLAYER)
+		if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==INTERNET_PLAYER)
 		{
             LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			collect_resources(s_res,list1,list2,&len1,&len2);
-			_roundManager->_players[cur_player]->set_robot_hu_target(s_res->target);
+			_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
 		}
 
-        if(_roundManager->_players[cur_player]->get_parter()->get_ting_status()==0)
+        if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
 		{
-			index = _roundManager->_players[cur_player]->chose_card(s_res,_roundManager->unDistributedNum,list1,list2,len1,len2);
-			if(index==-1||index>_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1)
+			index = _roundManager->_players[_roundManager->_curPlayer]->chose_card(s_res,_roundManager->unDistributedNum,list1,list2,len1,len2);
+			if(index==-1||index>_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1)
 			{
-				index=_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1;
+				index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 			}
-			if(s_res->hu_nums>=6&&action_todo==a_MING&&_roundManager->_players[cur_player]->get_parter()->get_ting_status()==0)
+			if(s_res->hu_nums>=6&&action_todo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
 			{
-				RototHandOutIndex=_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[index].kind;
-				KouCardsCheck(cur_player);
+				RototHandOutIndex =_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
+				KouCardsCheck(_roundManager->_curPlayer);
 				if(Kou_kindLen>0)
-					ming_kou_Choose(cur_player);
+					ming_kou_Choose(_roundManager->_curPlayer);
 			}
 		}
 		else
-			index=_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1;
+			index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 
-        _roundManager->RecordOutCard(_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[index]);
+        _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index]);
 
-		g_show_card=_roundManager->_players[cur_player]->get_parter()->hand_out(index);
-		auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[g_show_card]->getTexture());
+		_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
+		auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 		float p_x,p_y;
-		auto RobotList=_roundManager->_players[cur_player]->get_parter()->get_card_list();
-		auto LastCard=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+RobotList->len);
+		auto RobotList=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
+		auto LastCard=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+RobotList->len);
 		auto firstFunc=CallFunc::create([=](){
 			if(LastCard)
 				LastCard->setScale(0);
 		});
 		CallFunc* handOutCardKuang;
 		CallFunc* secondFunc;
-		if(cur_player==2)
+		if(_roundManager->_curPlayer==2)
 		{
 			show_card_kind->runAction(RotateTo::create(0,270));
 			if(myframe->getChildByTag(SHOW_CARD_INIDCATOR_TAD_ID))
@@ -2791,7 +2794,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 				cardBg->setAnchorPoint(Vec2(0.5,0.5));
 				cardBg->setPosition(Vec2(outCardFrame->getTextureRect().size.width*0.515,outCardFrame->getTextureRect().size.height*0.515));
 				outCardFrame->addChild(cardBg);
-				auto s_card=Sprite::createWithTexture(g_card_kind[g_show_card]->getTexture());
+				auto s_card=Sprite::createWithTexture(g_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 				s_card->setAnchorPoint(Vec2(0.5,0.5));
 				s_card->setPosition(Vec2(cardBg->getTextureRect().size.width/2,cardBg->getTextureRect().size.height*0.4));
 				cardBg->addChild(s_card);
@@ -2799,23 +2802,23 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			});
 			if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID))
 				myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);
-			outCardList* outCard=_roundManager->_players[cur_player]->get_parter()->getOutCardList();
+			outCardList* outCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
 			cardOut=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
-			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[g_show_card]->getTexture());
+			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 			show_card_kind->setPosition(Vec2(cardOut->getTextureRect().size.width/2,cardOut->getTextureRect().size.height*0.65));
 			show_card_kind->setRotation(-90);
 			show_card_kind->setScale(0.9);
 			cardOut->addChild(show_card_kind);
 			cardOut->setAnchorPoint(Vec2(0.5,0.5));
 			int curListLen=_roundManager->_players[2]->get_parter()->get_card_list()->len;
-			auto curOutPosTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+curListLen-1)->getPosition();
+			auto curOutPosTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+curListLen-1)->getPosition();
 			auto curOutPos=Vec2(curOutPosTemp.x,curOutPosTemp.y+cardOut->getTextureRect().size.height*1.5);
 			cardOut->setPosition(curOutPos);
 			cardOut->setVisible(false);
 			myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);
-			baction=OthersBizerMove(cur_player,outCard);
+			baction=OthersBizerMove(_roundManager->_curPlayer,outCard);
 		}
-		else if(cur_player==0)
+		else if(_roundManager->_curPlayer==0)
 		{
 			show_card_kind->runAction(RotateTo::create(0.0,90));
 			if(myframe->getChildByTag(SHOW_CARD_INIDCATOR_TAD_ID))
@@ -2831,7 +2834,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 				cardBg->setAnchorPoint(Vec2(0.5,0.5));
 				cardBg->setPosition(Vec2(outCardFrame->getTextureRect().size.width*0.515,outCardFrame->getTextureRect().size.height*0.515));
 				outCardFrame->addChild(cardBg);
-				auto s_card=Sprite::createWithTexture(g_card_kind[g_show_card]->getTexture());
+				auto s_card=Sprite::createWithTexture(g_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 				s_card->setAnchorPoint(Vec2(0.5,0.5));
 				s_card->setPosition(Vec2(cardBg->getTextureRect().size.width/2,cardBg->getTextureRect().size.height*0.4));
 				cardBg->addChild(s_card);
@@ -2840,19 +2843,19 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID))
 				myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);
 
-			outCardList* outCard=_roundManager->_players[cur_player]->get_parter()->getOutCardList();
+			outCardList* outCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
 			cardOut=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
-			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[g_show_card]->getTexture());
+			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 			show_card_kind->setPosition(Vec2(cardOut->getTextureRect().size.width/2,cardOut->getTextureRect().size.height*0.65));
 			show_card_kind->setRotation(90);
 			show_card_kind->setScale(0.9);
 			cardOut->addChild(show_card_kind);
 			cardOut->setAnchorPoint(Vec2(0.5,0.5));
-			auto cardOut_Yposition=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+RobotList->len-1)->getPosition().y-20;//-1)->getPosition().y;
-			cardOut->setPosition(Vec2(base_point[cur_player].x+10,cardOut_Yposition-35));
+			auto cardOut_Yposition=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+RobotList->len-1)->getPosition().y-20;//-1)->getPosition().y;
+			cardOut->setPosition(Vec2(base_point[_roundManager->_curPlayer].x+10,cardOut_Yposition-35));
 			cardOut->setVisible(false);
 			myframe->addChild(cardOut,20,OUT_CARD_FRAME_TAG_ID);
-			baction=OthersBizerMove(cur_player,outCard);
+			baction=OthersBizerMove(_roundManager->_curPlayer,outCard);
 		}
 		secondFunc=CallFunc::create([=](){myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)->setVisible(true);});
 		auto BizerVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/give.ogg");});
@@ -2860,21 +2863,21 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		voiceCall=CCCallFunc::create([=]()
 		{
             std::string sex;
-            _roundManager->_players[cur_player]->get_sex(sex);
+            _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
             if( sex=="Boy" )
-				SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[g_show_card].c_str());
+				SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
 			else
-				SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[g_show_card].c_str());
+				SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
 		});
 		Sequence *voiceEffect;	
-		if(s_res->hu_nums>=6&&action_todo==a_MING&&_roundManager->_players[cur_player]->get_parter()->get_ting_status()==0)
+		if(s_res->hu_nums>=6&&action_todo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
 		{
-			OtherTingHintBar(cur_player,index);
+			OtherTingHintBar(_roundManager->_curPlayer,index);
 			if(Kou_kindLen>0)
-				_roundManager->_players[cur_player]->get_parter()->action(g_server,a_KOU);
-			_roundManager->_players[cur_player]->get_parter()->action(g_server,a_MING);
-			_roundManager->_players[cur_player]->get_parter()->action1();
-			_roundManager->_players[cur_player]->get_parter()->set_ting_status(1);
+				_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(g_server,a_KOU);
+			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(g_server,a_MING);
+			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action1();
+			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 			auto simple_seq=simple_tip_effect(v,"daming.png");
 			voiceEffect=Sequence::create(simple_seq,firstFunc,secondFunc,Spawn::create(handOutCardKuang,baction,voiceCall,NULL),BizerVoice,NULL);
 		}
@@ -2887,9 +2890,9 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		auto callFunc2=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
 		auto seq=Sequence::create(targetAction,callFunc0,CCCallFunc::create([=]()
 		{
-			_roundManager->_players[cur_player]->get_parter()->action(g_server,a_JUMP);
+			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(g_server,a_JUMP);
 		}),callFunc1,callFunc2,NULL);
-		myframe->_ID=cur_player;
+		myframe->_ID=_roundManager->_curPlayer;
 		g_server=1;
 		myframe->runAction(seq);
 	}
@@ -2919,18 +2922,18 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 	myframe->_ID=no;
 	last_action=a_PENG;
 	Card card;
-	int outcard_place=_roundManager->_players[cur_player]->get_parter()->getOutCardList()->length;
-	_roundManager->_players[cur_player]->get_parter()->getOutCardList()->getCard(card,outcard_place);
-	_roundManager->_players[cur_player]->get_parter()->getOutCardList()->deleteItem();
-	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1))
+	int outcard_place=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
+	_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->getCard(card,outcard_place);
+	_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->deleteItem();
+	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+_roundManager->_curPlayer*25+outcard_place-1))
 	{
-		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1);
+		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+_roundManager->_curPlayer*25+outcard_place-1);
 	}
 
     _roundManager->RecordOutCard(card);
     _roundManager->RecordOutCard(card);
 
-	cur_player=no;
+	_roundManager->_curPlayer=no;
 	Vec2 v;
 	if(no==0)
 		v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
@@ -2950,7 +2953,7 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 
 	CallFunc* PengVoice;
     std::string sex;
-    _roundManager->_players[cur_player]->get_sex(sex);
+    _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     if( sex=="Boy" )
 		PengVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[0].c_str());});
 	else
@@ -2962,7 +2965,7 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 		auto peng_action=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_update));
 		auto callFunc_update_list=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
 		auto actcheckagain=CCCallFunc::create([=](){
-			action_todo=_roundManager->_players[cur_player]->get_parter()->ActiontodoCheckAgain();
+			action_todo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
 			if(no==1)
 				waitfor_myaction(no);
 			else
@@ -3301,7 +3304,7 @@ void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 			}
 		});
 		auto actcheckagain=CCCallFunc::create([=](){
-			action_todo=_roundManager->_players[cur_player]->get_parter()->ActiontodoCheckAgain();
+			action_todo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
 			if(no==1)
 				waitfor_myaction(no);
 			else
@@ -3368,7 +3371,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);		
 	CallFunc*GangVoice;
     std::string sex;
-    _roundManager->_players[cur_player]->get_sex(sex);
+    _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     if( sex=="Boy" )
 		GangVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[1].c_str());});
 	else
@@ -3381,12 +3384,12 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		auto callFunc_distribute_card=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 		auto update_list_seq1=Sequence::create(callFunc1,angang_action,callFunc_update_list,VoiceEffect1,CCCallFunc::create([=]()
 		{
-			cur_player=no;
+			_roundManager->_curPlayer=no;
 		}),callFunc_distribute_card,NULL);//dis_action
 
 		Spawn *simple_seq=simple_tip_effect(v,"gang.png");
 		auto GoldAccount=CallFunc::create([=](){
-			GoldNumInsert(no,1,cur_player);	
+			GoldNumInsert(no,1,_roundManager->_curPlayer);	
 		});
 		auto an_gang_seq=Sequence::create(Spawn::create(GangVoice,simple_seq,NULL),GoldAccount,update_list_seq1,NULL);
 		myframe->runAction(an_gang_seq);
@@ -3439,7 +3442,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		Card outCard;
 		int gang[4];
 		int ii;
-		int tingFlag=_roundManager->_players[cur_player]->get_parter()->get_ting_status();
+		int tingFlag=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
 		if(tingFlag==0)
 		{
 			for(ii=list->atcvie_place;ii<list->len;ii++)
@@ -3905,7 +3908,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		auto callFunc_distribute_card=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 		auto update_list_seq0=Sequence::create(callFunc1,/*angang_action,*/callFunc_update_list,VoiceEffect0,/*CCCallFunc::create([=]()
 																											 {
-																											 cur_player=no;
+																											 _roundManager->_curPlayer=no;
 																											 }),callFunc_distribute_card,*/NULL);//dis_action
 
 		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
@@ -3919,11 +3922,11 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		AnGangEffectNode->runAction(angang_seq);
 		myframe->_ID=1;
 		auto GoldAccount=CallFunc::create([=](){
-			GoldNumInsert(no,1,cur_player);	
+			GoldNumInsert(no,1,_roundManager->_curPlayer);	
 		});
 		myframe->runAction(Sequence::create(angang_action,DelayTime::create(0.48),GoldAccount,/*CallFunc::create([=](){card_list_update(1);}),*/CCCallFunc::create([=]()
 		{
-			cur_player=no;
+			_roundManager->_curPlayer=no;
 		}),callFunc_distribute_card,NULL));
 	}
 }
@@ -3932,42 +3935,42 @@ void NetRaceLayer::QiangGangHuJudge()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	g_server=1;
-	int no=(cur_player+1)%3;
-	unsigned char curTingStatus=_roundManager->_players[cur_player]->get_parter()->get_ting_status();
-	unsigned char action1=_roundManager->_players[no]->get_parter()->hand_in(g_show_card,g_server,curTingStatus,false,a_QIANG_GANG,continue_gang_times,isGangHua);
-	int no1=(cur_player+2)%3;
-	unsigned char action2=_roundManager->_players[no1]->get_parter()->hand_in(g_show_card,g_server,curTingStatus,false,a_QIANG_GANG,continue_gang_times,isGangHua);
+	int no=(_roundManager->_curPlayer+1)%3;
+	unsigned char curTingStatus=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
+	unsigned char action1=_roundManager->_players[no]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,false,a_QIANG_GANG,continue_gang_times,isGangHua);
+
+	int no1=(_roundManager->_curPlayer+2)%3;
+	unsigned char action2=_roundManager->_players[no1]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,false,a_QIANG_GANG,continue_gang_times,isGangHua);
 	//action1=a_HU;
 	//action2=a_HU;
 	if((action1&a_HU)&&(action2&a_HU))//双响
 	{
 		last_action_WithGold=a_QIANG_GANG;
-		update_clock(false,0,cur_player);
+		update_clock(false,0,_roundManager->_curPlayer);
 		if((no!=1&&no1!=1)||((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
 		{
 			hu_effect_tip(3);
 			distribute_event(DOUBLE_HU_WITH_ME,NULL);
 		}
-		else if((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==0)
+		else if((no==1||no1==1) && _roundManager->_players[1]->get_parter()->get_ting_status()==0)
 		{
-			ifDoubleAsk=true;
-			if(no==1)
-			{
+			_roundManager->_isDoubleHuAsking = true;
+            
+			if(no==1) {
 				action_todo=action1;
-				OtherOneForDouble=no1;
-			}
-			else
-			{
+				_roundManager->_otherOneForDouble = no1;
+			} else {
 				action_todo=action2;
-				OtherOneForDouble=no;
+				_roundManager->_otherOneForDouble = no;
 			}
+            
 			waitfor_myaction(1);
 			return;
 		}
 	}
 	else if(action1&a_HU||action2&a_HU)//点炮
 	{
-		update_clock(false,0,cur_player);
+		update_clock(false,0,_roundManager->_curPlayer);
 		if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&action_todo&a_HU)
@@ -3980,7 +3983,7 @@ void NetRaceLayer::QiangGangHuJudge()
 			}
 			else
 			{
-				ifQiangGangAsk=true;
+				_roundManager->_isQiangGangAsking=true;
 				if(no==1)
 					action_todo=action1;
 				else
@@ -4004,7 +4007,7 @@ void NetRaceLayer::QiangGangHuJudge()
 	{
 		g_server=0;
 		auto GoldAccount=CallFunc::create([=](){
-			GoldNumInsert(QiangGangTarget,2,cur_player);	
+			GoldNumInsert(QiangGangTarget,2,_roundManager->_curPlayer);	
 		});
 		auto distributeFunc=CallFunc::create([=](){call_distribute_card();});
 		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -4036,12 +4039,12 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 	
 	if(g_server!=0)
 	{
-		int outcard_place=_roundManager->_players[cur_player]->get_parter()->getOutCardList()->length;
-		_roundManager->_players[cur_player]->get_parter()->getOutCardList()->getCard(kind_out_card,outcard_place);
-		_roundManager->_players[cur_player]->get_parter()->getOutCardList()->deleteItem();
-		if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1))
+		int outcard_place=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->getCard(kind_out_card,outcard_place);
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->deleteItem();
+		if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+_roundManager->_curPlayer*25+outcard_place-1))
 		{
-			myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1);
+			myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+_roundManager->_curPlayer*25+outcard_place-1);
 		}
 
         _roundManager->RecordOutCard(kind_out_card);
@@ -4057,7 +4060,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 	}
 	CallFunc*GangVoice;
     std::string sex;
-    _roundManager->_players[cur_player]->get_sex(sex);
+    _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     if( sex=="Boy" )
 		GangVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[1].c_str());});
 	else
@@ -4078,12 +4081,12 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			dis_action=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 		auto update_list_seq=Sequence::create(callFunc1,minggang_action,callFunc_update_list,CCCallFunc::create([=]()
 		{
-			cur_player=no;
+			_roundManager->_curPlayer=no;
 		}),dis_action,NULL);//dis_action
 
 		Spawn *simple_seq=simple_tip_effect(v,"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
 		auto GoldAccount=CallFunc::create([=](){
-			GoldNumInsert(no,2,cur_player);	
+			GoldNumInsert(no,2,_roundManager->_curPlayer);	
 		});
 		Sequence *gang_seq;
 		if(g_server!=0)
@@ -4675,7 +4678,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 		//update_list_seq  **最后的清理
 		Spawn *simple_seq=simple_tip_effect(v,"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
 		//auto GoldAccount=CallFunc::create([=](){
-		//	GoldNumInsert(no,2,cur_player);	
+		//	GoldNumInsert(no,2,_roundManager->_curPlayer);	
 		//});
 		//auto minggang_seq=Sequence::create(g_seq1,simple_seq,g_out_card_action,g_spa0,g_spa1,update_list_seq,NULL);
 		auto no1_seq1_Delay=Sequence::create(DelayTime::create(0.42),g_out_card_action,NULL);
@@ -4731,7 +4734,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 				myframe->removeChildByTag(MING_GANG_EFFECT_NODE,true);
 		}),/*CCCallFunc::create([=]()
 		{
-			cur_player=no;
+			_roundManager->_curPlayer=no;
 		}),dis_action,*/NULL);//dis_action
 
 		auto minggang_seq=Sequence::create(g_seq1,Spawn::create(simple_seq,GangVoice,g_out_card_action,g_spa0,g_spa1,DelayVoice,NULL),/*GoldAccount,*/update_list_seq,NULL);
@@ -4740,8 +4743,8 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 
 		myframe->runAction(Sequence::create(minggang_action,DelayTime::create(0.48),CallFunc::create([=](){
 			if(g_server!=0)
-				GoldNumInsert(no,2,cur_player);	
-		}),/*CallFunc::create([=](){card_list_update(1);}),*/CCCallFunc::create([=](){cur_player=no;}),dis_action,NULL));
+				GoldNumInsert(no,2,_roundManager->_curPlayer);	
+		}),/*CallFunc::create([=](){card_list_update(1);}),*/CCCallFunc::create([=](){_roundManager->_curPlayer=no;}),dis_action,NULL));
 	}
 }
 void NetRaceLayer::qi_tip_effect(Node *psender)
@@ -4755,9 +4758,9 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 		continue_gang_times=0;
 	last_action=a_JUMP;
 	action_todo=a_JUMP;
-	if(ifMyActionHint)
+	if(_roundManager->_isWaitDecision)
 	{
-		ifMyActionHint=false;
+		_roundManager->_isWaitDecision=false;
 		//action_todo=temp_actionToDo;
 		temp_actionToDo=a_JUMP;
 	}
@@ -4773,19 +4776,19 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 	{
 		if(g_server==0)
 		{
-			if(ifGangAsk)
+			if(_roundManager->_isGangAsking)
 			{
 				auto showCardFunc=CallFunc::create([=](){
-					ifGangAsk=false;
+					_roundManager->_isGangAsking = false;
 					auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-					int last_one=_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1;
+					int last_one=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 					Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
 					if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
 						myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
 
-                    _roundManager->RecordOutCard(_roundManager->_players[cur_player]->get_parter()->get_card_list()->data[last_one]);
+                    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
 
-					g_show_card=_roundManager->_players[cur_player]->get_parter()->hand_out(last_one);
+					_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
 					update_outcard(myframe,location,2);
 				});
 				myframe->runAction(Sequence::create(shadeFunc,showCardFunc,NULL));
@@ -4796,25 +4799,25 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 		}
 		else
 		{
-			if(ifQiangGangAsk)//抢杠胡请求
+			if(_roundManager->_isQiangGangAsking)//抢杠胡请求
 			{
-				ifQiangGangAsk=false;
+				_roundManager->_isQiangGangAsking=false;
 				auto GoldAccount=CallFunc::create([=](){
-					GoldNumInsert(QiangGangTarget,2,cur_player);
+					GoldNumInsert(QiangGangTarget,2,_roundManager->_curPlayer);
 					QiangGangTarget=-1;
 				});
 				auto DistributeFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 				myframe->runAction(Sequence::create(shadeFunc,Spawn::create(GoldAccount,DistributeFunc,NULL),NULL));
 			}
-			else if(ifDoubleAsk)//双响请求
+			else if(_roundManager->_isDoubleHuAsking)//双响请求
 			{
-				ifDoubleAsk=false;
-				auto huFunc=CallFunc::create([=](){hu_effect_tip(OtherOneForDouble);});
+				_roundManager->_isDoubleHuAsking=false;
+				auto huFunc=CallFunc::create([=](){hu_effect_tip(_roundManager->_otherOneForDouble);});
 				myframe->runAction(Sequence::create(shadeFunc,huFunc,NULL));
 			}
 			else
 			{
-				cur_player=(cur_player+1)%3;
+				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 				auto DistributeFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
 				myframe->runAction(Sequence::create(shadeFunc,DistributeFunc,NULL));
 			}
@@ -5162,8 +5165,8 @@ void NetRaceLayer::card_list_update(int no)
 	unsigned char ting_flag=_roundManager->_players[no]->get_parter()->get_ting_status();
     LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
     
-	if(ting_flag==1&&FirstMingNo==-1)
-		FirstMingNo=no;
+	if( ting_flag==1 && _roundManager->_firstMingNo==-1 )
+		_roundManager->_firstMingNo=no;
 
     for(int i=0;i<list->len;i++)
 	{
@@ -6006,7 +6009,7 @@ void NetRaceLayer::KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
 			auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
 			auto callFunc2=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_tip_effect));
 			auto seq1=Sequence::create(buttonAction,callFunc0,callFunc1,callFunc2,NULL);
-			myframe->_ID=cur_player;
+			myframe->_ID=_roundManager->_curPlayer;
 			myframe->runAction(seq1);
 		}
 		break;
@@ -6046,7 +6049,7 @@ void NetRaceLayer::MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEv
 			auto callFunc0=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
 			auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
 			auto seq1=Sequence::create(ButtonAction,callFunc0,callFunc1,callFunc2,NULL);
-			myframe->_ID=cur_player;
+			myframe->_ID=_roundManager->_curPlayer;
 			myframe->runAction(seq1);
 		}
 		break;
@@ -6327,7 +6330,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 	if(psender->_ID==1)
 	{
 		ifMingTime=true;
-		_roundManager->_players[cur_player]->get_parter()->action(g_server,a_MING);
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(g_server,a_MING);
 		if(myframe->getChildByTag(MING_KOU_ENSURE))
 			myframe->removeChildByTag(MING_KOU_ENSURE);
 		if(myframe->getChildByTag(MING_KOU_SIGN))
@@ -6357,7 +6360,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 		myframe->runAction(callFunc2);
 	}
 	/*active_place_indexes 是按照bit 位来只是哪些张牌可以出，如果bit0==1 表示左手起的第一张可以出*/
-	//update_card_list(cur_player-1);
+	//update_card_list(_roundManager->_curPlayer-1);
 	//scheduleOnce(schedule_selector(NetRaceLayer::waitfor_ShowCardWithoutTouch),0.3);
 	//scheduleOnce(schedule_selector(NetRaceLayer::delete_act_tip),0.3);
 }
@@ -6379,9 +6382,9 @@ void NetRaceLayer::ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-			if(ifMyActionHint)
+			if(_roundManager->_isWaitDecision)
 			{
-				ifMyActionHint=false;
+				_roundManager->_isWaitDecision=false;
 				action_todo=temp_actionToDo;
 				temp_actionToDo=a_JUMP;
 			}
@@ -6444,6 +6447,7 @@ void NetRaceLayer::first_response(int no)
 	waitfor_MyTouchShowCard();
 
 	ifGameStart=true;
+    
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 	action_todo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();
 
@@ -6563,7 +6567,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	}
 	if(action_todo!=a_JUMP)
 	{
-		ifMyActionHint=true;
+		_roundManager->_isWaitDecision = true;
 		temp_actionToDo=action_todo;
 		action_todo=a_JUMP;
 	}
@@ -6630,7 +6634,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			isGangHua=true;
 		else
 			continue_gang_times=0;
-		action_todo=_roundManager->_players[sender->_ID]->get_parter()->hand_in(g_show_card,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		action_todo=_roundManager->_players[sender->_ID]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(sender->_ID==1)
 		{
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -6638,12 +6642,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			float y=base_point[1].y;
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 			{
-				x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(_roundManager->_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
+				x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(_roundManager->_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
 				y += 60+13;
 			}
 			else
 			{
-				x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(_roundManager->_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
+				x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(_roundManager->_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
 				y += 60;
 			}
 		}
@@ -6651,12 +6655,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		{
 			if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(g_show_card/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
 					action_todo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(g_show_card/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
 					action_todo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
@@ -6668,12 +6672,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
             LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(g_show_card/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
 					action_todo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(g_show_card/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(action_todo&a_HU)&&!(action_todo&a_AN_GANG)&&!(action_todo&a_SHOU_GANG)&&!(action_todo&a_MING_GANG))
 					action_todo=a_JUMP;
 			}
 			else if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
@@ -6706,7 +6710,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 	else
 	{
 		int no=(sender->_ID+1)%3;
-		unsigned char action1=_roundManager->_players[no]->get_parter()->hand_in(g_show_card,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		unsigned char action1=_roundManager->_players[no]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(no==1&&ifTuoGuan)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
@@ -6718,12 +6722,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		{
 			if(_roundManager->_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(g_show_card/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
 					action1 = a_JUMP;
 			}
 			else if(_roundManager->_players[no]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(g_show_card/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
 					action1 = a_JUMP;
 			}
 			else if(_roundManager->_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
@@ -6735,12 +6739,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
             LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			if(_roundManager->_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(g_show_card/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
 					action1 = a_JUMP;
 			}
 			else if(_roundManager->_players[no]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(g_show_card/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
 					action1 = a_JUMP;
 			}
 			else if(_roundManager->_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
@@ -6748,7 +6752,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 					action1=a_JUMP;
 		}
 		int no1=(sender->_ID+2)%3;
-		unsigned char action2=_roundManager->_players[no1]->get_parter()->hand_in(g_show_card,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		unsigned char action2=_roundManager->_players[no1]->get_parter()->hand_in(_roundManager->_lastHandedOutCard,g_server,curTingStatus,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(no1==1&&ifTuoGuan)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
@@ -6760,12 +6764,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		{
 			if(_roundManager->_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(g_show_card/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
 					action2 = a_JUMP;
 			}
 			else if(_roundManager->_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(g_show_card/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
 					action2 = a_JUMP;
 			}
 			else if(_roundManager->_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
@@ -6777,12 +6781,12 @@ void NetRaceLayer::waitfor_response(Node* sender)
             LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 			if(_roundManager->_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
 			{
-				if(g_show_card/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
 					action2 = a_JUMP;
 			}
 			else if(_roundManager->_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
 			{
-				if(g_show_card/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+				if(_roundManager->_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
 					action2 = a_JUMP;
 			}
 			else if(_roundManager->_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
@@ -6791,7 +6795,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		if((action1&a_HU)&&(action2&a_HU))//双响
 		{
-			update_clock(false,0,cur_player);
+			update_clock(false,0,_roundManager->_curPlayer);
 			if((no!=1&&no1!=1)||(no==1||no1==1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
 			{
 				hu_effect_tip(3);
@@ -6799,15 +6803,15 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			}
 			else if((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==0)
 			{
-				ifDoubleAsk=true;
+				_roundManager->_isDoubleHuAsking = true;
 				if(no==1)
 				{
-					OtherOneForDouble=no1;
+					_roundManager->_otherOneForDouble = no1;
 					action_todo=action1;
 				}
 				else
 				{
-					OtherOneForDouble=no;
+					_roundManager->_otherOneForDouble = no;
 					action_todo=action2;
 				}					
 				waitfor_myaction(1);
@@ -6816,7 +6820,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		else if(action1&a_HU||action2&a_HU)//点炮
 		{
-			update_clock(false,0,cur_player);
+			update_clock(false,0,_roundManager->_curPlayer);
 			if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
 			{
 				if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&action_todo&a_HU)
@@ -6876,8 +6880,8 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		else if(action1==action2&&action1==a_JUMP)
 		{
 			action_todo=action1;
-			cur_player=(cur_player+1)%3;
-			update_clock(true,0,cur_player);
+			_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
+			update_clock(true,0,_roundManager->_curPlayer);
 			call_distribute_card();
 		}
 	}
@@ -6888,52 +6892,52 @@ void NetRaceLayer::distribute_card_effect()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	auto list=_roundManager->_players[cur_player]->get_parter()->get_card_list();
+	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
 	Sprite *list_last_one;
-	float x=base_point[cur_player].x;
-	float y=base_point[cur_player].y;
-	unsigned char ting_flag=_roundManager->_players[cur_player]->get_parter()->get_ting_status();
-	if(cur_player==1)
+	float x=base_point[_roundManager->_curPlayer].x;
+	float y=base_point[_roundManager->_curPlayer].y;
+	unsigned char ting_flag=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
+	if(_roundManager->_curPlayer==1)
 	{
 		list_last_one=Sprite::createWithTexture(g_my_free->getTexture());
 		list_last_one->setAnchorPoint(Point(0.0f,0.0f));
 		if(ting_flag==1)
 		{
-			x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len-1))->getPosition().x+30;
+			x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().x+30;
 			y += 60+13;
 		}
 		else
 		{
-			x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len-1))->getPosition().x+30;
+			x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().x+30;
 			y += 60;
 		}
 		if(last_actionSource==1&&(last_action==a_AN_GANG||last_action==a_SHOU_GANG||last_action==a_MING_GANG))
 			x=distributeCardPos.x;
-		auto s_card=Sprite::createWithTexture(g_card_kind[g_show_card]->getTexture());
+		auto s_card=Sprite::createWithTexture(g_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 		s_card->setPosition(Vec2(list_last_one->getTextureRect().size.width/2,list_last_one->getTextureRect().size.height*0.4));
 		list_last_one->addChild(s_card);
 	}
-	else if(cur_player==2)
+	else if(_roundManager->_curPlayer==2)
 	{
 		list_last_one=Sprite::createWithTexture(g_right_free->getTexture());
 		list_last_one->setAnchorPoint(Point(0,0));
-		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len-1))->getPosition().y+86;
+		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().y+86;
 	}
 	else
 	{
 		list_last_one=Sprite::createWithTexture(g_left_free->getTexture());
 		list_last_one->setAnchorPoint(Point(0.0f,1.0f));
-		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len-2))->getPosition().y-20;//+5;
+		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-2))->getPosition().y-20;//+5;
 	}
 	list_last_one->setPosition(Vec2(x,y));
 	update_residue_cards(_roundManager->unDistributedNum);
 
-	if(cur_player==0)
-		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len));
-	else if(cur_player==1)
-		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len));
-	else if(cur_player==2)
-		myframe->addChild(list_last_one,0,HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len));
+	if(_roundManager->_curPlayer==0)
+		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+	else if(_roundManager->_curPlayer==1)
+		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+	else if(_roundManager->_curPlayer==2)
+		myframe->addChild(list_last_one,0,HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
 
 	auto action1=MoveTo::create(0.3,Vec2(list_last_one->getPositionX(),list_last_one->getPositionY()-50));
 	auto seq=Sequence::create(EaseElasticOut::create(action1),NULL);
@@ -6942,8 +6946,8 @@ void NetRaceLayer::distribute_card_effect()
 	//auto callFunc=CallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
 	auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
 	Sequence* seq2;
-	myframe->_ID=cur_player;
-	if(cur_player!=1)
+	myframe->_ID=_roundManager->_curPlayer;
+	if(_roundManager->_curPlayer!=1)
 		seq2=Sequence::create(last_one_action,DelayTime::create(0.5),callFunc1,NULL);
 	else
 		seq2=Sequence::create(last_one_action,callFunc1,NULL);
@@ -6957,6 +6961,7 @@ void NetRaceLayer::call_distribute_card()
     
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
+
 void NetRaceLayer::distribute_card()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -6964,7 +6969,7 @@ void NetRaceLayer::distribute_card()
     LOGGER_WRITE("\tadd listener to %s",DISTRIBUTE_DONE_EVENT_TYPE);
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DCI*>(event->getUserData());
-		g_show_card=userData->card;
+		_roundManager->_lastHandedOutCard=userData->card;
 		_roundManager->unDistributedNum=TOTAL_CARD_NUM-userData->num;
 		if(_roundManager->unDistributedNum==0)
 			is_last_one=true;
@@ -6985,7 +6990,7 @@ void NetRaceLayer::distribute_card()
 			this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);
 		//流局特效放在这里，结算也在这里，特效最后一个action dispatch WAIT_START_CALLBACK_EVENT_TYPE
 		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-        _roundManager->SetWin(NONE_WIN,cur_player);
+        _roundManager->SetWin(NONE_WIN,_roundManager->_curPlayer);
 
 		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
 		auto Nowinner=CallFunc::create([=](){
@@ -7009,8 +7014,8 @@ void NetRaceLayer::distribute_card()
 			//HuangZhuang->runAction(FadeIn::create(0.5));
 		});
 		auto GoldAccount=CallFunc::create([=](){
-			if(FirstMingNo!=-1)
-				GoldNumInsert(4,3,FirstMingNo);
+			if(_roundManager->_firstMingNo!=-1)
+				GoldNumInsert(4,3,_roundManager->_firstMingNo);
 		});
 		scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
 		this->runAction(Sequence::create(DelayTime::create(0.5),GoldAccount,DelayTime::create(1),Spawn::create(Nowinner,callfunc,NULL),NULL));
@@ -7172,7 +7177,6 @@ void NetRaceLayer::start_callback()
 
 	distributeCardPos=Vec2::ZERO;
 	ifGameStart=false;
-	ifGangAsk=false;
 	ifUpdateDuringEffect=false;
 	//ifTriangleHintEnable=false;
 	ifMingMybeError=false;
@@ -7194,13 +7198,9 @@ void NetRaceLayer::start_callback()
 	continue_gang_times=0;
 
     int lastWinner = _roundManager->GetLastWinner();
-	cur_player=lastWinner;
+	_roundManager->_curPlayer=lastWinner;
 	RototHandOutIndex=ck_NOT_DEFINED;
-	ifQiangGangAsk=false;
-	ifDoubleAsk=false;
-	OtherOneForDouble=-1;
 	QiangGangTarget=-1;
-	FirstMingNo=-1;
 
     LOGGER_WRITE("NETWORK : !!! %s a little messed up",__FUNCTION__);
 	ready_indicate(1);                     //准备状态
@@ -7821,7 +7821,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 	auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
 	signPlus->setAnchorPoint(Vec2(0,0.5));
 
-	if( _roundManager->IsWinner(no, cur_player, FirstMingNo) )
+	if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
 		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
 	else
 		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
@@ -7830,7 +7830,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 
 	auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
 	signMinus->setAnchorPoint(Vec2(0,0.5));
-	if( _roundManager->IsWinner(no, cur_player, FirstMingNo) )
+	if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
 		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
 	else
 		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
@@ -7841,7 +7841,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
     WinInfo_t win;
     _roundManager->GetWin(win);
 
-	if( !(win.kind==NONE_WIN && FirstMingNo==-1) )
+	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==-1) )
 	{
 		char char_AccoutnGold[80];
 		std::string str_AccountGold;
@@ -7853,7 +7853,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 			signPlus->setVisible(true);
 			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
 			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-			if( _roundManager->IsWinner(no, cur_player, FirstMingNo)  )
+			if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,BarOfPlayer->getContentSize().height/2));
 			else
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
@@ -7870,7 +7870,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 			signMinus->setVisible(true);
 			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
 			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-			if( _roundManager->IsWinner(no, cur_player, FirstMingNo)  )
+			if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,BarOfPlayer->getContentSize().height/2));
 			else
 				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
@@ -7936,13 +7936,13 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 		}
 		else if(list->data[i].status==c_FREE)
 		{
-			if( win.kind==SINGLE_WIN && win.player==no && win.player==cur_player && i==(list->len-2) )
+			if( win.kind==SINGLE_WIN && win.player==no && win.player==_roundManager->_curPlayer && i==(list->len-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
-	if((win.kind==SINGLE_WIN && win.player==no) || (win.kind==DOUBLE_WIN &&cur_player!=no))
+	if((win.kind==SINGLE_WIN && win.player==no) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=no))
 	{
 		if(g_server!=0)
 		{
@@ -7964,8 +7964,8 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 	int tagNum=BarOfPlayer->getTag();
 	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
 	if(tingStatus==1&&
-        ((win.kind==SINGLE_WIN && ((win.player==cur_player&&tagNum!=win.player)||(win.player!=cur_player&&tagNum==cur_player)))||
-        (win.kind==DOUBLE_WIN && tagNum==cur_player)))
+        ((win.kind==SINGLE_WIN && ((win.player==_roundManager->_curPlayer&&tagNum!=win.player)||(win.player!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
+        (win.kind==DOUBLE_WIN && tagNum==_roundManager->_curPlayer)))
 	{
 		auto mingFlag=Sprite::createWithSpriteFrameName("result_mpbh.png");
 		mingFlag->setAnchorPoint(Vec2(0,0.5));
@@ -7987,8 +7987,8 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
     WinInfo_t win;
     _roundManager->GetWin(win);
     
-	if((win.kind==SINGLE_WIN&&(win.player==cur_player&&curScore==2)||(win.player!=cur_player&&tagNum==win.player&&curScore==1))
-        ||(win.kind==DOUBLE_WIN&&tagNum!=cur_player&&curScore==1))
+	if((win.kind==SINGLE_WIN&&(win.player==_roundManager->_curPlayer&&curScore==2)||(win.player!=_roundManager->_curPlayer&&tagNum==win.player&&curScore==1))
+        ||(win.kind==DOUBLE_WIN&&tagNum!=_roundManager->_curPlayer&&curScore==1))
 	{
 		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -8015,7 +8015,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	}
 	if(num&RH_MING)
 	{
-		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.player)||(win.kind==DOUBLE_WIN&&(tagNum!=cur_player))))
+		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.player)||(win.kind==DOUBLE_WIN&&(tagNum!=_roundManager->_curPlayer))))
 		{
 			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -8549,21 +8549,21 @@ void NetRaceLayer::raceAccount(float delta)
             AccountShows(WinBar,win.player);
             AccountShows(WinBarPlus,(win.player+1)%3);
             AccountShows(WinBarMinus,(win.player+2)%3);
-            if(win.player==cur_player)
+            if(win.player==_roundManager->_curPlayer)
                 WinBar->getChildByTag(ACCOUNT_ZIMO_FONT)->setVisible(true);
             else
             {
                 WinBar->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
-                raceAccoutLayer->getChildByTag(cur_player)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
+                raceAccoutLayer->getChildByTag(_roundManager->_curPlayer)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
             }
             AccountHuKind(WinBar,num);
             break;
         case DOUBLE_WIN:
-            _roundManager->_players[(cur_player+1)%3]->get_parter()->get_Hu_Flag(&num);
-            _roundManager->_players[(cur_player+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
-            AccountShows(WinBar,cur_player);
-            AccountShows(WinBarPlus,(cur_player+1)%3);
-            AccountShows(WinBarMinus,(cur_player+2)%3);
+            _roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_Hu_Flag(&num);
+            _roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
+            AccountShows(WinBar,_roundManager->_curPlayer);
+            AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
+            AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
             
             WinBar->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
             WinBarPlus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
@@ -8572,11 +8572,11 @@ void NetRaceLayer::raceAccount(float delta)
             AccountHuKind(WinBarMinus,numDoubule);
             break;
         case NONE_WIN:
-            if(FirstMingNo!=-1)
+            if(_roundManager->_firstMingNo!=-1)
             {
-                AccountShows(WinBar,FirstMingNo);
-                AccountShows(WinBarPlus,(FirstMingNo+1)%3);
-                AccountShows(WinBarMinus,(FirstMingNo+2)%3);
+                AccountShows(WinBar,_roundManager->_firstMingNo);
+                AccountShows(WinBarPlus,(_roundManager->_firstMingNo+1)%3);
+                AccountShows(WinBarMinus,(_roundManager->_firstMingNo+2)%3);
             
                 WinBar->getChildByTag(ACCOUNT_BAOZHUANG_FONT)->setVisible(true);
             
@@ -8620,9 +8620,9 @@ void NetRaceLayer::raceAccount(float delta)
             }
             else
             {
-                AccountShows(WinBar,cur_player);
-                AccountShows(WinBarPlus,(cur_player+1)%3);
-                AccountShows(WinBarMinus,(cur_player+2)%3);
+                AccountShows(WinBar,_roundManager->_curPlayer);
+                AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
+                AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
             }
             break;
     }
@@ -8960,7 +8960,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 			v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
 		CallFunc*HuVoice;
         std::string sex;
-        _roundManager->_players[cur_player]->get_sex(sex);
+        _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
 		if( sex=="Boy" )
 			HuVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[3].c_str());});
 		else
@@ -8969,7 +8969,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 		{
 			Spawn *simple_seq=simple_tip_effect(v,"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(no,3,cur_player);	
+				GoldNumInsert(no,3,_roundManager->_curPlayer);	
 			});
 			auto hu_seq=Sequence::create(Spawn::create(HuVoice,simple_seq,NULL),GoldAccount,callfunc,NULL);
 			myframe->runAction(hu_seq);
@@ -9112,7 +9112,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 			
 			Spawn *simple_seq=simple_tip_effect(v,"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(no,3,cur_player);	
+				GoldNumInsert(no,3,_roundManager->_curPlayer);	
 			});
 			Spawn* hu_seq;
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1)
@@ -9124,7 +9124,8 @@ void NetRaceLayer::hu_effect_tip(int no)
 	}
 	else if(no==3)//两个对家双响
 	{
-        _roundManager->SetWin(DOUBLE_WIN,cur_player);
+        _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
+        
 		auto _doublehucallListener = EventListenerCustom::create(DOUBLE_HU_WITH_ME, [this](EventCustom * event){
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 			auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
@@ -9151,14 +9152,14 @@ void NetRaceLayer::hu_effect_tip(int no)
 				xian->runAction(Sequence::create(DelayTime::create(1.2),ScaleTo::create(0,0),NULL));
 			});
 			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(3,3,cur_player);	
+				GoldNumInsert(3,3,_roundManager->_curPlayer);	
 			});
-			int no=(cur_player+1)%3;
-			int no1=(cur_player+2)%3;
+			int no=(_roundManager->_curPlayer+1)%3;
+			int no1=(_roundManager->_curPlayer+2)%3;
 			Vec2 v[2];
 			for(int a=0;a<2;a++)
 			{
-				switch ((cur_player+1+a)%3)
+				switch ((_roundManager->_curPlayer+1+a)%3)
 				{
 				case 0:
 					v[a]=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
@@ -9196,11 +9197,11 @@ void NetRaceLayer::hu_tip_effect(Node *psender)
 
 //int NetRaceLayer::get_cur_player_no()
 //{
-//	return cur_player;
+//	return _roundManager->_curPlayer;
 //}
 //void NetRaceLayer::set_cur_player_no(int no)
 //{
-//	cur_player=no;
+//	_roundManager->_curPlayer=no;
 //}
 
 void NetRaceLayer::set_aims_sequence(const int p_aim[])
@@ -9250,7 +9251,6 @@ void NetRaceLayer::race_start_again()
 
 	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
         LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
-
         _roundManager->Shuffle();
 		_roundManager->_unDistributedNum = 40;
 	});

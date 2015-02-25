@@ -27,14 +27,10 @@ private:
     CARD_KIND RototHandOutIndex;
 	float s_scale;
 	int s_no;
-	volatile CARD_KIND g_show_card;
 	float residue_no_x,residue_no_y;
-	volatile int cur_player; //0 left,1 me,2 right, 3 server
-	int OtherOneForDouble;
 	int premiumLeast;//底
 	/************************自己手牌全局变量**************************/
 	/************************自己手牌全局变量**************************/
-	bool ifMyActionHint;
 	unsigned char temp_actionToDo;
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;
@@ -50,16 +46,12 @@ private:
 	bool ifMingTime;
 	bool ifMingMybeError;
 	//bool ifMyTime;
-	bool ifGangAsk;
 	bool ifGameStart;
-	bool ifQiangGangAsk;//双响是自己是否选择胡
 	bool ifResourcePrepared;
 	bool is_last_one;
 	int QiangGangTarget;
-	bool ifDoubleAsk;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
-	int FirstMingNo;
 	bool ifChosed;
 	//ifChosed=true;
 	int cardInList;

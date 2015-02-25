@@ -111,7 +111,6 @@ bool RoundManager::IsTing(int id) {
     return _players[id]->get_parter()->get_ting_status();
 }
 
-
 int RoundManager::Shuffle() {
 	for(int j=0;j<2;j++) {//伪随机数列生成
 		for(int i=0;i<TOTAL_CARD_NUM;i++) {
@@ -128,6 +127,15 @@ int RoundManager::Shuffle() {
         p[i] = (_unDistributedCards[i])/4;
     }
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
+
+    _isGangAsking = false;
+    _isQiangGangAsking = false;
+    _isDoubleHuAsking = false;
+    _firstMingNo = INVALID;
+    _otherOneForDouble = INVALID;
+    _isWaitDecision = false;
+
+    _curPlayer = GetLastWinner();
 
     return 0;
 }

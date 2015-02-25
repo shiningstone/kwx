@@ -37,7 +37,15 @@ public:
     void InitPlayers();
     bool IsTing(int player);
 
-    
+    bool _isGangAsking;
+    bool _isQiangGangAsking;
+    bool _isDoubleHuAsking;
+    int  _firstMingNo;
+    int  _curPlayer;
+    int  _otherOneForDouble;//this could be calculated via GetWin.
+    CARD_KIND  _lastHandedOutCard;
+    bool _isWaitDecision;
+        
     int  Shuffle();
     int  NotifyStart();
     bool GetReadyStatus(int tableId);
