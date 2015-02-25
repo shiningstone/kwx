@@ -9,6 +9,7 @@
 using namespace CocosDenshion;
 
 #include "RoundManager.h"
+#include "DataBase.h"
 #include "./../utils/LogManager.h"
 
 class NetRaceLayer : public cocos2d::Layer
@@ -20,6 +21,8 @@ protected:
     RoundManager  *_roundManager;
 private:
     Logger *_logger;
+    void _LoadPlayerInfo();
+    void _GenerateIds(int ids[3]);
     
     CARD_KIND RototHandOutIndex;
 	float s_scale;
@@ -191,7 +194,6 @@ public:
 	void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);//½ð±Ò¼ÆËã
 	void showall();
 	void ready_indicate(int direction);
-	void set_user_default();
 	//int get_cur_player_no();
 	//void set_cur_player_no(int no);
 	void raceAccount(float delta);

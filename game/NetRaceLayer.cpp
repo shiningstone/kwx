@@ -431,6 +431,39 @@ void NetRaceLayer::update_residue_cards(int no)
 	}
 }
 
+void NetRaceLayer::_GenerateIds(int ids[]) {
+    ids[0]=rand()%16;
+    ids[1]=17;
+    
+    do {
+        ids[2]=rand()%16;
+    } while( ids[2]==ids[0] );
+}
+
+void NetRaceLayer::_LoadPlayerInfo() {
+    Database *database = Database::getInstance();
+    
+    int  ids[3] = {0};
+    _GenerateIds(ids);
+    
+	for(int i=0;i<3;i++)
+	{	
+        _roundManager->_players[i]->set_player_id( ids[i] );
+
+        UserProfile_t user = {0};
+        database.getUserProfile(ids[i],user);
+
+		_roundManager->_players[i]->set_nick_name(user.name);
+		_roundManager->_players[i]->set_photo(user.photo);
+		_roundManager->_players[i]->set_property(user.property);
+		_roundManager->_players[i]->set_sex(user.sex);
+		_roundManager->_players[i]->set_language(user.language);
+
+        _roundManager->_players[i]->get_sex(playerSex[i]);
+        _roundManager->_players[i]->get_language(playerLanguage[i]);
+	}
+}
+
 void NetRaceLayer::create_race()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -557,82 +590,10 @@ void NetRaceLayer::create_race()
 	residue_card1->setScale(0.9);
 	residue_card1->setPosition(Vec2(residue_card_bkg->getTextureRect().size.width/10+19.4,residue_card_bkg->getTextureRect().size.height/2-3.5));
 	residue_card_bkg->addChild(residue_card1,0,RESERVED_BKG_CHILD_TAG_ID+2);
+
 	update_residue_cards(_roundManager->unDistributedNum);
+    _LoadPlayerInfo();
 
-	//auto sysinfo_bkg=Sprite::createWithSpriteFrameName("gonggaotiao.png");//公告条，单机场去掉
-	//sysinfo_bkg->setAnchorPoint(Vec2(0.5f,1.0f));
-	//sysinfo_bkg->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height-menu_bkg->getTextureRect().size.height-5+origin.y));
-	//this->addChild(sysinfo_bkg,2,SYSTEM_INFO_BKG_TAG_ID);
-
-	//auto horn=Sprite::createWithSpriteFrameName("laba.png");//喇叭，单机场去掉
-	//horn->setAnchorPoint(Vec2(0.0f,0.8f));
-	//horn->setPosition(Vec2(0,sysinfo_bkg->getTextureRect().size.height));
-	//sysinfo_bkg->addChild(horn,2,HORN_TAG_ID);
-
-	auto userDefault=UserDefault::getInstance();//UserDefault判断
-	if(userDefault->getBoolForKey("userDefault")==false)
-	{
-		set_user_default();//重新写入UserDefault
-	}
-
-	int RobotNum=0;
-	char bufferCash[80];
-	std::string nameOfPlayer;
-	std::string photoOfPlayer;
-	std::string propertyOfPlayer;
-	std::string SexOfPlayer;
-	for(int i=0;i<3;i++)
-	{	
-		if(i!=1)
-		{
-			int noOfRobot=rand()%16;;
-			switch (i)
-			{
-			case 0:			
-				RobotNum=noOfRobot;
-				break;
-			case 2:
-				while(noOfRobot==RobotNum)
-					noOfRobot=rand()%16;
-				break;
-			default:
-				break;
-			}
-            
-            _roundManager->_players[i]->set_player_id(noOfRobot);
-
-			sprintf(bufferCash,"Robot%d",noOfRobot);
-			nameOfPlayer=bufferCash;
-			sprintf(bufferCash,"PhotoOfRobot%d",noOfRobot);
-			photoOfPlayer=bufferCash;
-			sprintf(bufferCash,"PropertyOfRobot%d",noOfRobot);
-			propertyOfPlayer=bufferCash;
-			sprintf(bufferCash,"SexOfRobot%d",noOfRobot);
-			SexOfPlayer=bufferCash;
-		}
-		else
-		{
-            _roundManager->_players[i]->set_player_id(17);
-
-			nameOfPlayer="MyNickName";
-			photoOfPlayer="MyPhoto";
-			propertyOfPlayer="MyProperty";
-			SexOfPlayer="MySex";
-		}
-
-		_roundManager->_players[i]->set_nick_name(userDefault->getStringForKey(nameOfPlayer.c_str()));
-		_roundManager->_players[i]->set_photo(userDefault->getStringForKey(photoOfPlayer.c_str()));
-		_roundManager->_players[i]->set_property(userDefault->getIntegerForKey(propertyOfPlayer.c_str()));
-		_roundManager->_players[i]->set_sex(userDefault->getStringForKey(SexOfPlayer.c_str()));
-	}
-	sprintf(bufferCash,"Language%d",0);
-	std::string languageKind=bufferCash;
-	for(int i=0;i<3;i++)
-	{
-		_roundManager->_players[i]->set_language(userDefault->getStringForKey(languageKind.c_str()));
-		_roundManager->_players[i]->get_sex(playerSex[i]);
-		_roundManager->_players[i]->get_language(playerLanguage[i]);
-	}
 	space=5+residue_card_bkg->getTextureRect().size.width/5;
 	left_player_bkg=Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
 	left_player_bkg->setAnchorPoint(Point(0.0f,1.0f));
@@ -689,6 +650,8 @@ void NetRaceLayer::create_race()
 	StartButton->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 	StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
 	this->addChild(StartButton,2,START_GAME_TAG_ID);
+
+    
 	std::string buffer;
 	int score;
 	for(int i=0;i<3;i++)//更新玩家信息
@@ -700,6 +663,7 @@ void NetRaceLayer::create_race()
 		_roundManager->_players[i]->get_property(score);
 		update_score(i,score);
 	}
+    
 	auto mapai_left=Sprite::createWithSpriteFrameName("shuban.png");//码牌
 	mapai_left->setAnchorPoint(Vec2(0.5,0.5));
 	mapai_left->setScale(0.8);
@@ -763,51 +727,6 @@ void NetRaceLayer::create_race()
 		g_mid_card_kind[i]->retain();
 		g_card_kind[i]->retain();
 	}
-}
-
-void NetRaceLayer::set_user_default()
-{
-	auto userDefault=UserDefault::getInstance();
-	userDefault->setBoolForKey("userDefault",true);
-	userDefault->setIntegerForKey("load_days",0);
-	userDefault->setIntegerForKey("cur_sta",1);
-	userDefault->setIntegerForKey("load_time",7352);
-
-	userDefault->setStringForKey("MyNickName","雀友");
-	userDefault->setIntegerForKey("MyProperty",50000);
-	userDefault->setStringForKey("MyLevel","菜鸟");
-	userDefault->setStringForKey("MyPhoto","Head17.png");
-	userDefault->setStringForKey("MySex","Boy");
-	std::string RobotName[16]={"十堰冰冰","随州青霞","武汉丽缇","襄阳韦彤","孝感歆艺","郧西子怡","郧县若瑄",
-		"竹山紫琪","房县老李","十堰小李","随州小张","武汉关哥","襄阳小刘","孝感小王","郧西老杨","郧县小陈"};
-	char buffer[80];
-	for(int i=0;i<16;i++)
-	{
-		
-		sprintf(buffer,"Robot%d",i);
-		std::string robotName=buffer;
-		sprintf(buffer,"PropertyOfRobot%d",i);
-		std::string robotProperty=buffer;
-		sprintf(buffer,"LevelOfRobot%d",i);
-		std::string robotLevel=buffer;
-		sprintf(buffer,"PhotoOfRobot%d",i);
-		std::string robotPhoto=buffer;
-		sprintf(buffer,"SexOfRobot%d",i);
-		std::string robotSex=buffer;
-		sprintf(buffer,"Head%d.png",i+1);
-		std::string robotPath=buffer;
-		userDefault->setStringForKey(robotName.c_str(),RobotName[i]);
-		userDefault->setIntegerForKey(robotProperty.c_str(),50000);
-		userDefault->setStringForKey(robotLevel.c_str(),"菜鸟");
-		userDefault->setStringForKey(robotPhoto.c_str(),robotPath);
-		if(i<9)
-			userDefault->setStringForKey(robotSex.c_str(),"Girl");
-		else
-			userDefault->setStringForKey(robotSex.c_str(),"Boy");
-	}
-	sprintf(buffer,"Language%d",0);
-	std::string  languageKind=buffer;
-	userDefault->setStringForKey(languageKind.c_str(),"PuTongBan");
 }
 
 void NetRaceLayer::get_user_default()

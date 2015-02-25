@@ -8,6 +8,8 @@
 #include "Raction.h"
 #include "RaceType.h"
 
+#include "DataBase.h"
+
 class Logger;
 class NetPlayer:public Role
 {
@@ -15,7 +17,8 @@ class NetPlayer:public Role
 		NetPlayer();
 		virtual ~NetPlayer();
     private:
-        Logger *_logger;
+        Logger   *_logger;
+        Profile_t _profile;
 
 		int property;
 		int idOfPlayer;
@@ -39,8 +42,10 @@ class NetPlayer:public Role
 		unsigned char init(int card_array[],int len,int aim);
 		void init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2);
 		int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
+
 		void set_player_id(int player_id);
 		bool get_player_id(int & player_id);
+
 		void set_nick_name(const std::string name);
 		bool get_nick_name(std::string & name);
 		void set_photo(const std::string pho);

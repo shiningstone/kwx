@@ -7,6 +7,11 @@ USING_NS_CC;
 
 NetPlayer::NetPlayer() {
     _logger = LOGGER_REGISTER("NetPlayer");
+    memset(_profile,0,sizeof(_profile));
+}
+
+NetPlayer::NetPlayer(int id) {//this is for default settings ( robot ) 
+    _logger = LOGGER_REGISTER("NetPlayer_%d");
 }
 
 NetPlayer::~NetPlayer() {
@@ -727,19 +732,23 @@ void NetPlayer::init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2)
 	else
 		*target=PI_HU_TARGET;
 }
+
 void NetPlayer::set_player_id(int player_id)
 {
 	idOfPlayer=player_id;
 }
+
 bool NetPlayer::get_player_id(int & player_id)
 {
 	player_id=idOfPlayer;
 	return true;
 }
+
 void NetPlayer::set_photo(const std::string pho)
 {
 	photo=pho;
 }
+
 bool NetPlayer::get_photo(std::string & pho)
 {
 	pho=photo;
