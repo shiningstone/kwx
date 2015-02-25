@@ -60,7 +60,6 @@ private:
 	bool ifChosed;
 	//ifChosed=true;
 	int cardInList;
-	int total_reserved_card_num;
 	unsigned char last_action;
 	unsigned char last_action_WithGold;//´ø·Ö
 	int last_actionSource;
@@ -193,13 +192,9 @@ public:
 	void showall();
 	void ready_indicate(int direction);
 	void set_user_default();
-	bool get_ready_status(int direction);
 	//int get_cur_player_no();
 	//void set_cur_player_no(int no);
 	void raceAccount(float delta);
-	void set_reserved_num(int no);
-	int get_reserved_num();
-	void set_cards_sequence(const int list[]);
 	void set_aims_sequence(const int p_aim[]);
 
 	void ming_kou_Choose(int no);

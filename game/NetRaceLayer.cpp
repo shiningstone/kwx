@@ -430,33 +430,16 @@ void NetRaceLayer::update_residue_cards(int no)
 		}
 	}
 }
+
 void NetRaceLayer::create_race()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	visibleSize = Director::getInstance()->getVisibleSize();
-	origin = Director::getInstance()->getVisibleOrigin();
-
-	Sprite *sprite;
-	if(s_no==1)
-		sprite=Sprite::create("racetable.png");
-	else
-		sprite=Sprite::create("racetable2.png");
-
 	for(int k=0;k<3;k++)
         _roundManager->_ready[k] = false;
-    
-	sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-	sprite->setScaleX(s_scale);
-	sprite->setScaleY(s_scale);
-	this->addChild(sprite, 0);
 
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tools.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("xzdd_prepare_pop_res.plist");
-	premiumLeast=200;
-	distributeCardPos=Vec2::ZERO;
+    _roundManager->unDistributedNum = 84;
+    
 	ifGangAsk=false;
 	ifGameStart=false;
 	ifUpdateDuringEffect=false;
@@ -469,12 +452,35 @@ void NetRaceLayer::create_race()
 	ifMingTime=false;
 	ifEffectTime=false;
 	ifMyShowCardTime=false;
+    
+	premiumLeast=200;
+	distributeCardPos=Vec2::ZERO;
 	//ifEndGameChoose=false;
 	//tempEffectNode=Node::create();
 
+	visibleSize = Director::getInstance()->getVisibleSize();
+	origin = Director::getInstance()->getVisibleOrigin();
+
+	Sprite *sprite;
+	if(s_no==1)
+		sprite=Sprite::create("racetable.png");
+	else
+		sprite=Sprite::create("racetable2.png");
+
+	sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+	sprite->setScaleX(s_scale);
+	sprite->setScaleY(s_scale);
+	this->addChild(sprite, 0);
+
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tools.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("xzdd_prepare_pop_res.plist");
+    
 	auto center_bkg=Sprite::createWithSpriteFrameName("kawuxing.png");
 	center_bkg->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 	this->addChild(center_bkg,1,CENTER_BKG_TAG_ID);
+
 	auto menu_bkg=Sprite::createWithSpriteFrameName("gongnenganniu.png");
 	menu_bkg->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height-menu_bkg->getTextureRect().size.height/2+origin.y));
 	this->addChild(menu_bkg,4,MENU_BKG_TAG_ID);
@@ -526,7 +532,6 @@ void NetRaceLayer::create_race()
 	residue_card_bkg->setPosition(Vec2(5 + origin.x, visibleSize.height-5+origin.y));
 	this->addChild(residue_card_bkg,1,RESERVED_BKG_TAG_ID);		
 
-	total_reserved_card_num=84;
 	auto residue_card_warning=LayerColor::create(Color4B(250,47,47,250),residue_card_bkg->getContentSize().width,residue_card_bkg->getContentSize().height);
 	residue_card_warning->setScale(0);
 	residue_card_warning->setOpacity(50);
@@ -552,7 +557,7 @@ void NetRaceLayer::create_race()
 	residue_card1->setScale(0.9);
 	residue_card1->setPosition(Vec2(residue_card_bkg->getTextureRect().size.width/10+19.4,residue_card_bkg->getTextureRect().size.height/2-3.5));
 	residue_card_bkg->addChild(residue_card1,0,RESERVED_BKG_CHILD_TAG_ID+2);
-	update_residue_cards(total_reserved_card_num);
+	update_residue_cards(_roundManager->unDistributedNum);
 
 	//auto sysinfo_bkg=Sprite::createWithSpriteFrameName("gonggaotiao.png");//公告条，单机场去掉
 	//sysinfo_bkg->setAnchorPoint(Vec2(0.5f,1.0f));
@@ -2100,7 +2105,7 @@ void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND targ
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	memset(res,0,sizeof(HAH));
-	res->reserved_card_num=total_reserved_card_num;
+	res->reserved_card_num=_roundManager->unDistributedNum;
 	CARD s_card;
 	int jj=1;
 
@@ -2850,7 +2855,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 
         if(_roundManager->_players[cur_player]->get_parter()->get_ting_status()==0)
 		{
-			index = _roundManager->_players[cur_player]->chose_card(s_res,total_reserved_card_num,list1,list2,len1,len2);
+			index = _roundManager->_players[cur_player]->chose_card(s_res,_roundManager->unDistributedNum,list1,list2,len1,len2);
 			if(index==-1||index>_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1)
 			{
 				index=_roundManager->_players[cur_player]->get_parter()->get_card_list()->len-1;
@@ -7022,7 +7027,7 @@ void NetRaceLayer::distribute_card_effect()
 		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len-2))->getPosition().y-20;//+5;
 	}
 	list_last_one->setPosition(Vec2(x,y));
-	update_residue_cards(total_reserved_card_num);
+	update_residue_cards(_roundManager->unDistributedNum);
 
 	if(cur_player==0)
 		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+cur_player*20+(list->len));
@@ -7061,8 +7066,8 @@ void NetRaceLayer::distribute_card()
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DCI*>(event->getUserData());
 		g_show_card=userData->card;
-		total_reserved_card_num=TOTAL_CARD_NUM-userData->num;
-		if(total_reserved_card_num==0)
+		_roundManager->unDistributedNum=TOTAL_CARD_NUM-userData->num;
+		if(_roundManager->unDistributedNum==0)
 			is_last_one=true;
 		else
 			is_last_one=false;
@@ -7306,10 +7311,10 @@ void NetRaceLayer::start_callback()
 
     //_roundManager->Shuffle();
     
-    action_todo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unusedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
+    action_todo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
 	if(action_todo!=a_TIMEOUT) {
-		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unusedCards[14]),13,aim[(lastWinner+1)%3]);
-		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unusedCards[27]),13,aim[(lastWinner+2)%3]);
+		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
 		//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/sort.ogg");
 		effect_Distribute_Card(lastWinner);//牌局开始发牌效果。
 	}
@@ -7763,18 +7768,18 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 
 	distribute_card();
 
-	total_reserved_card_num=84;	
+	_roundManager->unDistributedNum=84;	
 	auto updateFourCards=CallFunc::create([=](){
-		total_reserved_card_num-=4;
-		update_residue_cards(total_reserved_card_num);		
+		_roundManager->unDistributedNum-=4;
+		update_residue_cards(_roundManager->unDistributedNum);		
 	});
 	auto updateOneCards=CallFunc::create([=](){
-		total_reserved_card_num-=1;
-		update_residue_cards(total_reserved_card_num);		
+		_roundManager->unDistributedNum-=1;
+		update_residue_cards(_roundManager->unDistributedNum);		
 	});
 	auto updateTwoCards=CallFunc::create([=](){
-		total_reserved_card_num-=2;
-		update_residue_cards(total_reserved_card_num);		
+		_roundManager->unDistributedNum-=2;
+		update_residue_cards(_roundManager->unDistributedNum);		
 	});
 	auto updateClock=CallFunc::create([=](){
 		update_clock(true,0,zhuang);		
@@ -9297,15 +9302,6 @@ void NetRaceLayer::hu_tip_effect(Node *psender)
 //	cur_player=no;
 //}
 
-void NetRaceLayer::set_reserved_num(int no)
-{
-	total_reserved_card_num=no;
-}
-int NetRaceLayer::get_reserved_num()
-{
-	return total_reserved_card_num;
-}
-
 void NetRaceLayer::set_aims_sequence(const int p_aim[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -9347,10 +9343,10 @@ void NetRaceLayer::update_UserDefault(int no)
 
 void NetRaceLayer::distribute_card_event()
 {
-	if(_roundManager->_unusedNum<TOTAL_CARD_NUM) {
+	if(_roundManager->_unDistributedNum<TOTAL_CARD_NUM) {
         DCI scard;
-		scard.card=CARD_KIND(_roundManager->_unusedCards[_roundManager->_unusedNum++]/4);
-		scard.num=_roundManager->_unusedNum;
+		scard.card=CARD_KIND(_roundManager->_unDistributedCards[_roundManager->_unDistributedNum++]/4);
+		scard.num=_roundManager->_unDistributedNum;
 		_eventDispatcher->dispatchCustomEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
         LOGGER_WRITE("%s : %s",__FUNCTION__,DISTRIBUTE_DONE_EVENT_TYPE);
 	}
@@ -9368,7 +9364,7 @@ void NetRaceLayer::race_start_again()
         LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
 
         _roundManager->Shuffle();
-		_roundManager->_unusedNum = 40;
+		_roundManager->_unDistributedNum = 40;
 	});
 
 	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);

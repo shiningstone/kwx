@@ -14,9 +14,9 @@ RoundManager::RoundManager() {
 
     _river = NULL;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
-		_unusedCards[i]=i;
+		_unDistributedCards[i]=i;
 	}
-    _unusedNum = TOTAL_CARD_NUM;
+    _unDistributedNum = TOTAL_CARD_NUM;
 
     for(int i=0;i<PLAYER_NUMBER;i++) {
         _players[i] = NULL;
@@ -115,17 +115,17 @@ bool RoundManager::IsTing(int id) {
 int RoundManager::Shuffle() {
 	for(int j=0;j<2;j++) {//伪随机数列生成
 		for(int i=0;i<TOTAL_CARD_NUM;i++) {
-			int tmp = _unusedCards[i];
+			int tmp = _unDistributedCards[i];
 			int cur = rand()%TOTAL_CARD_NUM;
-			_unusedCards[i] = _unusedCards[cur];
-			_unusedCards[cur] = tmp;
+			_unDistributedCards[i] = _unDistributedCards[cur];
+			_unDistributedCards[cur] = tmp;
 		}
 	}
 
     LOGGER_WRITE("NETWORK: Shuffle should be executed at the server, and it is more reasonable to hide the card sequence to clients");
     char p[TOTAL_CARD_NUM] = {0};
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        p[i] = (_unusedCards[i])/4;
+        p[i] = (_unDistributedCards[i])/4;
     }
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
 

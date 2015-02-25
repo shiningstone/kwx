@@ -38,11 +38,11 @@ public:
     bool IsTing(int player);
 
     
-    int Shuffle();
-    int NotifyStart();
+    int  Shuffle();
+    int  NotifyStart();
     bool GetReadyStatus(int tableId);
     bool WaitUntilAllReady();
-    int AllowMovement();
+    int  AllowMovement();
     bool WaitForDistribute();
     bool WaitForAction();
     
@@ -54,8 +54,8 @@ private:
     bool        _ready[PLAYER_NUMBER];
 
     outCardList *_river;
-    int         _unusedCards[TOTAL_CARD_NUM];
-    int         _unusedNum;
+    int         _unDistributedCards[TOTAL_CARD_NUM];
+    int         _unDistributedNum;
 };
 
 #endif
