@@ -31,34 +31,32 @@ private:
 	int premiumLeast;//底
 	/************************自己手牌全局变量**************************/
 	/************************自己手牌全局变量**************************/
+	bool ifGameStart;
+	bool ifResourcePrepared;
+
+	bool ifTuoGuan;
+	int MyCardChoosedNum;
+	int cardInList;  //only used in waitfor_MyTouchShowCard
+	bool ifChosed;   //only used in waitfor_MyTouchShowCard
+
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;
-	int MyCardChoosedNum;
+
 	bool ifInsertCardsTime;
-	Vec2 distributeCardPos;
 	bool ifInsertStopped;
 	bool ifEndGameChoose;//是否退出游戏
 	bool ifMyShowCardTime;//出牌阶段
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
-	bool ifTuoGuan;
 	bool ifMingTime;
 	bool ifMingMybeError;
 	//bool ifMyTime;
-	bool ifGameStart;
-	bool ifResourcePrepared;
-	int QiangGangTarget;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
-	bool ifChosed;
-	//ifChosed=true;
-	int cardInList;
-	unsigned char last_action;
-	unsigned char last_action_WithGold;//带分
-	int last_actionSource;
-	bool isGangHua;
 	unsigned int continue_gang_times;
-	int g_server;
+
+	Vec2 distributeCardPos;
+    
 	cocos2d::Point base_point[3];
 	cocos2d::Point river_point[3];
 	cocos2d::Point lastwinner_point[3];

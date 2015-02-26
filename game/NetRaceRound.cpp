@@ -1208,6 +1208,7 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 	{
 		temp_data.status=c_FREE;
 		temp_data.can_play=cps_NO;
+        
 		if(who_give!=0)
 			card_insert(temp_data,1);
 		else

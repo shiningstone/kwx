@@ -41,13 +41,24 @@ public:
     bool _isQiangGangAsking;
     bool _isDoubleHuAsking;
     int  _firstMingNo;
+    int  _qiangGangTargetNo;
     int  _curPlayer;
+    bool _isGangHua;
     int  _otherOneForDouble;//this could be calculated via GetWin.
-    CARD_KIND  _lastHandedOutCard;
     bool _isWaitDecision;
+    bool _isCardFromOthers;
+
+    int  _curEffectCardKind;
+    int  _curEffectCardStatus;
+    
     int  _tempActionToDo;
     int  _actionToDo;
         
+    CARD_KIND  _lastHandedOutCard;
+    int  _lastAction;
+    int  _lastActionWithGold;
+    int  _lastActionSource;
+
     int  Shuffle();
     int  NotifyStart();
     bool GetReadyStatus(int tableId);

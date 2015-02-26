@@ -131,9 +131,19 @@ int RoundManager::Shuffle() {
     _isGangAsking = false;
     _isQiangGangAsking = false;
     _isDoubleHuAsking = false;
+    _isCardFromOthers = false;
     _firstMingNo = INVALID;
+    _qiangGangTargetNo = INVALID;
     _otherOneForDouble = INVALID;
     _isWaitDecision = false;
+    _isGangHua = false;
+    
+    _curEffectCardKind = INVALID;
+    _curEffectCardStatus = INVALID;
+
+    _lastAction = INVALID;
+    _lastActionWithGold = INVALID;
+    _lastActionSource = INVALID;
 
     _curPlayer = GetLastWinner();
 
