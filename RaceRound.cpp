@@ -1065,7 +1065,7 @@ CARD_KIND RRound::hand_out(unsigned int place)
 		return l_kind;
 }
 
-void RRound::action1()
+void RRound::LockAllCards()
 {
 	for (int i=0;i<=card_list->len-1;i++)
 	{

@@ -60,7 +60,7 @@ public:
     CARD_KIND hand_out(unsigned int place);
     ACT_RES action(unsigned char who_give,ARRAY_ACTION act);
 	void MingCancel();
-	void action1();
+	void LockAllCards();
     unsigned int get_aim();
 	unsigned int get_ming_indexes();
 	int *get_ming_reserved_cards_num(outCardList *river_list);

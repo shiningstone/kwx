@@ -91,8 +91,10 @@ void RoundManager::RenewOutCard() {
 /***********************************************
         player information
 ***********************************************/
-#include "NetPlayer.h"
 #include "./../Me.h"
+#include "NetPlayer.h"
+#include "NetRaceRound.h"
+
 void RoundManager::InitPlayers() {
 	_players[0] = new NetPlayer();
 	_players[1] = new Me();

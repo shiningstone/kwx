@@ -12,7 +12,7 @@ using namespace CocosDenshion;
 #include "DataBase.h"
 #include "./../utils/LogManager.h"
 
-typedef struct {
+typedef enum {
     PENG,
     GANG,
     TING,
@@ -32,31 +32,40 @@ private:
     void _GenerateIds(int ids[3]);
     CallFunc * _SpeakCard();
     CallFunc *_SpeakAction(ActionType_t id);
+    CallFunc *_SpeakGive();
     void create_residue_cards();
     void refresh_residue_cards();
     std::string _NumToString( int number );
+    void _CalcAnGangGold(int winner,int goldOfPlayer[3]);
+    void _CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]);
     void _CalcSingleWinGold(int goldOfPlayer[3], int winner);
     void _CalcDoubleWinGold(int goldOfPlayer[3], int loser);
     void _CalcNoneWinGold(int goldOfPlayer[3], int loser);
     void _CalcHuGold(int goldOfPlayer[3]);
     void CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give);
 
+
+
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
     Vec2 _AnchorOfSign(int dir);
-    Vec2 _PositionOfSign(int dir,int size,int origin,int xOffset = 0);
-    Vec2 _DestOfSign(int dir,int size,int origin,int xOffset = 0);
+    Vec2 _PositionOfSign(int dir,Size size,Vec2 origin,int xOffset = 0);
+    Vec2 _DestOfSign(int dir,Size size,Vec2 origin,int xOffset = 0);
     Vec2 _AnchorOfNumber(int dir);
-    Vec2 _PositionOfNumber(int dir,int size,int origin);
-    Vec2 _DestOfNumber(int dir,int size,int origin);
+    Vec2 _PositionOfNumber(int dir,Size size,Vec2 origin);
+    Vec2 _DestOfNumber(int dir,Size size,Vec2 origin);
     Vec2 _AnchorOfGold(int dir);
-    Vec2 _PositionOfGold(int dir,int size,int origin,int xOffset = 0);
-    Vec2 _DestOfGold(int dir,int size,int origin,int xOffset = 0);
+    Vec2 _PositionOfGold(int dir,Size size,Vec2 origin,int xOffset = 0);
+    Vec2 _DestOfGold(int dir,Size size,Vec2 origin,int xOffset = 0);
     void GuiJinBiShow(int dir, int gold);
     void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
+    void _GuiUpdateScore(LayerColor *layer,int score);
 
-    void _ClockAddTime( Sprite *clock, int time );
-    void _Remove(Sprite *parent, int childTag);
+    void _ClockAddTime( Node *clock, int time );
+    void _Remove(Node *parent, int childTag);
+    bool _IsClickedOn(Sprite* button,Touch* touch);
+    void _Show(Node *parent, int childTag,bool flag);
+
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();
@@ -219,7 +228,6 @@ public:
 	void card_list_update(int no);
 	void update_card_list(Node *psender);//更新玩家手牌
 	void update_card_in_river_list(Node* sender);
-	void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);//金币计算
 	void showall();
 	void GuiShowReady(int direction);
 	//int get_cur_player_no();

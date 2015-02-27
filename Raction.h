@@ -19,7 +19,7 @@ public:
 	virtual CARD_KIND hand_out(unsigned int place)=0;
 	virtual bool get_Hu_Flag(unsigned int *hu_kind)=0;
 	virtual ACT_RES action(unsigned char who_give,ARRAY_ACTION act)=0;
-	virtual void action1()=0;
+	virtual void LockAllCards()=0;
 	virtual long get_card_score()=0;
 	virtual	void update_score(long score)=0;
 	virtual	CARD_ARRAY *get_card_list()=0;

@@ -2217,7 +2217,7 @@ void RaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		_eventDispatcher->removeEventListenersForTarget(myframe,true);
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
 		//last_action=a_MING;
-		player[cur_player]->get_parter()->action1();
+		player[cur_player]->get_parter()->LockAllCards();
 		player[cur_player]->get_parter()->set_ting_status(1);
 
 		while(myframe->getChildByTag(MING_EFFECT_DAMING))
@@ -2938,7 +2938,7 @@ void RaceLayer::waitfor_ShowCardWithoutTouch()
 			if(Kou_kindLen>0)
 				player[cur_player]->get_parter()->action(g_server,a_KOU);
 			player[cur_player]->get_parter()->action(g_server,a_MING);
-			player[cur_player]->get_parter()->action1();
+			player[cur_player]->get_parter()->LockAllCards();
 			player[cur_player]->get_parter()->set_ting_status(1);
 			auto simple_seq=simple_tip_effect(v,"daming.png");
 			voiceEffect=Sequence::create(simple_seq,firstFunc,secondFunc,Spawn::create(handOutCardKuang,baction,voiceCall,NULL),BizerVoice,NULL);

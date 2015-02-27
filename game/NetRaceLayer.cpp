@@ -267,7 +267,7 @@ void NetRaceLayer::create_race()
 		update_nickname(id,buffer);
 
         int score;
-        _roundManager->_players[dir]->get_property(score);
+        _roundManager->_players[id]->get_property(score);
 		GuiUpdateScore(id,score);
 	}
     
@@ -2298,7 +2298,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 	else if(no==2)
 		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);		
 
-	CallFunc*GangVoice = = _SpeakAction(GANG);
+	CallFunc* GangVoice = _SpeakAction(GANG);
 
     if(no!=1)
 	{
@@ -4623,7 +4623,7 @@ void NetRaceLayer::card_list_update(int no)
 			myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
 			//ifTingSignBarVisible=false;
 			ifTingSignBarVisible=false;
-			TingHintBarListener();
+			ListenToTingButton();
 			card_list_update(0);
 			card_list_update(2);
 		}
@@ -7875,7 +7875,7 @@ Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 
 void NetRaceLayer::hu_effect_tip(int no)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
 
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
 
@@ -8190,9 +8190,14 @@ CallFunc* NetRaceLayer::_SpeakCard() {
     _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     
     if( sex=="Boy" )
-        return SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
+		return CallFunc::create([=](){
+                    SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
+                });
     else
-        return SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
+		return CallFunc::create([=](){
+                    SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
+                });
+        
 }
 
 CallFunc* NetRaceLayer::_SpeakAction(ActionType_t id) {
@@ -8636,7 +8641,7 @@ void NetRaceLayer::update_residue_cards(int no)
         player information
 *****************************************************/
 std::string NetRaceLayer::_NumToString( int number ) {
-    char *buf[80] = {0};
+    char buf[80] = {0};
 	float tempProperty;
 	int tempXiapShu;
 
@@ -8842,7 +8847,7 @@ typedef enum {
     AN_GANG = 1,
     MING_GANG,
     MING,
-    HU,
+    HU_WIN,
 }GoldKind_t;
 
 void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
@@ -8901,13 +8906,13 @@ void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
     
     switch(win.kind) {
         case SINGLE_WIN:
-            _CalcSingleWinGold(win.player,goldOfPlayer);
+            _CalcSingleWinGold(goldOfPlayer,win.player);
             break;
         case DOUBLE_WIN:
-            _CalcDoubleWinGold(win.player,goldOfPlayer);
+            _CalcDoubleWinGold(goldOfPlayer,win.player);
             break;
         case NONE_WIN:
-            _CalcNoneWinGold(win.player,goldOfPlayer);
+            _CalcNoneWinGold(goldOfPlayer,win.player);
             break;
     }
 }
@@ -8921,7 +8926,7 @@ void NetRaceLayer::CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_
 		_CalcAnGangGold(GoldWinner,goldOfPlayer);
 	} else if(Gold_kind==MING_GANG) {
         _CalcMingGangGold(GoldWinner,who_give,goldOfPlayer);
-	} else if(Gold_kind==HU) {
+	} else if(Gold_kind==HU_WIN) {
     	_CalcHuGold(goldOfPlayer);
 	}
 }
@@ -8934,9 +8939,9 @@ void NetRaceLayer::_UpdateGouldAccount(int id,int gold) {
     total += gold;
     _roundManager->_players[id]->set_property(total);
     
-    int id = 0;
-    _roundManager->_players[id]->get_player_id(id);
-    database->SetProperty(id,total);
+    int globalId = 0;
+    _roundManager->_players[id]->get_player_id(globalId);
+    database->SetProperty(globalId,total);
 }
 
 void NetRaceLayer::UpdateGoldAccounts(int goldOfPlayer[3]) {
@@ -8953,7 +8958,7 @@ Vec2 NetRaceLayer::_AnchorOfSign(int dir) {
     }
 }
 
-Vec2 NetRaceLayer::_PositionOfSign(int dir,int size,int origin,int xOffset = 0) {
+Vec2 NetRaceLayer::_PositionOfSign(int dir,Size size,Vec2 origin,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(origin.x + size.width*271/1218,
@@ -8967,7 +8972,7 @@ Vec2 NetRaceLayer::_PositionOfSign(int dir,int size,int origin,int xOffset = 0) 
     }
 }
 
-Vec2 NetRaceLayer::_DestOfSign(int dir,int size,int origin,int xOffset = 0) {
+Vec2 NetRaceLayer::_DestOfSign(int dir,Size size,Vec2 origin,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(origin.x + size.width*271/1218,
@@ -8983,13 +8988,13 @@ Vec2 NetRaceLayer::_DestOfSign(int dir,int size,int origin,int xOffset = 0) {
 
 Vec2 NetRaceLayer::_AnchorOfNumber(int dir) {
     switch(dir) {
-        case 0:   return Vec2(0,0.5)
+        case 0:   return Vec2(0,0.5);
         case 1:   return Vec2(0,0.5);
         case 2:   return Vec2(1,0.5);
     }
 }
 
-Vec2 NetRaceLayer::_PositionOfNumber(int dir,int size,int origin) {
+Vec2 NetRaceLayer::_PositionOfNumber(int dir,Size size,Vec2 origin) {
     switch(dir) {
         case 0:   
             return Vec2(origin.x + size.width*291/1218,
@@ -9003,7 +9008,7 @@ Vec2 NetRaceLayer::_PositionOfNumber(int dir,int size,int origin) {
     }
 }
 
-Vec2 NetRaceLayer::_DestOfNumber(int dir,int size,int origin) {
+Vec2 NetRaceLayer::_DestOfNumber(int dir,Size size,Vec2 origin) {
     switch(dir) {
         case 0:   
             return Vec2(origin.x + size.width*291/1218,
@@ -9025,7 +9030,7 @@ Vec2 NetRaceLayer::_AnchorOfGold(int dir) {
     }
 }
 
-Vec2 NetRaceLayer::_PositionOfGold(int dir,int size,int origin,int xOffset = 0) {
+Vec2 NetRaceLayer::_PositionOfGold(int dir,Size size,Vec2 origin,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(origin.x + size.width*221/1218,
@@ -9040,7 +9045,7 @@ Vec2 NetRaceLayer::_PositionOfGold(int dir,int size,int origin,int xOffset = 0) 
     }
 }
 
-Vec2 NetRaceLayer::_DestOfGold(int dir,int size,int origin,int xOffset = 0) {
+Vec2 NetRaceLayer::_DestOfGold(int dir,Size size,Vec2 origin,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(origin.x + size.width*221/1218,
@@ -9121,9 +9126,9 @@ void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
 
 	for(int id=0;id<3;id++) {
         int score;
-        _roundManager->_players[dir]->get_property(score);
+        _roundManager->_players[id]->get_property(score);
         GuiUpdateScore(id,score);
-        GuiJinBiShow(id,GoldAccountImmediate[i]);        
+        GuiJinBiShow(id,GoldAccountImmediate[id]);        
 	}
 }
 
@@ -9153,14 +9158,16 @@ void NetRaceLayer::GuiShowReady(int dir)
 /****************************************************
     clock
 ****************************************************/
-void NetRaceLayer::_ClockAddTime( Sprite *clock, int time ) {
+void NetRaceLayer::_ClockAddTime( Node *clock, int time ) {
+    Sprite *p = (Sprite *)clock;
+
 	char strTime[16] = {0};
 	sprintf(strTime,"%d",time);
     
 	auto labelTime = LabelTTF::create( std::string(strTime), "Arial", 30 );
 	labelTime->setAnchorPoint(Vec2(0.5,0.5));
 	labelTime->setColor(Color3B(0,0,0));
-	labelTime->setPosition(Vec2(clock->getTextureRect().size.width/2,clock->getTextureRect().size.height*0.55));
+	labelTime->setPosition(Vec2(p->getTextureRect().size.width/2,p->getTextureRect().size.height*0.55));
 
     clock->addChild(labelTime,0,ALARM_CLOCK_CHILD_NUM_TAG_ID);
 }
@@ -9191,7 +9198,7 @@ bool NetRaceLayer::_IsClickedOn(Sprite* button,Touch* touch) {
 }
 
 void NetRaceLayer::HideClock() {
-    Sprite* indicator[4] = {0};
+    Node* indicator[4] = {0};
     
     indicator[0]  = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
     indicator[1]  = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
@@ -9206,7 +9213,7 @@ void NetRaceLayer::HideClock() {
 }
 
 void NetRaceLayer::UpdateClock(int time,int dir){		
-    Sprite* indicator[4] = {0};
+    Node* indicator[4] = {0};
     
     indicator[0]  = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
     indicator[1]  = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
@@ -9232,7 +9239,8 @@ void NetRaceLayer::delete_ActionRemind()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+
         
 	for(int i=0;i<17;i++){
         _Remove(myframe,REMIND_ACT_TAG_ID+i);
