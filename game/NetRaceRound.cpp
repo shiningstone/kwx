@@ -1037,11 +1037,10 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 		return l_kind;
 }
 
-void NetRRound::action1()
+void NetRRound::LockAllCards()
 {
-	for (int i=0;i<=card_list->len-1;i++)
-	{
-		card_list->data[i].can_play=cps_NO;
+	for (int i=0;i<=card_list->len-1;i++) {
+		card_list->data[i].can_play = cps_NO;
 	}
 }
 

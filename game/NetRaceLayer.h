@@ -30,7 +30,7 @@ private:
     Logger *_logger;
     void _LoadPlayerInfo();
     void _GenerateIds(int ids[3]);
-    void _SpeakCard();
+    CallFunc * _SpeakCard();
     CallFunc *_SpeakAction(ActionType_t id);
     void create_residue_cards();
     void refresh_residue_cards();
@@ -244,7 +244,7 @@ public:
 	void BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
 	void tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
 	void QiangGangHuJudge();
-	void TingHintBarListener();
+	void ListenToTingButton();
 
     void distribute_card_event();
     void race_start_again();

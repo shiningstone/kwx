@@ -911,7 +911,9 @@ void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND targ
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	memset(res,0,sizeof(HAH));
-	res->reserved_card_num = TOTAL_CARD_NUM - _roundManager->_distributedNum;
+
+    res->reserved_card_num = TOTAL_CARD_NUM - _roundManager->_distributedNum;
+    
 	CARD s_card;
 	int jj=1;
 
@@ -920,13 +922,14 @@ void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND targ
 	while(_roundManager->_river->getCard(s_card,jj++)==true)
 		res->card_in_river[res->river_len++]=s_card.kind;
 
-	int k=(_roundManager->_curPlayer+1)%3;
+	int k = (_roundManager->_curPlayer+1)%3;
 	_roundManager->_players[k]->get_parter()->get_hu_cards(target1,len1);
     
-	k=(_roundManager->_curPlayer+2)%3;
+	k = (_roundManager->_curPlayer+2)%3;
 	_roundManager->_players[k]->get_parter()->get_hu_cards(target2,len2);
 
-    for(int i=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->atcvie_place;i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++)
+    for(int i=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->atcvie_place;
+        i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++)
 	{
 		int time=res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].same_times++;
 		res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].place[time]=i;
@@ -937,83 +940,73 @@ void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND targ
 		_roundManager->_players[_roundManager->_curPlayer]->init_target(&res->target,*len1,*len2);
     }
 }
-void NetRaceLayer::TingHintBarListener()
+
+void NetRaceLayer::ListenToTingButton()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto TingListener = EventListenerTouchOneByOne::create();
 	TingListener->setSwallowTouches(false);
-	TingListener->onTouchBegan=[=](Touch* touch, Event* event)
-	{
+    
+	TingListener->onTouchBegan=[=](Touch* touch, Event* event) {
 		return true;
 	};
-	TingListener->onTouchMoved=[=](Touch* touch, Event* event)
-	{
+    
+	TingListener->onTouchMoved=[=](Touch* touch, Event* event) {
 	};
-	TingListener->onTouchEnded=[=](Touch* touch, Event* event)
-	{
+    
+	TingListener->onTouchEnded=[=](Touch* touch, Event* event) {
 		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-		auto curButton=(Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
-		float x=curButton->getPosition().x;
-		float y=curButton->getPosition().y;
-		Size curSize=curButton->getContentSize();
-		Rect rect=Rect(x,y,curSize.width,curSize.height);
-		if(!rect.containsPoint(touch->getLocation()))
-		{
-			if(ifTingSignBarVisible)
-			{
-				myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-				ifTingSignBarVisible=false;
-			}
+		auto button = (Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
+
+        if( !_IsClickedOn(button,touch) ) {
+            ifTingSignBarVisible=false;
+		} else {
+			ifTingSignBarVisible = !ifTingSignBarVisible;
 		}
-		else
-		{
-			ifTingSignBarVisible=!ifTingSignBarVisible;
-			if(ifTingSignBarVisible)
-				myframe->getChildByTag(TING_SING_BAR)->setVisible(true);
-			else
-				if(myframe->getChildByTag(TING_SING_BAR))
-					myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-		}
+
+        _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
 	};
+    
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
 }
+
 void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
     LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
 
-	//ifMyTime=false;
-	if(ifMingTime)
-	{
+	if(ifMingTime) {
 		ifMingMybeError=true;
 		ifMingTime=false;
 	}
-	if(_roundManager->_isWaitDecision)
-	{
+    
+	if(_roundManager->_isWaitDecision) {
 		_roundManager->_isWaitDecision=false;
-		//_roundManager->_actionToDo=_roundManager->_tempActionToDo;
 		_roundManager->_tempActionToDo=a_JUMP;
 	}
-	if((_roundManager->_actionToDo&a_MING)&&(!ifMingMybeError))
-	{
-		ifMingMybeError=false;
-		_roundManager->_actionToDo=a_JUMP;
-	}
-	if(myframe->getChildByTag(MING_CANCEL))
-		myframe->removeChildByTag(MING_CANCEL,true);
-	if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)!=NULL)
-		myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);
-	if(myframe->getChildByTag(TING_SING_BAR))
-		myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-	if(myframe->getChildByTag(MING_CANCEL))
-		myframe->removeChildByTag(MING_CANCEL,true);
 
-    LOGGER_WRITE("%s get out card list",__FUNCTION__);
-	outCardList* outCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
-	auto cardOut=Sprite::createWithTexture(g_my_out->getTexture());
-	auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
-	show_card_kind->setPosition(Vec2(cardOut->getTextureRect().size.width/2,cardOut->getTextureRect().size.height*0.65));
+	if( (_roundManager->_actionToDo&a_MING) && (!ifMingMybeError) ) {
+		ifMingMybeError = false;
+		_roundManager->_actionToDo = a_JUMP;
+	}
+
+    _Remove(myframe, MING_CANCEL);
+
+    if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)!=NULL)
+		myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);// why without true/false
+
+    _Show(myframe, TING_SING_BAR, false);
+    _Remove(myframe, MING_CANCEL);// why called twice ???
+
+
+	auto cardOut = Sprite::createWithTexture(g_my_out->getTexture());
+	auto show_card_kind = Sprite::createWithTexture(
+        g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture()
+    );
+	show_card_kind->setPosition(Vec2(
+        cardOut->getTextureRect().size.width/2,
+        cardOut->getTextureRect().size.height*0.65));
 	cardOut->addChild(show_card_kind);
 	cardOut->setAnchorPoint(Vec2(0,1));
 	if(time==1)
@@ -1022,31 +1015,33 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		cardOut->setPosition(location.x,100);
 	myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
 
-	auto deleteActionTip=CallFunc::create([=](){delete_ActionRemind();});
-	//auto deleteActionTip=CallFunc::create([=](){delete_act_tip();});
+	auto deleteActionTip = CallFunc::create([=](){delete_ActionRemind();});
+	
 	BezierTo *action;
+	outCardList* outCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
 	if(time==1)
-		action=BizerMove1(outCard,location);
+		action = BizerMove1(outCard,location);
 	else
-		action=BizerMove2(outCard,location,time);
-	auto BizerVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/give.ogg");});
-	CallFunc* voiceCall;
-	voiceCall=CCCallFunc::create([=]() {
-        _SpeakCard();
-	});
+		action = BizerMove2(outCard,location,time);
+
+    CallFunc* BizerVoice = _SpeakGive();
+	CallFunc* voiceCall  = _SpeakCard();
+
 	Sequence* voiceEffect;
-	Spawn* allEffect=Spawn::create(NULL);
+	Spawn* allEffect = Spawn::create(NULL);
+    
 	if(_roundManager->_actionToDo==a_MING && 
-        !_roundManager->IsTing(_roundManager->_curPlayer) )
-	{
+        !_roundManager->IsTing(_roundManager->_curPlayer) ) {
 		_eventDispatcher->removeEventListenersForTarget(myframe,true);
+        
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
-		//_roundManager->_lastAction=a_MING;
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action1();
+        
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 
 		while(myframe->getChildByTag(MING_EFFECT_DAMING))
 			myframe->removeChildByTag(MING_EFFECT_DAMING);
+        
 		while(myframe->getChildByTag(MING_EFFECT_ANIMATE))
 			myframe->removeChildByTag(MING_EFFECT_ANIMATE);
 
@@ -1055,14 +1050,21 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		daMingFont->setOpacity(0);
 		daMingFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2+50));
 		myframe->addChild(daMingFont,31,MING_EFFECT_DAMING);
-		auto DaMingAction=Sequence::create(FadeIn::create(0.18),DelayTime::create(0.36),Spawn::create(FadeOut::create(0.18),ScaleTo::create(0.18,1.2),NULL),NULL);
-		auto DaMingTarget=TargetedAction::create(daMingFont,DaMingAction);
+        
+		auto DaMingAction=Sequence::create(
+            FadeIn::create(0.18),
+            DelayTime::create(0.36),
+            Spawn::create(
+                FadeOut::create(0.18),
+                ScaleTo::create(0.18,1.2),NULL),NULL);
+		auto DaMingTarget = TargetedAction::create(daMingFont,DaMingAction);
 
 		auto mingEfeect=Sprite::createWithSpriteFrameName("ming_1.png");
 		mingEfeect->setAnchorPoint(Vec2(0.5,0.5));
 		mingEfeect->setScale(0);
 		mingEfeect->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.5));
 		myframe->addChild(mingEfeect,30,MING_EFFECT_ANIMATE);
+        
 		auto animation = Animation::create();
 		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_1.png"));
 		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_2.png"));
@@ -1078,12 +1080,23 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_12.png"));
 		animation->setDelayPerUnit(0.1f);
 		animation->setRestoreOriginalFrame(true);
+
 		auto MingAnimate = Animate::create(animation);
-		auto MingActionseq=Sequence::create(ScaleTo::create(0,2),MingAnimate,ScaleTo::create(0,0),NULL);
-		auto mingEffectTarget=TargetedAction::create(mingEfeect,MingActionseq);
-		voiceEffect=Sequence::create(Spawn::create(action,voiceCall,NULL),BizerVoice,NULL);
-		auto targetAction=TargetedAction::create(cardOut,voiceEffect);
-		allEffect=Spawn::create(
+		auto MingActionseq=Sequence::create(
+            ScaleTo::create(0,2),
+            MingAnimate,
+            ScaleTo::create(0,0),NULL);
+		auto mingEffectTarget=TargetedAction::create(
+            mingEfeect,
+            MingActionseq);
+		voiceEffect=Sequence::create(Spawn::create(
+            action,
+            voiceCall,NULL),
+            BizerVoice,NULL);
+		auto targetAction=TargetedAction::create(
+            cardOut,
+            voiceEffect);
+		allEffect = Spawn::create(
             DaMingTarget,
             mingEffectTarget,
             targetAction,
@@ -1095,8 +1108,13 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	}
 	else
 	{
-		voiceEffect=Sequence::create(Spawn::create(action,voiceCall,NULL),BizerVoice,NULL);
-		auto targetAction=TargetedAction::create(cardOut,voiceEffect);
+		voiceEffect=Sequence::create(Spawn::create(
+            action,
+            voiceCall,NULL),
+            BizerVoice,NULL);
+		auto targetAction=TargetedAction::create(
+            cardOut,
+            voiceEffect);
 		allEffect=Spawn::create(
             targetAction,
             CallFunc::create([=](){
@@ -1106,27 +1124,22 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
             NULL);
 	}
     
-	auto callFunc0=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_in_river_list));
-	//auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
-	auto callFunc2=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
-	auto sim=Sequence::create(callFunc0,CCCallFunc::create([=]()
-	{
+	auto riverUpdate = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_in_river_list));
+	auto waitForResponse = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
+	auto sim = Sequence::create(
+        riverUpdate,CCCallFunc::create([=]() {
 		_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
-		if(myframe->getChildByTag(TING_SING_BUTTON))
-			myframe->getChildByTag(TING_SING_BUTTON)->setVisible(true);
+        _Show(myframe,TING_SING_BUTTON,true);
 	}),CallFunc::create([=](){
 		if(ifInsertStopped)
-			ifInsertStopped=false;
-		else
-		{
-			int no=1;
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-			unsigned char ting_status=_roundManager->_players[no]->get_parter()->get_ting_status();
-			if(ting_status==1)
+			ifInsertStopped = false;
+		else {
+			if( _roundManager->IsTing(1) )
 				this->getChildByTag(MING_STATUS_PNG_1)->setVisible(true);
-			card_list_update(no);
+			card_list_update(1);
 		}
 	}),NULL);//callFunc1可优化一下ifInsertStopped ifInsertCardsTime=true;
+	
 	auto seq=Sequence::create(
         allEffect,
         DelayTime::create(0.12),
@@ -1134,46 +1147,37 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
             ifInsertCardsTime=false;}
         ),
         sim,
-        callFunc2,
+        waitForResponse,
         NULL);
         
 	myframe->_ID=1;
 	_roundManager->_isCardFromOthers = true;
 	myframe->runAction(seq);
-	//Director::getInstance()->getEventDispatcher()->rrrsForTarget(myframe,true);
 }
 
 void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_in_list,Touch* touch,int time)
 {
     LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,_roundManager->_isWaitDecision);
 
-	//ifMyTime=false;
-	if(ifMingTime)
-	{
+	if(ifMingTime) {
 		ifMingMybeError=true;
 		ifMingTime=false;
 	}
-	if(_roundManager->_isWaitDecision)
-	{
+    
+	if(_roundManager->_isWaitDecision) {
 		_roundManager->_isWaitDecision=false;
-		//_roundManager->_actionToDo=_roundManager->_tempActionToDo;
 		_roundManager->_tempActionToDo=a_JUMP;
 	}
-    
-	if(myframe->getChildByTag(MING_CANCEL))
-		myframe->removeChildByTag(MING_CANCEL,true);
-	if(myframe->getChildByTag(TING_SING_BAR))
-		myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
 
-    if(card_in_list==list->len-1)//||time==1)
-	{
-		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+card_in_list)->setScale(0);
-	}
-	else
-	{
-		for(int i=list->atcvie_place;i<list->len-1;i++)
-		{
-			auto card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+i);
+    _Remove(myframe,MING_CANCEL);
+    _Show(myframe,TING_SING_BAR,false);
+
+    if( card_in_list == list->len-1 ) {
+		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + card_in_list)->setScale(0);
+	} else {
+		for(int i=list->atcvie_place; i<list->len-1; i++) {
+			auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + i);
+            
 			auto curPos=card->getPosition();
 			auto cardSize=card->getTextureRect().size;
 			auto RightMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width,curPos.y));
@@ -1191,44 +1195,33 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 			auto LeftMoveAction3=MoveTo::create(0.06,Vec2(curPos.x-cardSize.width*0.2,curPos.y));
 			auto LeftInsertSeq=Sequence::create(LeftMoveAction1,LeftMoveAction2,LeftMoveAction3,NULL);
 						
-			if(i<card_in_list)
-			{
-				if(list->data[i].kind<=list->data[list->len-1].kind)
+			if(i < card_in_list) {
+				if(list->data[i].kind <= list->data[list->len-1].kind)
 					continue;
-				else
-				{
+				else {
 					if(i==list->atcvie_place)
 						last_card->runAction(RightInsertSeq);
 					else if(list->data[i-1].kind<=list->data[list->len-1].kind)
 						last_card->runAction(RightInsertSeq);
 					card->runAction(RightMove);
 				}
-			}
-			else if(i==card_in_list)
-			{
-				if(i==list->atcvie_place)
-				{
+			} else if(i==card_in_list) {
+				if(i==list->atcvie_place) {
 					if(list->data[i+1].kind>list->data[list->len-1].kind)
 						last_card->runAction(RightInsertSeq);
-				}
-				else if(i==list->len-2)
-				{
+				} else if(i==list->len-2) {
 					if(list->data[i-1].kind<=list->data[list->len-1].kind)
 						last_card->runAction(MoveTo::create(0.3,Vec2(curPos.x,sourcePos.y)));
-				}
-				else
-				{
+ 				} else {
 					if(list->data[i-1].kind<=list->data[list->len-1].kind&&list->data[i+1].kind>list->data[list->len-1].kind)
 						last_card->runAction(RightInsertSeq);
-				}				
+				}
+                
 				card->setScale(0);
-			}
-			else if(i>card_in_list)
-			{
+			} else if(i>card_in_list) {
 				if(list->data[i].kind>list->data[list->len-1].kind)
 					card->runAction(MoveTo::create(0.3,Vec2(curPos.x-cardSize.width*0.2,curPos.y)));
-				else
-				{
+				else {
 					if(i==list->len-2)
 						last_card->runAction(MoveTo::create(0.3,Vec2(curPos.x-cardSize.width*0.2,curPos.y)));
 					else if(list->data[i+1].kind>list->data[list->len-1].kind)
@@ -1238,8 +1231,8 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 			}
 		}
 	}
-	if(time==1)
-	{
+    
+	if(time==1) {
 		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
 			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
 	}
@@ -1249,6 +1242,7 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 	_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(card_in_list);
 	update_outcard(myframe,touch->getLocation(),time);
 }
+
 void NetRaceLayer::waitfor_MyShowCardInstruct()
 {
     LOGGER_WRITE("%s _roundManager->_isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
@@ -1667,11 +1661,12 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		Sprite *cardOut;
 		BezierTo *baction;
 		int index;
-		HAH *s_res=new HAH;
+		HAH *s_res = new HAH;
 		CARD_KIND list1[9];
 		CARD_KIND list2[9];
 		int len1;
 		int len2;
+        
 		if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
 		{
 			collect_resources(s_res,list1,list2,&len1,&len2);
@@ -1795,11 +1790,8 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			baction=OthersBizerMove(_roundManager->_curPlayer,outCard);
 		}
 		secondFunc=CallFunc::create([=](){myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)->setVisible(true);});
-		auto BizerVoice=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/give.ogg");});
-		CallFunc* voiceCall;
-		voiceCall=CCCallFunc::create([=]() {
-            _SpeakCard();
-		});
+		auto BizerVoice = CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/give.ogg");});
+		CallFunc* voiceCall = _SpeakCard();
 		Sequence *voiceEffect;	
 		if(s_res->hu_nums>=6&&_roundManager->_actionToDo==a_MING&&_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status()==0)
 		{
@@ -1807,7 +1799,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			if(Kou_kindLen>0)
 				_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU);
 			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
-			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action1();
+			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
 			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 			auto simple_seq=simple_tip_effect(v,"daming.png");
 			voiceEffect=Sequence::create(simple_seq,firstFunc,secondFunc,Spawn::create(handOutCardKuang,baction,voiceCall,NULL),BizerVoice,NULL);
@@ -8193,14 +8185,14 @@ const std::string GirlsMusicPath[21]={"Music/g_1tiao.ogg","Music/g_2tiao.ogg","M
 const std::string BoysActionPath[4]={"Music/peng.ogg","Music/gang.ogg","Music/ting2.ogg","Music/hu.ogg"};
 const std::string GirlsActionPath[4]={"Music/g_peng.ogg","Music/g_gang.ogg","Music/g_ting1.ogg","Music/g_hu.ogg"};
 
-void NetRaceLayer::_SpeakCard() {
+CallFunc* NetRaceLayer::_SpeakCard() {
     std::string sex;
     _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     
     if( sex=="Boy" )
-        SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
+        return SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
     else
-        SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
+        return SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
 }
 
 CallFunc* NetRaceLayer::_SpeakAction(ActionType_t id) {
@@ -8211,6 +8203,10 @@ CallFunc* NetRaceLayer::_SpeakAction(ActionType_t id) {
 		return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[id].c_str());});
 	else
 		return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(GirlsActionPath[id].c_str());});
+}
+
+CallFunc* NetRaceLayer::_SpeakGive() {
+	return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/give.ogg");});
 }
 
 /***********************************************************
@@ -8242,7 +8238,7 @@ void NetRaceLayer::tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType 
 				if( !_roundManager->IsTing(1) )
 					waitfor_MyTouchShowCard();
 				else
-					TingHintBarListener();
+					ListenToTingButton();
 			});
 			myframe->runAction(Sequence::create(CallFunc::create([=](){this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);}),StartSelfGame,NULL));
 		}
@@ -8394,7 +8390,7 @@ void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType typ
 					if(!_roundManager->IsTing(1))
 						waitfor_MyTouchShowCard();
 					else
-						TingHintBarListener();
+						ListenToTingButton();
 				}
 			});
 			if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
@@ -9169,9 +9165,28 @@ void NetRaceLayer::_ClockAddTime( Sprite *clock, int time ) {
     clock->addChild(labelTime,0,ALARM_CLOCK_CHILD_NUM_TAG_ID);
 }
 
-void NetRaceLayer::_Remove(Sprite *parent, int childTag) {
-    if(parent->getChildByTag(childTag)) {
+void NetRaceLayer::_Remove(Node *parent, int childTag) {
+    if(parent->getChildByTag(childTag)) {// this judgement is not necessary becaust the interface will do the same thing!!!
         parent->removeChildByTag(childTag,true);
+    }
+}
+
+void NetRaceLayer::_Show(Node *parent, int childTag,bool flag) {
+    if(parent->getChildByTag(childTag)) {
+        parent->setVisible(flag);
+    }
+}
+
+bool NetRaceLayer::_IsClickedOn(Sprite* button,Touch* touch) {
+    float x      = button->getPosition().x;
+    float y      = button->getPosition().y;
+    Size size    = button->getContentSize();
+    Rect rect    = Rect(x,y,size.width,size.height);
+    
+    if( rect.containsPoint( touch->getLocation() ) ) {
+        return true;
+    } else {
+        return false;
     }
 }
 
