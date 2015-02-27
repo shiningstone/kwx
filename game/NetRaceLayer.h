@@ -54,7 +54,16 @@ private:
     Vec2 _DestOfGold(int dir,int size,int origin,int xOffset = 0);
     void GuiJinBiShow(int dir, int gold);
     void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
+
+    void _ClockAddTime( Sprite *clock, int time );
+    void _Remove(Sprite *parent, int childTag);
+public:
+	void UpdateClock(int time,int direction);
+    void HideClock();
+
+
     
+private:
     CARD_KIND RototHandOutIndex;
 	float s_scale;
 	int s_no;
@@ -194,7 +203,6 @@ public:
 		2 show right indicator
 		-1 show none indicator
 	#########################*/
-	void update_clock(bool visible,int time,int direction);//闹钟更新
 	void delete_act_tip();//删除效果残留
 	void delete_ActionRemind();
 	void delete_ActionEffect();
@@ -213,7 +221,7 @@ public:
 	void update_card_in_river_list(Node* sender);
 	void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);//金币计算
 	void showall();
-	void ready_indicate(int direction);
+	void GuiShowReady(int direction);
 	//int get_cur_player_no();
 	//void set_cur_player_no(int no);
 	void raceAccount(float delta);

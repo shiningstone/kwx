@@ -390,84 +390,6 @@ bool NetRaceLayer::resource_prepare()
 	return true;
 }
 
-void NetRaceLayer::ready_indicate(int direction)
-{
-    LOGGER_WRITE("%s : %d",__FUNCTION__,direction);
-
-	auto Ready=Sprite::createWithSpriteFrameName("zhunbei.png");
-	Ready->setAnchorPoint(Vec2(0.5,1));
-	Ready->setScale(0.8);
-
-	if(direction==0)
-	{
-		Ready->setPosition(Vec2(_playerBkg[0]->getPosition().x+_playerBkg[0]->getContentSize().width/2,_playerBkg[0]->getPosition().y-_playerBkg[0]->getContentSize().height));
-		this->addChild(Ready,2,READY_INDICATE_LEFT_TAG_ID);
-	}
-	else if(direction==1)
-	{
-		;
-	}
-	else if(direction==2)
-	{
-		Ready->setPosition(Vec2(_playerBkg[2]->getPosition().x-_playerBkg[2]->getContentSize().width/2,_playerBkg[2]->getPosition().y-_playerBkg[2]->getContentSize().height));
-		this->addChild(Ready,2,READY_INDICATE_RIGHT_TAG_ID);
-	}
-
-    _roundManager->_ready[direction]=true;
-}
-
-void NetRaceLayer::update_clock(bool visible,int time,int direction)
-{		
-	auto clock=(Sprite*)this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
-	auto left=this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
-	auto right=this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
-	auto down=this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
-	if(!clock||!left||!right||!down)
-		return;
-
-	if(!visible)
-	{
-		clock->setVisible(visible);
-		right->setVisible(false);
-		down->setVisible(false);
-		left->setVisible(false);
-		return;
-	}	
-
-	clock->setVisible(true);
-	if(clock->getChildByTag(ALARM_CLOCK_CHILD_NUM_TAG_ID))
-		clock->removeChildByTag(ALARM_CLOCK_CHILD_NUM_TAG_ID,true);
-
-	char str_time[16];
-	sprintf(str_time,"%d",time);
-	std::string stringOfTime=str_time;
-	auto labelTime=LabelTTF::create(stringOfTime,"Arial",30);
-	labelTime->setAnchorPoint(Vec2(0.5,0.5));
-	labelTime->setColor(Color3B(0,0,0));
-	labelTime->setPosition(Vec2(clock->getTextureRect().size.width/2,clock->getTextureRect().size.height*0.55));
-	clock->addChild(labelTime,0,ALARM_CLOCK_CHILD_NUM_TAG_ID);
-
-	if(direction==0)
-	{
-		right->setVisible(false);
-		down->setVisible(false);
-		left->setVisible(true);
-	}
-	else if(direction==1)
-	{
-		left->setVisible(false);
-		right->setVisible(false);
-		down->setVisible(true);
-	}
-	else if(direction==2)
-	{
-		left->setVisible(false);
-		down->setVisible(false);
-		right->setVisible(true);
-	}	
-}
-
-
 void NetRaceLayer::startParticleSystem(float delta)
 {
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -2992,7 +2914,7 @@ void NetRaceLayer::QiangGangHuJudge()
 	if((action1&a_HU)&&(action2&a_HU))//双响
 	{
 		_roundManager->_lastActionWithGold=a_QIANG_GANG;
-		update_clock(false,0,_roundManager->_curPlayer);
+		HideClock();
 		if((no!=1&&no1!=1)||((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
 		{
 			hu_effect_tip(3);
@@ -3016,7 +2938,7 @@ void NetRaceLayer::QiangGangHuJudge()
 	}
 	else if(action1&a_HU||action2&a_HU)//点炮
 	{
-		update_clock(false,0,_roundManager->_curPlayer);
+        HideClock();
 		if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&_roundManager->_actionToDo&a_HU)
@@ -5865,7 +5787,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		if((action1&a_HU)&&(action2&a_HU))//双响
 		{
-			update_clock(false,0,_roundManager->_curPlayer);
+            HideClock();
 			if((no!=1&&no1!=1)||(no==1||no1==1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
 			{
 				hu_effect_tip(3);
@@ -5890,7 +5812,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		else if(action1&a_HU||action2&a_HU)//点炮
 		{
-			update_clock(false,0,_roundManager->_curPlayer);
+            HideClock();
 			if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
 			{
 				if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&_roundManager->_actionToDo&a_HU)
@@ -5920,13 +5842,13 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			_roundManager->_actionToDo=action1;
 			if(no==1)
 			{
-				update_clock(true,0,no);
+				UpdateClock(0,no);
 				waitfor_myaction(no);
 				return;
 			}
 			else
 			{
-				update_clock(true,0,no);
+				UpdateClock(0,no);
 				waitfor_otheraction(no);
 				return;
 			}
@@ -5936,13 +5858,13 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			_roundManager->_actionToDo=action2;
 			if(no1==1)
 			{
-				update_clock(true,0,no1);
+				UpdateClock(0,no1);
 				waitfor_myaction(no1);
 				return;
 			}
 			else
 			{
-				update_clock(true,0,no1);
+				UpdateClock(0,no1);
 				waitfor_otheraction(no1);
 				return;
 			}
@@ -5951,7 +5873,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		{
 			_roundManager->_actionToDo=action1;
 			_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
-			update_clock(true,0,_roundManager->_curPlayer);
+			UpdateClock(0,_roundManager->_curPlayer);
 			call_distribute_card();
 		}
 	}
@@ -6246,13 +6168,13 @@ void NetRaceLayer::start_callback()
 	RototHandOutIndex=ck_NOT_DEFINED;
 	_roundManager->_qiangGangTargetNo=-1;
 
-    LOGGER_WRITE("NETWORK : !!! %s a little messed up",__FUNCTION__);
-	ready_indicate(1);                     //准备状态
+    _roundManager->_ready[1]=true;
+	GuiShowReady(1);
     _roundManager->NotifyStart();
-    _roundManager->WaitUntilAllReady();
-	race_begin_prepare();                  //牌局开始效果
 
-    //_roundManager->Shuffle();
+    _roundManager->WaitUntilAllReady();
+
+	race_begin_prepare();                  //牌局开始效果
     
     _roundManager->_actionToDo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
 	if(_roundManager->_actionToDo!=a_TIMEOUT) {
@@ -6725,7 +6647,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
 	});
 	auto updateClock=CallFunc::create([=](){
-		update_clock(true,0,zhuang);		
+		UpdateClock(0,zhuang);		
 	});
 	auto StartDelay=DelayTime::create(0.7);
 	auto HandDelay=DelayTime::create(0.2);
@@ -7690,7 +7612,7 @@ void  NetRaceLayer::showall()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	update_clock(false,0,0);
+    HideClock();
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	float x,y;
 	Sprite *p_list[MAX_HANDIN_NUM];
@@ -9237,6 +9159,86 @@ void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
 }
 
 
+
+void NetRaceLayer::GuiShowReady(int dir)
+{
+	auto Ready = Sprite::createWithSpriteFrameName("zhunbei.png");
+	Ready->setAnchorPoint(Vec2(0.5,1));
+	Ready->setScale(0.8);
+
+	if( dir==0 ) {
+		Ready->setPosition(Vec2(
+            _playerBkg[0]->getPosition().x + _playerBkg[0]->getContentSize().width/2,
+            _playerBkg[0]->getPosition().y - _playerBkg[0]->getContentSize().height));
+		this->addChild(Ready,2,READY_INDICATE_LEFT_TAG_ID);
+	} else if( dir==1 ) {
+		;
+	} else if( dir==2 ) {
+		Ready->setPosition(Vec2(
+            _playerBkg[2]->getPosition().x - _playerBkg[2]->getContentSize().width/2,
+            _playerBkg[2]->getPosition().y - _playerBkg[2]->getContentSize().height));
+		this->addChild(Ready,2,READY_INDICATE_RIGHT_TAG_ID);
+	}
+}
+
+/****************************************************
+    clock
+****************************************************/
+void NetRaceLayer::_ClockAddTime( Sprite *clock, int time ) {
+	char strTime[16] = {0};
+	sprintf(strTime,"%d",time);
+    
+	auto labelTime = LabelTTF::create( std::string(strTime), "Arial", 30 );
+	labelTime->setAnchorPoint(Vec2(0.5,0.5));
+	labelTime->setColor(Color3B(0,0,0));
+	labelTime->setPosition(Vec2(clock->getTextureRect().size.width/2,clock->getTextureRect().size.height*0.55));
+
+    clock->addChild(labelTime,0,ALARM_CLOCK_CHILD_NUM_TAG_ID);
+}
+
+void NetRaceLayer::_Remove(Sprite *parent, int childTag) {
+    if(parent->getChildByTag(childTag)) {
+        parent->removeChildByTag(childTag,true);
+    }
+}
+
+void NetRaceLayer::HideClock() {
+    Sprite* indicator[4] = {0};
+    
+    indicator[0]  = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
+    indicator[1]  = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+    indicator[2]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+    indicator[3]  = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
+    
+    for(int i=0;i<4;i++) {
+        if( indicator[i] ) {
+            indicator[i]->setVisible(false);
+        }
+    }
+}
+
+void NetRaceLayer::UpdateClock(int time,int dir){		
+    Sprite* indicator[4] = {0};
+    
+    indicator[0]  = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
+    indicator[1]  = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+    indicator[2]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+    indicator[3]  = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
+    
+    for(int i=0;i<4;i++) {
+        if( !indicator[i] ) {
+            return;
+        }
+    }
+
+    indicator[3]->setVisible(true);
+    _Remove(indicator[3],ALARM_CLOCK_CHILD_NUM_TAG_ID);
+    _ClockAddTime(indicator[3],time);
+
+    indicator[dir]->setVisible(true);
+    indicator[(dir+1)%3]->setVisible(false);
+    indicator[(dir+2)%3]->setVisible(false);
+}
 
 
 
