@@ -12,6 +12,13 @@ using namespace CocosDenshion;
 #include "DataBase.h"
 #include "./../utils/LogManager.h"
 
+typedef struct {
+    PENG,
+    GANG,
+    TING,
+    HU,
+}ActionType_t;
+
 class NetRaceLayer : public cocos2d::Layer
 {
 public:
@@ -23,6 +30,30 @@ private:
     Logger *_logger;
     void _LoadPlayerInfo();
     void _GenerateIds(int ids[3]);
+    void _SpeakCard();
+    CallFunc *_SpeakAction(ActionType_t id);
+    void create_residue_cards();
+    void refresh_residue_cards();
+    std::string _NumToString( int number );
+    void _CalcSingleWinGold(int goldOfPlayer[3], int winner);
+    void _CalcDoubleWinGold(int goldOfPlayer[3], int loser);
+    void _CalcNoneWinGold(int goldOfPlayer[3], int loser);
+    void _CalcHuGold(int goldOfPlayer[3]);
+    void CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give);
+
+    void _UpdateGouldAccount(int id,int gold);
+    void UpdateGoldAccounts(int goldOfPlayer[3]);
+    Vec2 _AnchorOfSign(int dir);
+    Vec2 _PositionOfSign(int dir,int size,int origin,int xOffset = 0);
+    Vec2 _DestOfSign(int dir,int size,int origin,int xOffset = 0);
+    Vec2 _AnchorOfNumber(int dir);
+    Vec2 _PositionOfNumber(int dir,int size,int origin);
+    Vec2 _DestOfNumber(int dir,int size,int origin);
+    Vec2 _AnchorOfGold(int dir);
+    Vec2 _PositionOfGold(int dir,int size,int origin,int xOffset = 0);
+    Vec2 _DestOfGold(int dir,int size,int origin,int xOffset = 0);
+    void GuiJinBiShow(int dir, int gold);
+    void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
     
     CARD_KIND RototHandOutIndex;
 	float s_scale;
@@ -62,10 +93,14 @@ private:
 	cocos2d::Point lastwinner_point[3];
 	cocos2d::Sprite *last_winner;
 	cocos2d::Sprite *residue_card_bkg;
+    
+	cocos2d::Sprite *_playerBkg[3];
+
 	cocos2d::Sprite *left_player_bkg;
 	cocos2d::Sprite *right_player_bkg;
 	cocos2d::Sprite *my_bkg;
-	CCSpriteBatchNode *g_my_free;
+
+    CCSpriteBatchNode *g_my_free;
 	CCSpriteBatchNode *g_my_peng;
 	CCSpriteBatchNode *g_my_ming_canPlay;
 	CCSpriteBatchNode *g_my_ming_ting;
@@ -98,15 +133,15 @@ private:
 	void start_callback();//功能--开始
 	void restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type);
 	void start_touchCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void back_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
-	void robot_callback(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);//功能--机器人
+	void backPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
+	void tuoGuanPressed(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);//功能--机器人
 	/*######################
 	diretion:
 				0 left
 				1 middle(me)
 				2 right
 	#######################*/
-	void update_score(int direction,int score);//更新分数
+	void GuiUpdateScore(int direction,int score);//更新分数
 	void update_nickname(int direction,std::string str_Nick);//更新昵称
 	void update_headimage(int direction,std::string head_photo);//更新头像
     /*###################################*/
@@ -189,17 +224,17 @@ public:
 	void KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void KouCardsCheck(int no);
-	void updatePropertyImmediate(int GoldNum[3]);
+	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
 	void update_residue_TingCards(int no);
 	void tingHintCreate(Point curPos,int CardPlace);
 	void OtherTingHintBar(int curNo,int CardPlace);
 	virtual bool init();
 	int Hu_cardOut_place;
-	void BackChoose();
-	void BackChooseEnsure(Ref* pSender,ui::Widget::TouchEventType type);
-	void BackChooseCancel(Ref* pSender,ui::Widget::TouchEventType type);
-	void tuoGuanCancelFunc(Ref* pSender,ui::Widget::TouchEventType type);
+	void Back();
+	void BackConfirmPressed(Ref* pSender,ui::Widget::TouchEventType type);
+	void BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
+	void tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
 	void QiangGangHuJudge();
 	void TingHintBarListener();
 	void delete_NnnecessaryResource();
