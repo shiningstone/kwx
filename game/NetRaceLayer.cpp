@@ -8846,7 +8846,6 @@ void NetRaceLayer::update_headimage(int direction,std::string head_photo)
 typedef enum {
     AN_GANG = 1,
     MING_GANG,
-    MING,
     HU_WIN,
 }GoldKind_t;
 
@@ -9158,7 +9157,7 @@ void NetRaceLayer::GuiShowReady(int dir)
 /****************************************************
     clock
 ****************************************************/
-void NetRaceLayer::_ClockAddTime( Node *clock, int time ) {
+void NetRaceLayer::_ClockAddTime( Sprite *clock, int time ) {
     Sprite *p = (Sprite *)clock;
 
 	char strTime[16] = {0};
@@ -9228,7 +9227,7 @@ void NetRaceLayer::UpdateClock(int time,int dir){
 
     indicator[3]->setVisible(true);
     _Remove(indicator[3],ALARM_CLOCK_CHILD_NUM_TAG_ID);
-    _ClockAddTime(indicator[3],time);
+    _ClockAddTime((Sprite *)indicator[3],time);
 
     indicator[dir]->setVisible(true);
     indicator[(dir+1)%3]->setVisible(false);

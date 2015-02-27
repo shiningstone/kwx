@@ -61,7 +61,7 @@ private:
     void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
     void _GuiUpdateScore(LayerColor *layer,int score);
 
-    void _ClockAddTime( Node *clock, int time );
+    void _ClockAddTime( Sprite *clock, int time );
     void _Remove(Node *parent, int childTag);
     bool _IsClickedOn(Sprite* button,Touch* touch);
     void _Show(Node *parent, int childTag,bool flag);
