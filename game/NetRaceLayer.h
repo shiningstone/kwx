@@ -190,10 +190,10 @@ public:
 	void update_residue_cards(int no);//更新剩余牌数
 	void effect_Distribute_Card(int zhuang);//发牌效果
 	/***********callback function***********************/
-	void peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--碰牌
-	void hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--胡牌
-	void qi_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--弃牌
-	void gang_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--杠牌
+	void PengPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--碰牌
+	void HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--胡牌
+	void GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--杠牌
+	void QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--弃牌
 	void ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--名牌
 	/***********callback function***********************/
 	/*########################
@@ -209,7 +209,7 @@ public:
 	void angang_update(Node *psender);
 	void minggang_update(Node *psender);
 	void peng_update(Node *psender);
-	void peng_tip_effect(Node *psender);//me--碰牌效果
+	void PengEffect(Node *psender);//me--碰牌效果
 	void an_gang_tip_effect(Node *psender);//me--暗杠效果
 	void ming_gang_tip_effect(Node *psender);//me--明杠效果
 	void ming_tip_effect(Node *psender);//me--名牌效果
@@ -245,7 +245,6 @@ public:
 	void tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
 	void QiangGangHuJudge();
 	void TingHintBarListener();
-	void delete_NnnecessaryResource();
 
     void distribute_card_event();
     void race_start_again();

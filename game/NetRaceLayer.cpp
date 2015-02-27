@@ -419,11 +419,171 @@ void NetRaceLayer::startParticleSystem(float delta)
 	m_SmallParticle->isAutoRemoveOnFinish();
 }
 
-void NetRaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::PengPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	auto curButton=(Button*)pSender;
+    
+	switch (type)
+	{
+    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+    		curButton->setScale(1.2);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::MOVED:
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::ENDED:
+    		{
+                LOGGER_WRITE("%s",__FUNCTION__);
+                
+    			if(_roundManager->_isWaitDecision) {
+    				_roundManager->_isWaitDecision = false;
+    				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
+    				_roundManager->_tempActionToDo = a_JUMP;
+    			}
+
+    			curButton->setTouchEnabled(false);
+                
+    			auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::PengEffect));
+                curButton->_ID = 1;
+    			curButton->runAction(Sequence::create(
+                    ScaleTo::create(0.1,1),
+                    effect,NULL));
+    		}
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+    		curButton->setScale(1);
+    		break;
+    	default:
+    		break;
+	}
+}
+
+void NetRaceLayer::HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	_roundManager->_actionToDo = a_HU;
+    
+	auto curButton=(Button*)pSender;
+	int no = pSender->_ID;
+
+    switch(type) {
+    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+    		curButton->setScale(1.2);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::MOVED:
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::ENDED:
+    		{
+                LOGGER_WRITE("%s",__FUNCTION__);
+                
+    			if(_roundManager->_isWaitDecision) {
+    				_roundManager->_isWaitDecision = false;
+    				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
+    				_roundManager->_tempActionToDo = a_JUMP;
+    			}
+                
+    			curButton->setTouchEnabled(false);
+
+    			if(_roundManager->_isQiangGangAsking) {
+    				_roundManager->_lastActionWithGold = a_QIANG_GANG;
+                    
+    				curButton->_ID = pSender->_ID;
+    				auto clear  = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
+    				auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
+                    
+    				curButton->runAction(Sequence::create(
+                        clear,
+                        ScaleTo::create(0.1,1),
+                        effect,NULL));
+    			} 
+                else if(_roundManager->_isDoubleHuAsking) {
+    				auto ButtonAct = TargetedAction::create(curButton,ScaleTo::create(0.1,1));
+
+    				auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    				auto shade_act = (Sprite*)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
+    				auto fadeOut = FadeOut::create(0.3);
+    				auto easeBounce = ScaleTo::create(0.3,1.5);
+    				auto spawn = Spawn::create(fadeOut,easeBounce,NULL);
+    				auto seq = Sequence::create(ScaleTo::create(0,1),spawn,NULL);
+    				auto shadeAction = TargetedAction::create(shade_act,seq);
+
+    				auto clear = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
+
+    				auto huFunc = CallFunc::create([=](){	
+    					hu_effect_tip(3);
+    					distribute_event(DOUBLE_HU_WITH_ME,NULL);});
+                        
+					myframe->runAction(Sequence::create(
+                        ButtonAct,
+                        shadeAction,
+                        clear,
+                        huFunc,NULL));
+    			} 
+                else {
+    				curButton->_ID = pSender->_ID;
+    				auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
+                    
+    				curButton->runAction(Sequence::create(
+                        ScaleTo::create(0.1,1),
+                        effect,NULL));
+    			}
+    			break;
+    		}
+    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+    		curButton->setScale(1);
+    		break;
+	}
+}
+
+void NetRaceLayer::GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+
+	switch (type){
+    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+    		curButton->setScale(1.2);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::MOVED:
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::ENDED:
+    		{
+                LOGGER_WRITE("%s",__FUNCTION__);
+
+    			if(_roundManager->_isGangAsking)//is this judgement neccessary?
+    				_roundManager->_isGangAsking = false;
+                
+    			if(_roundManager->_isWaitDecision) {
+    				_roundManager->_isWaitDecision=false;
+    				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
+    				_roundManager->_tempActionToDo = a_JUMP;
+    			}
+                
+    			curButton->setTouchEnabled(false);
+    			curButton->_ID=1;
+    			if( _roundManager->_actionToDo & a_AN_GANG || _roundManager->_actionToDo & a_SHOU_GANG ) {
+    				auto angangEffect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::an_gang_tip_effect));
+    				curButton->runAction(Sequence::create(
+                        ScaleTo::create(0.1,1),
+                        angangEffect,NULL));
+    			}
+    			else if( _roundManager->_actionToDo & a_MING_GANG ) {
+    				auto minggangEffect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_gang_tip_effect));
+    				curButton->runAction(Sequence::create(
+                        ScaleTo::create(0.1,1),
+                        minggangEffect,NULL));
+    			}
+    		}
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+    		curButton->setScale(1);
+    		break;
+    	default:
+    		break;
+	}
+}
+
+void NetRaceLayer::QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -433,16 +593,14 @@ void NetRaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			if(_roundManager->_isWaitDecision)
-			{
-				_roundManager->_isWaitDecision = false;
-				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
-				_roundManager->_tempActionToDo = a_JUMP;
-			}
+            LOGGER_WRITE("%s",__FUNCTION__);
+
 			curButton->setTouchEnabled(false);
-			auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_tip_effect));
 			curButton->_ID=1;
-			curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc1,NULL));
+			auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::qi_tip_effect));
+			curButton->runAction(Sequence::create(
+                ScaleTo::create(0.1,1),
+                effect,NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -450,184 +608,6 @@ void NetRaceLayer::peng_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 		break;
 	default:
 		break;
-	}
-}
-
-void NetRaceLayer::hu_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	_roundManager->_actionToDo=a_HU;
-	auto curButton=(Button*)pSender;
-	int no=pSender->_ID;
-	switch(type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		curButton->setScale(1.2);
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		curButton->setScale(1);
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			curButton->setTouchEnabled(false);
-			if(_roundManager->_isWaitDecision)
-			{
-				_roundManager->_isWaitDecision = false;
-				_roundManager->_actionToDo=_roundManager->_tempActionToDo;
-				_roundManager->_tempActionToDo=a_JUMP;
-			}
-			if(_roundManager->_isQiangGangAsking)
-			{
-				_roundManager->_lastActionWithGold=a_QIANG_GANG;
-				curButton->_ID=pSender->_ID;
-				auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-				auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
-				curButton->runAction(Sequence::create(callFunc1,ScaleTo::create(0.1,1),callFunc,NULL));
-			}
-			else if(_roundManager->_isDoubleHuAsking)
-			{
-				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-				auto ButtonAct=TargetedAction::create(curButton,ScaleTo::create(0.1,1));
-				auto shade_act=(Sprite*)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
-				auto fadeOut=FadeOut::create(0.3);
-				auto easeBounce=ScaleTo::create(0.3,1.5);
-				auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-				auto seq=Sequence::create(ScaleTo::create(0,1),spawn,NULL);
-				auto shadeAction=TargetedAction::create(shade_act,seq);
-				auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-				auto huFunc=CallFunc::create([=](){	
-					hu_effect_tip(3);
-					distribute_event(DOUBLE_HU_WITH_ME,NULL);});
-					myframe->runAction(Sequence::create(ButtonAct,shadeAction,callFunc1,huFunc,NULL));
-			}
-			else
-			{
-				curButton->_ID=pSender->_ID;
-				auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
-				curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc,NULL));
-			}
-			break;
-		}
-	}
-}
-
-void NetRaceLayer::gang_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		curButton->setScale(1.2);
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			if(_roundManager->_isGangAsking)//is this judgement neccessary?
-				_roundManager->_isGangAsking = false;
-            
-			if(_roundManager->_isWaitDecision)
-			{
-				_roundManager->_isWaitDecision=false;
-				_roundManager->_actionToDo=_roundManager->_tempActionToDo;
-				_roundManager->_tempActionToDo=a_JUMP;
-			}
-			curButton->setTouchEnabled(false);
-			curButton->_ID=1;
-			if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG)
-			{
-				auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::an_gang_tip_effect));
-				curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc1,NULL));
-			}
-			else if(_roundManager->_actionToDo&a_MING_GANG)
-			{
-				auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_gang_tip_effect));
-				curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc1,NULL));
-			}
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		curButton->setScale(1);
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::qi_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		curButton->setScale(1.2);
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			curButton->setTouchEnabled(false);
-			curButton->_ID=1;
-			auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::qi_tip_effect));
-			curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),callFunc,NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		curButton->setScale(1);
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::delete_ActionRemind()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	for(int i=0;i<17;i++)
-	{
-		if(myframe->getChildByTag(REMIND_ACT_TAG_ID+i))
-			myframe->removeChildByTag(REMIND_ACT_TAG_ID+i,true);
-	}
-}
-void NetRaceLayer::delete_ActionEffect()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	for(int i=0;i<31;i++)
-	{
-		if(myframe->getChildByTag(MOJI_EFFECT_TAG_ID+i))
-			myframe->removeChildByTag(MOJI_EFFECT_TAG_ID+i,true);
-	}
-}
-void NetRaceLayer::delete_NnnecessaryResource()
-{
-}
-void NetRaceLayer::delete_act_tip()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-
-	for(int i=0;i<17;i++)
-	{
-		while(myframe->getChildByTag(REMIND_ACT_TAG_ID+i))
-			myframe->removeChildByTag(REMIND_ACT_TAG_ID+i,true);
-	}
-	
-	for(int i=0;i<31;i++)
-	{
-		if(myframe->getChildByTag(MOJI_EFFECT_TAG_ID+i))
-			myframe->removeChildByTag(MOJI_EFFECT_TAG_ID+i,true);
 	}
 }
 
@@ -1863,7 +1843,7 @@ void NetRaceLayer::minggang_update(Node *psender)
 	int no=psender->_ID;
 	_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING_GANG);
 }
-void NetRaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
+void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
@@ -5446,7 +5426,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	{
 		auto myact_qi=Button::create("qi.png","qi.png","qi.png",UI_TEX_TYPE_PLIST);
 		myact_qi->_ID=no;
-		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::qi_callback,this));
+		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::QiPressed,this));
 		myact_qi->setAnchorPoint(Vec2(0.5,0.5));
 		myact_qi->setPosition(Vec2(x,y));
 		myframe->addChild(myact_qi,35,QI_REMIND_ACT_TAG_ID);
@@ -5464,7 +5444,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 		x=x-act_hu->getContentSize().width/2;
 		auto myact_hu=Button::create("hu1.png","hu1.png","hu1.png",UI_TEX_TYPE_PLIST);
 		myact_hu->_ID=no;
-		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::hu_callback,this));
+		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::HuPressed,this));
 		myact_hu->setAnchorPoint(Vec2(0.5,0.5));
 		myact_hu->setPosition(Vec2(x,y+6));
 		myframe->addChild(myact_hu,35,HU_REMIND_ACT_TAG_ID);
@@ -5497,7 +5477,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	{
 		x=x-act_gang->getContentSize().width/2;
 		auto myact_gang=Button::create("gang1.png","gang1.png","gang1.png",UI_TEX_TYPE_PLIST);
-		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::gang_callback,this));
+		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::GangPressed,this));
 		myact_gang->setAnchorPoint(Vec2(0.5,0.5));
 		myact_gang->setPosition(Vec2(x,y));
 		myframe->addChild(myact_gang,35,GANG_REMING_ACT_TAG_ID);
@@ -5514,7 +5494,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	{		
 		x=x-act_peng->getContentSize().width/2;
 		auto myact_peng=Button::create("peng1.png","peng1.png","peng1.png",UI_TEX_TYPE_PLIST);
-		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::peng_callback,this));
+		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::PengPressed,this));
 		myact_peng->setAnchorPoint(Vec2(0.5,0.5));
 		myact_peng->setPosition(Vec2(x,y+13));
 		myframe->addChild(myact_peng,35,PENG_REMIND_ACT_TAG_ID);
@@ -5570,7 +5550,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	}
 	else if(_roundManager->_actionToDo&a_PENG)
 	{
-		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_tip_effect));
+		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::PengEffect));
 		myframe->runAction(callFunc);
 	}
 	else if(_roundManager->_actionToDo==a_JUMP)
@@ -7906,14 +7886,14 @@ void NetRaceLayer::hu_effect_tip(int no)
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
-	if(this->getChildByTag(ROBOT_TUO_GUAN))
-		this->removeChildByTag(ROBOT_TUO_GUAN,true);
-	if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
-		this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+
+    _Remove(this,ROBOT_TUO_GUAN);
+    _Remove(this,TUOGUAN_CANCEL_BUTTON);
+    
+	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
 	scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
-	if(no<3)
-	{
+
+	if(no<3) {
         _roundManager->SetWin(SINGLE_WIN,no);
         
 		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
@@ -8146,15 +8126,8 @@ void NetRaceLayer::hu_effect_tip(int no)
 
 void NetRaceLayer::hu_tip_effect(Node *psender)
 {
-	int no=psender->_ID;
-	//if(no==3)
-	//{
-	//	distribute_event(DOUBLE_HU_WITH_ME,NULL);
-	//}
-	//else
-	//{
+	int no = psender->_ID;
 		hu_effect_tip(no);
-	//}
 }
 
 //int NetRaceLayer::get_cur_player_no()
@@ -9240,7 +9213,35 @@ void NetRaceLayer::UpdateClock(int time,int dir){
     indicator[(dir+2)%3]->setVisible(false);
 }
 
+void NetRaceLayer::delete_ActionRemind()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
 
+	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+        
+	for(int i=0;i<17;i++){
+        _Remove(myframe,REMIND_ACT_TAG_ID+i);
+	}
+}
+
+void NetRaceLayer::delete_ActionEffect()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
+ 	for(int i=0;i<31;i++) {
+        _Remove(myframe,MOJI_EFFECT_TAG_ID+i);
+	}
+}
+
+void NetRaceLayer::delete_act_tip()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	delete_ActionRemind();
+    delete_ActionEffect();    
+}
 
 
 
