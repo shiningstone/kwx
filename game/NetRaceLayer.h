@@ -33,6 +33,7 @@ private:
     CallFunc * _SpeakCard();
     CallFunc *_SpeakAction(ActionType_t id);
     CallFunc *_SpeakGive();
+    CallFunc *_SpeakSelect();
     void create_residue_cards();
     void refresh_residue_cards();
     std::string _NumToString( int number );
@@ -93,9 +94,9 @@ private:
 	bool ifResourcePrepared;
 
 	bool ifTuoGuan;
-	int MyCardChoosedNum;
 	int cardInList;  //only used in waitfor_MyTouchShowCard
 	bool ifChosed;   //only used in waitfor_MyTouchShowCard
+	int MyCardChoosedNum;
 
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;

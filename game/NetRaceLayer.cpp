@@ -1126,18 +1126,15 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		if(ifInsertStopped)
 			ifInsertStopped = false;
 		else {
-			if( _roundManager->IsTing(1) )
-				this->getChildByTag(MING_STATUS_PNG_1)->setVisible(true);
+            _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
 			card_list_update(1);
 		}
 	}),NULL);//callFunc1可优化一下ifInsertStopped ifInsertCardsTime=true;
 	
 	auto seq=Sequence::create(
         allEffect,
-        DelayTime::create(0.12),
-        CallFunc::create([=](){
-            ifInsertCardsTime=false;}
-        ),
+        DelayTime::create(0.12),CallFunc::create([=](){
+        ifInsertCardsTime=false;}),
         sim,
         waitForResponse,
         NULL);
@@ -1274,356 +1271,308 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 	}
 }
 
+bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
+    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
+    if( ifInsertCardsTime ) {
+        ifInsertCardsTime=false;
+        ifInsertStopped=true;
+        card_list_update(MIDDLE);
+    }
+    
+    if( ifEffectTime && ifUpdateDuringEffect ) {
+        ifUpdateDuringEffect=false;
+        card_list_update(MIDDLE);
+    }
+
+    ifChosed=false;
+    
+    if(touch->getLocation().y > visibleSize.height*0.173) {
+        while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(1)))
+            myframe->removeChildByTag(TING_SING_BAR);
+        
+        float x1,y1;
+        x1 = base_point[MIDDLE].x+10;
+        y1 = base_point[MIDDLE].y+10;
+
+        MyCardChoosedNum = -1;
+        
+        auto cardsInHand   = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+        const int start    = cardsInHand->atcvie_place;
+        const int residualNum = (cardsInHand->len - cardsInHand->atcvie_place)%3;
+        const auto startPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+start)->getPosition();
+        const auto cardSize = (Sprite::createWithTexture(g_my_free->getTexture()))->getTextureRect().size;
+
+        for(int k=start; k<cardsInHand->len; k++) {
+            auto card = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+k);
+            card->_ID=1;
+            card->setScale(1);
+            card->setAnchorPoint(Vec2(0,0));
+
+            if(k < cardsInHand->len-1) {
+                card->setPosition(Vec2(startPos.x + cardSize.width*(k - cardsInHand->atcvie_place),y1));
+            } else {/*what about larger residualNum */
+                if(residualNum==1)
+                    card->setPosition(Vec2(startPos.x + cardSize.width*(k-cardsInHand->atcvie_place),y1));
+                else if(residualNum==2)
+                    card->setPosition(Vec2(startPos.x + cardSize.width*(k-cardsInHand->atcvie_place)+30,y1));
+            }
+        }
+    }
+    
+    return true;
+}
+
+void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
+    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
+	auto cardsInHand= _roundManager->_players[1]->get_parter()->get_card_list();
+	int  start      = cardsInHand->atcvie_place;
+    int  last       = cardsInHand->len-1;
+	int  residualNum= (cardsInHand->len - start)%3;
+	auto startPos   = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+start)->getPosition();
+	auto VoiceEffect= _SpeakSelect();
+    
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && touch->getLocation().y>visibleSize.height*0.173) {
+		MyCardChoosedNum = cardInList;
+		myframe->getChildByTag(CHOOSE_CARD_TAG_ID)->setPosition(touch->getLocation());
+		return;
+	} 
+    
+	for(int i=start; i<last+1; i++) {
+		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i)->setOpacity(255);
+	}
+    
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL)
+		myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
+    
+    auto cardSize = Sprite::createWithTexture(g_my_free->getTexture())->getTextureRect().size;
+    float x1,y1;
+    x1 = base_point[1].x+10;
+    y1 = base_point[1].y+10;
+
+	for(int i=start; i<last+1; i++){
+		if( _IsClickedOn((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i),touch) ) {
+			if(cardsInHand->data[i].can_play==cps_YES) {						
+				for(int k=start; k<last+1; k++) {
+					auto loopCard=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+k);
+                    
+					if(k<i) {//restore the original size & position?
+						loopCard->setPosition(Vec2(startPos.x + cardSize.width*(k-start), y1));
+						loopCard->setScale(1);
+					} else if(k==i) {
+						MyCardChoosedNum = k;
+
+                        //logic changed !!!
+						if( k==last && residualNum==2 ) {
+							loopCard->setPosition(Vec2(startPos.x+cardSize.width*(k-start)+30,y1+10));
+                        } else {
+							loopCard->setPosition(Vec2(startPos.x+cardSize.width*(k-start),   y1+10));
+                        }
+
+                        if(_roundManager->_actionToDo==a_MING && ifMingTime && (!_roundManager->IsTing(MIDDLE))) {
+                            if( loopCard->getScaleX()==1 ) {
+                                loopCard->setScale(1.2);
+                                loopCard->runAction(VoiceEffect);
+
+								while(myframe->getChildByTag(TING_SING_BAR))
+									myframe->removeChildByTag(TING_SING_BAR);
+
+								auto appearPoint=loopCard->getPosition();
+								tingHintCreate(appearPoint,k);
+                             } else if (!myframe->getChildByTag(TING_SING_BAR)) {
+								auto appearPoint=loopCard->getPosition();
+								tingHintCreate(appearPoint,k);
+                             }
+                             
+                             ifChosed = true;
+                             cardInList = i;
+                        }                        
+					} else {
+						if( k==last && residualNum==2 ) {
+                            loopCard->setPosition(Vec2(startPos.x+cardSize.width*(k-cardsInHand->atcvie_place)+30+14,y1));
+						} else {
+							loopCard->setPosition(Vec2(startPos.x+cardSize.width*(k-start)+14,y1));
+						}
+                        
+                        loopCard->setScale(1);
+					}
+				}
+			}
+			break;
+		} else if(touch->getLocation().y>visibleSize.height*0.173) {
+			if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)==NULL && ifChosed==true) {
+				int  kind = _roundManager->_players[1]->get_parter()->get_card_list()->data[cardInList].kind;
+				auto card = Sprite::createWithTexture(g_card_kind[kind]->getTexture());
+				auto freeCard = Sprite::createWithTexture(g_my_free->getTexture());
+                
+				freeCard->addChild(card);
+				card->setPosition(Vec2(
+                    freeCard->getTextureRect().size.width/2,
+                    freeCard->getTextureRect().size.height*0.4));
+				freeCard->setScale(1.2);
+                
+				MyCardChoosedNum = cardInList;
+                
+				freeCard->setPosition(touch->getLocation());
+				myframe->addChild(freeCard,35,CHOOSE_CARD_TAG_ID);
+				myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + cardInList)->setOpacity(150);
+
+				while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)))
+					myframe->removeChildByTag(TING_SING_BAR,true);
+			}
+			break;
+		}
+	}
+}
+
+void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
+    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
+    LOGGER_WRITE("%s",__FUNCTION__);
+	//========================PossibleCondition=================//
+	auto cardsInHand = _roundManager->_players[1]->get_parter()->get_card_list();
+	int start        = cardsInHand->atcvie_place;
+    int last         = cardsInHand->len - 1;
+	int residualNum  = (last - cardsInHand->atcvie_place + 1)%3;
+	auto startPos    = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+start)->getPosition();
+	//========================PossibleCondition=================//
+	auto VoiceEffect = _SpeakSelect();
+    
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && (touch->getLocation().y>visibleSize.height*0.2)) {
+		if(ifMyShowCardTime) {
+			ifMyShowCardTime=false;
+			MyCardChoosedNum=-1;
+			choose_and_insert_cards(myframe,cardsInHand,cardInList,touch,1);
+		} else {
+			MyCardChoosedNum=cardInList;
+			myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+cardInList)->setOpacity(255);
+			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID,true);
+		}
+		return;
+	} else {
+		for(int i=start; i<=last; i++)
+			myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i)->setOpacity(255);
+        
+		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL)
+			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID,true);
+	}
+    
+	int touchedCard = -1;
+    
+	for(int i=start; i<=last; i++) {
+        if ( _IsClickedOn((Button *)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i),touch)
+            && cardsInHand->data[i].can_play==cps_YES ) {
+			touchedCard = i;
+			break;
+		}
+	}
+    
+	if(touchedCard>=0) {
+		bool ifInsertCardsTime = false;
+        
+        float x,y;
+		x = base_point[1].x+10;
+		y = base_point[1].y+10;
+        
+		auto cardSize = Sprite::createWithTexture(g_my_free->getTexture())->getTextureRect().size;
+        
+		for(int k=start; k<=last; k++) {
+			auto loopCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+k);
+            
+			if(k<touchedCard) {
+				loopCard->_ID = 1;
+				loopCard->setPosition(Vec2(startPos.x + cardSize.width*(k-start),y));
+				loopCard->setScale(1);
+			} else if(k>touchedCard) {
+				loopCard->_ID=1;
+                loopCard->setScale(1);
+
+				if(k==last && residualNum==2){
+					loopCard->setPosition(Vec2(startPos.x + cardSize.width*(k-start)+30+14,y));
+				} else {
+					loopCard->setPosition(Vec2(startPos.x + cardSize.width*(k-start)+14,y));
+				}
+			} else {
+				MyCardChoosedNum=k;
+                
+				if(k==last) {
+					if(loopCard->_ID==100) {
+						if(ifMyShowCardTime) {
+							ifMyShowCardTime=false;
+							MyCardChoosedNum=-1;
+							cardInList=k;
+							choose_and_insert_cards(myframe,cardsInHand,cardInList,touch,2);
+						}
+					} else {
+						loopCard->_ID=100;
+                        
+						if(residualNum==1)
+							loopCard->setPosition(Vec2(startPos.x + cardSize.width*(k-start),y+10));
+						else if(residualNum==2)
+							loopCard->setPosition(Vec2(startPos.x + cardSize.width*(k-start)+30,y+10));
+                        
+						if(loopCard->getScale()==1)
+							loopCard->runAction(VoiceEffect);
+                        
+						loopCard->setScale(1.2);
+					}
+				} else {
+					if(loopCard->_ID==100)
+						ifInsertCardsTime=true;
+					else
+					{
+						loopCard->_ID=100;
+						loopCard->setPosition(Vec2(startPos.x+cardSize.width*(k-start),y+10));
+						if(loopCard->getScale()==1)
+							loopCard->runAction(VoiceEffect);
+						loopCard->setScale(1.2);
+					}
+				}
+                
+				if(_roundManager->_actionToDo==a_MING
+                    && ifMingTime && !_roundManager->IsTing(MIDDLE))
+				{
+					while(myframe->getChildByTag(TING_SING_BAR)&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
+						myframe->removeChildByTag(TING_SING_BAR);
+                    
+					Point curPos=loopCard->getPosition();
+					tingHintCreate(curPos,k);
+				}
+			}
+		}
+        
+		if(ifInsertCardsTime && ifMyShowCardTime)
+		{
+			ifMyShowCardTime=false;
+			MyCardChoosedNum=-1;
+			cardInList = touchedCard;
+			choose_and_insert_cards(myframe,cardsInHand,cardInList,touch,3);
+		}
+	}
+}
+
+void NetRaceLayer::ListenToCardTouch() {
+    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
+	auto listener = EventListenerTouchOneByOne::create();
+	listener->setSwallowTouches(true);
+    
+	listener->onTouchBegan = _CardTouchBegan;
+	listener->onTouchMoved = _CardTouchMove;
+	listener->onTouchEnded = _CardTouchEnd;
+
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
+}
+
 void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
     _roundManager->AllowMovement();
-
 	if( !_roundManager->IsTing(MIDDLE) && !ifTuoGuan ) {
-        auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-        
-		auto listener = EventListenerTouchOneByOne::create();
-		listener->setSwallowTouches(true);
-		listener->onTouchBegan=[=](Touch* touch, Event* event)
-		{
-			if( ifInsertCardsTime ) {
-				ifInsertCardsTime=false;
-				ifInsertStopped=true;
-				card_list_update(1);
-			}
-            
-			if( ifEffectTime && ifUpdateDuringEffect ) {
-				ifUpdateDuringEffect=false;
-				card_list_update(1);
-			}
-
-			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-			int list_active=list->atcvie_place;
-			auto startCardPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+list_active)->getPosition();
-			int residualCardsNum=(list->len-list->atcvie_place)%3;
-			ifChosed=false;
-			if(touch->getLocation().y>visibleSize.height*0.173)
-			{
-				while(myframe->getChildByTag(TING_SING_BAR)&&(!_roundManager->IsTing(1)))
-					myframe->removeChildByTag(TING_SING_BAR);
-				auto s_card=Sprite::createWithTexture(g_my_free->getTexture());
-				auto cardSize=s_card->getTextureRect().size;
-				float x1,y1;
-				x1=base_point[1].x+10;
-				y1=base_point[1].y+10;
-				MyCardChoosedNum=-1;
-				for(int k=list->atcvie_place;k<list->len;k++)
-				{
-					auto card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+k);
-					card->_ID=1;
-					card->setScale(1);
-					card->setAnchorPoint(Vec2(0,0));
-					if(k<list->len-1)
-						card->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y1));
-					else if(k==list->len-1)
-					{
-						if(residualCardsNum==1)
-							card->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y1));
-						else if(residualCardsNum==2)
-							card->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+30,y1));
-					}
-				}
-			}			
-			return true;
-		};
-        
-		listener->onTouchMoved=[=](Touch* touch, Event* event)
-		{
-			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-			int list_active=list->atcvie_place;
-			int residualCardsNum=(list->len-list->atcvie_place)%3;
-			auto startCardPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+list_active)->getPosition();
-			auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/select.ogg");});
-			if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL&&touch->getLocation().y>visibleSize.height*0.173)
-			{
-				MyCardChoosedNum=cardInList;
-				myframe->getChildByTag(CHOOSE_CARD_TAG_ID)->setPosition(touch->getLocation());
-				return;
-			}
-			else
-			{
-				for(int i=list->atcvie_place;i<list->len;i++)
-				{
-					auto card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i);
-					card->setOpacity(255);
-				}
-				if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL)
-					myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
-			}
-			float x,y;
-			for(int i=list->atcvie_place;i<list->len;i++)
-			{
-				auto card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i);
-				x=card->getPosition().x;
-				y=card->getPosition().y;
-				Size s=card->getContentSize();
-				Rect rect=Rect(x,y,s.width,s.height);
-				if(rect.containsPoint(touch->getLocation()))
-				{
-					if(list->data[i].can_play==cps_YES)
-					{						
-						float x1,y1;
-						x1=base_point[1].x+10;
-						y1=base_point[1].y+10;
-						auto TempCard=Sprite::createWithTexture(g_my_free->getTexture());
-						auto cardSize=TempCard->getTextureRect().size;
-						for(int k=list->atcvie_place;k<list->len;k++)
-						{
-							auto loopCard=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+k);
-							if(k<i)
-							{
-								loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y1));
-								loopCard->setScale(1);
-							}
-							else if(k==i)
-							{
-								MyCardChoosedNum=k;
-								if(k==list->len-1)
-								{
-									if(residualCardsNum==1)
-										loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y1+10));
-									else if(residualCardsNum==2)
-										loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+30,y1+10));
-									if(loopCard->getScaleX()==1)
-									{
-										loopCard->setScale(1.2);
-										loopCard->runAction(VoiceEffect);
-										if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
-										{
-											while(myframe->getChildByTag(TING_SING_BAR))
-												myframe->removeChildByTag(TING_SING_BAR);
-											auto appearPoint=loopCard->getPosition();
-											tingHintCreate(appearPoint,k);//,list->data[k].kind);
-										}
-									}
-									else if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
-									{
-										if(!myframe->getChildByTag(TING_SING_BAR))
-										{
-											auto appearPoint=loopCard->getPosition();
-											tingHintCreate(appearPoint,k);//,list->data[k].kind);
-										}
-									}
-									ifChosed=true;
-									cardInList=i;
-								}
-								else
-								{
-									loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list_active),y1+10));
-									if(loopCard->getScaleX()==1)
-									{
-										loopCard->setScale(1.2);
-										loopCard->runAction(VoiceEffect);
-										if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
-										{
-											while(myframe->getChildByTag(TING_SING_BAR))
-												myframe->removeChildByTag(TING_SING_BAR);
-											auto appearPoint=loopCard->getPosition();
-											tingHintCreate(appearPoint,k);//,list->data[k].kind);
-										}
-									}
-									else if(_roundManager->_actionToDo==a_MING&&ifMingTime&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
-									{
-										if(!myframe->getChildByTag(TING_SING_BAR))
-										{
-											auto appearPoint=loopCard->getPosition();
-											tingHintCreate(appearPoint,k);//,list->data[k].kind);
-										}
-									}
-									ifChosed=true;
-									cardInList=i;
-								}
-							}
-							else if(k>i)
-							{
-								if(k==list->len-1)
-								{
-									if(residualCardsNum==1)
-										loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+14,y1));
-									else if(residualCardsNum==2)
-										loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+30+14,y1));
-									loopCard->setScale(1);
-								}
-								else
-								{
-									loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list_active)+14,y1));
-									loopCard->setScale(1);
-								}
-							}
-						}
-					}
-					break;
-				}
-				else if(touch->getLocation().y>visibleSize.height*0.173)
-				{
-					if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)==NULL && ifChosed==true)
-					{
-						auto my_handin=Sprite::createWithTexture(g_my_free->getTexture());
-						int single_click_chose_card=_roundManager->_players[1]->get_parter()->get_card_list()->data[cardInList].kind;
-						auto show_card_kind=Sprite::createWithTexture(g_card_kind[single_click_chose_card]->getTexture());
-						my_handin->addChild(show_card_kind);
-						show_card_kind->setPosition(Vec2(my_handin->getTextureRect().size.width/2,my_handin->getTextureRect().size.height*0.4));
-						my_handin->setScale(1.2);
-						MyCardChoosedNum=cardInList;
-						my_handin->setPosition(touch->getLocation());
-						myframe->addChild(my_handin,35,CHOOSE_CARD_TAG_ID);
-						myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+cardInList)->setOpacity(150);
-
-						while(myframe->getChildByTag(TING_SING_BAR)&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
-							myframe->removeChildByTag(TING_SING_BAR,true);
-					}
-					break;
-				}
-			}
-			return;
-		};
-		listener->onTouchEnded=[=](Touch* touch, Event* event)
-		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-			//========================PossibleCondition=================//
-			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-			int list_active=list->atcvie_place;
-			int residualCardsNum=(list->len-list->atcvie_place)%3;
-			auto startCardPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+list_active)->getPosition();
-			//========================PossibleCondition=================//
-			auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/select.ogg");});
-			if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL&&(touch->getLocation().y>visibleSize.height*0.2))
-			{
-				if(ifMyShowCardTime)
-				{
-					ifMyShowCardTime=false;
-					MyCardChoosedNum=-1;
-					choose_and_insert_cards(myframe,list,cardInList,touch,1);
-				}
-				else
-				{
-					MyCardChoosedNum=cardInList;
-					myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+cardInList)->setOpacity(255);
-					myframe->removeChildByTag(CHOOSE_CARD_TAG_ID,true);
-				}
-				return;
-			}
-			else
-			{
-				for(int i=list->atcvie_place;i<list->len;i++)
-					myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i)->setOpacity(255);
-				if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL)
-					myframe->removeChildByTag(CHOOSE_CARD_TAG_ID,true);
-			}
-			float x,y;
-			int TouchLocationNum=-1;
-			for(int i=list->atcvie_place;i<list->len;i++)
-			{
-				x=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i)->getPosition().x;
-				y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i)->getPosition().y;
-				Size s = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i)->getContentSize();
-				Rect rect=Rect(x,y,s.width,s.height);
-				if(rect.containsPoint(touch->getLocation())&&list->data[i].can_play==cps_YES)
-				{
-					TouchLocationNum=i;
-					break;
-				}
-			}
-			if(TouchLocationNum>=0)
-			{
-				bool ifInsertCardsTime=false;
-				x=base_point[1].x+10;
-				y=base_point[1].y+10;
-				auto ca=Sprite::createWithTexture(g_my_free->getTexture());
-				auto cardSize=ca->getTextureRect().size;
-				for(int k=list->atcvie_place;k<list->len;k++)
-				{
-					auto loopCard=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+k);
-					if(k<TouchLocationNum)
-					{
-						loopCard->_ID=1;
-						loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y));
-						loopCard->setScale(1);
-					}					
-					else if(k>TouchLocationNum)
-					{
-						loopCard->_ID=1;
-						if(k==list->len-1)
-						{
-							if(residualCardsNum==1)
-								loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+14,y));
-							else if(residualCardsNum==2)
-								loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+30+14,y));
-							loopCard->setScale(1);
-						}
-						else
-						{
-							loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+14,y));
-							loopCard->setScale(1);
-						}
-					}
-					else if(k==TouchLocationNum)
-					{
-						MyCardChoosedNum=k;
-						if(k==list->len-1)
-						{
-							if(loopCard->_ID==100)
-							{
-								if(ifMyShowCardTime)
-								{
-									ifMyShowCardTime=false;
-									MyCardChoosedNum=-1;
-									cardInList=k;
-									choose_and_insert_cards(myframe,list,cardInList,touch,2);
-								}
-							}
-							else
-							{
-								loopCard->_ID=100;
-								if(residualCardsNum==1)
-									loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y+10));
-								else if(residualCardsNum==2)
-									loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place)+30,y+10));
-								if(loopCard->getScale()==1)
-									loopCard->runAction(VoiceEffect);
-								loopCard->setScale(1.2);
-							}
-						}
-						else
-						{
-							if(loopCard->_ID==100)
-								ifInsertCardsTime=true;
-							else
-							{
-								loopCard->_ID=100;
-								loopCard->setPosition(Vec2(startCardPos.x+cardSize.width*(k-list->atcvie_place),y+10));
-								if(loopCard->getScale()==1)
-									loopCard->runAction(VoiceEffect);
-								loopCard->setScale(1.2);
-							}
-						}
-						if(_roundManager->_actionToDo==a_MING&&ifMingTime&&!_roundManager->_players[1]->get_parter()->get_ting_status())
-						{
-							while(myframe->getChildByTag(TING_SING_BAR)&&(!_roundManager->_players[1]->get_parter()->get_ting_status()))
-								myframe->removeChildByTag(TING_SING_BAR);
-							Point curPos=loopCard->getPosition();
-							tingHintCreate(curPos,k);
-						}
-					}
-				}
-				if(ifInsertCardsTime && ifMyShowCardTime)
-				{
-					ifMyShowCardTime=false;
-					MyCardChoosedNum=-1;
-					cardInList = TouchLocationNum;
-					choose_and_insert_cards(myframe,list,cardInList,touch,3);
-				}
-			}
-			return;
-		};
-
-		Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
-	}
+        ListenToCardTouch();
+    }
 }
+
 void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -4622,22 +4571,12 @@ void NetRaceLayer::card_list_update(int no)
 
 void NetRaceLayer::update_card_list(Node *psender)
 {
-	int no=psender->_ID;
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	//if(myframe->getChildByTag(MING_DAOPAI_EFFECT))
-	//	myframe->removeChildByTag(MING_DAOPAI_EFFECT);
-	//if(this->getChildByTag(GAME_BKG_TAG_ID)->getChildByTag(MING_DAOPAI_EFFECT))
-	//	this->getChildByTag(GAME_BKG_TAG_ID)->removeChildByTag(MING_DAOPAI_EFFECT);
-	unsigned char ting_status=_roundManager->_players[no]->get_parter()->get_ting_status();
-	if(ting_status==1)
-	{
-		if(no==0)
-			this->getChildByTag(MING_STATUS_PNG_0)->setVisible(true);
-		else if(no==1)
-			this->getChildByTag(MING_STATUS_PNG_1)->setVisible(true);
-		else if(no==2)
-			this->getChildByTag(MING_STATUS_PNG_2)->setVisible(true);
+    int no = psender->_ID;
+    
+	if(_roundManager->IsTing(no)) {
+        _Show(this,MING_STATUS_PNG_0+no,true);
 	}
+    
 	card_list_update(no);
 }
 
@@ -8215,6 +8154,10 @@ CallFunc* NetRaceLayer::_SpeakAction(ActionType_t id) {
 
 CallFunc* NetRaceLayer::_SpeakGive() {
 	return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/give.ogg");});
+}
+
+CallFunc* NetRaceLayer::_SpeakSelect() {
+	return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/select.ogg");});
 }
 
 /***********************************************************
