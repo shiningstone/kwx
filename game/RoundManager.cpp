@@ -69,6 +69,11 @@ bool RoundManager::IsWinner(int no, int curPlayer, int FirstMingPlayer) {
 /***********************************************
         river information
 ***********************************************/
+void RoundManager::RecordHandOut(int cardIdx) {
+    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[cardIdx]);
+    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(cardIdx);
+}
+
 void RoundManager::RecordOutCard( Card card ) {
     _river->insertItem(card);
 

@@ -1155,7 +1155,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	myframe->runAction(seq);
 }
 
-void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int card_in_list,Touch* touch,int time)
+void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int chosenCard,Touch* touch,int time)
 {
     LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,_roundManager->_isWaitDecision);
 
@@ -1172,60 +1172,65 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
     _Remove(myframe,MING_CANCEL);
     _Show(myframe,TING_SING_BAR,false);
 
-    if( card_in_list == list->len-1 ) {
-		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + card_in_list)->setScale(0);
+    if( chosenCard == list->len-1 ) {
+		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + chosenCard)->setScale(0);
 	} else {
-		for(int i=list->atcvie_place; i<list->len-1; i++) {
-			auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + i);
+        auto firstCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20);
+        const auto SIZE      = firstCard->getTextureRect().size;
+
+        const int  LAST      = list->len-1;
+        /* maybe need to be put into the circulation */
+        const auto LAST_CARD = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST);
+        const auto LAST_POS  = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST)->getPosition();
+
+        /* need to be optimized !!! */
+		for(int i=list->atcvie_place; i<LAST; i++) {
+			auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 
+                _roundManager->_curPlayer*20 + i);
+			auto curPos   = card->getPosition();
             
-			auto curPos=card->getPosition();
-			auto cardSize=card->getTextureRect().size;
-			auto RightMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width,curPos.y));
-			auto LeftMove=MoveTo::create(0.3,Vec2(curPos.x-cardSize.width*1.2,curPos.y));
+			auto RightMove = MoveTo::create(0.3,Vec2(curPos.x+SIZE.width,curPos.y));
+			auto LeftMove  = MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*1.2,curPos.y));
 
-			auto last_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+list->len-1);
-			auto sourcePos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+list->len-1)->getPosition();
-			auto RightMoveAction1=MoveTo::create(0.06,Vec2(sourcePos.x,sourcePos.y+100));
-			auto RightMoveAction2=MoveTo::create(0.24,Vec2(curPos.x,sourcePos.y+100));
-			auto RightMoveAction3=MoveTo::create(0.06,Vec2(curPos));
-			auto RightInsertSeq=Sequence::create(RightMoveAction1,RightMoveAction2,RightMoveAction3,NULL);
-
-			auto LeftMoveAction1=MoveTo::create(0.06,Vec2(sourcePos.x,sourcePos.y+100));
-			auto LeftMoveAction2=MoveTo::create(0.24,Vec2(curPos.x-cardSize.width*0.2,sourcePos.y+100));
-			auto LeftMoveAction3=MoveTo::create(0.06,Vec2(curPos.x-cardSize.width*0.2,curPos.y));
-			auto LeftInsertSeq=Sequence::create(LeftMoveAction1,LeftMoveAction2,LeftMoveAction3,NULL);
+			auto RightInsertSeq   = Sequence::create(
+                MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
+                MoveTo::create(0.24,Vec2(curPos.x,LAST_POS.y+100)),
+                MoveTo::create(0.06,Vec2(curPos)),NULL);
+			auto LeftInsertSeq   = Sequence::create(
+                MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
+                MoveTo::create(0.24,Vec2(curPos.x-SIZE.width*0.2,LAST_POS.y+100)),
+                MoveTo::create(0.06,Vec2(curPos.x-SIZE.width*0.2,curPos.y)),NULL);
 						
-			if(i < card_in_list) {
-				if(list->data[i].kind <= list->data[list->len-1].kind)
+			if(i < chosenCard) {
+				if(list->data[i].kind <= list->data[LAST].kind)
 					continue;
 				else {
-					if(i==list->atcvie_place)
-						last_card->runAction(RightInsertSeq);
-					else if(list->data[i-1].kind<=list->data[list->len-1].kind)
-						last_card->runAction(RightInsertSeq);
+					if( i==list->atcvie_place || list->data[i-1].kind<=list->data[LAST].kind )
+						LAST_CARD->runAction(RightInsertSeq);
+                    
 					card->runAction(RightMove);
 				}
-			} else if(i==card_in_list) {
+			} else if(i==chosenCard) {
 				if(i==list->atcvie_place) {
-					if(list->data[i+1].kind>list->data[list->len-1].kind)
-						last_card->runAction(RightInsertSeq);
-				} else if(i==list->len-2) {
-					if(list->data[i-1].kind<=list->data[list->len-1].kind)
-						last_card->runAction(MoveTo::create(0.3,Vec2(curPos.x,sourcePos.y)));
+					if(list->data[i+1].kind>list->data[LAST].kind)
+						LAST_CARD->runAction(RightInsertSeq);
+				} else if(i==LAST-1) {
+					if(list->data[i-1].kind<=list->data[LAST].kind)
+						LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x,LAST_POS.y)));
  				} else {
-					if(list->data[i-1].kind<=list->data[list->len-1].kind&&list->data[i+1].kind>list->data[list->len-1].kind)
-						last_card->runAction(RightInsertSeq);
+					if(list->data[i-1].kind<=list->data[LAST].kind&&list->data[i+1].kind>list->data[LAST].kind)
+						LAST_CARD->runAction(RightInsertSeq);
 				}
                 
 				card->setScale(0);
-			} else if(i>card_in_list) {
-				if(list->data[i].kind>list->data[list->len-1].kind)
-					card->runAction(MoveTo::create(0.3,Vec2(curPos.x-cardSize.width*0.2,curPos.y)));
+			} else {/* i>chosenCard */
+				if(list->data[i].kind>list->data[LAST].kind)
+					card->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
 				else {
-					if(i==list->len-2)
-						last_card->runAction(MoveTo::create(0.3,Vec2(curPos.x-cardSize.width*0.2,curPos.y)));
-					else if(list->data[i+1].kind>list->data[list->len-1].kind)
-						last_card->runAction(LeftInsertSeq);					
+					if(i==LAST-1)
+						LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
+					else if(list->data[i+1].kind>list->data[LAST].kind)
+						LAST_CARD->runAction(LeftInsertSeq);					
 					card->runAction(LeftMove);
 				}
 			}
@@ -1237,55 +1242,43 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ca
 			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
 	}
 
-    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[card_in_list]);
+    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[chosenCard]);
+	_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(chosenCard);
 
-	_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(card_in_list);
 	update_outcard(myframe,touch->getLocation(),time);
 }
 
+typedef enum {
+    LEFT,
+    MIDDLE,
+    RIGHT,
+}PlayerDir_t;
+
 void NetRaceLayer::waitfor_MyShowCardInstruct()
 {
-    LOGGER_WRITE("%s _roundManager->_isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
+    LOGGER_WRITE("%s isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	if(!_roundManager->_isCardFromOthers)
-	{
-		if(ifTuoGuan)
-		{
-			int last_one=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
-			Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
-			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
-				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
+    
+	if(!_roundManager->_isCardFromOthers) {
+		if( ifTuoGuan ||
+            (_roundManager->IsTing(_roundManager->_curPlayer) && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
+			int last = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+			Vec2 location = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + MIDDLE*20 + last)->getPosition();
             
-            _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
-
-			_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
+			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + MIDDLE*20 + last))
+				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID + MIDDLE*20 + last);
+            
+            _roundManager->RecordHandOut(last);
 			update_outcard(myframe,location,2);
+            
+		} else if( myframe->getChildByTag(GANG_REMING_ACT_TAG_ID) ) {
+			_roundManager->_isGangAsking = true;
 		}
-		else if( _roundManager->IsTing(_roundManager->_curPlayer) )
-		{
-			if(myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) {
-				_roundManager->_isGangAsking = true;
-            }
-			else
-			{
-				int last_one=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
-				Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
-				if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
-					myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
-
-                _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
-
-				_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
-				update_outcard(myframe,location,2);
-			}
-		}
-		else
-			ifMyShowCardTime=true;
+		else {
+			ifMyShowCardTime = true;
+        }
 	}
-	//else if(_roundManager->_isCardFromOthers)
-	//{
-	//}
 }
 void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
@@ -1632,7 +1625,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 				{
 					ifMyShowCardTime=false;
 					MyCardChoosedNum=-1;
-					cardInList=TouchLocationNum;
+					cardInList = TouchLocationNum;
 					choose_and_insert_cards(myframe,list,cardInList,touch,3);
 				}
 			}
@@ -1698,8 +1691,8 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 			index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 
         _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index]);
-
 		_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
+
 		auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
 		float p_x,p_y;
 		auto RobotList=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
