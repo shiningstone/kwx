@@ -32,6 +32,7 @@ public:
 
     void RecordOutCard( Card card );
     void RenewOutCard();
+    void RecordHandOut(int cardIdx);
 
 
     void InitPlayers();

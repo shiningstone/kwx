@@ -64,17 +64,22 @@ private:
 
     void _ClockAddTime( Sprite *clock, int time );
     void _Remove(Node *parent, int childTag);
-    bool _IsClickedOn(Sprite* button,Touch* touch);
+    bool _IsClickedOn(Node* button,Touch* touch);
     void _Show(Node *parent, int childTag,bool flag);
 
     /*Ming*/
-    Button *_CreateKouChooseCancelButton();
-    Button *_CreateKouChooseConfirmButton();
-    Sprite *_CreateMingSign();
-    Sprite *_NonKouMask(Sprite *card);
+    Node *_CreateKouChooseCancelButton();
+    Node *_CreateKouChooseConfirmButton();
+    Node *_CreateMingSign();
+    Node *_NonKouMask(Sprite *card);
     void    MaskNonKouCards();
     void    ListenToKou(int no);
-
+    TargetedAction *ShowBigMing(Node *myframe);
+    bool _CardTouchBegan(Touch* touch, Event* event);
+    void _CardTouchMove(Touch* touch, Event* event);
+    void _CardTouchEnd(Touch* touch, Event* event);
+    void ListenToCardTouch();
+    Vec2 getEffectVec(int dir);
 
 public:
 	void UpdateClock(int time,int direction);

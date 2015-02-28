@@ -1554,9 +1554,9 @@ void NetRaceLayer::ListenToCardTouch() {
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
     
-	listener->onTouchBegan = _CardTouchBegan;
-	listener->onTouchMoved = _CardTouchMove;
-	listener->onTouchEnded = _CardTouchEnd;
+	listener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_CardTouchBegan,this);
+	listener->onTouchMoved = CC_CALLBACK_2(NetRaceLayer::_CardTouchMove,this);
+	listener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_CardTouchEnd,this);
 
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
 }
@@ -4994,7 +4994,7 @@ void NetRaceLayer::KouCardsCheck(int no)
 	}
 }
 
-Button *NetRaceLayer::_CreateKouChooseCancelButton() {
+Node *NetRaceLayer::_CreateKouChooseCancelButton() {
     auto ChooseCancel = Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
     ChooseCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouCancle,this));
     ChooseCancel->setAnchorPoint(Vec2(0.5,0.5));
@@ -5004,7 +5004,7 @@ Button *NetRaceLayer::_CreateKouChooseCancelButton() {
     return ChooseCancel;
 }
 
-Button *NetRaceLayer::_CreateKouChooseConfirmButton() {
+Node *NetRaceLayer::_CreateKouChooseConfirmButton() {
     auto ChooseEnsure=Button::create("wancheng.png","wancheng.png","wancheng.png",UI_TEX_TYPE_PLIST);
     ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouEnsure,this));
     ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
@@ -5015,7 +5015,7 @@ Button *NetRaceLayer::_CreateKouChooseConfirmButton() {
 }
 
 
-Sprite *NetRaceLayer::_CreateMingSign() {
+Node *NetRaceLayer::_CreateMingSign() {
     auto MingSign=Sprite::createWithSpriteFrameName("gpts.png");
     MingSign->setAnchorPoint(Vec2(0.5,0.5));
     MingSign->setPosition(Vec2(
@@ -5024,11 +5024,13 @@ Sprite *NetRaceLayer::_CreateMingSign() {
     return MingSign;
 }
 
-Sprite *NetRaceLayer::_NonKouMask(Sprite *card) {
+Node *NetRaceLayer::_NonKouMask(Sprite *card) {
     auto mask = Sprite::createWithTexture(g_my_mask->getTexture());
     mask->setAnchorPoint(Vec2(0.5,0.5));
-    mask->setPosition(p_list[a]->getTextureRect().size.width/2,p_list[a]->getTextureRect().size.height/2);
+    mask->setPosition(card->getTextureRect().size.width/2,card->getTextureRect().size.height/2);
     card->addChild(mask,2,MING_KOU_MASK);
+
+    return mask;
 }
 
 void NetRaceLayer::MaskNonKouCards() {
@@ -5038,7 +5040,7 @@ void NetRaceLayer::MaskNonKouCards() {
     for(int i=cards->atcvie_place; i<cards->len; i++) {
         if(cards->data[i].status!=c_KOU_ENABLE) {
             Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
-            _NonKouMask(cards);
+            _NonKouMask(card);
         }
     }
 }
@@ -5091,7 +5093,7 @@ void NetRaceLayer::ListenToKou(int no) {
             if(kouCards_kind[kind].status==c_FREE)
                 continue;
             
-            for(i=0;i<3;i++) {
+            for(int i=0;i<3;i++) {
                 if ( _IsClickedOn(cardsInHand[KouCardsPlace[kind][i]],touch) ) {
                     if(cardsInHand[KouCardsPlace[kind][i]]->_ID!=1)
                         kindChosen = kind;
@@ -5104,16 +5106,16 @@ void NetRaceLayer::ListenToKou(int no) {
         if(kindChosen!=-1) {
             if(kouCards_kind[kindChosen].status==c_MING_KOU) {
                 kouCards_kind[kindChosen].status=c_KOU_ENABLE;
-                cardsInHand->data[KouCardsPlace[kindChosen][0]].status=c_KOU_ENABLE;
-                cardsInHand->data[KouCardsPlace[kindChosen][1]].status=c_KOU_ENABLE;
-                cardsInHand->data[KouCardsPlace[kindChosen][2]].status=c_KOU_ENABLE;
+                cards->data[KouCardsPlace[kindChosen][0]].status=c_KOU_ENABLE;
+                cards->data[KouCardsPlace[kindChosen][1]].status=c_KOU_ENABLE;
+                cards->data[KouCardsPlace[kindChosen][2]].status=c_KOU_ENABLE;
             }
             else if(kouCards_kind[kindChosen].status==c_KOU_ENABLE)
             {
                 kouCards_kind[kindChosen].status=c_MING_KOU;
-                cardsInHand->data[KouCardsPlace[kindChosen][0]].status=c_MING_KOU;
-                cardsInHand->data[KouCardsPlace[kindChosen][1]].status=c_MING_KOU;
-                cardsInHand->data[KouCardsPlace[kindChosen][2]].status=c_MING_KOU;
+                cards->data[KouCardsPlace[kindChosen][0]].status=c_MING_KOU;
+                cards->data[KouCardsPlace[kindChosen][1]].status=c_MING_KOU;
+                cards->data[KouCardsPlace[kindChosen][2]].status=c_MING_KOU;
             }
         }
         
@@ -5122,14 +5124,14 @@ void NetRaceLayer::ListenToKou(int no) {
                 if(_roundManager->_players[1]->get_parter()->judge_kou_cards(
                     kouCards_kind[a].kind, no, RototHandOutIndex))
                 {
-                    cardsInHand->data[KouCardsPlace[a][0]].status=c_KOU_ENABLE;
-                    cardsInHand->data[KouCardsPlace[a][1]].status=c_KOU_ENABLE;
-                    cardsInHand->data[KouCardsPlace[a][2]].status=c_KOU_ENABLE;
+                    cards->data[KouCardsPlace[a][0]].status=c_KOU_ENABLE;
+                    cards->data[KouCardsPlace[a][1]].status=c_KOU_ENABLE;
+                    cards->data[KouCardsPlace[a][2]].status=c_KOU_ENABLE;
                     kouCards_kind[a].status=c_KOU_ENABLE;
                 } else {
-                    cardsInHand->data[KouCardsPlace[a][0]].status=c_FREE;
-                    cardsInHand->data[KouCardsPlace[a][1]].status=c_FREE;
-                    cardsInHand->data[KouCardsPlace[a][2]].status=c_FREE;
+                    cards->data[KouCardsPlace[a][0]].status=c_FREE;
+                    cards->data[KouCardsPlace[a][1]].status=c_FREE;
+                    cards->data[KouCardsPlace[a][2]].status=c_FREE;
                     kouCards_kind[a].status=c_FREE;
                 }
             }
@@ -5256,7 +5258,7 @@ void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		(Button*)pSender->setScale(1.2);
+		((Button*)pSender)->setScale(1.2);
 		break;
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
@@ -5321,7 +5323,7 @@ void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		(Button*)pSender->setScale(1);
+		((Button*)pSender)->setScale(1);
 		break;
 	default:
 		break;
@@ -9145,7 +9147,7 @@ void NetRaceLayer::_Show(Node *parent, int childTag,bool flag) {
     }
 }
 
-bool NetRaceLayer::_IsClickedOn(Sprite* button,Touch* touch) {
+bool NetRaceLayer::_IsClickedOn(Node* button,Touch* touch) {
     float x      = button->getPosition().x;
     float y      = button->getPosition().y;
     Size size    = button->getContentSize();
