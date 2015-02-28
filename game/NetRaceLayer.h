@@ -66,6 +66,14 @@ private:
     bool _IsClickedOn(Sprite* button,Touch* touch);
     void _Show(Node *parent, int childTag,bool flag);
 
+    /*Ming*/
+    Button *_CreateKouChooseCancelButton();
+    Button *_CreateKouChooseConfirmButton();
+    Sprite *_CreateMingSign();
+    Sprite *_NonKouMask(Sprite *card);
+    void    MaskNonKouCards();
+    void    ListenToKou(int no);
+
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();
@@ -203,7 +211,7 @@ public:
 	void HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ºúÅÆ
 	void GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--¸ÜÅÆ
 	void QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÆúÅÆ
-	void ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÃûÅÆ
+	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÃûÅÆ
 	/***********callback function***********************/
 	/*########################
 	diretion:
