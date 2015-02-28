@@ -94,7 +94,7 @@ private:
 	bool ifResourcePrepared;
 
 	bool ifTuoGuan;
-	int cardInList;  //only used in waitfor_MyTouchShowCard
+	int  touched;  //only used in waitfor_MyTouchShowCard
 	bool ifChosed;   //only used in waitfor_MyTouchShowCard
 	int MyCardChoosedNum;
 
