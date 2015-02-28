@@ -74,6 +74,7 @@ private:
     void    MaskNonKouCards();
     void    ListenToKou(int no);
 
+
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();

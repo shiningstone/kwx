@@ -972,6 +972,22 @@ void NetRaceLayer::ListenToTingButton()
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
 }
 
+TargetedAction *NetRaceLayer::ShowBigMing(Node *myframe) {
+    auto damingFont = Sprite::createWithSpriteFrameName("daming.png");
+    
+    damingFont->setAnchorPoint(Vec2(0.5,0.5));
+    damingFont->setOpacity(0);
+    damingFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2+50));
+
+    myframe->addChild(damingFont,31,MING_EFFECT_DAMING);
+
+    return TargetedAction::create(damingFont,Sequence::create(
+        FadeIn::create(0.18),
+        DelayTime::create(0.36),Spawn::create(
+        FadeOut::create(0.18),
+        ScaleTo::create(0.18,1.2),NULL),NULL));
+}
+
 void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
     LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
@@ -1015,8 +1031,6 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		cardOut->setPosition(location.x,100);
 	myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
 
-	auto deleteActionTip = CallFunc::create([=](){delete_ActionRemind();});
-	
 	BezierTo *action;
 	outCardList* outCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
 	if(time==1)
@@ -1044,20 +1058,6 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
         
 		while(myframe->getChildByTag(MING_EFFECT_ANIMATE))
 			myframe->removeChildByTag(MING_EFFECT_ANIMATE);
-
-		auto daMingFont=Sprite::createWithSpriteFrameName("daming.png");
-		daMingFont->setAnchorPoint(Vec2(0.5,0.5));
-		daMingFont->setOpacity(0);
-		daMingFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2+50));
-		myframe->addChild(daMingFont,31,MING_EFFECT_DAMING);
-        
-		auto DaMingAction=Sequence::create(
-            FadeIn::create(0.18),
-            DelayTime::create(0.36),
-            Spawn::create(
-                FadeOut::create(0.18),
-                ScaleTo::create(0.18,1.2),NULL),NULL);
-		auto DaMingTarget = TargetedAction::create(daMingFont,DaMingAction);
 
 		auto mingEfeect=Sprite::createWithSpriteFrameName("ming_1.png");
 		mingEfeect->setAnchorPoint(Vec2(0.5,0.5));
@@ -1096,32 +1096,24 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		auto targetAction=TargetedAction::create(
             cardOut,
             voiceEffect);
+
+        auto damingShow = ShowBigMing(myframe);
+        
 		allEffect = Spawn::create(
-            DaMingTarget,
+            damingShow,
             mingEffectTarget,
-            targetAction,
-            CallFunc::create([=](){
-                ifInsertCardsTime=true;}
-            ),
-            deleteActionTip,
-            NULL);
+            targetAction,CallFunc::create([=](){
+            ifInsertCardsTime=true;}),CallFunc::create([=](){
+            delete_ActionRemind();}),NULL);
 	}
 	else
 	{
-		voiceEffect=Sequence::create(Spawn::create(
+		allEffect=Spawn::create( TargetedAction::create(cardOut,Sequence::create(Spawn::create(
             action,
             voiceCall,NULL),
-            BizerVoice,NULL);
-		auto targetAction=TargetedAction::create(
-            cardOut,
-            voiceEffect);
-		allEffect=Spawn::create(
-            targetAction,
-            CallFunc::create([=](){
-                ifInsertCardsTime=true;}
-            ),
-            deleteActionTip,
-            NULL);
+            BizerVoice,NULL)),CallFunc::create([=](){
+            ifInsertCardsTime=true;}),CallFunc::create([=](){
+            delete_ActionRemind();}),NULL);
 	}
     
 	auto riverUpdate = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_in_river_list));
@@ -1262,7 +1254,8 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
     
 	if(!_roundManager->_isCardFromOthers) {
 		if( ifTuoGuan ||
-            (_roundManager->IsTing(_roundManager->_curPlayer) && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
+            (_roundManager->IsTing(_roundManager->_curPlayer) 
+            && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
 			int last = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 			Vec2 location = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + MIDDLE*20 + last)->getPosition();
             
@@ -1280,28 +1273,25 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
         }
 	}
 }
+
 void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
     _roundManager->AllowMovement();
 
-	if( !_roundManager->IsTing(1) && !ifTuoGuan )
-	{
-		auto listener=EventListenerTouchOneByOne::create();
-		listener->setSwallowTouches(true);
+	if( !_roundManager->IsTing(MIDDLE) && !ifTuoGuan ) {
+        auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
         
+		auto listener = EventListenerTouchOneByOne::create();
+		listener->setSwallowTouches(true);
 		listener->onTouchBegan=[=](Touch* touch, Event* event)
 		{
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-			if(ifInsertCardsTime)
-			{
+			if( ifInsertCardsTime ) {
 				ifInsertCardsTime=false;
 				ifInsertStopped=true;
 				card_list_update(1);
 			}
             
-			if(ifEffectTime&&ifUpdateDuringEffect)
-			{
+			if( ifEffectTime && ifUpdateDuringEffect ) {
 				ifUpdateDuringEffect=false;
 				card_list_update(1);
 			}
@@ -1343,7 +1333,6 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
         
 		listener->onTouchMoved=[=](Touch* touch, Event* event)
 		{
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
 			int list_active=list->atcvie_place;
 			int residualCardsNum=(list->len-list->atcvie_place)%3;
@@ -1494,8 +1483,8 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 		};
 		listener->onTouchEnded=[=](Touch* touch, Event* event)
 		{
+            LOGGER_WRITE("%s",__FUNCTION__);
 			//========================PossibleCondition=================//
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
 			int list_active=list->atcvie_place;
 			int residualCardsNum=(list->len-list->atcvie_place)%3;
@@ -1631,7 +1620,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 			}
 			return;
 		};
-		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+
 		Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
 	}
 }
