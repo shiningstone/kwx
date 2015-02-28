@@ -9141,9 +9141,9 @@ void NetRaceLayer::_Remove(Node *parent, int childTag) {
     }
 }
 
-void NetRaceLayer::_Show(Node *parent, int childTag,bool flag) {
+void NetRaceLayer::_Show(Node *parent, int childTag, bool flag) {
     if(parent->getChildByTag(childTag)) {
-        parent->setVisible(flag);
+        parent->getChildByTag(childTag)->setVisible(flag);
     }
 }
 
