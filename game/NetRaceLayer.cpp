@@ -1570,7 +1570,7 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 
 /*local variable issue???*/
 Vec2 NetRaceLayer::getEffectVec(int dir) {
-    switch(_roundManager->_curPlayer) {
+    switch(dir) {
         case 0:
             return Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
         case 1:
@@ -1754,15 +1754,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 
-        Vec2 v;
-        if(_roundManager->_curPlayer==0)
-            v = Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-        else if(_roundManager->_curPlayer==1)
-            v = Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-        else if(_roundManager->_curPlayer==2)
-            v = Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
-        
-		auto simple_seq = simple_tip_effect(v,"daming.png");
+		auto simple_seq = simple_tip_effect( getEffectVec(_roundManager->_curPlayer),"daming.png" );
 		voiceEffect = Sequence::create(
                         simple_seq,
                         hideLastInHand,CallFunc::create([=](){ 
@@ -1811,6 +1803,7 @@ void NetRaceLayer::minggang_update(Node *psender)
 	int no=psender->_ID;
 	_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING_GANG);
 }
+
 void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -1833,14 +1826,9 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
     _roundManager->RecordOutCard(card);
 
 	_roundManager->_curPlayer=no;
-	Vec2 v;
-	if(no==0)
-		v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-	else if(no==1)
-		v=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-	else if(no==2)
-		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
-
+    
+ 	Vec2 v = getEffectVec(_roundManager->_curPlayer);
+    
 	auto curOutCard=myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
 	auto action=Sequence::create(DelayTime::create(0.1),ScaleTo::create(0,0),NULL);
 	auto l_del_outcard=TargetedAction::create(curOutCard,action);
@@ -2242,6 +2230,7 @@ void NetRaceLayer::angang_update(Node *psender)
 	else if(_roundManager->_actionToDo&a_SHOU_GANG)
 		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_SHOU_GANG);
 }
+
 void NetRaceLayer::an_gang_tip_effect(Node *psender)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -2266,13 +2255,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 	auto VoiceEffect0=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/lanpai.ogg");});
 	auto VoiceEffect1=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/down.ogg");});
 
-	Vec2 v;
-	if(no==0)
-		v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-	else if(no==1)
-		v=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-	else if(no==2)
-		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);		
+	Vec2 v = getEffectVec(_roundManager->_curPlayer);
 
 	CallFunc* GangVoice = _SpeakAction(GANG);
 
@@ -2945,13 +2928,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 	float delayTime=0.18;
 	Card kind_out_card;
 	//auto QiangGangJudge=CallFunc::create([=](){});
-	Vec2 v;
-	if(no==0)
-		v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-	else if(no==1)
-		v=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-	else if(no==2)
-		v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);		
+	Vec2 v = getEffectVec(_roundManager->_curPlayer);
 	
 	if(_roundManager->_isCardFromOthers) {
 		int outcard_place = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
@@ -7878,13 +7855,7 @@ void NetRaceLayer::hu_effect_tip(int no)
         _roundManager->SetWin(SINGLE_WIN,no);
         
 		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
-		cocos2d::Size v;
-		if(no==0)
-			v=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-		else if(no==1)
-			v=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-		else if(no==2)
-			v=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
+		Vec2 v = getEffectVec(_roundManager->_curPlayer);
 
         CallFunc*HuVoice = _SpeakAction(HU);
 
@@ -8077,28 +8048,8 @@ void NetRaceLayer::hu_effect_tip(int no)
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(3,3,_roundManager->_curPlayer);	
 			});
-			int no=(_roundManager->_curPlayer+1)%3;
-			int no1=(_roundManager->_curPlayer+2)%3;
-			Vec2 v[2];
-			for(int a=0;a<2;a++)
-			{
-				switch ((_roundManager->_curPlayer+1+a)%3)
-				{
-				case 0:
-					v[a]=Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
-					break;
-				case 1:
-					v[a]=Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
-					break;
-				case 2:
-					v[a]=Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
-					break;
-				default:
-					break;
-				}
-			}					
-			auto HuFontNo=simple_tip_effect(v[0],"dahu.png");
-			auto HuFontNo1=simple_tip_effect(v[1],"dahu.png");
+			auto HuFontNo=simple_tip_effect( getEffectVec((_roundManager->_curPlayer+1)%3),"dahu.png");
+			auto HuFontNo1=simple_tip_effect( getEffectVec((_roundManager->_curPlayer+2)%3),"dahu.png");
 			myframe->runAction(Sequence::create(Spawn::create(DoubleFileFunc,callfunc,HuFontNo,HuFontNo1,NULL),GoldAccount,NULL));
 		});
 		_eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
