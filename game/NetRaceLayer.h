@@ -80,6 +80,7 @@ private:
     void _CardTouchEnd(Touch* touch, Event* event);
     void ListenToCardTouch();
     Vec2 getEffectVec(int dir);
+    void _CollectResouce(HAH *res) ;
 
 public:
 	void UpdateClock(int time,int direction);
