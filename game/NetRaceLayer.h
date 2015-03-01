@@ -82,6 +82,10 @@ private:
     Vec2 getEffectVec(int dir);
     void _CollectResouce(HAH *res) ;
 
+    int  _RotateAngleOfOutcard(int dir);
+    Vec2 _AnchorOfOutcard(int dir);
+    Vec2 _PositionOfOutcard(int dir,Size size,Vec2 origin);
+
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();
