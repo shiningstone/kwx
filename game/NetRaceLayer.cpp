@@ -906,32 +906,30 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
 	return action;
 }
 
-void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
+void NetRaceLayer::_CollectResouce(HAH *res) {
 	memset(res,0,sizeof(HAH));
+	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
 
     res->reserved_card_num = TOTAL_CARD_NUM - _roundManager->_distributedNum;
     
 	CARD s_card;
-	int jj=1;
-
-	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
-
-	while(_roundManager->_river->getCard(s_card,jj++)==true)
+	int i = 1;
+	while(_roundManager->_river->getCard(s_card,i++)==true)
 		res->card_in_river[res->river_len++]=s_card.kind;
+}
 
-	int k = (_roundManager->_curPlayer+1)%3;
-	_roundManager->_players[k]->get_parter()->get_hu_cards(target1,len1);
-    
-	k = (_roundManager->_curPlayer+2)%3;
-	_roundManager->_players[k]->get_parter()->get_hu_cards(target2,len2);
+void NetRaceLayer::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	_CollectResouce(res);
+
+	_roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_hu_cards(target1,len1);
+	_roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_hu_cards(target2,len2);
 
     for(int i=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->atcvie_place;
-        i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++)
-	{
-		int time=res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].same_times++;
+        i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++) {
+		int time = res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].same_times++;
 		res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].place[time]=i;
 	}
 
