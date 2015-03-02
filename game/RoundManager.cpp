@@ -191,3 +191,33 @@ bool RoundManager::WaitForAction() {
     return true;
 }
 
+/****************************************
+        card handler
+****************************************/
+int RoundManager::FindGangCards(int dir,int cards[4]) {
+    auto list = _players[dir]->get_parter()->get_card_list();
+    int matchCardNum = 0;
+    int firstMatchCard = 0;
+    
+    for(int i=list->atcvie_place; i<list->len; i++) {
+        for(int j=i+1; j<list->len; j++) {
+            if(list->data[i].kind==list->data[j].kind) {
+                matchCardNum++;
+                if(matchCardNum==3) {
+                    firstMatchCard = i;
+                    break;
+                }
+            }
+        }
+    }
+
+    int idx = 0;
+    for(int i=firstMatchCard; i<list->len; i++) {
+        if(list->data[firstMatchCard].kind==list->data[i].kind) {
+            cards[idx++] = i;
+        }
+    }
+
+    return 0;
+}
+

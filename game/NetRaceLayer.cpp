@@ -1823,7 +1823,7 @@ void NetRaceLayer::angang_dispatch(Node *psender)
 		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_SHOU_GANG);
 }
 
-Sprite *_GetEffectCardInHand(int i,CARD_KIND value ) {
+Sprite *NetRaceLayer::_GetEffectCardInHand(Node *myframe, int i,CARD_KIND value ) {
     auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
     auto pos  = card->getPosition();
     
@@ -1834,7 +1834,8 @@ Sprite *_GetEffectCardInHand(int i,CARD_KIND value ) {
     
     auto kind = Sprite::createWithTexture(g_card_kind[value]->getTexture());
     kind->setAnchorPoint(Vec2(0.5,0.5));
-    kind->setPosition(Vec2(
+    kind->setPosition(Vec2(
+
         effectCard->getTextureRect().size.width/2,
         effectCard->getTextureRect().size.height*0.4));
 
@@ -1872,7 +1873,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 			_Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
                 outCard,Sequence::create(
                 DelayTime::create(0.1),
-                ScaleTo::create(0,0),NULL)),NULL)
+                ScaleTo::create(0,0),NULL)),NULL);
 		
 	if(no!=1) {
 		myframe->runAction(Sequence::create( 
@@ -1918,8 +1919,8 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 		auto hideReminder = Sequence::create( Spawn::create(
                         shadeAction, CCCallFunc::create([=]() {
             			for(int i=0; i<11; i++) {// why devided into two circulation(0-8,9-11) in the old code???
-                            _Remove(myframe,REMIND_ACT_TAG_ID+i,true);}}),NULL),CCCallFunc::create([=](){
-                        _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID,true);
+                            _Remove(myframe,REMIND_ACT_TAG_ID+i);}}),NULL),CCCallFunc::create([=](){
+                        _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID);
                 		}),NULL);
 	
         /****************
@@ -1939,7 +1940,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             myframe->addChild(showCards[i],20,SINGLE_ACTION_EFFECT_TAG_ID+i);
         }
 
-        const Vec2 REFERENCE = Vec2(origin.x+visibleSize.width*0.445, origin.y+visibleSize.height*0.255)
+        const Vec2 REFERENCE = Vec2(origin.x+visibleSize.width*0.445, origin.y+visibleSize.height*0.255);
         const Size SIZE      = showCards[0]->getTextureRect().size;
 
 		showCards[0]->setPosition( outCard->getPosition() );
@@ -1952,7 +1953,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),
 			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96 + 150, REFERENCE.y)),
 			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),NULL);
-		auto p_seq1 = TargetedAction::create(show_card[0],action1);
+		auto p_seq1 = TargetedAction::create(showCards[0],action1);
 
 		auto action2=Sequence::create(
             DelayTime::create(0.48),
@@ -1960,7 +1961,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             DelayTime::create(0.12),
 			MoveTo::create(0.12,Vec2(REFERENCE.x - 150, REFERENCE.y)),
 			MoveTo::create(0.12,REFERENCE),NULL);
-		auto p_seq2 = TargetedAction::create(show_card[1],action2);
+		auto p_seq2 = TargetedAction::create(showCards[1],action2);
 
         auto action3=Sequence::create(
             DelayTime::create(0.48),
@@ -1968,7 +1969,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             DelayTime::create(0.12),
 			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98 - 150, REFERENCE.y)),
 			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98,       REFERENCE.y)),NULL);
-		auto p_seq3 = TargetedAction::create(show_card[2],action3);
+		auto p_seq3 = TargetedAction::create(showCards[2],action3);
 
         auto move3PengCards = Spawn::create(p_seq1,p_seq2,p_seq3,NULL);
 
@@ -2005,7 +2006,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 		}
 
 
-		auto LeftPengCard = _GetEffectCardInHand(firstMatch, card.kind);
+		auto LeftPengCard = _GetEffectCardInHand(myframe, firstMatch, card.kind);
 		myframe->addChild(LeftPengCard,20,EFFET_NEWCATD1_TAG);
 		auto moveLeftCardInHand = TargetedAction::create(LeftPengCard,Sequence::create(
             DelayTime::create(0.18),
@@ -2016,7 +2017,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 			DelayTime::create(0.12),
 			ScaleTo::create(0,0),NULL));
 
-		auto RightPengCard = _GetEffectCardInHand(secondMatch, card.kind);
+		auto RightPengCard = _GetEffectCardInHand(myframe,secondMatch, card.kind);
 		myframe->addChild(RightPengCard,20,EFFET_NEWCATD2_TAG);
 
         /* in case these values are changed during being moved */
@@ -2061,7 +2062,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
                     seq = Sequence::create(
                         DelayTime::create(0.18),
                         MoveTo::create(0.3,Vec2(
-                            curPos.x + (cardPengSize.width*(3.5+GAP),
+                            curPos.x + cardPengSize.width*(3.5+GAP),
                             curPos.y)),NULL);
                 } else {
                     seq = Sequence::create(
@@ -2112,7 +2113,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             background effect
         ****************/
 		auto light = Sprite::createWithSpriteFrameName("Q3.png");
-		light->setPosition(Vec2(origin.x+visibleSize.width*0.445+show_card->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
+		light->setPosition(Vec2(origin.x+visibleSize.width*0.445+showCards[0]->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
 		myframe->addChild(light,23,IMG_Q3_EFFECT_TAG_ID);
 		light->setOpacity(60);
 		light->setScale(0);
@@ -2122,10 +2123,10 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
     		DelayTime::create(0.84),
     		ScaleTo::create(0,1),
     		DelayTime::create(0.48),
-    		FadeOut::create(0),NULL););
+    		FadeOut::create(0),NULL));
 
 		auto circle=Sprite::createWithSpriteFrameName("Q15.png");
-		circle->setPosition(Vec2(origin.x+visibleSize.width*0.445+show_card->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
+		circle->setPosition(Vec2(origin.x+visibleSize.width*0.445+showCards[0]->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
 		circle->setTag(4);
 		circle->setScale(2.0);
 		circle->setScale(0);
@@ -2138,7 +2139,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 
 		auto fire = Sprite::createWithSpriteFrameName("G1.png");
 		fire->setPosition( Vec2(
-            origin.x + visibleSize.width*0.445 + show_card->getTextureRect().size.width*1.96,
+            origin.x + visibleSize.width*0.445 + showCards[0]->getTextureRect().size.width*1.96,
             origin.y + visibleSize.height*0.315));
 		fire->setTag(4);
 		fire->setScale(0);
@@ -2230,53 +2231,40 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	int no=psender->_ID;
-	continue_gang_times++;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
-	_roundManager->_lastActionSource=no;
-	if(_roundManager->_actionToDo&a_AN_GANG)
-	{
+
+	continue_gang_times++;
+	_roundManager->_lastActionSource = no;
+    
+	if(_roundManager->_actionToDo&a_AN_GANG) {
 		_roundManager->_actionToDo=a_AN_GANG;
 		_roundManager->_lastAction=a_AN_GANG;
 		_roundManager->_lastActionWithGold=a_AN_GANG;
-	}
-	else if(_roundManager->_actionToDo&a_SHOU_GANG)
-	{
+	} else if(_roundManager->_actionToDo&a_SHOU_GANG) {
 		_roundManager->_actionToDo=a_SHOU_GANG;
 		_roundManager->_lastAction=a_SHOU_GANG;
 		_roundManager->_lastActionWithGold=a_SHOU_GANG;
 	}
-	auto VoiceEffect0=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/lanpai.ogg");});
-	auto VoiceEffect1=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/down.ogg");});
 
-	CallFunc* GangVoice = _SpeakAction(GANG);
-
-    if(no!=1)
-	{
-		auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-		auto angang_action=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::angang_dispatch));
-		auto callFunc_update_list=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
-		auto callFunc_distribute_card=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
-		auto update_list_seq1=Sequence::create(callFunc1,angang_action,callFunc_update_list,VoiceEffect1,CCCallFunc::create([=]()
-		{
-			_roundManager->_curPlayer=no;
-		}),callFunc_distribute_card,NULL);//dis_action
-
-		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png");
-		auto GoldAccount=CallFunc::create([=](){
-			GoldNumInsert(no,1,_roundManager->_curPlayer);	
-		});
-		auto an_gang_seq=Sequence::create(Spawn::create(GangVoice,simple_seq,NULL),GoldAccount,update_list_seq1,NULL);
-		myframe->runAction(an_gang_seq);
+    if(no!=1) {
+		myframe->runAction(Sequence::create(
+            Spawn::create(
+                _SpeakAction(GANG),
+                simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
+			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::update_card_list)),
+            _Speak("down.ogg"), CCCallFunc::create([=](){
+			_roundManager->_curPlayer=no;}),CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::call_distribute_card)),NULL),NULL));
 	}
-	else 
-	{
-		for(int NodeNum=0;NodeNum<3;NodeNum++)//PENG_EFFECT_NODE_ID
-		{
-			if(myframe->getChildByTag(PENG_EFFECT_NODE_ID+NodeNum))
-				myframe->removeChildByTag(PENG_EFFECT_NODE_ID+NodeNum,true);
-			if(ifEffectTime)
-			{
+	else {
+		for(int NodeNum=0;NodeNum<3;NodeNum++) {
+            _Remove(myframe,PENG_EFFECT_NODE_ID+NodeNum);
+            
+			if(ifEffectTime) {
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
 				_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
@@ -2285,12 +2273,14 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 				card_list_update(no);
 			}
 		}
-		auto shade_act=(Sprite*)myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID);
-		auto fadeOut=FadeOut::create(0.18);
-		auto easeBounce=ScaleTo::create(0.18,1.3);
-		auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-		auto seq=Sequence::create(ScaleTo::create(0,1),spawn,NULL);
-		auto shadeAction=TargetedAction::create(shade_act,seq);
+        
+		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID),
+            Sequence::create(
+                ScaleTo::create(0,1),
+            Spawn::create(
+                FadeOut::create(0.18),
+                ScaleTo::create(0.18,1.3),NULL),NULL));
+        
 		auto spa1=Spawn::create(shadeAction,CCCallFunc::create([=]()
 		{
 			for(int i=0;i<4;i++)
@@ -2310,46 +2300,26 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 				myframe->removeChildByTag(GANG_REMING_ACT_BKG_TAG_ID,true);
 		}),NULL);
 
-		auto list=_roundManager->_players[no]->get_parter()->get_card_list();
-		Size cardPengSize;
-		auto cardInHand=Sprite::createWithTexture(g_my_free->getTexture());
-		Size cardSize=cardInHand->getTextureRect().size;
-		Card outCard;
+		auto list = _roundManager->_players[no]->get_parter()->get_card_list();
 		int gang[4];
-		int ii;
-		int tingFlag=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
-		if(tingFlag==0)
-		{
-			for(ii=list->atcvie_place;ii<list->len;ii++)
-			{
-				int k=1;
-				for(int j=ii+1;j<list->len;j++)
-					if(list->data[ii].kind==list->data[j].kind)
-						k++;
-				if(k==4)
-					break;
-			}
-			gang[0]=ii;
-			outCard=list->data[ii];
+        Card outCard;
+
+        if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {/* is no equals _curPlayer ??? */
+			_roundManager->FindGangCards(no,gang);
+            outCard = list->data[gang[0]];
+            
 			_roundManager->_curEffectCardKind=outCard.kind;
 			_roundManager->_curEffectCardStatus=c_AN_GANG;
 			ifEffectTime=true;
 			ifUpdateDuringEffect=true;
-			int p=1;
-			for(int t=ii+1;t<list->len;t++)
-				if(list->data[ii].kind==list->data[t].kind)
-					gang[p++]=t;
-		}
-		else if(tingFlag!=0&&no==1)
-		{
-			gang[3]=list->len-1;
-			int p=0;
-			for(ii=0;ii<list->atcvie_place;ii++)
-			{
-				if(list->data[ii].kind==list->data[gang[3]].kind)
-					gang[p++]=ii;
+		} else if(no==1) { /* get gang card from kou cards */
+			gang[3] = list->len-1;
+			int p = 0;
+			for(int i=0;i<list->atcvie_place;i++){
+				if(list->data[i].kind==list->data[gang[3]].kind)
+					gang[p++]=i;
 			}
-			outCard=list->data[gang[0]];
+            outCard = list->data[gang[0]];
 		}
 
 		int ifZeroPointTwo=0;
@@ -2374,13 +2344,16 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		auto GangSize=tempMyGangCard->getTextureRect().size;
 		auto baseCard=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+list->len-5);
 		auto basePos=baseCard->getPosition();
+
+		auto cardInHand = Sprite::createWithTexture(g_my_free->getTexture());
+		Size cardSize = cardInHand->getTextureRect().size;
 		if(list->atcvie_place>0)
 			distributeCardPos=Vec2(basePos.x+GangSize.width*4+30+baseCard->getBoundingBox().size.width-cardSize.width*ifZeroPointTwo*0.2*ifLeft,basePos.y);
 		else
 			distributeCardPos=Vec2(basePos.x+GangSize.width*3.5+30+baseCard->getBoundingBox().size.width-cardSize.width*ifZeroPointTwo*0.2*ifLeft,basePos.y);
 
 		auto show_card=Sprite::createWithTexture(g_my_angang->getTexture());
-		cardPengSize=show_card->getTextureRect().size;
+		Size cardPengSize=show_card->getTextureRect().size;
 		show_card->setAnchorPoint(Vec2(0,0));		
 		show_card->setPosition(Vec2(origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,origin.y+visibleSize.height*0.255));
 		show_card->setScale(0);
@@ -2781,14 +2754,14 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 			}
 		});
 		auto callFunc_distribute_card=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
-		auto update_list_seq0=Sequence::create(callFunc1,/*angang_action,*/callFunc_update_list,VoiceEffect0,/*CCCallFunc::create([=]()
+		auto update_list_seq0=Sequence::create(callFunc1,/*angang_action,*/callFunc_update_list,_Speak("lanpai.ogg"),/*CCCallFunc::create([=]()
 																											 {
 																											 _roundManager->_curPlayer=no;
 																											 }),callFunc_distribute_card,*/NULL);//dis_action
 
 		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
 		auto delayVoice=Sequence::create(DelayTime::create(0.66),VoiceEffect,NULL);
-		auto angang_seq=Sequence::create(g_seq1,Spawn::create(simple_seq,GangVoice,g_spa0,g_spa1,delayVoice,NULL),/*GoldAccount,*/update_list_seq0,
+		auto angang_seq=Sequence::create(g_seq1,Spawn::create(simple_seq,_SpeakAction(GANG),g_spa0,g_spa1,delayVoice,NULL),/*GoldAccount,*/update_list_seq0,
 			CallFunc::create([=](){
 				if(myframe->getChildByTag(AN_GANG_EFFECT_NODE))
 					myframe->removeChildByTag(AN_GANG_EFFECT_NODE,true);
@@ -2805,6 +2778,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		}),callFunc_distribute_card,NULL));
 	}
 }
+
 void NetRaceLayer::QiangGangHuJudge()
 {
     LOGGER_WRITE("%s",__FUNCTION__);

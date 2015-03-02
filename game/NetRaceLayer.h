@@ -44,8 +44,8 @@ private:
     void _CalcHuGold(int goldOfPlayer[3]);
     void CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give);
 
-
-
+    void DispatchAction(Node *psender,ARRAY_ACTION action);
+    Sprite *_GetEffectCardInHand(Node *myframe, int i,CARD_KIND value );
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
     Vec2 _AnchorOfSign(int dir);

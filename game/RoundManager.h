@@ -67,7 +67,9 @@ public:
     int  AllowMovement();
     bool WaitForDistribute();
     bool WaitForAction();
+
     
+    int FindGangCards(int dir,int cards[4]);
 private:
     Logger *_logger;
 
