@@ -1851,10 +1851,6 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 	auto hide    = Sequence::create(DelayTime::create(0.1),ScaleTo::create(0,0),NULL);
 	auto hideOutcard = TargetedAction::create(outCard,hide);
     
-	auto no1_seq1=Spawn::create(CCCallFunc::create([=]() {
-            _Show(this,SHOWCARD_INDICATOR_TAG_ID,false); }),
-            hideOutcard,NULL);
-
 	if(no!=1) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
@@ -1869,14 +1865,10 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
                                 NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
                 				waitfor_otheraction(no);}),NULL),NULL));
-	}
-	else
-	{
-		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID))
-		{
+	} else {
+		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
 			myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);
-			if(ifEffectTime)
-			{
+			if(ifEffectTime) {
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
                 
@@ -1886,8 +1878,6 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 				delete_ActionEffect();
 				card_list_update(no);
 			}
-			//myframe->_ID=1;
-			//myframe->runAction(CallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list)));
 		}
         
 		_roundManager->_curEffectCardKind=card.kind;
@@ -1895,74 +1885,66 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
         
 		ifEffectTime=true;
 		ifUpdateDuringEffect=true;
-		auto shade_act=(Sprite*)myframe->getChildByTag(PENG_REMIND_ACT_BKG_TAG_ID);//----onTouchEnd
-		auto fadeOut0=FadeOut::create(0.18);
-		auto easeBounce0=ScaleTo::create(0.18,1.2);
-		auto spawn=Spawn::create(fadeOut0,easeBounce0,NULL);
-		auto seq=Sequence::create(ScaleTo::create(0,1),spawn,NULL);
-		auto shadeAction=TargetedAction::create(shade_act,seq);
-		auto spa1=Spawn::create(shadeAction,CCCallFunc::create([=]()//Spawn
-		{
-			for(int i=0;i<8;i++)
-			{
-				if(myframe->getChildByTag(REMIND_ACT_TAG_ID+i))
-					myframe->removeChildByTag(REMIND_ACT_TAG_ID+i,true);
-			}
-			for(int i=9;i<11;i++)
-			{
-				if(myframe->getChildByTag(REMIND_ACT_TAG_ID+i))
-					myframe->removeChildByTag(REMIND_ACT_TAG_ID+i,true);
-			}
-		}),NULL);
-		auto seq1=Sequence::create(spa1,CCCallFunc::create([=]()
-		{
-			if(myframe->getChildByTag(PENG_REMIND_ACT_BKG_TAG_ID))
-					myframe->removeChildByTag(PENG_REMIND_ACT_BKG_TAG_ID,true);
-		}),NULL);
+        
+		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(PENG_REMIND_ACT_BKG_TAG_ID),
+            Sequence::create(
+                ScaleTo::create(0,1), Spawn::create(
+                FadeOut::create(0.18),
+                ScaleTo::create(0.18,1.2),NULL),NULL));
+
+		auto seq1 = Sequence::create( Spawn::create(
+                        shadeAction, CCCallFunc::create([=]() {
+            			for(int i=0; i<11; i++) {// why devided into two circulation(0-8,9-11) in the old code???
+                            _Remove(myframe,REMIND_ACT_TAG_ID+i,true);}}),NULL),CCCallFunc::create([=](){
+                        _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID,true);
+                		}),NULL);
 	
-		auto curPos = outCard->getPosition();//三张---出            碰的牌
-		auto show_card=Sprite::createWithTexture(g_my_peng->getTexture());
-		auto show_card_kind=Sprite::createWithTexture(g_mid_card_kind[card.kind]->getTexture());
-		show_card_kind->setAnchorPoint(Vec2(0.5,0.5));
-		show_card_kind->setPosition(Vec2(show_card->getTextureRect().size.width/2,show_card->getTextureRect().size.height*0.65));
-		show_card->addChild(show_card_kind);
-		show_card->setAnchorPoint(Vec2(0,0));
-		show_card->setPosition(curPos);
-		show_card->setScale(0);
-		myframe->addChild(show_card,20,SINGLE_ACTION_EFFECT_TAG_ID);
-		auto action1=Sequence::create(DelayTime::create(0.48),ScaleTo::create(0,1),MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445+show_card->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445+show_card->getTextureRect().size.width*1.96+150,origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445+show_card->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.255)),NULL);
-		auto p_seq1=TargetedAction::create(show_card,action1);
+        Sprite *showCards[3] = {0};
+        for(int i=0;i<3;i++) {
+            showCards[i] = Sprite::createWithTexture(g_my_peng->getTexture());
+            auto kind = Sprite::createWithTexture(g_mid_card_kind[card.kind]->getTexture());
+            kind->setAnchorPoint(Vec2(0.5,0.5));
+            kind->setPosition(Vec2(
+                showCards[i]->getTextureRect().size.width/2,
+                showCards[i]->getTextureRect().size.height*0.65));
+            showCards[i]->addChild(kind);
+            showCards[i]->setAnchorPoint(Vec2(0,0));
+            showCards[i]->setScale(0);
+            myframe->addChild(showCards[i],20,SINGLE_ACTION_EFFECT_TAG_ID+i);
+        }
 
-		auto show_card1=Sprite::createWithTexture(g_my_peng->getTexture());//左
-		auto show_card_kind1=Sprite::createWithTexture(g_mid_card_kind[card.kind]->getTexture());
-		show_card_kind1->setAnchorPoint(Vec2(0.5,0.5));
-		show_card_kind1->setPosition(Vec2(show_card->getTextureRect().size.width/2,show_card->getTextureRect().size.height*0.65));
-		show_card1->addChild(show_card_kind1);
-		show_card1->setAnchorPoint(Vec2(0,0));
-		show_card1->setScale(0);
-		show_card1->setPosition(Vec2(origin.x+visibleSize.width*0.445,origin.y+visibleSize.height*0.255));
-		myframe->addChild(show_card1,20,SINGLE_ACTION2_EFFECT_TAG_ID);
-		auto action2=Sequence::create(DelayTime::create(0.48),ScaleTo::create(0,1),DelayTime::create(0.12),
-			MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445-150,origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445,origin.y+visibleSize.height*0.255)),NULL);
-		auto p_seq2=TargetedAction::create(show_card1,action2);
+        const Vec2 REFERENCE = Vec2(origin.x+visibleSize.width*0.445, origin.y+visibleSize.height*0.255)
+        const Size SIZE      = showCards[0]->getTextureRect().size;
 
-		auto show_card2=Sprite::createWithTexture(g_my_peng->getTexture());//左
-		auto show_card_kind2=Sprite::createWithTexture(g_mid_card_kind[card.kind]->getTexture());
-		show_card_kind2->setAnchorPoint(Vec2(0.5,0.5));
-		show_card_kind2->setPosition(Vec2(show_card->getTextureRect().size.width/2,show_card->getTextureRect().size.height*0.65));
-		show_card2->addChild(show_card_kind2);
-		show_card2->setAnchorPoint(Vec2(0,0));
-		show_card2->setScale(0);
-		show_card2->setPosition(Vec2(origin.x+visibleSize.width*0.445+show_card2->getTextureRect().size.width*0.98,origin.y+visibleSize.height*0.255));
-		myframe->addChild(show_card2,20,SINGLE_ACTION3_EFFECT_TAG_ID);
-		auto action3=Sequence::create(DelayTime::create(0.48),ScaleTo::create(0,1),DelayTime::create(0.12),
-			MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445+show_card2->getTextureRect().size.width*0.98-150,origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(origin.x+visibleSize.width*0.445+show_card2->getTextureRect().size.width*0.98,origin.y+visibleSize.height*0.255)),NULL);
-		auto p_seq3=TargetedAction::create(show_card2,action3);
-		auto no1_seq2=Spawn::create(p_seq1,p_seq2,p_seq3,NULL);
+		showCards[0]->setPosition( outCard->getPosition() );
+		showCards[1]->setPosition( REFERENCE );
+		showCards[2]->setPosition( Vec2(REFERENCE.x + SIZE.width*0.98, REFERENCE.y) );
+
+		auto action1 = Sequence::create(
+            DelayTime::create(0.48),
+            ScaleTo::create(0,1),
+            MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96 + 150, REFERENCE.y)),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),NULL);
+		auto p_seq1 = TargetedAction::create(show_card[0],action1);
+
+		auto action2=Sequence::create(
+            DelayTime::create(0.48),
+            ScaleTo::create(0,1),
+            DelayTime::create(0.12),
+			MoveTo::create(0.12,Vec2(REFERENCE.x - 150, REFERENCE.y)),
+			MoveTo::create(0.12,REFERENCE),NULL);
+		auto p_seq2 = TargetedAction::create(show_card[1],action2);
+
+        auto action3=Sequence::create(
+            DelayTime::create(0.48),
+            ScaleTo::create(0,1),
+            DelayTime::create(0.12),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98 - 150, REFERENCE.y)),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98,       REFERENCE.y)),NULL);
+		auto p_seq3 = TargetedAction::create(show_card[2],action3);
+
+        auto no1_seq2 = Spawn::create(p_seq1,p_seq2,p_seq3,NULL);
 
 		int j=0;
 		int k=0;
@@ -2159,9 +2141,6 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 		auto s_list_action=Spawn::create(l_list_card);
 		auto pengCardAction=Spawn::create(rightTargetAction,leftTargetAction,NULL);
 		auto big_action=Spawn::create(s_big_action,no1_seq2,NULL);
-		//no1_seq1 outcard 0.1 00
-		//s_list_action 0.3
-		//big_action 
 		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"peng.png");
 		auto no1_seq1_Delay=Sequence::create(DelayTime::create(0.42),no1_seq1,NULL);
 		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
