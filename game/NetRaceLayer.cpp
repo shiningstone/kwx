@@ -1847,32 +1847,28 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 
 	_roundManager->_curPlayer=no;
     
-	auto curOutCard = myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
-	auto action = Sequence::create(DelayTime::create(0.1),ScaleTo::create(0,0),NULL);
-	auto l_del_outcard = TargetedAction::create(curOutCard,action);
+	auto outCard = myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
+	auto hide    = Sequence::create(DelayTime::create(0.1),ScaleTo::create(0,0),NULL);
+	auto hideOutcard = TargetedAction::create(outCard,hide);
     
-	auto no1_seq1=Spawn::create(CCCallFunc::create([=]()
-		{
-			auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
-			show_card_indicator->setVisible(false);
-		}),l_del_outcard,NULL);
+	auto no1_seq1=Spawn::create(CCCallFunc::create([=]() {
+            _Show(this,SHOWCARD_INDICATOR_TAG_ID,false); }),
+            hideOutcard,NULL);
 
-	if(no!=1)
-	{
-		auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-		auto peng_action=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::peng_dispatch));
-		auto callFunc_update_list=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
-		auto actcheckagain=CCCallFunc::create([=](){
-			_roundManager->_actionToDo=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
-			if(no==1)
-				waitfor_myaction(no);
-			else
-				waitfor_otheraction(no);
-		});
-		auto seq_last=Sequence::create(callFunc1,peng_action,callFunc_update_list,actcheckagain,NULL);
-		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"peng.png");
-		auto all_seq=Sequence::create(Spawn::create(_SpeakAction(PENG),simple_seq,NULL),no1_seq1,seq_last,NULL);
-		myframe->runAction(all_seq);
+	if(no!=1) {
+		myframe->runAction(Sequence::create( 
+                            Spawn::create(
+                                _SpeakAction(PENG),
+                                simple_tip_effect( getEffectVec(_roundManager->_curPlayer),"peng.png" ),NULL), 
+                            Spawn::create(CCCallFunc::create([=]() {
+                                _Show(this,SHOWCARD_INDICATOR_TAG_ID,false); }),
+                                hideOutcard,NULL), 
+                            Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                                NetRaceLayer::delete_act_tip)),   CCCallFuncN::create(this,callfuncN_selector(
+                                NetRaceLayer::peng_dispatch)),    CCCallFuncN::create(this,callfuncN_selector(
+                                NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
+                    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+                				waitfor_otheraction(no);}),NULL),NULL));
 	}
 	else
 	{
@@ -1924,7 +1920,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 					myframe->removeChildByTag(PENG_REMIND_ACT_BKG_TAG_ID,true);
 		}),NULL);
 	
-		auto curPos=curOutCard->getPosition();//三张---出            碰的牌
+		auto curPos = outCard->getPosition();//三张---出            碰的牌
 		auto show_card=Sprite::createWithTexture(g_my_peng->getTexture());
 		auto show_card_kind=Sprite::createWithTexture(g_mid_card_kind[card.kind]->getTexture());
 		show_card_kind->setAnchorPoint(Vec2(0.5,0.5));
