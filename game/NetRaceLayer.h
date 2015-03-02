@@ -32,8 +32,7 @@ private:
     void _GenerateIds(int ids[3]);
     CallFunc * _SpeakCard();
     CallFunc *_SpeakAction(ActionType_t id);
-    CallFunc *_SpeakGive();
-    CallFunc *_SpeakSelect();
+    CallFunc *_Speak(char *file);
     void create_residue_cards();
     void refresh_residue_cards();
     std::string _NumToString( int number );
