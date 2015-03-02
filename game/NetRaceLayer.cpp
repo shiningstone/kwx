@@ -1975,9 +1975,6 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
         /****************
             
         ****************/
-		auto cardPeng = Sprite::createWithTexture(g_my_peng->getTexture());
-		auto cardPengSize = cardPeng->getTextureRect().size;
-        
 		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
         
 		int firstMatch = 0;
@@ -2039,48 +2036,43 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 			DelayTime::create(0.12),
 			ScaleTo::create(0,0),NULL));
 
+        /****************
+            delete 2 cards from hand 
+        ****************/
+		auto cardPeng = Sprite::createWithTexture(g_my_peng->getTexture());
+		auto cardPengSize = cardPeng->getTextureRect().size;
+        
+        const float GAP = (list->atcvie_place==0)? 0.5 : 0;
+        
 		Vector<FiniteTimeAction *> l_list_card;
+
 		for(int i=list->atcvie_place;i<list->len;i++) {
-			auto s_card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i);
+			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
+            Sequence *seq;
+
+            if(i==firstMatch||i==secondMatch) {
+				seq = Sequence::create(
+                    ScaleTo::create(0,0),NULL);
+            } else {
+				auto curPos   = s_card->getPosition();
+				auto cardSize = s_card->getTextureRect().size;
+
+                if (i<firstMatch) {
+                    seq = Sequence::create(
+                        DelayTime::create(0.18),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x + (cardPengSize.width*(3.5+GAP),
+                            curPos.y)),NULL);
+                } else {
+                    seq = Sequence::create(
+                        DelayTime::create(0.18),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x + (cardPengSize.width*(3.5+GAP)) - cardSize.width*(2 + ifZeroPointTwo*0.2),
+                            curPos.y)),NULL);
+                }
+            }
             
-			if(list->atcvie_place>0) {
-				if(i<firstMatch) {
-					auto curPos=s_card->getPosition();
-					auto cardSize=s_card->getTextureRect().size;
-					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width*2+(cardPengSize.width*3.5-cardSize.width*2),curPos.y));
-					auto seq=Sequence::create(DelayTime::create(0.18),actionMove,NULL);
-						l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				} else if(i==firstMatch||i==secondMatch) {
-					auto actionScale=ScaleTo::create(0,0);
-					auto seq=Sequence::create(actionScale,NULL);
-					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				} else if(i>secondMatch) {
-					auto curPos=s_card->getPosition();
-					auto cardSize=s_card->getTextureRect().size;
-					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+(cardPengSize.width*3.5-cardSize.width*(2+ifZeroPointTwo*0.2)),curPos.y));
-					auto seq=Sequence::create(DelayTime::create(0.18),actionMove,NULL);
-					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				}
-			}
-			else if(list->atcvie_place==0) {
-				if(i<firstMatch) {
-					auto curPos=s_card->getPosition();
-					auto cardSize=s_card->getTextureRect().size;
-					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width*2+(cardPengSize.width*4-cardSize.width*2),curPos.y));
-					auto seq=Sequence::create(DelayTime::create(0.18),actionMove,NULL);
-					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				} else if(i==firstMatch||i==secondMatch) {
-					auto actionScale=ScaleTo::create(0,0);
-					auto seq=Sequence::create(actionScale,NULL);
-					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				} else if(i>secondMatch) {
-					auto curPos=s_card->getPosition();
-					auto cardSize=s_card->getTextureRect().size;
-					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+(cardPengSize.width*4-cardSize.width*(2+ifZeroPointTwo*0.2)),curPos.y));
-					auto seq=Sequence::create(DelayTime::create(0.18),actionMove,NULL);
-					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				}
-			}
+            l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
 		}
         
 		Vector<SpriteFrame*> ani;
