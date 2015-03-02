@@ -1823,6 +1823,26 @@ void NetRaceLayer::angang_dispatch(Node *psender)
 		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_SHOU_GANG);
 }
 
+Sprite *_GetEffectCardInHand(int i,CARD_KIND value ) {
+    auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
+    auto pos  = card->getPosition();
+    
+    auto effectCard = Sprite::createWithTexture( g_my_free->getTexture() );
+    effectCard->setAnchorPoint( Vec2(0,0) );
+    effectCard->setScale( card->getScale() );
+    effectCard->setPosition( Vec2(pos.x,pos.y) );
+    
+    auto kind = Sprite::createWithTexture(g_card_kind[value]->getTexture());
+    kind->setAnchorPoint(Vec2(0.5,0.5));
+    kind->setPosition(Vec2(
+        effectCard->getTextureRect().size.width/2,
+        effectCard->getTextureRect().size.height*0.4));
+
+    effectCard->addChild(kind,1);
+
+    return effectCard;
+}
+
 void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 {
 	int no = psender->_ID;
@@ -1885,7 +1905,10 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
         
 		ifEffectTime=true;
 		ifUpdateDuringEffect=true;
-        
+
+        /****************
+            hiding
+        ****************/
 		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(PENG_REMIND_ACT_BKG_TAG_ID),
             Sequence::create(
                 ScaleTo::create(0,1), Spawn::create(
@@ -1899,6 +1922,9 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
                         _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID,true);
                 		}),NULL);
 	
+        /****************
+            move 3 cards
+        ****************/
         Sprite *showCards[3] = {0};
         for(int i=0;i<3;i++) {
             showCards[i] = Sprite::createWithTexture(g_my_peng->getTexture());
@@ -1946,98 +1972,89 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 
         auto no1_seq2 = Spawn::create(p_seq1,p_seq2,p_seq3,NULL);
 
-		int j=0;
-		int k=0;
-		auto cardPeng=Sprite::createWithTexture(g_my_peng->getTexture());
-		auto cardPengSize=cardPeng->getTextureRect().size;
-		auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-		for(int i=list->atcvie_place;i<list->len;i++)
-		{
-			if(card.kind==list->data[i].kind)
-			{
-				if(i==0)
-				{
-					j=i;
-				}
-				else if(i>0 && card.kind!=list->data[i-1].kind)
-				{
-					j=i;
-				}
-				else if(i>0 && card.kind==list->data[i-1].kind)
-				{
-					k=i;
+        /****************
+            
+        ****************/
+		auto cardPeng = Sprite::createWithTexture(g_my_peng->getTexture());
+		auto cardPengSize = cardPeng->getTextureRect().size;
+        
+		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
+        
+		int firstMatch = 0;
+		int secondMatch = 0;
+		for(int i=list->atcvie_place;i<list->len;i++) {
+			if(card.kind==list->data[i].kind) {
+				if(i==0) {
+					firstMatch = 0;
+				} else if(card.kind!=list->data[i-1].kind) {
+					firstMatch = i;
+				} else if(card.kind==list->data[i-1].kind) {
+					secondMatch = i;
 					break;
 				}
 			}
 		}
 
 		int ifZeroPointTwo=0;
-		if(MyCardChoosedNum!=-1)
-		{
-			if(MyCardChoosedNum>k)
-				MyCardChoosedNum+=1;
-			else if(MyCardChoosedNum==k||MyCardChoosedNum==j)
-			{
-				ifZeroPointTwo=1;
-				MyCardChoosedNum=-1;
+		if(MyCardChoosedNum!=-1) {
+			if(MyCardChoosedNum > secondMatch)
+				MyCardChoosedNum += 1;
+			else if(MyCardChoosedNum== secondMatch || MyCardChoosedNum==firstMatch) {
+				ifZeroPointTwo = 1;
+				MyCardChoosedNum = -1;
 			}
-			else if(MyCardChoosedNum<j)
-				MyCardChoosedNum+=3;
+			else if(MyCardChoosedNum<firstMatch)
+				MyCardChoosedNum += 3;
 		}
 
-		auto OldLeftCard=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+j);//j
-		auto OldPos=OldLeftCard->getPosition();
-		auto LeftPengCard=Sprite::createWithTexture(g_my_free->getTexture());
-		LeftPengCard->setAnchorPoint(Vec2(0,0));
-		LeftPengCard->setScale(OldLeftCard->getScale());
-		LeftPengCard->setPosition(Vec2(OldPos.x,OldPos.y));
-		auto LeftPengKind=Sprite::createWithTexture(g_card_kind[card.kind]->getTexture());
-		LeftPengKind->setAnchorPoint(Vec2(0.5,0.5));
-		LeftPengKind->setPosition(Vec2(LeftPengCard->getTextureRect().size.width/2,LeftPengCard->getTextureRect().size.height*0.4));
-		LeftPengCard->addChild(LeftPengKind,1);
-		myframe->addChild(LeftPengCard,20,EFFET_NEWCATD1_TAG);
-		auto LeftSeq=Sequence::create(DelayTime::create(0.18),ScaleTo::create(0,0.6),MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.45,origin.y+visibleSize.height*0.26)),
-			DelayTime::create(0.12),ScaleTo::create(0,0),NULL);
-		auto leftTargetAction=TargetedAction::create(LeftPengCard,LeftSeq);
 
-		auto OldRightCard=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+k);//k
-		auto OldRightPos=OldRightCard->getPosition();
-		auto OldCardSize=OldRightCard->getTextureRect().size;
-		auto RightPengCard=Sprite::createWithTexture(g_my_free->getTexture());
-		RightPengCard->setScale(OldRightCard->getScale());
-		RightPengCard->setAnchorPoint(Vec2(0,0));
-		RightPengCard->setPosition(Vec2(OldRightPos.x,OldRightPos.y));
-		auto RightPengKind=Sprite::createWithTexture(g_card_kind[card.kind]->getTexture());
-		RightPengKind->setAnchorPoint(Vec2(0.5,0.5));
-		RightPengKind->setPosition(Vec2(OldCardSize.width/2,OldCardSize.height*0.4));
-		RightPengCard->addChild(RightPengKind,1);
+		auto LeftPengCard = _GetEffectCardInHand(firstMatch, card.kind);
+		myframe->addChild(LeftPengCard,20,EFFET_NEWCATD1_TAG);
+		auto leftTargetAction = TargetedAction::create(LeftPengCard,Sequence::create(
+            DelayTime::create(0.18),
+            ScaleTo::create(0,0.6),
+            MoveTo::create(0.18,Vec2(
+                origin.x+visibleSize.width*0.45,
+                origin.y+visibleSize.height*0.26)),
+			DelayTime::create(0.12),
+			ScaleTo::create(0,0),NULL));
+
+		auto RightPengCard = _GetEffectCardInHand(secondMatch, card.kind);
 		myframe->addChild(RightPengCard,20,EFFET_NEWCATD2_TAG);
-		auto RightSeq=Sequence::create(DelayTime::create(0.18),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldRightPos.x-OldCardSize.width*0.4,OldRightPos.y)),NULL),
-			MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.45+OldCardSize.width*0.6,origin.y+visibleSize.height*0.26)),DelayTime::create(0.12),ScaleTo::create(0,0),NULL);
-		auto rightTargetAction=TargetedAction::create(RightPengCard,RightSeq);
+
+        /* in case these values are changed during being moved */
+		auto OldRightPos = RightPengCard->getPosition();
+		auto OldCardSize = RightPengCard->getTextureRect().size;
+        
+		auto rightTargetAction=TargetedAction::create(RightPengCard,Sequence::create(
+            DelayTime::create(0.18),
+            Spawn::create(
+                ScaleTo::create(0,0.6),
+                MoveTo::create(0,Vec2(
+                    OldRightPos.x-OldCardSize.width*0.4,
+                    OldRightPos.y)),NULL),
+			MoveTo::create(0.18,Vec2(
+			    origin.x+visibleSize.width*0.45+OldCardSize.width*0.6,
+			    origin.y+visibleSize.height*0.26)),
+			DelayTime::create(0.12),
+			ScaleTo::create(0,0),NULL));
 
 		Vector<FiniteTimeAction *> l_list_card;
-		for(int i=list->atcvie_place;i<list->len;i++)
-		{
+		for(int i=list->atcvie_place;i<list->len;i++) {
 			auto s_card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i);
-			if(list->atcvie_place>0)
-			{
-				if(i<j)
-				{
+            
+			if(list->atcvie_place>0) {
+				if(i<firstMatch) {
 					auto curPos=s_card->getPosition();
 					auto cardSize=s_card->getTextureRect().size;
 					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width*2+(cardPengSize.width*3.5-cardSize.width*2),curPos.y));
 					auto seq=Sequence::create(DelayTime::create(0.18),actionMove,NULL);
 						l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				}
-				else if(i==j||i==k)
-				{
+				} else if(i==firstMatch||i==secondMatch) {
 					auto actionScale=ScaleTo::create(0,0);
 					auto seq=Sequence::create(actionScale,NULL);
 					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				}
-				else if(i>k)
-				{
+				} else if(i>secondMatch) {
 					auto curPos=s_card->getPosition();
 					auto cardSize=s_card->getTextureRect().size;
 					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+(cardPengSize.width*3.5-cardSize.width*(2+ifZeroPointTwo*0.2)),curPos.y));
@@ -2045,25 +2062,18 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
 				}
 			}
-			else if(list->atcvie_place==0)
-			{
-
-				if(i<j)
-				{
+			else if(list->atcvie_place==0) {
+				if(i<firstMatch) {
 					auto curPos=s_card->getPosition();
 					auto cardSize=s_card->getTextureRect().size;
 					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+cardSize.width*2+(cardPengSize.width*4-cardSize.width*2),curPos.y));
 					auto seq=Sequence::create(DelayTime::create(0.18),actionMove,NULL);
 					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				}
-				else if(i==j||i==k)
-				{
+				} else if(i==firstMatch||i==secondMatch) {
 					auto actionScale=ScaleTo::create(0,0);
 					auto seq=Sequence::create(actionScale,NULL);
 					l_list_card.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-				}
-				else if(i>k)
-				{
+				} else if(i>secondMatch) {
 					auto curPos=s_card->getPosition();
 					auto cardSize=s_card->getTextureRect().size;
 					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+(cardPengSize.width*4-cardSize.width*(2+ifZeroPointTwo*0.2)),curPos.y));
@@ -2072,6 +2082,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 				}
 			}
 		}
+        
 		Vector<SpriteFrame*> ani;
 
 		for(int a=list->len-1;a>=list->atcvie_place;a--)
@@ -2080,13 +2091,13 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 			if(!myframe->getChildByTag(curTag))
 				continue;
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
-			if(a>k)
+			if(a>secondMatch)
 				EveryCard->setTag(curTag+1);
-			else if(a==k)
+			else if(a==secondMatch)
 				EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-			else if(a==j)
+			else if(a==firstMatch)
 				EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-			else if(a<j&&a>=list->atcvie_place)
+			else if(a<firstMatch&&a>=list->atcvie_place)
 				EveryCard->setTag(curTag+3);
 			if(a==list->atcvie_place)
 			{
