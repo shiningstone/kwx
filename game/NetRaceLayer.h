@@ -235,9 +235,11 @@ public:
 	void delete_act_tip();//删除效果残留
 	void delete_ActionRemind();
 	void delete_ActionEffect();
-	void angang_update(Node *psender);
-	void minggang_update(Node *psender);
-	void peng_update(Node *psender);
+    
+	void angang_dispatch(Node *psender);
+	void minggang_dispatch(Node *psender);
+	void peng_dispatch(Node *psender);
+
 	void PengEffect(Node *psender);//me--碰牌效果
 	void an_gang_tip_effect(Node *psender);//me--暗杠效果
 	void ming_gang_tip_effect(Node *psender);//me--明杠效果
