@@ -85,6 +85,7 @@
 #define PENG_REMIND_ACT_BKG_TAG_ID			508//
 #define MING_REMIND_ACT_TAG_ID				509//ming
 #define MING_REMIND_ACT_BKG_TAG_ID			510//
+
 #define MING_KOU_ENSURE						511
 #define MING_KOU_CANCEL						512
 #define MING_CANCEL							513
