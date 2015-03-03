@@ -2591,52 +2591,54 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
         moveFreeCards = Spawn::create(gang_list_seq);
 
         /**********************
-            
+            update tag
         **********************/
-		for(int a=list->len-1;a>=0;a--)
-		{
-			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
+		for(int i=list->len-1;i>=0;i--) {
+			int curTag=HAND_IN_CARDS_TAG_ID+1*20+i;
+            
 			if(!myframe->getChildByTag(curTag))
 				continue;
+            
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
-			if(gang[0]<list->atcvie_place)
-			{
-				if(a==gang[3])
+            
+			if( gang[0]<list->atcvie_place ) {/* peng cards transfer to gang cards */
+				if(i==gang[3])
 					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-				else if(a<gang[3]&&a>gang[2])
-					EveryCard->setTag(curTag+1);
-				if(a==gang[2]+1)
-				{
-					((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
-					break;
-				}
-			}
-			else 
-			{
-				if(a==gang[3])
-					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-				else if(a<gang[3]&&a>gang[2])
-					EveryCard->setTag(curTag+1);
-				else if(a==gang[2]||a==gang[1]||a==gang[0])
-				{
-					if(a==gang[2])
+				else if(i>gang[2] && i<gang[3]) {
+                    EveryCard->setTag(curTag+1);
+                    
+                    if(i==gang[2]+1) {       /* insert 1 addition gang card*/
+                        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
+                        break;
+                    }
+                }
+			} else {/* gang directly */
+				if(i>gang[2] && i<gang[3]) {
+					EveryCard->setTag(curTag+1);      /*right shift*/
+                } else if(i==gang[3]||i==gang[2]||i==gang[1]||i==gang[0]) {
+					if(i==gang[3])
+						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
+					if(i==gang[2])
 						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_THREE);
-					if(a==gang[1])
+					if(i==gang[1])
 						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-					if(a==gang[0])
+					if(i==gang[0])
 						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-				}
-				else if(a>=list->atcvie_place&&a<gang[0])
-					EveryCard->setTag(curTag+4);
-				if(a==list->atcvie_place)
-				{
-					for(int b=0;b<4;b++)
-						((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
-					break;
-				}
+				} else if(i>=list->atcvie_place && i<gang[0]) {
+					EveryCard->setTag(curTag+4);      /* leave for 4 space for gang cards*/
+                    
+                    if(i==list->atcvie_place) {       /* insert 4 gang cards*/
+                        for(int b=0;b<4;b++)
+                            ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
+                        break;
+                    }
+                }
 			}
 		}
 
+        /**********************
+            background effect
+        **********************/
 		auto lightCircle=Sprite::createWithSpriteFrameName("4.png");
 		lightCircle->setPosition(Vec2(origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,origin.y+visibleSize.height*0.315));
 		myframe->addChild(lightCircle,32,IMG_4_EFFECT_TAG_ID);
