@@ -85,6 +85,14 @@ private:
     Vec2 _AnchorOfOutcard(int dir);
     Vec2 _PositionOfOutcard(int dir,Size size,Vec2 origin);
 
+    Vec2 _OrigPositionOfGangCard(int i,Size size);
+    Vec2 _MiddlePositionOfGangCard(int i,Size size);
+    Vec2 _DestPositionOfGangCard(int i,Size size);
+    void _DestPositionOfGangCardInHand(int i,Size gangCard);
+    void _CreateGangCardsMotion(TargetedAction *motions[4]);
+    void _MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
+    void _CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind);
+
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();

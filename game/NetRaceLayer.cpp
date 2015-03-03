@@ -2230,6 +2230,135 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             NULL));
 	}
 }
+
+Vec2 NetRaceLayer::_OrigPositionOfGangCard(int i,Size size) {
+    switch(i+1) {
+        case 1: return Vec2(
+            origin.x + visibleSize.width*0.5 + size.width*0.98,
+            origin.y + visibleSize.height*0.255)
+        case 2: return Vec2(
+            origin.x + visibleSize.width*0.5 - size.width*1.96,
+            origin.y + visibleSize.height*0.255)
+        case 3: return Vec2(
+            origin.x + visibleSize.width*0.5 - size.width*0.98,
+            origin.y + visibleSize.height*0.255)
+        case 4: return Vec2(
+            origin.x + visibleSize.width*0.5,
+            origin.y + visibleSize.height*0.255)
+    }
+}
+
+Vec2 NetRaceLayer::_MiddlePositionOfGangCard(int i,Size size) {
+    switch(i+1) {
+        case 1: return Vec2(
+                origin.x + visibleSize.width*0.5  +  size.width*0.98  +  150,
+                origin.y + visibleSize.height*0.255)
+        case 2: return Vec2(
+			    origin.x + visibleSize.width*0.5 - size.width*1.96 - 150,
+			    origin.y + visibleSize.height*0.255)
+        case 3: return Vec2(
+			    origin.x + visibleSize.width*0.5 - size.width*0.98 - 150,
+			    origin.y + visibleSize.height*0.255)
+        case 4: return Vec2(
+			    origin.x + visibleSize.width*0.5 - 150,
+			    origin.y + visibleSize.height*0.255)
+    }
+}
+
+Vec2 NetRaceLayer::_DestPositionOfGangCard(int i,Size size) {
+    switch(i+1) {
+        case 1: return Vec2(
+                origin.x + visibleSize.width*0.5  +  size.width*0.98,
+                origin.y + visibleSize.height*0.255)
+        case 2: return Vec2(
+    			origin.x + visibleSize.width*0.5 - size.width*1.96,
+    			origin.y + visibleSize.height*0.255)
+        case 3: return Vec2(
+			    origin.x + visibleSize.width*0.5 - size.width*0.98,
+			    origin.y + visibleSize.height*0.255)
+        case 4: return Vec2(
+			    origin.x + visibleSize.width*0.5,
+			    origin.y + visibleSize.height*0.255)
+    }
+}
+
+void NetRaceLayer::_DestPositionOfGangCardInHand(int i,Size gangCard) {
+    switch(i+1) {
+        case 1: return Vec2(
+            origin.x+visibleSize.width*0.5 - gangCard.width*1.96,
+            origin.y+visibleSize.height*0.26);
+        case 2: return Vec2(
+            origin.x+visibleSize.width*0.5 - gangCard.width*0.98,
+            origin.y+visibleSize.height*0.26);
+        case 3: return Vec2(
+            origin.x+visibleSize.width*0.5,
+            origin.y+visibleSize.height*0.26);
+        case 4: return Vec2(
+            origin.x+visibleSize.width*0.5 + gangCard.width*0.98,
+            origin.y+visibleSize.height*0.255);
+    }
+}
+
+void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
+    for (int i=0; i<4; i++ ) {
+        auto GangCard = Sprite::createWithTexture(g_my_angang->getTexture());
+        Size GangCardSize = GangCard->getTextureRect().size;
+        GangCard->setAnchorPoint(Vec2(0,0));       
+        GangCard->setScale(0);
+        
+        GangCard->setPosition(_OrigPositionOfGangCard(i,GangCardSize));
+        myframe->addChild(GangCard,30,SINGLE_ACTION_EFFECT_TAG_ID+i);
+
+        motions[i] = TargetedAction::create(GangCard,Sequence::create(
+            DelayTime::create(0.42),
+            ScaleTo::create(0,1),
+            MoveTo::create(0.12,_MiddlePositionOfGangCard(i,GangCardSize)),
+            MoveTo::create(0.12,_DestPositionOfGangCard(i,GangCardSize)),NULL));
+    }
+}
+
+
+void NetRaceLayer::_MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
+    switch(i+1) {
+        case 1: return Vec2(origPos.x,origPos.y);
+        case 2: return Vec2(origPos.x - freeCard.width*0.4, origPos.y);
+        case 3: return Vec2(origPos.x - freeCard.width*0.8, origPos.y);
+        case 4: return Vec2(origPos.x,origPos.y);
+    }
+}
+
+void NetRaceLayer::_CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind) {
+    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    Size FreeCardSize = Sprite::createWithTexture(g_my_free->getTexture())->getTextureRect().size;
+    auto GangCardSize = Sprite::createWithTexture(g_my_angang->getTexture())->getTextureRect().size;
+
+    for (int i=0;i<4;i++ ) {
+        auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + cardInHand[i] + 1*20);//gang1
+        auto OldPos  = OldCard->getPosition();
+        auto OldSize = OldCard->getScale();
+        
+        auto GangCard=Sprite::createWithTexture(g_my_free->getTexture());//gang1
+        GangCard->setScale(OldSize);
+        GangCard->setAnchorPoint(Vec2(0,0));
+        GangCard->setPosition(Vec2(OldPos.x,OldPos.y));
+        
+        auto GangKind=Sprite::createWithTexture(g_card_kind[kind]->getTexture());
+        GangKind->setAnchorPoint(Vec2(0.5,0.5));
+        /*!!! Gang1Kind.Positon use OldGang2Size, maybe mal-spell ??? */
+        GangKind->setPosition(Vec2(OldSize.width/2,OldSize.height*0.4));
+        GangCard->addChild(GangKind,1);
+        myframe->addChild(GangCard,20,EFFET_NEWCATD1_TAG+i);
+
+        motions[i] = TargetedAction::create(GangCard,Sequence::create(
+            DelayTime::create(0.18),Spawn::create(
+                ScaleTo::create(0,0.6),
+                MoveTo::create(0,_MiddlePositionOfGangCardInHand(i,OldPos,FreeCardSize)),NULL),
+            MoveTo::create(0.18,_DestPositionOfGangCardInHand(i,GangCardSize)),
+            DelayTime::create(0.06),
+            ScaleTo::create(0,0),NULL));
+    }
+}
+
 void NetRaceLayer::an_gang_tip_effect(Node *psender)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -2278,6 +2407,9 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 			}
 		}
         
+        /**********************
+            clear screen
+        **********************/
 		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID),
             Sequence::create(
                 ScaleTo::create(0,1),
@@ -2285,7 +2417,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
                 FadeOut::create(0.18),
                 ScaleTo::create(0.18,1.3),NULL),NULL));
         
-		auto g_seq1 = Sequence::create(Spawn::create(shadeAction,CCCallFunc::create([=](){
+		auto hideReminder = Sequence::create(Spawn::create(shadeAction,CCCallFunc::create([=](){
 		    for (int i=0;i<11;i++) {
                 if(i==GANG_REMING_ACT_BKG_TAG_ID) {
                     continue;
@@ -2296,6 +2428,9 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 			if(myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID))
 				myframe->removeChildByTag(GANG_REMING_ACT_BKG_TAG_ID,true);}),NULL);
 
+        /**********************
+            logical
+        **********************/
 		auto list = _roundManager->_players[no]->get_parter()->get_card_list();
 		int gang[4];
         Card outCard;
@@ -2333,155 +2468,25 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 				MyCardChoosedNum+=4;
 		}
 
-		auto GangCard1 = Sprite::createWithTexture(g_my_angang->getTexture());
-		Size GangCardSize = GangCard1->getTextureRect().size;
-		GangCard1->setAnchorPoint(Vec2(0,0));		
-		GangCard1->setPosition(Vec2(
-            origin.x + visibleSize.width*0.5 + GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.255));
-		GangCard1->setScale(0);
-		myframe->addChild(GangCard1,30,SINGLE_ACTION_EFFECT_TAG_ID);
-		auto moveGangCard1 = TargetedAction::create(GangCard1,Sequence::create(
-            DelayTime::create(0.42),
-            ScaleTo::create(0,1),
-			MoveTo::create(0.12,Vec2(
-    			origin.x+visibleSize.width*0.5 + GangCardSize.width*0.98 + 150,
-    			origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(
-    			origin.x+visibleSize.width*0.5 + GangCardSize.width*0.98,
-    			origin.y+visibleSize.height*0.255)),NULL));
+        /**********************
+            move 4 cards
+        **********************/
+        TargetedAction *moveGangCardEffect[4];
+        _CreateGangCardsMotion(moveGangCardEffect);
 
-		auto GangCard2 = Sprite::createWithTexture(g_my_angang->getTexture());
-		GangCard2->setAnchorPoint(Vec2(0,0));
-		GangCard2->setScale(0);
-		GangCard2->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5-GangCardSize.width*1.96,
-            origin.y+visibleSize.height*0.255));
-		myframe->addChild(GangCard2,30,SINGLE_ACTION2_EFFECT_TAG_ID);
-		auto moveGangCard2 = TargetedAction::create(GangCard2,Sequence::create(
-            DelayTime::create(0.42),
-            ScaleTo::create(0,1),
-			MoveTo::create(0.12,Vec2(
-			    origin.x+visibleSize.width*0.5-GangCardSize.width*1.96-150,
-			    origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(
-    			origin.x+visibleSize.width*0.5-GangCardSize.width*1.96,
-    			origin.y+visibleSize.height*0.255)),NULL));
+        /**********************
+            move 4 cards in hand
+        **********************/
+        Size FreeCardSize = Sprite::createWithTexture(g_my_free->getTexture())->getTextureRect().size;
+		auto curKindOfGang = list->data[gang[0]].kind;
 
-		auto GangCard3 = Sprite::createWithTexture(g_my_angang->getTexture());
-		GangCard3->setAnchorPoint(Vec2(0,0));
-		GangCard3->setScale(0);
-		GangCard3->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5-GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.255));
-		myframe->addChild(GangCard3,30,SINGLE_ACTION3_EFFECT_TAG_ID);
-		auto moveGangCard3 = TargetedAction::create(GangCard3,Sequence::create(
-            DelayTime::create(0.42),
-            ScaleTo::create(0,1),
-			MoveTo::create(0.12,Vec2(
-			    origin.x+visibleSize.width*0.5-GangCardSize.width*0.98-150,
-			    origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(
-			    origin.x+visibleSize.width*0.5-GangCardSize.width*0.98,
-			    origin.y+visibleSize.height*0.255)),NULL));
+        TargetedAction *moveGangCardInHand[4];
+        _CreateGangCardInHandMotion(moveGangCardInHand, gang, curKindOfGang);
 
-		auto GangCard4 = Sprite::createWithTexture(g_my_angang->getTexture());
-		GangCard4->setAnchorPoint(Vec2(0,0));
-		GangCard4->setScale(0);
-		GangCard4->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5,
-            origin.y+visibleSize.height*0.255));
-		myframe->addChild(GangCard4,30,SINGLE_ACTION4_EFFECT_TAG_ID);
-		auto moveGangCard4 = TargetedAction::create(GangCard4,Sequence::create(
-            DelayTime::create(0.42),
-            ScaleTo::create(0,1),
-			MoveTo::create(0.12,Vec2(
-			    origin.x+visibleSize.width*0.5-150,
-			    origin.y+visibleSize.height*0.255)),
-			MoveTo::create(0.12,Vec2(
-			    origin.x+visibleSize.width*0.5,
-			    origin.y+visibleSize.height*0.255)),NULL));
+		auto moveAngangCards = Spawn::create(
+            moveGangCardEffect[0],moveGangCardEffect[1],moveGangCardEffect[2],moveGangCardEffect[4],
+            moveGangCardInHand[0],moveGangCardInHand[1],moveGangCardInHand[2],moveGangCardInHand[3],NULL);
 
-		////////////////////////////////////////////////////////////////////////////////////////
-		Sprite* Gang1Card;
-		Sprite* Gang2Card;
-		Sprite* Gang3Card;
-		Sprite* Gang4Card;
-		Sequence* Gnag1Card_seq;
-		TargetedAction* Gang1TarAction;
-		Sequence* Gnag2Card_seq;
-		TargetedAction* Gang2TarAction;
-		Sequence* Gnag3Card_seq;
-		TargetedAction *Gang3TarAction;
-		Sequence* Gnag4Card_seq;
-		TargetedAction* Gang4TarAction;
-		auto curKindOfGang=list->data[gang[0]].kind;
-		auto OldGang1Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[0]);//gang1
-		auto OldGang1Pos=OldGang1Card->getPosition();
-		auto OldGang1Size=OldGang1Card->getTextureRect().size;
-		auto OldGang2Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[1]);//gang2
-		auto OldGang2Pos=OldGang2Card->getPosition();
-		auto OldGang2Size=OldGang2Card->getTextureRect().size;
-		auto OldGang3Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]);//gang3
-		auto OldGang3Pos=OldGang3Card->getPosition();
-		auto OldGang3Size=OldGang3Card->getTextureRect().size;
-		auto OldGang4Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[3]);//gang4
-		auto OldGang4Pos=OldGang4Card->getPosition();
-		auto OldGang4Size=OldGang4Card->getTextureRect().size;
-		Gang1Card=Sprite::createWithTexture(g_my_free->getTexture());//gang1
-		Gang1Card->setScale(OldGang1Card->getScale());
-		Gang1Card->setAnchorPoint(Vec2(0,0));
-		Gang1Card->setPosition(Vec2(OldGang1Pos.x,OldGang1Pos.y));
-		auto Gang1Kind=Sprite::createWithTexture(g_card_kind[curKindOfGang]->getTexture());
-		Gang1Kind->setAnchorPoint(Vec2(0.5,0.5));
-		Gang1Kind->setPosition(Vec2(OldGang2Size.width/2,OldGang2Size.height*0.4));
-		Gang1Card->addChild(Gang1Kind,1);
-		myframe->addChild(Gang1Card,20,EFFET_NEWCATD1_TAG);
-		auto actionMove1=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5-GangCardSize.width*1.96,origin.y+visibleSize.height*0.26));
-		Gnag1Card_seq=Sequence::create(DelayTime::create(0.18),ScaleTo::create(0,0.6),actionMove1,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-		Gang1TarAction=TargetedAction::create(Gang1Card,Gnag1Card_seq);
-
-		Size FreeCardSize = Sprite::createWithTexture(g_my_free->getTexture())->getTextureRect().size;
-
-		Gang2Card=Sprite::createWithTexture(g_my_free->getTexture());//gang2
-		Gang2Card->setScale(OldGang2Card->getScale());
-		Gang2Card->setAnchorPoint(Vec2(0,0));
-		Gang2Card->setPosition(Vec2(OldGang2Pos.x,OldGang2Pos.y));
-		auto Gang2Kind=Sprite::createWithTexture(g_card_kind[curKindOfGang]->getTexture());
-		Gang2Kind->setAnchorPoint(Vec2(0.5,0.5));
-		Gang2Kind->setPosition(Vec2(OldGang2Size.width/2,OldGang2Size.height*0.4));
-		Gang2Card->addChild(Gang2Kind,1);
-		myframe->addChild(Gang2Card,20,EFFET_NEWCATD2_TAG);
-		auto actionMove2=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5-GangCardSize.width*0.98,origin.y+visibleSize.height*0.26));
-		Gnag2Card_seq=Sequence::create(DelayTime::create(0.18),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldGang2Pos.x-FreeCardSize.width*0.4,OldGang2Pos.y)),NULL),actionMove2,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-		Gang2TarAction=TargetedAction::create(Gang2Card,Gnag2Card_seq);
-
-		Gang3Card=Sprite::createWithTexture(g_my_free->getTexture());//gang3
-		Gang3Card->setScale(OldGang3Card->getScale());
-		Gang3Card->setAnchorPoint(Vec2(0,0));
-		Gang3Card->setPosition(Vec2(OldGang3Pos.x,OldGang3Pos.y));
-		auto Gang3Kind=Sprite::createWithTexture(g_card_kind[curKindOfGang]->getTexture());
-		Gang3Kind->setAnchorPoint(Vec2(0.5,0.5));
-		Gang3Kind->setPosition(Vec2(OldGang3Size.width/2,OldGang3Size.height*0.4));
-		Gang3Card->addChild(Gang3Kind,1);
-		myframe->addChild(Gang3Card,20,EFFET_NEWCATD3_TAG);
-		auto actionMove3=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.26));
-		Gnag3Card_seq=Sequence::create(DelayTime::create(0.18),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldGang3Pos.x-FreeCardSize.width*0.8,OldGang3Pos.y)),NULL),actionMove3,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-		Gang3TarAction=TargetedAction::create(Gang3Card,Gnag3Card_seq);
-
-		Gang4Card=Sprite::createWithTexture(g_my_free->getTexture());//gang4
-		Gang4Card->setScale(OldGang4Card->getScale());
-		Gang4Card->setAnchorPoint(Vec2(0,0));
-		Gang4Card->setPosition(Vec2(OldGang4Pos.x,OldGang4Pos.y));
-		auto Gang4Kind=Sprite::createWithTexture(g_card_kind[curKindOfGang]->getTexture());
-		Gang4Kind->setAnchorPoint(Vec2(0.5,0.5));
-		Gang4Kind->setPosition(Vec2(OldGang4Size.width/2,OldGang4Size.height*0.4));
-		Gang4Card->addChild(Gang4Kind,1);
-		myframe->addChild(Gang4Card,20,EFFET_NEWCATD4_TAG);
-		auto actionMove4=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,origin.y+visibleSize.height*0.255));
-		Gnag4Card_seq=Sequence::create(DelayTime::create(0.18),ScaleTo::create(0,0.6),actionMove4,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-		Gang4TarAction=TargetedAction::create(Gang4Card,Gnag4Card_seq);
-		auto an_gang_spawn=Spawn::create(moveGangCard1,moveGangCard2,moveGangCard3,moveGangCard4,Gang1TarAction,Gang2TarAction,Gang3TarAction,Gang4TarAction,NULL);
 		////////////////////////////////////////////////////////////////////////////////////////
 		int actionStartPlace=0;
 		for(int a=0;a<=list->atcvie_place;a++)
@@ -2712,13 +2717,13 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		auto light_seq=Sequence::create(DelayTime::create(0.66),ScaleTo::create(0.12,0.5),Spawn::create(ScaleTo::create(0.18,0),FadeOut::create(0.18),NULL),NULL);
 		auto light_action=TargetedAction::create(light,light_seq);
 
-		auto g_spa1=Spawn::create(an_gang_spawn,Sequence::create(DelayTime::create(0.66),CCCallFunc::create([=]()
+		auto g_spa1=Spawn::create(moveAngangCards,Sequence::create(DelayTime::create(0.66),CCCallFunc::create([=]()
 		{
 			startParticleSystem(0.3);
 		}),NULL),light1_action,light2_action,light3_action,yellow_action,light_action,NULL);
 	
 		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png");
-		//g_seq1  **clear
+		//hideReminder  **clear
 		//simple_seq **moji&&font
 		//g_spa0 **手牌
 		//g_spa1
@@ -2772,7 +2777,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 
 		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
 		auto delayVoice=Sequence::create(DelayTime::create(0.66),VoiceEffect,NULL);
-		auto angang_seq=Sequence::create(g_seq1,Spawn::create(simple_seq,_SpeakAction(GANG),g_spa0,g_spa1,delayVoice,NULL),/*GoldAccount,*/update_list_seq0,
+		auto angang_seq=Sequence::create(hideReminder,Spawn::create(simple_seq,_SpeakAction(GANG),g_spa0,g_spa1,delayVoice,NULL),/*GoldAccount,*/update_list_seq0,
 			CallFunc::create([=](){
 				if(myframe->getChildByTag(AN_GANG_EFFECT_NODE))
 					myframe->removeChildByTag(AN_GANG_EFFECT_NODE,true);
