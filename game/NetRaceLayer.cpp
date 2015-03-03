@@ -2307,7 +2307,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
         _CreateGangCardInHandMotion(moveGangCardInHand, gang, curKindOfGang);
 
 		auto moveAngangCards = Spawn::create(
-            moveGangCardEffect[0],moveGangCardEffect[1],moveGangCardEffect[2],moveGangCardEffect[4],
+            moveGangCardEffect[0],moveGangCardEffect[1],moveGangCardEffect[2],moveGangCardEffect[3],
             moveGangCardInHand[0],moveGangCardInHand[1],moveGangCardInHand[2],moveGangCardInHand[3],NULL);
 
         /**********************
