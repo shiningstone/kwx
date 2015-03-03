@@ -88,9 +88,9 @@ private:
     Vec2 _OrigPositionOfGangCard(int i,Size size);
     Vec2 _MiddlePositionOfGangCard(int i,Size size);
     Vec2 _DestPositionOfGangCard(int i,Size size);
-    void _DestPositionOfGangCardInHand(int i,Size gangCard);
+    Vec2 _DestPositionOfGangCardInHand(int i,Size gangCard);
     void _CreateGangCardsMotion(TargetedAction *motions[4]);
-    void _MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
+    Vec2 _MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
     void _CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind);
 
 public:

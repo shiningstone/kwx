@@ -1867,16 +1867,16 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
                 FadeOut::create(0.18),
                 ScaleTo::create(0.18,1.2),NULL),NULL));
 
-		auto hideReminder = Sequence::create( Spawn::create(
-                        shadeAction, CCCallFunc::create([=]() {
-            			for(int i=0; i<11; i++) {
-                            if(i==PENG_REMIND_ACT_BKG_TAG_ID) {
-                                continue;
-                            } else {
-                                _Remove(myframe,REMIND_ACT_TAG_ID+i);}}),NULL),CCCallFunc::create([=](){
-                            }
-                        _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID);
-                		}),NULL);
+		auto hideReminder = Sequence::create( 
+            Spawn::create(
+                shadeAction, CCCallFunc::create([=]() {
+    			for(int i=0; i<11; i++) {
+                    if(i==PENG_REMIND_ACT_BKG_TAG_ID) {
+                        continue;
+                    } else {
+                        _Remove(myframe,REMIND_ACT_TAG_ID+i);}}}),NULL),
+            CCCallFunc::create([=](){
+                _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID);}),NULL);
 	
         /****************
             move 3 cards
@@ -2320,6 +2320,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 				actionStartPlace = i;
 				break;
 			}
+        auto GangCardSize = Sprite::createWithTexture(g_my_angang->getTexture())->getTextureRect().size;
 
         const float GAP = (list->atcvie_place==0)?(0.5):(0.0);
         
@@ -2327,18 +2328,20 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 		Spawn* moveFreeCards;
         
 		if( outCard.kind==list->data[list->len-1].kind ) {
-			for(int i=actionStartPlace;i<list->len-1;i++)
+            int i;
+            for(i=actionStartPlace;i<list->len-1;i++)
 			{
                 auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
                 TargetedAction *motion;
                 
 				if(i<gang[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE))
 				{
-					motion=Sequence::create(
-                        DelayTime::create(0.18),
-                        MoveTo::create(0.3,Vec2(
-                            curPos.x+GangCardSize.width*(3.5+GAP),
-                            curPos.y)),NULL);
+					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            DelayTime::create(0.18),
+                            MoveTo::create(0.3,Vec2(
+                                curPos.x+GangCardSize.width*(3.5+GAP),
+                                curPos.y)),NULL));
 				}
 				else if(i==gang[0]||i==gang[1]||i==gang[2])
 				{
@@ -2407,7 +2410,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
                             actionMove,NULL));
 				}
 
-                gang_list_seq.insert(i-actionStartPlace,ll_action);
+                gang_list_seq.insert(i-actionStartPlace,motion);
 			}
 		}
         
@@ -9008,16 +9011,16 @@ Vec2 NetRaceLayer::_OrigPositionOfGangCard(int i,Size size) {
     switch(i+1) {
         case 1: return Vec2(
             origin.x + visibleSize.width*0.5 + size.width*0.98,
-            origin.y + visibleSize.height*0.255)
+            origin.y + visibleSize.height*0.255);
         case 2: return Vec2(
             origin.x + visibleSize.width*0.5 - size.width*1.96,
-            origin.y + visibleSize.height*0.255)
+            origin.y + visibleSize.height*0.255);
         case 3: return Vec2(
             origin.x + visibleSize.width*0.5 - size.width*0.98,
-            origin.y + visibleSize.height*0.255)
+            origin.y + visibleSize.height*0.255);
         case 4: return Vec2(
             origin.x + visibleSize.width*0.5,
-            origin.y + visibleSize.height*0.255)
+            origin.y + visibleSize.height*0.255);
     }
 }
 
@@ -9025,16 +9028,16 @@ Vec2 NetRaceLayer::_MiddlePositionOfGangCard(int i,Size size) {
     switch(i+1) {
         case 1: return Vec2(
                 origin.x + visibleSize.width*0.5  +  size.width*0.98  +  150,
-                origin.y + visibleSize.height*0.255)
+                origin.y + visibleSize.height*0.255);
         case 2: return Vec2(
 			    origin.x + visibleSize.width*0.5 - size.width*1.96 - 150,
-			    origin.y + visibleSize.height*0.255)
+			    origin.y + visibleSize.height*0.255);
         case 3: return Vec2(
 			    origin.x + visibleSize.width*0.5 - size.width*0.98 - 150,
-			    origin.y + visibleSize.height*0.255)
+			    origin.y + visibleSize.height*0.255);
         case 4: return Vec2(
 			    origin.x + visibleSize.width*0.5 - 150,
-			    origin.y + visibleSize.height*0.255)
+			    origin.y + visibleSize.height*0.255);
     }
 }
 
@@ -9042,20 +9045,20 @@ Vec2 NetRaceLayer::_DestPositionOfGangCard(int i,Size size) {
     switch(i+1) {
         case 1: return Vec2(
                 origin.x + visibleSize.width*0.5  +  size.width*0.98,
-                origin.y + visibleSize.height*0.255)
+                origin.y + visibleSize.height*0.255);
         case 2: return Vec2(
     			origin.x + visibleSize.width*0.5 - size.width*1.96,
-    			origin.y + visibleSize.height*0.255)
+    			origin.y + visibleSize.height*0.255);
         case 3: return Vec2(
 			    origin.x + visibleSize.width*0.5 - size.width*0.98,
-			    origin.y + visibleSize.height*0.255)
+			    origin.y + visibleSize.height*0.255);
         case 4: return Vec2(
 			    origin.x + visibleSize.width*0.5,
-			    origin.y + visibleSize.height*0.255)
+			    origin.y + visibleSize.height*0.255);
     }
 }
 
-void NetRaceLayer::_DestPositionOfGangCardInHand(int i,Size gangCard) {
+Vec2 NetRaceLayer::_DestPositionOfGangCardInHand(int i,Size gangCard) {
     switch(i+1) {
         case 1: return Vec2(
             origin.x+visibleSize.width*0.5 - gangCard.width*1.96,
@@ -9073,6 +9076,7 @@ void NetRaceLayer::_DestPositionOfGangCardInHand(int i,Size gangCard) {
 }
 
 void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
+    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
     for (int i=0; i<4; i++ ) {
         auto GangCard = Sprite::createWithTexture(g_my_angang->getTexture());
         Size GangCardSize = GangCard->getTextureRect().size;
@@ -9091,7 +9095,7 @@ void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
 }
 
 
-void NetRaceLayer::_MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
+Vec2 NetRaceLayer::_MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
     switch(i+1) {
         case 1: return Vec2(origPos.x,origPos.y);
         case 2: return Vec2(origPos.x - freeCard.width*0.4, origPos.y);
@@ -9108,10 +9112,11 @@ void NetRaceLayer::_CreateGangCardInHandMotion(TargetedAction *motions[4],int ca
     for (int i=0;i<4;i++ ) {
         auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + cardInHand[i] + 1*20);//gang1
         auto OldPos  = OldCard->getPosition();
-        auto OldSize = OldCard->getScale();
+        auto OldScale = OldCard->getScale();
+        auto OldSize = OldCard->getTextureRect().size;
         
         auto GangCard=Sprite::createWithTexture(g_my_free->getTexture());//gang1
-        GangCard->setScale(OldSize);
+        GangCard->setScale(OldScale);
         GangCard->setAnchorPoint(Vec2(0,0));
         GangCard->setPosition(Vec2(OldPos.x,OldPos.y));
         
