@@ -8920,13 +8920,13 @@ void NetRaceLayer::_AttachKindTextureToFreeCard(Sprite *parent,CARD_KIND kind) {
     parent->addChild(kindTexture);
 }
     
-
+/* the first is non-peng card*/
 void NetRaceLayer::_CreateMingGangCardInHandMotion(TargetedAction *motions[3], int idxInHand[3], CARD_KIND kind) {
     auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
 	float delayTime=0.18;
     
     for (int i=0;i<3;i++) {
-		auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + idxInHand[i+1]);
+		auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + idxInHand[i]);
 		auto OldPos  = OldCard->getPosition();
 		auto OldSize = OldCard->getTextureRect().size;
         
@@ -8936,10 +8936,10 @@ void NetRaceLayer::_CreateMingGangCardInHandMotion(TargetedAction *motions[3], i
 
         _AttachKindTexture(card,kind);
         
-        myframe->addChild(card,20,EFFET_NEWCATD1_TAG+1+i);
+        myframe->addChild(card,20,(EFFET_NEWCATD1_TAG+1)+i);
         motions[i] = TargetedAction::create(card,Sequence::create(
             DelayTime::create(delayTime),
-            MoveTo::create(0.18,_PositionOfMingGangCard(i+1,card->getTextureRect().size)),
+            MoveTo::create(0.18,_PositionOfMingGangCard((i+1),card->getTextureRect().size)),
             DelayTime::create(0.06),
             ScaleTo::create(0,0),NULL));
     }
