@@ -2465,84 +2465,8 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
         /**********************
             background effect
         **********************/
-		auto lightCircle = Sprite::createWithSpriteFrameName("4.png");
-		lightCircle->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.315));
-		myframe->addChild(lightCircle,32,IMG_4_EFFECT_TAG_ID);
-		lightCircle->setScale(0);
-		BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
-		lightCircle->setBlendFunc(tmp_oBlendFunc);
-		auto light1_action = TargetedAction::create(lightCircle, 
-            Sequence::create(
-                DelayTime::create(0.66),
-                ScaleTo::create(0,0.4),
-                ScaleTo::create(0.18,1.0),
-            Spawn::create(
-                ScaleTo::create(0.06,1.2),
-                FadeOut::create(0.06),NULL),NULL));
-
-		auto lightCircle1=Sprite::createWithSpriteFrameName("Q4.png");
-		lightCircle1->setAnchorPoint(Vec2(0.5,0));
-		lightCircle1->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.315));
-		myframe->addChild(lightCircle1,32,IMG_Q4_EFFECT_TAG_ID);
-		lightCircle1->setScale(0);
-		lightCircle1->setBlendFunc(tmp_oBlendFunc);
-		auto light2_action=TargetedAction::create(lightCircle1,
-            Sequence::create(
-                DelayTime::create(0.9),
-                ScaleTo::create(0,0.1),
-                ScaleTo::create(0.18,0.6),
-            Spawn::create(
-                ScaleTo::create(0.06,0.7),
-                FadeOut::create(0.06),NULL),NULL));
-
-		auto lightCircle2=Sprite::createWithSpriteFrameName("Q4.png");
-		lightCircle2->setAnchorPoint(Vec2(0.5,0));
-		lightCircle2->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.315));
-		myframe->addChild(lightCircle2,32,IMG_Q4_EFFECT_TAG_ID+1);
-		lightCircle2->setScale(0);
-		lightCircle2->setBlendFunc(tmp_oBlendFunc);
-		auto light3_action = TargetedAction::create(lightCircle2,
-            Sequence::create(
-                DelayTime::create(1.14),
-                ScaleTo::create(0,0.1),
-                ScaleTo::create(0.18,0.4),
-            Spawn::create(
-                ScaleTo::create(0.06,0.5),
-                FadeOut::create(0.06),NULL),NULL));
-
-		auto yellowlight=Sprite::createWithSpriteFrameName("c33.png");
-		yellowlight->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.315));
-		myframe->addChild(yellowlight,30,IMG_C33_EFFECT_TAG_ID);
-		yellowlight->setScale(0);
-		auto yellow_action=TargetedAction::create(yellowlight,
-            Sequence::create(
-                DelayTime::create(0.66),
-                ScaleTo::create(0.12,1),
-            Spawn::create(
-                ScaleTo::create(0.18,0),
-                FadeOut::create(0.18),NULL),NULL));
-
-		auto light = Sprite::createWithSpriteFrameName("c3.png");
-		light->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
-            origin.y+visibleSize.height*0.315));
-		light->setScale(0);
-		myframe->addChild(light,31,IMG_C3_EFFECT_TAG_ID);
-		light->setOpacity(200);
-		auto light_action=TargetedAction::create(light,Sequence::create(
-                DelayTime::create(0.66),
-                ScaleTo::create(0.12,0.5),
-            Spawn::create(
-                ScaleTo::create(0.18,0),
-                FadeOut::create(0.18),NULL),NULL));
+        TargetedAction *bgElementsMotions[5];
+        _CreateBackgroundElementMotion(bgElementsMotions,0);
 
         /* final effect */
 		auto callFunc_update_list=CCCallFunc::create([=](){
@@ -2590,11 +2514,11 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
             		        DelayTime::create(0.66),CCCallFunc::create([=]() {
                     		startParticleSystem(0.3);
                     		}),NULL),
-                        light1_action,
-                        light2_action,
-                        light3_action,
-                        yellow_action,
-                        light_action,NULL),
+                        bgElementsMotions[0],
+                        bgElementsMotions[1],
+                        bgElementsMotions[2],
+                        bgElementsMotions[3],
+                        bgElementsMotions[4],NULL),
             		Sequence::create(
                         DelayTime::create(0.66),CallFunc::create([=](){
                         SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");}),NULL),NULL),
@@ -3058,113 +2982,103 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 				actionStartPlace=a;
 				break;
 			}
+		actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
             
 		Vector<FiniteTimeAction *>gang_list_seq;
         
 		if(!_roundManager->_isCardFromOthers) {
-			actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
-            
-			for(int i=actionStartPlace; i<=gang[2]; i++){
-				if(i<gang[0]) {/* right shift */
-					auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+			for(int i=actionStartPlace; i<=gang[0]; i++) {/* right shift */
+				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
 
-					auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                        DelayTime::create(delayTime),
-                        MoveTo::create(0.3,Vec2(
-                            curPos.x+cardPengSize.width*3.5,
-                            curPos.y)),NULL));
-					gang_list_seq.insert(i-actionStartPlace,action);
-				} else {/*hide gang cards*/
-					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                            ScaleTo::create(0,0),NULL)));
-				}
+				auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                    Sequence::create(
+                    DelayTime::create(delayTime),
+                    MoveTo::create(0.3,Vec2(
+                        curPos.x+cardPengSize.width*3.5,
+                        curPos.y)),NULL));
+				gang_list_seq.insert(i-actionStartPlace,action);
+             }
+			for(int i=gang[0]; i<=gang[2]; i++) {/*hide gang cards*/
+				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        ScaleTo::create(0,0),NULL)));
 			}
 		}
 		else {
-			actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
             const float GAP = (list->atcvie_place==0)?0.5:0.0;
+            auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
             
-			for(int i=actionStartPlace;i<list->len;i++){
-				if(i<gang[0]) {/* right shift */
-					auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-
-					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                            DelayTime::create(delayTime),
-                            MoveTo::create(0.3,Vec2(
-                                curPos.x+cardPengSize.width*(3.5+GAP),
-                                curPos.y)),NULL)));
-				} else if(i==gang[0]||i==gang[1]||i==gang[2]) {/* hide */
-					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                            ScaleTo::create(0,0),NULL)));
-				} else if(i>gang[2]) {/* right shift */
-					auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-                    
-					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                            DelayTime::create(delayTime),
-                            MoveTo::create(0.3,Vec2(
-                                curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
-                                curPos.y)),NULL)));
-				}
+			for(int i=actionStartPlace;i<gang[0];i++) {/* right shift */
+				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        DelayTime::create(delayTime),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x+cardPengSize.width*(3.5+GAP),
+                            curPos.y)),NULL)));
+			}
+            for(int i=gang[0];i<=gang[2];i++) {/* hide */
+				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        ScaleTo::create(0,0),NULL)));
+			} 
+            for(int i=gang[2]+1;i<list->len;i++) {/* right shift */
+				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        DelayTime::create(delayTime),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
+                            curPos.y)),NULL)));
 			}
 		}
 
-		for(int a=list->len-1;a>=0;a--)
-		{
+        Spawn *moveFreeCards = Spawn::create(gang_list_seq);
+        /**********************
+            update tag
+        **********************/
+		for(int a=list->len-1;a>=0;a--) {
 			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
 			if(!myframe->getChildByTag(curTag))
 				continue;
+            
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
-			if(!_roundManager->_isCardFromOthers)
-			{
+			if(!_roundManager->_isCardFromOthers) {
 				if(a==list->len-1)
 					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
 				else if(a<list->len-1&&a>gang[2])
 					EveryCard->setTag(curTag+1);
-				if(a==(gang[2]+1))
-				{
+				if(a==(gang[2]+1)) {
 					((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
 				}
-			}
-			else
-			{
-				if(gang[0]<list->atcvie_place)
-				{
+			} else {
+				if(gang[0]<list->atcvie_place) {
 					if(a>gang[2])
 						EveryCard->setTag(curTag+1);
-					if(a==gang[2]+1)
-					{
+                    
+					if(a==gang[2]+1) {
 						auto EmptyCard=Sprite::createWithTexture(g_my_free->getTexture());
 						EmptyCard->setAnchorPoint(Vec2(1,1));
 						EmptyCard->setScale(0);
 						EmptyCard->setPosition(Vec2::ZERO);
 						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
 					}
-				}
-				else
-				{
-
+				} else {
 					if(a>gang[2])
 						EveryCard->setTag(curTag+1);
-					else if(a<=gang[2]&&a>=gang[0])
-					{
+					else if(a<=gang[2]&&a>=gang[0]) {
 						if(a==gang[2])
 							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_THREE);
 						if(a==gang[1])
 							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
 						if(a==gang[0])
 							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-					}
-					else if(a<gang[0]&&a>=list->atcvie_place)
+					} else if(a<gang[0]&&a>=list->atcvie_place)
 						EveryCard->setTag(curTag+4);
+                    
 					if(a==list->atcvie_place)
 					{
 						for(int b=0;b<3;b++)
 							((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
+
 						auto EmptyCard=Sprite::createWithTexture(g_my_free->getTexture());
 						EmptyCard->setAnchorPoint(Vec2(1,1));
 						EmptyCard->setScale(0);
@@ -3175,53 +3089,23 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			}
 		}
 
-		auto lightCircle=Sprite::createWithSpriteFrameName("4.png");
-		lightCircle->setPosition(Vec2(origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,origin.y+visibleSize.height*0.315));
-		myframe->addChild(lightCircle,32,IMG_4_EFFECT_TAG_ID);
-		lightCircle->setScale(0);
-		BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
-		lightCircle->setBlendFunc(tmp_oBlendFunc);
-		auto lightCircle_seq=Sequence::create(DelayTime::create(0.78),ScaleTo::create(0,0.4),ScaleTo::create(0.18,1.0),Spawn::create(ScaleTo::create(0.06,1.2),FadeOut::create(0.06),NULL),NULL);
-		auto light1_action=TargetedAction::create(lightCircle,lightCircle_seq);
+        /**********************
+            background effect
+        **********************/
+        TargetedAction *bgElementsMotions[5];
+        _CreateBackgroundElementMotion(bgElementsMotions, 1);
 
-		auto lightCircle1=Sprite::createWithSpriteFrameName("Q4.png");
-		lightCircle1->setAnchorPoint(Vec2(0.5,0));
-		lightCircle1->setPosition(Vec2(origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,origin.y+visibleSize.height*0.315));
-		myframe->addChild(lightCircle1,32,IMG_Q4_EFFECT_TAG_ID);
-		lightCircle1->setScale(0);
-		lightCircle1->setBlendFunc(tmp_oBlendFunc);
-		auto lightCircle1_seq=Sequence::create(DelayTime::create(1.02),ScaleTo::create(0,0.1),ScaleTo::create(0.18,0.6),Spawn::create(ScaleTo::create(0.06,0.7),FadeOut::create(0.06),NULL),NULL);
-		auto light2_action=TargetedAction::create(lightCircle1,lightCircle1_seq);
+		auto g_spa1 = Spawn::create(
+                moveFreeCards,
+                Sequence::create(
+                    DelayTime::create(0.78), CCCallFunc::create([=]() {
+        			startParticleSystem(0.3); }),NULL),
+                bgElementsMotions[0],
+                bgElementsMotions[1],
+                bgElementsMotions[2],
+                bgElementsMotions[3],
+                bgElementsMotions[4],NULL);
 
-		auto lightCircle2=Sprite::createWithSpriteFrameName("Q4.png");
-		lightCircle2->setAnchorPoint(Vec2(0.5,0));
-		lightCircle2->setPosition(Vec2(origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,origin.y+visibleSize.height*0.315));
-		myframe->addChild(lightCircle2,32,IMG_Q4_EFFECT_TAG_ID+1);
-		lightCircle2->setScale(0);
-		lightCircle2->setBlendFunc(tmp_oBlendFunc);
-		auto lightCircle2_seq=Sequence::create(DelayTime::create(1.26),ScaleTo::create(0,0.1),ScaleTo::create(0.18,0.4),Spawn::create(ScaleTo::create(0.06,0.5),FadeOut::create(0.06),NULL),NULL);
-		auto light3_action=TargetedAction::create(lightCircle2,lightCircle2_seq);
-
-		auto yellowlight=Sprite::createWithSpriteFrameName("c33.png");
-		yellowlight->setPosition(Vec2(origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,origin.y+visibleSize.height*0.315));
-		myframe->addChild(yellowlight,30,IMG_C33_EFFECT_TAG_ID);
-		yellowlight->setScale(0);
-		auto yellowlight_seq=Sequence::create(DelayTime::create(0.78),ScaleTo::create(0.12,1),Spawn::create(ScaleTo::create(0.18,0),FadeOut::create(0.18),NULL),NULL);
-		auto yellow_action=TargetedAction::create(yellowlight,yellowlight_seq);
-
-		auto light=Sprite::createWithSpriteFrameName("c3.png");
-		light->setPosition(Vec2(origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,origin.y+visibleSize.height*0.315));
-		light->setScale(0);
-		myframe->addChild(light,31,IMG_C3_EFFECT_TAG_ID);
-		light->setOpacity(200);
-		auto light_seq=Sequence::create(DelayTime::create(0.78),ScaleTo::create(0.12,0.5),Spawn::create(ScaleTo::create(0.18,0),FadeOut::create(0.18),NULL),NULL);
-		auto light_action=TargetedAction::create(light,light_seq);
-
-		auto g_spa0=Spawn::create(gang_list_seq);
-		auto g_spa1=Spawn::create(ming_gang_spawn,Sequence::create(DelayTime::create(0.78),CCCallFunc::create([=]()
-		{
-			startParticleSystem(0.3);
-		}),NULL),light1_action,light2_action,light3_action,yellow_action,light_action,NULL);
 		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
 		auto no1_seq1_Delay=Sequence::create(DelayTime::create(0.42),hideOutcard,NULL);
 		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
@@ -9139,7 +9023,91 @@ void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND
     }
 }
 
-
+void NetRaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int gangType) {
+    const double delays[2] = {
+        {0.66,   0.9,   1.14,   0.66,   0.66},/* an gang */
+        {0.78,  1.02,   1.26,   0.78,   0.78},/* ming gang */
+    };
+    
+    auto lightCircle = Sprite::createWithSpriteFrameName("4.png");
+    lightCircle->setPosition(Vec2(
+        origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
+        origin.y+visibleSize.height*0.315));
+    myframe->addChild(lightCircle,32,IMG_4_EFFECT_TAG_ID);
+    lightCircle->setScale(0);
+    BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
+    lightCircle->setBlendFunc(tmp_oBlendFunc);
+    motions[0] = TargetedAction::create(lightCircle, 
+        Sequence::create(
+            DelayTime::create(delays[gangType][0]),
+            ScaleTo::create(0,0.4),
+            ScaleTo::create(0.18,1.0),
+        Spawn::create(
+            ScaleTo::create(0.06,1.2),
+            FadeOut::create(0.06),NULL),NULL));
+    
+    auto lightCircle1=Sprite::createWithSpriteFrameName("Q4.png");
+    lightCircle1->setAnchorPoint(Vec2(0.5,0));
+    lightCircle1->setPosition(Vec2(
+        origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
+        origin.y+visibleSize.height*0.315));
+    myframe->addChild(lightCircle1,32,IMG_Q4_EFFECT_TAG_ID);
+    lightCircle1->setScale(0);
+    lightCircle1->setBlendFunc(tmp_oBlendFunc);
+    motions[1]=TargetedAction::create(lightCircle1,
+        Sequence::create(
+            DelayTime::create(delays[gangType][1]),
+            ScaleTo::create(0,0.1),
+            ScaleTo::create(0.18,0.6),
+        Spawn::create(
+            ScaleTo::create(0.06,0.7),
+            FadeOut::create(0.06),NULL),NULL));
+    
+    auto lightCircle2=Sprite::createWithSpriteFrameName("Q4.png");
+    lightCircle2->setAnchorPoint(Vec2(0.5,0));
+    lightCircle2->setPosition(Vec2(
+        origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
+        origin.y+visibleSize.height*0.315));
+    myframe->addChild(lightCircle2,32,IMG_Q4_EFFECT_TAG_ID+1);
+    lightCircle2->setScale(0);
+    lightCircle2->setBlendFunc(tmp_oBlendFunc);
+    motions[2] = TargetedAction::create(lightCircle2,
+        Sequence::create(
+            DelayTime::create(delays[gangType][2]),
+            ScaleTo::create(0,0.1),
+            ScaleTo::create(0.18,0.4),
+        Spawn::create(
+            ScaleTo::create(0.06,0.5),
+            FadeOut::create(0.06),NULL),NULL));
+    
+    auto yellowlight=Sprite::createWithSpriteFrameName("c33.png");
+    yellowlight->setPosition(Vec2(
+        origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
+        origin.y+visibleSize.height*0.315));
+    myframe->addChild(yellowlight,30,IMG_C33_EFFECT_TAG_ID);
+    yellowlight->setScale(0);
+    motions[3]=TargetedAction::create(yellowlight,
+        Sequence::create(
+            DelayTime::create(delays[gangType][3]),
+            ScaleTo::create(0.12,1),
+        Spawn::create(
+            ScaleTo::create(0.18,0),
+            FadeOut::create(0.18),NULL),NULL));
+    
+    auto light = Sprite::createWithSpriteFrameName("c3.png");
+    light->setPosition(Vec2(
+        origin.x+visibleSize.width*0.5+GangCardSize.width*0.98,
+        origin.y+visibleSize.height*0.315));
+    light->setScale(0);
+    myframe->addChild(light,31,IMG_C3_EFFECT_TAG_ID);
+    light->setOpacity(200);
+    motions[4]=TargetedAction::create(light,Sequence::create(
+            DelayTime::create(delays[gangType][4]),
+            ScaleTo::create(0.12,0.5),
+        Spawn::create(
+            ScaleTo::create(0.18,0),
+            FadeOut::create(0.18),NULL),NULL));
+}
 
 
 
