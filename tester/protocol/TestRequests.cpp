@@ -329,12 +329,13 @@ public:
             'K','W','X',           //KWX
             0x00,76,               //request code(下发其他玩家反应)
             7,                     //package level
-            0x00,25,               //package size
+            0x00,27,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            2,
+            3,
             60,1,                  //seatId
-            65,2,                  //reaction
+            61,2,
+            66,3,                  //reaction
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -349,7 +350,8 @@ public:
         assert( aMsg.GetRequestCode()==REQ_GAME_RECV_RESPONSE );
         assert( aMsg.GetLevel()==7 );
         assert( actionInfo.seat==1 );
-        assert( actionInfo.action==2 );
+        assert( actionInfo.cardKind==2 );
+        assert( actionInfo.action==3 );
 
         return 0;
     }

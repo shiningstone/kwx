@@ -20,6 +20,7 @@ typedef struct _distributeResponse {
 
 typedef struct _othersAction {
     INT8U         seat;
+    CardType_t    cardKind;
     ActionId_t    action;
 }OthersAction_t;
 
