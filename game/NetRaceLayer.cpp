@@ -2619,9 +2619,10 @@ void NetRaceLayer::QiangGangHuJudge()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	_roundManager->_isCardFromOthers=true;
-	int no=(_roundManager->_curPlayer+1)%3;
 	unsigned char curTingStatus=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
-	unsigned char action1=_roundManager->_players[no]->get_parter()->hand_in(
+    
+	int no1=(_roundManager->_curPlayer+1)%3;
+    unsigned char action1=_roundManager->_players[no1]->get_parter()->hand_in(
         _roundManager->_lastHandedOutCard,
         _roundManager->_isCardFromOthers,
         curTingStatus,
@@ -2631,8 +2632,8 @@ void NetRaceLayer::QiangGangHuJudge()
         _roundManager->_isGangHua
     );
 
-	int no1=(_roundManager->_curPlayer+2)%3;
-	unsigned char action2=_roundManager->_players[no1]->get_parter()->hand_in(
+	int no2=(_roundManager->_curPlayer+2)%3;
+	unsigned char action2=_roundManager->_players[no2]->get_parter()->hand_in(
         _roundManager->_lastHandedOutCard,
         _roundManager->_isCardFromOthers,
         curTingStatus,
@@ -2641,79 +2642,70 @@ void NetRaceLayer::QiangGangHuJudge()
         continue_gang_times,
         _roundManager->_isGangHua
     );
-	//action1=a_HU;
-	//action2=a_HU;
+
 	if((action1&a_HU)&&(action2&a_HU))//双响
 	{
 		_roundManager->_lastActionWithGold=a_QIANG_GANG;
 		HideClock();
-		if((no!=1&&no1!=1)||((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
-		{
+        
+		if((no1!=1&&no2!=1)||
+            ((no1==1||no2==1)&&_roundManager->IsTing(1))) {
 			hu_effect_tip(3);
 			distribute_event(DOUBLE_HU_WITH_ME,NULL);
-		}
-		else if((no==1||no1==1) && _roundManager->_players[1]->get_parter()->get_ting_status()==0)
-		{
+		} else if((no1==1||no2==1) && !_roundManager->IsTing(1))) {
 			_roundManager->_isDoubleHuAsking = true;
             
-			if(no==1) {
+			if(no1==1) {
 				_roundManager->_actionToDo=action1;
-				_roundManager->_otherOneForDouble = no1;
+				_roundManager->_otherOneForDouble = no2;
 			} else {
 				_roundManager->_actionToDo=action2;
-				_roundManager->_otherOneForDouble = no;
+				_roundManager->_otherOneForDouble = no1;
 			}
             
 			waitfor_myaction(1);
 			return;
 		}
-	}
-	else if(action1&a_HU||action2&a_HU)//点炮
+	} else if(action1&a_HU||action2&a_HU)//点炮
 	{
         HideClock();
-		if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
-		{
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&_roundManager->_actionToDo&a_HU)
-			{
+        
+		if((no1==1&&(action1&a_HU))||(no2==1&&(action2&a_HU))) {
+			if(_roundManager->IsTing(1)) {
 				_roundManager->_lastActionWithGold=a_QIANG_GANG;
-				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+
+                auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 				myframe->_ID=1;
-				auto huCallFunc=CallFunc::create([=](){hu_effect_tip(1);});
-				myframe->runAction(huCallFunc);
-			}
-			else
-			{
+				myframe->runAction(CallFunc::create([=](){
+                    hu_effect_tip(1);}));
+			} else {
 				_roundManager->_isQiangGangAsking=true;
-				if(no==1)
+				if(no1==1)
 					_roundManager->_actionToDo=action1;
 				else
 					_roundManager->_actionToDo=action2;
 				waitfor_myaction(1);
 				return;
 			}
-		}
-		else if(no!=1&&(action1&a_HU))
-		{
+		} else if( (no1!=1&&(action1&a_HU))||(no2!=1&&(action2&a_HU)) ) {
 			_roundManager->_lastActionWithGold=a_QIANG_GANG;
-			hu_effect_tip(no);
+
+            if(action1&a_HU) {
+                hu_effect_tip(no1);
+            } else {
+                hu_effect_tip(no2);
+            }
 		}
-		else if(no1!=1&&(action2&a_HU))
-		{
-			_roundManager->_lastActionWithGold=a_QIANG_GANG;
-			hu_effect_tip(no1);
-		}
-	}
-	else
-	{
+	} else {
 		_roundManager->_isCardFromOthers=false;
-		auto GoldAccount=CallFunc::create([=](){
-			GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);	
-		});
-		auto distributeFunc=CallFunc::create([=](){call_distribute_card();});
+
 		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-		myframe->runAction(Sequence::create(GoldAccount,distributeFunc,NULL));
+		myframe->runAction(Sequence::create(CallFunc::create([=](){
+			GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);}),CallFunc::create([=](){
+    		call_distribute_card();}),NULL));
 	}
 }
+
 void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
