@@ -98,6 +98,7 @@ private:
     void _CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_KIND kind);
     void _CreateMingGangCardInHandMotion(TargetedAction *motions[3], int idxInHand[3], CARD_KIND kind);
     void _CreateBackgroundElementMotion(TargetedAction *motions[5],int gangType);
+    Sequence *_HideReminder(int reminderTag, double shadeScale);
 
 public:
 	void UpdateClock(int time,int direction);

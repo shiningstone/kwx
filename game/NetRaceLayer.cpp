@@ -498,6 +498,7 @@ void NetRaceLayer::HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
     				auto ButtonAct = TargetedAction::create(curButton,ScaleTo::create(0.1,1));
 
     				auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+                    
     				auto shade_act = (Sprite*)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
     				auto fadeOut = FadeOut::create(0.3);
     				auto easeBounce = ScaleTo::create(0.3,1.5);
@@ -1861,22 +1862,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
         /****************
             hide reminder
         ****************/
-		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(PENG_REMIND_ACT_BKG_TAG_ID),
-            Sequence::create(
-                ScaleTo::create(0,1), Spawn::create(
-                FadeOut::create(0.18),
-                ScaleTo::create(0.18,1.2),NULL),NULL));
-
-		auto hideReminder = Sequence::create( 
-            Spawn::create(
-                shadeAction, CCCallFunc::create([=]() {
-    			for(int i=0; i<11; i++) {
-                    if(i==PENG_REMIND_ACT_BKG_TAG_ID) {
-                        continue;
-                    } else {
-                        _Remove(myframe,REMIND_ACT_TAG_ID+i);}}}),NULL),
-            CCCallFunc::create([=](){
-                _Remove(myframe,PENG_REMIND_ACT_BKG_TAG_ID);}),NULL);
+        auto hideReminder = _HideReminder(PENG_REMIND_ACT_BKG_TAG_ID, 0.18, 1.2);
 	
         /****************
             move 3 cards
@@ -2233,23 +2219,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
         /**********************
             clear screen
         **********************/
-		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID),
-            Sequence::create(
-                ScaleTo::create(0,1),
-            Spawn::create(
-                FadeOut::create(0.18),
-                ScaleTo::create(0.18,1.3),NULL),NULL));
-        
-		auto hideReminder = Sequence::create(Spawn::create(shadeAction,CCCallFunc::create([=](){
-		    for (int i=0;i<11;i++) {
-                if(i==GANG_REMING_ACT_BKG_TAG_ID) {
-                    continue;
-                } else {
-                    _Remove(myframe,REMIND_ACT_TAG_ID+i);
-                }
-            }}),NULL),CCCallFunc::create([=]() {
-			if(myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID))
-				myframe->removeChildByTag(GANG_REMING_ACT_BKG_TAG_ID,true);}),NULL);
+        auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
 
         /**********************
             logical
@@ -2727,25 +2697,9 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 		ifUpdateDuringEffect=true;
 
         /**********************
-            clear screen (this is the same as an gang)
+            clear screen
         **********************/
-		auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID),
-            Sequence::create(
-                ScaleTo::create(0,1),
-            Spawn::create(
-                FadeOut::create(0.18),
-                ScaleTo::create(0.18,1.3),NULL),NULL));
-        
-		auto hideReminder = Sequence::create(Spawn::create(shadeAction,CCCallFunc::create([=](){
-		    for (int i=0;i<11;i++) {
-                if(i==GANG_REMING_ACT_BKG_TAG_ID) {
-                    continue;
-                } else {
-                    _Remove(myframe,REMIND_ACT_TAG_ID+i);
-                }
-            }}),NULL),CCCallFunc::create([=]() {
-			if(myframe->getChildByTag(GANG_REMING_ACT_BKG_TAG_ID))
-				myframe->removeChildByTag(GANG_REMING_ACT_BKG_TAG_ID,true);}),NULL);
+        auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
 
         /**********************
             hide out card
@@ -3187,21 +3141,22 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 
 void NetRaceLayer::qi_tip_effect(Node *psender)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	int no=psender->_ID;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=1;
+
+    LOGGER_WRITE("%s",__FUNCTION__);
+
 	if(_roundManager->_lastAction==a_JUMP)
 		continue_gang_times=0;
 	_roundManager->_lastAction=a_JUMP;
 	_roundManager->_actionToDo=a_JUMP;
-	if(_roundManager->_isWaitDecision)
-	{
+	if(_roundManager->_isWaitDecision) {
 		_roundManager->_isWaitDecision=false;
-		//_roundManager->_actionToDo=_roundManager->_tempActionToDo;
 		_roundManager->_tempActionToDo=a_JUMP;
 	}
+
+    
 	auto shade_act=(Sprite*)myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID);
 	auto fadeOut=FadeOut::create(0.3);
 	auto easeBounce=ScaleTo::create(0.3,1.3);
@@ -3210,6 +3165,7 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 	auto shadeAction=TargetedAction::create(shade_act,seq);
 	auto DeleteActTip=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_ActionRemind));
 	auto shadeFunc=Sequence::create(shadeAction,DeleteActTip,NULL);
+    
 	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL&&no==1)
 	{
 		if(!_roundManager->_isCardFromOthers)
@@ -7418,31 +7374,8 @@ void NetRaceLayer::hu_effect_tip(int no)
 		else
 		{
 			Sequence* g_seq1;
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1)
-			{
-				auto shade_act=(Sprite*)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
-				auto fadeOut=FadeOut::create(0.3);
-				auto easeBounce=ScaleTo::create(0.3,1.5);
-				auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-				auto seq=Sequence::create(ScaleTo::create(0,1),spawn,NULL);
-				auto shadeAction=TargetedAction::create(shade_act,seq);
-				auto sim_act=Spawn::create(shadeAction,CCCallFunc::create([=]()
-				{
-					for(int i=0;i<5;i++)
-					{
-						if(myframe->getChildByTag(REMIND_ACT_TAG_ID+i))
-							myframe->removeChildByTag(REMIND_ACT_TAG_ID+i,true);
-					}
-					for(int i=6;i<11;i++)
-					{
-						if(myframe->getChildByTag(REMIND_ACT_TAG_ID+i))
-							myframe->removeChildByTag(REMIND_ACT_TAG_ID+i,true);
-					}
-				}),NULL);
-				g_seq1=Sequence::create(sim_act,CCCallFunc::create([=]()
-				{
-					myframe->removeChildByTag(HU_REMIND_ACT_TAG_ID,true);
-				}),NULL);
+			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1) {
+			    g_seq1 = _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5);
 			}
 
 			auto centerExplode=Sprite::createWithSpriteFrameName("101.png");
@@ -9036,6 +8969,8 @@ void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND
 }
 
 void NetRaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int gangType) {
+    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+
     const double delays[2] = {
         {0.66,   0.9,   1.14,   0.66,   0.66},/* an gang */
         {0.78,  1.02,   1.26,   0.78,   0.78},/* ming gang */
@@ -9121,6 +9056,27 @@ void NetRaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int
             FadeOut::create(0.18),NULL),NULL));
 }
 
+Sequence *NetRaceLayer::_HideReminder(int reminderTag, double lastingTime, double shadeScale) {
+    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
+    auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(reminderTag),
+        Sequence::create(
+            ScaleTo::create(0,1), Spawn::create(
+            FadeOut::create(lastingTime),
+            ScaleTo::create(lastingTime,shadeScale),NULL),NULL));
+    
+    return Sequence::create( 
+        Spawn::create(
+            shadeAction, CCCallFunc::create([=]() {
+            for(int i=0; i<11; i++) {
+                if(i==reminderTag) {
+                    continue;
+                } else {
+                    _Remove(myframe,REMIND_ACT_TAG_ID+i);
+                }
+            }}),NULL),CCCallFunc::create([=](){
+        _Remove(myframe,reminderTag);}),NULL);
+}
 
 
 
