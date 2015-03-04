@@ -95,6 +95,7 @@ private:
 
     void _AttachKindTexture(Sprite *parent,CARD_KIND kind);
     void _CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_KIND kind);
+    void _CreateMingGangCardInHandMotion(TargetedAction *motions[3], int idxInHand[3], CARD_KIND kind);
 
 public:
 	void UpdateClock(int time,int direction);
