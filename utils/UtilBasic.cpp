@@ -31,3 +31,4 @@ INT16U _ntohs(INT16U n) {
 INT16U _htons(INT16U n) {
     return _ntohs(n);
 }
+

@@ -28,7 +28,7 @@ int RoundManager::GetLastWinner() {
 }
 
 int RoundManager::Shuffle(int *cardSeq) {
-    LOGGER_WRITE("NETWORK: Shuffle should be executed at the server, and it is more reasonable to hide the card sequence to clients");
+    LOGGER_WRITE("NETWORK: %s receive from server",__FUNCTION__);
 
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
 		cardSeq[i]=i;
@@ -76,13 +76,18 @@ int RoundManager::AllowMovement() {
     return 0;
 }
 
-bool RoundManager::WaitForDistribute() {
-    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
+bool RoundManager::WaitForAction() {
+    LOGGER_WRITE("NETWORK : %s if cur_player is not me",__FUNCTION__);
     return true;
 }
 
-bool RoundManager::WaitForAction() {
-    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
+bool RoundManager::DistributeCard(int player) {
+    if(player==1) {
+        LOGGER_WRITE("NETWORK : %s send request to server",__FUNCTION__);
+    } else {
+        LOGGER_WRITE("NETWORK : %s wait until receive from server",__FUNCTION__);
+    }
     return true;
 }
+
 

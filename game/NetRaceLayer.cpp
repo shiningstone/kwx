@@ -2155,8 +2155,6 @@ void NetRaceLayer::TingHintBarListener()
 }
 void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
-    LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
-
 	//ifMyTime=false;
 	if(ifMingTime)
 	{
@@ -5788,6 +5786,13 @@ void NetRaceLayer::update_card_list(Node *psender)
 		else if(no==2)
 			this->getChildByTag(MING_STATUS_PNG_2)->setVisible(true);
 	}
+
+    if(no==1) {
+        LOGGER_WRITE("NETWORK : %s send to server",__FUNCTION__);
+    } else {
+        LOGGER_WRITE("NETWORK : %s receive from server",__FUNCTION__);
+    }
+    
 	card_list_update(no);
 }
 
@@ -6504,7 +6509,6 @@ void NetRaceLayer::ming_callback(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 void NetRaceLayer::first_response(int no)
 {
     LOGGER_WRITE("%s from zhuang(%d)",__FUNCTION__,no);
-    _roundManager->WaitForAction();
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
@@ -6516,15 +6520,17 @@ void NetRaceLayer::first_response(int no)
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 	action_todo=player[no]->get_parter()->ActiontodoCheckAgain();
 
-	if(no==1)
+	if(no==1) {
 		waitfor_myaction(no);
-	else
+    }
+	else {
 		waitfor_otheraction(no);
+    }
 }
 
 void NetRaceLayer::waitfor_myaction(int no)
 {
-    LOGGER_WRITE("%s : %d, action_todo = %d",__FUNCTION__,no,action_todo);
+    LOGGER_WRITE("NETWORK : %s : %d, action_todo = %d send to server",__FUNCTION__,no,action_todo);
 
 	float x,y;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -6647,7 +6653,8 @@ void NetRaceLayer::waitfor_myaction(int no)
 
 void NetRaceLayer::waitfor_otheraction(int no)
 {
-    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,action_todo);
+    LOGGER_WRITE("NETWORK : %s (%d) perform action %d, receive from server",__FUNCTION__,no,action_todo);
+    _roundManager->WaitForAction();
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	myframe->_ID=no;
@@ -7022,16 +7029,12 @@ void NetRaceLayer::distribute_card_effect()
 void NetRaceLayer::call_distribute_card()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-    _roundManager->WaitDistribute();
-    
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
 void NetRaceLayer::distribute_card()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-    LOGGER_WRITE("\tadd listener to %s",DISTRIBUTE_DONE_EVENT_TYPE);
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
+        LOGGER_WRITE("got event %s",DISTRIBUTE_DONE_EVENT_TYPE);
 		auto userData = static_cast<DCI*>(event->getUserData());
 		g_show_card=userData->card;
 		total_reserved_card_num=TOTAL_CARD_NUM-userData->num;
@@ -7039,13 +7042,16 @@ void NetRaceLayer::distribute_card()
 			is_last_one=true;
 		else
 			is_last_one=false;
+
 		g_server=0;
+
+        _roundManager->DistributeCard(cur_player);
 		distribute_card_effect();
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 
-    LOGGER_WRITE("\tadd listener to %s",NOONE_WIN_EVENT_TYPE);
 	auto _noonewinListener = EventListenerCustom::create(NOONE_WIN_EVENT_TYPE, [this](EventCustom * event){
+        LOGGER_WRITE("got event %s",NOONE_WIN_EVENT_TYPE);
 
 		((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
 		if(this->getChildByTag(ROBOT_TUO_GUAN))
@@ -7274,9 +7280,8 @@ void NetRaceLayer::start_callback()
     _roundManager->NotifyStart();
     _roundManager->WaitUntilAllReady();
 	race_begin_prepare();                  //牌局开始效果
-
     //_roundManager->Shuffle(card_seq);
-    
+
     action_todo = player[(last_winner_no)%3]->init(&card_seq[0],14,aim[last_winner_no]);//玩家手牌初始化
 	if(action_todo!=a_TIMEOUT) {
 		player[(last_winner_no+1)%3]->init(&card_seq[14],13,aim[(last_winner_no+1)%3]);
@@ -9314,7 +9319,7 @@ int NetRaceLayer::get_reserved_num()
 
 void NetRaceLayer::set_cards_sequence(const int list[])
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
+    LOGGER_WRITE("%s (first 40 distributed cards)",__FUNCTION__);
 	for(int i=0;i<INIT_CARDS_NUM;i++)
 		card_seq[i]=list[i];
 }

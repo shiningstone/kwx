@@ -1,5 +1,5 @@
-#ifndef  _NET_RACE_ROUND_H_
-#define  _NET_RACE_ROUND_H_
+#ifndef  _ME_RACE_ROUND_H_
+#define  _ME_RACE_ROUND_H_
 
 #include "OutCardList.h"
 #include "Raction.h"
@@ -7,11 +7,11 @@
 
 #include "./../utils/LogManager.h"
 
-class NetRRound : public Raction
+class MeRRound : public Raction
 {
 public:
-	NetRRound();
-    virtual ~NetRRound();
+	MeRRound();
+    virtual ~MeRRound();
 
 private:
     Logger *_logger;

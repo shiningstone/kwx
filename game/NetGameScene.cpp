@@ -1,5 +1,8 @@
 
 #include "NetGameScene.h"
+#include "NetMe.h"
+#include "NetPlayer.h"
+#include "MeRaceRound.h"
 #include <stdio.h>
 using namespace std;
 
@@ -43,9 +46,26 @@ void NetGameScene::distribute_card_event()
     }   
 }
 
+#include "./../utils/UtilBasic.h"
+#include "./../protocol/MsgFormats.h"
+#include "./../protocol/KwxMsg.h"
+#include "./../protocol/EnvVariables.h"
 void NetGameScene::race_start_again()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
+
+	/**************************/
+	/* this is just for test */
+    INT8U buf[MSG_MAX_LEN] = {0};
+    int   len = 0;
+    
+    SeatInfo *seat = SeatInfo::getInstance();
+    seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+    
+    KwxMsg aMsg(UP_STREAM);
+    aMsg.StartReceiving();
+    len = aMsg.SetAction(buf,PENG);
+	/**************************/
 
 	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
         LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
@@ -78,14 +98,12 @@ void NetGameScene::init_race_sequence()
 		card_seq[i]=i;
 	}
 
-	set_winner_no( _roundManager->GetLastWinner() );
-
 	race_role[0]=new NetPlayer();
-	race_role[1]=new Me();
+	race_role[1]=new NetMe();
 	race_role[2]=new NetPlayer();
 
 	race_action[0]=new NetRRound();
-	race_action[1]=new NetRRound();
+	race_action[1]=new MeRRound();
 	race_action[2]=new NetRRound();
 
 	init_role(race_role,race_action);

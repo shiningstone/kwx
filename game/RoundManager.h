@@ -20,8 +20,8 @@ public:
     bool GetReadyStatus(int tableId);
     bool WaitUntilAllReady();
     int AllowMovement();
-    bool WaitForDistribute();
     bool WaitForAction();
+    bool DistributeCard(int player);
     
 private:
     Logger *_logger;

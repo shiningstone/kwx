@@ -757,7 +757,7 @@ bool NetPlayer::get_nick_name(std::string & name)
 
 unsigned char NetPlayer::init(int card_array[],int len,int aim)
 {
-    LOGGER_WRITE("NETWROK : %s just need zhuang's action(jump or hu)",__FUNCTION__);
+    LOGGER_WRITE("NETWROK : %s should receive from server",__FUNCTION__);
 	return parter->init(card_array,len,aim);
 }
 

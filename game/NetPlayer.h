@@ -3,10 +3,10 @@
 #define __NET_PLAYER__
 
 /* This file is copied from Robot.h/Robot.cpp */
-
-#include "NetRaceRound.h"
-#include "Raction.h"
 #include "RaceType.h"
+
+#include "Role.h"
+#include "Raction.h"
 
 class Logger;
 class NetPlayer:public Role

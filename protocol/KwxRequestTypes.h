@@ -12,9 +12,10 @@ typedef INT8U  SeatId_t;
 typedef INT8U  CardType_t;/*this type could reference to other modules*/
 
 typedef struct _distributeResponse {
-    INT8U         room;
     INT8U         seat;
     CardType_t    cardKind;
+    INT8U         counter;
+    INT32U        reminder;
 }DistributeResponse_t;
 
 typedef struct _othersAction {

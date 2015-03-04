@@ -228,9 +228,10 @@ int KwxMsg::GetLevel() {
 }
 
 int KwxMsg::Construct(DistributeResponse_t &response) {
-    response.room = _body->_items[0]->_value;    /*id==60*/
-    response.seat = _body->_items[1]->_value;    /*id==61*/
-    response.cardKind = _body->_items[2]->_value;/*id==70*/
+    response.seat = _body->_items[0]->_value;                          /*id==60*/
+    response.cardKind = _body->_items[1]->_value;                      /*id==61*/
+    response.counter = _body->_items[2]->_value;                       /*id==62*/
+    response.reminder = _ntohl(*((INT32U *)_body->_items[3]->_buf));   /*id==130*/
 
     return 0;
 }

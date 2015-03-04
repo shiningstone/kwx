@@ -222,13 +222,14 @@ public:
             'K','W','X',           //KWX
             0x00,50,               //request code(·¢ËÍ·¢ÅÆÇëÇó)
             7,                     //package level
-            0x00,27,               //package size
+            0x00,33,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            3,
-            60,1,                  //roomId
-            61,2,                  //seat
-            70,0,                  //card kind
+            4,
+            60,1,                  //seat
+            61,2,                  //card kind
+            62,3,                  //counter
+            130,4,0,0,0,4          //reminder
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -243,9 +244,10 @@ public:
         assert( aMsg.GetRequestCode()==REQ_GAME_SEND_DIST );
         assert( aMsg.GetLevel()==7 );
 
-        assert( response.room==1 );
-        assert( response.seat==2 );
-        assert( response.cardKind==0 );
+        assert( response.seat==1 );
+        assert( response.cardKind==2 );
+        assert( response.counter==3 );
+        assert( response.reminder==4 );
         
         return 0;
     }
@@ -379,4 +381,11 @@ void testRequests() {
 
     aCase = new TestGameRecvOthersReaction();
     aCase->Execute();
+
+    #if 0
+    aCase = new TestGameRecvUpdateList();
+    aCase = new TestGameRecvScore();
+    aCase = new TestGameRecvCounter();
+    aCase = new TestGameRecvConfirmRaction();
+    #endif
 }
