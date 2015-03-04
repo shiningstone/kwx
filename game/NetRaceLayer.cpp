@@ -3164,54 +3164,43 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
     /********************************
         
     ********************************/
-	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL&&no==1)
-	{
-		if(!_roundManager->_isCardFromOthers)
-		{
-			if(_roundManager->_isGangAsking)
-			{
-				auto showCardFunc=CallFunc::create([=](){
-					_roundManager->_isGangAsking = false;
-					auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-					int last_one=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
-					Vec2 location=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one)->getPosition();
-					if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one))
-						myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last_one);
+	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && no==1) {
+		if(!_roundManager->_isCardFromOthers) {
+			if(_roundManager->_isGangAsking) {
+				myframe->runAction(Sequence::create(
+                    shadeFunc,CallFunc::create([=](){
+    					_roundManager->_isGangAsking = false;
 
-                    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
+    					int lastOne = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+    					Vec2 location = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+lastOne)->getPosition();
+    					if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+lastOne))
+    						myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+lastOne);
 
-					_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
-					update_outcard(myframe,location,2);
-				});
-				myframe->runAction(Sequence::create(shadeFunc,showCardFunc,NULL));
-
-			}
-			else
+                        _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[last_one]);
+    					_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(last_one);
+    					update_outcard(myframe,location,2);
+                    }),NULL));
+			} else
 				myframe->runAction(shadeFunc);
-		}
-		else
-		{
-			if(_roundManager->_isQiangGangAsking)//抢杠胡请求
-			{
+		} else {
+			if(_roundManager->_isQiangGangAsking) {
 				_roundManager->_isQiangGangAsking=false;
-				auto GoldAccount=CallFunc::create([=](){
-					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
-					_roundManager->_qiangGangTargetNo=-1;
-				});
-				auto DistributeFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
-				myframe->runAction(Sequence::create(shadeFunc,Spawn::create(GoldAccount,DistributeFunc,NULL),NULL));
-			}
-			else if(_roundManager->_isDoubleHuAsking)//双响请求
-			{
+
+				myframe->runAction(Sequence::create(
+                    shadeFunc,Spawn::create(CallFunc::create([=](){
+    					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
+    					_roundManager->_qiangGangTargetNo=-1;/*!!! could this be called before runAction */}),CCCallFunc::create(this,callfunc_selector(
+                        NetRaceLayer::call_distribute_card)),NULL),NULL));
+			} else if(_roundManager->_isDoubleHuAsking) {
 				_roundManager->_isDoubleHuAsking=false;
-				auto huFunc=CallFunc::create([=](){hu_effect_tip(_roundManager->_otherOneForDouble);});
-				myframe->runAction(Sequence::create(shadeFunc,huFunc,NULL));
-			}
-			else
-			{
+				myframe->runAction(Sequence::create(
+                    shadeFunc,CallFunc::create([=](){
+                    hu_effect_tip(_roundManager->_otherOneForDouble);}),NULL));
+			} else {
 				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
-				auto DistributeFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
-				myframe->runAction(Sequence::create(shadeFunc,DistributeFunc,NULL));
+				myframe->runAction(Sequence::create(
+                    shadeFunc,CCCallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::call_distribute_card)),NULL));
 			}
 		}
 	}
