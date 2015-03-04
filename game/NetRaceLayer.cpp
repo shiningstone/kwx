@@ -3000,16 +3000,6 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 		Sequence* Gang4Card_seq;
         float delayTime=0.18;
 
-		auto OldGang2Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[0]);//gang[0]
-		auto OldGang2Pos=OldGang2Card->getPosition();
-		auto OldGang2Size=OldGang2Card->getTextureRect().size;
-		auto OldGang3Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[1]);//gang[1]
-		auto OldGang3Pos=OldGang3Card->getPosition();
-		auto OldGang3Size=OldGang3Card->getTextureRect().size;
-		auto OldGang4Card=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]);//gang[2]
-		auto OldGang4Pos=OldGang4Card->getPosition();
-		auto OldGang4Size=OldGang4Card->getTextureRect().size;
-
         TargetedAction *gangCardInHandMotion[3];
         Sprite *gangCard[3];
 
@@ -3018,40 +3008,49 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 		} else {
 		    _CreateFreeCard(gangCard,gang,GangCard.kind);
 
-            if(list->atcvie_place>0)
+            if(list->atcvie_place>=0)/* active_place can less than 0 ???? */
 			{
-				//gang[0]
-				auto actionMove2=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5-gangCard[0]->getTextureRect().size.width*0.6*1.96,origin.y+visibleSize.height*0.26));
-				Gang2Card_seq=Sequence::create(DelayTime::create(delayTime),ScaleTo::create(0,0.6),actionMove2,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-				gangCardInHandMotion[0]=TargetedAction::create(gangCard[0],Gang2Card_seq);
-				//gang[1]
-				auto actionMove3=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5-gangCard[1]->getTextureRect().size.width*0.6*0.98,origin.y+visibleSize.height*0.26));
-				Gang3Card_seq=Sequence::create(DelayTime::create(delayTime),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldGang3Pos.x-FreeCardSize.width*0.4,OldGang3Pos.y)),NULL),actionMove3,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-				gangCardInHandMotion[1]=TargetedAction::create(gangCard[1],Gang3Card_seq);
-				//gang[2]
-				auto actionMove4=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.26));
-				Gang4Card_seq=Sequence::create(DelayTime::create(delayTime),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldGang4Pos.x-FreeCardSize.width*0.8,OldGang4Pos.y)),NULL),actionMove4,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-				gangCardInHandMotion[2]=TargetedAction::create(gangCard[2],Gang4Card_seq);
-			}
-			else if(list->atcvie_place==0)
-			{
-				//gang[0]
-				auto actionMove2=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5-gangCard[0]->getTextureRect().size.width*0.6*1.96,origin.y+visibleSize.height*0.26));
-				Gang2Card_seq=Sequence::create(DelayTime::create(delayTime),ScaleTo::create(0,0.6),actionMove2,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-				gangCardInHandMotion[0]=TargetedAction::create(gangCard[0],Gang2Card_seq);
-				//gang[1]
-				auto actionMove3=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5-gangCard[1]->getTextureRect().size.width*0.6*0.98,origin.y+visibleSize.height*0.26));
-				Gang3Card_seq=Sequence::create(DelayTime::create(delayTime),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldGang3Pos.x-FreeCardSize.width*0.4,OldGang3Pos.y)),NULL),actionMove3,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-				gangCardInHandMotion[1]=TargetedAction::create(gangCard[1],Gang3Card_seq);
-				//gang[2]
-				auto actionMove4=MoveTo::create(0.18,Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.26));
-				Gang4Card_seq=Sequence::create(DelayTime::create(delayTime),Spawn::create(ScaleTo::create(0,0.6),MoveTo::create(0,Vec2(OldGang4Pos.x-FreeCardSize.width*0.8,OldGang4Pos.y)),NULL),actionMove4,DelayTime::create(0.06),ScaleTo::create(0,0),NULL);
-				gangCardInHandMotion[2]=TargetedAction::create(gangCard[2],Gang4Card_seq);
+                auto OldGang2Pos = gangCard[0]->getPosition();
+                auto OldGang3Pos = gangCard[1]->getPosition();
+                auto OldGang4Pos = gangCard[2]->getPosition();
+                
+				gangCardInHandMotion[0]=TargetedAction::create(gangCard[0],Sequence::create(
+                    DelayTime::create(delayTime),
+                    ScaleTo::create(0,0.6),MoveTo::create(0.18,Vec2(
+        				origin.x+visibleSize.width*0.5-gangCard[0]->getTextureRect().size.width*0.6*1.96,
+        				origin.y+visibleSize.height*0.26)),
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL));
+
+				gangCardInHandMotion[1]=TargetedAction::create(gangCard[1],Sequence::create(
+                    DelayTime::create(delayTime),Spawn::create(
+                        ScaleTo::create(0,0.6),
+                        MoveTo::create(0,Vec2(OldGang3Pos.x-FreeCardSize.width*0.4,OldGang3Pos.y)),NULL),
+                    MoveTo::create(0.18,Vec2(
+        				origin.x+visibleSize.width*0.5-gangCard[1]->getTextureRect().size.width*0.6*0.98,
+        				origin.y+visibleSize.height*0.26)),
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL));
+
+				gangCardInHandMotion[2]=TargetedAction::create(gangCard[2],Sequence::create(
+                    DelayTime::create(delayTime),Spawn::create(
+                        ScaleTo::create(0,0.6),
+                        MoveTo::create(0,Vec2(OldGang4Pos.x-FreeCardSize.width*0.8,OldGang4Pos.y)),NULL),
+                    MoveTo::create(0.18,Vec2(
+        				origin.x+visibleSize.width*0.5,
+        				origin.y+visibleSize.height*0.26)),
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL));
 			}
 		}
-		auto ming_gang_spawn=Spawn::create(gangCardsMotion[0],gangCardInHandMotion[0],gangCardInHandMotion[1],gangCardInHandMotion[2],l_action2,l_action3,l_action4,NULL);
-		////////////////////////////////////////////////////////////////////////////////////
-        
+		auto ming_gang_spawn=Spawn::create(
+            gangCardsMotion[0],gangCardsMotion[1],gangCardsMotion[2],gangCardsMotion[3],
+            gangCardInHandMotion[0],gangCardInHandMotion[1],gangCardInHandMotion[2],NULL);
+
+
+        /**********************
+            move free cards in hand
+        **********************/
 		int actionStartPlace=0;
 		for(int a=0;a<=list->atcvie_place;a++)
 			if(list->data[a].status==c_MING_KOU||list->data[a].status==c_FREE)
@@ -3059,92 +3058,57 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 				actionStartPlace=a;
 				break;
 			}
+            
 		Vector<FiniteTimeAction *>gang_list_seq;
-		if(!_roundManager->_isCardFromOthers)
-		{
-			int startPlace;
-			if(actionStartPlace>=gang[0])
-				startPlace=gang[0];
-			else
-				startPlace=actionStartPlace;
-			for(int i=startPlace;i<list->atcvie_place;i++)
-			{
-				if(i<gang[0])
-				{
+        
+		if(!_roundManager->_isCardFromOthers) {
+			actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
+            
+			for(int i=actionStartPlace; i<=gang[2]; i++){
+				if(i<gang[0]) {/* right shift */
 					auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-					auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+cardPengSize.width*3.5,curPos.y));
-					auto seq=Sequence::create(DelayTime::create(delayTime),actionMove,NULL);
-					auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-					gang_list_seq.insert(i-startPlace,action);
-				}
-				else if(i==gang[0]||i==gang[1]||i==gang[2])
-				{
-					auto seq=Sequence::create(/*DelayTime::create(delayTime),*/ScaleTo::create(0,0),NULL);
-					auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-					gang_list_seq.insert(i-startPlace,action);
-					if(i==gang[2])
-						break;
+
+					auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                        DelayTime::create(delayTime),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x+cardPengSize.width*3.5,
+                            curPos.y)),NULL));
+					gang_list_seq.insert(i-actionStartPlace,action);
+				} else {/*hide gang cards*/
+					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                            ScaleTo::create(0,0),NULL)));
 				}
 			}
 		}
-		else 
-		{
-			int startPlace;
-			if(actionStartPlace>=gang[0])
-				startPlace=gang[0];
-			else
-				startPlace=actionStartPlace;
-			for(int i=startPlace;i<list->len;i++)
-			{
-				if(list->atcvie_place>0)
-				{
-					if(i<gang[0])
-					{
-						auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-						auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+cardPengSize.width*3.5,curPos.y));
-						auto seq=Sequence::create(DelayTime::create(delayTime),actionMove,NULL);
-						auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-						gang_list_seq.insert(i-startPlace,action);
-					}
-					else if(i==gang[0]||i==gang[1]||i==gang[2])
-					{
-						auto seq=Sequence::create(ScaleTo::create(0,0),NULL);
-						auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-						gang_list_seq.insert(i-startPlace,action);
-					}
-					else if(i>gang[2])
-					{
-						auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-						auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+(cardPengSize.width*3.5-FreeCardSize.width*(3+ifZeroPointTwo*0.2)),curPos.y));
-						auto seq=Sequence::create(DelayTime::create(delayTime),actionMove,NULL);
-						auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-						gang_list_seq.insert(i-startPlace,action);
-					}
-				}
-				else if(list->atcvie_place==0)
-				{
-					if(i<gang[0])
-					{
-						auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-						auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+FreeCardSize.width*3+(cardPengSize.width*4-FreeCardSize.width*3),curPos.y));
-						auto seq=Sequence::create(DelayTime::create(delayTime),actionMove,NULL);
-						auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-						gang_list_seq.insert(i-startPlace,action);
-					}
-					else if(i==gang[0]||i==gang[1]||i==gang[2])
-					{
-						auto seq=Sequence::create(ScaleTo::create(0,0),NULL);
-						auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-						gang_list_seq.insert(i-startPlace,action);
-					}
-					else if(i>gang[2])
-					{
-						auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-						auto actionMove=MoveTo::create(0.3,Vec2(curPos.x+(cardPengSize.width*4-FreeCardSize.width*(3+ifZeroPointTwo*0.2)),curPos.y));
-						auto seq=Sequence::create(DelayTime::create(delayTime),actionMove,NULL);
-						auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),seq);
-						gang_list_seq.insert(i-startPlace,action);
-					}
+		else {
+			actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
+            const float GAP = (list->atcvie_place==0)?0.5:0.0;
+            
+			for(int i=actionStartPlace;i<list->len;i++){
+				if(i<gang[0]) {/* right shift */
+					auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+
+					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                            DelayTime::create(delayTime),
+                            MoveTo::create(0.3,Vec2(
+                                curPos.x+cardPengSize.width*(3.5+GAP),
+                                curPos.y)),NULL)));
+				} else if(i==gang[0]||i==gang[1]||i==gang[2]) {/* hide */
+					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                            ScaleTo::create(0,0),NULL)));
+				} else if(i>gang[2]) {/* right shift */
+					auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                    
+					gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                        myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                            DelayTime::create(delayTime),
+                            MoveTo::create(0.3,Vec2(
+                                curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
+                                curPos.y)),NULL)));
 				}
 			}
 		}
@@ -3258,17 +3222,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 		{
 			startParticleSystem(0.3);
 		}),NULL),light1_action,light2_action,light3_action,yellow_action,light_action,NULL);
-		//g_seq1 **clear	
-		//simple_seq **moji
-		//g_out_card_action **杠的那张牌
-		//g_spa0 **手上的三张牌
-		//g_spa1  **碰的三张牌
-		//update_list_seq  **最后的清理
 		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
-		//auto GoldAccount=CallFunc::create([=](){
-		//	GoldNumInsert(no,2,_roundManager->_curPlayer);	
-		//});
-		//auto minggang_seq=Sequence::create(g_seq1,simple_seq,g_out_card_action,g_spa0,g_spa1,update_list_seq,NULL);
 		auto no1_seq1_Delay=Sequence::create(DelayTime::create(0.42),hideOutcard,NULL);
 		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
 		auto DelayVoice=Sequence::create(DelayTime::create(0.78),VoiceEffect,NULL);
@@ -3418,15 +3372,12 @@ void NetRaceLayer::update_residue_TingCards(int no)
 
     _roundManager->_players[no]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
     
-	//int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
+
 	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
-	//CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
+
 	_roundManager->_players[no]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
 	_roundManager->_players[no]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-	//_roundManager->_players[no]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
-	//_roundManager->_players[no]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
-
 
 	int cardNum=hu_NumForEveryCard[Hu_cardOut_place];
 
