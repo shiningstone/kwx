@@ -219,7 +219,6 @@ int KwxMsg::SetUpdateCardList(INT8U *buf,CARD *cards,int num) {
     AddRoomId(seat->_roomId);
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
-    AddCards(cards,num);
 
     LOGGER_WRITE("%s\n",__FUNCTION__);
 
