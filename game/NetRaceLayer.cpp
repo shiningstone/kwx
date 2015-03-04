@@ -3156,16 +3156,14 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 		_roundManager->_tempActionToDo=a_JUMP;
 	}
 
+    /********************************
+        hide reminder
+    ********************************/
+	auto shadeFunc =_HideQiReminder();
     
-	auto shade_act=(Sprite*)myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID);
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	auto seq=Sequence::create(ScaleTo::create(0,1),spawn,NULL);
-	auto shadeAction=TargetedAction::create(shade_act,seq);
-	auto DeleteActTip=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_ActionRemind));
-	auto shadeFunc=Sequence::create(shadeAction,DeleteActTip,NULL);
-    
+    /********************************
+        
+    ********************************/
 	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL&&no==1)
 	{
 		if(!_roundManager->_isCardFromOthers)
@@ -9061,13 +9059,14 @@ Sequence *NetRaceLayer::_HideReminder(int reminderTag, double lastingTime, doubl
     
     auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(reminderTag),
         Sequence::create(
-            ScaleTo::create(0,1), Spawn::create(
-            FadeOut::create(lastingTime),
-            ScaleTo::create(lastingTime,shadeScale),NULL),NULL));
+            ScaleTo::create(0,1), 
+            Spawn::create(
+                FadeOut::create(lastingTime),
+                ScaleTo::create(lastingTime,shadeScale),NULL),NULL));
     
     return Sequence::create( 
         Spawn::create(
-            shadeAction, CCCallFunc::create([=]() {
+            shadeAction, CCCallFunc::create([=]() {/* why devide into 2 parts??? is it ok to execute as _ShadeQiReminder*/
             for(int i=0; i<11; i++) {
                 if(i==reminderTag) {
                     continue;
@@ -9077,6 +9076,22 @@ Sequence *NetRaceLayer::_HideReminder(int reminderTag, double lastingTime, doubl
             }}),NULL),CCCallFunc::create([=](){
         _Remove(myframe,reminderTag);}),NULL);
 }
+
+Sequence *NetRaceLayer::_HideQiReminder() {
+    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
+    auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID),
+        Sequence::create(
+            ScaleTo::create(0,1), 
+            Spawn::create(
+                FadeOut::create(0.3),
+                ScaleTo::create(0.3,1.3),NULL),NULL));
+
+    return Sequence::create(
+            shadeAction,CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_ActionRemind)),NULL);
+}
+
 
 
 
