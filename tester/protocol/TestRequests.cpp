@@ -383,9 +383,10 @@ void testRequests() {
     aCase->Execute();
 
     #if 0
-    aCase = new TestGameRecvUpdateList();
-    aCase = new TestGameRecvScore();
-    aCase = new TestGameRecvCounter();
-    aCase = new TestGameRecvConfirmRaction();
+    aCase = new TestGameRecvUpdateList();/*REQ_GAME_RECV_UPDATELIST(56)*/
+    aCase = new TestGameRecvCalScore();/*REQ_GAME_SEND_CALSCORE£¨51£©*/
+    aCase = new TestGameRecvCounter();/*REQ_GAME_SEND_DAOJISHI£¨55£©*/
+    aCase = new TestGameRecvConfirmRaction();/*REQ_GAME_SEND_OK£¨54£©*/
+    /*REQ_GAME_SEND_DAOJISHI£¨57£©*/
     #endif
 }
