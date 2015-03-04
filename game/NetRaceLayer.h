@@ -89,9 +89,12 @@ private:
     Vec2 _MiddlePositionOfGangCard(int i,Size size);
     Vec2 _DestPositionOfGangCard(int i,Size size);
     Vec2 _DestPositionOfGangCardInHand(int i,Size gangCard);
-    void _CreateGangCardsMotion(TargetedAction *motions[4]);
     Vec2 _MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
+    void _CreateGangCardsMotion(TargetedAction *motions[4]);
     void _CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind);
+
+    void _AttachKindTexture(Sprite *parent,CARD_KIND kind);
+    void _CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_KIND kind);
 
 public:
 	void UpdateClock(int time,int direction);
