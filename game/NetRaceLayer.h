@@ -94,6 +94,7 @@ private:
     void _CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind);
 
     void _AttachKindTexture(Sprite *parent,CARD_KIND kind);
+    void _AttachKindTextureToFreeCard(Sprite *parent,CARD_KIND kind);
     void _CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_KIND kind);
     void _CreateMingGangCardInHandMotion(TargetedAction *motions[3], int idxInHand[3], CARD_KIND kind);
 
