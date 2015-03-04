@@ -101,15 +101,16 @@ public:
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,49,               //request code(发送玩家反应)
-            0x00,53,               //package size
+            0x00,55,               //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
 
-            5,
+            6,
             131,4,0,1,2,3,         //roomPath:0x00010203
             132,4,4,5,6,7,         //roomId:  0x04050607
             133,4,8,9,10,11,       //tableId: 0x08090a0b
             60,1,                  //site:    1
-            67,1,                  //act:     1(碰)
+            61,2,                  //card kind: 2
+            66,3,                  //act: 
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -118,7 +119,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        len = aMsg.SetReaction(buf,PENG);
+        len = aMsg.SetReaction(buf,2,GUO);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));

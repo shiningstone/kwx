@@ -56,7 +56,9 @@ typedef enum {
 
 typedef enum {
 	SeatId   = 60,
+    CardKindOfReaction = 61,
     CardKind = 65,
+    ActionIdOfReaction = 66,
 	ActionId = 67,
 	RoomPath = 131,
 	RoomId   = 132,
