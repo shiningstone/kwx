@@ -2521,11 +2521,11 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
                         bgElementsMotions[4],NULL),
             		Sequence::create(
                         DelayTime::create(0.66),CallFunc::create([=](){
-                        SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");}),NULL),NULL),
+                        _Speak("Music/paizhuangji.ogg");}),NULL),NULL),
                 Sequence::create(CCCallFunc::create(this,callfunc_selector(
                     NetRaceLayer::delete_ActionEffect)),
                     callFunc_update_list,
-                    _Speak("lanpai.ogg"),NULL),CallFunc::create([=](){
+                    _Speak("Music/lanpai.ogg"),NULL),CallFunc::create([=](){
                 _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
         
 		myframe->_ID=1;
@@ -3106,17 +3106,8 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
                 bgElementsMotions[3],
                 bgElementsMotions[4],NULL);
 
-		Spawn *simple_seq=simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
-		auto no1_seq1_Delay=Sequence::create(DelayTime::create(0.42),hideOutcard,NULL);
-		auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/paizhuangji.ogg");});
-		auto DelayVoice=Sequence::create(DelayTime::create(0.78),VoiceEffect,NULL);
-		auto MingGangEffectNode=Node::create();
-		myframe->addChild(MingGangEffectNode,1,MING_GANG_EFFECT_NODE);
-
-		auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_ActionEffect));
-		//auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-		auto minggang_action=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::minggang_dispatch));
-		auto callFunc_update_list=CCCallFunc::create([=](){
+        /* final effect */
+		auto callFunc_update_list = CCCallFunc::create([=](){
 			if(ifEffectTime)
 			{
 				ifEffectTime=false;
@@ -3147,32 +3138,53 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 				}
 			}
 		});
+
+		auto MingGangEffectNode = Node::create();
+		myframe->addChild(MingGangEffectNode,1,MING_GANG_EFFECT_NODE);
+
+		MingGangEffectNode->_ID=1;
+		MingGangEffectNode->runAction(
+            Sequence::create(
+                hideReminder,
+            Spawn::create(
+                simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png"),
+                _SpeakAction(GANG),
+                hideOutcard,
+                moveFreeCards,
+                Spawn::create(
+                    moveFreeCards,
+                    Sequence::create(
+                        DelayTime::create(0.78), CCCallFunc::create([=]() {
+            			startParticleSystem(0.3); }),NULL),
+                    bgElementsMotions[0],
+                    bgElementsMotions[1],
+                    bgElementsMotions[2],
+                    bgElementsMotions[3],
+                    bgElementsMotions[4],NULL),
+                Sequence::create(
+                    DelayTime::create(0.78),CallFunc::create([=](){
+                    _Speak("Music/paizhuangji.ogg");}),NULL),NULL),
+            Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                NetRaceLayer::delete_ActionEffect)),
+                callFunc_update_list,CallFunc::create([=](){
+                _Remove(myframe,MING_GANG_EFFECT_NODE);}),NULL),NULL));
+
 		CallFunc* dis_action;
-		if(!_roundManager->_isCardFromOthers)
-		{
+		if(!_roundManager->_isCardFromOthers) {
 			_roundManager->_qiangGangTargetNo=no;
 			dis_action=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::QiangGangHuJudge));
-		}
-		else
+		} else
 			dis_action=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
-		auto update_list_seq=Sequence::create(callFunc1,/*minggang_action,*/callFunc_update_list,CallFunc::create([=](){
-			if(myframe->getChildByTag(MING_GANG_EFFECT_NODE))
-				myframe->removeChildByTag(MING_GANG_EFFECT_NODE,true);
-		}),/*CCCallFunc::create([=]()
-		{
-			_roundManager->_curPlayer=no;
-		}),dis_action,*/NULL);//dis_action
 
-		auto minggang_seq=Sequence::create(hideReminder,Spawn::create(simple_seq,_SpeakAction(GANG),hideOutcard,g_spa0,g_spa1,DelayVoice,NULL),/*GoldAccount,*/update_list_seq,NULL);
-		MingGangEffectNode->_ID=1;
-		MingGangEffectNode->runAction(minggang_seq);
-
-		myframe->runAction(Sequence::create(minggang_action,DelayTime::create(0.48),CallFunc::create([=](){
+		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::minggang_dispatch)),
+            DelayTime::create(0.48),CallFunc::create([=](){
 			if(_roundManager->_isCardFromOthers)
-				GoldNumInsert(no,2,_roundManager->_curPlayer);	
-		}),/*CallFunc::create([=](){card_list_update(1);}),*/CCCallFunc::create([=](){_roundManager->_curPlayer=no;}),dis_action,NULL));
+				GoldNumInsert(no,2,_roundManager->_curPlayer);}),CCCallFunc::create([=](){
+				_roundManager->_curPlayer=no;}),dis_action,NULL));
 	}
 }
+
 void NetRaceLayer::qi_tip_effect(Node *psender)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
