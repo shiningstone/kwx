@@ -1041,7 +1041,8 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		action = BizerMove2(outCard,location,time);
 
     CallFunc* BizerVoice = _voice->Speak("give");
-	CallFunc* voiceCall  = _SpeakCard();
+	CallFunc* voiceCall  = _voice->SpeakCard(_roundManager->_lastHandedOutCard,
+                                _roundManager->_players[_roundManager->_curPlayer]->get_sex());
 
 	Sequence* voiceEffect;
 	Spawn* allEffect = Spawn::create(NULL);
@@ -1715,7 +1716,8 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                         _Show(myframe,OUT_CARD_FRAME_TAG_ID,true);} ),Spawn::create(
                             showAndHideOutcardNotice,
                             inHandMoveToOutHand,
-                            _SpeakCard(),NULL),
+                            _voice->SpeakCard(_roundManager->_lastHandedOutCard,
+                                _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),
                         _voice->Speak("give"),NULL);
 	}
 	else
@@ -1724,7 +1726,8 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                         _Show(myframe,OUT_CARD_FRAME_TAG_ID,true);} ),Spawn::create(
                     		showAndHideOutcardNotice,
                     		inHandMoveToOutHand,
-                    		_SpeakCard(),NULL),
+                    		_voice->SpeakCard(_roundManager->_lastHandedOutCard,
+                                _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),
                 		_voice->Speak("give"),NULL);
 
 	delete s_res;
@@ -1832,7 +1835,8 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 	if(no!=1) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
-                                _SpeakAction(PENG),
+                                _voice->SpeakAction(PENG,
+                                    _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
                                 simple_tip_effect( getEffectVec(_roundManager->_curPlayer),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
@@ -2142,7 +2146,8 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
 		PengEffectNode->runAction(Sequence::create(
             hideReminder,Spawn::create(
                 simple_seq,
-                _SpeakAction(PENG),Spawn::create(
+                _voice->SpeakAction(PENG,
+                    _roundManager->_players[_roundManager->_curPlayer]->get_sex()),Spawn::create(
                 hide2CardsInhand),Spawn::create(
                 moveRightCardInHand,
                 moveLeftCardInHand,NULL),Sequence::create(
@@ -2194,7 +2199,8 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
     if(no!=1) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
-                _SpeakAction(GANG),
+                _voice->SpeakAction(GANG,
+                    _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
                 simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
@@ -2478,7 +2484,8 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
                 hideReminder,
                 Spawn::create(
                     simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png"),
-                    _SpeakAction(GANG),
+                    _voice->SpeakAction(GANG,
+                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
                     moveFreeCards,
                     Spawn::create(
             		    moveAngangCards,
@@ -2670,12 +2677,18 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			gang_seq=Sequence::create(
                 hideOutCard,Spawn::create(
                     simple_seq,
-                    _SpeakAction(GANG),NULL),CallFunc::create([=](){
+                    _voice->SpeakAction(GANG,
+                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),CallFunc::create([=](){
     			GoldNumInsert(no,2,_roundManager->_curPlayer);}),
                 update_list_seq,NULL);
 		}
 		else
-			gang_seq=Sequence::create(Spawn::create(_SpeakAction(GANG),simple_seq,NULL),update_list_seq,NULL);
+			gang_seq=Sequence::create(
+			    Spawn::create(
+			        _voice->SpeakAction(GANG,
+                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
+                    simple_seq,NULL),
+                update_list_seq,NULL);
         
 		myframe->runAction(gang_seq);
 	} else {
@@ -3109,7 +3122,8 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
                 hideReminder,
             Spawn::create(
                 simple_tip_effect(getEffectVec(_roundManager->_curPlayer),"gang.png"),
-                _SpeakAction(GANG),
+                _voice->SpeakAction(GANG,
+                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
                 hideOutcard,
                 moveFreeCards,
                 Spawn::create(
@@ -7355,7 +7369,8 @@ void NetRaceLayer::hu_effect_tip(int no)
         
 		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
 
-        CallFunc*HuVoice = _SpeakAction(HU);
+        CallFunc*HuVoice = _voice->SpeakAction(HU,
+                        _roundManager->_players[_roundManager->_curPlayer]->get_sex());
 
         if(no!=1)
 		{
@@ -7584,29 +7599,6 @@ void NetRaceLayer::race_start_again()
 			distribute_card_event();
 		});
 	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
-}
-
-/**************************************************
-        voice
-**************************************************/
-CallFunc* NetRaceLayer::_SpeakCard() {/* the access interface is not convenient */
-    std::string sex;
-    _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
-    
-    if( sex=="Boy" )
-        return _voice->SpeakCard(_roundManager->_lastHandedOutCard,BOY);
-    else
-        return _voice->SpeakCard(_roundManager->_lastHandedOutCard,GIRL);
-}
-
-CallFunc* NetRaceLayer::_SpeakAction(Action_t id) {
-    std::string sex;
-    _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
-    
-    if( sex=="Boy" )
-        return _voice->SpeakAction(id,BOY);
-	else
-        return _voice->SpeakAction(id,GIRL);
 }
 
 /***********************************************************

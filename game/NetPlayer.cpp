@@ -779,16 +779,7 @@ bool NetPlayer::get_property(int & pro)
 	pro=property;
 	return true;
 }
-void NetPlayer::set_sex(std::string sex) 
-{
-	playerSex=sex;
 
-}
-bool NetPlayer::get_sex(std::string & sex)
-{
-	sex=playerSex;
-	return true;
-}
 void NetPlayer::set_language(std::string language)
 {
 	playerLanguage=language;

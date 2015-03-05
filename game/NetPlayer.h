@@ -11,7 +11,7 @@
 #include "DataBase.h"
 
 class Logger;
-class NetPlayer:public Role
+class NetPlayer:public NetRole
 {
 	public:
 		NetPlayer();
@@ -53,8 +53,6 @@ class NetPlayer:public Role
 		bool get_photo(std::string & pho);
 		void set_property(int pro);
 		bool get_property(int & pro);
-		void set_sex(std::string sex); 
-		bool get_sex(std::string & sex);
 		void set_language(std::string language); 
 		bool get_language(std::string & language);
 		void get_hu_cards(CARD_KIND c_list[],int *len);
