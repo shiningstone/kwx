@@ -7613,7 +7613,7 @@ CallFunc* NetRaceLayer::_SpeakCard() {
         
 }
 
-CallFunc* NetRaceLayer::_SpeakAction(ActionType_t id) {
+CallFunc* NetRaceLayer::_SpeakAction(Action_t id) {
     std::string sex;
     _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     

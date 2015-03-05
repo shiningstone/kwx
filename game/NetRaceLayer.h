@@ -8,16 +8,10 @@
 #include "Resources.h"
 using namespace CocosDenshion;
 
+#include "./../utils/BasicType.h"
+#include "./../utils/LogManager.h"
 #include "RoundManager.h"
 #include "DataBase.h"
-#include "./../utils/LogManager.h"
-
-typedef enum {
-    PENG,
-    GANG,
-    TING,
-    HU,
-}ActionType_t;
 
 class NetRaceLayer : public cocos2d::Layer
 {
@@ -31,7 +25,7 @@ private:
     void _LoadPlayerInfo();
     void _GenerateIds(int ids[3]);
     CallFunc * _SpeakCard();
-    CallFunc *_SpeakAction(ActionType_t id);
+    CallFunc *_SpeakAction(Action_t id);
     CallFunc *_Speak(char *file);
     void create_residue_cards();
     void refresh_residue_cards();
