@@ -12,6 +12,7 @@ NetRaceLayer::NetRaceLayer()
 	s_scale=1.189;
 	s_no=1;
 
+    _voice = VoiceEffect::getInstance();
     _roundManager = new RoundManager();
     _logger = LOGGER_REGISTER("NetRaceLayer");
 }
@@ -44,6 +45,7 @@ NetRaceLayer::~NetRaceLayer()
 	_eventDispatcher->removeAllEventListeners();
 
     delete _roundManager;
+    _voice->destroyInstance();
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -1038,7 +1040,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 	else
 		action = BizerMove2(outCard,location,time);
 
-    CallFunc* BizerVoice = _Speak("Music/give.ogg");
+    CallFunc* BizerVoice = _voice->Speak("give");
 	CallFunc* voiceCall  = _SpeakCard();
 
 	Sequence* voiceEffect;
@@ -1329,7 +1331,7 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
     int  last       = cardsInHand->len-1;
 	int  residualNum= (cardsInHand->len - start)%3;
 	auto startPos   = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+start)->getPosition();
-	auto VoiceEffect= _Speak("Music/select.ogg");
+	auto VoiceEffect= _voice->Speak("select");
     
 	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && touch->getLocation().y>visibleSize.height*0.173) {
 		MyCardChoosedNum = touched;
@@ -1435,7 +1437,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 	int residualNum  = (last - cardsInHand->atcvie_place + 1)%3;
 	auto startPos    = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+start)->getPosition();
 	//========================PossibleCondition=================//
-	auto VoiceEffect = _Speak("Music/select.ogg");
+	auto VoiceEffect = _voice->Speak("select");
     
 	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && (touch->getLocation().y>visibleSize.height*0.2)) {
 		if(ifMyShowCardTime) {
@@ -1714,7 +1716,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                             showAndHideOutcardNotice,
                             inHandMoveToOutHand,
                             _SpeakCard(),NULL),
-                        _Speak("Music/give.ogg"),NULL);
+                        _voice->Speak("give"),NULL);
 	}
 	else
 		voiceEffect = Sequence::create(
@@ -1723,7 +1725,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                     		showAndHideOutcardNotice,
                     		inHandMoveToOutHand,
                     		_SpeakCard(),NULL),
-                		_Speak("Music/give.ogg"),NULL);
+                		_voice->Speak("give"),NULL);
 
 	delete s_res;
 
@@ -2149,7 +2151,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
                 backGoundEffect,
                 move3PengCards,NULL),Sequence::create(
                 DelayTime::create(0.84),
-                _Speak("Music/paizhuangji.ogg"),NULL),NULL),Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                _voice->Speak("paizhuangji"),NULL),NULL),Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::delete_ActionEffect)),
             callFunc_update_list,CallFunc::create([=](){
 			if(myframe->getChildByTag(PENG_EFFECT_NODE_ID))
@@ -2198,7 +2200,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
             NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::update_card_list)),
-            _Speak("down.ogg"), CCCallFunc::create([=](){
+            _voice->Speak("down"), CCCallFunc::create([=](){
 			_roundManager->_curPlayer=no;}),CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::call_distribute_card)),NULL),NULL));
 	}
@@ -2491,11 +2493,11 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
                         bgElementsMotions[4],NULL),
             		Sequence::create(
                         DelayTime::create(0.66),CallFunc::create([=](){
-                        _Speak("Music/paizhuangji.ogg");}),NULL),NULL),
+                        _voice->Speak("paizhuangji");}),NULL),NULL),
                 Sequence::create(CCCallFunc::create(this,callfunc_selector(
                     NetRaceLayer::delete_ActionEffect)),
                     callFunc_update_list,
-                    _Speak("Music/lanpai.ogg"),NULL),CallFunc::create([=](){
+                    _voice->Speak("lanpai"),NULL),CallFunc::create([=](){
                 _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
         
 		myframe->_ID=1;
@@ -3122,7 +3124,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
                     bgElementsMotions[4],NULL),
                 Sequence::create(
                     DelayTime::create(0.78),CallFunc::create([=](){
-                    _Speak("Music/paizhuangji.ogg");}),NULL),NULL),
+                    _voice->Speak("paizhuangji");}),NULL),NULL),
             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                 NetRaceLayer::delete_ActionEffect)),
                 callFunc_update_list,CallFunc::create([=](){
@@ -7587,30 +7589,14 @@ void NetRaceLayer::race_start_again()
 /**************************************************
         voice
 **************************************************/
-const std::string BoysMusicPath[21]={"Music/1tiao.ogg","Music/2tiao.ogg","Music/3tiao.ogg","Music/4tiao.ogg","Music/5tiao.ogg",
-	"Music/6tiao.ogg","Music/7tiao.ogg","Music/8tiao.ogg","Music/9tiao.ogg","Music/1tong.ogg","Music/2tong.ogg","Music/3tong.ogg",
-	"Music/4tong.ogg","Music/5tong.ogg","Music/6tong.ogg","Music/7tong.ogg","Music/8tong.ogg","Music/9tong.ogg","Music/zhong.ogg",
-	"Music/fa.ogg","Music/bai.ogg"};
-const std::string GirlsMusicPath[21]={"Music/g_1tiao.ogg","Music/g_2tiao.ogg","Music/g_3tiao.ogg","Music/g_4tiao.ogg","Music/g_5tiao.ogg",
-	"Music/g_6tiao.ogg","Music/g_7tiao.ogg","Music/g_8tiao.ogg","Music/g_9tiao.ogg","Music/g_1tong.ogg","Music/g_2tong.ogg","Music/g_3tong.ogg",
-	"Music/g_4tong.ogg","Music/g_5tong.ogg","Music/g_6tong.ogg","Music/g_7tong.ogg","Music/g_8tong.ogg","Music/g_9tong.ogg","Music/g_zhong.ogg",
-	"Music/g_fa.ogg","Music/g_bai.ogg"};
-const std::string BoysActionPath[4]={"Music/peng.ogg","Music/gang.ogg","Music/ting2.ogg","Music/hu.ogg"};
-const std::string GirlsActionPath[4]={"Music/g_peng.ogg","Music/g_gang.ogg","Music/g_ting1.ogg","Music/g_hu.ogg"};
-
-CallFunc* NetRaceLayer::_SpeakCard() {
+CallFunc* NetRaceLayer::_SpeakCard() {/* the access interface is not convenient */
     std::string sex;
     _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     
     if( sex=="Boy" )
-		return CallFunc::create([=](){
-                    SimpleAudioEngine::sharedEngine()->playEffect(BoysMusicPath[_roundManager->_lastHandedOutCard].c_str());
-                });
+        return _voice->SpeakCard(_roundManager->_lastHandedOutCard,BOY);
     else
-		return CallFunc::create([=](){
-                    SimpleAudioEngine::sharedEngine()->playEffect(GirlsMusicPath[_roundManager->_lastHandedOutCard].c_str());
-                });
-        
+        return _voice->SpeakCard(_roundManager->_lastHandedOutCard,GIRL);
 }
 
 CallFunc* NetRaceLayer::_SpeakAction(Action_t id) {
@@ -7618,13 +7604,9 @@ CallFunc* NetRaceLayer::_SpeakAction(Action_t id) {
     _roundManager->_players[_roundManager->_curPlayer]->get_sex(sex);
     
     if( sex=="Boy" )
-		return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(BoysActionPath[id].c_str());});
+        return _voice->SpeakAction(id,BOY);
 	else
-		return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(GirlsActionPath[id].c_str());});
-}
-
-CallFunc* NetRaceLayer::_Speak(char *file) {
-	return CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect(file);});
+        return _voice->SpeakAction(id,GIRL);
 }
 
 /***********************************************************

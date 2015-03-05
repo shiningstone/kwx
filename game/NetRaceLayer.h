@@ -10,6 +10,7 @@ using namespace CocosDenshion;
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
+#include "./../multimedia/VoiceEffect.h"
 #include "RoundManager.h"
 #include "DataBase.h"
 
@@ -20,13 +21,13 @@ public:
 	virtual ~NetRaceLayer();
 protected:
     RoundManager  *_roundManager;
+    VoiceEffect   *_voice;
 private:
     Logger *_logger;
     void _LoadPlayerInfo();
     void _GenerateIds(int ids[3]);
     CallFunc * _SpeakCard();
     CallFunc *_SpeakAction(Action_t id);
-    CallFunc *_Speak(char *file);
     void create_residue_cards();
     void refresh_residue_cards();
     std::string _NumToString( int number );
