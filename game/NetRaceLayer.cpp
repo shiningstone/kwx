@@ -8672,7 +8672,7 @@ void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND
     auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
 
     for(int i=0;i<3;i++) {
- 		auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + idxInHand[i+1]);
+ 		auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + idxInHand[i]);
 		auto OldPos  = OldCard->getPosition();
 		auto OldSize = OldCard->getTextureRect().size;
         
