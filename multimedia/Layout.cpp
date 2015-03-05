@@ -159,6 +159,10 @@ Vec2 Layout::PositionOfOutcard(int dir) {
 /*************************************
     action
 *************************************/
+Vec2 Layout::Center() {
+    return Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2);
+}
+
 Vec2 Layout::PositionOfMingSign() {
     return Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2+50);
 }

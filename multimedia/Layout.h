@@ -35,6 +35,7 @@ class Layout {
         /*************************************
             action
         *************************************/
+        Vec2 Center();
         Vec2 PositionOfMingSign();
         Vec2 PositionOfActSign(int dir);
 

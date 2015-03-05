@@ -144,7 +144,7 @@ void NetRaceLayer::create_race()
 	else
 		sprite=Sprite::create("racetable2.png");
 
-	sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+	sprite->setPosition(_layout->Center());
 	sprite->setScaleX(s_scale);
 	sprite->setScaleY(s_scale);
 	this->addChild(sprite, 0);
@@ -155,11 +155,13 @@ void NetRaceLayer::create_race()
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("xzdd_prepare_pop_res.plist");
     
 	auto center_bkg=Sprite::createWithSpriteFrameName("kawuxing.png");
-	center_bkg->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
+	center_bkg->setPosition(_layout->Center());
 	this->addChild(center_bkg,1,CENTER_BKG_TAG_ID);
 
 	auto menu_bkg=Sprite::createWithSpriteFrameName("gongnenganniu.png");
-	menu_bkg->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height-menu_bkg->getTextureRect().size.height/2+origin.y));
+	menu_bkg->setPosition(Vec2(
+        visibleSize.width/2 + origin.x, 
+        visibleSize.height + origin.y-menu_bkg->getTextureRect().size.height/2));
 	this->addChild(menu_bkg,4,MENU_BKG_TAG_ID);
 
 	float space,x,y;
