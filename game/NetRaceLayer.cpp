@@ -132,6 +132,7 @@ void NetRaceLayer::create_race()
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
+    _layout->SetScope(origin,visibleSize);
 
 	Sprite *sprite;
 	if(s_no==1)
@@ -1648,7 +1649,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 	CallFunc* showAndHideOutcardNotice = CallFunc::create([=](){
 		auto cardFrame = Sprite::create("tileImage/tile_lastTileBG.png");
 		cardFrame->setAnchorPoint(_layout->_AnchorOfOutcard(curPlayer));
-		cardFrame->setPosition(_layout->_PositionOfOutcard(curPlayer,visibleSize,origin));
+		cardFrame->setPosition(_layout->_PositionOfOutcard(curPlayer));
 		myframe->addChild(cardFrame,35,SHOW_CARD_INIDCATOR_TAD_ID);
         
 		auto cardBg = Sprite::createWithTexture(g_my_free->getTexture());
@@ -8347,27 +8348,27 @@ void NetRaceLayer::GuiJinBiShow(int dir, int gold) {
 	auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
 	number->setAnchorPoint(_layout->_AnchorOfNumber(dir));
 	number->setOpacity(0);
-	number->setPosition(_layout->_PositionOfNumber(dir,size,origin));
+	number->setPosition(_layout->_PositionOfNumber(dir));
 	this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
 
     int xoffset = number->getContentSize().width;
     
 	auto minus=Sprite::create("-.png");
 	minus->setAnchorPoint(_layout->_AnchorOfSign(dir));
-	minus->setPosition(_layout->_PositionOfSign(dir,size,origin,xoffset));
+	minus->setPosition(_layout->_PositionOfSign(dir,xoffset));
 	minus->setOpacity(0);
 	this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
 
 	auto plus=Sprite::create("+.png");
 	plus->setAnchorPoint(_layout->_AnchorOfSign(dir));
-	plus->setPosition(_layout->_PositionOfSign(dir,size,origin,xoffset));
+	plus->setPosition(_layout->_PositionOfSign(dir,xoffset));
 	plus->setOpacity(0);
 	this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
 
 	auto jinbi=Sprite::create("jinbi-game.png");
 	jinbi->setAnchorPoint(_layout->_AnchorOfGold(dir));
 	jinbi->setOpacity(0);
-	jinbi->setPosition(_layout->_PositionOfGold(dir,size,origin,xoffset));
+	jinbi->setPosition(_layout->_PositionOfGold(dir,xoffset));
 	this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
 
     Sprite *symbol;
@@ -8382,19 +8383,19 @@ void NetRaceLayer::GuiJinBiShow(int dir, int gold) {
 	jinbi->runAction(Sequence::create(
         DelayTime::create(0),
         Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->_DestOfGold(dir,size,origin,xoffset)),NULL),
+        MoveTo::create(1.5,_layout->_DestOfGold(dir,xoffset)),NULL),
         ScaleTo::create(0,0),NULL));
     
 	number->runAction(Sequence::create(
         DelayTime::create(0),
         Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->_DestOfNumber(dir,size,origin)),NULL),
+        MoveTo::create(1.5,_layout->_DestOfNumber(dir)),NULL),
         ScaleTo::create(0,0),NULL));
 
     symbol->runAction(Sequence::create(
         DelayTime::create(0),
         Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->_DestOfSign(dir,size,origin,xoffset)),NULL),
+        MoveTo::create(1.5,_layout->_DestOfSign(dir,xoffset)),NULL),
         ScaleTo::create(0,0),NULL));
 }
 
@@ -8840,49 +8841,49 @@ Sequence *NetRaceLayer::_HideQiReminder() {
         auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
         number->setAnchorPoint(_layout->_AnchorOfNumber(1));
         number->setOpacity(0);
-        number->setPosition(_layout->_PositionOfNumber(1,size,origin));
+        number->setPosition(_layout->_PositionOfNumber(1));
         this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
     
         auto minus = Sprite::create("-.png");
         minus->setAnchorPoint(_layout->_AnchorOfSign(1));
-        minus->setPosition(_layout->_PositionOfSign(1,size,origin));
+        minus->setPosition(_layout->_PositionOfSign(1));
         minus->setOpacity(0);
         this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
     
         auto plus=Sprite::create("+.png");
         plus->setAnchorPoint(_layout->_AnchorOfSign(1));
-        plus->setPosition(_layout->_PositionOfSign(1,size,origin));
+        plus->setPosition(_layout->_PositionOfSign(1));
         plus->setOpacity(0);
         this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
         
         auto jinbi=Sprite::create("jinbi-game.png");
         jinbi->setAnchorPoint(_layout->_AnchorOfGold(1));
         jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->_PositionOfGold(1,size,origin));
+        jinbi->setPosition(_layout->_PositionOfGold(1));
         this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
     
         if( gold!=0 ) {
             jinbi->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->_DestOfGold(1,size,origin)),NULL),
+                MoveTo::create(1.5,_layout->_DestOfGold(1)),NULL),
                 ScaleTo::create(0,0),NULL));
             number->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->_DestOfNumber(1,size,origin)),NULL),
+                MoveTo::create(1.5,_layout->_DestOfNumber(1)),NULL),
                 ScaleTo::create(0,0),NULL));
             if(gold>0) {
                 plus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->_DestOfSign(1,size,origin)),NULL),
+                    MoveTo::create(1.5,_layout->_DestOfSign(1)),NULL),
                     ScaleTo::create(0,0),NULL));
             } else {
                 minus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->_DestOfSign(1,size,origin)),NULL),
+                    MoveTo::create(1.5,_layout->_DestOfSign(1)),NULL),
                     ScaleTo::create(0,0),NULL));
             }   
         }
@@ -8897,49 +8898,49 @@ Sequence *NetRaceLayer::_HideQiReminder() {
         auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
         number->setAnchorPoint(_layout->_AnchorOfNumber(0));
         number->setOpacity(0);
-        number->setPosition(_layout->_PositionOfNumber(0,size,origin));
+        number->setPosition(_layout->_PositionOfNumber(0));
         this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
     
         auto minus=Sprite::create("-.png");
         minus->setAnchorPoint(_layout->_AnchorOfSign(0));
-        minus->setPosition(_layout->_PositionOfSign(0,size,origin));
+        minus->setPosition(_layout->_PositionOfSign(0));
         minus->setOpacity(0);
         this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
     
         auto plus=Sprite::create("+.png");
         plus->setAnchorPoint(_layout->_AnchorOfSign(0));
-        plus->setPosition(_layout->_PositionOfSign(0,size,origin));
+        plus->setPosition(_layout->_PositionOfSign(0));
         plus->setOpacity(0);
         this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
     
         auto jinbi=Sprite::create("jinbi-game.png");
         jinbi->setAnchorPoint(_layout->_AnchorOfGold(0));
         jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->_PositionOfGold(0,size,origin));
+        jinbi->setPosition(_layout->_PositionOfGold(0));
         this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
     
         if( gold!=0 ) {
             jinbi->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->_DestOfGold(0,size,origin)),NULL),
+                MoveTo::create(1.5,_layout->_DestOfGold(0)),NULL),
                 ScaleTo::create(0,0),NULL));
             number->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->_DestOfNumber(0,size,origin)),NULL),
+                MoveTo::create(1.5,_layout->_DestOfNumber(0)),NULL),
                 ScaleTo::create(0,0),NULL));
             if(gold>0) {
                 plus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->_DestOfSign(0,size,origin)),NULL),
+                    MoveTo::create(1.5,_layout->_DestOfSign(0)),NULL),
                     ScaleTo::create(0,0),NULL));
             } else {
                 minus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->_DestOfSign(0,size,origin)),NULL),
+                    MoveTo::create(1.5,_layout->_DestOfSign(0)),NULL),
                     ScaleTo::create(0,0),NULL));
             }
         }
@@ -8954,51 +8955,51 @@ Sequence *NetRaceLayer::_HideQiReminder() {
         auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
         number->setAnchorPoint(_layout->_AnchorOfNumber(2));
         number->setOpacity(0);
-        number->setPosition(_layout->_PositionOfNumber(2,size,origin));
+        number->setPosition(_layout->_PositionOfNumber(2));
         this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
     
         int xoffset = number->getContentSize().width;
         
         auto minus=Sprite::create("-.png");
         minus->setAnchorPoint(_layout->_AnchorOfSign(2));
-        minus->setPosition(_layout->_PositionOfSign(2,size,origin,xoffset));
+        minus->setPosition(_layout->_PositionOfSign(2,xoffset));
         minus->setOpacity(0);
         this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
     
         auto plus=Sprite::create("+.png");
         plus->setAnchorPoint(_layout->_AnchorOfSign(2));
-        plus->setPosition(_layout->_PositionOfSign(2,size,origin,xoffset));
+        plus->setPosition(_layout->_PositionOfSign(2,xoffset));
         plus->setOpacity(0);
         this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
     
         auto jinbi=Sprite::create("jinbi-game.png");
         jinbi->setAnchorPoint(_layout->_AnchorOfGold(2));
         jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->_PositionOfGold(2,size,origin,xoffset));
+        jinbi->setPosition(_layout->_PositionOfGold(2,xoffset));
         this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
     
         if( gold!=0 ) {
             jinbi->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->_DestOfGold(2,size,origin,xoffset)),NULL),
+                MoveTo::create(1.5,_layout->_DestOfGold(2,xoffset)),NULL),
                 ScaleTo::create(0,0),NULL));
             number->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->_DestOfNumber(2,size,origin)),NULL),
+                MoveTo::create(1.5,_layout->_DestOfNumber(2)),NULL),
                 ScaleTo::create(0,0),NULL));
             if(gold>0) {
                 plus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->_DestOfSign(2,size,origin,xoffset)),NULL),
+                    MoveTo::create(1.5,_layout->_DestOfSign(2,xoffset)),NULL),
                     ScaleTo::create(0,0),NULL));
             } else {
                 minus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->_DestOfSign(2,size,origin,xoffset)),NULL),
+                    MoveTo::create(1.5,_layout->_DestOfSign(2,xoffset)),NULL),
                     ScaleTo::create(0,0),NULL));
             }
         }

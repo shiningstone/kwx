@@ -10,25 +10,27 @@ class Layout {
         static Layout *getInstance();
         static void destroyInstance();
 
+        void SetScope(cocos2d::Point origin,cocos2d::Size visibleSize);
+
         /*************************************
             gold count
         *************************************/
         Vec2 _AnchorOfSign(int dir);
-        Vec2 _PositionOfSign(int dir,Size size,Vec2 origin,int xOffset = 0);
-        Vec2 _DestOfSign(int dir,Size size,Vec2 origin,int xOffset = 0);
+        Vec2 _PositionOfSign(int dir,int xOffset = 0);
+        Vec2 _DestOfSign(int dir,int xOffset = 0);
         Vec2 _AnchorOfNumber(int dir);
-        Vec2 _PositionOfNumber(int dir,Size size,Vec2 origin);
-        Vec2 _DestOfNumber(int dir,Size size,Vec2 origin);
+        Vec2 _PositionOfNumber(int dir);
+        Vec2 _DestOfNumber(int dir);
         Vec2 _AnchorOfGold(int dir);
-        Vec2 _PositionOfGold(int dir,Size size,Vec2 origin,int xOffset = 0);
-        Vec2 _DestOfGold(int dir,Size size,Vec2 origin,int xOffset = 0);
+        Vec2 _PositionOfGold(int dir,int xOffset = 0);
+        Vec2 _DestOfGold(int dir,int xOffset = 0);
         
         /*************************************
             out card
         *************************************/
         int  _RotateAngleOfOutcard(int dir);
         Vec2 _AnchorOfOutcard(int dir);
-        Vec2 _PositionOfOutcard(int dir,Size size,Vec2 origin);
+        Vec2 _PositionOfOutcard(int dir);
 
         /*************************************
             action
@@ -45,6 +47,9 @@ class Layout {
     private:
         Layout();
         static Layout *_instance;
+
+        cocos2d::Size  SIZE;
+        cocos2d::Point ORIGIN;
 };
 
 #endif

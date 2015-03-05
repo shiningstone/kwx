@@ -77,7 +77,6 @@ private:
     Sequence *_HideReminder(int reminderTag, double lastingTime, double shadeScale);
     Sequence *_HideQiReminder();
     void _CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND kind);
-    Vec2 _PositionOfMingGangCard(int i,Size size);
 
 public:
 	void UpdateClock(int time,int direction);

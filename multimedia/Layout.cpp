@@ -1,6 +1,11 @@
 
 #include "Layout.h"
 
+void Layout::SetScope(cocos2d::Point p,cocos2d::Size s) {
+    ORIGIN = p;
+    SIZE   = s;
+}
+
 /*************************************
     gold count
 *************************************/
@@ -12,31 +17,31 @@ Vec2 Layout::_AnchorOfSign(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfSign(int dir,Size size,Vec2 origin,int xOffset) {
+Vec2 Layout::_PositionOfSign(int dir,int xOffset) {
     switch(dir) {
         case 0:   
-            return Vec2(origin.x + size.width*271/1218,
-                        origin.y + size.height*406/716);
+            return Vec2(ORIGIN.x + SIZE.width*271/1218,
+                        ORIGIN.y + SIZE.height*406/716);
         case 1:   
-            return Vec2(origin.x + size.width*559/1218,
-                        origin.y + size.height*154/716);
+            return Vec2(ORIGIN.x + SIZE.width*559/1218,
+                        ORIGIN.y + SIZE.height*154/716);
         case 2:   
-            return Vec2(origin.x + size.width*996/1218 - xOffset,
-                        origin.y + size.height*406/716);
+            return Vec2(ORIGIN.x + SIZE.width*996/1218 - xOffset,
+                        ORIGIN.y + SIZE.height*406/716);
     }
 }
 
-Vec2 Layout::_DestOfSign(int dir,Size size,Vec2 origin,int xOffset) {
+Vec2 Layout::_DestOfSign(int dir,int xOffset) {
     switch(dir) {
         case 0:   
-            return Vec2(origin.x + size.width*271/1218,
-                        origin.y + size.height*480/716);
+            return Vec2(ORIGIN.x + SIZE.width*271/1218,
+                        ORIGIN.y + SIZE.height*480/716);
         case 1:   
-            return Vec2(origin.x + size.width*559/1218,
-                        origin.y + size.height*228/716);
+            return Vec2(ORIGIN.x + SIZE.width*559/1218,
+                        ORIGIN.y + SIZE.height*228/716);
         case 2:   
-            return Vec2(origin.x + size.width*996/1218 - xOffset,
-                        origin.y + size.height*480/716);
+            return Vec2(ORIGIN.x + SIZE.width*996/1218 - xOffset,
+                        ORIGIN.y + SIZE.height*480/716);
     }
 }
 
@@ -48,31 +53,31 @@ Vec2 Layout::_AnchorOfNumber(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfNumber(int dir,Size size,Vec2 origin) {
+Vec2 Layout::_PositionOfNumber(int dir) {
     switch(dir) {
         case 0:   
-            return Vec2(origin.x + size.width*291/1218,
-                        origin.y + size.height*406/716);
+            return Vec2(ORIGIN.x + SIZE.width*291/1218,
+                        ORIGIN.y + SIZE.height*406/716);
         case 1:   
-            return Vec2(origin.x + size.width*578/1218,
-                        origin.y + size.height*154/716);
+            return Vec2(ORIGIN.x + SIZE.width*578/1218,
+                        ORIGIN.y + SIZE.height*154/716);
         case 2:   
-            return Vec2(origin.x + size.width*996/1218,
-                        origin.y + size.height*406/716);
+            return Vec2(ORIGIN.x + SIZE.width*996/1218,
+                        ORIGIN.y + SIZE.height*406/716);
     }
 }
 
-Vec2 Layout::_DestOfNumber(int dir,Size size,Vec2 origin) {
+Vec2 Layout::_DestOfNumber(int dir) {
     switch(dir) {
         case 0:   
-            return Vec2(origin.x + size.width*291/1218,
-                        origin.y + size.height*480/716);
+            return Vec2(ORIGIN.x + SIZE.width*291/1218,
+                        ORIGIN.y + SIZE.height*480/716);
         case 1:   
-            return Vec2(origin.x + size.width*578/1218,
-                        origin.y + size.height*228/716);
+            return Vec2(ORIGIN.x + SIZE.width*578/1218,
+                        ORIGIN.y + SIZE.height*228/716);
         case 2:   
-            return Vec2(origin.x + size.width*996/1218,
-                        origin.y + size.height*480/716);
+            return Vec2(ORIGIN.x + SIZE.width*996/1218,
+                        ORIGIN.y + SIZE.height*480/716);
     }
 }
 
@@ -84,39 +89,39 @@ Vec2 Layout::_AnchorOfGold(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfGold(int dir,Size size,Vec2 origin,int xOffset) {
+Vec2 Layout::_PositionOfGold(int dir,int xOffset) {
     switch(dir) {
         case 0:   
-            return Vec2(origin.x + size.width*221/1218,
-                        origin.y + size.height*406/716);
+            return Vec2(ORIGIN.x + SIZE.width*221/1218,
+                        ORIGIN.y + SIZE.height*406/716);
         case 1:   
-            return Vec2(origin.x + size.width*509/1218,
-                        origin.y + size.height*154/716);
+            return Vec2(ORIGIN.x + SIZE.width*509/1218,
+                        ORIGIN.y + SIZE.height*154/716);
         case 2:   
-            return Vec2(origin.x + size.width*936/1218 - xOffset,
-                        origin.y + size.height*406/716);
+            return Vec2(ORIGIN.x + SIZE.width*936/1218 - xOffset,
+                        ORIGIN.y + SIZE.height*406/716);
                 
     }
 }
 
-Vec2 Layout::_DestOfGold(int dir,Size size,Vec2 origin,int xOffset) {
+Vec2 Layout::_DestOfGold(int dir,int xOffset) {
     switch(dir) {
         case 0:   
-            return Vec2(origin.x + size.width*221/1218,
-                        origin.y + size.height*480/716);
+            return Vec2(ORIGIN.x + SIZE.width*221/1218,
+                        ORIGIN.y + SIZE.height*480/716);
         case 1:   
-            return Vec2(origin.x + size.width*509/1218,
-                        origin.y + size.height*228/716);
+            return Vec2(ORIGIN.x + SIZE.width*509/1218,
+                        ORIGIN.y + SIZE.height*228/716);
         case 2:   
-            return Vec2(origin.x + size.width*936/1218 - xOffset,
-                        origin.y + size.height*480/716);
+            return Vec2(ORIGIN.x + SIZE.width*936/1218 - xOffset,
+                        ORIGIN.y + SIZE.height*480/716);
     }
 }
 
 /*************************************
     out card
 *************************************/
-int  NetRaceLayer::_RotateAngleOfOutcard(int dir) {
+int  Layout::_RotateAngleOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return 90;
@@ -129,7 +134,7 @@ int  NetRaceLayer::_RotateAngleOfOutcard(int dir) {
     }
 }
 
-Vec2 NetRaceLayer::_AnchorOfOutcard(int dir) {
+Vec2 Layout::_AnchorOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return Vec2(0,0.5);
@@ -140,12 +145,12 @@ Vec2 NetRaceLayer::_AnchorOfOutcard(int dir) {
     }
 }
 
-Vec2 NetRaceLayer::_PositionOfOutcard(int dir,Size size,Vec2 origin) {
+Vec2 Layout::_PositionOfOutcard(int dir) {
     switch(dir) {
         case 0:
-            return Vec2(origin.x + size.width*0.18, origin.y + size.height*0.6);
+            return Vec2(ORIGIN.x + SIZE.width*0.18, ORIGIN.y + SIZE.height*0.6);
         case 2:
-            return Vec2(origin.x + size.width*0.82, origin.y + size.height*0.6);
+            return Vec2(ORIGIN.x + SIZE.width*0.82, ORIGIN.y + SIZE.height*0.6);
         default:
             LOGGER_WRITE("%s Error ! invalid player");
     }
@@ -154,105 +159,105 @@ Vec2 NetRaceLayer::_PositionOfOutcard(int dir,Size size,Vec2 origin) {
 /*************************************
     action
 *************************************/
-Vec2 NetRaceLayer::_PostionOfActSign(int dir) {
+Vec2 Layout::_PostionOfActSign(int dir) {
     switch(dir) {
         case 0:
-            return Vec2(origin.x+visibleSize.width*0.206,origin.y+visibleSize.height*0.6);
+            return Vec2(ORIGIN.x+visibleSize.width*0.206,ORIGIN.y+visibleSize.height*0.6);
         case 1:
-            return Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2);
+            return Vec2(ORIGIN.x+visibleSize.width/2,ORIGIN.y+visibleSize.height/2);
         case 2:
-            return Vec2(origin.x+visibleSize.width*0.79,origin.y+visibleSize.height*0.6);
+            return Vec2(ORIGIN.x+visibleSize.width*0.79,ORIGIN.y+visibleSize.height*0.6);
         default:
             LOGGER_WRITE("%s Error ! invalid player");
     }
 }
 
-Vec2 NetRaceLayer::_OrigPositionOfGangCard(int i,Size size) {
+Vec2 Layout::_OrigPositionOfGangCard(int i,Size SIZE) {
     switch(i+1) {
         case 1: return Vec2(
-            origin.x + visibleSize.width*0.5 + size.width*0.98,
-            origin.y + visibleSize.height*0.255);
+            ORIGIN.x + visibleSize.width*0.5 + SIZE.width*0.98,
+            ORIGIN.y + visibleSize.height*0.255);
         case 2: return Vec2(
-            origin.x + visibleSize.width*0.5 - size.width*1.96,
-            origin.y + visibleSize.height*0.255);
+            ORIGIN.x + visibleSize.width*0.5 - SIZE.width*1.96,
+            ORIGIN.y + visibleSize.height*0.255);
         case 3: return Vec2(
-            origin.x + visibleSize.width*0.5 - size.width*0.98,
-            origin.y + visibleSize.height*0.255);
+            ORIGIN.x + visibleSize.width*0.5 - SIZE.width*0.98,
+            ORIGIN.y + visibleSize.height*0.255);
         case 4: return Vec2(
-            origin.x + visibleSize.width*0.5,
-            origin.y + visibleSize.height*0.255);
+            ORIGIN.x + visibleSize.width*0.5,
+            ORIGIN.y + visibleSize.height*0.255);
     }
 }
 
-Vec2 NetRaceLayer::_MiddlePositionOfGangCard(int i,Size size) {
+Vec2 Layout::_MiddlePositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
-                origin.x + visibleSize.width*0.5  +  size.width*0.98  +  150,
-                origin.y + visibleSize.height*0.255);
+                ORIGIN.x + SIZE.width*0.5  +  cardSize.width*0.98  +  150,
+                ORIGIN.y + SIZE.height*0.255);
         case 2: return Vec2(
-			    origin.x + visibleSize.width*0.5 - size.width*1.96 - 150,
-			    origin.y + visibleSize.height*0.255);
+			    ORIGIN.x + SIZE.width*0.5 - cardSize.width*1.96 - 150,
+			    ORIGIN.y + SIZE.height*0.255);
         case 3: return Vec2(
-			    origin.x + visibleSize.width*0.5 - size.width*0.98 - 150,
-			    origin.y + visibleSize.height*0.255);
+			    ORIGIN.x + SIZE.width*0.5 - cardSize.width*0.98 - 150,
+			    ORIGIN.y + SIZE.height*0.255);
         case 4: return Vec2(
-			    origin.x + visibleSize.width*0.5 - 150,
-			    origin.y + visibleSize.height*0.255);
+			    ORIGIN.x + SIZE.width*0.5 - 150,
+			    ORIGIN.y + SIZE.height*0.255);
     }
 }
 
-Vec2 NetRaceLayer::_DestPositionOfGangCard(int i,Size size) {
+Vec2 Layout::_DestPositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
-                origin.x + visibleSize.width*0.5  +  size.width*0.98,
-                origin.y + visibleSize.height*0.255);
+                ORIGIN.x + SIZE.width*0.5  +  cardSize.width*0.98,
+                ORIGIN.y + SIZE.height*0.255);
         case 2: return Vec2(
-    			origin.x + visibleSize.width*0.5 - size.width*1.96,
-    			origin.y + visibleSize.height*0.255);
+    			ORIGIN.x + SIZE.width*0.5 - cardSize.width*1.96,
+    			ORIGIN.y + SIZE.height*0.255);
         case 3: return Vec2(
-			    origin.x + visibleSize.width*0.5 - size.width*0.98,
-			    origin.y + visibleSize.height*0.255);
+			    ORIGIN.x + SIZE.width*0.5 - cardSize.width*0.98,
+			    ORIGIN.y + SIZE.height*0.255);
         case 4: return Vec2(
-			    origin.x + visibleSize.width*0.5,
-			    origin.y + visibleSize.height*0.255);
+			    ORIGIN.x + SIZE.width*0.5,
+			    ORIGIN.y + SIZE.height*0.255);
     }
 }
 
-Vec2 NetRaceLayer::_DestPositionOfGangCardInHand(int i,Size gangCard) {
+Vec2 Layout::_DestPositionOfGangCardInHand(int i,Size gangCard) {
     switch(i+1) {
         case 1: return Vec2(
-            origin.x+visibleSize.width*0.5 - gangCard.width*1.96,
-            origin.y+visibleSize.height*0.26);
+            ORIGIN.x+SIZE.width*0.5 - gangCard.width*1.96,
+            ORIGIN.y+SIZE.height*0.26);
         case 2: return Vec2(
-            origin.x+visibleSize.width*0.5 - gangCard.width*0.98,
-            origin.y+visibleSize.height*0.26);
+            ORIGIN.x+SIZE.width*0.5 - gangCard.width*0.98,
+            ORIGIN.y+SIZE.height*0.26);
         case 3: return Vec2(
-            origin.x+visibleSize.width*0.5,
-            origin.y+visibleSize.height*0.26);
+            ORIGIN.x+SIZE.width*0.5,
+            ORIGIN.y+SIZE.height*0.26);
         case 4: return Vec2(
-            origin.x+visibleSize.width*0.5 + gangCard.width*0.98,
-            origin.y+visibleSize.height*0.255);
+            ORIGIN.x+SIZE.width*0.5 + gangCard.width*0.98,
+            ORIGIN.y+SIZE.height*0.255);
     }
 }
 
-Vec2 NetRaceLayer::_PositionOfMingGangCard(int i,Size size) {
+Vec2 Layout::_PositionOfMingGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
-            origin.x + visibleSize.width*0.5 + size.width*0.98,
-            origin.y + visibleSize.height*0.26);
+            ORIGIN.x + SIZE.width*0.5 + cardSize.width*0.98,
+            ORIGIN.y + SIZE.height*0.26);
         case 2: return Vec2(
-            origin.x + visibleSize.width*0.5 - size.width*1.96,
-            origin.y + visibleSize.height*0.26);
+            ORIGIN.x + SIZE.width*0.5 - cardSize.width*1.96,
+            ORIGIN.y + SIZE.height*0.26);
         case 3: return Vec2(
-            origin.x + visibleSize.width*0.5 - size.width*0.98,
-            origin.y + visibleSize.height*0.26);
+            ORIGIN.x + SIZE.width*0.5 - cardSize.width*0.98,
+            ORIGIN.y + SIZE.height*0.26);
         case 4: return Vec2(
-            origin.x + visibleSize.width*0.5,
-            origin.y + visibleSize.height*0.26);
+            ORIGIN.x + SIZE.width*0.5,
+            ORIGIN.y + SIZE.height*0.26);
     }
 }
 
-Vec2 NetRaceLayer::_MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
+Vec2 Layout::_MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
     switch(i+1) {
         case 1: return Vec2(origPos.x,origPos.y);
         case 2: return Vec2(origPos.x - freeCard.width*0.4, origPos.y);
