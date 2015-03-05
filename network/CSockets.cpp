@@ -58,30 +58,31 @@ int CSocket::Recv(char *buf,int *len,int bufSize) {
 /******************************************************
 	ServerSocket
 ******************************************************/
+#ifdef __UNIT_TEST__
 void ServerSocket::Start(const char *serverIp,int port) {
 	Init();
 
     SOCKET serSocket=socket(AF_INET,SOCK_STREAM,0);
 
-    SOCKADDR_IN local;
+    sockaddr_in local;
     local.sin_family=AF_INET;
     local.sin_addr.S_un.S_addr=htonl(INADDR_ANY);
     local.sin_port=htons(port);
   
-	if ( bind( serSocket, (SOCKADDR*)&local, sizeof(SOCKADDR) ) == 0 ) {
+	if ( bind( serSocket, (sockaddr*)&local, sizeof(sockaddr) ) == 0 ) {
 	    listen( serSocket, 5 );
 	} else {
 		LOGGER_WRITE("%s : bind() error!\n",__FUNCTION__);
 	}
   
-	SOCKADDR client = {0};
-    int      len=sizeof(SOCKADDR);
-    _connection = accept( serSocket, (SOCKADDR*)&client, &len );
+	sockaddr client = {0};
+    int      len=sizeof(sockaddr);
+    _connection = accept( serSocket, (sockaddr*)&client, &len );
 	if( _connection==INVALID_SOCKET ) {
 		LOGGER_WRITE("%s : accept() error!\n",__FUNCTION__);
 	}
 }
-
+#endif
 /******************************************************
 	ClientSocket
 ******************************************************/
@@ -114,12 +115,12 @@ void ClientSocket::Start(const char *serverIp,int port) {
     fcntl(_connection, F_SETFL, O_NONBLOCK);  
 #endif   
 
-	SOCKADDR_IN server;
-    server.sin_addr.S_un.S_addr=inet_addr(serverIp);
+	sockaddr_in server;
+    server.sin_addr.s_addr=inet_addr(serverIp);
     server.sin_family=AF_INET;
     server.sin_port=htons(port);
 
-	int result = connect( _connection, (SOCKADDR*)&server, sizeof(SOCKADDR) );
+	int result = connect( _connection, (sockaddr*)&server, sizeof(sockaddr) );
 	if ( result==SOCKET_ERROR ) {
         if (hasError()) {  
             Stop();  

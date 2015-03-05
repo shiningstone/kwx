@@ -101,15 +101,16 @@ public:
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,49,               //request code(发送玩家反应)
-            0x00,53,               //package size
+            0x00,55,               //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
 
-            5,
+            6,
             131,4,0,1,2,3,         //roomPath:0x00010203
             132,4,4,5,6,7,         //roomId:  0x04050607
             133,4,8,9,10,11,       //tableId: 0x08090a0b
             60,1,                  //site:    1
-            67,1,                  //act:     1(碰)
+            61,2,                  //card kind: 2
+            66,3,                  //act: 
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -118,7 +119,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        len = aMsg.SetReaction(buf,PENG);
+        len = aMsg.SetReaction(buf,2,GUO);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));
@@ -178,17 +179,14 @@ public:
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,52,               //request code(发送更新牌队列)
-            0x00,61,               //package size
+            0x00,51,               //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
 
-            5,
+            4,
             131,4,0,1,2,3,         //roomPath:0x00010203
             132,4,4,5,6,7,         //roomId:  0x04050607
             133,4,8,9,10,11,       //tableId: 0x08090a0b
             60,1,                  //site:    1
-            135,8,  
-                0,1,2,1,           //一张牌：0-reserved；1-ck_ER_TIAO；2-c_MING_GANG；0-cps_YES
-                0,3,4,0,           //一张牌：0-reserved；3-ck_SI_TIAO；4-c_MING_KOU ；0-cps_NO
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -222,13 +220,14 @@ public:
             'K','W','X',           //KWX
             0x00,50,               //request code(发送发牌请求)
             7,                     //package level
-            0x00,27,               //package size
+            0x00,33,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            3,
-            60,1,                  //roomId
-            61,2,                  //seat
-            70,0,                  //card kind
+            4,
+            60,1,                  //seat
+            61,2,                  //card kind
+            62,3,                  //counter
+            130,4,0,0,0,4          //reminder
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -243,9 +242,10 @@ public:
         assert( aMsg.GetRequestCode()==REQ_GAME_SEND_DIST );
         assert( aMsg.GetLevel()==7 );
 
-        assert( response.room==1 );
-        assert( response.seat==2 );
-        assert( response.cardKind==0 );
+        assert( response.seat==1 );
+        assert( response.cardKind==2 );
+        assert( response.counter==3 );
+        assert( response.reminder==4 );
         
         return 0;
     }
@@ -326,12 +326,13 @@ public:
             'K','W','X',           //KWX
             0x00,76,               //request code(下发其他玩家反应)
             7,                     //package level
-            0x00,25,               //package size
+            0x00,27,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            2,
+            3,
             60,1,                  //seatId
-            65,2,                  //reaction
+            61,2,
+            66,3,                  //reaction
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -346,7 +347,8 @@ public:
         assert( aMsg.GetRequestCode()==REQ_GAME_RECV_RESPONSE );
         assert( aMsg.GetLevel()==7 );
         assert( actionInfo.seat==1 );
-        assert( actionInfo.action==2 );
+        assert( actionInfo.cardKind==2 );
+        assert( actionInfo.action==3 );
 
         return 0;
     }
@@ -379,4 +381,12 @@ void testRequests() {
 
     aCase = new TestGameRecvOthersReaction();
     aCase->Execute();
+
+    #if 0
+    aCase = new TestGameRecvUpdateList();/*REQ_GAME_RECV_UPDATELIST(56)*/
+    aCase = new TestGameRecvCalScore();/*REQ_GAME_SEND_CALSCORE（51）*/
+    aCase = new TestGameRecvCounter();/*REQ_GAME_SEND_DAOJISHI（55）*/
+    aCase = new TestGameRecvConfirmRaction();/*REQ_GAME_SEND_OK（54）*/
+    /*REQ_GAME_SEND_DAOJISHI（57）*/
+    #endif
 }
