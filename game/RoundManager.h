@@ -4,7 +4,7 @@
 
 #include "./../utils/LogManager.h"
 
-class Role;
+class NetRole;
 
 #define PLAYER_NUMBER 3
 
@@ -74,7 +74,7 @@ private:
     Logger *_logger;
 
     WinInfo_t   _lastWin;
-    Role        *_players[PLAYER_NUMBER];
+    NetRole     *_players[PLAYER_NUMBER];
     bool        _ready[PLAYER_NUMBER];
 
     outCardList *_river;

@@ -4,6 +4,11 @@
 
 #include "ui/CocosGUI.h"
 using namespace CocosDenshion;
+#include "cocos2d.h"
+USING_NS_CC;
+#include "ui/CocosGUI.h"
+USING_NS_CC;
+using namespace ui;
 
 #include "./../utils/BasicType.h"
 
@@ -19,7 +24,7 @@ private:
     VoiceEffect();
     static VoiceEffect *_instance;
 
-    static int _motionToFile(const char *motion);
+    static int _motionToFile(char *file,const char *motion);
 };
 
 #endif

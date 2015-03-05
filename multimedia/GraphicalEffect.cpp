@@ -1,7 +1,11 @@
 
 #include "GraphicalEffect.h"
 
-TargetedAction *GraphicEffect::Shade(Sprite* target) {
+GraphicEffect::GraphicEffect() {
+
+}
+
+TargetedAction *GraphicEffect::Shade(Node* target) {
     return TargetedAction::create(target,
         Sequence::create(
             ScaleTo::create(0,1),
@@ -14,6 +18,8 @@ TargetedAction *GraphicEffect::Shade(Sprite* target) {
 /*************************************
     singleton
 *************************************/
+GraphicEffect *GraphicEffect::_instance = NULL;
+
 GraphicEffect *GraphicEffect::getInstance() {
     if (_instance==NULL) {
         _instance = new GraphicEffect();

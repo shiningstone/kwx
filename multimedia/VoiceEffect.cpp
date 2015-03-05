@@ -1,6 +1,9 @@
 
 #include "VoiceEffect.h"
 
+using namespace cocos2d::ui;
+USING_NS_CC;
+
 const char * VoiceCards[SEX_MAX][CARD_MAX] = {
     {
         "Music/1tiao.ogg","Music/2tiao.ogg","Music/3tiao.ogg","Music/4tiao.ogg","Music/5tiao.ogg",
@@ -23,6 +26,10 @@ const char * VoiceActions[SEX_MAX][ACTION_MAX] = {
     {"Music/g_peng.ogg","Music/g_gang.ogg","Music/g_ting1.ogg","Music/g_hu.ogg"},
 };
 
+VoiceEffect::VoiceEffect() {
+
+}
+
 CallFunc* VoiceEffect::SpeakCard(Card_t card,Sex_t sex) {
     return CallFunc::create([=](){
         SimpleAudioEngine::sharedEngine()->playEffect(
@@ -35,18 +42,21 @@ CallFunc* VoiceEffect::SpeakAction(Action_t action,Sex_t sex) {
             VoiceActions[sex][action]);});
 }
 
-static int VoiceEffect::_motionToFile(char *file, const char *motion) {
+int VoiceEffect::_motionToFile(char *file, const char *motion) {
     const char *DIR = "Music/";
     const char *EXT  = ".ogg";
 
     memcpy(file, DIR, strlen(DIR));
     memcpy(file+strlen(DIR), motion, strlen(motion));
     memcpy(file+strlen(DIR)+strlen(motion), EXT, strlen(EXT));
+
+    return 0;
 }
 
 
 CallFunc* VoiceEffect::Speak(const char *motion) {
-    char file[32] = {0};
+    char buf[32] = {0};
+    char *file = buf;
     
     _motionToFile(file,motion);
     
@@ -57,6 +67,8 @@ CallFunc* VoiceEffect::Speak(const char *motion) {
 /*************************************
     singleton
 *************************************/
+VoiceEffect *VoiceEffect::_instance = NULL;
+
 VoiceEffect *VoiceEffect::getInstance() {
     if (_instance==NULL) {
         _instance = new VoiceEffect();

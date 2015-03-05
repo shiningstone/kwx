@@ -1,13 +1,15 @@
 
-#ifndef __LAYOUT__
-#define __LAYOUT__
+#ifndef __GAME_LAYOUT__
+#define __GAME_LAYOUT__
 
-#include "ui/CocosGUI.h"
-using namespace CocosDenshion;
+#include "cocos2d.h"
+USING_NS_CC;
 
-class Layout {
+#include "./../utils/LogManager.h"
+
+class GameLayout {
     public:
-        static Layout *getInstance();
+        static GameLayout *getInstance();
         static void destroyInstance();
 
         void SetScope(cocos2d::Point origin,cocos2d::Size visibleSize);
@@ -47,8 +49,9 @@ class Layout {
         Vec2 PositionOfMingGangCard(int i,Size size);
 
     private:
-        Layout();
-        static Layout *_instance;
+        GameLayout();
+        static GameLayout *_instance;
+        Logger *_logger;
 
         cocos2d::Size  SIZE;
         cocos2d::Point ORIGIN;

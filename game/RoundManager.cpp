@@ -2,9 +2,9 @@
 #include <stdlib.h>
 
 #include "RaceType.h"
-#include "Role.h"
 #include "Raction.h"
 
+#include "NetRole.h"
 #include "RoundManager.h"
 
 #define INVALID -1
@@ -96,13 +96,13 @@ void RoundManager::RenewOutCard() {
 /***********************************************
         player information
 ***********************************************/
-#include "./../Me.h"
+#include "NetMe.h"
 #include "NetPlayer.h"
 #include "NetRaceRound.h"
 
 void RoundManager::InitPlayers() {
 	_players[0] = new NetPlayer();
-	_players[1] = new Me();
+	_players[1] = new NetMe();
 	_players[2] = new NetPlayer();
 
 	_players[0]->set_parter( new NetRRound() );

@@ -8,6 +8,7 @@
 #include "Raction.h"
 #include "RaceType.h"
 
+#include "NetRole.h"
 #include "DataBase.h"
 
 class Logger;

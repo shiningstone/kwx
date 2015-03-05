@@ -24,8 +24,13 @@
 
 #define LOGGER_REGISTER(x)     LogManager::GetInstance()->Recruit(x)
 #define LOGGER_DEREGISTER(x)   LogManager::GetInstance()->Dismiss(x)
-#define LOGGER_WRITE(fmt,...)      _logger->Write(fmt,##__VA_ARGS__)
-#define LOGGER_WRITE_ARRAY(p,len)  _logger->WriteArray(p,len)
+#define LOGGER_WRITE(fmt,...)      if(_logger!=NULL) { \
+    _logger->Write(fmt,##__VA_ARGS__); \
+}while(0)
+
+#define LOGGER_WRITE_ARRAY(p,len)  if(_logger!=NULL) { \
+    _logger->WriteArray(p,len); \
+}while(0)
 
 class Logger {
 public :

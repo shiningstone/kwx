@@ -13,7 +13,7 @@ NetRaceLayer::NetRaceLayer()
 	s_no=1;
 
     _voice = VoiceEffect::getInstance();
-    _layout = Layout::getInstance();
+    _layout = GameLayout::getInstance();
     _graphic = GraphicEffect::getInstance();
     
     _roundManager = new RoundManager();
@@ -1044,7 +1044,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		action = BizerMove2(outCard,location,time);
 
     CallFunc* BizerVoice = _voice->Speak("give");
-	CallFunc* voiceCall  = _voice->SpeakCard(_roundManager->_lastHandedOutCard,
+	CallFunc* voiceCall  = _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
                                 _roundManager->_players[_roundManager->_curPlayer]->get_sex());
 
 	Sequence* voiceEffect;
@@ -1719,7 +1719,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                         _Show(myframe,OUT_CARD_FRAME_TAG_ID,true);} ),Spawn::create(
                             showAndHideOutcardNotice,
                             inHandMoveToOutHand,
-                            _voice->SpeakCard(_roundManager->_lastHandedOutCard,
+                            _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
                                 _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),
                         _voice->Speak("give"),NULL);
 	}
@@ -1729,7 +1729,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                         _Show(myframe,OUT_CARD_FRAME_TAG_ID,true);} ),Spawn::create(
                     		showAndHideOutcardNotice,
                     		inHandMoveToOutHand,
-                    		_voice->SpeakCard(_roundManager->_lastHandedOutCard,
+                    		_voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
                                 _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),
                 		_voice->Speak("give"),NULL);
 
