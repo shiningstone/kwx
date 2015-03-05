@@ -11,6 +11,7 @@ using namespace CocosDenshion;
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 #include "./../multimedia/VoiceEffect.h"
+#include "./../multimedia/Layout.h"
 #include "RoundManager.h"
 #include "DataBase.h"
 
@@ -22,6 +23,7 @@ public:
 protected:
     RoundManager  *_roundManager;
     VoiceEffect   *_voice;
+    Layout        *_layout;
 private:
     Logger *_logger;
     void _LoadPlayerInfo();
@@ -41,15 +43,6 @@ private:
     Sprite *_GetEffectCardInHand(Node *myframe, int i,CARD_KIND value );
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
-    Vec2 _AnchorOfSign(int dir);
-    Vec2 _PositionOfSign(int dir,Size size,Vec2 origin,int xOffset = 0);
-    Vec2 _DestOfSign(int dir,Size size,Vec2 origin,int xOffset = 0);
-    Vec2 _AnchorOfNumber(int dir);
-    Vec2 _PositionOfNumber(int dir,Size size,Vec2 origin);
-    Vec2 _DestOfNumber(int dir,Size size,Vec2 origin);
-    Vec2 _AnchorOfGold(int dir);
-    Vec2 _PositionOfGold(int dir,Size size,Vec2 origin,int xOffset = 0);
-    Vec2 _DestOfGold(int dir,Size size,Vec2 origin,int xOffset = 0);
     void GuiJinBiShow(int dir, int gold);
     void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
     void _GuiUpdateScore(LayerColor *layer,int score);
@@ -71,18 +64,8 @@ private:
     void _CardTouchMove(Touch* touch, Event* event);
     void _CardTouchEnd(Touch* touch, Event* event);
     void ListenToCardTouch();
-    Vec2 getEffectVec(int dir);
     void _CollectResouce(HAH *res) ;
 
-    int  _RotateAngleOfOutcard(int dir);
-    Vec2 _AnchorOfOutcard(int dir);
-    Vec2 _PositionOfOutcard(int dir,Size size,Vec2 origin);
-
-    Vec2 _OrigPositionOfGangCard(int i,Size size);
-    Vec2 _MiddlePositionOfGangCard(int i,Size size);
-    Vec2 _DestPositionOfGangCard(int i,Size size);
-    Vec2 _DestPositionOfGangCardInHand(int i,Size gangCard);
-    Vec2 _MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
     void _CreateGangCardsMotion(TargetedAction *motions[4]);
     void _CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind);
 
