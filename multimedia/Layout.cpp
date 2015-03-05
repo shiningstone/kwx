@@ -9,7 +9,7 @@ void Layout::SetScope(cocos2d::Point p,cocos2d::Size s) {
 /*************************************
     gold count
 *************************************/
-Vec2 Layout::_AnchorOfSign(int dir) {
+Vec2 Layout::AnchorOfSign(int dir) {
     switch(dir) {
         case 0:   return Vec2(0.5,0.5);
         case 1:   return Vec2(0.5,0.5);
@@ -17,7 +17,7 @@ Vec2 Layout::_AnchorOfSign(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfSign(int dir,int xOffset) {
+Vec2 Layout::PositionOfSign(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*271/1218,
@@ -31,7 +31,7 @@ Vec2 Layout::_PositionOfSign(int dir,int xOffset) {
     }
 }
 
-Vec2 Layout::_DestOfSign(int dir,int xOffset) {
+Vec2 Layout::DestOfSign(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*271/1218,
@@ -45,7 +45,7 @@ Vec2 Layout::_DestOfSign(int dir,int xOffset) {
     }
 }
 
-Vec2 Layout::_AnchorOfNumber(int dir) {
+Vec2 Layout::AnchorOfNumber(int dir) {
     switch(dir) {
         case 0:   return Vec2(0,0.5);
         case 1:   return Vec2(0,0.5);
@@ -53,7 +53,7 @@ Vec2 Layout::_AnchorOfNumber(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfNumber(int dir) {
+Vec2 Layout::PositionOfNumber(int dir) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*291/1218,
@@ -67,7 +67,7 @@ Vec2 Layout::_PositionOfNumber(int dir) {
     }
 }
 
-Vec2 Layout::_DestOfNumber(int dir) {
+Vec2 Layout::DestOfNumber(int dir) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*291/1218,
@@ -81,7 +81,7 @@ Vec2 Layout::_DestOfNumber(int dir) {
     }
 }
 
-Vec2 Layout::_AnchorOfGold(int dir) {
+Vec2 Layout::AnchorOfGold(int dir) {
     switch(dir) {
         case 0:   return Vec2(0.5,0.5);
         case 1:   return Vec2(0.5,0.5);
@@ -89,7 +89,7 @@ Vec2 Layout::_AnchorOfGold(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfGold(int dir,int xOffset) {
+Vec2 Layout::PositionOfGold(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*221/1218,
@@ -104,7 +104,7 @@ Vec2 Layout::_PositionOfGold(int dir,int xOffset) {
     }
 }
 
-Vec2 Layout::_DestOfGold(int dir,int xOffset) {
+Vec2 Layout::DestOfGold(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*221/1218,
@@ -121,7 +121,7 @@ Vec2 Layout::_DestOfGold(int dir,int xOffset) {
 /*************************************
     out card
 *************************************/
-int  Layout::_RotateAngleOfOutcard(int dir) {
+int  Layout::RotateAngleOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return 90;
@@ -134,7 +134,7 @@ int  Layout::_RotateAngleOfOutcard(int dir) {
     }
 }
 
-Vec2 Layout::_AnchorOfOutcard(int dir) {
+Vec2 Layout::AnchorOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return Vec2(0,0.5);
@@ -145,7 +145,7 @@ Vec2 Layout::_AnchorOfOutcard(int dir) {
     }
 }
 
-Vec2 Layout::_PositionOfOutcard(int dir) {
+Vec2 Layout::PositionOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return Vec2(ORIGIN.x + SIZE.width*0.18, ORIGIN.y + SIZE.height*0.6);
@@ -159,37 +159,41 @@ Vec2 Layout::_PositionOfOutcard(int dir) {
 /*************************************
     action
 *************************************/
-Vec2 Layout::_PostionOfActSign(int dir) {
+Vec2 Layout::PositionOfMingSign() {
+    return Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2+50);
+}
+
+Vec2 Layout::PositionOfActSign(int dir) {
     switch(dir) {
         case 0:
-            return Vec2(ORIGIN.x+visibleSize.width*0.206,ORIGIN.y+visibleSize.height*0.6);
+            return Vec2(ORIGIN.x+SIZE.width*0.206,ORIGIN.y+SIZE.height*0.6);
         case 1:
-            return Vec2(ORIGIN.x+visibleSize.width/2,ORIGIN.y+visibleSize.height/2);
+            return Vec2(ORIGIN.x+SIZE.width/2,ORIGIN.y+SIZE.height/2);
         case 2:
-            return Vec2(ORIGIN.x+visibleSize.width*0.79,ORIGIN.y+visibleSize.height*0.6);
+            return Vec2(ORIGIN.x+SIZE.width*0.79,ORIGIN.y+SIZE.height*0.6);
         default:
             LOGGER_WRITE("%s Error ! invalid player");
     }
 }
 
-Vec2 Layout::_OrigPositionOfGangCard(int i,Size SIZE) {
+Vec2 Layout::OrigPositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
-            ORIGIN.x + visibleSize.width*0.5 + SIZE.width*0.98,
-            ORIGIN.y + visibleSize.height*0.255);
+            ORIGIN.x + SIZE.width*0.5 + cardSize.width*0.98,
+            ORIGIN.y + SIZE.height*0.255);
         case 2: return Vec2(
-            ORIGIN.x + visibleSize.width*0.5 - SIZE.width*1.96,
-            ORIGIN.y + visibleSize.height*0.255);
+            ORIGIN.x + SIZE.width*0.5 - cardSize.width*1.96,
+            ORIGIN.y + SIZE.height*0.255);
         case 3: return Vec2(
-            ORIGIN.x + visibleSize.width*0.5 - SIZE.width*0.98,
-            ORIGIN.y + visibleSize.height*0.255);
+            ORIGIN.x + SIZE.width*0.5 - cardSize.width*0.98,
+            ORIGIN.y + SIZE.height*0.255);
         case 4: return Vec2(
-            ORIGIN.x + visibleSize.width*0.5,
-            ORIGIN.y + visibleSize.height*0.255);
+            ORIGIN.x + SIZE.width*0.5,
+            ORIGIN.y + SIZE.height*0.255);
     }
 }
 
-Vec2 Layout::_MiddlePositionOfGangCard(int i,Size cardSize) {
+Vec2 Layout::MiddlePositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
                 ORIGIN.x + SIZE.width*0.5  +  cardSize.width*0.98  +  150,
@@ -206,7 +210,7 @@ Vec2 Layout::_MiddlePositionOfGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 Layout::_DestPositionOfGangCard(int i,Size cardSize) {
+Vec2 Layout::DestPositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
                 ORIGIN.x + SIZE.width*0.5  +  cardSize.width*0.98,
@@ -223,7 +227,7 @@ Vec2 Layout::_DestPositionOfGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 Layout::_DestPositionOfGangCardInHand(int i,Size gangCard) {
+Vec2 Layout::DestPositionOfGangCardInHand(int i,Size gangCard) {
     switch(i+1) {
         case 1: return Vec2(
             ORIGIN.x+SIZE.width*0.5 - gangCard.width*1.96,
@@ -240,7 +244,7 @@ Vec2 Layout::_DestPositionOfGangCardInHand(int i,Size gangCard) {
     }
 }
 
-Vec2 Layout::_PositionOfMingGangCard(int i,Size cardSize) {
+Vec2 Layout::PositionOfMingGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
             ORIGIN.x + SIZE.width*0.5 + cardSize.width*0.98,
@@ -257,7 +261,7 @@ Vec2 Layout::_PositionOfMingGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 Layout::_MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
+Vec2 Layout::MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
     switch(i+1) {
         case 1: return Vec2(origPos.x,origPos.y);
         case 2: return Vec2(origPos.x - freeCard.width*0.4, origPos.y);

@@ -15,34 +15,35 @@ class Layout {
         /*************************************
             gold count
         *************************************/
-        Vec2 _AnchorOfSign(int dir);
-        Vec2 _PositionOfSign(int dir,int xOffset = 0);
-        Vec2 _DestOfSign(int dir,int xOffset = 0);
-        Vec2 _AnchorOfNumber(int dir);
-        Vec2 _PositionOfNumber(int dir);
-        Vec2 _DestOfNumber(int dir);
-        Vec2 _AnchorOfGold(int dir);
-        Vec2 _PositionOfGold(int dir,int xOffset = 0);
-        Vec2 _DestOfGold(int dir,int xOffset = 0);
+        Vec2 AnchorOfSign(int dir);
+        Vec2 PositionOfSign(int dir,int xOffset = 0);
+        Vec2 DestOfSign(int dir,int xOffset = 0);
+        Vec2 AnchorOfNumber(int dir);
+        Vec2 PositionOfNumber(int dir);
+        Vec2 DestOfNumber(int dir);
+        Vec2 AnchorOfGold(int dir);
+        Vec2 PositionOfGold(int dir,int xOffset = 0);
+        Vec2 DestOfGold(int dir,int xOffset = 0);
         
         /*************************************
             out card
         *************************************/
-        int  _RotateAngleOfOutcard(int dir);
-        Vec2 _AnchorOfOutcard(int dir);
-        Vec2 _PositionOfOutcard(int dir);
+        int  RotateAngleOfOutcard(int dir);
+        Vec2 AnchorOfOutcard(int dir);
+        Vec2 PositionOfOutcard(int dir);
 
         /*************************************
             action
         *************************************/
-        Vec2 _PostionOfActSign(int dir);
+        Vec2 PositionOfMingSign();
+        Vec2 PositionOfActSign(int dir);
 
-        Vec2 _OrigPositionOfGangCard(int i,Size size);
-        Vec2 _MiddlePositionOfGangCard(int i,Size size);
-        Vec2 _DestPositionOfGangCard(int i,Size size);
-        Vec2 _DestPositionOfGangCardInHand(int i,Size gangCard);
-        Vec2 _MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
-        Vec2 _PositionOfMingGangCard(int i,Size size);
+        Vec2 OrigPositionOfGangCard(int i,Size size);
+        Vec2 MiddlePositionOfGangCard(int i,Size size);
+        Vec2 DestPositionOfGangCard(int i,Size size);
+        Vec2 DestPositionOfGangCardInHand(int i,Size gangCard);
+        Vec2 MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
+        Vec2 PositionOfMingGangCard(int i,Size size);
 
     private:
         Layout();
