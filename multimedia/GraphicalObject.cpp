@@ -21,6 +21,18 @@ Sprite *TextureFactory::Create(TextureId_t id) {
     return Sprite::createWithTexture(_protoType[id]->getTexture());
 }
 
+Sprite *TextureFactory::Create(TextureId_t id, Sprite *son) {
+    Sprite *parent = Sprite::createWithTexture(_protoType[id]->getTexture());
+
+    son->setAnchorPoint(Vec2(0.5,0.5));/*anchor point is not set in some cases*/
+    son->setPosition( Vec2(
+        parent->getTextureRect().size.width/2,
+        parent->getTextureRect().size.height*0.4) );
+    parent->addChild(son);/*in ming_gang_tip_effect(hide out card), there is extra parameter equals 1*/
+
+    return parent;
+}
+
 /*************************************
     singleton
 *************************************/

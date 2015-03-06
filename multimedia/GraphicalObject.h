@@ -19,6 +19,7 @@ public:
     
     Size RectSize(TextureId_t id);
     Sprite *Create(TextureId_t id);
+    Sprite *Create(TextureId_t id,Sprite *son);
 
 protected:
     static CCSpriteBatchNode * _protoType[TEXTURE_NUM];

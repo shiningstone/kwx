@@ -1651,15 +1651,11 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		cardFrame->setPosition(_layout->PositionOfOutcard(curPlayer));
 		myframe->addChild(cardFrame,35,SHOW_CARD_INIDCATOR_TAD_ID);
         
-		auto cardBg = _texture->Create(FREE_CARD);
+		auto card = Sprite::createWithTexture(g_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
+		auto cardBg = _texture->Create(FREE_CARD,card);
 		cardBg->setAnchorPoint(Vec2(0.5,0.5));
 		cardBg->setPosition( Vec2(cardFrame->getTextureRect().size.width*0.515,cardFrame->getTextureRect().size.height*0.515) );
 		cardFrame->addChild(cardBg);
-        
-		auto card = Sprite::createWithTexture(g_card_kind[_roundManager->_lastHandedOutCard]->getTexture());
-		card->setAnchorPoint(Vec2(0.5,0.5));
-		card->setPosition(Vec2(cardBg->getTextureRect().size.width/2,cardBg->getTextureRect().size.height*0.4));
-		cardBg->addChild(card);
         
 		cardFrame->runAction(Sequence::create(
             DelayTime::create(1.5),
@@ -2731,17 +2727,12 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20 + list->len-1);//gang1
 			lastInHand->runAction(ScaleTo::create(0,0));
 			
-			s_curOutCard=_texture->Create(FREE_CARD);
+			auto kind = Sprite::createWithTexture(g_card_kind[GangCard.kind]->getTexture());
+			s_curOutCard=_texture->Create(FREE_CARD,kind);
 			s_curOutCard->setAnchorPoint(Vec2(0,0));
 			s_curOutCard->setPosition(Vec2(
                 lastInHand->getPosition().x,
                 lastInHand->getPosition().y));
-			auto kind = Sprite::createWithTexture(g_card_kind[GangCard.kind]->getTexture());
-			kind->setAnchorPoint(Vec2(0.5,0.5));
-			kind->setPosition(Vec2(
-                s_curOutCard->getTextureRect().size.width/2,
-                s_curOutCard->getTextureRect().size.height*0.4));
-			s_curOutCard->addChild(kind,1);
             
 			myframe->addChild(s_curOutCard,29,EFFET_NEWCATD1_TAG);
 			lastInHand->runAction(ScaleTo::create(0,0));
