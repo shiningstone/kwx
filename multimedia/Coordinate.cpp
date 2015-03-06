@@ -1,11 +1,11 @@
 
-#include "GameLayout.h"
+#include "Coordinate.h"
 
-GameLayout::GameLayout() {
+Coordinate::Coordinate() {
 
 }
 
-void GameLayout::SetScope(cocos2d::Point p,cocos2d::Size s) {
+void Coordinate::SetScope(cocos2d::Point p,cocos2d::Size s) {
     ORIGIN = p;
     SIZE   = s;
 }
@@ -13,7 +13,7 @@ void GameLayout::SetScope(cocos2d::Point p,cocos2d::Size s) {
 /*************************************
     gold count
 *************************************/
-Vec2 GameLayout::AnchorOfSign(int dir) {
+Vec2 Coordinate::AnchorOfSign(int dir) {
     switch(dir) {
         case 0:   return Vec2(0.5,0.5);
         case 1:   return Vec2(0.5,0.5);
@@ -21,7 +21,7 @@ Vec2 GameLayout::AnchorOfSign(int dir) {
     }
 }
 
-Vec2 GameLayout::PositionOfSign(int dir,int xOffset) {
+Vec2 Coordinate::PositionOfSign(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*271/1218,
@@ -35,7 +35,7 @@ Vec2 GameLayout::PositionOfSign(int dir,int xOffset) {
     }
 }
 
-Vec2 GameLayout::DestOfSign(int dir,int xOffset) {
+Vec2 Coordinate::DestOfSign(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*271/1218,
@@ -49,7 +49,7 @@ Vec2 GameLayout::DestOfSign(int dir,int xOffset) {
     }
 }
 
-Vec2 GameLayout::AnchorOfNumber(int dir) {
+Vec2 Coordinate::AnchorOfNumber(int dir) {
     switch(dir) {
         case 0:   return Vec2(0,0.5);
         case 1:   return Vec2(0,0.5);
@@ -57,7 +57,7 @@ Vec2 GameLayout::AnchorOfNumber(int dir) {
     }
 }
 
-Vec2 GameLayout::PositionOfNumber(int dir) {
+Vec2 Coordinate::PositionOfNumber(int dir) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*291/1218,
@@ -71,7 +71,7 @@ Vec2 GameLayout::PositionOfNumber(int dir) {
     }
 }
 
-Vec2 GameLayout::DestOfNumber(int dir) {
+Vec2 Coordinate::DestOfNumber(int dir) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*291/1218,
@@ -85,7 +85,7 @@ Vec2 GameLayout::DestOfNumber(int dir) {
     }
 }
 
-Vec2 GameLayout::AnchorOfGold(int dir) {
+Vec2 Coordinate::AnchorOfGold(int dir) {
     switch(dir) {
         case 0:   return Vec2(0.5,0.5);
         case 1:   return Vec2(0.5,0.5);
@@ -93,7 +93,7 @@ Vec2 GameLayout::AnchorOfGold(int dir) {
     }
 }
 
-Vec2 GameLayout::PositionOfGold(int dir,int xOffset) {
+Vec2 Coordinate::PositionOfGold(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*221/1218,
@@ -108,7 +108,7 @@ Vec2 GameLayout::PositionOfGold(int dir,int xOffset) {
     }
 }
 
-Vec2 GameLayout::DestOfGold(int dir,int xOffset) {
+Vec2 Coordinate::DestOfGold(int dir,int xOffset) {
     switch(dir) {
         case 0:   
             return Vec2(ORIGIN.x + SIZE.width*221/1218,
@@ -125,7 +125,7 @@ Vec2 GameLayout::DestOfGold(int dir,int xOffset) {
 /*************************************
     out card
 *************************************/
-int  GameLayout::RotateAngleOfOutcard(int dir) {
+int  Coordinate::RotateAngleOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return 90;
@@ -138,7 +138,7 @@ int  GameLayout::RotateAngleOfOutcard(int dir) {
     }
 }
 
-Vec2 GameLayout::AnchorOfOutcard(int dir) {
+Vec2 Coordinate::AnchorOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return Vec2(0,0.5);
@@ -149,7 +149,7 @@ Vec2 GameLayout::AnchorOfOutcard(int dir) {
     }
 }
 
-Vec2 GameLayout::PositionOfOutcard(int dir) {
+Vec2 Coordinate::PositionOfOutcard(int dir) {
     switch(dir) {
         case 0:
             return Vec2(ORIGIN.x + SIZE.width*0.18, ORIGIN.y + SIZE.height*0.6);
@@ -163,15 +163,15 @@ Vec2 GameLayout::PositionOfOutcard(int dir) {
 /*************************************
     action
 *************************************/
-Vec2 GameLayout::Center() {
+Vec2 Coordinate::Center() {
     return Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2);
 }
 
-Vec2 GameLayout::PositionOfMingSign() {
+Vec2 Coordinate::PositionOfMingSign() {
     return Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2+50);
 }
 
-Vec2 GameLayout::PositionOfActSign(int dir) {
+Vec2 Coordinate::PositionOfActSign(int dir) {
     switch(dir) {
         case 0:
             return Vec2(ORIGIN.x+SIZE.width*0.206,ORIGIN.y+SIZE.height*0.6);
@@ -184,7 +184,7 @@ Vec2 GameLayout::PositionOfActSign(int dir) {
     }
 }
 
-Vec2 GameLayout::OrigPositionOfGangCard(int i,Size cardSize) {
+Vec2 Coordinate::OrigPositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
             ORIGIN.x + SIZE.width*0.5 + cardSize.width*0.98,
@@ -201,7 +201,7 @@ Vec2 GameLayout::OrigPositionOfGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 GameLayout::MiddlePositionOfGangCard(int i,Size cardSize) {
+Vec2 Coordinate::MiddlePositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
                 ORIGIN.x + SIZE.width*0.5  +  cardSize.width*0.98  +  150,
@@ -218,7 +218,7 @@ Vec2 GameLayout::MiddlePositionOfGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 GameLayout::DestPositionOfGangCard(int i,Size cardSize) {
+Vec2 Coordinate::DestPositionOfGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
                 ORIGIN.x + SIZE.width*0.5  +  cardSize.width*0.98,
@@ -235,7 +235,7 @@ Vec2 GameLayout::DestPositionOfGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 GameLayout::DestPositionOfGangCardInHand(int i,Size gangCard) {
+Vec2 Coordinate::DestPositionOfGangCardInHand(int i,Size gangCard) {
     switch(i+1) {
         case 1: return Vec2(
             ORIGIN.x+SIZE.width*0.5 - gangCard.width*1.96,
@@ -252,7 +252,7 @@ Vec2 GameLayout::DestPositionOfGangCardInHand(int i,Size gangCard) {
     }
 }
 
-Vec2 GameLayout::PositionOfMingGangCard(int i,Size cardSize) {
+Vec2 Coordinate::PositionOfMingGangCard(int i,Size cardSize) {
     switch(i+1) {
         case 1: return Vec2(
             ORIGIN.x + SIZE.width*0.5 + cardSize.width*0.98,
@@ -269,7 +269,7 @@ Vec2 GameLayout::PositionOfMingGangCard(int i,Size cardSize) {
     }
 }
 
-Vec2 GameLayout::MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
+Vec2 Coordinate::MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard) {
     switch(i+1) {
         case 1: return Vec2(origPos.x,origPos.y);
         case 2: return Vec2(origPos.x - freeCard.width*0.4, origPos.y);
@@ -281,17 +281,17 @@ Vec2 GameLayout::MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard
 /*************************************
     singleton
 *************************************/
-GameLayout *GameLayout::_instance = NULL;
+Coordinate *Coordinate::_instance = NULL;
 
-GameLayout *GameLayout::getInstance() {
+Coordinate *Coordinate::getInstance() {
     if (_instance==NULL) {
-        _instance = new GameLayout();
+        _instance = new Coordinate();
     }
 
     return _instance;
 }
 
-void GameLayout::destroyInstance() {
+void Coordinate::destroyInstance() {
     delete _instance;
     _instance = NULL;
 }

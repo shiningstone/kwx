@@ -13,7 +13,7 @@ NetRaceLayer::NetRaceLayer()
 	s_no=1;
 
     _voice = VoiceEffect::getInstance();
-    _layout = GameLayout::getInstance();
+    _coordinate = Coordinate::getInstance();
     _texture = TextureFactory::getInstance();
     _gEffect = GraphicEffect::getInstance();
     
@@ -28,7 +28,7 @@ NetRaceLayer::~NetRaceLayer()
 
     delete _roundManager;
     _voice->destroyInstance();
-    _layout->destroyInstance();
+    _coordinate->destroyInstance();
     _texture->destroyInstance();
     _gEffect->destroyInstance();
     
@@ -111,12 +111,10 @@ void NetRaceLayer::create_race()
     
 	premiumLeast=200;
 	distributeCardPos=Vec2::ZERO;
-	//ifEndGameChoose=false;
-	//tempEffectNode=Node::create();
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
-    _layout->SetScope(origin,visibleSize);
+    _coordinate->SetScope(origin,visibleSize);
 
 	Sprite *sprite;
 	if(s_no==1)
@@ -124,7 +122,7 @@ void NetRaceLayer::create_race()
 	else
 		sprite=Sprite::create("racetable2.png");
 
-	sprite->setPosition(_layout->Center());
+	sprite->setPosition(_coordinate->Center());
 	sprite->setScaleX(s_scale);
 	sprite->setScaleY(s_scale);
 	this->addChild(sprite, 0);
@@ -135,7 +133,7 @@ void NetRaceLayer::create_race()
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("xzdd_prepare_pop_res.plist");
     
 	auto center_bkg=Sprite::createWithSpriteFrameName("kawuxing.png");
-	center_bkg->setPosition(_layout->Center());
+	center_bkg->setPosition(_coordinate->Center());
 	this->addChild(center_bkg,1,CENTER_BKG_TAG_ID);
 
 	auto menu_bkg=Sprite::createWithSpriteFrameName("gongnenganniu.png");
@@ -921,7 +919,7 @@ TargetedAction *NetRaceLayer::ShowBigMing(Node *myframe) {
     
     damingFont->setAnchorPoint(Vec2(0.5,0.5));
     damingFont->setOpacity(0);
-    damingFont->setPosition(_layout->PositionOfMingSign());
+    damingFont->setPosition(_coordinate->PositionOfMingSign());
 
     myframe->addChild(damingFont,31,MING_EFFECT_DAMING);
 
@@ -1570,7 +1568,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
     int curPlayer = _roundManager->_curPlayer;
     
 	auto smallCard = _texture->CreateKind(_roundManager->_lastHandedOutCard,SMALL);
-	smallCard->runAction(RotateTo::create(0,_layout->RotateAngleOfOutcard(curPlayer)));
+	smallCard->runAction(RotateTo::create(0,_coordinate->RotateAngleOfOutcard(curPlayer)));
     
 	if(myframe->getChildByTag(SHOW_CARD_INIDCATOR_TAD_ID)) {
 		myframe->removeChildByTag(SHOW_CARD_INIDCATOR_TAD_ID);
@@ -1585,8 +1583,8 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 
 	CallFunc* showAndHideOutcardNotice = CallFunc::create([=](){
 		auto cardFrame = Sprite::create("tileImage/tile_lastTileBG.png");
-		cardFrame->setAnchorPoint(_layout->AnchorOfOutcard(curPlayer));
-		cardFrame->setPosition(_layout->PositionOfOutcard(curPlayer));
+		cardFrame->setAnchorPoint(_coordinate->AnchorOfOutcard(curPlayer));
+		cardFrame->setPosition(_coordinate->PositionOfOutcard(curPlayer));
 		myframe->addChild(cardFrame,35,SHOW_CARD_INIDCATOR_TAD_ID);
         
 		auto card = _texture->CreateKind(_roundManager->_lastHandedOutCard);
@@ -1645,7 +1643,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 
-		auto simple_seq = simple_tip_effect( _layout->PositionOfActSign(_roundManager->_curPlayer),"daming.png" );
+		auto simple_seq = simple_tip_effect( _coordinate->PositionOfActSign(_roundManager->_curPlayer),"daming.png" );
 		voiceEffect = Sequence::create(
                         simple_seq,
                         hideLastInHand,CallFunc::create([=](){ 
@@ -1773,7 +1771,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
                             Spawn::create(
                                 _voice->SpeakAction(PENG,
                                     _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
-                                simple_tip_effect( _layout->PositionOfActSign(_roundManager->_curPlayer),"peng.png" ),NULL), 
+                                simple_tip_effect( _coordinate->PositionOfActSign(_roundManager->_curPlayer),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::delete_act_tip)),   CCCallFuncN::create(this,callfuncN_selector(
@@ -2047,7 +2045,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
             circleEffect,
             fireEffect,NULL);
         
-		Spawn *simple_seq = simple_tip_effect( _layout->PositionOfActSign(_roundManager->_curPlayer),"peng.png" );
+		Spawn *simple_seq = simple_tip_effect( _coordinate->PositionOfActSign(_roundManager->_curPlayer),"peng.png" );
         
 		auto PengEffectNode = Node::create();
 		PengEffectNode->_ID=1;
@@ -2137,7 +2135,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
             Spawn::create(
                 _voice->SpeakAction(GANG,
                     _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
-                simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
+                simple_tip_effect(_coordinate->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
@@ -2419,7 +2417,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
     		Sequence::create(
                 hideReminder,
                 Spawn::create(
-                    simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
+                    simple_tip_effect(_coordinate->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
                     _voice->SpeakAction(GANG,
                         _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
                     moveFreeCards,
@@ -2598,7 +2596,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			_roundManager->_curPlayer=no;}),
             dis_action,NULL);//dis_action
 
-		Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
+		Spawn *simple_seq=simple_tip_effect(_coordinate->PositionOfActSign(_roundManager->_curPlayer),"gang.png");///墨迹等。。。update_list_seq 最后处理，转换cur_player
 
 		Sequence *gang_seq;
 		if(_roundManager->_isCardFromOthers)
@@ -2781,7 +2779,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
         
 		show_card->setAnchorPoint(Vec2(0,0));
 		if(!_roundManager->_isCardFromOthers) {
-			show_card->setPosition(_layout->OrigPositionOfGangCard(0,cardPengSize));
+			show_card->setPosition(_coordinate->OrigPositionOfGangCard(0,cardPengSize));
 		} else {
 			show_card->setPosition(s_curOutCard->getPosition());
 		}
@@ -2806,14 +2804,14 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			gangCardsMotion[0] = TargetedAction::create(s_curOutCard,Sequence::create(
                     DelayTime::create(0.42),
                     ScaleTo::create(0,0.6),
-                    MoveTo::create(0.12,_layout->OrigPositionOfGangCard(0,cardPengSize)),
+                    MoveTo::create(0.12,_coordinate->OrigPositionOfGangCard(0,cardPengSize)),
                     ScaleTo::create(0,0),NULL));
             gangCard0Motion = Sequence::create(
                 gangCardsMotion[0],
                 TargetedAction::create(show_card,Sequence::create(
                     ScaleTo::create(0,1),
-                    MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(0,cardPengSize)),
-    				MoveTo::create(0.12,_layout->DestPositionOfGangCard(0,cardPengSize)),NULL)),NULL);
+                    MoveTo::create(0.12,_coordinate->MiddlePositionOfGangCard(0,cardPengSize)),
+    				MoveTo::create(0.12,_coordinate->DestPositionOfGangCard(0,cardPengSize)),NULL)),NULL);
 		}
 
         _CreateMingGangCardsMotion(gangCardsMotion,GangCard.kind);
@@ -3052,7 +3050,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
             Sequence::create(
                 hideReminder,
             Spawn::create(
-                simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
+                simple_tip_effect(_coordinate->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
                 _voice->SpeakAction(GANG,
                         _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
                 hideOutcard,
@@ -7302,7 +7300,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 
         if(no!=1)
 		{
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"dahu.png");
+			Spawn *simple_seq=simple_tip_effect(_coordinate->PositionOfActSign(_roundManager->_curPlayer),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(no,3,_roundManager->_curPlayer);	
 			});
@@ -7422,7 +7420,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 			auto ll_action10=TargetedAction::create(this,l_seq10);
 			auto l_spa=Spawn::create(ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
 			
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"dahu.png");
+			Spawn *simple_seq=simple_tip_effect(_coordinate->PositionOfActSign(_roundManager->_curPlayer),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(no,3,_roundManager->_curPlayer);	
 			});
@@ -7466,8 +7464,8 @@ void NetRaceLayer::hu_effect_tip(int no)
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(3,3,_roundManager->_curPlayer);	
 			});
-			auto HuFontNo=simple_tip_effect( _layout->PositionOfActSign((_roundManager->_curPlayer+1)%3),"dahu.png");
-			auto HuFontNo1=simple_tip_effect( _layout->PositionOfActSign((_roundManager->_curPlayer+2)%3),"dahu.png");
+			auto HuFontNo=simple_tip_effect( _coordinate->PositionOfActSign((_roundManager->_curPlayer+1)%3),"dahu.png");
+			auto HuFontNo1=simple_tip_effect( _coordinate->PositionOfActSign((_roundManager->_curPlayer+2)%3),"dahu.png");
 			myframe->runAction(Sequence::create(Spawn::create(DoubleFileFunc,callfunc,HuFontNo,HuFontNo1,NULL),GoldAccount,NULL));
 		});
 		_eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
@@ -8271,29 +8269,29 @@ void NetRaceLayer::GuiJinBiShow(int dir, int gold) {
 	char str[15];
 	sprintf(str,"%d",abs(gold));
 	auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-	number->setAnchorPoint(_layout->AnchorOfNumber(dir));
+	number->setAnchorPoint(_coordinate->AnchorOfNumber(dir));
 	number->setOpacity(0);
-	number->setPosition(_layout->PositionOfNumber(dir));
+	number->setPosition(_coordinate->PositionOfNumber(dir));
 	this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
 
     int xoffset = number->getContentSize().width;
     
 	auto minus=Sprite::create("-.png");
-	minus->setAnchorPoint(_layout->AnchorOfSign(dir));
-	minus->setPosition(_layout->PositionOfSign(dir,xoffset));
+	minus->setAnchorPoint(_coordinate->AnchorOfSign(dir));
+	minus->setPosition(_coordinate->PositionOfSign(dir,xoffset));
 	minus->setOpacity(0);
 	this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
 
 	auto plus=Sprite::create("+.png");
-	plus->setAnchorPoint(_layout->AnchorOfSign(dir));
-	plus->setPosition(_layout->PositionOfSign(dir,xoffset));
+	plus->setAnchorPoint(_coordinate->AnchorOfSign(dir));
+	plus->setPosition(_coordinate->PositionOfSign(dir,xoffset));
 	plus->setOpacity(0);
 	this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
 
 	auto jinbi=Sprite::create("jinbi-game.png");
-	jinbi->setAnchorPoint(_layout->AnchorOfGold(dir));
+	jinbi->setAnchorPoint(_coordinate->AnchorOfGold(dir));
 	jinbi->setOpacity(0);
-	jinbi->setPosition(_layout->PositionOfGold(dir,xoffset));
+	jinbi->setPosition(_coordinate->PositionOfGold(dir,xoffset));
 	this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
 
     Sprite *symbol;
@@ -8308,19 +8306,19 @@ void NetRaceLayer::GuiJinBiShow(int dir, int gold) {
 	jinbi->runAction(Sequence::create(
         DelayTime::create(0),
         Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->DestOfGold(dir,xoffset)),NULL),
+        MoveTo::create(1.5,_coordinate->DestOfGold(dir,xoffset)),NULL),
         ScaleTo::create(0,0),NULL));
     
 	number->runAction(Sequence::create(
         DelayTime::create(0),
         Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->DestOfNumber(dir)),NULL),
+        MoveTo::create(1.5,_coordinate->DestOfNumber(dir)),NULL),
         ScaleTo::create(0,0),NULL));
 
     symbol->runAction(Sequence::create(
         DelayTime::create(0),
         Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->DestOfSign(dir,xoffset)),NULL),
+        MoveTo::create(1.5,_coordinate->DestOfSign(dir,xoffset)),NULL),
         ScaleTo::create(0,0),NULL));
 }
 
@@ -8484,14 +8482,14 @@ void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
         GangCard->setAnchorPoint(Vec2(0,0));       
         GangCard->setScale(0);
         
-        GangCard->setPosition(_layout->OrigPositionOfGangCard(i,GangCardSize));
+        GangCard->setPosition(_coordinate->OrigPositionOfGangCard(i,GangCardSize));
         myframe->addChild(GangCard,30,SINGLE_ACTION_EFFECT_TAG_ID+i);
 
         motions[i] = TargetedAction::create(GangCard,Sequence::create(
             DelayTime::create(0.42),
             ScaleTo::create(0,1),
-            MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(i,GangCardSize)),
-            MoveTo::create(0.12,_layout->DestPositionOfGangCard(i,GangCardSize)),NULL));
+            MoveTo::create(0.12,_coordinate->MiddlePositionOfGangCard(i,GangCardSize)),
+            MoveTo::create(0.12,_coordinate->DestPositionOfGangCard(i,GangCardSize)),NULL));
     }
 }
 
@@ -8504,15 +8502,15 @@ void NetRaceLayer::_CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_K
 
         card->setAnchorPoint(Vec2(0,0));
         card->setScale(0);
-        card->setPosition(_layout->OrigPositionOfGangCard(i,size));
+        card->setPosition(_coordinate->OrigPositionOfGangCard(i,size));
         myframe->addChild(card,29,SINGLE_ACTION_EFFECT_TAG_ID+i);
         
         mostions[i] = TargetedAction::create(card,Sequence::create(
             DelayTime::create(0.42),
             ScaleTo::create(0,1),
             DelayTime::create(0.12),
-            MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(1,size)),
-            MoveTo::create(0.12,_layout->DestPositionOfGangCard(1,size)),NULL));
+            MoveTo::create(0.12,_coordinate->MiddlePositionOfGangCard(1,size)),
+            MoveTo::create(0.12,_coordinate->DestPositionOfGangCard(1,size)),NULL));
     }
 }
 
@@ -8543,8 +8541,8 @@ void NetRaceLayer::_CreateGangCardInHandMotion(TargetedAction *motions[4],int ca
         motions[i] = TargetedAction::create(GangCard,Sequence::create(
             DelayTime::create(0.18),Spawn::create(
                 ScaleTo::create(0,0.6),
-                MoveTo::create(0,_layout->MiddlePositionOfGangCardInHand(i,OldPos,FreeCardSize)),NULL),
-            MoveTo::create(0.18,_layout->DestPositionOfGangCardInHand(i,GangCardSize)),
+                MoveTo::create(0,_coordinate->MiddlePositionOfGangCardInHand(i,OldPos,FreeCardSize)),NULL),
+            MoveTo::create(0.18,_coordinate->DestPositionOfGangCardInHand(i,GangCardSize)),
             DelayTime::create(0.06),
             ScaleTo::create(0,0),NULL));
     }
@@ -8590,7 +8588,7 @@ void NetRaceLayer::_CreateMingGangCardInHandMotion(TargetedAction *motions[3], i
         myframe->addChild(card,20,(EFFET_NEWCATD1_TAG+1)+i);
         motions[i] = TargetedAction::create(card,Sequence::create(
             DelayTime::create(delayTime),
-            MoveTo::create(0.18,_layout->PositionOfMingGangCard((i+1),card->getTextureRect().size)),
+            MoveTo::create(0.18,_coordinate->PositionOfMingGangCard((i+1),card->getTextureRect().size)),
             DelayTime::create(0.06),
             ScaleTo::create(0,0),NULL));
     }
@@ -8764,51 +8762,51 @@ Sequence *NetRaceLayer::_HideQiReminder() {
         char str[15];
         sprintf(str,"%d",abs(gold));
         auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-        number->setAnchorPoint(_layout->AnchorOfNumber(1));
+        number->setAnchorPoint(_coordinate->AnchorOfNumber(1));
         number->setOpacity(0);
-        number->setPosition(_layout->PositionOfNumber(1));
+        number->setPosition(_coordinate->PositionOfNumber(1));
         this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
     
         auto minus = Sprite::create("-.png");
-        minus->setAnchorPoint(_layout->AnchorOfSign(1));
-        minus->setPosition(_layout->PositionOfSign(1));
+        minus->setAnchorPoint(_coordinate->AnchorOfSign(1));
+        minus->setPosition(_coordinate->PositionOfSign(1));
         minus->setOpacity(0);
         this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
     
         auto plus=Sprite::create("+.png");
-        plus->setAnchorPoint(_layout->AnchorOfSign(1));
-        plus->setPosition(_layout->PositionOfSign(1));
+        plus->setAnchorPoint(_coordinate->AnchorOfSign(1));
+        plus->setPosition(_coordinate->PositionOfSign(1));
         plus->setOpacity(0);
         this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
         
         auto jinbi=Sprite::create("jinbi-game.png");
-        jinbi->setAnchorPoint(_layout->AnchorOfGold(1));
+        jinbi->setAnchorPoint(_coordinate->AnchorOfGold(1));
         jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->PositionOfGold(1));
+        jinbi->setPosition(_coordinate->PositionOfGold(1));
         this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
     
         if( gold!=0 ) {
             jinbi->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfGold(1)),NULL),
+                MoveTo::create(1.5,_coordinate->DestOfGold(1)),NULL),
                 ScaleTo::create(0,0),NULL));
             number->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfNumber(1)),NULL),
+                MoveTo::create(1.5,_coordinate->DestOfNumber(1)),NULL),
                 ScaleTo::create(0,0),NULL));
             if(gold>0) {
                 plus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(1)),NULL),
+                    MoveTo::create(1.5,_coordinate->DestOfSign(1)),NULL),
                     ScaleTo::create(0,0),NULL));
             } else {
                 minus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(1)),NULL),
+                    MoveTo::create(1.5,_coordinate->DestOfSign(1)),NULL),
                     ScaleTo::create(0,0),NULL));
             }   
         }
@@ -8821,51 +8819,51 @@ Sequence *NetRaceLayer::_HideQiReminder() {
         char str[15];
         sprintf(str,"%d",abs(gold));
         auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-        number->setAnchorPoint(_layout->AnchorOfNumber(0));
+        number->setAnchorPoint(_coordinate->AnchorOfNumber(0));
         number->setOpacity(0);
-        number->setPosition(_layout->PositionOfNumber(0));
+        number->setPosition(_coordinate->PositionOfNumber(0));
         this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
     
         auto minus=Sprite::create("-.png");
-        minus->setAnchorPoint(_layout->AnchorOfSign(0));
-        minus->setPosition(_layout->PositionOfSign(0));
+        minus->setAnchorPoint(_coordinate->AnchorOfSign(0));
+        minus->setPosition(_coordinate->PositionOfSign(0));
         minus->setOpacity(0);
         this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
     
         auto plus=Sprite::create("+.png");
-        plus->setAnchorPoint(_layout->AnchorOfSign(0));
-        plus->setPosition(_layout->PositionOfSign(0));
+        plus->setAnchorPoint(_coordinate->AnchorOfSign(0));
+        plus->setPosition(_coordinate->PositionOfSign(0));
         plus->setOpacity(0);
         this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
     
         auto jinbi=Sprite::create("jinbi-game.png");
-        jinbi->setAnchorPoint(_layout->AnchorOfGold(0));
+        jinbi->setAnchorPoint(_coordinate->AnchorOfGold(0));
         jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->PositionOfGold(0));
+        jinbi->setPosition(_coordinate->PositionOfGold(0));
         this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
     
         if( gold!=0 ) {
             jinbi->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfGold(0)),NULL),
+                MoveTo::create(1.5,_coordinate->DestOfGold(0)),NULL),
                 ScaleTo::create(0,0),NULL));
             number->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfNumber(0)),NULL),
+                MoveTo::create(1.5,_coordinate->DestOfNumber(0)),NULL),
                 ScaleTo::create(0,0),NULL));
             if(gold>0) {
                 plus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(0)),NULL),
+                    MoveTo::create(1.5,_coordinate->DestOfSign(0)),NULL),
                     ScaleTo::create(0,0),NULL));
             } else {
                 minus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(0)),NULL),
+                    MoveTo::create(1.5,_coordinate->DestOfSign(0)),NULL),
                     ScaleTo::create(0,0),NULL));
             }
         }
@@ -8878,53 +8876,53 @@ Sequence *NetRaceLayer::_HideQiReminder() {
         char str[15];
         sprintf(str,"%d",abs(gold));
         auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-        number->setAnchorPoint(_layout->AnchorOfNumber(2));
+        number->setAnchorPoint(_coordinate->AnchorOfNumber(2));
         number->setOpacity(0);
-        number->setPosition(_layout->PositionOfNumber(2));
+        number->setPosition(_coordinate->PositionOfNumber(2));
         this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
     
         int xoffset = number->getContentSize().width;
         
         auto minus=Sprite::create("-.png");
-        minus->setAnchorPoint(_layout->AnchorOfSign(2));
-        minus->setPosition(_layout->PositionOfSign(2,xoffset));
+        minus->setAnchorPoint(_coordinate->AnchorOfSign(2));
+        minus->setPosition(_coordinate->PositionOfSign(2,xoffset));
         minus->setOpacity(0);
         this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
     
         auto plus=Sprite::create("+.png");
-        plus->setAnchorPoint(_layout->AnchorOfSign(2));
-        plus->setPosition(_layout->PositionOfSign(2,xoffset));
+        plus->setAnchorPoint(_coordinate->AnchorOfSign(2));
+        plus->setPosition(_coordinate->PositionOfSign(2,xoffset));
         plus->setOpacity(0);
         this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
     
         auto jinbi=Sprite::create("jinbi-game.png");
-        jinbi->setAnchorPoint(_layout->AnchorOfGold(2));
+        jinbi->setAnchorPoint(_coordinate->AnchorOfGold(2));
         jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->PositionOfGold(2,xoffset));
+        jinbi->setPosition(_coordinate->PositionOfGold(2,xoffset));
         this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
     
         if( gold!=0 ) {
             jinbi->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfGold(2,xoffset)),NULL),
+                MoveTo::create(1.5,_coordinate->DestOfGold(2,xoffset)),NULL),
                 ScaleTo::create(0,0),NULL));
             number->runAction(Sequence::create(
                 DelayTime::create(0),
                 Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfNumber(2)),NULL),
+                MoveTo::create(1.5,_coordinate->DestOfNumber(2)),NULL),
                 ScaleTo::create(0,0),NULL));
             if(gold>0) {
                 plus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(2,xoffset)),NULL),
+                    MoveTo::create(1.5,_coordinate->DestOfSign(2,xoffset)),NULL),
                     ScaleTo::create(0,0),NULL));
             } else {
                 minus->runAction(Sequence::create(
                     DelayTime::create(0),
                     Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(2,xoffset)),NULL),
+                    MoveTo::create(1.5,_coordinate->DestOfSign(2,xoffset)),NULL),
                     ScaleTo::create(0,0),NULL));
             }
         }

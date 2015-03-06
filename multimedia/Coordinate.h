@@ -1,15 +1,15 @@
 
-#ifndef __GAME_LAYOUT__
-#define __GAME_LAYOUT__
+#ifndef __COORDINATE__
+#define __COORDINATE__
 
 #include "cocos2d.h"
 USING_NS_CC;
 
 #include "./../utils/LogManager.h"
 
-class GameLayout {
+class Coordinate {
     public:
-        static GameLayout *getInstance();
+        static Coordinate *getInstance();
         static void destroyInstance();
 
         void SetScope(cocos2d::Point origin,cocos2d::Size visibleSize);
@@ -49,8 +49,8 @@ class GameLayout {
         Vec2 PositionOfMingGangCard(int i,Size size);
 
     private:
-        GameLayout();
-        static GameLayout *_instance;
+        Coordinate();
+        static Coordinate *_instance;
         Logger *_logger;
 
         cocos2d::Size  SIZE;
