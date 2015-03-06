@@ -17,7 +17,7 @@ public:
 	virtual int judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex)=0;
 	virtual void MingCancel()=0;
 	virtual CARD_KIND hand_out(unsigned int place)=0;
-	virtual bool get_Hu_Flag(unsigned int *hu_kind)=0;
+	virtual bool get_Hu_Flag(unsigned int *hu_kindSmall)=0;
 	virtual ACT_RES action(unsigned char who_give,ARRAY_ACTION act)=0;
 	virtual void LockAllCards()=0;
 	virtual long get_card_score()=0;

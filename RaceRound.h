@@ -49,7 +49,7 @@ private:
 	//void kou_check(CARD_KIND river_list[],int river_len,CARD_KIND list[],int *len);
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex);
     void task_check(unsigned int flag);//ÐÞ¸Ä1//,unsigned char last_action
-    int hu_check(CARD_KIND data_kind); //0:not 1:hu
+    int hu_check(CARD_KIND data_kindSmall); //0:not 1:hu
     unsigned int ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);
     void array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
     void array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[]);
@@ -81,7 +81,7 @@ public:
 	//void set_property(int pro);
 	//bool get_property(int & pro);
 	void get_hu_cards(CARD_KIND c_list[],int *len);
-	bool get_Hu_Flag(unsigned int *hu_kind);
+	bool get_Hu_Flag(unsigned int *hu_kindSmall);
 	bool get_ming_check_result(MRES *res);
 	void set_role_type(RT type);
 	RT get_role_type();

@@ -69,7 +69,7 @@ The reason for implement as private inheritance is to hide some interface call b
 #define		RA_BAO					RH_MING|RH_SHOUYIZHUA
 #define		RA_DIAN					RH_MINGSIGUI
 
-typedef enum card_kind
+typedef enum card_kindSmall
 {
 	ck_YI_TIAO=0,
 	ck_ER_TIAO,

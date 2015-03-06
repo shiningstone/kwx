@@ -533,7 +533,7 @@ int Robot::Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND l
 		{
 				if(Robot_check_pickup_card((CARD_KIND)(i),list1,list2,len1,len2)==0
 					&&card_array->list[i].same_times==1&&river_reserved_card(card_array,i)==4&&
-					Robot_check_card_stable(card_array,card_kind(i))!=0)
+					Robot_check_card_stable(card_array,card_kindSmall(i))!=0)
 				{
 					chose_place=card_array->list[i].place[card_array->list[i].same_times-1];
 					break;
@@ -628,13 +628,13 @@ int Robot::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],
 		int s_k;
 		int s_num;
 		int ming_index=parter->get_ming_indexes();
-		CARD_KIND s_kind;
+		CARD_KIND s_kindSmall;
 		for(int k=0;k<MAX_HANDIN_NUM;k++)
 		{
 			if(ming_index&(1<<k))
 			{
-				s_kind=parter->get_card_list()->data[k].kind;
-				if(Robot_check_pickup_card(s_kind,list1,list2,len1,len2)!=0)
+				s_kindSmall=parter->get_card_list()->data[k].kind;
+				if(Robot_check_pickup_card(s_kindSmall,list1,list2,len1,len2)!=0)
 				{
 					res->hu_cards_num[k]=0;
 					continue;
@@ -656,8 +656,8 @@ int Robot::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],
 		for(s_k=0;s_k<MAX_HANDIN_NUM;s_k++)
 			if(ming_index&(1<<s_k))
 			{
-				s_kind=parter->get_card_list()->data[s_k].kind;
-				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card(s_kind,list1,list2,len1,len2)==0)
+				s_kindSmall=parter->get_card_list()->data[s_k].kind;
+				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card(s_kindSmall,list1,list2,len1,len2)==0)
 					l_place=s_k;
 			}
 		show_place=l_place;

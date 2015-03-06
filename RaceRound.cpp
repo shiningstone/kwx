@@ -438,7 +438,7 @@ int RRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 		int its_si=len;
 		int its_liu=len;
 		int its_five=len;
-		CARD_KIND temp_kind;
+		CARD_KIND temp_kindSmall;
 		for(k=0;k<len;k++)
 			if(data[k]==kind-1)
 				its_si=k;
@@ -455,14 +455,14 @@ int RRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 					temp[k]=data[k];
 			for(k=0;k<len;k++)
 			{
-				temp_kind=temp[k];
+				temp_kindSmall=temp[k];
 				for(int j=k+1;j<len;j++)
 				{
-					if(temp[j]<temp_kind)
+					if(temp[j]<temp_kindSmall)
 					{
 						temp[k]=temp[j];
-						temp[j]=temp_kind;
-						temp_kind=temp[k];
+						temp[j]=temp_kindSmall;
+						temp_kindSmall=temp[k];
 					}
 				}
 			}
@@ -584,22 +584,22 @@ void RRound::task_check(unsigned int flag)
 		rr_aim=0;
 }
 
-int RRound::hu_check(CARD_KIND data_kind)
+int RRound::hu_check(CARD_KIND data_kindSmall)
 {
 	CARD_KIND temp_list[MAX_HANDIN_NUM];
-	CARD_KIND temp_kind=data_kind;
+	CARD_KIND temp_kindSmall=data_kindSmall;
 	int res=0;
 
 	int index=card_list->atcvie_place;
 	int i;
 	for(i=index;i<card_list->len;i++)
 	{
-		if(temp_kind<=card_list->data[i].kind)
+		if(temp_kindSmall<=card_list->data[i].kind)
 			break;
 	}
 	if(i==index)
 	{
-		temp_list[0]=temp_kind;
+		temp_list[0]=temp_kindSmall;
 		for(int j=0;j<card_list->len-index;j++)
 			temp_list[j+1]=card_list->data[j+index].kind;
 	}
@@ -607,13 +607,13 @@ int RRound::hu_check(CARD_KIND data_kind)
 	{
 		for(int j=0;j<card_list->len-index;j++)
 			temp_list[j]=card_list->data[index+j].kind;
-		temp_list[card_list->len-index]=temp_kind;
+		temp_list[card_list->len-index]=temp_kindSmall;
 	}
 	else
 	{
 		for(int j=index;j<i;j++)
 			temp_list[j-index]=card_list->data[j].kind;
-		temp_list[i-index]=temp_kind;
+		temp_list[i-index]=temp_kindSmall;
 		for(int j=i-index;j<card_list->len-index;j++)
 			temp_list[j+1]=card_list->data[j+index].kind;
 	}
@@ -626,7 +626,7 @@ int RRound::hu_check(CARD_KIND data_kind)
 void RRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[])
 {
 	int i,j;
-	CARD_KIND temp_kind;
+	CARD_KIND temp_kindSmall;
 
 	for(i=0;i<len;i++)
 		if(	i != index )
@@ -635,14 +635,14 @@ void RRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND 
 			rlist[index]=kind;
 	for(i=0;i<len;i++)
 	{
-		temp_kind=rlist[i];
+		temp_kindSmall=rlist[i];
 		for(j=i+1;j<len;j++)
 		{
-			if(rlist[j]<temp_kind)
+			if(rlist[j]<temp_kindSmall)
 			{
 				rlist[i]=rlist[j];
-				rlist[j]=temp_kind;
-				temp_kind=rlist[i];
+				rlist[j]=temp_kindSmall;
+				temp_kindSmall=rlist[i];
 			}
 		}
 	}
@@ -651,7 +651,7 @@ void RRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND 
 void RRound::array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[])
 {
 	int i,j;
-	CARD_KIND temp_kind;
+	CARD_KIND temp_kindSmall;
 
 	for(i=0;i<len;i++)
 		if(i==index1)
@@ -662,14 +662,14 @@ void RRound::array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND ki
 			rlist[i]=clist[i].kind;
 	for(i=0;i<len;i++)
 	{
-		temp_kind=rlist[i];
+		temp_kindSmall=rlist[i];
 		for(j=i+1;j<len;j++)
 		{
-			if(rlist[j]<temp_kind)
+			if(rlist[j]<temp_kindSmall)
 			{
 				rlist[i]=rlist[j];
-				rlist[j]=temp_kind;
-				temp_kind=rlist[i];
+				rlist[j]=temp_kindSmall;
+				temp_kindSmall=rlist[i];
 			}
 		}
 	}
@@ -1030,7 +1030,7 @@ unsigned char RRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned cha
 CARD_KIND RRound::hand_out(unsigned int place)
 {
 
-	CARD_KIND l_kind;
+	CARD_KIND l_kindSmall;
 	CARD tail_card;
 	tail_card.kind = card_list->data[card_list->len-1].kind;
 	tail_card.status = card_list->data[card_list->len-1].status;
@@ -1039,15 +1039,15 @@ CARD_KIND RRound::hand_out(unsigned int place)
 	{
 		return ck_NOT_DEFINED;
 	}
-	l_kind=card_list->data[place].kind;
-    LOGGER_WRITE("%x %s : %d",this,__FUNCTION__,l_kind);
+	l_kindSmall=card_list->data[place].kind;
+    LOGGER_WRITE("%x %s : %d",this,__FUNCTION__,l_kindSmall);
 
 	out_card_list->insertItem(card_list->data[place]);
 
 	if( place==card_list->len-1 )
 	{
 		card_delete(place,1);
-		return l_kind;
+		return l_kindSmall;
 	}
 
 	card_delete(place,1);
@@ -1062,7 +1062,7 @@ CARD_KIND RRound::hand_out(unsigned int place)
 	{
 		;
 	}
-		return l_kind;
+		return l_kindSmall;
 }
 
 void RRound::LockAllCards()
@@ -1344,9 +1344,9 @@ outCardList* RRound::getOutCardList()
 	return out_card_list;
 }
 
-bool RRound::get_Hu_Flag(unsigned int *hu_kind)
+bool RRound::get_Hu_Flag(unsigned int *hu_kindSmall)
 {
-	*hu_kind=kind_hu;
+	*hu_kindSmall=kind_hu;
 	return true;
 }
 

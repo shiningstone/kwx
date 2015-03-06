@@ -1,10 +1,15 @@
 
 #include "GraphicObject.h"
 
-CCSpriteBatchNode *TextureFactory::_protoType[TEXTURE_NUM] = {NULL};
-Size *TextureFactory::_rectSize[TEXTURE_NUM] = {NULL};
+CCSpriteBatchNode *TextureFactory::_status[TEXTURE_MAX] = {NULL};
+CCSpriteBatchNode *TextureFactory::_kindSmall[CARD_MAX] = {NULL};
+CCSpriteBatchNode *TextureFactory::_kindSmallBlack[CARD_MAX] = {NULL};
+CCSpriteBatchNode *TextureFactory::_kindMiddle[CARD_MAX] = {NULL};
+CCSpriteBatchNode *TextureFactory::_kind[CARD_MAX] = {NULL};
 
-SrcItem_t TextureFactory::TEXTURE_FILES[TEXTURE_NUM] = {
+Size *TextureFactory::_rectSize[TEXTURE_MAX] = {NULL};
+
+SrcItem_t TextureFactory::TEXTURE_FILES[TEXTURE_MAX] = {
     {FREE_CARD,       "tileImage/me-handin.png" },
     {PENG_CARD,       "tileImage/me-peng.png" },
     {MING_BKG,        "tileImage/Ming-bkg.png" },
@@ -22,11 +27,27 @@ SrcItem_t TextureFactory::TEXTURE_FILES[TEXTURE_NUM] = {
 };
 
 TextureFactory::TextureFactory() {
-    for(int i=0;i<TEXTURE_NUM;i++) {
+    for(int i=0;i<TEXTURE_MAX;i++) {
         char *file = TEXTURE_FILES[i][1];
         
-        _protoType[i] = CCSpriteBatchNode::create(file);
-        _protoType[i]->retain();
+        _status[i] = CCSpriteBatchNode::create(file);
+        _status[i]->retain();
+    }
+
+    for(int i=0;i<CARD_MAX;i++) {/* is it more efficiency to use SetScale ??? */
+        _kindSmall[i] = CCSpriteBatchNode::create(
+                        String::createWithFormat("tileImage/tile_Up_%d.png",(int)(i+1))->getCString());
+		_kindSmallBlack[i] = CCSpriteBatchNode::create(
+                        String::createWithFormat("tileImage/tile_Upblack_%d.png",(int)(i+1))->getCString());
+		_kindMiddle[i] = CCSpriteBatchNode::create(
+                        String::createWithFormat("tileImage/tile_Set_%d.png",(int)(i+1))->getCString());
+		_kind[i] =CCSpriteBatchNode::create(
+                        String::createWithFormat("tileImage/tile_%d.png",(int)(i+1))->getCString());
+
+        _kindSmall[i]->retain();
+        _kindSmallBlack[i]->retain();
+        _kindMiddle[i]->retain();
+        _kind[i]->retain();
     }
 }
 
@@ -39,11 +60,25 @@ Size TextureFactory::RectSize(TextureId_t id) {
 }
 
 Sprite *TextureFactory::Create(TextureId_t id) {
-    return Sprite::createWithTexture(_protoType[id]->getTexture());
+    return Sprite::createWithTexture(_status[id]->getTexture());
+}
+
+
+Sprite *TextureFactory::CreateKind(Card_t type,CardSize_t size) {
+    switch(size) {
+        case SMALL:
+            return Sprite::createWithTexture(_kindSmall[type]->getTexture());
+        case SMALL_BLACK:
+            return Sprite::createWithTexture(_kindSmallBlack[type]->getTexture());
+        case MIDDLE:
+            return Sprite::createWithTexture(_kindMiddle[type]->getTexture());
+        case NORMAL:
+            return Sprite::createWithTexture(_kind[type]->getTexture());
+    }
 }
 
 Sprite *TextureFactory::Create(TextureId_t id, Sprite *son) {
-    Sprite *parent = Sprite::createWithTexture(_protoType[id]->getTexture());
+    Sprite *parent = Sprite::createWithTexture(_status[id]->getTexture());
 
     son->setAnchorPoint(Vec2(0.5,0.5));/*anchor point is not set in some cases*/
     son->setPosition( Vec2(
@@ -53,6 +88,7 @@ Sprite *TextureFactory::Create(TextureId_t id, Sprite *son) {
 
     return parent;
 }
+
 
 /*************************************
     singleton
@@ -68,8 +104,15 @@ TextureFactory *TextureFactory::getInstance() {
 }
 
 void TextureFactory::destroyInstance() {
-    for(int i=0;i<TEXTURE_NUM;i++) {
-        _protoType[i]->release();
+    for(int i=0;i<TEXTURE_MAX;i++) {
+        _status[i]->release();
+    }
+    
+    for(int i=0;i<CARD_MAX;i++) {
+        _kindSmall[i]->release();
+        _kindSmallBlack[i]->release();
+        _kindMiddle[i]->release();
+        _kind[i]->release();
     }
     
     delete _instance;

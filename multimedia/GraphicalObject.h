@@ -23,8 +23,17 @@ typedef enum {
     MING_MASK_CARD,
     MING_KOU_CARD,
     
-    TEXTURE_NUM,
+    TEXTURE_MAX,
 }TextureId_t;
+
+typedef enum {
+    SMALL,
+    SMALL_BLACK,
+    MIDDLE,
+    NORMAL,
+    
+    SIZE_MAX,
+}CardSize_t;
 
 class TextureFactory {
 public:
@@ -33,11 +42,16 @@ public:
     
     Size RectSize(TextureId_t id);
     Sprite *Create(TextureId_t id);
+    Sprite *CreateKind(Card_t type,CardSize_t size = NORMAL);
     Sprite *Create(TextureId_t id,Sprite *son);
 
 protected:
-    static CCSpriteBatchNode * _protoType[TEXTURE_NUM];
-    static Size              * _rectSize[TEXTURE_NUM];
+    static CCSpriteBatchNode * _status[TEXTURE_MAX];
+    static CCSpriteBatchNode * _kindSmall[CARD_MAX];
+    static CCSpriteBatchNode * _kindSmallBlack[CARD_MAX];
+    static CCSpriteBatchNode * _kindMiddle[CARD_MAX];
+    static CCSpriteBatchNode * _kind[CARD_MAX];
+    static Size              * _rectSize[TEXTURE_MAX];
     
 private:
     TextureFactory();
@@ -48,7 +62,7 @@ private:
         char        file[32];
     }SrcItem_t;
 
-    SrcItem_t TEXTURE_FILES[TEXTURE_NUM];
+    SrcItem_t TEXTURE_FILES[TEXTURE_MAX];
 };
 
 #endif
