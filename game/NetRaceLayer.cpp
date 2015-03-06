@@ -23,19 +23,6 @@ NetRaceLayer::NetRaceLayer()
 
 NetRaceLayer::~NetRaceLayer()
 {
-	g_my_peng->release();
-	g_my_angang->release();
-	g_my_out->release();
-	g_my_in->release();
-	g_left_right_in->release();
-	g_left_free->release();
-	g_left_right_peng_out->release();
-	g_left_right_angang->release();
-	g_right_free->release();
-	g_my_mask->release();
-	g_my_ming_canPlay->release();
-	g_my_ming_ting->release();
-	g_my_kou->release();
 	for(int i=0;i<TOTAL_CARD_KIND;i++)
 	{
 		g_small_card_kind[i]->release();
@@ -307,33 +294,6 @@ void NetRaceLayer::create_race()
 	mapai_bottom->setPosition(Vec2(origin.x+visibleSize.width*568/1218,origin.y+visibleSize.height*218/716));
 	this->addChild(mapai_bottom,2,CARD_ARRAGE_BOTTOM_TAG_ID);
 
-	g_my_ming_canPlay=CCSpriteBatchNode::create("tileImage/Ming-bkg.png");
-	g_my_ming_canPlay->retain();
-	g_my_ming_ting=CCSpriteBatchNode::create("tileImage/me-ming.png");
-	g_my_ming_ting->retain();
-	g_my_peng=CCSpriteBatchNode::create("tileImage/me-peng.png");
-	g_my_peng->retain();
-	g_my_angang=CCSpriteBatchNode::create("tileImage/me-angang.png");
-	g_my_angang->retain();
-	g_my_out=CCSpriteBatchNode::create("tileImage/me-out.png");
-	g_my_out->retain();
-	g_my_in=CCSpriteBatchNode::create("tileImage/me-in.png");
-	g_my_in->retain();
-	g_left_free=CCSpriteBatchNode::create("tileImage/left-handin.png");
-	g_left_free->retain();
-	g_left_right_peng_out=CCSpriteBatchNode::create("tileImage/lr-out.png");
-	g_left_right_peng_out->retain();
-	g_left_right_in=CCSpriteBatchNode::create("tileImage/lr-in.png");
-	g_left_right_in->retain();
-	g_left_right_angang=CCSpriteBatchNode::create("tileImage/lr-angang.png");
-	g_left_right_angang->retain();	
-	g_right_free=CCSpriteBatchNode::create("tileImage/right-handin.png");
-	g_right_free->retain();
-	g_my_mask=CCSpriteBatchNode::create("tileImage/ming-mask.png");
-	g_my_mask->retain();
-	g_my_kou=CCSpriteBatchNode::create("tileImage/ming-kou.png");
-	g_my_kou->retain();
-    
 	for(int i=0;i<TOTAL_CARD_KIND;i++)
 	{
 		g_small_card_kind[i]=CCSpriteBatchNode::create(String::createWithFormat("tileImage/tile_Up_%d.png",(int)(i+1))->getCString());
@@ -1020,7 +980,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
     _Remove(myframe, MING_CANCEL);// why called twice ???
 
 
-	auto cardOut = Sprite::createWithTexture(g_my_out->getTexture());
+	auto cardOut = _texture->Create(OUT_CARD);
 	auto show_card_kind = Sprite::createWithTexture(
         g_small_card_kind[_roundManager->_lastHandedOutCard]->getTexture()
     );
@@ -1665,7 +1625,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 	if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID))
 		myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);
 
-	Sprite   * cardOut = Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+	Sprite   * cardOut = _texture->Create(LR_OUT_CARD);
 	smallCard->setPosition(Vec2(
         cardOut->getTextureRect().size.width/2,
         cardOut->getTextureRect().size.height*0.65));
@@ -1873,7 +1833,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
         ****************/
         Sprite *showCards[3] = {0};
         for(int i=0;i<3;i++) {
-            showCards[i] = Sprite::createWithTexture(g_my_peng->getTexture());
+            showCards[i] = _texture->Create(PENG_CARD);
             auto kind = Sprite::createWithTexture(g_mid_card_kind[card.kind]->getTexture());
             kind->setAnchorPoint(Vec2(0.5,0.5));
             kind->setPosition(Vec2(
@@ -1985,7 +1945,7 @@ void NetRaceLayer::PengEffect(Node *psender)//效果逻辑分离
         /****************
             delete 2 peng cards in hand 
         ****************/
-		auto cardPeng = Sprite::createWithTexture(g_my_peng->getTexture());
+		auto cardPeng = _texture->Create(PENG_CARD);
 		auto cardPengSize = cardPeng->getTextureRect().size;
         
         const float GAP = (list->atcvie_place==0)? 0.5 : 0;
@@ -2296,7 +2256,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 				actionStartPlace = i;
 				break;
 			}
-        auto GangCardSize = Sprite::createWithTexture(g_my_angang->getTexture())->getTextureRect().size;
+        auto GangCardSize = _texture->RectSize(AN_GANG_CARD);;
 
         const float GAP = (list->atcvie_place==0)?(0.5):(0.0);
         
@@ -2801,7 +2761,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
         /**********************
             
         **********************/
-		auto Pengsize = Sprite::createWithTexture(g_my_peng->getTexture())->getTextureRect().size;
+		auto Pengsize = _texture->RectSize(PENG_CARD);
         
 		Sprite* baseCard;
 		Vec2    basePos;
@@ -2836,7 +2796,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
         TargetedAction *gangCardsMotion[4];
         Sequence *gangCard0Motion;
 
-		auto show_card = Sprite::createWithTexture(g_my_peng->getTexture());
+		auto show_card = _texture->Create(PENG_CARD);
 		auto cardPengSize = show_card->getTextureRect().size;
 
         _AttachKindTexture(show_card,GangCard.kind);
@@ -3347,7 +3307,7 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 			SingForCards->setAnchorPoint(Vec2(0,1));
 			SingForCards->setPosition(Vec2(0,SignBarSize.height-LeftSize.height-CardSize.height*(k+1)));
 
-			auto WinCard=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+			auto WinCard=_texture->Create(LR_OUT_CARD);
 			WinCard->setAnchorPoint(Vec2(0.5,0.5));
 			WinCard->setPosition(Vec2(CardSize.width/2,CardSize.height/2));//  /2  0.65
 			auto s_card=Sprite::createWithTexture(g_small_card_kind[hu_cards[CardPlace][k]]->getTexture());
@@ -3390,7 +3350,7 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 			SingForCards->setAnchorPoint(Vec2(0,0));
 			SingForCards->setPosition(Vec2(0,LeftSize.height+CardSize.height*(k+1)));
 
-			auto WinCard=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+			auto WinCard=_texture->Create(LR_OUT_CARD);
 			WinCard->setAnchorPoint(Vec2(0.5,0.5));
 			WinCard->setPosition(Vec2(CardSize.width/2,CardSize.height/2));//  /2  0.65
 			auto s_card=Sprite::createWithTexture(g_small_card_kind[hu_cards[CardPlace][k]]->getTexture());
@@ -3491,7 +3451,7 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 		SignForCards->setAnchorPoint(Vec2(0,0));
 		SignForCards->setPosition(Vec2(SignHead->getTextureRect().size.width+SignHuBKG->getTextureRect().size.width+SignForCards->getTextureRect().size.width*k,0));
 
-		auto WinCard=Sprite::createWithTexture(g_my_peng->getTexture());
+		auto WinCard=_texture->Create(PENG_CARD);
 		WinCard->setAnchorPoint(Vec2(0.5,0.5));
 		WinCard->setPosition(Vec2(10+WinCard->getTextureRect().size.width/2,43));
 		auto s_card=Sprite::createWithTexture(g_mid_card_kind[hu_cards[CardPlace][k]]->getTexture());
@@ -3568,19 +3528,19 @@ void NetRaceLayer::card_list_update(int no)
 				{
 					if(ting_flag==1)
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+						p_list[i]=_texture->Create(LR_OUT_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 					}
 					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+						p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 					}
 					else
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_free->getTexture());
+						p_list[i]=_texture->Create(L_IN_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.0f,1.0f));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 					}
@@ -3588,21 +3548,21 @@ void NetRaceLayer::card_list_update(int no)
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind&&ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-						p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+						p_list[i]=_texture->Create(LR_OUT_CARD);
 					else
-						p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+						p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 					p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 					p_list[i]->setPosition(Vec2(x-10,y-8));
 				}
 				else if(list->data[i].status==c_MING_KOU)
 				{
-					p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+					p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 					p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 					p_list[i]->setPosition(Vec2(x-10,y-8));
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
 				{
-					p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+					p_list[i]=_texture->Create(LR_OUT_CARD);
 					p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 					p_list[i]->setPosition(Vec2(x-10,y-8));
 				}
@@ -3734,20 +3694,20 @@ void NetRaceLayer::card_list_update(int no)
 				if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
 				{
 					if(ting_flag==1)
-						p_list[i]=Sprite::createWithTexture(g_my_ming_ting->getTexture());
+						p_list[i]=_texture->Create(MING_CARD);
 					else
 						p_list[i]=_texture->Create(FREE_CARD);
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
 				{
-					p_list[i]=Sprite::createWithTexture(g_my_peng->getTexture());
+					p_list[i]=_texture->Create(PENG_CARD);
 				}
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-						p_list[i]=Sprite::createWithTexture(g_my_peng->getTexture());
+						p_list[i]=_texture->Create(PENG_CARD);
 					else
-						p_list[i]=Sprite::createWithTexture(g_my_angang->getTexture());
+						p_list[i]=_texture->Create(AN_GANG_CARD);
 				}
 				p_list[i]->setAnchorPoint(Vec2(0,0));
 				p_list[i]->setPosition(Vec2(x,y));
@@ -3781,7 +3741,7 @@ void NetRaceLayer::card_list_update(int no)
 					{
 						if(list->data[i].can_play==cps_YES)
 						{
-							auto MingCps_yesMask=Sprite::createWithTexture(g_my_ming_canPlay->getTexture());
+							auto MingCps_yesMask=_texture->Create(MING_BKG);
 							MingCps_yesMask->setAnchorPoint(Vec2(0.5,0.5));
 							MingCps_yesMask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height/2));
 							p_list[i]->addChild(MingCps_yesMask,2,MING_KOU_MASK);
@@ -3789,7 +3749,7 @@ void NetRaceLayer::card_list_update(int no)
 						else if(list->data[i].can_play==cps_NO)
 						{
 							Sprite* mask;
-							mask=Sprite::createWithTexture(g_my_mask->getTexture());
+							mask=_texture->Create(MING_MASK_CARD);
 							mask->setAnchorPoint(Vec2(0.5,1));
 							mask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height));
 							p_list[i]->addChild(mask,2,MING_KOU_MASK);
@@ -3801,7 +3761,7 @@ void NetRaceLayer::card_list_update(int no)
 				{
 					if(ting_flag!=1)
 					{
-						auto KouSign=Sprite::createWithTexture(g_my_kou->getTexture());
+						auto KouSign=_texture->Create(MING_KOU_CARD);
 						KouSign->setAnchorPoint(Vec2(0.5,0.5));
 						KouSign->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height/2));
 						p_list[i]->addChild(KouSign,2);
@@ -3892,19 +3852,19 @@ void NetRaceLayer::card_list_update(int no)
 				{
 					if(ting_flag==1)
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+						p_list[i]=_texture->Create(LR_OUT_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.3f,0));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 					}
 					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+						p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.3f,0));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 					}
 					else
 					{
-						p_list[i]=Sprite::createWithTexture(g_right_free->getTexture());
+						p_list[i]=_texture->Create(R_IN_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.0f,0));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 					}
@@ -3912,21 +3872,21 @@ void NetRaceLayer::card_list_update(int no)
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind&&ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-						p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+						p_list[i]=_texture->Create(LR_OUT_CARD);
 					else
-						p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+						p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 					p_list[i]->setAnchorPoint(Vec2(0.3f,0));
 					p_list[i]->setPosition(Vec2(x-10,y-8));
 				}
 				else if(list->data[i].status==c_MING_KOU)
 				{
-					p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+					p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 					p_list[i]->setAnchorPoint(Vec2(0.3f,0));
 					p_list[i]->setPosition(Vec2(x-10,y-8));
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
 				{
-					p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+					p_list[i]=_texture->Create(LR_OUT_CARD);
 					p_list[i]->setAnchorPoint(Vec2(0.3f,0));
 					p_list[i]->setPosition(Vec2(x-10,y-8));
 				}
@@ -4127,7 +4087,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 	{
 		if(sender->_ID==1)
 		{
-			auto show_card=Sprite::createWithTexture(g_my_out->getTexture());
+			auto show_card=_texture->Create(OUT_CARD);
 			Card oCard;
 			outCard->getCard(oCard,i+1);
 			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[oCard.kind]->getTexture());
@@ -4163,7 +4123,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 
 		if(sender->_ID==2)
 		{
-			auto show_card=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+			auto show_card=_texture->Create(LR_OUT_CARD);
 			Card oCard;
 			outCard->getCard(oCard,i+1);
 			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[oCard.kind]->getTexture());
@@ -4198,7 +4158,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 
 		if(sender->_ID==0)
 		{
-			auto show_card=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+			auto show_card=_texture->Create(LR_OUT_CARD);
 			Card oCard;
 			outCard->getCard(oCard,i+1);
 			auto show_card_kind=Sprite::createWithTexture(g_small_card_kind[oCard.kind]->getTexture());
@@ -4534,7 +4494,7 @@ Node *NetRaceLayer::_CreateMingSign() {
 }
 
 Node *NetRaceLayer::_NonKouMask(Sprite *card) {
-    auto mask = Sprite::createWithTexture(g_my_mask->getTexture());
+    auto mask = _texture->Create(MING_MASK_CARD);
     mask->setAnchorPoint(Vec2(0.5,0.5));
     mask->setPosition(card->getTextureRect().size.width/2,card->getTextureRect().size.height/2);
     card->addChild(mask,2,MING_KOU_MASK);
@@ -4653,12 +4613,12 @@ void NetRaceLayer::ListenToKou(int no) {
                 if(cardsInHand[KouCardsPlace[a][b]]->getChildByTag(MING_KOU_MASK))
                     cardsInHand[KouCardsPlace[a][b]]->removeChildByTag(MING_KOU_MASK);
                 if(cards->data[KouCardsPlace[a][b]].status==c_MING_KOU) {
-                    auto MingKouMark=Sprite::createWithTexture(g_my_kou->getTexture());
+                    auto MingKouMark=_texture->Create(MING_KOU_CARD);
                     MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
                     MingKouMark->setPosition(Vec2(cardsInHand[KouCardsPlace[a][b]]->getTextureRect().size.width/2,cardsInHand[KouCardsPlace[a][b]]->getTextureRect().size.height/2));
                     cardsInHand[KouCardsPlace[a][b]]->addChild(MingKouMark,2,MING_KOU);
                 } else if(cards->data[KouCardsPlace[a][b]].status!=c_KOU_ENABLE) {
-                    auto KouNo=Sprite::createWithTexture(g_my_mask->getTexture());
+                    auto KouNo=_texture->Create(MING_MASK_CARD);
                     KouNo->setAnchorPoint(Vec2(0.5,0.5));
                     KouNo->setPosition(Vec2(cardsInHand[KouCardsPlace[a][b]]->getTextureRect().size.width/2,cardsInHand[KouCardsPlace[a][b]]->getTextureRect().size.height/2));
                     cardsInHand[KouCardsPlace[a][b]]->addChild(KouNo,2,MING_KOU_MASK);
@@ -5353,13 +5313,13 @@ void NetRaceLayer::distribute_card_effect()
 	}
 	else if(_roundManager->_curPlayer==2)
 	{
-		list_last_one=Sprite::createWithTexture(g_right_free->getTexture());
+		list_last_one=_texture->Create(R_IN_CARD);
 		list_last_one->setAnchorPoint(Point(0,0));
 		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().y+86;
 	}
 	else
 	{
-		list_last_one=Sprite::createWithTexture(g_left_free->getTexture());
+		list_last_one=_texture->Create(L_IN_CARD);
 		list_last_one->setAnchorPoint(Point(0.0f,1.0f));
 		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-2))->getPosition().y-20;//+5;
 	}
@@ -5676,7 +5636,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	int a,b;
 	float x,y;
 	//自己
-	auto Mecard_in=Sprite::createWithTexture(g_my_in->getTexture());	
+	auto Mecard_in=_texture->Create(IN_CARD);	
 	auto Mehand_in=_texture->Create(FREE_CARD);
 	auto Card_inSize=Mecard_in->getTextureRect().size.width;
 	auto Hand_inSize=Mehand_in->getTextureRect().size.width;
@@ -5684,7 +5644,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	Vec2 meHandPosition[4];
 	for (a=0;a<4;a++)
 	{
-		meHandCard[a]=Sprite::createWithTexture(g_my_in->getTexture());
+		meHandCard[a]=_texture->Create(IN_CARD);
 		meHandCard[a]->setAnchorPoint(Vec2(0,0.5));
 		meHandCard[a]->setPosition(Vec2(origin.x+visibleSize.width/2-Card_inSize*2+Card_inSize*a,origin.y+visibleSize.height*0.5));
 		meHandCard[a]->setScale(0);
@@ -5832,15 +5792,15 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 	}
 	//右手
-	auto RightHandIn=Sprite::createWithTexture(g_right_free->getTexture());
-	auto RightCardIn=Sprite::createWithTexture(g_left_right_in->getTexture());
+	auto RightHandIn=_texture->Create(R_IN_CARD);
+	auto RightCardIn=_texture->Create(LR_IN_CARD);
 	auto RightHandInSize=RightHandIn->getTextureRect().size.height;
 	auto RightCardInSize=RightCardIn->getTextureRect().size.height;
 	Sprite* RobotHandCard[4];
 	Vec2 RightHandPosition[4];
 	for (a=0;a<4;a++)
 	{
-		RobotHandCard[a]=Sprite::createWithTexture(g_left_right_in->getTexture());
+		RobotHandCard[a]=_texture->Create(LR_IN_CARD);
 		RobotHandCard[a]->setAnchorPoint(Vec2(0.5,0));
 		RobotHandCard[a]->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.5-RightCardInSize*1.65+RightCardInSize*a*0.65));
 		RobotHandCard[a]->setScale(0);
@@ -5880,7 +5840,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			y=base_point[2].y+10;
 			for(int i=0;i<4;i++)
 			{
-				p_list[i]=Sprite::createWithTexture(g_right_free->getTexture());
+				p_list[i]=_texture->Create(R_IN_CARD);
 				p_list[i]->setAnchorPoint(Point(0,0));
 				p_list[i]->setPosition(Vec2(x-10,y-8));
 				y+=((p_list[i]->getTextureRect().size.height)*0.5);
@@ -5896,7 +5856,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			y+=((RightHandIn->getTextureRect().size.height)*0.5)*4;
 			for(int i=0;i<4;i++)
 			{
-				p_list[i]=Sprite::createWithTexture(g_right_free->getTexture());
+				p_list[i]=_texture->Create(R_IN_CARD);
 				p_list[i]->setAnchorPoint(Vec2(0,0));
 				p_list[i]->setPosition(Vec2(x-10,y-8));
 				y+=((p_list[i]->getTextureRect().size.height)*0.5);
@@ -5912,7 +5872,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			y+=((RightHandIn->getTextureRect().size.height)*0.5)*8;
 			for(int i=0;i<4;i++)
 			{
-				p_list[i]=Sprite::createWithTexture(g_right_free->getTexture());
+				p_list[i]=_texture->Create(R_IN_CARD);
 				p_list[i]->setAnchorPoint(Vec2(0,0));
 				p_list[i]->setPosition(Vec2(x-10,y-8));
 				y+=((p_list[i]->getTextureRect().size.height)*0.5);
@@ -5926,7 +5886,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			x=base_point[2].x+10;
 			y=base_point[2].y+10;
 			y+=((RightHandIn->getTextureRect().size.height)*0.5)*12;
-			lastTwo[0]=Sprite::createWithTexture(g_right_free->getTexture());
+			lastTwo[0]=_texture->Create(R_IN_CARD);
 			lastTwo[0]->setAnchorPoint(Vec2(0,0));
 			lastTwo[0]->setPosition(Vec2(x-10,y-8));
 			myframe->addChild(lastTwo[0],RightLen-12,HAND_IN_CARDS_TAG_ID+2*20+12);
@@ -5936,7 +5896,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			{
 				y=base_point[2].y+10;
 				y+=((RightHandIn->getTextureRect().size.height)*0.5)*13;
-				lastTwo[1]=Sprite::createWithTexture(g_right_free->getTexture());
+				lastTwo[1]=_texture->Create(R_IN_CARD);
 				lastTwo[1]->setAnchorPoint(Vec2(0,0));
 				lastTwo[1]->setPosition(Vec2(x-10,y-8));
 				myframe->addChild(lastTwo[1],RightLen-13,HAND_IN_CARDS_TAG_ID+2*20+13);
@@ -5951,7 +5911,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	Vec2 LeftHandPosition[4];
 	for (a=0;a<4;a++)
 	{
-		LeftRobotHandCard[a]=Sprite::createWithTexture(g_left_right_in->getTexture());
+		LeftRobotHandCard[a]=_texture->Create(LR_IN_CARD);
 		LeftRobotHandCard[a]->setAnchorPoint(Vec2(0.5f,0.5f));
 		LeftRobotHandCard[a]->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.5+RightCardInSize*1.2-RightCardInSize*a*0.6));
 		LeftRobotHandCard[a]->setScale(0);
@@ -5991,7 +5951,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			y=base_point[0].y+10;
 			for(int i=0;i<4;i++)
 			{
-				p_list[i]=Sprite::createWithTexture(g_left_free->getTexture());
+				p_list[i]=_texture->Create(L_IN_CARD);
 				p_list[i]->setAnchorPoint(Vec2(0.0f,1.0f));
 				p_list[i]->setPosition(Vec2(x-10,y-8));
 				y -= ((p_list[i]->getTextureRect().size.height)*0.5);
@@ -6007,7 +5967,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			y-= (RightHandInSize*0.5)*4;
 			for(int i=0;i<4;i++)
 			{
-				p_list[i]=Sprite::createWithTexture(g_left_free->getTexture());
+				p_list[i]=_texture->Create(L_IN_CARD);
 				p_list[i]->setAnchorPoint(Vec2(0.0f,1.0f));
 				p_list[i]->setPosition(Vec2(x-10,y-8));
 				y -= ((p_list[i]->getTextureRect().size.height)*0.5);
@@ -6023,7 +5983,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			y-= (RightHandInSize*0.5)*8;
 			for(int i=0;i<4;i++)
 			{
-				p_list[i]=Sprite::createWithTexture(g_left_free->getTexture());
+				p_list[i]=_texture->Create(L_IN_CARD);
 				p_list[i]->setAnchorPoint(Vec2(0.0f,1.0f));
 				p_list[i]->setPosition(Vec2(x-10,y-8));
 				y-=((p_list[i]->getTextureRect().size.height)*0.5);
@@ -6037,7 +5997,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			x=base_point[0].x+10;
 			y=base_point[0].y+10;
 			y-= (RightHandInSize*0.5)*12;
-			lastTwo[0]=Sprite::createWithTexture(g_left_free->getTexture());
+			lastTwo[0]=_texture->Create(L_IN_CARD);
 			lastTwo[0]->setAnchorPoint(Vec2(0.0f,1.0f));
 			lastTwo[0]->setPosition(Vec2(x-10,y-8));
 			myframe->addChild(lastTwo[0],13,HAND_IN_CARDS_TAG_ID+0*20+12);
@@ -6047,7 +6007,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			{
 				y=base_point[0].y+10;
 				y-=(RightHandInSize*0.5)*13;
-				lastTwo[1]=Sprite::createWithTexture(g_left_free->getTexture());
+				lastTwo[1]=_texture->Create(L_IN_CARD);
 				lastTwo[1]->setAnchorPoint(Vec2(0.0f,1.0f));
 				lastTwo[1]->setPosition(Vec2(x-10,y-8));
 				myframe->addChild(lastTwo[1],14,HAND_IN_CARDS_TAG_ID+0*20+13);
@@ -6302,12 +6262,12 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 
 	Sprite *show_card_list[MAX_HANDIN_NUM];
 	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
-	auto tempCard=Sprite::createWithTexture(g_my_peng->getTexture());
+	auto tempCard=_texture->Create(PENG_CARD);
 	float x=posOfCards.x;
 	float y=posOfCards.y-tempCard->getTextureRect().size.height/2;
 	for(int i=0;i<list->len;i++)
 	{
-		show_card_list[i]=Sprite::createWithTexture(g_my_peng->getTexture());
+		show_card_list[i]=_texture->Create(PENG_CARD);
 		show_card_list[i]->setAnchorPoint(Vec2(0,0.5));
 		show_card_list[i]->setPosition(Vec2(x,y));
 		BarOfPlayer->addChild(show_card_list[i],2);
@@ -6353,7 +6313,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 	{
 		if(_roundManager->_isCardFromOthers)
 		{
-			auto winCard=Sprite::createWithTexture(g_my_peng->getTexture());
+			auto winCard=_texture->Create(PENG_CARD);
 			winCard->setAnchorPoint(Vec2(0,0.5));
 			winCard->setPosition(Vec2(x+30,y));
 			BarOfPlayer->addChild(winCard,2);
@@ -7081,7 +7041,7 @@ void  NetRaceLayer::showall()
 					{
 						if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)
 						{
-							p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+							p_list[i]=_texture->Create(LR_OUT_CARD);
 							p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 							p_list[i]->setPosition(Vec2(x-10,y-8));
 							auto s_card=Sprite::createWithTexture(g_small_card_kind[list->data[i].kind]->getTexture());
@@ -7092,14 +7052,14 @@ void  NetRaceLayer::showall()
 						}
 						else
 						{
-							p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+							p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 							p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 							p_list[i]->setPosition(Vec2(x-10,y-8));
 						}
 					}
 					else
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+						p_list[i]=_texture->Create(LR_OUT_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 						auto s_card=Sprite::createWithTexture(g_small_card_kind[list->data[i].kind]->getTexture());
@@ -7137,15 +7097,15 @@ void  NetRaceLayer::showall()
 				else if(no==1)
 				{
 					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
-						p_list[i]=Sprite::createWithTexture(g_my_ming_ting->getTexture());
+						p_list[i]=_texture->Create(MING_CARD);
 					else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
-						p_list[i]=Sprite::createWithTexture(g_my_peng->getTexture());
+						p_list[i]=_texture->Create(PENG_CARD);
 					else if(list->data[i].status==c_AN_GANG)
 					{
 						if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-							p_list[i]=Sprite::createWithTexture(g_my_peng->getTexture());
+							p_list[i]=_texture->Create(PENG_CARD);
 						else
-							p_list[i]=Sprite::createWithTexture(g_my_angang->getTexture());
+							p_list[i]=_texture->Create(AN_GANG_CARD);
 					}
 					p_list[i]->setAnchorPoint(Vec2(0,0));
 					p_list[i]->setPosition(Vec2(x,y));
@@ -7235,7 +7195,7 @@ void  NetRaceLayer::showall()
 					{
 						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
 						{
-							p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+							p_list[i]=_texture->Create(LR_OUT_CARD);
 							p_list[i]->setAnchorPoint(Vec2(0.3,0));
 							p_list[i]->setPosition(Vec2(x-10,y-8));
 							auto s_card=Sprite::createWithTexture(g_small_card_kind[list->data[i].kind]->getTexture());
@@ -7246,14 +7206,14 @@ void  NetRaceLayer::showall()
 						}
 						else
 						{
-							p_list[i]=Sprite::createWithTexture(g_left_right_angang->getTexture());
+							p_list[i]=_texture->Create(LR_AN_GANG_CARD);
 							p_list[i]->setAnchorPoint(Vec2(0.3,0));
 							p_list[i]->setPosition(Vec2(x-10,y-8));
 						}
 					}
 					else
 					{
-						p_list[i]=Sprite::createWithTexture(g_left_right_peng_out->getTexture());
+						p_list[i]=_texture->Create(LR_OUT_CARD);
 						p_list[i]->setAnchorPoint(Vec2(0.3,0));
 						p_list[i]->setPosition(Vec2(x-10,y-8));
 						auto s_card=Sprite::createWithTexture(g_small_card_kind[list->data[i].kind]->getTexture());
@@ -8541,7 +8501,7 @@ void NetRaceLayer::delete_act_tip()
 void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
     auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
     for (int i=0; i<4; i++ ) {
-        auto GangCard = Sprite::createWithTexture(g_my_angang->getTexture());
+        auto GangCard = _texture->Create(AN_GANG_CARD);
         Size GangCardSize = GangCard->getTextureRect().size;
         GangCard->setAnchorPoint(Vec2(0,0));       
         GangCard->setScale(0);
@@ -8560,7 +8520,7 @@ void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
 void NetRaceLayer::_CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_KIND kind) {
     auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
     for (int i=1;i<4;i++) {
-        auto card = Sprite::createWithTexture(g_my_peng->getTexture());
+        auto card = _texture->Create(PENG_CARD);
         Size size = card->getTextureRect().size;
         _AttachKindTexture(card,kind);
 
@@ -8582,7 +8542,7 @@ void NetRaceLayer::_CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_K
 void NetRaceLayer::_CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind) {
     auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
     Size FreeCardSize = _texture->RectSize(FREE_CARD);
-    auto GangCardSize = Sprite::createWithTexture(g_my_angang->getTexture())->getTextureRect().size;
+    auto GangCardSize = _texture->RectSize(AN_GANG_CARD);;
 
     for (int i=0;i<4;i++ ) {
         auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + cardInHand[i] + 1*20);//gang1
@@ -8643,7 +8603,7 @@ void NetRaceLayer::_CreateMingGangCardInHandMotion(TargetedAction *motions[3], i
 		auto OldPos  = OldCard->getPosition();
 		auto OldSize = OldCard->getTextureRect().size;
         
-        Sprite* card = Sprite::createWithTexture(g_my_peng->getTexture());
+        Sprite* card = _texture->Create(PENG_CARD);
         card->setAnchorPoint(Vec2(0,0));
         card->setPosition(Vec2(OldPos.x,OldPos.y));
 
@@ -8679,7 +8639,7 @@ void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND
 
 void NetRaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int gangType) {
     auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
-    Size GangCardSize = Sprite::createWithTexture(g_my_angang->getTexture())->getTextureRect().size;
+    Size GangCardSize = _texture->RectSize(AN_GANG_CARD);;
 
     const double delays[2][5] = {
         {0.66,   0.9,   1.14,   0.66,   0.66},/* an gang */

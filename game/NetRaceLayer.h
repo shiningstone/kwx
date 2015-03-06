@@ -135,27 +135,15 @@ private:
 	cocos2d::Sprite *right_player_bkg;
 	cocos2d::Sprite *my_bkg;
 
-    CCSpriteBatchNode *g_my_free;
-	CCSpriteBatchNode *g_my_peng;
-	CCSpriteBatchNode *g_my_ming_canPlay;
-	CCSpriteBatchNode *g_my_ming_ting;
-	CCSpriteBatchNode *g_my_angang;
-	CCSpriteBatchNode *g_my_out;
-	CCSpriteBatchNode *g_my_in;
-	CCSpriteBatchNode *g_my_mask;
-	CCSpriteBatchNode *g_my_kou;
-	CCSpriteBatchNode *g_left_free;
-	CCSpriteBatchNode *g_right_free;
-	CCSpriteBatchNode *g_left_right_peng_out;
-	CCSpriteBatchNode *g_left_right_in;
-	CCSpriteBatchNode *g_left_right_angang;
 	CCSpriteBatchNode *g_small_card_kind[21];
 	CCSpriteBatchNode *g_small_cardKind_black[21];
 	CCSpriteBatchNode *g_mid_card_kind[21];
 	CCSpriteBatchNode *g_card_kind[21];
+    
 	cocos2d::Size visibleSize;
 	cocos2d::Point origin;
-	int aim[3];
+
+    int aim[3];
 	CARD_KIND dist_card;
 private:
 	void AccountShows(LayerColor* BarOfPlayer,int no);

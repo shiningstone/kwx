@@ -4,9 +4,30 @@
 CCSpriteBatchNode *TextureFactory::_protoType[TEXTURE_NUM] = {NULL};
 Size *TextureFactory::_rectSize[TEXTURE_NUM] = {NULL};
 
+SrcItem_t TextureFactory::TEXTURE_FILES[TEXTURE_NUM] = {
+    {FREE_CARD,       "tileImage/me-handin.png" },
+    {PENG_CARD,       "tileImage/me-peng.png" },
+    {MING_BKG,        "tileImage/Ming-bkg.png" },
+    {MING_CARD,       "tileImage/me-ming.png" },
+    {AN_GANG_CARD,    "tileImage/me-angang.png" },
+    {OUT_CARD,        "tileImage/me-out.png" },
+    {IN_CARD,         "tileImage/me-in.png" },
+    {L_IN_CARD,       "tileImage/left-handin.png" },
+    {LR_OUT_CARD,     "tileImage/lr-out.png" },
+    {LR_IN_CARD,      "tileImage/lr-in.png" },
+    {LR_AN_GANG_CARD, "tileImage/lr-angang.png" },
+    {R_IN_CARD,       "tileImage/right-handin.png" },
+    {MING_MASK_CARD,  "tileImage/ming-mask.png" },
+    {MING_KOU_CARD,   "tileImage/ming-kou.png" },
+};
+
 TextureFactory::TextureFactory() {
-    _protoType[FREE_CARD] = CCSpriteBatchNode::create("tileImage/me-handin.png");
-    _protoType[FREE_CARD]->retain();
+    for(int i=0;i<TEXTURE_NUM;i++) {
+        char *file = TEXTURE_FILES[i][1];
+        
+        _protoType[i] = CCSpriteBatchNode::create(file);
+        _protoType[i]->retain();
+    }
 }
 
 Size TextureFactory::RectSize(TextureId_t id) {
