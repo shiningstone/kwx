@@ -12,6 +12,7 @@ using namespace CocosDenshion;
 #include "./../utils/LogManager.h"
 #include "./../multimedia/VoiceEffect.h"
 #include "./../multimedia/Coordinate.h"
+#include "./../multimedia/GameLayout.h"
 #include "./../multimedia/GraphicalObject.h"
 #include "./../multimedia/GraphicalEffect.h"
 #include "RoundManager.h"
@@ -26,6 +27,7 @@ protected:
     RoundManager  *_roundManager;
     VoiceEffect   *_voice;
     Coordinate    *_coordinate;
+    GameLayout    *_layout;
     TextureFactory *_texture;
     GraphicEffect *_gEffect;
     

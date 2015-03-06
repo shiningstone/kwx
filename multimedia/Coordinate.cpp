@@ -10,6 +10,12 @@ void Coordinate::SetScope(cocos2d::Point p,cocos2d::Size s) {
     SIZE   = s;
 }
 
+Vec2 Coordinate::PositionOfMenuBkg(Size bkgSize) {
+    return Vec2(
+        ORIGIN.x + SIZE.width/2, 
+        ORIGIN.y + SIZE.height - _sizeOfMenuBkg.height/2);
+}
+
 /*************************************
     gold count
 *************************************/

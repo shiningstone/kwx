@@ -15,6 +15,11 @@ class Coordinate {
         void SetScope(cocos2d::Point origin,cocos2d::Size visibleSize);
 
         /*************************************
+            non-game
+        *************************************/
+        Vec2 PositionOfMenuBkg();
+
+        /*************************************
             gold count
         *************************************/
         Vec2 AnchorOfSign(int dir);

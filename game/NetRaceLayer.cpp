@@ -14,6 +14,7 @@ NetRaceLayer::NetRaceLayer()
 
     _voice = VoiceEffect::getInstance();
     _coordinate = Coordinate::getInstance();
+    _layout = GameLayout::getInstance();
     _texture = TextureFactory::getInstance();
     _gEffect = GraphicEffect::getInstance();
     
@@ -29,6 +30,7 @@ NetRaceLayer::~NetRaceLayer()
     delete _roundManager;
     _voice->destroyInstance();
     _coordinate->destroyInstance();
+    _layout->destroyInstance();
     _texture->destroyInstance();
     _gEffect->destroyInstance();
     
@@ -114,40 +116,21 @@ void NetRaceLayer::create_race()
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
+
     _coordinate->SetScope(origin,visibleSize);
-
-	Sprite *sprite;
-	if(s_no==1)
-		sprite=Sprite::create("racetable.png");
-	else
-		sprite=Sprite::create("racetable2.png");
-
-	sprite->setPosition(_coordinate->Center());
-	sprite->setScaleX(s_scale);
-	sprite->setScaleY(s_scale);
-	this->addChild(sprite, 0);
-
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tools.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("xzdd_prepare_pop_res.plist");
-    
-	auto center_bkg=Sprite::createWithSpriteFrameName("kawuxing.png");
-	center_bkg->setPosition(_coordinate->Center());
-	this->addChild(center_bkg,1,CENTER_BKG_TAG_ID);
+    _layout->init(_coordinate);
 
 	auto menu_bkg=Sprite::createWithSpriteFrameName("gongnenganniu.png");
-	menu_bkg->setPosition(Vec2(
-        visibleSize.width/2 + origin.x, 
-        visibleSize.height + origin.y-menu_bkg->getTextureRect().size.height/2));
+	menu_bkg->setPosition( _coordinate->PositionOfMenuBkg(menu_bkg->getTextureRect().size) );
 	this->addChild(menu_bkg,4,MENU_BKG_TAG_ID);
 
 	float space,x,y;
-	auto flag=Sprite::createWithSpriteFrameName("baomingbisai2.png");
-	auto robot=Sprite::createWithSpriteFrameName("tuoguan.png");
-	auto set=Sprite::createWithSpriteFrameName("shezhi.png");
-	auto mall=Sprite::createWithSpriteFrameName("shangcheng2.png");
-	auto back=Sprite::createWithSpriteFrameName("fanhui.png");
+	auto flag = Sprite::createWithSpriteFrameName("baomingbisai2.png");
+	auto robot = Sprite::createWithSpriteFrameName("tuoguan.png");
+	auto set = Sprite::createWithSpriteFrameName("shezhi.png");
+	auto mall = Sprite::createWithSpriteFrameName("shangcheng2.png");
+	auto back = Sprite::createWithSpriteFrameName("fanhui.png");
+    
 	y = menu_bkg->getTextureRect().size.height*3/5;
 	space = menu_bkg->getTextureRect().size.width/11.0f;
 
