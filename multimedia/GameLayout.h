@@ -15,7 +15,12 @@ class GameLayout{
         GameLayout();
         static GameLayout *_instance;
 
+        cocos2d::Layer *_employer;
         Coordinate _coordinate;
+
+        void _addTable(int option);
+        void _addBackground();
+        void _cache(const char *file);
 };
 
 #endif
