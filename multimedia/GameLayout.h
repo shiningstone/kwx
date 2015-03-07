@@ -9,10 +9,8 @@ USING_NS_CC;
 
 class GameLayout {
     public:
-        static GameLayout *getInstance();
+        static GameLayout *getInstance(cocos2d::Point origin, cocos2d::Size size);
         static void destroyInstance();
-
-        void SetScope(cocos2d::Point origin,cocos2d::Size visibleSize);
 
         /*************************************
             gold count
@@ -49,7 +47,7 @@ class GameLayout {
         Vec2 PositionOfMingGangCard(int i,Size size);
 
     private:
-        GameLayout();
+        GameLayout(cocos2d::Point origin, cocos2d::Size size);
         static GameLayout *_instance;
         Logger *_logger;
 

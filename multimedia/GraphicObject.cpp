@@ -1,7 +1,40 @@
 
 #include "GraphicObject.h"
 
+/***********************************************
+        global
+***********************************************/
+float GObjectFactory::SCALE = 1.189;
+GameLayout *GObjectFactory::_layout = NULL;
 
+Sprite *GObjectFactory::CreateTable(int option) {
+	Sprite *sprite = (option==1)?(Sprite::create("racetable.png")):(Sprite::create("racetable2.png"));
+	sprite->setPosition(_layout->Center());
+	sprite->setScaleX(SCALE);
+	sprite->setScaleY(SCALE);
+    
+    return sprite;
+}
+
+Sprite *GObjectFactory::CreateBackground() {
+	auto center_bkg = Sprite::createWithSpriteFrameName("kawuxing.png");
+	center_bkg->setPosition(_layout->Center());
+    
+    return center_bkg;
+}
+
+GMenu *GObjectFactory::CreateMenu() {
+	auto menu_bkg = Sprite::createWithSpriteFrameName("gongnenganniu.png");
+	menu_bkg->setPosition(Vec2(
+        SIZE.width/2 + ORIGIN.x, 
+        SIZE.height + ORIGIN.y-menu_bkg->getTextureRect().size.height/2));
+    
+    return new GMenu(menu_bkg);
+}
+
+/***********************************************
+        card
+***********************************************/
 CCSpriteBatchNode *GObjectFactory::_status[TEXTURE_NUM] = {NULL};
 CCSpriteBatchNode *GObjectFactory::_kindSmall[CARD_MAX] = {NULL};
 CCSpriteBatchNode *GObjectFactory::_kindSmallBlack[CARD_MAX] = {NULL};
@@ -27,7 +60,8 @@ SrcItem_t GObjectFactory::TEXTURE_FILES[TEXTURE_NUM] = {
     {MING_KOU_CARD,   "tileImage/ming-kou.png" },
 };
 
-GObjectFactory::GObjectFactory() {
+GObjectFactory::GObjectFactory(cocos2d::Point origin, cocos2d::Size size)
+:ORIGIN(origin),SIZE(size) {
     for(int i=0;i<TEXTURE_NUM;i++) {
         char *file = TEXTURE_FILES[i].file;
         
@@ -90,15 +124,49 @@ Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
     return parent;
 }
 
+/*************************************
+    menu
+*************************************/
+#define BAOMING_MENU_BUTTON					1
+#define TUOGUAN_MENU_BUTTON					2
+#define SHEZHI_MENU_BUTTON					3
+#define SHOP_MENU_BUTTON					4
+#define GAMEBACK_MENU_BUTTON				5
+
+GMenu::GMenu(Sprite *menuBkg)
+:Y(menuBkg->getTextureRect().size.height*3/5),
+SPACE(menuBkg->getTextureRect().size.width/11.0f) {
+    _bkg = menuBkg;
+    _imgSize = -1;
+    _itemNum = 0;
+    for(int i=0;i<ITEM_NUM;i++) {
+        _items[i] = NULL;
+    }
+}
+
+void GMenu::AddItem(Button *item,Sprite *img) {
+    if (_imgSize<0) {/*img is only required when the first item is added*/
+        _imgSize = img->getTextureRect().size.width;
+    }
+    
+	float x = SPACE*4/5 + _itemNum * (_imgSize+SPACE);
+    
+	item->setAnchorPoint(Vec2(0,0.5));
+	item->setPosition(Vec2(x,Y));
+	_bkg->addChild(item,1,BAOMING_MENU_BUTTON+_itemNum);
+
+    _itemNum++;
+}
 
 /*************************************
     singleton
 *************************************/
 GObjectFactory *GObjectFactory::_instance = NULL;
 
-GObjectFactory *GObjectFactory::getInstance() {
+GObjectFactory *GObjectFactory::getInstance(cocos2d::Point origin, cocos2d::Size size) {
     if (_instance==NULL) {
-        _instance = new GObjectFactory();
+        _instance = new GObjectFactory(origin,size);
+        _layout = GameLayout::getInstance(origin,size);
     }
 
     return _instance;

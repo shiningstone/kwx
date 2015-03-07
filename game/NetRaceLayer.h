@@ -23,10 +23,10 @@ public:
 	NetRaceLayer();
 	virtual ~NetRaceLayer();
 protected:
-    RoundManager  *_roundManager;
-    VoiceEffect   *_voice;
-    GameLayout        *_layout;
-    GraphicEffect *_effect;
+    RoundManager   *_roundManager;
+    VoiceEffect    *_voice;
+    GameLayout     *_layout;
+    GraphicEffect  *_effect;
     GObjectFactory *_object;
 private:
     Logger *_logger;

@@ -1,13 +1,9 @@
 
 #include "GameLayout.h"
 
-GameLayout::GameLayout() {
+GameLayout::GameLayout(cocos2d::Point origin, cocos2d::Size size)
+:ORIGIN(origin),SIZE(size){
 
-}
-
-void GameLayout::SetScope(cocos2d::Point p,cocos2d::Size s) {
-    ORIGIN = p;
-    SIZE   = s;
 }
 
 /*************************************
@@ -283,9 +279,9 @@ Vec2 GameLayout::MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard
 *************************************/
 GameLayout *GameLayout::_instance = NULL;
 
-GameLayout *GameLayout::getInstance() {
+GameLayout *GameLayout::getInstance(cocos2d::Point origin, cocos2d::Size size) {
     if (_instance==NULL) {
-        _instance = new GameLayout();
+        _instance = new GameLayout(origin,size);
     }
 
     return _instance;

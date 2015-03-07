@@ -1,8 +1,14 @@
 
 #ifndef __GRAPHIC_OBJECT__
 #define __GRAPHIC_OBJECT__
+
 #include "cocos2d.h"
 USING_NS_CC;
+#include "ui/CocosGUI.h"
+USING_NS_CC;
+using namespace ui;
+
+#include "GameLayout.h"
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
@@ -40,17 +46,45 @@ typedef struct {
     char        file[32];
 }SrcItem_t;
 
+/**********************************************************
+    this is just a tool for adding items conveniently
+**********************************************************/
+class GMenu {
+public:
+    GMenu(Sprite *menuBkg);
+    void AddItem(Button *item, Sprite *img=NULL);
+    
+    Sprite *_bkg;
+
+private:
+    static const int ITEM_NUM = 6;
+
+    const float  Y;
+    const float  SPACE;
+
+    float  _imgSize;
+    int    _itemNum;
+    Sprite *_items[ITEM_NUM];
+};
+
 class GObjectFactory {
 public:
-    static GObjectFactory *getInstance();
+    static GObjectFactory *getInstance(cocos2d::Point origin, cocos2d::Size size);
     static void destroyInstance();
-    
+
+    /* global */
+    Sprite *CreateTable(int option=1);
+    Sprite *CreateBackground();
+    GMenu  *CreateMenu();
+    /* card */
     Size RectSize(TextureId_t id);
     Sprite *Create(TextureId_t id);
     Sprite *CreateKind(Card_t type,CardSize_t size = NORMAL);
     Sprite *Create(TextureId_t id,Sprite *son);
 
 protected:
+    static float SCALE;
+
     static CCSpriteBatchNode * _status[TEXTURE_NUM];
     static CCSpriteBatchNode * _kindSmall[CARD_MAX];
     static CCSpriteBatchNode * _kindSmallBlack[CARD_MAX];
@@ -59,8 +93,11 @@ protected:
     static Size              * _rectSize[TEXTURE_NUM];
     
 private:
-    GObjectFactory();
+    GObjectFactory(cocos2d::Point origin, cocos2d::Size size);
     static GObjectFactory *_instance;
+    static GameLayout     *_layout;
+    const  cocos2d::Point  ORIGIN;
+    const  cocos2d::Size   SIZE;
 
     static SrcItem_t TEXTURE_FILES[TEXTURE_NUM];
 };

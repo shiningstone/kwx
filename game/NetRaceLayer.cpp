@@ -12,9 +12,13 @@ NetRaceLayer::NetRaceLayer()
 	s_scale=1.189;
 	s_no=1;
 
+
+	visibleSize = Director::getInstance()->getVisibleSize();
+	origin = Director::getInstance()->getVisibleOrigin();
+
+    _object = GObjectFactory::getInstance(origin,visibleSize);
     _voice = VoiceEffect::getInstance();
-    _layout = GameLayout::getInstance();
-    _object = GObjectFactory::getInstance();
+    _layout = GameLayout::getInstance(origin,visibleSize);
     _effect = GraphicEffect::getInstance();
     
     _roundManager = new RoundManager();
@@ -114,86 +118,46 @@ void NetRaceLayer::create_race()
 	//ifEndGameChoose=false;
 	//tempEffectNode=Node::create();
 
-	visibleSize = Director::getInstance()->getVisibleSize();
-	origin = Director::getInstance()->getVisibleOrigin();
-    _layout->SetScope(origin,visibleSize);
-
-	Sprite *sprite;
-	if(s_no==1)
-		sprite=Sprite::create("racetable.png");
-	else
-		sprite=Sprite::create("racetable2.png");
-
-	sprite->setPosition(_layout->Center());
-	sprite->setScaleX(s_scale);
-	sprite->setScaleY(s_scale);
-	this->addChild(sprite, 0);
-
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tools.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("xzdd_prepare_pop_res.plist");
-    
-	auto center_bkg=Sprite::createWithSpriteFrameName("kawuxing.png");
-	center_bkg->setPosition(_layout->Center());
-	this->addChild(center_bkg,1,CENTER_BKG_TAG_ID);
 
-	auto menu_bkg=Sprite::createWithSpriteFrameName("gongnenganniu.png");
-	menu_bkg->setPosition(Vec2(
-        visibleSize.width/2 + origin.x, 
-        visibleSize.height + origin.y-menu_bkg->getTextureRect().size.height/2));
-	this->addChild(menu_bkg,4,MENU_BKG_TAG_ID);
+	this->addChild(_object->CreateTable(s_no), 0);
+	this->addChild(_object->CreateBackground(),1,CENTER_BKG_TAG_ID);
 
-	float space,x,y;
-	auto flag=Sprite::createWithSpriteFrameName("baomingbisai2.png");
-	auto robot=Sprite::createWithSpriteFrameName("tuoguan.png");
-	auto set=Sprite::createWithSpriteFrameName("shezhi.png");
-	auto mall=Sprite::createWithSpriteFrameName("shangcheng2.png");
-	auto back=Sprite::createWithSpriteFrameName("fanhui.png");
-	y = menu_bkg->getTextureRect().size.height*3/5;
-	space = menu_bkg->getTextureRect().size.width/11.0f;
+    GMenu *gMenu = _object->CreateMenu();
+	this->addChild(gMenu->_bkg,4,MENU_BKG_TAG_ID);
 
-	x = space*4/5;
-	auto flagButton=Button::create("baomingbisai2.png","baomingbisai2.png","baomingbisai2.png",UI_TEX_TYPE_PLIST);
-	flagButton->setAnchorPoint(Vec2(0,0.5));
-	flagButton->setPosition(Vec2(x,y));
-	menu_bkg->addChild(flagButton,1,BAOMING_MENU_BUTTON);
+	auto buttonImg = Sprite::createWithSpriteFrameName("baomingbisai2.png");
+	auto flagButton = Button::create("baomingbisai2.png","baomingbisai2.png","baomingbisai2.png",UI_TEX_TYPE_PLIST);
+    gMenu->AddItem(flagButton,buttonImg);
 
-	x += flag->getTextureRect().size.width+space;
-	auto robotButton=Button::create("tuoguan.png","tuoguan1.png","tuoguan1.png",UI_TEX_TYPE_PLIST);
+	auto robotButton = Button::create("tuoguan.png","tuoguan1.png","tuoguan1.png",UI_TEX_TYPE_PLIST);
 	robotButton->setTouchEnabled(false);
-	robotButton->setAnchorPoint(Vec2(0,0.5));
-	robotButton->setPosition(Vec2(x,y));
 	robotButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::tuoGuanPressed,this));
-	menu_bkg->addChild(robotButton,1,TUOGUAN_MENU_BUTTON);
+    gMenu->AddItem(robotButton);
 
-	x += robot->getTextureRect().size.width+space;
-	auto setButton=Button::create("shezhi.png","shezhi.png","shezhi.png",UI_TEX_TYPE_PLIST);
-	setButton->setAnchorPoint(Vec2(0,0.5));
-	setButton->setPosition(Vec2(x,y));
-	menu_bkg->addChild(setButton,1,SHEZHI_MENU_BUTTON);
+    auto setButton = Button::create("shezhi.png","shezhi.png","shezhi.png",UI_TEX_TYPE_PLIST);
+    gMenu->AddItem(setButton);
 
-	x += set->getTextureRect().size.width+space;
-	auto mallButton=Button::create("shangcheng2.png","shangcheng2.png","shangcheng2.png",UI_TEX_TYPE_PLIST);
-	mallButton->setAnchorPoint(Vec2(0,0.5));
-	mallButton->setPosition(Vec2(x,y));
-	menu_bkg->addChild(mallButton,1,SHOP_MENU_BUTTON);
+	auto mallButton = Button::create("shangcheng2.png","shangcheng2.png","shangcheng2.png",UI_TEX_TYPE_PLIST);
+    gMenu->AddItem(mallButton);
 
-	x+=mall->getTextureRect().size.width+space;
-	auto backButton=Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);
-	backButton->setAnchorPoint(Vec2(0,0.5));
-	backButton->setPosition(Vec2(x,y));
+	auto backButton = Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);
 	backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::backPressed,this));
-	menu_bkg->addChild(backButton,1,GAMEBACK_MENU_BUTTON);
+    gMenu->AddItem(backButton);
+
 
     create_residue_cards();
 	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
     _LoadPlayerInfo();
 
-	space = 5 + residue_card_bkg->getTextureRect().size.width/5;
-	_playerBkg[0]=Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
+	float space = 5 + residue_card_bkg->getTextureRect().size.width/5;
+	float y=visibleSize.height-gMenu->_bkg->getTextureRect().size.height-5-69;
+
+    _playerBkg[0]=Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
 	_playerBkg[0]->setAnchorPoint(Point(0.0f,1.0f));
-	y=visibleSize.height-menu_bkg->getTextureRect().size.height-5-69;
 	_playerBkg[0]->setPosition(Vec2(origin.x+visibleSize.width*387/1218-_playerBkg[0]->getContentSize().width,origin.y+visibleSize.height/2+_playerBkg[0]->getContentSize().height/2));
 	this->addChild(_playerBkg[0],1,LEFT_IMG_BKG_TAG_ID);
 
