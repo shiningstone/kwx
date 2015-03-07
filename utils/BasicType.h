@@ -3,6 +3,12 @@
 #define __BASIC_TYPE__
 
 typedef enum {
+    LEFT,
+    MIDDLE,
+    RIGHT,
+}PlayerDir_t;
+
+typedef enum {
     PENG,
     GANG,
     TING,
