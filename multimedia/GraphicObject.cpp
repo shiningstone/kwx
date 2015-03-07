@@ -3,10 +3,10 @@
 
 
 CCSpriteBatchNode *GObjectFactory::_status[TEXTURE_NUM] = {NULL};
-CCSpriteBatchNode *GObjectFactory::_kindSmall[CARD_SIZE_NUM] = {NULL};
-CCSpriteBatchNode *GObjectFactory::_kindSmallBlack[CARD_SIZE_NUM] = {NULL};
-CCSpriteBatchNode *GObjectFactory::_kindMiddle[CARD_SIZE_NUM] = {NULL};
-CCSpriteBatchNode *GObjectFactory::_kind[CARD_SIZE_NUM] = {NULL};
+CCSpriteBatchNode *GObjectFactory::_kindSmall[CARD_MAX] = {NULL};
+CCSpriteBatchNode *GObjectFactory::_kindSmallBlack[CARD_MAX] = {NULL};
+CCSpriteBatchNode *GObjectFactory::_kindMiddle[CARD_MAX] = {NULL};
+CCSpriteBatchNode *GObjectFactory::_kind[CARD_MAX] = {NULL};
 
 Size *GObjectFactory::_rectSize[TEXTURE_NUM] = {NULL};
 
@@ -35,7 +35,7 @@ GObjectFactory::GObjectFactory() {
         _status[i]->retain();
     }
 
-    for(int i=0;i<CARD_SIZE_NUM;i++) {/* is it more efficiency to use SetScale ??? */
+    for(int i=0;i<CARD_MAX;i++) {/* is it more efficiency to use SetScale ??? */
         _kindSmall[i] = CCSpriteBatchNode::create(
                         String::createWithFormat("tileImage/tile_Up_%d.png",(int)(i+1))->getCString());
 		_kindSmallBlack[i] = CCSpriteBatchNode::create(
@@ -109,7 +109,7 @@ void GObjectFactory::destroyInstance() {
         _status[i]->release();
     }
     
-    for(int i=0;i<CARD_SIZE_NUM;i++) {
+    for(int i=0;i<CARD_MAX;i++) {
         _kindSmall[i]->release();
         _kindSmallBlack[i]->release();
         _kindMiddle[i]->release();

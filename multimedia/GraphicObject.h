@@ -52,10 +52,10 @@ public:
 
 protected:
     static CCSpriteBatchNode * _status[TEXTURE_NUM];
-    static CCSpriteBatchNode * _kindSmall[CARD_SIZE_NUM];
-    static CCSpriteBatchNode * _kindSmallBlack[CARD_SIZE_NUM];
-    static CCSpriteBatchNode * _kindMiddle[CARD_SIZE_NUM];
-    static CCSpriteBatchNode * _kind[CARD_SIZE_NUM];
+    static CCSpriteBatchNode * _kindSmall[CARD_MAX];
+    static CCSpriteBatchNode * _kindSmallBlack[CARD_MAX];
+    static CCSpriteBatchNode * _kindMiddle[CARD_MAX];
+    static CCSpriteBatchNode * _kind[CARD_MAX];
     static Size              * _rectSize[TEXTURE_NUM];
     
 private:

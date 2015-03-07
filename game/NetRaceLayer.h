@@ -134,10 +134,6 @@ private:
 	cocos2d::Sprite *right_player_bkg;
 	cocos2d::Sprite *my_bkg;
 
-	CCSpriteBatchNode *g_small_card_kind[21];
-	CCSpriteBatchNode *g_small_cardKind_black[21];
-	CCSpriteBatchNode *g_mid_card_kind[21];
-	CCSpriteBatchNode *g_card_kind[21];
 	cocos2d::Size visibleSize;
 	cocos2d::Point origin;
 	int aim[3];
