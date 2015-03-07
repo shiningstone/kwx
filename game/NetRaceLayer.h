@@ -12,7 +12,8 @@ using namespace CocosDenshion;
 #include "./../utils/LogManager.h"
 #include "./../multimedia/VoiceEffect.h"
 #include "./../multimedia/GameLayout.h"
-#include "./../multimedia/GraphicalEffect.h"
+#include "./../multimedia/GraphicObject.h"
+#include "./../multimedia/GraphicEffect.h"
 #include "RoundManager.h"
 #include "DataBase.h"
 
@@ -25,7 +26,8 @@ protected:
     RoundManager  *_roundManager;
     VoiceEffect   *_voice;
     GameLayout        *_layout;
-    GraphicEffect *_graphic;
+    GraphicEffect *_effect;
+    GObjectFactory *_object;
 private:
     Logger *_logger;
     void _LoadPlayerInfo();

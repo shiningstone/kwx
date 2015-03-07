@@ -1,5 +1,5 @@
 
-#include "GraphicalEffect.h"
+#include "GraphicEffect.h"
 
 GraphicEffect::GraphicEffect() {
 

@@ -14,7 +14,8 @@ NetRaceLayer::NetRaceLayer()
 
     _voice = VoiceEffect::getInstance();
     _layout = GameLayout::getInstance();
-    _graphic = GraphicEffect::getInstance();
+    _object = GObjectFactory::getInstance();
+    _effect = GraphicEffect::getInstance();
     
     _roundManager = new RoundManager();
     _logger = LOGGER_REGISTER("NetRaceLayer");
@@ -50,7 +51,8 @@ NetRaceLayer::~NetRaceLayer()
     delete _roundManager;
     _voice->destroyInstance();
     _layout->destroyInstance();
-    _graphic->destroyInstance();
+    _object->destroyInstance();
+    _effect->destroyInstance();
     
     LOGGER_DEREGISTER(_logger);
 }
@@ -509,7 +511,7 @@ void NetRaceLayer::HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
     				auto ButtonAct = TargetedAction::create(curButton,ScaleTo::create(0.1,1));
 
     				auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
-    				auto shadeAction = _graphic->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
+    				auto shadeAction = _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
 
     				auto clear = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
 
