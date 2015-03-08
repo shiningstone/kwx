@@ -154,51 +154,25 @@ void NetRaceLayer::create_race()
 	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
     _LoadPlayerInfo();
 
-	float space = 5 + residue_card_bkg->getTextureRect().size.width/5;
-	float y=visibleSize.height-gMenu->_bkg->getTextureRect().size.height-5-69;
 
-    _playerBkg[0]=Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
-	_playerBkg[0]->setAnchorPoint(Point(0.0f,1.0f));
-	_playerBkg[0]->setPosition(Vec2(origin.x+visibleSize.width*387/1218-_playerBkg[0]->getContentSize().width,origin.y+visibleSize.height/2+_playerBkg[0]->getContentSize().height/2));
-	this->addChild(_playerBkg[0],1,LEFT_IMG_BKG_TAG_ID);
+    Sprite *bkg = _object->CreateHeadBkg(LEFT);
+    _layout->SetPlayerBkg(LEFT,bkg);
+	this->addChild(_layout->_playerBkg[0],1,LEFT_IMG_BKG_TAG_ID);
 
-	base_point[0].x=29+_playerBkg[0]->getTextureRect().size.width*1.5+origin.x;
-	base_point[0].y=origin.y+visibleSize.height-30;
-	river_point[0].x=origin.x+visibleSize.width*0.33;
-	river_point[0].y=origin.y+visibleSize.height*0.64;
+    bkg = _object->CreateHeadBkg(RIGHT);
+    _layout->SetPlayerBkg(RIGHT,bkg);
+	this->addChild(_layout->_playerBkg[2],1,RIGHT_IMG_BKG_TAG_ID);
 
-	_playerBkg[2]=Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
-	_playerBkg[2]->setAnchorPoint(Point(1.0f,1.0f));
-	_playerBkg[2]->setPosition(Vec2(origin.x+visibleSize.width*851/1218+_playerBkg[2]->getContentSize().width*0.8,origin.y+visibleSize.height/2+_playerBkg[2]->getContentSize().height/2));
-	this->addChild(_playerBkg[2],1,RIGHT_IMG_BKG_TAG_ID);
+    bkg = _object->CreateHeadBkg(MIDDLE);
+    _layout->SetPlayerBkg(MIDDLE,bkg);
+	this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
 
-	base_point[2].x=1190-_playerBkg[2]->getTextureRect().size.width*2+origin.x+visibleSize.width*0.019+10;
-	base_point[2].y=220;
-	river_point[2].x=origin.x+visibleSize.width*0.67;
-	river_point[2].y=origin.y+visibleSize.height*0.43;
-
-	_playerBkg[1]=Sprite::createWithSpriteFrameName("touxiangxinxikuang.png");
-	_playerBkg[1]->setAnchorPoint(Point(0.0f,0.0f));
-	_playerBkg[1]->setPosition(Vec2(origin.x+visibleSize.width/2-_playerBkg[1]->getContentSize().width/2,origin.y+visibleSize.height*144/716-_playerBkg[1]->getContentSize().height*0.5));
-	this->addChild(_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
-
-	lastwinner_point[0].x=29+_playerBkg[0]->getTextureRect().size.width/2;
-	lastwinner_point[0].y=536-_playerBkg[0]->getTextureRect().size.height;
-	lastwinner_point[1].x=49+_playerBkg[1]->getTextureRect().size.width;
-	lastwinner_point[1].y=129+_playerBkg[1]->getTextureRect().size.height/2;
-	lastwinner_point[2].x=1190-_playerBkg[2]->getTextureRect().size.width/2;
-	lastwinner_point[2].y=536-_playerBkg[2]->getTextureRect().size.height;
 
 	auto mic=Sprite::createWithSpriteFrameName("maikefeng.png");
 	mic->setAnchorPoint(Point(0.0f,0.0f));
-	mic->setPosition(Vec2(49,129+_playerBkg[1]->getTextureRect().size.height));
+	mic->setPosition(Vec2(49,129+_layout->_playerBkg[1]->getTextureRect().size.height));
 	this->addChild(mic,1,MIC_TAG_ID);
 	mic->setScale(0);
-
-	base_point[1].x=visibleSize.width*0.06+origin.x;
-	base_point[1].y=origin.y;
-	river_point[1].x=origin.x+visibleSize.width*0.412;
-	river_point[1].y=origin.y+visibleSize.height*0.38;
 
 	auto danji_font=Sprite::createWithSpriteFrameName("danjiban.png");
 	danji_font->setOpacity(100);
@@ -531,42 +505,42 @@ BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
 		{
 			if(location.x<visibleSize.width*0.4)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 				config.controlPoint_1=Vec2(location.x+30,location.y+30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36)+100,river_point[1].y-100);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
 			}
 			else if(location.x>=visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36)+100,river_point[1].y-100);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
 			}
 			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			}
 		}
 		else if(location.y>=visibleSize.height*0.4)
 		{
 			if(location.x<=visibleSize.width*0.4)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 				config.controlPoint_1=Vec2(location.x+100,location.y-100);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36)+100,river_point[1].y+100);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y+100);
 			}
 			else if(location.x>=visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 				config.controlPoint_1=Vec2(location.x-100,location.y-100);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36)+100,river_point[1].y+100);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y+100);
 			}
 			else if(location.x>visibleSize.width*0.4&&location.x<visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			}
 		}
 	}
@@ -576,42 +550,42 @@ BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
 		{
 			if(location.x<visibleSize.width*0.4)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 				config.controlPoint_1=Vec2(location.x+30,location.y+30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36)-100,river_point[1].y-141);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
 			}
 			else if(location.x>=visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36)+100,river_point[1].y-141);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
 			}
 			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			}
 		}
 		else if(location.y>=visibleSize.height*0.4)
 		{
 			if(location.x<visibleSize.width*0.4)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 				config.controlPoint_1=Vec2(location.x+30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36)-100,river_point[1].y+141);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y+141);
 			}
 			else if(location.x>=visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36)+100,river_point[1].y+141);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y+141);
 			}
 			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			}
 		}
 	}
@@ -621,42 +595,42 @@ BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
 		{
 			if(location.x<visibleSize.width*0.4)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 				config.controlPoint_1=Vec2(location.x+30,location.y+30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36)-100,river_point[1].y-182);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
 			}
 			else if(location.x>=visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36)+100,river_point[1].y-182);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
 			}
 			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36),river_point[1].y-82);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
 			}
 		}
 		else if(location.y>=visibleSize.height*0.4)
 		{
 			if(location.x<visibleSize.width*0.4)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 				config.controlPoint_1=Vec2(location.x+30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36)-100,river_point[1].y+182);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y+182);
 			}
 			else if(location.x>=visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36)+100,river_point[1].y+182);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y+182);
 			}
 			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 			{
-				config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36),river_point[1].y-82);
+				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
 			}
 		}
 	}
@@ -679,69 +653,69 @@ BezierTo* NetRaceLayer::BizerMove2(outCardList* outCard,Vec2 location,int time)
 	{
 		if(location.x<visibleSize.width*0.4)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36)-100,river_point[1].y-100);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)-100,_layout->_playerPosi[1].riverPoint.y-100);
 		}
 		else if(location.x>=visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36)+100,river_point[1].y-100);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
 		}
 		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-1)*36),river_point[1].y);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
 		}
 	}
 	else if((outCard->length-1)<14)
 	{
 		if(location.x<visibleSize.width*0.4)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			if(time==2)
 				config.controlPoint_1=Vec2(location.x,200);
 			else
 				config.controlPoint_1=Vec2(location.x+30,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36)-100,river_point[1].y-141);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
 		}
 		else if(location.x>=visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36)+100,river_point[1].y-141);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
 		}
 		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-8)*36),river_point[1].y-41);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 		}
 	}
 	else
 	{
 		if(location.x<visibleSize.width*0.4)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 			if(time==2)
 				config.controlPoint_1=Vec2(location.x,200);
 			else
 				config.controlPoint_1=Vec2(location.x+30,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36)-100,river_point[1].y-182);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
 		}
 		else if(location.x>=visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36)+100,river_point[1].y-182);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
 		}
 		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(river_point[1].x+((outCard->length-1)-16)*36,river_point[1].y-82);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(river_point[1].x+((outCard->length-16)*36),river_point[1].y-82);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
 		}
 	}
 	BezierTo *action;
@@ -775,20 +749,20 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
 		if((outCard->length-1)<6)
 		{
 			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
-			config.controlPoint_2=Vec2(river_point[no].x,river_point[no].y+30*(outCard->length-1));
-			config.endPosition=Vec2(river_point[no].x,river_point[no].y+30*(outCard->length-1));
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y+30*(outCard->length-1));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y+30*(outCard->length-1));
 		}
 		else if((outCard->length-1)<14)
 		{
 			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
-			config.controlPoint_2=Vec2(river_point[no].x+48,river_point[no].y+30*((outCard->length-1)-7));
-			config.endPosition=Vec2(river_point[no].x+48,river_point[no].y+30*((outCard->length-1)-7));
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x+48,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-7));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x+48,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-7));
 		}
 		else
 		{
 			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
-			config.controlPoint_2=Vec2(river_point[no].x+96,river_point[no].y+30*((outCard->length-1)-16));
-			config.endPosition=Vec2(river_point[no].x+96,river_point[no].y+30*((outCard->length-1)-16));
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x+96,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-16));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x+96,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-16));
 		}
 	}
 	else if(no==0)
@@ -797,21 +771,21 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
 		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+l_list_len);
 		if((outCard->length-1)<6)
 		{
-			config.controlPoint_1=Vec2(base_point[no].x+110,l_card->getPosition().y-35);
-			config.controlPoint_2=Vec2(river_point[no].x,river_point[no].y-30*(outCard->length-1));
-			config.endPosition=Vec2(river_point[no].x,river_point[no].y-30*(outCard->length-1));
+			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y-30*(outCard->length-1));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y-30*(outCard->length-1));
 		}
 		else if((outCard->length-1)<14)
 		{
-			config.controlPoint_1=Vec2(base_point[no].x+110,l_card->getPosition().y-35);
-			config.controlPoint_2=Vec2(river_point[no].x-48,river_point[no].y-30*((outCard->length-1)-7));
-			config.endPosition=Vec2(river_point[no].x-48,river_point[no].y-30*((outCard->length-1)-7));
+			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x-48,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-7));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x-48,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-7));
 		}
 		else
 		{
-			config.controlPoint_1=Vec2(base_point[no].x+110,l_card->getPosition().y-35);
-			config.controlPoint_2=Vec2(river_point[no].x-96,river_point[no].y-30*((outCard->length-1)-16));
-			config.endPosition=Vec2(river_point[no].x-96,river_point[no].y-30*((outCard->length-1)-16));
+			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x-96,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-16));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x-96,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-16));
 		}
 	}
 	auto action=BezierTo::create(0.3,config);
@@ -1195,8 +1169,8 @@ bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
             myframe->removeChildByTag(TING_SING_BAR);
         
         float x1,y1;
-        x1 = base_point[MIDDLE].x+10;
-        y1 = base_point[MIDDLE].y+10;
+        x1 = _layout->_playerPosi[MIDDLE].basePoint.x+10;
+        y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
 
         MyCardChoosedNum = -1;
         
@@ -1249,8 +1223,8 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
     
     auto cardSize = _object->RectSize(FREE_CARD);
     float x1,y1;
-    x1 = base_point[1].x+10;
-    y1 = base_point[1].y+10;
+    x1 = _layout->_playerPosi[1].basePoint.x+10;
+    y1 = _layout->_playerPosi[1].basePoint.y+10;
 
 	for(int i=start; i<last+1; i++){
 		if( _IsClickedOn((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i),touch) ) {
@@ -1373,8 +1347,8 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		bool ifInsertCardsTime = false;
         
         float x,y;
-		x = base_point[1].x+10;
-		y = base_point[1].y+10;
+		x = _layout->_playerPosi[1].basePoint.x+10;
+		y = _layout->_playerPosi[1].basePoint.y+10;
         
 		auto cardSize = _object->RectSize(FREE_CARD);
         
@@ -1586,7 +1560,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 	else if(_roundManager->_curPlayer==0) {
 		auto cardOut_Yposition = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+cardInHand->len-1)->getPosition().y;
         curOutPos = Vec2(
-            base_point[_roundManager->_curPlayer].x + 10,
+            _layout->_playerPosi[_roundManager->_curPlayer].basePoint.x + 10,
             cardOut_Yposition - 20 - 35);
 	}
 
@@ -3456,8 +3430,8 @@ void NetRaceLayer::card_list_update(int no)
 		if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik))
 			myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik,true);
 	}
-	x=base_point[no].x+10; 
-	y=base_point[no].y+10;
+	x=_layout->_playerPosi[no].basePoint.x+10; 
+	y=_layout->_playerPosi[no].basePoint.y+10;
 	int residualCardsNum=(list->len-list->atcvie_place)%3;
 	unsigned char ting_flag=_roundManager->_players[no]->get_parter()->get_ting_status();
     LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
@@ -4045,23 +4019,23 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 			show_card_indicator->stopAllActions();
 			if(i<6)
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x+((i)*36)+20,river_point[sender->_ID].y+5));						
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+((i)*36)+20,river_point[sender->_ID].y+15)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+((i)*36)+20,river_point[sender->_ID].y+5)),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x+i*36,river_point[sender->_ID].y));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+((i)*36)+20,_layout->_playerPosi[sender->_ID].riverPoint.y+5));						
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+((i)*36)+20,_layout->_playerPosi[sender->_ID].riverPoint.y+15)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+((i)*36)+20,_layout->_playerPosi[sender->_ID].riverPoint.y+5)),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+i*36,_layout->_playerPosi[sender->_ID].riverPoint.y));
 				zOrder=0;
 			}
 			else if(i<14)
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x+(i-7)*36+20,river_point[sender->_ID].y-36));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+(i-7)*36+20,river_point[sender->_ID].y-26)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+(i-7)*36+20,river_point[sender->_ID].y-36)),NULL)));		
-				show_card->setPosition(Vec2(river_point[sender->_ID].x+(i-7)*36,river_point[sender->_ID].y-41));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-7)*36+20,_layout->_playerPosi[sender->_ID].riverPoint.y-36));
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-7)*36+20,_layout->_playerPosi[sender->_ID].riverPoint.y-26)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-7)*36+20,_layout->_playerPosi[sender->_ID].riverPoint.y-36)),NULL)));		
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-7)*36,_layout->_playerPosi[sender->_ID].riverPoint.y-41));
 				zOrder=1;
 			}
 			else
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x+(i-16)*36+20,river_point[sender->_ID].y-77));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+(i-16)*36+20,river_point[sender->_ID].y-67)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+(i-16)*36+20,river_point[sender->_ID].y-77)),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x+(i-16)*36,river_point[sender->_ID].y-82));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-16)*36+20,_layout->_playerPosi[sender->_ID].riverPoint.y-77));
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-16)*36+20,_layout->_playerPosi[sender->_ID].riverPoint.y-67)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-16)*36+20,_layout->_playerPosi[sender->_ID].riverPoint.y-77)),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+(i-16)*36,_layout->_playerPosi[sender->_ID].riverPoint.y-82));
 				zOrder=2;
 			}
 			myframe->addChild(show_card,zOrder+1,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
@@ -4083,21 +4057,21 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 			show_card_indicator->stopAllActions();
 			if(i<6)
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y+30*(i+1)));						
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y+30*(i+1)+10)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y+30*(i+1))),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y+30*i));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i+1)));						
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i+1)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i+1))),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*i));
 			}
 			else if(i<14)
 			{
-			show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x+48,river_point[sender->_ID].y+30*(i-6)));
-			show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+48,river_point[sender->_ID].y+30*(i-6)+10)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+48,river_point[sender->_ID].y+30*(i-6))),NULL)));
-			show_card->setPosition(Vec2(river_point[sender->_ID].x+48,river_point[sender->_ID].y+30*(i-7)));
+			show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-6)));
+			show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-6)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-6))),NULL)));
+			show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-7)));
 			}
 			else
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x+96,river_point[sender->_ID].y+30*(i-15)));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+96,river_point[sender->_ID].y+30*(i-15)+10)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x+96,river_point[sender->_ID].y+30*(i-15))),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x+96,river_point[sender->_ID].y+30*(i-16)));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-15)));
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-15)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-15))),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-16)));
 			}
 			myframe->addChild(show_card,20-i,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
 			//update_clock(true,0,sender->_ID);//////////-----网络版需要获取时间----///////////
@@ -4118,21 +4092,21 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 			show_card_indicator->stopAllActions();
 			if(i<6)
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y-30*(i-1)));						
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y-30*(i-1)+10)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y-30*(i-1))),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x,river_point[sender->_ID].y-30*i));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-1)));						
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-1)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-1))),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*i));
 			}
 			else if(i<14)
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x-48,river_point[sender->_ID].y-30*(i-8)));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x-48,river_point[sender->_ID].y-30*(i-8)+10)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x-48,river_point[sender->_ID].y-30*(i-8))),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x-48,river_point[sender->_ID].y-30*(i-7)));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-8)));
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-8)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-8))),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-7)));
 			}
 			else
 			{
-				show_card_indicator->setPosition(Vec2(river_point[sender->_ID].x-96,river_point[sender->_ID].y-30*(i-17)));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(river_point[sender->_ID].x-96,river_point[sender->_ID].y-30*(i-17)+10)),MoveTo::create(0.5,Vec2(river_point[sender->_ID].x-96,river_point[sender->_ID].y-30*(i-17))),NULL)));
-				show_card->setPosition(Vec2(river_point[sender->_ID].x-96,river_point[sender->_ID].y-30*(i-16)));
+				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-17)));
+				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-17)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-17))),NULL)));
+				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-16)));
 			}
 			myframe->addChild(show_card,i+1,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
 			//update_clock(true,0,sender->_ID);
@@ -4202,15 +4176,15 @@ void NetRaceLayer::race_begin_prepare()
     switch(lastWinner) {
         case 0:
             last_winner->setAnchorPoint(Vec2(0.5,1));
-            last_winner->setPosition(lastwinner_point[0]);
+            last_winner->setPosition(_layout->_playerPosi[0].zhuangPoint);
             break;
         case 1:
             last_winner->setAnchorPoint(Vec2(0,0.5));
-            last_winner->setPosition(lastwinner_point[1]);
+            last_winner->setPosition(_layout->_playerPosi[1].zhuangPoint);
             break;
         case 2:
             last_winner->setAnchorPoint(Vec2(0.5,1));
-            last_winner->setPosition(lastwinner_point[2]);
+            last_winner->setPosition(_layout->_playerPosi[2].zhuangPoint);
             break;
     }
 	last_winner->runAction(Sequence::create(DelayTime::create(0.65),EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
@@ -4959,8 +4933,8 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		if(sender->_ID==1)
 		{
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-			float x=base_point[1].x;
-			float y=base_point[1].y;
+			float x=_layout->_playerPosi[1].basePoint.x;
+			float y=_layout->_playerPosi[1].basePoint.y;
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 			{
 				x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(_roundManager->_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
@@ -5234,8 +5208,8 @@ void NetRaceLayer::distribute_card_effect()
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
 	Sprite *list_last_one;
-	float x=base_point[_roundManager->_curPlayer].x;
-	float y=base_point[_roundManager->_curPlayer].y;
+	float x=_layout->_playerPosi[_roundManager->_curPlayer].basePoint.x;
+	float y=_layout->_playerPosi[_roundManager->_curPlayer].basePoint.y;
 	unsigned char ting_flag=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
 	if(_roundManager->_curPlayer==1)
 	{
@@ -5599,7 +5573,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		meHandPosition[a]=meHandCard[a]->getPosition();
 	}
 
-	Point HandoutEnd=Vec2(base_point[1].x+10,base_point[1].y+110);
+	Point HandoutEnd=Vec2(_layout->_playerPosi[1].basePoint.x+10,_layout->_playerPosi[1].basePoint.y+110);
 	float changingPosition[4];
 	for(a=0;a<4;a++)
 	{
@@ -5624,14 +5598,14 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			outTime4=Sequence::create(DelayTime::create(0.4),NULL);
 		meHandCard[a]->runAction(Sequence::create(outTime1,outTime2,outTime3,outTime4,NULL));
 	}
-	auto xmeCardStart=base_point[1].x+10;
-	auto ymeCardStart=base_point[1].y+10;
+	auto xmeCardStart=_layout->_playerPosi[1].basePoint.x+10;
+	auto ymeCardStart=_layout->_playerPosi[1].basePoint.y+10;
 	for(a=0;a<4;a++)
 	{
 		if(a==0)//DealayTime::create(0.9)
 		{
-			x=base_point[1].x+10;
-			y=base_point[1].y+10;
+			x=_layout->_playerPosi[1].basePoint.x+10;
+			y=_layout->_playerPosi[1].basePoint.y+10;
 			for(int i=0;i<4;i++)
 			{				
 				p_list[i]=_object->Create(FREE_CARD);
@@ -5646,8 +5620,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 				myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+1*20+i);
 				auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.2),ScaleTo::create(0,1),NULL);
 
-				x=base_point[1].x+10;
-				y=base_point[1].y+10;
+				x=_layout->_playerPosi[1].basePoint.x+10;
+				y=_layout->_playerPosi[1].basePoint.y+10;
 				auto cardSize=Mehand_in->getTextureRect().size;
 				auto mv1=MoveTo::create(0.2,Vec2(x+cardSize.width*i*2,y));
 				auto delay1=DelayTime::create(0.4);
@@ -5662,8 +5636,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		{
 			for(int i=0;i<4;i++)
 			{
-				x=base_point[1].x+10;
-				y=base_point[1].y+10;
+				x=_layout->_playerPosi[1].basePoint.x+10;
+				y=_layout->_playerPosi[1].basePoint.y+10;
 				auto cardSize=Mehand_in->getTextureRect().size;
 				x += cardSize.width*1.0*i*2+cardSize.width;
 				p_list[i]=_object->Create(FREE_CARD);
@@ -5677,8 +5651,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 				myframe->addChild(p_list[i],i+5,HAND_IN_CARDS_TAG_ID+1*20+4+i);
 				auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.8),ScaleTo::create(0,1),NULL);
 				
-				x=base_point[1].x+10;
-				y=base_point[1].y+10;
+				x=_layout->_playerPosi[1].basePoint.x+10;
+				y=_layout->_playerPosi[1].basePoint.y+10;
 				auto mv1=MoveTo::create(0.2,Vec2(x+cardSize.width*i*3+cardSize.width,y));
 				auto delay1=DelayTime::create(0.4);
 				auto list_seq1=Sequence::create(DelayTime::create(timeXH[1]+0.8),delay1,mv1,NULL);
@@ -5690,8 +5664,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		{
 			for(int i=0;i<4;i++)
 			{
-				x=base_point[1].x+10;
-				y=base_point[1].y+10;
+				x=_layout->_playerPosi[1].basePoint.x+10;
+				y=_layout->_playerPosi[1].basePoint.y+10;
 				x += Mehand_in->getTextureRect().size.width*(i*3)+Mehand_in->getTextureRect().size.width*1.0*2;
 				p_list[i]=_object->Create(FREE_CARD);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
@@ -5708,8 +5682,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==3)//DelayTime(2.7)
 		{
-			x=base_point[1].x+10;
-			y=base_point[1].y+10;
+			x=_layout->_playerPosi[1].basePoint.x+10;
+			y=_layout->_playerPosi[1].basePoint.y+10;
 			x += Mehand_in->getTextureRect().size.width*1.0*12;
 			lastTwo[0]=_object->Create(FREE_CARD);
 			lastTwo[0]->setAnchorPoint(Vec2(0.0f,0.0f));
@@ -5723,7 +5697,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[1]+2),ScaleTo::create(0,1),NULL));	
 			if(zhuang==1)
 			{
-				x=base_point[1].x+10;
+				x=_layout->_playerPosi[1].basePoint.x+10;
 				x += Mehand_in->getTextureRect().size.width*1.0*13+30;
 				lastTwo[1]=_object->Create(FREE_CARD);
 				lastTwo[1]->setAnchorPoint(Vec2(0.0f,0.0f));
@@ -5754,7 +5728,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		myframe->addChild(RobotHandCard[a],6-a,START_CARDS_IN_TAG_ID+2*a);
 		RightHandPosition[a]=RobotHandCard[a]->getPosition();
 	}
-	Point RinghtHandoutEnd=Vec2(base_point[2].x+10,base_point[2].y+10);
+	Point RinghtHandoutEnd=Vec2(_layout->_playerPosi[2].basePoint.x+10,_layout->_playerPosi[2].basePoint.y+10);
 	for(a=0;a<4;a++)
 	{
 		for (b=0;b<4;b++)
@@ -5783,8 +5757,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	{
 		if(a==0)//DealayTime::create(1.1)
 		{
-			x=base_point[2].x+10;
-			y=base_point[2].y+10;
+			x=_layout->_playerPosi[2].basePoint.x+10;
+			y=_layout->_playerPosi[2].basePoint.y+10;
 			for(int i=0;i<4;i++)
 			{
 				p_list[i]=_object->Create(R_IN_CARD);
@@ -5798,8 +5772,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==1)//DelayTime::create(1.7)
 		{
-			x=base_point[2].x+10;
-			y=base_point[2].y+10;
+			x=_layout->_playerPosi[2].basePoint.x+10;
+			y=_layout->_playerPosi[2].basePoint.y+10;
 			y+=((RightHandIn->getTextureRect().size.height)*0.5)*4;
 			for(int i=0;i<4;i++)
 			{
@@ -5814,8 +5788,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==2)//DelayTime::create(2.3)
 		{
-			x=base_point[2].x+10;
-			y=base_point[2].y+10;
+			x=_layout->_playerPosi[2].basePoint.x+10;
+			y=_layout->_playerPosi[2].basePoint.y+10;
 			y+=((RightHandIn->getTextureRect().size.height)*0.5)*8;
 			for(int i=0;i<4;i++)
 			{
@@ -5830,8 +5804,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==3)//DelayTime(2.9)
 		{	
-			x=base_point[2].x+10;
-			y=base_point[2].y+10;
+			x=_layout->_playerPosi[2].basePoint.x+10;
+			y=_layout->_playerPosi[2].basePoint.y+10;
 			y+=((RightHandIn->getTextureRect().size.height)*0.5)*12;
 			lastTwo[0]=_object->Create(R_IN_CARD);
 			lastTwo[0]->setAnchorPoint(Vec2(0,0));
@@ -5841,7 +5815,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[2]+2),ScaleTo::create(0,1),NULL));
 			if(zhuang==2)
 			{
-				y=base_point[2].y+10;
+				y=_layout->_playerPosi[2].basePoint.y+10;
 				y+=((RightHandIn->getTextureRect().size.height)*0.5)*13;
 				lastTwo[1]=_object->Create(R_IN_CARD);
 				lastTwo[1]->setAnchorPoint(Vec2(0,0));
@@ -5853,7 +5827,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 	}
 	//左手
-	Point LeftHandoutEnd=Vec2(base_point[0].x+10,base_point[0].y+10);
+	Point LeftHandoutEnd=Vec2(_layout->_playerPosi[0].basePoint.x+10,_layout->_playerPosi[0].basePoint.y+10);
 	Sprite* LeftRobotHandCard[4];
 	Vec2 LeftHandPosition[4];
 	for (a=0;a<4;a++)
@@ -5894,8 +5868,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	{
 		if(a==0)//DealayTime::create(1.1)
 		{
-			x=base_point[0].x+10;
-			y=base_point[0].y+10;
+			x=_layout->_playerPosi[0].basePoint.x+10;
+			y=_layout->_playerPosi[0].basePoint.y+10;
 			for(int i=0;i<4;i++)
 			{
 				p_list[i]=_object->Create(L_IN_CARD);
@@ -5909,8 +5883,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==1)//DelayTime::create(1.7)
 		{
-			x=base_point[0].x+10;
-			y=base_point[0].y+10;
+			x=_layout->_playerPosi[0].basePoint.x+10;
+			y=_layout->_playerPosi[0].basePoint.y+10;
 			y-= (RightHandInSize*0.5)*4;
 			for(int i=0;i<4;i++)
 			{
@@ -5925,8 +5899,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==2)//DelayTime::create(2.3)
 		{
-			x=base_point[0].x+10;
-			y=base_point[0].y+10;
+			x=_layout->_playerPosi[0].basePoint.x+10;
+			y=_layout->_playerPosi[0].basePoint.y+10;
 			y-= (RightHandInSize*0.5)*8;
 			for(int i=0;i<4;i++)
 			{
@@ -5941,8 +5915,8 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==3)//DelayTime(2.9)
 		{	
-			x=base_point[0].x+10;
-			y=base_point[0].y+10;
+			x=_layout->_playerPosi[0].basePoint.x+10;
+			y=_layout->_playerPosi[0].basePoint.y+10;
 			y-= (RightHandInSize*0.5)*12;
 			lastTwo[0]=_object->Create(L_IN_CARD);
 			lastTwo[0]->setAnchorPoint(Vec2(0.0f,1.0f));
@@ -5952,7 +5926,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[0]+2),ScaleTo::create(0,1),NULL));
 			if(zhuang==0)
 			{
-				y=base_point[0].y+10;
+				y=_layout->_playerPosi[0].basePoint.y+10;
 				y-=(RightHandInSize*0.5)*13;
 				lastTwo[1]=_object->Create(L_IN_CARD);
 				lastTwo[1]->setAnchorPoint(Vec2(0.0f,1.0f));
@@ -6976,8 +6950,8 @@ void  NetRaceLayer::showall()
 			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik))
 				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik,true);
 		}
-		x=base_point[no].x+10; 
-		y=base_point[no].y+10;
+		x=_layout->_playerPosi[no].basePoint.x+10; 
+		y=_layout->_playerPosi[no].basePoint.y+10;
 		for(int i=0;i<list->len;i++)
 		{
 			if(list->data[i].kind!=ck_NOT_DEFINED )
@@ -8009,33 +7983,33 @@ void NetRaceLayer::_GuiUpdateScore(LayerColor *layer,int score) {
 
 void NetRaceLayer::GuiUpdateScore(int dir,int score)
 {
-    if( !_playerBkg[dir] ) {
+    if( !_layout->_playerBkg[dir] ) {
         return;
     }
 
 	LayerColor *propertyLayerBar = LayerColor::create();
 	propertyLayerBar->ignoreAnchorPointForPosition(false);
 
-    if(_playerBkg[dir]->getChildByTag(SCORE_TAG_ID))
-        _playerBkg[dir]->removeChildByTag(SCORE_TAG_ID,true);
+    if(_layout->_playerBkg[dir]->getChildByTag(SCORE_TAG_ID))
+        _layout->_playerBkg[dir]->removeChildByTag(SCORE_TAG_ID,true);
 
     propertyLayerBar->setAnchorPoint(Vec2(0.5,0.5));
     
 	if(dir==0) {
-		propertyLayerBar->setContentSize( Size(_playerBkg[0]->getTextureRect().size.width, 25) );
-		propertyLayerBar->setPosition( Vec2(_playerBkg[0]->getTextureRect().size.width*0.5,
-            _playerBkg[0]->getTextureRect().size.height * 0.1));
+		propertyLayerBar->setContentSize( Size(_layout->_playerBkg[0]->getTextureRect().size.width, 25) );
+		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*0.5,
+            _layout->_playerBkg[0]->getTextureRect().size.height * 0.1));
 	} else if(dir==1) {
 		propertyLayerBar->setContentSize( Size(140, 25) );
-		propertyLayerBar->setPosition( Vec2(_playerBkg[1]->getTextureRect().size.width*0.6635,
-            _playerBkg[1]->getTextureRect().size.height*0.3));
+		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[1]->getTextureRect().size.width*0.6635,
+            _layout->_playerBkg[1]->getTextureRect().size.height*0.3));
 	} else if(dir==2) {
-		propertyLayerBar->setContentSize( Size(_playerBkg[2]->getTextureRect().size.width, 25) );
-		propertyLayerBar->setPosition( Vec2(_playerBkg[2]->getTextureRect().size.width*0.5,
-            _playerBkg[2]->getTextureRect().size.height * 0.1));
+		propertyLayerBar->setContentSize( Size(_layout->_playerBkg[2]->getTextureRect().size.width, 25) );
+		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*0.5,
+            _layout->_playerBkg[2]->getTextureRect().size.height * 0.1));
 	}
     
-    _playerBkg[dir]->addChild(propertyLayerBar,1,SCORE_TAG_ID);
+    _layout->_playerBkg[dir]->addChild(propertyLayerBar,1,SCORE_TAG_ID);
     
     _GuiUpdateScore(propertyLayerBar,score);
 }
@@ -8044,37 +8018,37 @@ void NetRaceLayer::update_nickname(int direction,std::string str_Nick)
 {		
 	if(direction==0)
 	{
-		if(!_playerBkg[0])
+		if(!_layout->_playerBkg[0])
 			return;
-		if(_playerBkg[0]->getChildByTag(NICK_NAME_TAG_ID))
-			_playerBkg[0]->removeChildByTag(NICK_NAME_TAG_ID,true);
+		if(_layout->_playerBkg[0]->getChildByTag(NICK_NAME_TAG_ID))
+			_layout->_playerBkg[0]->removeChildByTag(NICK_NAME_TAG_ID,true);
 
 		auto left_Name=Label::create(str_Nick,"Arial",20);
-		left_Name->setPosition(Vec2(_playerBkg[0]->getTextureRect().size.width*0.5,_playerBkg[0]->getTextureRect().size.height*0.265));
-		_playerBkg[0]->addChild(left_Name,1,NICK_NAME_TAG_ID);
+		left_Name->setPosition(Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*0.5,_layout->_playerBkg[0]->getTextureRect().size.height*0.265));
+		_layout->_playerBkg[0]->addChild(left_Name,1,NICK_NAME_TAG_ID);
 	}
 	else if(direction==1)
 	{
-		if(!_playerBkg[1])
+		if(!_layout->_playerBkg[1])
 			return;
-		if(_playerBkg[1]->getChildByTag(NICK_NAME_TAG_ID))
-			_playerBkg[1]->removeChildByTag(NICK_NAME_TAG_ID,true);
+		if(_layout->_playerBkg[1]->getChildByTag(NICK_NAME_TAG_ID))
+			_layout->_playerBkg[1]->removeChildByTag(NICK_NAME_TAG_ID,true);
 
 		auto myName=Label::create(str_Nick,"Arial",20);
-		myName->setPosition(Vec2(_playerBkg[1]->getTextureRect().size.width*0.65,_playerBkg[1]->getTextureRect().size.height*0.7));
-		_playerBkg[1]->addChild(myName,1,NICK_NAME_TAG_ID);
+		myName->setPosition(Vec2(_layout->_playerBkg[1]->getTextureRect().size.width*0.65,_layout->_playerBkg[1]->getTextureRect().size.height*0.7));
+		_layout->_playerBkg[1]->addChild(myName,1,NICK_NAME_TAG_ID);
 
 	}
 	else if(direction==2)
 	{
-		if(!_playerBkg[2])
+		if(!_layout->_playerBkg[2])
 			return;
-		if(_playerBkg[2]->getChildByTag(NICK_NAME_TAG_ID))
-			_playerBkg[2]->removeChildByTag(NICK_NAME_TAG_ID,true);
+		if(_layout->_playerBkg[2]->getChildByTag(NICK_NAME_TAG_ID))
+			_layout->_playerBkg[2]->removeChildByTag(NICK_NAME_TAG_ID,true);
 
 		auto Right_Name=Label::create(str_Nick,"Arial",20);
-		Right_Name->setPosition(Vec2(_playerBkg[2]->getTextureRect().size.width*0.5,_playerBkg[2]->getTextureRect().size.height*0.265));
-		_playerBkg[2]->addChild(Right_Name,1,NICK_NAME_TAG_ID);
+		Right_Name->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*0.5,_layout->_playerBkg[2]->getTextureRect().size.height*0.265));
+		_layout->_playerBkg[2]->addChild(Right_Name,1,NICK_NAME_TAG_ID);
 	}
 
 }
@@ -8085,45 +8059,45 @@ void NetRaceLayer::update_headimage(int direction,std::string head_photo)
 
 	if(direction==0)
 	{
-		if(!_playerBkg[0])
+		if(!_layout->_playerBkg[0])
 			return;
 
-		if(_playerBkg[0]->getChildByTag(HEAD_IMG_TAG_ID))
-			_playerBkg[0]->removeChildByTag(HEAD_IMG_TAG_ID,true);
+		if(_layout->_playerBkg[0]->getChildByTag(HEAD_IMG_TAG_ID))
+			_layout->_playerBkg[0]->removeChildByTag(HEAD_IMG_TAG_ID,true);
 
-		head_image->setScaleX(_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
-		head_image->setScaleY(_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setScaleX(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setScaleY(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
 		head_image->setAnchorPoint(Vec2(0.5f,1.0f));
-		head_image->setPosition(Vec2(_playerBkg[0]->getTextureRect().size.width*1/2,_playerBkg[0]->getTextureRect().size.height*23/24));
-		_playerBkg[0]->addChild(head_image,1,HEAD_IMG_TAG_ID);
+		head_image->setPosition(Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*1/2,_layout->_playerBkg[0]->getTextureRect().size.height*23/24));
+		_layout->_playerBkg[0]->addChild(head_image,1,HEAD_IMG_TAG_ID);
 	}
 	else if(direction==1)
 	{
-		if(!_playerBkg[1])
+		if(!_layout->_playerBkg[1])
 			return;
-		if(_playerBkg[1]->getChildByTag(HEAD_IMG_TAG_ID))
-			_playerBkg[1]->removeChildByTag(HEAD_IMG_TAG_ID,true);
+		if(_layout->_playerBkg[1]->getChildByTag(HEAD_IMG_TAG_ID))
+			_layout->_playerBkg[1]->removeChildByTag(HEAD_IMG_TAG_ID,true);
 
 		float head_scale;
-		head_scale=(_playerBkg[1]->getTextureRect().size.height*5)/(6*head_image->getTextureRect().size.height);
+		head_scale=(_layout->_playerBkg[1]->getTextureRect().size.height*5)/(6*head_image->getTextureRect().size.height);
 		head_image->setScaleX(head_scale);
 		head_image->setScaleY(head_scale);
 		head_image->setAnchorPoint(Vec2(0.0f,0.5f));
-		head_image->setPosition(Vec2(_playerBkg[1]->getTextureRect().size.width/39,_playerBkg[1]->getTextureRect().size.height*1/2));
-		_playerBkg[1]->addChild(head_image,1,HEAD_IMG_TAG_ID);
+		head_image->setPosition(Vec2(_layout->_playerBkg[1]->getTextureRect().size.width/39,_layout->_playerBkg[1]->getTextureRect().size.height*1/2));
+		_layout->_playerBkg[1]->addChild(head_image,1,HEAD_IMG_TAG_ID);
 	}
 	else if(direction==2)
 	{
-		if(!_playerBkg[2])
+		if(!_layout->_playerBkg[2])
 			return;
-		if(_playerBkg[2]->getChildByTag(HEAD_IMG_TAG_ID))
-			_playerBkg[2]->removeChildByTag(HEAD_IMG_TAG_ID,true);
+		if(_layout->_playerBkg[2]->getChildByTag(HEAD_IMG_TAG_ID))
+			_layout->_playerBkg[2]->removeChildByTag(HEAD_IMG_TAG_ID,true);
 
-		head_image->setScaleX(_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
-		head_image->setScaleY(_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setScaleX(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setScaleY(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
 		head_image->setAnchorPoint(Vec2(0.5f,1.0f));
-		head_image->setPosition(Vec2(_playerBkg[2]->getTextureRect().size.width*1/2,_playerBkg[2]->getTextureRect().size.height*23/24));
-		_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
+		head_image->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*1/2,_layout->_playerBkg[2]->getTextureRect().size.height*23/24));
+		_layout->_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
 	}
 }
 
@@ -8316,15 +8290,15 @@ void NetRaceLayer::GuiShowReady(int dir)
 
 	if( dir==0 ) {
 		Ready->setPosition(Vec2(
-            _playerBkg[0]->getPosition().x + _playerBkg[0]->getContentSize().width/2,
-            _playerBkg[0]->getPosition().y - _playerBkg[0]->getContentSize().height));
+            _layout->_playerBkg[0]->getPosition().x + _layout->_playerBkg[0]->getContentSize().width/2,
+            _layout->_playerBkg[0]->getPosition().y - _layout->_playerBkg[0]->getContentSize().height));
 		this->addChild(Ready,2,READY_INDICATE_LEFT_TAG_ID);
 	} else if( dir==1 ) {
 		;
 	} else if( dir==2 ) {
 		Ready->setPosition(Vec2(
-            _playerBkg[2]->getPosition().x - _playerBkg[2]->getContentSize().width/2,
-            _playerBkg[2]->getPosition().y - _playerBkg[2]->getContentSize().height));
+            _layout->_playerBkg[2]->getPosition().x - _layout->_playerBkg[2]->getContentSize().width/2,
+            _layout->_playerBkg[2]->getPosition().y - _layout->_playerBkg[2]->getContentSize().height));
 		this->addChild(Ready,2,READY_INDICATE_RIGHT_TAG_ID);
 	}
 }

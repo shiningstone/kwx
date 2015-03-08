@@ -5,13 +5,28 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
+#include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
+
+typedef struct {
+    cocos2d::Vec2   basePoint;
+    cocos2d::Vec2   riverPoint;
+    cocos2d::Vec2   zhuangPoint;
+}PlayerPos_t;
 
 class GameLayout {
     public:
         static GameLayout *getInstance(cocos2d::Point origin, cocos2d::Size size);
         static void destroyInstance();
 
+        /*************************************
+            head image
+        *************************************/
+        Vec2 AnchorOfHeadBkg(int dir);
+        void SetPlayerBkg(PlayerDir_t id, Sprite *bkg);
+        /*these should be private finally*/
+        cocos2d::Sprite *_playerBkg[3];
+        PlayerPos_t      _playerPosi[3];
         /*************************************
             gold count
         *************************************/

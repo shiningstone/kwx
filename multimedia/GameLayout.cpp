@@ -7,6 +7,48 @@ GameLayout::GameLayout(cocos2d::Point origin, cocos2d::Size size)
 }
 
 /*************************************
+    player
+*************************************/
+Vec2 GameLayout::AnchorOfHeadBkg(int dir) {
+    switch(dir) {
+        case 0:   return Vec2(0.0f,1.0f);
+        case 1:   return Vec2(0,0);
+        case 2:   return Vec2(1,1);
+    }
+}
+
+void GameLayout::SetPlayerBkg(PlayerDir_t dir,Sprite *bkg) {
+    _playerBkg[dir] = bkg;
+
+    switch(dir) {
+        case LEFT:
+            _playerPosi[dir].basePoint.x = 29 + _playerBkg[dir]->getTextureRect().size.width*1.5 + ORIGIN.x;
+            _playerPosi[dir].basePoint.y = ORIGIN.y + SIZE.height-30;
+            _playerPosi[dir].riverPoint.x = ORIGIN.x + SIZE.width*0.33;
+            _playerPosi[dir].riverPoint.y = ORIGIN.y + SIZE.height*0.64;
+            _playerPosi[dir].zhuangPoint.x = 29 + _playerBkg[dir]->getTextureRect().size.width/2;
+            _playerPosi[dir].zhuangPoint.y = 536 - _playerBkg[dir]->getTextureRect().size.height;
+            break;
+        case MIDDLE:
+            _playerPosi[dir].basePoint.x = SIZE.width*0.06 + ORIGIN.x;
+            _playerPosi[dir].basePoint.y = ORIGIN.y;
+            _playerPosi[dir].riverPoint.x = ORIGIN.x + SIZE.width*0.412;
+            _playerPosi[dir].riverPoint.y = ORIGIN.y + SIZE.height*0.38;
+            _playerPosi[dir].zhuangPoint.x = 49 + _playerBkg[dir]->getTextureRect().size.width;
+            _playerPosi[dir].zhuangPoint.y = 129 + _playerBkg[1]->getTextureRect().size.height/2;
+            break;
+        case RIGHT:
+            _playerPosi[dir].basePoint.x = 1190-_playerBkg[dir]->getTextureRect().size.width*2 + ORIGIN.x + SIZE.width*0.019 + 10;
+            _playerPosi[dir].basePoint.y = 220;
+            _playerPosi[dir].riverPoint.x = ORIGIN.x + SIZE.width*0.67;
+            _playerPosi[dir].riverPoint.y = ORIGIN.y + SIZE.height*0.43;
+            _playerPosi[dir].zhuangPoint.x = 1190 - _playerBkg[dir]->getTextureRect().size.width/2;
+            _playerPosi[dir].zhuangPoint.y = 536 - _playerBkg[dir]->getTextureRect().size.height;
+            break;
+    }
+}
+
+/*************************************
     gold count
 *************************************/
 Vec2 GameLayout::AnchorOfSign(int dir) {

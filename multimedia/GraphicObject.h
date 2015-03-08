@@ -85,6 +85,9 @@ public:
     Sprite *CreateBackground();
     GMenu  *CreateMenu();
     Button *CreateButton(MenuButtonId_t id);
+
+    /* player */
+    Sprite *CreateHeadBkg(PlayerDir_t dir);
     
     /* card */
     Size RectSize(TextureId_t id);

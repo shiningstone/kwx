@@ -122,14 +122,9 @@ private:
 
 	Vec2 distributeCardPos;
     
-	cocos2d::Point base_point[3];
-	cocos2d::Point river_point[3];
-	cocos2d::Point lastwinner_point[3];
 	cocos2d::Sprite *last_winner;
 	cocos2d::Sprite *residue_card_bkg;
     
-	cocos2d::Sprite *_playerBkg[3];
-
 	cocos2d::Sprite *left_player_bkg;
 	cocos2d::Sprite *right_player_bkg;
 	cocos2d::Sprite *my_bkg;
