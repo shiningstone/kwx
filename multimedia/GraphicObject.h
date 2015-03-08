@@ -95,6 +95,7 @@ public:
     Sprite *CreateClock();
     Sprite *CreateClockIndicator(PlayerDir_t dir);
     Sprite *CreatePlayerPointer();
+    Sprite *CreateTingSignBar(PlayerDir_t dir);
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
     

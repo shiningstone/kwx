@@ -354,6 +354,15 @@ Vec2 GameLayout::MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard
     }
 }
 
+Vec2 GameLayout::PositionOfTingSignBar(PlayerDir_t dir) {
+    switch(dir) {
+        case LEFT:
+            return Vec2(ORIGIN.x+SIZE.width*266/1218, ORIGIN.y+SIZE.height*0.65);//0.69 0.23
+        case RIGHT:
+            return Vec2(ORIGIN.x+SIZE.width*952/1218, ORIGIN.y+SIZE.height*0.62);//0.77 0.66
+    }
+}
+
 /*************************************
     singleton
 *************************************/

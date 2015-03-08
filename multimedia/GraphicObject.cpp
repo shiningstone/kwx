@@ -308,6 +308,12 @@ Sprite *GObjectFactory::CreatePlayerPointer() {
     return pointer;
 }
 
+Sprite *GObjectFactory::CreateTingSignBar(PlayerDir_t dir) {
+    Sprite * bar;
+    return bar;
+}
+
+
 /*************************************
     singleton
 *************************************/

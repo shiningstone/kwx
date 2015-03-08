@@ -3106,46 +3106,29 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	Vec2 curPos;
-	if(curNo==0)
-		curPos=Vec2(origin.x+visibleSize.width*266/1218,origin.y+visibleSize.height*0.65);//0.69 0.23
-	else
-		curPos=Vec2(origin.x+visibleSize.width*952/1218,origin.y+visibleSize.height*0.62);//0.77 0.66
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 
 	Hu_cardOut_place=CardPlace;
-	//int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
-	//int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
-	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-	_roundManager->_players[curNo]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	//_roundManager->_players[curNo]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-	//_roundManager->_players[curNo]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
-	_roundManager->_players[curNo]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
+	int hu_NumForEveryCard[MAX_HANDIN_NUM];
+	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];
+	_roundManager->_players[curNo]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);
+	_roundManager->_players[curNo]->get_parter()->get_hu_cards(hu_cards);
 
-	int cardNum=hu_NumForEveryCard[CardPlace];
+	int cardNum = hu_NumForEveryCard[CardPlace];
 
-	auto tishiLeft=Sprite::createWithSpriteFrameName("Leftcorner-other.png");
-	auto LeftSize=tishiLeft->getTextureRect().size;
-	auto tishiCard=Sprite::createWithSpriteFrameName("Husign-other.png");
-	auto CardSize=tishiCard->getTextureRect().size;
-	auto tishiEnd=Sprite::createWithSpriteFrameName("Rightangle-other.png");
-	auto RightSize=tishiEnd->getTextureRect().size;
+	Vec2 curPos = _layout->PositionOfTingSignBar((PlayerDir_t)curNo);
+
+	auto LeftSize=Sprite::createWithSpriteFrameName("Leftcorner-other.png")->getTextureRect().size;
+	auto CardSize=Sprite::createWithSpriteFrameName("Husign-other.png")->getTextureRect().size;
+	auto RightSize=Sprite::createWithSpriteFrameName("Rightangle-other.png")->getTextureRect().size;
 
 	Size SignBarSize=Size(LeftSize.width,LeftSize.height+CardSize.height*(cardNum+1)+RightSize.height);
-	
-	float BarHeight=SignBarSize.height;
-	float y=curPos.y;
-	float curScale=1;
-	if((y+SignBarSize.height/2)>(origin.y+visibleSize.height-10))
-		curScale=(origin.y+visibleSize.height-10-y)/(SignBarSize.height/2);
 
 	auto TingSignBar=LayerColor::create();
 	TingSignBar->setAnchorPoint(Vec2(0.5,0.5));
 	TingSignBar->setContentSize(SignBarSize);
 	TingSignBar->ignoreAnchorPointForPosition(false);
 	TingSignBar->setPosition(Vec2(curPos.x,curPos.y));
-	myframe->addChild(TingSignBar,30,TING_SING_LEFTBAR+curNo/2);
 
 	if(curNo==0)
 	{
@@ -3179,7 +3162,9 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 			s_card->setRotation(90);
 			s_card->setScale(0.9);
 			s_card->setAnchorPoint(Vec2(0.5,0.5));
-			s_card->setPosition(Vec2(WinCard->getTextureRect().size.width/2,WinCard->getTextureRect().size.height*0.65));
+			s_card->setPosition(Vec2(
+                WinCard->getTextureRect().size.width/2,
+                WinCard->getTextureRect().size.height*0.65));
 			WinCard->addChild(s_card,1);
 			SingForCards->addChild(WinCard,1);
 			TingSignBar->addChild(SingForCards,1,k+3);
@@ -3222,7 +3207,9 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 			s_card->setRotation(-90);
 			s_card->setScale(0.9);
 			s_card->setAnchorPoint(Vec2(0.5,0.5));
-			s_card->setPosition(Vec2(WinCard->getTextureRect().size.width/2,WinCard->getTextureRect().size.height*0.65));
+			s_card->setPosition(Vec2(
+                WinCard->getTextureRect().size.width/2,
+                WinCard->getTextureRect().size.height*0.65));
 			WinCard->addChild(s_card,1);
 			SingForCards->addChild(WinCard,1);
 			TingSignBar->addChild(SingForCards,1,k+3);
@@ -3233,6 +3220,8 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 		SignRight->setPosition(Vec2(0,LeftSize.height+CardSize.height*(k+1)));
 		TingSignBar->addChild(SignRight,1,k+3);
 	}
+
+    myframe->addChild(TingSignBar,30,TING_SING_LEFTBAR+curNo/2);
 }
 void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 {

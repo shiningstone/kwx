@@ -28,6 +28,9 @@ class GameLayout {
         cocos2d::Sprite *_playerBkg[3];
         PlayerPos_t      _playerPosi[3];
 
+        /*************************************
+            global
+        *************************************/
         Vec2 PositionOfMicIcon();
         Vec2 PositionOfMapai(int direction);
         Vec2 PositionOfClock();
@@ -44,14 +47,12 @@ class GameLayout {
         Vec2 AnchorOfGold(int dir);
         Vec2 PositionOfGold(int dir,int xOffset = 0);
         Vec2 DestOfGold(int dir,int xOffset = 0);
-        
         /*************************************
             out card
         *************************************/
         int  RotateAngleOfOutcard(int dir);
         Vec2 AnchorOfOutcard(int dir);
         Vec2 PositionOfOutcard(int dir);
-
         /*************************************
             action
         *************************************/
@@ -66,6 +67,7 @@ class GameLayout {
         Vec2 MiddlePositionOfGangCardInHand(int i,Vec2 origPos,Size freeCard);
         Vec2 PositionOfMingGangCard(int i,Size size);
 
+        Vec2 PositionOfTingSignBar(PlayerDir_t dir);
     private:
         GameLayout(cocos2d::Point origin, cocos2d::Size size);
         static GameLayout *_instance;
