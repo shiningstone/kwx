@@ -67,6 +67,14 @@ private:
     Sprite *_items[ITEM_NUM];
 };
 
+typedef enum {
+     MENUBTN_BAOMING,
+     MENUBTN_TUOGUAN,
+     MENUBTN_SHEZHI,
+     MENUBTN_SHOP,
+     MENUBTN_GAMEBACK,
+}MenuButtonId_t;
+
 class GObjectFactory {
 public:
     static GObjectFactory *getInstance(cocos2d::Point origin, cocos2d::Size size);
@@ -76,6 +84,8 @@ public:
     Sprite *CreateTable(int option=1);
     Sprite *CreateBackground();
     GMenu  *CreateMenu();
+    Button *CreateButton(MenuButtonId_t id);
+    
     /* card */
     Size RectSize(TextureId_t id);
     Sprite *Create(TextureId_t id);

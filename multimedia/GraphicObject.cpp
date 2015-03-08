@@ -127,12 +127,6 @@ Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
 /*************************************
     menu
 *************************************/
-#define BAOMING_MENU_BUTTON					1
-#define TUOGUAN_MENU_BUTTON					2
-#define SHEZHI_MENU_BUTTON					3
-#define SHOP_MENU_BUTTON					4
-#define GAMEBACK_MENU_BUTTON				5
-
 GMenu::GMenu(Sprite *menuBkg)
 :Y(menuBkg->getTextureRect().size.height*3/5),
 SPACE(menuBkg->getTextureRect().size.width/11.0f) {
@@ -153,9 +147,24 @@ void GMenu::AddItem(Button *item,Sprite *img) {
     
 	item->setAnchorPoint(Vec2(0,0.5));
 	item->setPosition(Vec2(x,Y));
-	_bkg->addChild(item,1,BAOMING_MENU_BUTTON+_itemNum);
+	_bkg->addChild(item,1,MENUBTN_BAOMING + _itemNum);
 
     _itemNum++;
+}
+
+Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
+    switch(id) {
+        case MENUBTN_BAOMING:
+            return Button::create("baomingbisai2.png","baomingbisai2.png","baomingbisai2.png",UI_TEX_TYPE_PLIST);
+        case MENUBTN_TUOGUAN:
+            return Button::create("tuoguan.png","tuoguan1.png","tuoguan1.png",UI_TEX_TYPE_PLIST);
+        case MENUBTN_SHEZHI:
+            return Button::create("shezhi.png","shezhi.png","shezhi.png",UI_TEX_TYPE_PLIST);
+        case MENUBTN_SHOP:
+            return Button::create("shangcheng2.png","shangcheng2.png","shangcheng2.png",UI_TEX_TYPE_PLIST);
+        case MENUBTN_GAMEBACK:
+            return Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);
+    }
 }
 
 /*************************************

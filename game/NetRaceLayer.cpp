@@ -130,21 +130,22 @@ void NetRaceLayer::create_race()
 	this->addChild(gMenu->_bkg,4,MENU_BKG_TAG_ID);
 
 	auto buttonImg = Sprite::createWithSpriteFrameName("baomingbisai2.png");
-	auto flagButton = Button::create("baomingbisai2.png","baomingbisai2.png","baomingbisai2.png",UI_TEX_TYPE_PLIST);
+    
+	auto flagButton = _object->CreateButton(MENUBTN_BAOMING);
     gMenu->AddItem(flagButton,buttonImg);
 
-	auto robotButton = Button::create("tuoguan.png","tuoguan1.png","tuoguan1.png",UI_TEX_TYPE_PLIST);
+	auto robotButton = _object->CreateButton(MENUBTN_TUOGUAN);
 	robotButton->setTouchEnabled(false);
 	robotButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::tuoGuanPressed,this));
     gMenu->AddItem(robotButton);
 
-    auto setButton = Button::create("shezhi.png","shezhi.png","shezhi.png",UI_TEX_TYPE_PLIST);
+    auto setButton = _object->CreateButton(MENUBTN_SHEZHI);
     gMenu->AddItem(setButton);
 
-	auto mallButton = Button::create("shangcheng2.png","shangcheng2.png","shangcheng2.png",UI_TEX_TYPE_PLIST);
+	auto mallButton = _object->CreateButton(MENUBTN_SHOP);
     gMenu->AddItem(mallButton);
 
-	auto backButton = Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);
+	auto backButton = _object->CreateButton(MENUBTN_GAMEBACK);
 	backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::backPressed,this));
     gMenu->AddItem(backButton);
 
