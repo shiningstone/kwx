@@ -1,0 +1,24 @@
+RoundManager
+	负责牌局总体进度控制
+	负责界面更新请求
+
+	牌局开始	StartGame
+		资源初始化
+	发牌        DistributeTo(Player,Card)
+		调用Player.Handin
+		执行发牌特效
+	接收出牌    RecvHandoutFrom(Player)
+		调用RecvAction
+	接收动作    RecvAction(Player,Card)
+		调用Player.Act
+	发布动作    InformAction(AllPlayer)
+		执行动作特效
+	
+Player
+	抓牌		Handin
+		玩家判断（本地机器人、网络机器人、玩家）
+		调用Handout
+	出牌		Handout
+		调用RoundManager.RecvHandoutFrom
+	动作		Act
+		调用RoundManager.InformAction
