@@ -164,6 +164,12 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
             return Button::create("shangcheng2.png","shangcheng2.png","shangcheng2.png",UI_TEX_TYPE_PLIST);
         case MENUBTN_GAMEBACK:
             return Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);
+
+        case BTN_START:
+            Button *button = Button::create("kaishiyouxi1.png","kaishiyouxi2.png","kaishiyouxi2.png",UI_TEX_TYPE_PLIST);
+            button->setAnchorPoint(Vec2(0.5,0.5));
+            button->setPosition(Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2));
+            return button; 
     }
 }
 
@@ -196,6 +202,31 @@ Sprite *GObjectFactory::CreateHeadBkg(PlayerDir_t dir) {
     }
 
     return sprite;
+}
+
+Sprite *GObjectFactory::CreateMicIcon() {
+	auto mic = Sprite::createWithSpriteFrameName("maikefeng.png");
+
+    mic->setAnchorPoint(Point(0.0f,0.0f));
+	mic->setPosition( _layout->PositionOfMicIcon() );
+	mic->setScale(0);
+    
+    return mic;
+}
+
+Sprite *GObjectFactory::CreateModeFont(GameMode_t mode) {
+    Sprite *font;
+
+    if(mode==LOCAL_GAME) {
+        font = Sprite::createWithSpriteFrameName("danjiban.png");
+        font->setOpacity(100);
+        font->setAnchorPoint( Vec2(1,0) );
+        font->setPosition( Vec2(ORIGIN.x+SIZE.width-10, ORIGIN.y+10) );
+    } else {
+
+    }
+
+    return font;
 }
 
 /*************************************

@@ -48,6 +48,10 @@ void GameLayout::SetPlayerBkg(PlayerDir_t dir,Sprite *bkg) {
     }
 }
 
+Vec2 GameLayout::PositionOfMicIcon() {
+    return Vec2(49, 129 + _playerBkg[MIDDLE]->getTextureRect().size.height);
+}
+
 /*************************************
     gold count
 *************************************/

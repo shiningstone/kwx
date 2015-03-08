@@ -68,11 +68,13 @@ private:
 };
 
 typedef enum {
-     MENUBTN_BAOMING,
+     MENUBTN_BAOMING = 1,
      MENUBTN_TUOGUAN,
      MENUBTN_SHEZHI,
      MENUBTN_SHOP,
      MENUBTN_GAMEBACK,
+
+     BTN_START,
 }MenuButtonId_t;
 
 class GObjectFactory {
@@ -85,7 +87,8 @@ public:
     Sprite *CreateBackground();
     GMenu  *CreateMenu();
     Button *CreateButton(MenuButtonId_t id);
-
+    Sprite *CreateMicIcon();
+    Sprite *CreateModeFont(GameMode_t mode = LOCAL_GAME);
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
     

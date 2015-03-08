@@ -126,6 +126,9 @@ void NetRaceLayer::create_race()
 	this->addChild(_object->CreateTable(s_no), 0);
 	this->addChild(_object->CreateBackground(),1,CENTER_BKG_TAG_ID);
 
+    /************************
+        buttons
+    ************************/
     GMenu *gMenu = _object->CreateMenu();
 	this->addChild(gMenu->_bkg,4,MENU_BKG_TAG_ID);
 
@@ -149,11 +152,16 @@ void NetRaceLayer::create_race()
 	backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::backPressed,this));
     gMenu->AddItem(backButton);
 
-
+    /************************
+        residue cards
+    ************************/
     create_residue_cards();
 	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
-    _LoadPlayerInfo();
 
+    /************************
+        head image
+    ************************/
+    _LoadPlayerInfo();
 
     Sprite *bkg = _object->CreateHeadBkg(LEFT);
     _layout->SetPlayerBkg(LEFT,bkg);
@@ -167,22 +175,12 @@ void NetRaceLayer::create_race()
     _layout->SetPlayerBkg(MIDDLE,bkg);
 	this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
 
-
-	auto mic=Sprite::createWithSpriteFrameName("maikefeng.png");
-	mic->setAnchorPoint(Point(0.0f,0.0f));
-	mic->setPosition(Vec2(49,129+_layout->_playerBkg[1]->getTextureRect().size.height));
-	this->addChild(mic,1,MIC_TAG_ID);
-	mic->setScale(0);
-
-	auto danji_font=Sprite::createWithSpriteFrameName("danjiban.png");
-	danji_font->setOpacity(100);
-	danji_font->setAnchorPoint(Vec2(1,0));
-	danji_font->setPosition(Vec2(origin.x+visibleSize.width-10,origin.y+10));
-	this->addChild(danji_font,1,SINGLE_PLAY_TAG_ID);
-
-	auto StartButton=Button::create("kaishiyouxi1.png","kaishiyouxi2.png","kaishiyouxi2.png",UI_TEX_TYPE_PLIST);
-	StartButton->setAnchorPoint(Vec2(0.5,0.5));
-	StartButton->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+    /************************
+        other accessories
+    ************************/
+	this->addChild(_object->CreateMicIcon(),1,MIC_TAG_ID);
+	this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
+	auto StartButton = _object->CreateButton(BTN_START);
 	StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
 	this->addChild(StartButton,2,START_GAME_TAG_ID);
     

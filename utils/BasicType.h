@@ -3,6 +3,11 @@
 #define __BASIC_TYPE__
 
 typedef enum {
+    LOCAL_GAME,
+    NETWORK_GAME,
+}GameMode_t;
+
+typedef enum {
     LEFT,
     MIDDLE,
     RIGHT,

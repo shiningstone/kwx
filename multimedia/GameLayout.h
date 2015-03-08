@@ -27,6 +27,8 @@ class GameLayout {
         /*these should be private finally*/
         cocos2d::Sprite *_playerBkg[3];
         PlayerPos_t      _playerPosi[3];
+
+        Vec2 PositionOfMicIcon();
         /*************************************
             gold count
         *************************************/
