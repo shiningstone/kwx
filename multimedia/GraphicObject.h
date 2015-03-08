@@ -89,6 +89,12 @@ public:
     Button *CreateButton(MenuButtonId_t id);
     Sprite *CreateMicIcon();
     Sprite *CreateModeFont(GameMode_t mode = LOCAL_GAME);
+    Sprite *CreateMaPai(int i);
+    Sprite *CreateMingSign(PlayerDir_t dir);
+    Sprite *CreateZhuangSign();
+    Sprite *CreateClock();
+    Sprite *CreateClockIndicator(PlayerDir_t dir);
+    Sprite *CreatePlayerPointer();
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
     

@@ -52,6 +52,40 @@ Vec2 GameLayout::PositionOfMicIcon() {
     return Vec2(49, 129 + _playerBkg[MIDDLE]->getTextureRect().size.height);
 }
 
+Vec2 GameLayout::PositionOfMapai(int direction) {
+    switch(direction) {
+        case 0:
+            return Vec2(ORIGIN.x + SIZE.width*419/1218,ORIGIN.y + SIZE.height*390/716);
+            break;
+        case 1:
+            return Vec2(ORIGIN.x + SIZE.width*650/1218,ORIGIN.y + SIZE.height*498/716);
+            break;
+        case 2:
+            return Vec2(ORIGIN.x + SIZE.width*799/1218,ORIGIN.y + SIZE.height*326/716);
+            break;
+        case 3:
+            return Vec2(ORIGIN.x + SIZE.width*568/1218,ORIGIN.y + SIZE.height*218/716);
+            break;
+    }
+}
+
+Vec2 GameLayout::PositionOfClock() {
+    return Vec2(ORIGIN.x+SIZE.width*0.5,ORIGIN.y+SIZE.height*0.65);
+}
+
+Vec2 GameLayout::PositionOfClockIndicator(PlayerDir_t dir) {
+    Vec2 clock = PositionOfClock();
+    
+    switch(dir) {
+        case LEFT:
+            return Vec2(clock.x-60,clock.y);
+        case MIDDLE:
+            return Vec2(clock.x,clock.y-60);
+        case RIGHT:
+            return Vec2(clock.x+60,clock.y);
+    }
+}
+
 /*************************************
     gold count
 *************************************/

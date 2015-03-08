@@ -229,6 +229,85 @@ Sprite *GObjectFactory::CreateModeFont(GameMode_t mode) {
     return font;
 }
 
+Sprite *GObjectFactory::CreateMaPai(int direction) {
+    char *file[4] = {
+        "shuban.png","hengban.png","shuban.png","hengban.png"
+    };
+    
+	auto mapai = Sprite::createWithSpriteFrameName( file[direction] );
+	mapai->setAnchorPoint(Vec2(0.5,0.5));
+	mapai->setScale(0.8);
+    mapai->setPosition(_layout->PositionOfMapai(direction));
+
+    return mapai;
+}
+
+Sprite *GObjectFactory::CreateMingSign(PlayerDir_t dir) {
+    Sprite *sign;
+    
+    switch(dir) {
+        case LEFT:
+            sign = Sprite::create("tileImage/Tile_mingOther.png");
+            sign->setAnchorPoint(Vec2(0.5,0));
+            sign->setPosition(Vec2(ORIGIN.x + SIZE.width*85/1218,ORIGIN.y + SIZE.height*536/716));
+            break;
+        case RIGHT:
+            sign = Sprite::create("tileImage/Tile_mingOther.png");
+            sign->setAnchorPoint(Vec2(0.5,0));
+            sign->setPosition(Vec2(ORIGIN.x + SIZE.width*1140/1218,ORIGIN.y + SIZE.height*536/716));
+            break;
+        case MIDDLE:
+            sign = Sprite::create("tileImage/Tile_mingMe.png");
+            sign->setAnchorPoint(Vec2(0,0.5));
+    }
+
+    sign->setVisible(false);
+    return sign;
+}
+
+Sprite *GObjectFactory::CreateZhuangSign() {
+    Sprite *zhuang = Sprite::create("tileImage/zhuang.png");
+    zhuang->setScale(0);
+    return zhuang;
+}
+
+Sprite *GObjectFactory::CreateClock() {
+    Sprite *clock = Sprite::createWithSpriteFrameName("naozhongzhong.png");
+    clock->setAnchorPoint(Vec2(0.5,0.5));
+    clock->setPosition(Vec2(ORIGIN.x+SIZE.width*0.5,ORIGIN.y+SIZE.height*0.65));
+    clock->setVisible(false);
+    return clock;
+}
+
+Sprite *GObjectFactory::CreateClockIndicator(PlayerDir_t dir) {
+    Sprite *tag;
+
+    switch(dir) {
+        case LEFT:
+            tag = Sprite::createWithSpriteFrameName("naozhongzhishizuo.png");
+            break;
+        case MIDDLE:
+            tag = Sprite::createWithSpriteFrameName("naozhongzhishixia.png");
+            break;
+        case RIGHT:
+            tag = Sprite::createWithSpriteFrameName("naozhongzhishiyou.png");
+            break;
+    }
+
+    tag->setAnchorPoint(Vec2(0.5,0.5));
+    tag->setPosition(_layout->PositionOfClockIndicator(dir));
+    tag->setVisible(false);
+
+    return tag;
+}
+
+Sprite *GObjectFactory::CreatePlayerPointer() {
+	auto pointer = Sprite::create("tileImage/tile_pointer.png");
+	pointer->setPosition(Vec2(ORIGIN.x+SIZE.width/2,ORIGIN.y+SIZE.height/2));
+	pointer->setVisible(false);
+    return pointer;
+}
+
 /*************************************
     singleton
 *************************************/

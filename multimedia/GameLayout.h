@@ -29,6 +29,9 @@ class GameLayout {
         PlayerPos_t      _playerPosi[3];
 
         Vec2 PositionOfMicIcon();
+        Vec2 PositionOfMapai(int direction);
+        Vec2 PositionOfClock();
+        Vec2 PositionOfClockIndicator(PlayerDir_t dir);
         /*************************************
             gold count
         *************************************/

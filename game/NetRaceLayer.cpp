@@ -198,82 +198,28 @@ void NetRaceLayer::create_race()
         _roundManager->_players[id]->get_property(score);
 		GuiUpdateScore(id,score);
 	}
-    
-	auto mapai_left=Sprite::createWithSpriteFrameName("shuban.png");//码牌
-	mapai_left->setAnchorPoint(Vec2(0.5,0.5));
-	mapai_left->setScale(0.8);
-	mapai_left->setPosition(Vec2(origin.x+visibleSize.width*419/1218,origin.y+visibleSize.height*390/716));
-	this->addChild(mapai_left,2,CARD_ARRAGE_LEFT_TAG_ID);
 
-	auto mapai_top=Sprite::createWithSpriteFrameName("hengban.png");
-	mapai_top->setAnchorPoint(Vec2(0.5,0.5));
-	mapai_top->setScale(0.8);
-	mapai_top->setPosition(Vec2(origin.x+visibleSize.width*650/1218,origin.y+visibleSize.height*498/716));
-	this->addChild(mapai_top,2,CARD_ARRAGE_TOP_TAG_ID);
-
-	auto mapai_right=Sprite::createWithSpriteFrameName("shuban.png");
-	mapai_right->setAnchorPoint(Vec2(0.5,0.5));
-	mapai_right->setScale(0.8);
-	mapai_right->setPosition(Vec2(origin.x+visibleSize.width*799/1218,origin.y+visibleSize.height*326/716));
-	this->addChild(mapai_right,2,CARD_ARRAGE_RIGHT_TAG_ID);
-
-	auto mapai_bottom=Sprite::createWithSpriteFrameName("hengban.png");
-	mapai_bottom->setAnchorPoint(Vec2(0.5,0.5));
-	mapai_bottom->setScale(0.8);
-	mapai_bottom->setPosition(Vec2(origin.x+visibleSize.width*568/1218,origin.y+visibleSize.height*218/716));
-	this->addChild(mapai_bottom,2,CARD_ARRAGE_BOTTOM_TAG_ID);
-
+    for(int i=0;i<4;i++) {
+        auto mapai = _object->CreateMaPai(i);
+        this->addChild(mapai,2,CARD_ARRAGE_LEFT_TAG_ID + i);
+    }
 }
 
 bool NetRaceLayer::resource_prepare()
 {
-	auto MingSignForLeft=Sprite::create("tileImage/Tile_mingOther.png");
-	MingSignForLeft->setAnchorPoint(Vec2(0.5,0));
-	MingSignForLeft->setPosition(Vec2(origin.x+visibleSize.width*85/1218,origin.y+visibleSize.height*536/716));
-	MingSignForLeft->setVisible(false);
-	this->addChild(MingSignForLeft,2,MING_STATUS_PNG_0);
-	auto MingSignForRight=Sprite::create("tileImage/Tile_mingOther.png");
-	MingSignForRight->setAnchorPoint(Vec2(0.5,0));
-	MingSignForRight->setPosition(Vec2(origin.x+visibleSize.width*1140/1218,origin.y+visibleSize.height*536/716));
-	MingSignForRight->setVisible(false);
-	this->addChild(MingSignForRight,2,MING_STATUS_PNG_2);
-	auto MingSignForMe=Sprite::create("tileImage/Tile_mingMe.png");
-	MingSignForMe->setAnchorPoint(Vec2(0,0.5));
-	MingSignForMe->setVisible(false);
-	this->addChild(MingSignForMe,2,MING_STATUS_PNG_1);
+	this->addChild(_object->CreateMingSign(LEFT),2,MING_STATUS_PNG_0);
+	this->addChild(_object->CreateMingSign(MIDDLE),2,MING_STATUS_PNG_1);
+	this->addChild(_object->CreateMingSign(RIGHT),2,MING_STATUS_PNG_2);
 
-	last_winner=Sprite::create("tileImage/zhuang.png");
-	last_winner->setScale(0);
+    last_winner = _object->CreateZhuangSign();
 	this->addChild(last_winner,1,LAST_WINNER_TAG_ID);
+	this->addChild(_object->CreateClock(),3,ALARM_CLOCK_INDICATOR_TAG_ID);
 
-	auto clock=Sprite::createWithSpriteFrameName("naozhongzhong.png");
-	clock->setAnchorPoint(Vec2(0.5,0.5));
-	clock->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.65));
-	this->addChild(clock,3,ALARM_CLOCK_INDICATOR_TAG_ID);
-	clock->setVisible(false);
+	this->addChild(_object->CreateClockIndicator(MIDDLE),3,ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+	this->addChild(_object->CreateClockIndicator(RIGHT),4,ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+	this->addChild(_object->CreateClockIndicator(LEFT),4,ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
 
-	auto tag1=Sprite::createWithSpriteFrameName("naozhongzhishixia.png");
-	tag1->setAnchorPoint(Vec2(0.5,0.5));
-	tag1->setPosition(Vec2(clock->getPositionX(),clock->getPositionY()-60));
-	this->addChild(tag1,3,ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
-	tag1->setVisible(false);
-
-	auto tag2=Sprite::createWithSpriteFrameName("naozhongzhishiyou.png");
-	tag2->setAnchorPoint(Vec2(0.5,0.5));
-	tag2->setPosition(Vec2(clock->getPositionX()+60,clock->getPositionY()));
-	this->addChild(tag2,4,ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
-	tag2->setVisible(false);
-
-	auto tag3=Sprite::createWithSpriteFrameName("naozhongzhishizuo.png");
-	tag3->setAnchorPoint(Vec2(0.5,0.5));
-	tag3->setPosition(Vec2(clock->getPositionX()-60,clock->getPositionY()));
-	this->addChild(tag3,4,ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
-	tag3->setVisible(false);
-
-	auto show_card_indicator=Sprite::create("tileImage/tile_pointer.png");
-	show_card_indicator->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-	this->addChild(show_card_indicator,5,SHOWCARD_INDICATOR_TAG_ID);
-	show_card_indicator->setVisible(false);
+	this->addChild(_object->CreatePlayerPointer(),5,SHOWCARD_INDICATOR_TAG_ID);
 
 	return true;
 }
