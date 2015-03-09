@@ -308,9 +308,113 @@ Sprite *GObjectFactory::CreatePlayerPointer() {
     return pointer;
 }
 
-Sprite *GObjectFactory::CreateTingSignBar(PlayerDir_t dir) {
-    Sprite * bar;
-    return bar;
+LayerColor *GObjectFactory::CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum) {
+	Vec2 curPos = _layout->PositionOfTingSignBar((PlayerDir_t)dir);
+
+	auto LeftSize  = Sprite::createWithSpriteFrameName("Leftcorner-other.png")->getTextureRect().size;
+	auto CardSize  = Sprite::createWithSpriteFrameName("Husign-other.png")->getTextureRect().size;
+	auto RightSize = Sprite::createWithSpriteFrameName("Rightangle-other.png")->getTextureRect().size;
+
+	Size SignBarSize = Size(LeftSize.width,LeftSize.height+CardSize.height*(cardNum+1)+RightSize.height);
+
+	auto TingSignBar = LayerColor::create();
+	TingSignBar->setAnchorPoint(Vec2(0.5,0.5));
+	TingSignBar->setContentSize(SignBarSize);
+	TingSignBar->ignoreAnchorPointForPosition(false);
+	TingSignBar->setPosition(Vec2(curPos.x,curPos.y));
+
+	if(dir==0)
+	{
+		auto SignLeft=Sprite::createWithSpriteFrameName("Rightangle-other.png");
+		SignLeft->setAnchorPoint(Vec2(0,1));
+		SignLeft->setPosition(Vec2(0,SignBarSize.height));
+		TingSignBar->addChild(SignLeft,1,1);
+
+		auto SignHuBKG=Sprite::createWithSpriteFrameName("Husign-other.png");
+		SignHuBKG->setAnchorPoint(Vec2(0,1));
+		SignHuBKG->setPosition(Vec2(0,SignBarSize.height-LeftSize.height));
+		auto SignHuFont=Sprite::create("smallHu.png");
+		SignHuFont->setRotation(90);
+		SignHuFont->setScale(0.7);
+		SignHuFont->setAnchorPoint(Vec2(0.5,0.5));
+		SignHuFont->setPosition(Vec2(CardSize.width/2,CardSize.height/2));
+		SignHuBKG->addChild(SignHuFont,1);
+		TingSignBar->addChild(SignHuBKG,1,2);
+
+		int k=0;
+		for(k=0;k<cardNum;k++)
+		{
+			auto SingForCards=Sprite::createWithSpriteFrameName("Husign-other.png");
+			SingForCards->setAnchorPoint(Vec2(0,1));
+			SingForCards->setPosition(Vec2(0,SignBarSize.height-LeftSize.height-CardSize.height*(k+1)));
+
+			auto WinCard=Create(LR_OUT_CARD);
+			WinCard->setAnchorPoint(Vec2(0.5,0.5));
+			WinCard->setPosition(Vec2(CardSize.width/2,CardSize.height/2));//  /2  0.65
+			auto s_card=CreateKind(cards[k],SMALL);
+			s_card->setRotation(90);
+			s_card->setScale(0.9);
+			s_card->setAnchorPoint(Vec2(0.5,0.5));
+			s_card->setPosition(Vec2(
+                WinCard->getTextureRect().size.width/2,
+                WinCard->getTextureRect().size.height*0.65));
+			WinCard->addChild(s_card,1);
+			SingForCards->addChild(WinCard,1);
+			TingSignBar->addChild(SingForCards,1,k+3);
+		}
+
+		auto SignRight=Sprite::createWithSpriteFrameName("Leftcorner-other.png");
+		SignRight->setAnchorPoint(Vec2(0,1));
+		SignRight->setPosition(Vec2(0,SignBarSize.height-LeftSize.height-CardSize.height*(k+1)));
+		TingSignBar->addChild(SignRight,1,k+3);
+	}
+	else if(dir==2)
+	{
+		auto SignLeft=Sprite::createWithSpriteFrameName("Leftcorner-other.png");
+		SignLeft->setAnchorPoint(Vec2(0,0));
+		SignLeft->setPosition(Vec2::ZERO);
+		TingSignBar->addChild(SignLeft,1,1);
+
+		auto SignHuBKG=Sprite::createWithSpriteFrameName("Husign-other.png");
+		SignHuBKG->setAnchorPoint(Vec2(0,0));
+		SignHuBKG->setPosition(Vec2(0,LeftSize.height));
+		auto SignHuFont=Sprite::create("smallHu.png");
+		SignHuFont->setRotation(-90);
+		SignHuFont->setScale(0.7);
+		SignHuFont->setAnchorPoint(Vec2(0.5,0.5));
+		SignHuFont->setPosition(Vec2(CardSize.width/2,CardSize.height/2));
+		SignHuBKG->addChild(SignHuFont,1);
+		TingSignBar->addChild(SignHuBKG,1,2);
+
+		int k=0;
+		for(k=0;k<cardNum;k++)
+		{
+			auto SingForCards=Sprite::createWithSpriteFrameName("Husign-other.png");
+			SingForCards->setAnchorPoint(Vec2(0,0));
+			SingForCards->setPosition(Vec2(0,LeftSize.height+CardSize.height*(k+1)));
+
+			auto WinCard=Create(LR_OUT_CARD);
+			WinCard->setAnchorPoint(Vec2(0.5,0.5));
+			WinCard->setPosition(Vec2(CardSize.width/2,CardSize.height/2));//  /2  0.65
+			auto s_card=CreateKind(cards[k],SMALL);
+			s_card->setRotation(-90);
+			s_card->setScale(0.9);
+			s_card->setAnchorPoint(Vec2(0.5,0.5));
+			s_card->setPosition(Vec2(
+                WinCard->getTextureRect().size.width/2,
+                WinCard->getTextureRect().size.height*0.65));
+			WinCard->addChild(s_card,1);
+			SingForCards->addChild(WinCard,1);
+			TingSignBar->addChild(SingForCards,1,k+3);
+		}
+
+		auto SignRight=Sprite::createWithSpriteFrameName("Rightangle-other.png");
+		SignRight->setAnchorPoint(Vec2(0,0));
+		SignRight->setPosition(Vec2(0,LeftSize.height+CardSize.height*(k+1)));
+		TingSignBar->addChild(SignRight,1,k+3);
+	}
+    
+    return TingSignBar;
 }
 
 
