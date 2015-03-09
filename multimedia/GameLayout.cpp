@@ -364,6 +364,55 @@ Vec2 GameLayout::PositionOfTingSignBar(PlayerDir_t dir) {
 }
 
 /*************************************
+    card in hand
+*************************************/
+Vec2 GameLayout::AnchorOfNormalCard(PlayerDir_t dir) {
+    switch(dir) {
+        case LEFT:
+            return Vec2(0.3f,1.0f);
+        case RIGHT:
+            return Vec2(0.3f,0);
+    }
+}
+
+Vec2 GameLayout::PositionOfNormalCard(PlayerDir_t dir,int x,int y) {
+    switch(dir) {
+        case LEFT:
+            return Vec2(x-10,y-8);
+        case RIGHT:
+            return Vec2(x-10,y-8);
+    }
+}
+
+Vec2 GameLayout::AnchorOfFreeCard(PlayerDir_t dir) {
+    switch(dir) {
+        case LEFT:
+            return Vec2(0.0f,1.0f);
+        case RIGHT:
+            return Vec2(0.0f,0);
+    }
+}
+
+int  GameLayout::RotateAngleOfCard(PlayerDir_t dir) {
+    switch(dir) {
+        case LEFT:
+            return 90;
+        case RIGHT:
+            return -90;
+    }
+}
+
+float GameLayout::YOfNextCard(PlayerDir_t dir,float originY,Size cardSize) {
+    switch(dir) {
+        case LEFT:
+            return originY - cardSize.height*0.65;
+        case RIGHT:
+            return originY + cardSize.height*0.65;
+    }
+}
+
+
+/*************************************
     singleton
 *************************************/
 GameLayout *GameLayout::_instance = NULL;

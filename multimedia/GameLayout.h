@@ -68,6 +68,14 @@ class GameLayout {
         Vec2 PositionOfMingGangCard(int i,Size size);
 
         Vec2 PositionOfTingSignBar(PlayerDir_t dir);
+        /*************************************
+            card in hand
+        *************************************/
+        Vec2 AnchorOfNormalCard(PlayerDir_t dir);
+        Vec2 PositionOfNormalCard(PlayerDir_t dir,int x,int y);
+        Vec2 AnchorOfFreeCard(PlayerDir_t dir);
+        int  RotateAngleOfCard(PlayerDir_t dir);
+        float YOfNextCard(PlayerDir_t dir,float originY,Size cardSize);
     private:
         GameLayout(cocos2d::Point origin, cocos2d::Size size);
         static GameLayout *_instance;

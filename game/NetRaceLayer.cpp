@@ -3144,24 +3144,28 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 
 void NetRaceLayer::card_list_update(int no)
 {
-	float x,y;
-	Sprite *p_list[MAX_HANDIN_NUM];
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
-	for(int ik=0;ik<MAX_HANDIN_NUM;ik++)
-	{
-		if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik))
-			myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik,true);
-	}
-	x=_layout->_playerPosi[no].basePoint.x+10; 
-	y=_layout->_playerPosi[no].basePoint.y+10;
-	int residualCardsNum=(list->len-list->atcvie_place)%3;
-	unsigned char ting_flag=_roundManager->_players[no]->get_parter()->get_ting_status();
-    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
     
+	for(int i=0;i<MAX_HANDIN_NUM;i++) {
+        _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
+	}
+
+	float x,y;
+	x = _layout->_playerPosi[no].basePoint.x+10; 
+	y = _layout->_playerPosi[no].basePoint.y+10;
+
+	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
+
+	int residualCardsNum = (list->len-list->atcvie_place)%3;
+
+	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
 	if( ting_flag==1 && _roundManager->_firstMingNo==-1 )
 		_roundManager->_firstMingNo=no;
 
+    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
+    
+
+	Sprite *p_list[MAX_HANDIN_NUM];
     for(int i=0;i<list->len;i++)
 	{
 		if(list->data[i].kind!=ck_NOT_DEFINED )
@@ -3173,20 +3177,20 @@ void NetRaceLayer::card_list_update(int no)
 					if(ting_flag==1)
 					{
 						p_list[i]=_object->Create(LR_OUT_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
+						p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+						p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
 					}
 					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 					{
 						p_list[i]=_object->Create(LR_AN_GANG_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
+						p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+						p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
 					}
 					else
 					{
 						p_list[i]=_object->Create(L_IN_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.0f,1.0f));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
+						p_list[i]->setAnchorPoint(_layout->AnchorOfFreeCard((PlayerDir_t)no));
+						p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
 					}
 				}
 				else if(list->data[i].status==c_AN_GANG)
@@ -3195,21 +3199,22 @@ void NetRaceLayer::card_list_update(int no)
 						p_list[i]=_object->Create(LR_OUT_CARD);
 					else
 						p_list[i]=_object->Create(LR_AN_GANG_CARD);
-					p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-					p_list[i]->setPosition(Vec2(x-10,y-8));
+					p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+					p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
 				}
 				else if(list->data[i].status==c_MING_KOU)
 				{
 					p_list[i]=_object->Create(LR_AN_GANG_CARD);
-					p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-					p_list[i]->setPosition(Vec2(x-10,y-8));
+					p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+					p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
 				{
 					p_list[i]=_object->Create(LR_OUT_CARD);
-					p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-					p_list[i]->setPosition(Vec2(x-10,y-8));
+					p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+					p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
 				}
+                
 				if(list->data[i].status==c_FREE)
 				{
 					if(ting_flag==1||_roundManager->_players[1]->get_parter()->get_ting_status()==1)
@@ -3219,7 +3224,6 @@ void NetRaceLayer::card_list_update(int no)
 							s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
 						else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 							s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL_BLACK);
-							//s_card=Sprite::create("tileImage/tile_Upblack_14.png");
 						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
 						s_card->setRotation(90);
 						s_card->setScale(0.9);
@@ -3276,19 +3280,15 @@ void NetRaceLayer::card_list_update(int no)
 						{
 							if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
 								y-=((p_list[i]->getTextureRect().size.height)*1);
-							else /*if(list->data[i+1].kind!=list->data[i].kind)*/
+							else
 								y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
-							//else
-							//	y-=((p_list[i]->getTextureRect().size.height)*0.65);
 						}
 						else
 						{
 							if(list->data[i+1].status==c_FREE)
 								y-=((p_list[i]->getTextureRect().size.height)*0.4);
-							else /*if(list->data[i+1].kind!=list->data[i].kind)*/
+							else
 								y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
-							//else
-							//	y-=((p_list[i]->getTextureRect().size.height)*0.65);
 						}
 					}
 				}
@@ -3329,6 +3329,170 @@ void NetRaceLayer::card_list_update(int no)
 								y-=((p_list[i]->getTextureRect().size.height)*0.4);
 							else
 								y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						}
+					}
+				}
+			}
+			else if(no==2)
+			{
+				if(list->data[i].status==c_FREE)
+				{
+					if(ting_flag==1)
+					{
+						p_list[i]=_object->Create(LR_OUT_CARD);
+						p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+						p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
+					}
+					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
+					{
+						p_list[i]=_object->Create(LR_AN_GANG_CARD);
+						p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+						p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
+					}
+					else
+					{
+						p_list[i]=_object->Create(R_IN_CARD);
+						p_list[i]->setAnchorPoint(_layout->AnchorOfFreeCard((PlayerDir_t)no));
+						p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
+					}
+				}
+				else if(list->data[i].status==c_AN_GANG)
+				{
+					if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind&&ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
+						p_list[i]=_object->Create(LR_OUT_CARD);
+					else
+						p_list[i]=_object->Create(LR_AN_GANG_CARD);
+					p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+					p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
+				}
+				else if(list->data[i].status==c_MING_KOU)
+				{
+					p_list[i]=_object->Create(LR_AN_GANG_CARD);
+					p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+					p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
+				}
+				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
+				{
+					p_list[i]=_object->Create(LR_OUT_CARD);
+					p_list[i]->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)no));
+					p_list[i]->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)no,x,y));
+				}
+
+				if(list->data[i].status==c_FREE)
+				{
+					if(ting_flag==1||_roundManager->_players[1]->get_parter()->get_ting_status()==1)
+					{
+						Sprite* s_card;
+						if(ting_flag==1)
+							s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+						else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
+							s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL_BLACK);
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+						s_card->setRotation(-90);
+						s_card->setScale(0.9);
+						p_list[i]->addChild(s_card);
+						y+=((p_list[i]->getTextureRect().size.height)*0.65);
+
+					}
+					else
+						y+=((p_list[i]->getTextureRect().size.height)*0.5);
+				}
+				else if(list->data[i].status==c_MING_KOU)
+					y+=((p_list[i]->getTextureRect().size.height)*0.65);
+				else if(list->data[i].status==c_PENG)
+				{
+					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+					s_card->setRotation(-90);
+					s_card->setScale(0.9);
+					p_list[i]->addChild(s_card);
+					if(_roundManager->_players[1]->get_parter()->get_ting_status()==1||ting_flag==1)
+					{
+						if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
+							y+=((p_list[i]->getTextureRect().size.height)*1);
+						else if(list->data[i+1].kind!=list->data[i].kind)
+							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						else
+							y+=((p_list[i]->getTextureRect().size.height)*0.65);
+					}
+					else
+					{
+						if(list->data[i+1].status==c_FREE)
+							y+=((p_list[i]->getTextureRect().size.height)*0.8);
+						else if(list->data[i+1].kind!=list->data[i].kind)
+							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						else
+							y+=((p_list[i]->getTextureRect().size.height)*0.65);
+					}
+				}
+				else if(list->data[i].status==c_MING_GANG)
+				{
+					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+					s_card->setRotation(-90);
+					s_card->setScale(0.9);
+					p_list[i]->addChild(s_card);
+					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+						y+=(p_list[i]->getTextureRect().size.height*0.65+13);
+					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+						y-=13;
+					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+						y+=p_list[i]->getTextureRect().size.height*0.65;
+					else if(list->data[i].kind!=list->data[i+1].kind)//4
+					{
+						if(_roundManager->_players[1]->get_parter()->get_ting_status()==1||ting_flag==1)
+						{
+							if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
+								y+=((p_list[i]->getTextureRect().size.height)*1);
+							else
+								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						}
+						else
+						{
+							if(list->data[i+1].status==c_FREE)
+								y+=((p_list[i]->getTextureRect().size.height)*0.8);
+							else
+								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						}
+					}
+				}
+				else if(list->data[i].status==c_AN_GANG)
+				{
+					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+						y+=(p_list[i]->getTextureRect().size.height*0.65+13);
+					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+					{
+						if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
+						{
+							Sprite* s_card;
+							if(ting_flag==1)
+								s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+							else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
+								s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL_BLACK);
+							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+							s_card->setRotation(-90);
+							s_card->setScale(0.9);
+							p_list[i]->addChild(s_card);
+						}
+						y-=13;
+					}
+					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+						y+=((p_list[i]->getTextureRect().size.height)*0.65);
+					else if(list->data[i].kind!=list->data[i+1].kind)//4
+					{
+						if(_roundManager->_players[1]->get_parter()->get_ting_status()==1||ting_flag==1)
+						{
+							if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
+								y+=((p_list[i]->getTextureRect().size.height)*1);
+							else
+								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						}
+						else
+						{
+							if(list->data[i+1].status==c_FREE)
+								y+=((p_list[i]->getTextureRect().size.height)*0.8);
+							else
+								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
 						}
 					}
 				}
@@ -3490,169 +3654,9 @@ void NetRaceLayer::card_list_update(int no)
 					}
 				}
 			}
-			else if(no==2)
-			{
-				if(list->data[i].status==c_FREE)
-				{
-					if(ting_flag==1)
-					{
-						p_list[i]=_object->Create(LR_OUT_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.3f,0));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
-					}
-					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-					{
-						p_list[i]=_object->Create(LR_AN_GANG_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.3f,0));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
-					}
-					else
-					{
-						p_list[i]=_object->Create(R_IN_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.0f,0));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
-					}
-				}
-				else if(list->data[i].status==c_AN_GANG)
-				{
-					if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind&&ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-						p_list[i]=_object->Create(LR_OUT_CARD);
-					else
-						p_list[i]=_object->Create(LR_AN_GANG_CARD);
-					p_list[i]->setAnchorPoint(Vec2(0.3f,0));
-					p_list[i]->setPosition(Vec2(x-10,y-8));
-				}
-				else if(list->data[i].status==c_MING_KOU)
-				{
-					p_list[i]=_object->Create(LR_AN_GANG_CARD);
-					p_list[i]->setAnchorPoint(Vec2(0.3f,0));
-					p_list[i]->setPosition(Vec2(x-10,y-8));
-				}
-				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
-				{
-					p_list[i]=_object->Create(LR_OUT_CARD);
-					p_list[i]->setAnchorPoint(Vec2(0.3f,0));
-					p_list[i]->setPosition(Vec2(x-10,y-8));
-				}
-				if(list->data[i].status==c_FREE)
-				{
-					if(ting_flag==1||_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-					{
-						Sprite* s_card;
-						if(ting_flag==1)
-							s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-						else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-							s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL_BLACK);
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-						s_card->setRotation(-90);
-						s_card->setScale(0.9);
-						p_list[i]->addChild(s_card);
-						y+=((p_list[i]->getTextureRect().size.height)*0.65);
 
-					}
-					else
-						y+=((p_list[i]->getTextureRect().size.height)*0.5);
-				}
-				else if(list->data[i].status==c_MING_KOU)
-					y+=((p_list[i]->getTextureRect().size.height)*0.65);
-				else if(list->data[i].status==c_PENG)
-				{
-					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-					s_card->setRotation(-90);
-					s_card->setScale(0.9);
-					p_list[i]->addChild(s_card);
-					if(_roundManager->_players[1]->get_parter()->get_ting_status()==1||ting_flag==1)
-					{
-						if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
-							y+=((p_list[i]->getTextureRect().size.height)*1);
-						else if(list->data[i+1].kind!=list->data[i].kind)
-							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						else
-							y+=((p_list[i]->getTextureRect().size.height)*0.65);
-					}
-					else
-					{
-						if(list->data[i+1].status==c_FREE)
-							y+=((p_list[i]->getTextureRect().size.height)*0.8);
-						else if(list->data[i+1].kind!=list->data[i].kind)
-							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						else
-							y+=((p_list[i]->getTextureRect().size.height)*0.65);
-					}
-				}
-				else if(list->data[i].status==c_MING_GANG)
-				{
-					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-					s_card->setRotation(-90);
-					s_card->setScale(0.9);
-					p_list[i]->addChild(s_card);
-					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-						y+=(p_list[i]->getTextureRect().size.height*0.65+13);
-					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-						y-=13;
-					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-						y+=p_list[i]->getTextureRect().size.height*0.65;
-					else if(list->data[i].kind!=list->data[i+1].kind)//4
-					{
-						if(_roundManager->_players[1]->get_parter()->get_ting_status()==1||ting_flag==1)
-						{
-							if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
-								y+=((p_list[i]->getTextureRect().size.height)*1);
-							else
-								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						}
-						else
-						{
-							if(list->data[i+1].status==c_FREE)
-								y+=((p_list[i]->getTextureRect().size.height)*0.8);
-							else
-								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						}
-					}
-				}
-				else if(list->data[i].status==c_AN_GANG)
-				{
-					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-						y+=(p_list[i]->getTextureRect().size.height*0.65+13);
-					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-					{
-						if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-						{
-							Sprite* s_card;
-							if(ting_flag==1)
-								s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-							else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-								s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL_BLACK);
-							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-							s_card->setRotation(-90);
-							s_card->setScale(0.9);
-							p_list[i]->addChild(s_card);
-						}
-						y-=13;
-					}
-					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-						y+=((p_list[i]->getTextureRect().size.height)*0.65);
-					else if(list->data[i].kind!=list->data[i+1].kind)//4
-					{
-						if(_roundManager->_players[1]->get_parter()->get_ting_status()==1||ting_flag==1)
-						{
-							if(list->data[i+1].status==c_FREE||list->data[i+1].status==c_MING_KOU)
-								y+=((p_list[i]->getTextureRect().size.height)*1);
-							else
-								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						}
-						else
-						{
-							if(list->data[i+1].status==c_FREE)
-								y+=((p_list[i]->getTextureRect().size.height)*0.8);
-							else
-								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						}
-					}
-				}
-			}
+
+
 			if(no!=2)
 				myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+no*20+i);
 			else if(no==2)
