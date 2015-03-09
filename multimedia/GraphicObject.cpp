@@ -311,9 +311,9 @@ Sprite *GObjectFactory::CreatePlayerPointer() {
 LayerColor *GObjectFactory::CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum) {
 	Vec2 curPos = _layout->PositionOfTingSignBar((PlayerDir_t)dir);
 
-	auto LeftSize  = Sprite::createWithSpriteFrameName("Leftcorner-other.png")->getTextureRect().size;
-	auto CardSize  = Sprite::createWithSpriteFrameName("Husign-other.png")->getTextureRect().size;
-	auto RightSize = Sprite::createWithSpriteFrameName("Rightangle-other.png")->getTextureRect().size;
+	auto LeftSize  = _image("Leftcorner-other.png")->getTextureRect().size;
+	auto CardSize  = _image("Husign-other.png")->getTextureRect().size;
+	auto RightSize = _image("Rightangle-other.png")->getTextureRect().size;
 
 	Size SignBarSize = Size(LeftSize.width,LeftSize.height+CardSize.height*(cardNum+1)+RightSize.height);
 
@@ -417,6 +417,124 @@ LayerColor *GObjectFactory::CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int 
     return TingSignBar;
 }
 
+LabelAtlas *GObjectFactory::_createNumberSign(int number) {
+    char tempForChar[10] = {0};
+    
+    sprintf(tempForChar,"%d",number);
+    std::string tempForStr = tempForChar;
+
+    auto numberSign = LabelAtlas::create(tempForStr,"fonts/NumMingNotice.png",17, 20, '0');
+    numberSign->setAnchorPoint(Vec2(0.5,0.5));
+    numberSign->setPosition(Vec2(78,62));
+
+    return numberSign;
+}
+
+LayerColor *GObjectFactory::CreateMingSignBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum) {
+	auto tishiLeft = _image("Left corner.png")->getTextureRect().size;
+	auto tishiHu   = _image("Hu sign.png")->getTextureRect().size;
+	auto tishiCard = _image("Card and Zhang.png")->getTextureRect().size;
+	auto tishiEnd  = _image("Right angle.png")->getTextureRect().size;
+
+	Size SignBarSize=Size(tishiLeft.width+tishiHu.width+tishiCard.width*cardNum+tishiEnd.width,tishiLeft.height);
+    
+	float BarWith=SignBarSize.width;
+	float x=referPoint.x;
+
+    Vec2 PositionAdjust=Vec2::ZERO;
+	Vec2 PointAdjust=Vec2::ZERO;
+	if((x-BarWith/2)>=10&&(x+BarWith/2)<=(SIZE.width-10))
+	{
+		PointAdjust=Vec2(0.5,0.5);
+		PositionAdjust=referPoint;
+	}
+	else if((x-BarWith/2)<10)
+	{
+		PointAdjust=Vec2((x-10)/BarWith,0.5);
+		PositionAdjust=referPoint;
+	}
+	else if((x+BarWith/2)>(SIZE.width-10))
+	{
+		PointAdjust=Vec2(1-(SIZE.width-10-x)/BarWith,0.5);
+		PositionAdjust=referPoint;
+	}
+
+	auto TingSignBar=LayerColor::create();
+	TingSignBar->setAnchorPoint(PointAdjust);
+	TingSignBar->setContentSize(SignBarSize);
+	TingSignBar->ignoreAnchorPointForPosition(false);
+	TingSignBar->setPosition(Vec2(PositionAdjust.x,ORIGIN.y+SIZE.height*0.3));
+
+	auto tipPoint=Sprite::createWithSpriteFrameName("Small triangle.png");
+	tipPoint->setAnchorPoint(Vec2(0.5,1));
+	//tipPoint->getTexture()->setAliasTexParameters();
+	tipPoint->setPosition(Vec2(PointAdjust.x*TingSignBar->getContentSize().width,0.5));
+	TingSignBar->addChild(tipPoint,1);
+
+	auto SignHead=Sprite::createWithSpriteFrameName("Left corner.png");//å·?
+	//SignHead->getTexture()->setAliasTexParameters();
+	SignHead->setAnchorPoint(Vec2(0,0));
+	SignHead->setPosition(Vec2::ZERO);
+	TingSignBar->addChild(SignHead,1,1);
+
+	auto SignHuBKG=Sprite::createWithSpriteFrameName("Hu sign.png");//èƒ?
+	SignHuBKG->setAnchorPoint(Vec2(0,0));
+	SignHuBKG->setPosition(Vec2(SignHead->getTextureRect().size.width,0));
+	auto SignHuFont=Sprite::create("smallHu.png");
+	SignHuFont->setScale(0.8);
+	SignHuFont->setAnchorPoint(Vec2(0.5,0.5));
+	SignHuFont->setPosition(Vec2(ORIGIN.x+SignHuBKG->getTextureRect().size.width/2,ORIGIN.y+SignHuBKG->getTextureRect().size.height/2));
+	SignHuBKG->addChild(SignHuFont,1);
+	TingSignBar->addChild(SignHuBKG,1,2);
+
+	for(int i=0;i<cardNum;i++)//ç‰?
+	{
+		auto SignForCards=Sprite::createWithSpriteFrameName("Card and Zhang.png");
+		//SignForCards->getTexture()->setAliasTexParameters();
+		SignForCards->setAnchorPoint(Vec2(0,0));
+		SignForCards->setPosition(Vec2(SignHead->getTextureRect().size.width+SignHuBKG->getTextureRect().size.width+SignForCards->getTextureRect().size.width*i,0));
+
+		auto WinCard=Create(PENG_CARD);
+		WinCard->setAnchorPoint(Vec2(0.5,0.5));
+		WinCard->setPosition(Vec2(10+WinCard->getTextureRect().size.width/2,43));
+		auto s_card=CreateKind(cards[i],MIDDLE_SIZE);
+		s_card->setAnchorPoint(Vec2(0.5,0.5));
+		s_card->setPosition(WinCard->getTextureRect().size.width/2,WinCard->getTextureRect().size.height*0.6);
+		WinCard->addChild(s_card,1);
+		SignForCards->addChild(WinCard,1);
+
+        auto winTime = _createNumberSign(winTimes[i]);
+        winTime->setPosition(Vec2(78,62));
+        SignForCards->addChild(winTime,1,1);
+
+		auto fanFont=Sprite::createWithSpriteFrameName("fan.png");
+		fanFont->setAnchorPoint(Vec2(0.5,0.5));
+		fanFont->setPosition(Vec2(108,62));
+		SignForCards->addChild(fanFont,1);
+
+        auto remainNum = _createNumberSign(winTimes[i]);
+        remainNum->setPosition(Vec2(78,24));
+        SignForCards->addChild(remainNum,1,1);
+
+		auto zhangFont=Sprite::createWithSpriteFrameName("zhang.png");
+		zhangFont->setAnchorPoint(Vec2(0.5,0.5));
+		zhangFont->setPosition(Vec2(108,24));
+		SignForCards->addChild(zhangFont,1);
+
+		TingSignBar->addChild(SignForCards,1,3+i);
+	}
+	auto SignEnd=Sprite::createWithSpriteFrameName("Right angle.png");
+	//SignEnd->getTexture()->setAliasTexParameters();
+	SignEnd->setAnchorPoint(Vec2(1,0));
+	SignEnd->setPosition(Vec2(TingSignBar->getContentSize().width,0));
+	TingSignBar->addChild(SignEnd,1,cardNum+3);
+
+    return TingSignBar;
+}
+
+Sprite *GObjectFactory::_image(const char *file) {
+    return Sprite::createWithSpriteFrameName(file);
+}
 
 /*************************************
     singleton

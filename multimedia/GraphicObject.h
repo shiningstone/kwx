@@ -96,6 +96,7 @@ public:
     Sprite *CreateClockIndicator(PlayerDir_t dir);
     Sprite *CreatePlayerPointer();
     LayerColor *CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum);
+    LayerColor *CreateMingSignBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum);
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
     
@@ -114,7 +115,9 @@ protected:
     static CCSpriteBatchNode * _kindMiddle[CARD_MAX];
     static CCSpriteBatchNode * _kind[CARD_MAX];
     static Size              * _rectSize[TEXTURE_NUM];
-    
+
+    Sprite *_image(const char *file);
+    LabelAtlas *_createNumberSign(int number);
 private:
     GObjectFactory(cocos2d::Point origin, cocos2d::Size size);
     static GObjectFactory *_instance;
