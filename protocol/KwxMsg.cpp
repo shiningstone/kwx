@@ -144,7 +144,18 @@ int KwxMsg::AddCards(CARD *cards,int num) {
 }
 
 int KwxMsg::AddCardKind(CardType_t code) {
-    return _add_item( new Item(CardKindOfReaction,code) );
+    return _add_item( new Item(CardList,1,&code) );
+}
+
+int KwxMsg::AddCardKind(int num,Card_t *card) {
+    INT8U buf[MAX_HANDIN_NUM+1] = {0};
+
+    buf[0] = 0xff;
+    for(int i=1;i<num+1;i++) {
+        buf[i] = card[i-1];
+    }
+
+    return _add_item( new Item(CardList,num+1,buf) );
 }
 /**********************************************************
 	Interfaces
@@ -181,7 +192,7 @@ int KwxMsg::SetShowCard(INT8U *buf,CardType_t code) {
     return Serialize(buf);
 }
 
-int KwxMsg::SetReaction(INT8U *buf,CardType_t kind,ActionId_t code) {
+int KwxMsg::SetReaction(INT8U *buf,ActionId_t code,CardType_t kind) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_RESPONSE);
@@ -189,8 +200,24 @@ int KwxMsg::SetReaction(INT8U *buf,CardType_t kind,ActionId_t code) {
     AddRoomId(seat->_roomId);
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
-    AddCardKind(kind);
     AddAction(code);
+    AddCardKind(kind);
+
+    LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
+
+    return Serialize(buf);
+}
+
+int KwxMsg::SetReaction(INT8U *buf,ActionId_t code,int num,Card_t *kind) {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_RESPONSE);
+    AddRoomPath(seat->_roomPath);
+    AddRoomId(seat->_roomId);
+    AddTableId(seat->_tableId);
+    AddSeatId(seat->_seatId);
+    AddAction(code);
+    AddCardKind(num,kind);
 
     LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
 

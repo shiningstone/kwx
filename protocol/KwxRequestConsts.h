@@ -48,10 +48,12 @@ typedef enum {
 }RequestId_t;
 
 typedef enum {
-    PENG = 1,
-    GANG,
-    GUO,
-    HU,
+    aPENG = 1,
+    aGANG,
+    aGUO,
+    aHU,
+    aQIANG_GANG,
+    aMING,
 }ActionId_t;/*ARRAY_ACTION???*/
 
 typedef enum {

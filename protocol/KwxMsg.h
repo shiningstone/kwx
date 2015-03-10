@@ -6,6 +6,7 @@
 #include "./../RaceType.h"
 
 #include "./../utils/UtilBasic.h"
+#include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
 #include "KwxRequestConsts.h"
@@ -38,7 +39,8 @@ public:
     /* upstream */
     int SetAction(INT8U *buf,ActionId_t code);
     int SetShowCard(INT8U *buf,CardType_t code);
-    int SetReaction(INT8U *buf,CardType_t kind,ActionId_t code);
+    int SetReaction(INT8U *buf,ActionId_t code,CardType_t kind);
+    int SetReaction(INT8U *buf,ActionId_t code,int num,Card_t *kind);
     int SetRequestDistribute(INT8U *buf);
     int SetUpdateCardList(INT8U *buf,CARD *cards,int cardNum);
     
@@ -75,6 +77,7 @@ protected:
     int AddShowCard(CardType_t card);
     int AddCards(CARD *cards,int num);
     int AddCardKind(CardType_t code);
+    int AddCardKind(int num,Card_t *card);
 
     static Logger   *_logger;
 };
