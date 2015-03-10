@@ -99,7 +99,7 @@ Sprite *GObjectFactory::Create(TextureId_t id) {
 }
 
 Sprite *GObjectFactory::Create(TextureId_t id,PlayerDir_t dir,float x,float y) {
-    Sprite card = Create(id);
+    Sprite *card = Create(id);
     card->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)dir));
     card->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)dir,x,y));
     
@@ -131,7 +131,7 @@ void GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind,
     cardFace->setPosition(Vec2(
         parent->getTextureRect().size.width/2, 
         parent->getTextureRect().size.height*0.65));
-    cardFace->setRotation(_layout->RotateAngleOfCard(dir);
+    cardFace->setRotation(_layout->RotateAngleOfCard(dir));
     cardFace->setScale(0.9);
     parent->addChild(cardFace);/* additional parameter 1 if dir==MIDDLE */
 }

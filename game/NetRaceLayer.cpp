@@ -3142,11 +3142,6 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 	myframe->addChild(mingSignBar, 30, TING_SING_BAR);
 }
 
-void NetRaceLayer::other_player_card_list_update(int no) 
-{
-
-}
-
 void NetRaceLayer::card_list_update(int no)
 {
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
@@ -3179,32 +3174,32 @@ void NetRaceLayer::card_list_update(int no)
 				{
 					if(ting_flag==1)
 					{
-						p_list[i]=_object->Create(LR_OUT_CARD,no,x,y);
+						p_list[i]=_object->Create(LR_OUT_CARD,(PlayerDir_t)no,x,y);
 					}
 					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 					{
-						p_list[i]=_object->Create(LR_AN_GANG_CARD,no,x,y);
+						p_list[i]=_object->Create(LR_AN_GANG_CARD,(PlayerDir_t)no,x,y);
 					}
 					else
 					{
-						p_list[i]=_object->Create(L_IN_CARD,no,x,y);
+						p_list[i]=_object->Create(L_IN_CARD,(PlayerDir_t)no,x,y);
 						p_list[i]->setAnchorPoint(_layout->AnchorOfFreeCard((PlayerDir_t)no));
 					}
 				}
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind&&ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-						p_list[i]=_object->Create(LR_OUT_CARD,no,x,y);
+						p_list[i]=_object->Create(LR_OUT_CARD,(PlayerDir_t)no,x,y);
 					else
-						p_list[i]=_object->Create(LR_AN_GANG_CARD,no,x,y);
+						p_list[i]=_object->Create(LR_AN_GANG_CARD,(PlayerDir_t)no,x,y);
 				}
 				else if(list->data[i].status==c_MING_KOU)
 				{
-					p_list[i]=_object->Create(LR_AN_GANG_CARD,no,x,y);
+					p_list[i]=_object->Create(LR_AN_GANG_CARD,(PlayerDir_t)no,x,y);
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
 				{
-					p_list[i]=_object->Create(LR_OUT_CARD,no,x,y);
+					p_list[i]=_object->Create(LR_OUT_CARD,(PlayerDir_t)no,x,y);
 				}
                 
 				if(list->data[i].status==c_FREE)
@@ -3318,32 +3313,32 @@ void NetRaceLayer::card_list_update(int no)
 				{
 					if(ting_flag==1)
 					{
-                        p_list[i]=_object->Create(LR_OUT_CARD,no,x,y);
+                        p_list[i]=_object->Create(LR_OUT_CARD,(PlayerDir_t)no,x,y);
 					}
 					else if(ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
 					{
-                        p_list[i]=_object->Create(LR_AN_GANG_CARD,no,x,y);
+                        p_list[i]=_object->Create(LR_AN_GANG_CARD,(PlayerDir_t)no,x,y);
 					}
 					else
 					{
-                        p_list[i]=_object->Create(R_IN_CARD,no,x,y);
+                        p_list[i]=_object->Create(R_IN_CARD,(PlayerDir_t)no,x,y);
                         p_list[i]->setAnchorPoint(_layout->AnchorOfFreeCard((PlayerDir_t)no));
 					}
 				}
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind&&ting_flag!=1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1)
-                        p_list[i]=_object->Create(LR_OUT_CARD,no,x,y);
+                        p_list[i]=_object->Create(LR_OUT_CARD,(PlayerDir_t)no,x,y);
 					else
-                        p_list[i]=_object->Create(LR_AN_GANG_CARD,no,x,y);
+                        p_list[i]=_object->Create(LR_AN_GANG_CARD,(PlayerDir_t)no,x,y);
 				}
 				else if(list->data[i].status==c_MING_KOU)
 				{
-                    p_list[i]=_object->Create(LR_AN_GANG_CARD,no,x,y);
+                    p_list[i]=_object->Create(LR_AN_GANG_CARD,(PlayerDir_t)no,x,y);
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG )
 				{
-                    p_list[i]=_object->Create(LR_OUT_CARD,no,x,y);
+                    p_list[i]=_object->Create(LR_OUT_CARD,(PlayerDir_t)no,x,y);
 				}
 
 				if(list->data[i].status==c_FREE)
@@ -3456,20 +3451,20 @@ void NetRaceLayer::card_list_update(int no)
 				if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
 				{
 					if(ting_flag==1)
-						p_list[i]=_object->Create(MING_CARD,no,x,y);
+						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)no,x,y);
 					else
-						p_list[i]=_object->Create(FREE_CARD,no,x,y);
+						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)no,x,y);
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
 				{
-					p_list[i]=_object->Create(PENG_CARD,no,x,y);
+					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
 				}
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-						p_list[i]=_object->Create(PENG_CARD,no,x,y);
+						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
 					else
-						p_list[i]=_object->Create(AN_GANG_CARD,no,x,y);
+						p_list[i]=_object->Create(AN_GANG_CARD,(PlayerDir_t)no,x,y);
 				}
                 
                 /* the card being chosen */
