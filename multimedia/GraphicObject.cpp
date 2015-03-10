@@ -547,7 +547,7 @@ LayerColor *GObjectFactory::CreateTingInfoBar(Vec2 &referPoint, Card_t *cards,in
 		fanFont->setPosition(Vec2(108,62));
 		SignForCards->addChild(fanFont,1);
 
-        auto remainNum = _createNumberSign(winTimes[i]);
+        auto remainNum = _createNumberSign(remainingNum[i]);
         remainNum->setPosition(Vec2(78,24));
         SignForCards->addChild(remainNum,1,1);
 
