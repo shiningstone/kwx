@@ -118,9 +118,10 @@ Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
     return parent;
 }
 
+/* only for LEFT/RIGHT */
 Sprite *GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind, Card_t isHide) {
     Sprite* cardFace;
-
+    
     if(isHide==HIDE) {
         cardFace = CreateKind((Card_t)kind,SMALL_BLACK);
     } else {
@@ -132,8 +133,9 @@ Sprite *GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t ki
         parent->getTextureRect().size.height*0.65));
     cardFace->setRotation(_layout->RotateAngleOfCard(dir);
     cardFace->setScale(0.9);
-    parent->addChild(cardFace);
+    parent->addChild(cardFace);/* additional parameter 1 if dir==MIDDLE */
 }
+
 
 Sprite *GObjectFactory::CreateKind(Card_t type,CardSize_t size) {
     switch(size) {
@@ -454,7 +456,7 @@ LabelAtlas *GObjectFactory::_createNumberSign(int number) {
     return numberSign;
 }
 
-LayerColor *GObjectFactory::CreateMingSignBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum) {
+LayerColor *GObjectFactory::CreateTingInfoBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum) {
 	auto tishiLeft = _image("Left corner.png")->getTextureRect().size;
 	auto tishiHu   = _image("Hu sign.png")->getTextureRect().size;
 	auto tishiCard = _image("Card and Zhang.png")->getTextureRect().size;
@@ -554,6 +556,13 @@ LayerColor *GObjectFactory::CreateMingSignBar(Vec2 &referPoint, Card_t *cards,in
 	TingSignBar->addChild(SignEnd,1,cardNum+3);
 
     return TingSignBar;
+}
+
+Sprite *GObjectFactory::CreateTingSign() {
+    auto tingSign = Sprite::createWithSpriteFrameName("fanxingtishi.png");
+    tingSign->setAnchorPoint(Vec2(0,0));
+    tingSign->setPosition(Vec2(ORIGIN.x+SIZE.width*0.9, ORIGIN.y+SIZE.height*0.2));
+    return tingSign;
 }
 
 Sprite *GObjectFactory::_image(const char *file) {

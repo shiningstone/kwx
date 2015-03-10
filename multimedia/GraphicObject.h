@@ -95,8 +95,10 @@ public:
     Sprite *CreateClock();
     Sprite *CreateClockIndicator(PlayerDir_t dir);
     Sprite *CreatePlayerPointer();
+    
     LayerColor *CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum);
-    LayerColor *CreateMingSignBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum);
+    LayerColor *CreateTingInfoBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum);
+    Sprite *CreateTingSign();
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
     
@@ -106,7 +108,7 @@ public:
     Sprite *Create(TextureId_t id,PlayerDir_t dir,float x,float y);
     Sprite *CreateKind(Card_t type,CardSize_t size = NORMAL);
     Sprite *Create(TextureId_t id,Sprite *son);
-    Sprite *LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind,Card_t isHide = HIDE);
+    Sprite *LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind,Card_t isHide = NON_HIDE);
 protected:
     static float SCALE;
 

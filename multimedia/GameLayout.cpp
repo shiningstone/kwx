@@ -370,6 +370,8 @@ Vec2 GameLayout::AnchorOfNormalCard(PlayerDir_t dir) {
     switch(dir) {
         case LEFT:
             return Vec2(0.3f,1.0f);
+        case MIDDLE:
+            return Vec2(0,0);
         case RIGHT:
             return Vec2(0.3f,0);
     }
@@ -379,6 +381,8 @@ Vec2 GameLayout::PositionOfNormalCard(PlayerDir_t dir,int x,int y) {
     switch(dir) {
         case LEFT:
             return Vec2(x-10,y-8);
+        case MIDDLE:
+            return Vec2(x,y);
         case RIGHT:
             return Vec2(x-10,y-8);
     }
@@ -397,6 +401,8 @@ int  GameLayout::RotateAngleOfCard(PlayerDir_t dir) {
     switch(dir) {
         case LEFT:
             return 90;
+        case MIDDLE:
+            return 0;
         case RIGHT:
             return -90;
     }

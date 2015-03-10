@@ -3137,9 +3137,14 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 
 	int cardNum=hu_NumForEveryCard[CardPlace];
 
-    auto mingSignBar = _object->CreateMingSignBar(
+    auto mingSignBar = _object->CreateTingInfoBar(
         curPos,(Card_t *)hu_cards[CardPlace],cardNum,huTiemsForEveryOne[CardPlace],hu_residueForEvery[CardPlace]);
 	myframe->addChild(mingSignBar, 30, TING_SING_BAR);
+}
+
+void NetRaceLayer::other_player_card_list_update(int no) 
+{
+
 }
 
 void NetRaceLayer::card_list_update(int no)
@@ -3155,8 +3160,6 @@ void NetRaceLayer::card_list_update(int no)
 	y = _layout->_playerPosi[no].basePoint.y+10;
 
 	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
-
-	int residualCardsNum = (list->len-list->atcvie_place)%3;
 
 	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
 	if( ting_flag==1 && _roundManager->_firstMingNo==-1 )
@@ -3453,47 +3456,52 @@ void NetRaceLayer::card_list_update(int no)
 				if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
 				{
 					if(ting_flag==1)
-						p_list[i]=_object->Create(MING_CARD);
+						p_list[i]=_object->Create(MING_CARD,no,x,y);
 					else
-						p_list[i]=_object->Create(FREE_CARD);
+						p_list[i]=_object->Create(FREE_CARD,no,x,y);
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
 				{
-					p_list[i]=_object->Create(PENG_CARD);
+					p_list[i]=_object->Create(PENG_CARD,no,x,y);
 				}
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-						p_list[i]=_object->Create(PENG_CARD);
+						p_list[i]=_object->Create(PENG_CARD,no,x,y);
 					else
-						p_list[i]=_object->Create(AN_GANG_CARD);
+						p_list[i]=_object->Create(AN_GANG_CARD,no,x,y);
 				}
-				p_list[i]->setAnchorPoint(Vec2(0,0));
-				p_list[i]->setPosition(Vec2(x,y));
-				if(MyCardChoosedNum==i)
-				{
+                
+				if(MyCardChoosedNum==i) {
 					p_list[i]->setScale(1.2);
 					p_list[i]->setPosition(Vec2(x,y+10));
 					x+=p_list[i]->getTextureRect().size.width*0.2;
 				}
-				if(residualCardsNum==2&&i==list->len-2)
+                
+                int residualCardsNum = (list->len-list->atcvie_place)%3;
+				if(residualCardsNum==2 && i==list->len-2)
 					x+=30;
-				if(list->data[i].kind==_roundManager->_curEffectCardKind&&list->data[i].status==_roundManager->_curEffectCardStatus)
+
+                if(list->data[i].kind==_roundManager->_curEffectCardKind
+                    &&list->data[i].status==_roundManager->_curEffectCardStatus)
 					p_list[i]->setVisible(false);
-				if(list->data[i].status==c_FREE)
+
+                if(list->data[i].status==c_FREE)
 				{
 					if(ting_flag==1)
 					{
 						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                            p_list[i]->getTextureRect().size.height*0.6));
 						p_list[i]->addChild(s_card,1);
 					}
 					else
 					{
 						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.4));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                            p_list[i]->getTextureRect().size.height*0.4));
 						p_list[i]->addChild(s_card,1);						
 					}
 					if(ting_flag==1||(_roundManager->_actionToDo==a_MING&&ting_flag==0))
@@ -3502,7 +3510,8 @@ void NetRaceLayer::card_list_update(int no)
 						{
 							auto MingCps_yesMask=_object->Create(MING_BKG);
 							MingCps_yesMask->setAnchorPoint(Vec2(0.5,0.5));
-							MingCps_yesMask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height/2));
+							MingCps_yesMask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                                p_list[i]->getTextureRect().size.height/2));
 							p_list[i]->addChild(MingCps_yesMask,2,MING_KOU_MASK);
 						}
 						else if(list->data[i].can_play==cps_NO)
@@ -3608,49 +3617,49 @@ void NetRaceLayer::card_list_update(int no)
 
 
 
-			if(no!=2)
-				myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+no*20+i);
-			else if(no==2)
+			if(no!=2)//each one lay above the previous ones
+				myframe->addChild(p_list[i],i+1,        HAND_IN_CARDS_TAG_ID+no*20+i);
+			else if(no==2)//each one lay below the previous ones
 				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
-			if(no==1&&_roundManager->_actionToDo==a_MING&&_roundManager->_players[1]->get_parter()->get_ting_status()!=1&&list->data[i].can_play==cps_YES)
+            
+			if(no==1
+                &&_roundManager->_actionToDo==a_MING
+                &&_roundManager->_players[1]->get_parter()->get_ting_status()!=1
+                &&list->data[i].can_play==cps_YES) {
 				p_list[i]->setZOrder(30);
+            }
+            
 			p_list[i]->_ID=1;
-			if(no==1 && MyCardChoosedNum==i)
+
+            if(no==1 && MyCardChoosedNum==i)
 				p_list[i]->_ID=100;
-		}
+		}//for each card
 	}
+    
 	if(no==1&&ting_flag!=0)
 	{
 		if(!myframe->getChildByTag(TING_SING_BUTTON))
 		{
-			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);//
-			//auto Ting_Sign=Button::create("fanxingtishi.png","fanxingtishi.png","fanxingtishi.png",UI_TEX_TYPE_PLIST);
-			//Ting_Sign->setAnchorPoint(Vec2(0,0));
-			//Ting_Sign->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.2));
-			//myframe->addChild(Ting_Sign,1,TING_SING_BUTTON);
-			auto Ting_Sign=Sprite::createWithSpriteFrameName("fanxingtishi.png");
-			Ting_Sign->setAnchorPoint(Vec2(0,0));
-			Ting_Sign->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.2));
+			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+            
+			auto Ting_Sign = _object->CreateTingSign();
 			myframe->addChild(Ting_Sign,1,TING_SING_BUTTON);
-			while(myframe->getChildByTag(TING_SING_BAR))
+
+            while(myframe->getChildByTag(TING_SING_BAR))
 				myframe->removeChildByTag(TING_SING_BAR);
-			tingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
+
+            tingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
 			myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-			//ifTingSignBarVisible=false;
 			ifTingSignBarVisible=false;
 			ListenToTingButton();
-			card_list_update(0);
+
+            card_list_update(0);
 			card_list_update(2);
 		}
 	}
-	if(no==1&&myframe->getChildByTag(TING_SING_BUTTON))//||(no!=1&&_roundManager->_players[no]->get_parter()->get_ting_status()))
+    
+	if(no==1&&myframe->getChildByTag(TING_SING_BUTTON))
 		update_residue_TingCards(1);
-	//Vec2 cardsPosition[MAX_HANDIN_NUM];
-	//for(int count=0;count<list->len;count++)
-	//{
-	//	if(p_list[count]->getPosition().x&&p_list[count]->getPosition().y)
-	//		cardsPosition[count]=p_list[count]->getPosition();
-	//}
 }
 
 void NetRaceLayer::update_card_list(Node *psender)
