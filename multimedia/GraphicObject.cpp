@@ -119,7 +119,7 @@ Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
 }
 
 /* only for LEFT/RIGHT */
-Sprite *GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind, Card_t isHide) {
+void GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind, Card_t isHide) {
     Sprite* cardFace;
     
     if(isHide==HIDE) {
@@ -134,6 +134,15 @@ Sprite *GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t ki
     cardFace->setRotation(_layout->RotateAngleOfCard(dir);
     cardFace->setScale(0.9);
     parent->addChild(cardFace);/* additional parameter 1 if dir==MIDDLE */
+}
+
+/* only for MIDDLE */
+void GObjectFactory::LayDownWithFace(Sprite *parent,Card_t kind, float height_x) {
+    auto cardFace = CreateKind(kind,NORMAL);
+    cardFace->setAnchorPoint(Vec2(0.5,0.5));
+    cardFace->setPosition(Vec2(parent->getTextureRect().size.width/2,
+        parent->getTextureRect().size.height*height_x));
+    parent->addChild(cardFace,1);
 }
 
 

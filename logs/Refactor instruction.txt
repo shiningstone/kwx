@@ -35,6 +35,6 @@ Player
 		CardsOutHand更新
 		CardsInHand更新
 		执行出牌特效（玩家）
-		***调用RoundManager.RecvHandoutFrom
+		***调用RoundManager.RecvHandoutFrom       复杂
 	动作		Act
 		***调用RoundManager.InformAction

@@ -3472,38 +3472,35 @@ void NetRaceLayer::card_list_update(int no)
 						p_list[i]=_object->Create(AN_GANG_CARD,no,x,y);
 				}
                 
+                /* the card being chosen */
 				if(MyCardChoosedNum==i) {
 					p_list[i]->setScale(1.2);
 					p_list[i]->setPosition(Vec2(x,y+10));
 					x+=p_list[i]->getTextureRect().size.width*0.2;
 				}
-                
+
+                /* the second last card before handout*/
                 int residualCardsNum = (list->len-list->atcvie_place)%3;
 				if(residualCardsNum==2 && i==list->len-2)
 					x+=30;
 
+                /* the card showing somewhere else */
                 if(list->data[i].kind==_roundManager->_curEffectCardKind
                     &&list->data[i].status==_roundManager->_curEffectCardStatus)
 					p_list[i]->setVisible(false);
+
 
                 if(list->data[i].status==c_FREE)
 				{
 					if(ting_flag==1)
 					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
-                            p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.6);
 					}
 					else
 					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
-                            p_list[i]->getTextureRect().size.height*0.4));
-						p_list[i]->addChild(s_card,1);						
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.4);
 					}
+                    
 					if(ting_flag==1||(_roundManager->_actionToDo==a_MING&&ting_flag==0))
 					{
 						if(list->data[i].can_play==cps_YES)
@@ -3519,10 +3516,12 @@ void NetRaceLayer::card_list_update(int no)
 							Sprite* mask;
 							mask=_object->Create(MING_MASK_CARD);
 							mask->setAnchorPoint(Vec2(0.5,1));
-							mask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height));
+							mask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                                p_list[i]->getTextureRect().size.height));
 							p_list[i]->addChild(mask,2,MING_KOU_MASK);
 						}
 					}
+                    
 					x+=p_list[i]->getTextureRect().size.width*1.0;
 				}
 				else if(list->data[i].status==c_MING_KOU)
@@ -3531,23 +3530,19 @@ void NetRaceLayer::card_list_update(int no)
 					{
 						auto KouSign=_object->Create(MING_KOU_CARD);
 						KouSign->setAnchorPoint(Vec2(0.5,0.5));
-						KouSign->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height/2));
+						KouSign->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                            p_list[i]->getTextureRect().size.height/2));
 						p_list[i]->addChild(KouSign,2);
 
-						//auto str_card_kind=String::createWithFormat("majiang/%d.png",(int)(list->data[i].kind+1));
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.4));
-						p_list[i]->addChild(s_card,1);
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.4);
+                        
 						x += p_list[i]->getTextureRect().size.width*1;
 					}
 					else
 					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
-						x += p_list[i]->getTextureRect().size.width*1;
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.6);
+
+                        x += p_list[i]->getTextureRect().size.width*1;
 					}
 				}
 				else if(list->data[i].status==c_PENG)
@@ -3556,6 +3551,7 @@ void NetRaceLayer::card_list_update(int no)
 					s_card->setAnchorPoint(Vec2(0.5,0.5));
 					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 					p_list[i]->addChild(s_card,1);
+                    
 					if(list->data[i+1].status==c_FREE)
 						x += p_list[i]->getTextureRect().size.width*2;
 					else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
@@ -3569,6 +3565,7 @@ void NetRaceLayer::card_list_update(int no)
 					s_card->setAnchorPoint(Vec2(0.5,0.5));
 					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 					p_list[i]->addChild(s_card,1);
+                    
 					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
 						x+=p_list[i]->getTextureRect().size.width*1.0;
 					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
