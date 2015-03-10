@@ -98,18 +98,12 @@ Sprite *GObjectFactory::Create(TextureId_t id) {
     return Sprite::createWithTexture(_status[id]->getTexture());
 }
 
-
-Sprite *GObjectFactory::CreateKind(Card_t type,CardSize_t size) {
-    switch(size) {
-        case SMALL:
-            return Sprite::createWithTexture(_kindSmall[type]->getTexture());
-        case SMALL_BLACK:
-            return Sprite::createWithTexture(_kindSmallBlack[type]->getTexture());
-        case MIDDLE_SIZE:
-            return Sprite::createWithTexture(_kindMiddle[type]->getTexture());
-        case NORMAL:
-            return Sprite::createWithTexture(_kind[type]->getTexture());
-    }
+Sprite *GObjectFactory::Create(TextureId_t id,PlayerDir_t dir,float x,float y) {
+    Sprite card = Create(id);
+    card->setAnchorPoint(_layout->AnchorOfNormalCard((PlayerDir_t)dir));
+    card->setPosition(_layout->PositionOfNormalCard((PlayerDir_t)dir,x,y));
+    
+    return card;
 }
 
 Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
@@ -122,6 +116,36 @@ Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
     parent->addChild(son);/*in ming_gang_tip_effect(hide out card), there is extra parameter equals 1*/
 
     return parent;
+}
+
+Sprite *GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind, Card_t isHide) {
+    Sprite* cardFace;
+
+    if(isHide==HIDE) {
+        cardFace = CreateKind((Card_t)kind,SMALL_BLACK);
+    } else {
+        cardFace = CreateKind((Card_t)kind,SMALL);
+    }
+    
+    cardFace->setPosition(Vec2(
+        parent->getTextureRect().size.width/2, 
+        parent->getTextureRect().size.height*0.65));
+    cardFace->setRotation(_layout->RotateAngleOfCard(dir);
+    cardFace->setScale(0.9);
+    parent->addChild(cardFace);
+}
+
+Sprite *GObjectFactory::CreateKind(Card_t type,CardSize_t size) {
+    switch(size) {
+        case SMALL:
+            return Sprite::createWithTexture(_kindSmall[type]->getTexture());
+        case SMALL_BLACK:
+            return Sprite::createWithTexture(_kindSmallBlack[type]->getTexture());
+        case MIDDLE_SIZE:
+            return Sprite::createWithTexture(_kindMiddle[type]->getTexture());
+        case NORMAL:
+            return Sprite::createWithTexture(_kind[type]->getTexture());
+    }
 }
 
 /*************************************

@@ -44,6 +44,7 @@ typedef enum {
     FA,
     BAI,        
     CARD_MAX,
+    HIDE = CARD_MAX,
 }Card_t;
 
 typedef enum {
