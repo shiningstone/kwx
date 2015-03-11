@@ -273,8 +273,8 @@ int KwxMsg::Construct(DistributeResponse_t &response) {
 int KwxMsg::Construct(OthersAction_t &actionInfo) {
     if(GetRequestCode()==REQ_GAME_RECV_RESPONSE) {
         actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
-        actionInfo.cardKind = (CardType_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
-        actionInfo.action = (ActionId_t)_body->_items[2]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
+        actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
+        actionInfo.cardKind = (CardType_t)_body->_items[2]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
     } else {
         actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
         actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/

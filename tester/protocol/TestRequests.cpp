@@ -135,6 +135,41 @@ public:
 };
 
 
+class TestGameRecvOthersReaction : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,76,               //request code(下发其他玩家反应)
+            7,                     //package level
+            0x00,27,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            60,1,                  //seatId
+            66,2,                  //reaction
+            67,3,                  //card kind
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxMsg aMsg(DOWN_STREAM);
+        OthersAction_t actionInfo = {0};
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(actionInfo);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_RESPONSE );
+        assert( aMsg.GetLevel()==7 );
+        assert( actionInfo.seat==1 );
+        assert( actionInfo.action==2 );
+        assert( actionInfo.cardKind==3 );
+
+        return 0;
+    }
+};
+
 #if 0
 class TestGameSendAction : public CTestCase {
 public:
@@ -404,41 +439,6 @@ public:
     }
 };
 
-
-class TestGameRecvOthersReaction : public CTestCase {
-public:
-    virtual int Execute() {
-        INT8U msgInNetwork[] = {
-            'K','W','X',           //KWX
-            0x00,76,               //request code(下发其他玩家反应)
-            7,                     //package level
-            0x00,27,               //package size
-            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
-
-            3,
-            60,1,                  //seatId
-            61,2,
-            66,3,                  //reaction
-        };
-        INT8U buf[MSG_MAX_LEN] = {0};
-        int   len = 0;
-
-        KwxMsg aMsg(DOWN_STREAM);
-        OthersAction_t actionInfo = {0};
-
-        len = aMsg.Deserialize(msgInNetwork);
-        aMsg.Construct(actionInfo);
-
-        assert(len==sizeof(msgInNetwork));
-        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_RESPONSE );
-        assert( aMsg.GetLevel()==7 );
-        assert( actionInfo.seat==1 );
-        assert( actionInfo.cardKind==2 );
-        assert( actionInfo.action==3 );
-
-        return 0;
-    }
-};
 #endif
 
 void testRequests() {
@@ -449,6 +449,9 @@ void testRequests() {
     aCase->Execute();
 
     aCase = new TestGameSendReactionMing2Cards();
+    aCase->Execute();
+
+    aCase = new TestGameRecvOthersReaction();
     aCase->Execute();
 
 
@@ -472,9 +475,6 @@ void testRequests() {
     aCase->Execute();
 
     aCase = new TestGameRecvOthersShowCard();
-    aCase->Execute();
-
-    aCase = new TestGameRecvOthersReaction();
     aCase->Execute();
 
     aCase = new TestGameRecvUpdateList();/*REQ_GAME_RECV_UPDATELIST(56)*/
