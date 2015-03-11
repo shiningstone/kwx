@@ -76,13 +76,26 @@ class GameLayout {
         Vec2 AnchorOfFreeCard(PlayerDir_t dir);
         int  RotateAngleOfCard(PlayerDir_t dir);
         float YOfNextCard(PlayerDir_t dir,float originY,Size cardSize);
+        /*************************************
+            card in river
+        *************************************/
+        Vec2 OrigPositionOfRiverCard(PlayerDir_t dir,int idx);
+        Vec2 Middle1PositionOfRiverCard(PlayerDir_t dir,int idx);
+        Vec2 Middle2PositionOfRiverCard(PlayerDir_t dir,int idx);
+        Vec2 DestPositionOfRiverCard(PlayerDir_t dir,int idx);
     private:
+        static const int RIVER_CARD_IN_LINE_1 = 6;
+        static const int RIVER_CARD_IN_LINE_2 = 14;
+
         GameLayout(cocos2d::Point origin, cocos2d::Size size);
         static GameLayout *_instance;
         Logger *_logger;
 
         cocos2d::Size  SIZE;
         cocos2d::Point ORIGIN;
+
+        int _getRiverLineNo(int i);
+        int _getRiverLineIdx(int i);
 };
 
 #endif

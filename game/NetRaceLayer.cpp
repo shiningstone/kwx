@@ -3671,15 +3671,12 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 
-	outCardList* outCard=_roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
+	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
 
-	for(int ik=0;ik<outCard->length;ik++)
-	{
-		if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+sender->_ID*25+ik))
-		{
-			myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+sender->_ID*25+ik,true);
-		}
+	for(int i=0;i<outCard->length;i++) {
+	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i)
 	}
+    
 	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
 	show_card_indicator->setVisible(true);
 
@@ -3721,74 +3718,31 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 			//update_clock(true,0,sender->_ID);//////////-----网络版需要获取时间----///////////
 		}
 
-		if(sender->_ID==2)
+		if( sender->_ID==2 || sender->_ID==0 )
 		{
 			auto show_card=_object->Create(LR_OUT_CARD);
 			Card oCard;
 			outCard->getCard(oCard,i+1);
 			auto show_card_kind=_object->CreateKind((Card_t)oCard.kind,SMALL);
-			show_card_kind->setRotation(-90);
+			show_card_kind->setRotation(_layout->RotateAngleOfCard(sender->_ID));
 			show_card_kind->setAnchorPoint(Vec2(0.5,0.5));
 			show_card_kind->setScale(0.9);
 			show_card_kind->setPosition(show_card->getTextureRect().size.width/2,show_card->getTextureRect().size.height*0.65);
 			show_card->addChild(show_card_kind);
 			show_card->setAnchorPoint(Vec2(0.5,0.5));
 			show_card_indicator->stopAllActions();
-			if(i<6)
-			{
-				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i+1)));						
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i+1)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i+1))),NULL)));
-				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y+30*i));
-			}
-			else if(i<14)
-			{
-			show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-6)));
-			show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-6)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-6))),NULL)));
-			show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+48,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-7)));
-			}
-			else
-			{
-				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-15)));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-15)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-15))),NULL)));
-				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x+96,_layout->_playerPosi[sender->_ID].riverPoint.y+30*(i-16)));
-			}
-			myframe->addChild(show_card,20-i,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-			//update_clock(true,0,sender->_ID);//////////-----网络版需要获取时间----///////////
-		}
+            
+			show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard(sender->_ID,i));                       
+			show_card_indicator->runAction(RepeatForever::create(Sequence::create(
+                MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard(sender->_ID,i)),
+                MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard(sender->_ID,i)),NULL)));
+			show_card->setPosition(_layout->DestPositionOfRiverCard(sender->_ID,i));
 
-		if(sender->_ID==0)
-		{
-			auto show_card=_object->Create(LR_OUT_CARD);
-			Card oCard;
-			outCard->getCard(oCard,i+1);
-			auto show_card_kind=_object->CreateKind((Card_t)oCard.kind,SMALL);
-			show_card_kind->setRotation(90);
-			show_card_kind->setAnchorPoint(Vec2(0.5,0.5));
-			show_card_kind->setScale(0.9);
-			show_card_kind->setPosition(show_card->getTextureRect().size.width/2,show_card->getTextureRect().size.height*0.65);
-			show_card->addChild(show_card_kind);
-			show_card->setAnchorPoint(Vec2(0.5,0.5));
-			show_card_indicator->stopAllActions();
-			if(i<6)
-			{
-				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-1)));						
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-1)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-1))),NULL)));
-				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x,_layout->_playerPosi[sender->_ID].riverPoint.y-30*i));
-			}
-			else if(i<14)
-			{
-				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-8)));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-8)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-8))),NULL)));
-				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-48,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-7)));
-			}
-			else
-			{
-				show_card_indicator->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-17)));
-				show_card_indicator->runAction(RepeatForever::create(Sequence::create(MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-17)+10)),MoveTo::create(0.5,Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-17))),NULL)));
-				show_card->setPosition(Vec2(_layout->_playerPosi[sender->_ID].riverPoint.x-96,_layout->_playerPosi[sender->_ID].riverPoint.y-30*(i-16)));
-			}
-			myframe->addChild(show_card,i+1,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-			//update_clock(true,0,sender->_ID);
+            if(sender->_ID==2) {
+                myframe->addChild(show_card,20-i,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+            } else {
+                myframe->addChild(show_card,i+1,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+            }
 		}
 	}
 }

@@ -417,6 +417,84 @@ float GameLayout::YOfNextCard(PlayerDir_t dir,float originY,Size cardSize) {
     }
 }
 
+/*************************************
+    card in river
+*************************************/
+int GameLayout::_getRiverLineIdx(int i) {
+    if(i<RIVER_CARD_IN_LINE_1) {
+        return i;
+    } else if (i<RIVER_CARD_IN_LINE_2) {
+        return i-RIVER_CARD_IN_LINE_1;
+    } else {
+        return i-RIVER_CARD_IN_LINE_2;
+    }
+}
+
+int GameLayout::_getRiverLineNo(int i) {
+    if(i<RIVER_CARD_IN_LINE_1) {
+        return 0;
+    } else if (i<RIVER_CARD_IN_LINE_2) {
+        return 1;
+    } else {
+        return 2;
+    }
+}
+
+Vec2 GameLayout::OrigPositionOfRiverCard(PlayerDir_t dir,int idx) {
+    int lineNo  = _getRiverLineNo(idx);
+    int lineIdx = _getRiverLineIdx(idx);
+    
+    switch(dir) {
+        case LEFT:
+            return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-1-lineNo));
+        case RIGHT:
+            return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx+1-lineNo));
+    }
+}
+
+Vec2 GameLayout::Middle1PositionOfRiverCard(PlayerDir_t dir,int idx) {
+    int lineNo  = _getRiverLineNo(idx);
+    int lineIdx = _getRiverLineIdx(idx);
+    
+    switch(dir) {
+        case LEFT:
+            return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-1-lineNo)+10);
+        case RIGHT:
+            return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx+1-lineNo)+10);
+    }
+}
+
+Vec2 GameLayout::Middle2PositionOfRiverCard(PlayerDir_t dir,int idx) {
+    int lineNo  = _getRiverLineNo(idx);
+    int lineIdx = _getRiverLineIdx(idx);
+    
+    switch(dir) {
+        case LEFT:
+            return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-1-lineNo))),NULL));
+        case RIGHT:
+            return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx+1-lineNo))),NULL));
+    }
+}
+
+Vec2 GameLayout::DestPositionOfRiverCard(PlayerDir_t dir,int idx) {
+    int lineNo  = _getRiverLineNo(idx);
+    int lineIdx = _getRiverLineIdx(idx);
+    
+    switch(dir) {
+        case LEFT:
+            return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo));
+        case RIGHT:
+            return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo));
+    }
+}
 
 /*************************************
     singleton
