@@ -177,6 +177,11 @@ private:
 	void choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int cardInList,Touch* touch,int time);
 public:
 	int GoldAccountImmediate[3];
+
+    void _kouCardsRecordClear();
+    void _kouCardsRecordAdd(CARD_KIND kind, int idx[]);
+    int  _findCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
+
 	CARD kouCards_kind[4];
 	int Kou_kindLen;
 	int KouCardsPlace[4][3];

@@ -3932,69 +3932,75 @@ void NetRaceLayer::MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		break;
 	}
 }
+
+void NetRaceLayer::_kouCardsRecordClear() {
+	Kou_kindLen = 0;
+    
+	for(int a=0;a<4;a++) {
+		kouCards_kind[a].kind  = ck_NOT_DEFINED;
+		kouCards_kind[a].status= c_FREE;
+	}
+    
+	for(int a=0;a<4;a++)
+		for(int b=0;b<3;b++)
+			KouCardsPlace[a][b] = -1;
+}
+
+void NetRaceLayer::_kouCardsRecordAdd(CARD_KIND kind, int idx[]) {
+    KouCardsPlace[Kou_kindLen][0] = idx[0];
+    KouCardsPlace[Kou_kindLen][1] = idx[1];
+    KouCardsPlace[Kou_kindLen][2] = idx[2];
+    
+    kouCards_kind[Kou_kindLen].kind     = kind;
+    kouCards_kind[Kou_kindLen++].status = c_KOU_ENABLE;
+    
+    Kou_kindLen++;
+}
+
+bool NetRaceLayer::_kouCardsRecordIncludes(CARD_KIND kind) {
+    for(int i=0;i<4;i++) {
+        if(kouCards_kind[i].kind==kind) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int NetRaceLayer::_findCards(int idx[],CARD_ARRAY *list,CARD_KIND kind) {
+    int num = 0;
+    
+    for(int i=list->atcvie_place; i<list->len; i++) {   
+        if(list->data[i].kind==kind) {
+            idx[num++] = i;
+        }
+    }
+
+    return num;
+}
+
 void NetRaceLayer::KouCardsCheck(int no)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	int a,b,c,num;
 	CARD_ARRAY *list = _roundManager->_players[no]->get_parter()->get_card_list();
     
-	for(a=0;a<4;a++) {
-		kouCards_kind[a].kind=ck_NOT_DEFINED;
-		kouCards_kind[a].status=c_FREE;
-	}
-    
-	Kou_kindLen=0;
-	for(a=0;a<4;a++)
-		for(b=0;b<3;b++)
-			KouCardsPlace[a][b]=-1;
+	_kouCardsRecordClear();
         
-	int tempCardPlace[4]={-1,-1,-1,-1};
-	int countA=0,countB;
-	bool ifJudged=false;
-    
-	for(a=list->atcvie_place;a<list->len;a++)
-	{
-		for(c=0;c<4;c++)
-		{
-			if(kouCards_kind[c].kind==list->data[a].kind)
-			{
-				ifJudged=true;
-				break;
-			}
-		}
-		if(c==4)
-			ifJudged=false;
-		if(ifJudged)
-			continue;
-
-		num=0;
-		countB=0;
-		for(int b=list->atcvie_place;b<list->len;b++)
-		{	
-			if(list->data[b].kind==list->data[a].kind)
-			{
-				tempCardPlace[countB++]=b;
-				num++;
-				if(num==3)
-				{
-					if(_roundManager->_players[no]->get_parter()->judge_kou_cards(list->data[a].kind,no,RototHandOutIndex))
-					{
-						KouCardsPlace[countA][0]=tempCardPlace[0];
-						KouCardsPlace[countA][1]=tempCardPlace[1];
-						KouCardsPlace[countA][2]=tempCardPlace[2];
-
-						list->data[tempCardPlace[0]].status=c_KOU_ENABLE;
-						list->data[tempCardPlace[1]].status=c_KOU_ENABLE;
-						list->data[tempCardPlace[2]].status=c_KOU_ENABLE;
-
-						kouCards_kind[countA].kind=list->data[a].kind;
-						kouCards_kind[countA++].status=c_KOU_ENABLE;
-						Kou_kindLen++;
-					}
-				}
-			}
-		}
+	for(int i=list->atcvie_place; i<list->len; i++){
+	    auto curKind = list->data[i].kind;
+        
+        if( !_kouCardsRecordIncludes(curKind) ) {
+            int cardIdx[4] = {-1,-1,-1,-1};
+            if(_findCards(cardIdx, list, curKind)==3 
+                &&_roundManager->_players[no]->get_parter()->judge_kou_cards(curKind,no,RototHandOutIndex)) {
+                
+                _kouCardsRecordAdd(cardIdx,curKind);
+                
+                list->data[cardIdx[0]].status=c_KOU_ENABLE;
+                list->data[cardIdx[1]].status=c_KOU_ENABLE;
+                list->data[cardIdx[2]].status=c_KOU_ENABLE;
+            }
+        }
 	}
 }
 
