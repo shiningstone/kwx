@@ -110,6 +110,8 @@ public:
     Sprite *Create(TextureId_t id,Sprite *son);
     void LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind,Card_t isHide = NON_HIDE);
     void LayDownWithFace(Sprite *parent,Card_t kind, float height_x);
+
+    Sprite *CreateRiverCard(PlayerDir_t dir,Card_t kind);
 protected:
     static float SCALE;
 

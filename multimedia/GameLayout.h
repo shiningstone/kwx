@@ -79,6 +79,7 @@ class GameLayout {
         /*************************************
             card in river
         *************************************/
+        int  _getRiverLineNo(int i);
         Vec2 OrigPositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle1PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle2PositionOfRiverCard(PlayerDir_t dir,int idx);
@@ -94,7 +95,6 @@ class GameLayout {
         cocos2d::Size  SIZE;
         cocos2d::Point ORIGIN;
 
-        int _getRiverLineNo(int i);
         int _getRiverLineIdx(int i);
 };
 

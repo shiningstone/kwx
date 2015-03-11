@@ -159,6 +159,29 @@ Sprite *GObjectFactory::CreateKind(Card_t type,CardSize_t size) {
     }
 }
 
+Sprite *GObjectFactory::CreateRiverCard(PlayerDir_t dir,Card_t kind) {
+    TextureId_t texture = (dir==MIDDLE) ? OUT_CARD : LR_OUT_CARD;
+    
+    auto riverCard = Create(texture);
+    auto riverCard_kind = CreateKind(kind,SMALL);
+
+    riverCard_kind->setPosition(riverCard->getTextureRect().size.width/2,riverCard->getTextureRect().size.height*0.65);
+
+    if( dir!=MIDDLE ) {
+        riverCard_kind->setRotation(_layout->RotateAngleOfCard(dir));
+        riverCard_kind->setAnchorPoint(Vec2(0.5,0.5));
+        riverCard_kind->setScale(0.9);
+
+        riverCard->setAnchorPoint(Vec2(0.5,0.5));
+    } else {
+        riverCard->setAnchorPoint(Vec2(0,1));
+    }
+    
+    riverCard->addChild(riverCard_kind);
+
+    return riverCard;
+}
+    
 /*************************************
     menu
 *************************************/

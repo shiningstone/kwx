@@ -447,10 +447,13 @@ Vec2 GameLayout::OrigPositionOfRiverCard(PlayerDir_t dir,int idx) {
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-1-lineNo));
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo-1));
+        case MIDDLE:
+            return Vec2(_playerPosi[dir].riverPoint.x+((lineIdx-lineNo)*36)+20,
+                        _playerPosi[dir].riverPoint.y+41*lineNo+5);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx+1-lineNo));
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo+1));
     }
 }
 
@@ -461,10 +464,13 @@ Vec2 GameLayout::Middle1PositionOfRiverCard(PlayerDir_t dir,int idx) {
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-1-lineNo)+10);
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo-1)+10);
+        case MIDDLE:
+            return Vec2(_playerPosi[dir].riverPoint.x+((lineIdx-lineNo)*36)+20,
+                        _playerPosi[dir].riverPoint.y+41*lineNo+15);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx+1-lineNo)+10);
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo+1)+10);
     }
 }
 
@@ -475,10 +481,13 @@ Vec2 GameLayout::Middle2PositionOfRiverCard(PlayerDir_t dir,int idx) {
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-1-lineNo))),NULL));
+                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo-1));
+        case MIDDLE:
+            return Vec2(_playerPosi[dir].riverPoint.x+((lineIdx-lineNo)*36)+20,
+                        _playerPosi[dir].riverPoint.y+41*lineNo+5);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx+1-lineNo))),NULL));
+                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo+1));
     }
 }
 
@@ -490,6 +499,9 @@ Vec2 GameLayout::DestPositionOfRiverCard(PlayerDir_t dir,int idx) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
                         _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo));
+        case MIDDLE:
+            return Vec2(_playerPosi[dir].riverPoint.x+(lineIdx-lineNo)*36,
+                        _playerPosi[dir].riverPoint.y+41*lineNo);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
                         _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo));
