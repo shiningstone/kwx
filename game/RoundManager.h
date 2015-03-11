@@ -15,8 +15,8 @@ typedef enum {
 }WinKind_t;
 
 typedef struct {
-    WinKind_t  kind;
-    int        player;
+    WinKind_t    kind;
+    PlayerDir_t  player;
 }WinInfo_t;
 
 class RoundManager {

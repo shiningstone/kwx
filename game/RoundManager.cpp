@@ -37,7 +37,7 @@ RoundManager::~RoundManager() {
 /***********************************************
         winner information
 ***********************************************/
-int RoundManager::GetLastWinner() {
+PlayerDir_t RoundManager::GetLastWinner() {
     if( _lastWin.player==INVALID ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
         _lastWin.player = 1;

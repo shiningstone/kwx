@@ -86,6 +86,17 @@ Vec2 GameLayout::PositionOfClockIndicator(PlayerDir_t dir) {
     }
 }
 
+Vec2 GameLayout::AnchorOfZhuang(PlayerDir_t dir) {
+    switch(dir) {
+        case LEFT:
+            return Vec2(0.5,1);
+        case MIDDLE:
+            return Vec2(0,0.5);
+        case RIGHT:
+            return Vec2(0.5,1);
+    }
+}
+
 /*************************************
     gold count
 *************************************/
@@ -245,6 +256,10 @@ Vec2 GameLayout::Center() {
 
 Vec2 GameLayout::PositionOfMingSign() {
     return Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2+50);
+}
+
+Vec2 GameLayout::PositionOfMingSignForMe(float zhuangWidth) {
+    return Vec2(ORIGIN.x+SIZE.width*255/1218+zhuangWidth, ORIGIN.y+SIZE.height*168/716)
 }
 
 Vec2 GameLayout::PositionOfActSign(int dir) {

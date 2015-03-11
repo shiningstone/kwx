@@ -35,6 +35,7 @@ class GameLayout {
         Vec2 PositionOfMapai(int direction);
         Vec2 PositionOfClock();
         Vec2 PositionOfClockIndicator(PlayerDir_t dir);
+        Vec2 AnchorOfZhuang(PlayerDir_t dir);
         /*************************************
             gold count
         *************************************/
@@ -58,6 +59,7 @@ class GameLayout {
         *************************************/
         Vec2 Center();
         Vec2 PositionOfMingSign();
+        Vec2 PositionOfMingSignForMe(PlayerDir_t dir,float zhuangWidth = 0.0);
         Vec2 PositionOfActSign(int dir);
 
         Vec2 OrigPositionOfGangCard(int i,Size size);

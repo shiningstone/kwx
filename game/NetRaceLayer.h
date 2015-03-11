@@ -122,7 +122,7 @@ private:
 
 	Vec2 distributeCardPos;
     
-	cocos2d::Sprite *last_winner;
+	cocos2d::Sprite *_zhuangSign;
 	cocos2d::Sprite *residue_card_bkg;
     
 	cocos2d::Sprite *left_player_bkg;

@@ -211,8 +211,8 @@ bool NetRaceLayer::resource_prepare()
 	this->addChild(_object->CreateMingSign(MIDDLE),2,MING_STATUS_PNG_1);
 	this->addChild(_object->CreateMingSign(RIGHT),2,MING_STATUS_PNG_2);
 
-    last_winner = _object->CreateZhuangSign();
-	this->addChild(last_winner,1,LAST_WINNER_TAG_ID);
+    _zhuangSign = _object->CreateZhuangSign();
+	this->addChild(_zhuangSign,1,LAST_WINNER_TAG_ID);
 	this->addChild(_object->CreateClock(),3,ALARM_CLOCK_INDICATOR_TAG_ID);
 
 	this->addChild(_object->CreateClockIndicator(MIDDLE),3,ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
@@ -3712,27 +3712,25 @@ void NetRaceLayer::race_begin_prepare()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	//SimpleAudioEngine::sharedEngine()->preloadEffect("Music/lanpai.ogg");	
+    _Remove(this,READY_INDICATE_LEFT_TAG_ID);
+    _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
+    _Remove(this,READY_INDICATE_MID_TAG_ID);
 
-	int i,j,temp;
-	int list[3][13];
-	int aim[3];
-
-	if(this->getChildByTag(READY_INDICATE_LEFT_TAG_ID))
-		this->removeChildByTag(READY_INDICATE_LEFT_TAG_ID,true);
-
-	if(this->getChildByTag(READY_INDICATE_RIGHT_TAG_ID))
-		this->removeChildByTag(READY_INDICATE_RIGHT_TAG_ID,true);
-
-	if(this->getChildByTag(READY_INDICATE_MID_TAG_ID))
-		this->removeChildByTag(READY_INDICATE_MID_TAG_ID,true);
-
-	(Sprite*)this->getChildByTag(LEFT_IMG_BKG_TAG_ID)->runAction(EaseIn::create(MoveTo::create(0.6,Vec2(29,536)),1.5));
-	(Sprite*)this->getChildByTag(RIGHT_IMG_BKG_TAG_ID)->runAction(EaseIn::create(MoveTo::create(0.6,Vec2(1190,536)),1.5));
-	(Sprite*)this->getChildByTag(MID_IMG_BKG_TAG_ID)->runAction(EaseIn::create(MoveTo::create(0.6,Vec2(49,129)),1.5));
-	(Sprite*)this->getChildByTag(MIC_TAG_ID)->runAction(Sequence::create(DelayTime::create(0.65),EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
-	for(int i=CARD_ARRAGE_LEFT_TAG_ID;i<=CARD_ARRAGE_TOP_TAG_ID;i++)
-		(Sprite*)this->getChildByTag(i)->runAction(EaseIn::create(FadeOut::create(0.2),2));
+	(Sprite*)this->getChildByTag(LEFT_IMG_BKG_TAG_ID)->runAction(
+        EaseIn::create(MoveTo::create(0.6,Vec2(29,536)),1.5));
+	(Sprite*)this->getChildByTag(RIGHT_IMG_BKG_TAG_ID)->runAction(
+        EaseIn::create(MoveTo::create(0.6,Vec2(1190,536)),1.5));
+	(Sprite*)this->getChildByTag(MID_IMG_BKG_TAG_ID)->runAction(
+        EaseIn::create(MoveTo::create(0.6,Vec2(49,129)),1.5));
+    
+	(Sprite*)this->getChildByTag(MIC_TAG_ID)->runAction(Sequence::create(
+        DelayTime::create(0.65),
+        EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
+    
+	for(int i=CARD_ARRAGE_LEFT_TAG_ID;i<=CARD_ARRAGE_TOP_TAG_ID;i++) {
+		(Sprite*)this->getChildByTag(i)->runAction(
+		    EaseIn::create(FadeOut::create(0.2),2));
+    }
 
 	auto colorLayer=LayerColor::create(Color4B(0,0,0,150),visibleSize.width,visibleSize.height*200/716);
 	colorLayer->setAnchorPoint(Vec2(0.5,0.5));
@@ -3741,7 +3739,6 @@ void NetRaceLayer::race_begin_prepare()
 	colorLayer->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 	this->addChild(colorLayer,4,COLOR_LAYER_TAG_ID);
 
-	auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/duijukaishi.ogg");});
 	auto paijuStart=Sprite::create("paijukaishi.png");
 	paijuStart->setScale(0);
 	paijuStart->setAnchorPoint(Vec2(0.5,0.5));
@@ -3754,41 +3751,56 @@ void NetRaceLayer::race_begin_prepare()
 	paijuStart_guang->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 	this->addChild(paijuStart_guang,6,RACE_LIGHT_TAG_ID);
 
-	auto StartActionIn=FadeIn::create(0.2);
-	auto StartActionScale=ScaleTo::create(0.2,1);
-	auto StartActionFirst=Spawn::create(StartActionIn,StartActionScale,NULL);
-	auto StartActionOut=Spawn::create(ScaleTo::create(0.3,4),FadeOut::create(0.3),NULL);
+	paijuStart->runAction(
+        Sequence::create(
+            DelayTime::create(0.7),
+            ScaleTo::create(0,4),
+            Spawn::create(
+                FadeIn::create(0.2),
+                ScaleTo::create(0.2,1),NULL),
+            Spawn::create(
+                _voice->Speak("duijukaishi.ogg"),
+                Sequence::create(
+                    DelayTime::create(0.5),
+                    ScaleTo::create(0.15,0.5),
+                    Spawn::create(
+                        ScaleTo::create(0.3,4),
+                        FadeOut::create(0.3),NULL),NULL),NULL),NULL));
+    
+	colorLayer->runAction(
+        Sequence::create(
+            DelayTime::create(0.9),
+            ScaleTo::create(0,1),
+            DelayTime::create(0.9),
+            ScaleTo::create(0.4,1,0),NULL));
+    
+	paijuStart_guang->runAction(
+        Sequence::create(
+            DelayTime::create(1.7),
+            Spawn::create(
+                ScaleTo::create(0.3,8,3),
+                FadeIn::create(0.3),NULL),
+                Spawn::create(
+                    ScaleTo::create(0.5,8,0),
+                    FadeOut::create(0.5),NULL),NULL));
 
-	paijuStart->runAction(Sequence::create(DelayTime::create(0.7),ScaleTo::create(0,4),StartActionFirst,Spawn::create(VoiceEffect,Sequence::create(DelayTime::create(0.5),ScaleTo::create(0.15,0.5),StartActionOut,NULL),NULL),NULL));
-	colorLayer->runAction(Sequence::create(DelayTime::create(0.9),ScaleTo::create(0,1),DelayTime::create(0.9),ScaleTo::create(0.4,1,0),NULL));
-	paijuStart_guang->runAction(Sequence::create(DelayTime::create(1.7),Spawn::create(ScaleTo::create(0.3,8,3),FadeIn::create(0.3),NULL),Spawn::create(ScaleTo::create(0.5,8,0),FadeOut::create(0.5),NULL),NULL));
-
-	if(this>getChildByTag(SHOWCARD_INDICATOR_TAG_ID))
-		this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID)->setVisible(false);
+    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
 
     int lastWinner = _roundManager->GetLastWinner();
-    switch(lastWinner) {
-        case 0:
-            last_winner->setAnchorPoint(Vec2(0.5,1));
-            last_winner->setPosition(_layout->_playerPosi[0].zhuangPoint);
-            break;
-        case 1:
-            last_winner->setAnchorPoint(Vec2(0,0.5));
-            last_winner->setPosition(_layout->_playerPosi[1].zhuangPoint);
-            break;
-        case 2:
-            last_winner->setAnchorPoint(Vec2(0.5,1));
-            last_winner->setPosition(_layout->_playerPosi[2].zhuangPoint);
-            break;
-    }
-	last_winner->runAction(Sequence::create(DelayTime::create(0.65),EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
+    _zhuangSign->setAnchorPoint(_layout->AnchorOfZhuang((PlayerDir_t)lastWinner));
+    _zhuangSign->setPosition(_layout->_playerPosi[lastWinner].zhuangPoint);
+	_zhuangSign->runAction(Sequence::create(
+        DelayTime::create(0.65),
+        EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
 
 	auto MingSignForMe=(Sprite*)this->getChildByTag(MING_STATUS_PNG_1);
-	if(lastWinner!=1)
-		MingSignForMe->setPosition(Vec2(origin.x+visibleSize.width*255/1218,origin.y+visibleSize.height*168/716));
-	else
-		MingSignForMe->setPosition(Vec2(origin.x+visibleSize.width*255/1218+last_winner->getTextureRect().size.width,origin.y+visibleSize.height*168/716));
+	if(lastWinner!=1) {
+        MingSignForMe->setPosition(_layout->PositionOfMingSignForMe());
+    } else {
+        MingSignForMe->setPosition(_layout->PositionOfMingSignForMe(_zhuangSign->getTextureRect().size.width));
+    }
 }
+
 void NetRaceLayer::KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
