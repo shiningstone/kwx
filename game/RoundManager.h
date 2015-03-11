@@ -25,7 +25,7 @@ public:
     RoundManager();
     ~RoundManager();
     
-    int GetLastWinner();
+    PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     void GetWin(WinInfo_t &info);
     bool IsWinner(int no, int curPlayer, int FirstMingPlayer);

@@ -59,7 +59,7 @@ class GameLayout {
         *************************************/
         Vec2 Center();
         Vec2 PositionOfMingSign();
-        Vec2 PositionOfMingSignForMe(PlayerDir_t dir,float zhuangWidth = 0.0);
+        Vec2 PositionOfMingSignForMe(float zhuangWidth = 0.0);
         Vec2 PositionOfActSign(int dir);
 
         Vec2 OrigPositionOfGangCard(int i,Size size);
@@ -82,6 +82,7 @@ class GameLayout {
             card in river
         *************************************/
         int  _getRiverLineNo(int i);
+        int  _getRiverLineIdx(int i);
         Vec2 OrigPositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle1PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle2PositionOfRiverCard(PlayerDir_t dir,int idx);
@@ -96,8 +97,6 @@ class GameLayout {
 
         cocos2d::Size  SIZE;
         cocos2d::Point ORIGIN;
-
-        int _getRiverLineIdx(int i);
 };
 
 #endif

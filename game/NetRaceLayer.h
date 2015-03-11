@@ -177,6 +177,7 @@ public:
 
     void _kouCardsRecordClear();
     void _kouCardsRecordAdd(CARD_KIND kind, int idx[]);
+    bool _kouCardsRecordIncludes(CARD_KIND kind);
     int  _findCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
 
 	CARD kouCards_kind[4];

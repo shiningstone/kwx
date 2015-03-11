@@ -7,8 +7,6 @@
 #include "NetRole.h"
 #include "RoundManager.h"
 
-#define INVALID -1
-
 RoundManager::RoundManager() {
     _lastWin.player = INVALID;
 
@@ -40,14 +38,14 @@ RoundManager::~RoundManager() {
 PlayerDir_t RoundManager::GetLastWinner() {
     if( _lastWin.player==INVALID ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-        _lastWin.player = 1;
+        _lastWin.player = MIDDLE;
     }
     return _lastWin.player;
 }
 
 void RoundManager::SetWin(WinKind_t kind,int player) {
     _lastWin.kind       = kind;
-    _lastWin.player     = player;
+    _lastWin.player     = (PlayerDir_t)player;
 }
 
 void RoundManager::GetWin(WinInfo_t &info) {

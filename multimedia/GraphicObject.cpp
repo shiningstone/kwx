@@ -613,14 +613,14 @@ Sprite *GObjectFactory::_image(const char *file) {
 /*************************************
     action buttons
 *************************************/
-Node *GObjectFactory::CreateKouCancelButton() {
+Button *GObjectFactory::CreateKouCancelButton() {
     auto ChooseCancel = Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
     ChooseCancel->setAnchorPoint(Vec2(0.5,0.5));
     ChooseCancel->setPosition(Vec2(ORIGIN.x+SIZE.width*0.15,ORIGIN.y+SIZE.height*0.25));
     return ChooseCancel;
 }
 
-Node *GObjectFactory::CreateKouConfirmButton() {
+Button *GObjectFactory::CreateKouConfirmButton() {
     auto ChooseEnsure=Button::create("wancheng.png","wancheng.png","wancheng.png",UI_TEX_TYPE_PLIST);
     ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
     ChooseEnsure->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));

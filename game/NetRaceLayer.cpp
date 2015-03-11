@@ -3674,7 +3674,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
 
 	for(int i=0;i<outCard->length;i++) {
-	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i)
+	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
 	}
     
 	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
@@ -3688,22 +3688,25 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
         auto show_card = _object->CreateRiverCard((PlayerDir_t)sender->_ID,(Card_t)oCard.kind);
         show_card_indicator->stopAllActions();
         
-        show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard(sender->_ID,i));                      
+        show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard((PlayerDir_t)sender->_ID,i));                      
         show_card_indicator->runAction(RepeatForever::create(Sequence::create(
-            MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard(sender->_ID,i)),
-            MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard(sender->_ID,i)),NULL)));
-        show_card->setPosition(_layout->DestPositionOfRiverCard(sender->_ID,i));
+            MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),
+            MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),NULL)));
+        show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)sender->_ID,i));
 
-        switch(sender->_ID) {
+        switch((PlayerDir_t)sender->_ID) {
             case 0:
                 myframe->addChild(show_card,i+1,
                     HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+                break;
             case 1:
                 myframe->addChild(show_card,_layout->_getRiverLineIdx(i)+1,
                     HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+                break;
             case 2:
                 myframe->addChild(show_card,20-i,
                     HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+                break;
         }
 	}
 }
@@ -3953,8 +3956,6 @@ void NetRaceLayer::_kouCardsRecordAdd(CARD_KIND kind, int idx[]) {
     
     kouCards_kind[Kou_kindLen].kind     = kind;
     kouCards_kind[Kou_kindLen++].status = c_KOU_ENABLE;
-    
-    Kou_kindLen++;
 }
 
 bool NetRaceLayer::_kouCardsRecordIncludes(CARD_KIND kind) {
@@ -3994,7 +3995,7 @@ void NetRaceLayer::KouCardsCheck(int no)
             if(_findCards(cardIdx, list, curKind)==3 
                 &&_roundManager->_players[no]->get_parter()->judge_kou_cards(curKind,no,RototHandOutIndex)) {
                 
-                _kouCardsRecordAdd(cardIdx,curKind);
+                _kouCardsRecordAdd(curKind,cardIdx);
                 
                 list->data[cardIdx[0]].status=c_KOU_ENABLE;
                 list->data[cardIdx[1]].status=c_KOU_ENABLE;
@@ -4511,7 +4512,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
                 _roundManager->_isGangHua
             );
         
-		if(sender->_ID==1)
+		if((PlayerDir_t)sender->_ID==1)
 		{
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 			float x=_layout->_playerPosi[1].basePoint.x;
@@ -4560,7 +4561,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				if(!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
 					_roundManager->_actionToDo=a_JUMP;
 		}
-		if(sender->_ID==1)
+		if((PlayerDir_t)sender->_ID==1)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(_roundManager->_actionToDo&a_HU))
 			{
@@ -4573,19 +4574,19 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			{
 				if(ifTuoGuan)
 					_roundManager->_actionToDo=a_JUMP;
-				waitfor_myaction(sender->_ID);
+				waitfor_myaction((PlayerDir_t)sender->_ID);
 				return;
 			}
 		}
 		else
 		{
-			waitfor_otheraction(sender->_ID);
+			waitfor_otheraction((PlayerDir_t)sender->_ID);
 			return;
 		}
 	}
 	else
 	{
-		int no=(sender->_ID+1)%3;
+		int no=((PlayerDir_t)sender->_ID+1)%3;
 		unsigned char action1 = 
             _roundManager->_players[no]->get_parter()->hand_in(
                 _roundManager->_lastHandedOutCard,
@@ -4637,7 +4638,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
 					action1=a_JUMP;
 		}
-		int no1=(sender->_ID+2)%3;
+		int no1=((PlayerDir_t)sender->_ID+2)%3;
 		unsigned char action2=
             _roundManager->_players[no1]->get_parter()->hand_in(
                 _roundManager->_lastHandedOutCard,
@@ -7969,7 +7970,6 @@ void NetRaceLayer::delete_ActionRemind()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
-
         
 	for(int i=0;i<17;i++){
         _Remove(myframe,REMIND_ACT_TAG_ID+i);

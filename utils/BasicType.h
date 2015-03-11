@@ -11,6 +11,7 @@ typedef enum {
     LEFT,
     MIDDLE,
     RIGHT,
+    INVALID,
 }PlayerDir_t;
 
 typedef enum {

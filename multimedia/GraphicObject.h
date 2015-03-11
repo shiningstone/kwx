@@ -115,8 +115,8 @@ public:
 
     Sprite *CreateRiverCard(PlayerDir_t dir,Card_t kind);
     /* button */
-    Node *CreateKouCancelButton();
-    Node *CreateKouConfirmButton();
+    Button *CreateKouCancelButton();
+    Button *CreateKouConfirmButton();
     
 protected:
     static float SCALE;
