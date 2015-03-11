@@ -3801,10 +3801,8 @@ void NetRaceLayer::race_begin_prepare()
     }
 }
 
-void NetRaceLayer::KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	auto curButton=(Button*)pSender;
 	switch (type)
 	{
@@ -3814,27 +3812,33 @@ void NetRaceLayer::KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+            LOGGER_WRITE("%s",__FUNCTION__);
+
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-			if (myframe->getChildByTag(MING_KOU_ENSURE))
-				myframe->removeChildByTag(MING_KOU_ENSURE);			
-			if (myframe->getChildByTag(MING_KOU_SIGN))
-				myframe->removeChildByTag(MING_KOU_SIGN);
-			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-			Sprite *p_list[MAX_HANDIN_NUM];
-			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-			for(int a=list->atcvie_place;a<list->len;a++)
+            
+			_Remove(myframe,MING_KOU_ENSURE);			
+			_Remove(myframe,MING_KOU_SIGN);
+
+            Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+
+            Sprite *p_list[MAX_HANDIN_NUM];
+			auto list = _roundManager->_players[1]->get_parter()->get_card_list();
+			for(int i=list->atcvie_place;i<list->len;i++)
 			{
-				list->data[a].status=c_FREE;
-				p_list[a]=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+a);
-				if(p_list[a]->getChildByTag(MING_KOU))
-					p_list[a]->removeChildByTag(MING_KOU);
+				list->data[i].status=c_FREE;
+                
+				Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
+				if(card->getChildByTag(MING_KOU))
+					card->removeChildByTag(MING_KOU);
 			}			
 			curButton->setTouchEnabled(false);
-			auto ButtonAction=TargetedAction::create(curButton,ScaleTo::create(0,0));
-			auto callFunc=CallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_tip_effect));
-			//auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+            
 			myframe->_ID=1;
-			myframe->runAction(Sequence::create(ButtonAction,callFunc,NULL));
+			myframe->runAction(
+                Sequence::create(
+                    TargetedAction::create(curButton,
+                        ScaleTo::create(0,0)),CallFuncN::create(this,callfuncN_selector(
+                    NetRaceLayer::ming_tip_effect)),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -3843,10 +3847,9 @@ void NetRaceLayer::KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
 		break;
 	}	
 }
-void NetRaceLayer::KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
 
+void NetRaceLayer::KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -3855,29 +3858,35 @@ void NetRaceLayer::KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+            LOGGER_WRITE("%s",__FUNCTION__);
+            
 			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+            
 			if (myframe->getChildByTag(MING_KOU_SIGN))
 				myframe->removeChildByTag(MING_KOU_SIGN);
-			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-			for(int a=list->atcvie_place;a<list->len;a++)
+
+            auto list = _roundManager->_players[1]->get_parter()->get_card_list();
+			for(int i=list->atcvie_place;i<list->len;i++)
 			{
-				if(list->data[a].status==c_KOU_ENABLE)
-					list->data[a].status=c_FREE;
+				if(list->data[i].status==c_KOU_ENABLE)
+					list->data[i].status=c_FREE;
 			}	
+            
 			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-			auto curButton=(Button*)pSender;
-			curButton->setTouchEnabled(false);
-			auto buttonact=ScaleTo::create(0,0);
+            
 			_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU);
 			auto ming_indexesCur=_roundManager->_players[1]->get_parter()->ming_check();
 			_roundManager->_players[1]->get_parter()->set_ming_indexes(ming_indexesCur);
-			auto buttonAction=TargetedAction::create(curButton,buttonact);
-			auto callFunc0=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));//????
-			auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-			auto callFunc2=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_tip_effect));
-			auto seq1=Sequence::create(buttonAction,callFunc0,callFunc1,callFunc2,NULL);
-			myframe->_ID=_roundManager->_curPlayer;
-			myframe->runAction(seq1);
+
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+
+			myframe->_ID = _roundManager->_curPlayer;
+			myframe->runAction(Sequence::create(TargetedAction::create(
+                curButton,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
+                NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+                NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
+                NetRaceLayer::ming_tip_effect)),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -3886,10 +3895,8 @@ void NetRaceLayer::KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
 		break;
 	}
 }
-void NetRaceLayer::MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -3898,26 +3905,25 @@ void NetRaceLayer::MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEv
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+            LOGGER_WRITE("%s",__FUNCTION__);
+            
 			ifMingTime=false;
-			auto curButton=(Button*)pSender;
-			auto buttonact=ScaleTo::create(0,0);
-			auto ButtonAction=TargetedAction::create(curButton,buttonact);
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-			auto list=_roundManager->_players[1]->get_parter()->get_card_list();
+            
 			_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU_CANCEL);
 			_roundManager->_actionToDo=a_JUMP;
-			auto callFunc2=CallFunc::create([=](){
-				_roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
-				waitfor_myaction(1);
-			});
+            
 			_roundManager->_players[1]->get_parter()->MingCancel();
 			_roundManager->_players[1]->get_parter()->set_ming_indexes(0);
 			_roundManager->_players[1]->get_parter()->set_ting_status(0);
-			auto callFunc0=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
-			auto callFunc1=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-			auto seq1=Sequence::create(ButtonAction,callFunc0,callFunc1,callFunc2,NULL);
-			myframe->_ID=_roundManager->_curPlayer;
-			myframe->runAction(seq1);
+
+			auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+			myframe->_ID = _roundManager->_curPlayer;
+			myframe->runAction(Sequence::create(TargetedAction::create(
+                (Button*)pSender,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
+                NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+                NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+				_roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
+				waitfor_myaction(1);}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -3942,9 +3948,11 @@ void NetRaceLayer::KouCardsCheck(int no)
 	for(a=0;a<4;a++)
 		for(b=0;b<3;b++)
 			KouCardsPlace[a][b]=-1;
+        
 	int tempCardPlace[4]={-1,-1,-1,-1};
 	int countA=0,countB;
 	bool ifJudged=false;
+    
 	for(a=list->atcvie_place;a<list->len;a++)
 	{
 		for(c=0;c<4;c++)
@@ -3992,7 +4000,7 @@ void NetRaceLayer::KouCardsCheck(int no)
 
 Node *NetRaceLayer::_CreateKouChooseCancelButton() {
     auto ChooseCancel = Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-    ChooseCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouCancle,this));
+    ChooseCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouCancelPressed,this));
     ChooseCancel->setAnchorPoint(Vec2(0.5,0.5));
     ChooseCancel->setPosition(Vec2(
         origin.x+visibleSize.width*0.15,
@@ -4002,7 +4010,7 @@ Node *NetRaceLayer::_CreateKouChooseCancelButton() {
 
 Node *NetRaceLayer::_CreateKouChooseConfirmButton() {
     auto ChooseEnsure=Button::create("wancheng.png","wancheng.png","wancheng.png",UI_TEX_TYPE_PLIST);
-    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouEnsure,this));
+    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouConfirmPressed,this));
     ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
     ChooseEnsure->setPosition(Vec2(
         origin.x+visibleSize.width*0.8,
@@ -4219,7 +4227,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 		if(myframe->getChildByTag(MING_KOU_SIGN))
 			myframe->removeChildByTag(MING_KOU_SIGN);
 		auto MingCancel=Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancle,this));
+		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelPressed,this));
 		MingCancel->setAnchorPoint(Vec2(0.5,0.5));
 		MingCancel->setPosition(Vec2(origin.x+visibleSize.width*0.15,origin.y+visibleSize.height*0.25));
 		myframe->addChild(MingCancel,20,MING_CANCEL);

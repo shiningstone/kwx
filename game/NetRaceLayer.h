@@ -231,9 +231,9 @@ public:
 	void set_aims_sequence(const int p_aim[]);
 
 	void ming_kou_Choose(int no);
-	void KouCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void KouEnsure(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void MingCancle(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void KouCardsCheck(int no);
 	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
