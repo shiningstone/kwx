@@ -117,6 +117,17 @@ public:
     /* button */
     Button *CreateKouCancelButton();
     Button *CreateKouConfirmButton();
+    Button *CreateMingCancelButton();
+    Button *CreateQiButton(const Vec2 &position);
+    Sprite *CreateQiBkg(const Vec2 &position);
+    Button *CreateHuButton(const Vec2 &position);
+    Sprite *CreateHuBkg(const Vec2 &position);
+    Button *CreateMingButton(const Vec2 &position);
+    Sprite *CreateMingBkg(const Vec2 &position);
+    Button *CreateGangButton(const Vec2 &position);
+    Sprite *CreateGangBkg(const Vec2 &position);
+    Button *CreatePengButton(const Vec2 &position);
+    Sprite *CreatePengBkg(const Vec2 &position);
     
 protected:
     static float SCALE;

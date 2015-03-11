@@ -4209,9 +4209,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 		if(myframe->getChildByTag(MING_KOU_SIGN))
 			myframe->removeChildByTag(MING_KOU_SIGN);
 
-		auto MingCancel=Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-		MingCancel->setAnchorPoint(Vec2(0.5,0.5));
-		MingCancel->setPosition(Vec2(origin.x+visibleSize.width*0.15,origin.y+visibleSize.height*0.25));
+		auto MingCancel = _object->CreateMingCancelButton();
 		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelPressed,this));
 		myframe->addChild(MingCancel,20,MING_CANCEL);
 
@@ -4334,103 +4332,86 @@ void NetRaceLayer::waitfor_myaction(int no)
     LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,no,_roundManager->_actionToDo);
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 
-	auto act_qi = Sprite::createWithSpriteFrameName("qi.png");//弃牌
-	auto act_hu =Sprite::createWithSpriteFrameName("hu1.png");//胡牌	
-	auto act_ming = Sprite::createWithSpriteFrameName("ming.png");//明牌
-	auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
-	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
-
-
     _Show(myframe,TING_SING_BAR,false);
 
 	float x,y;
 	y=origin.y+visibleSize.height*0.25;
 	x=origin.x+visibleSize.width*0.85;
+
 	if(_roundManager->_actionToDo!=a_JUMP)
 	{
-		auto myact_qi=Button::create("qi.png","qi.png","qi.png",UI_TEX_TYPE_PLIST);
-		myact_qi->_ID=no;
+		auto myact_qi = _object->CreateQiButton(Vec2(x,y));
+		myact_qi->_ID = no;
 		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::QiPressed,this));
-		myact_qi->setAnchorPoint(Vec2(0.5,0.5));
-		myact_qi->setPosition(Vec2(x,y));
 		myframe->addChild(myact_qi,35,QI_REMIND_ACT_TAG_ID);
 
-		auto qi_act=Sprite::createWithSpriteFrameName("qi.png");
-		qi_act->setAnchorPoint(Vec2(0.5,0.5));
-		qi_act->setOpacity(150);
-		qi_act->setPosition(Vec2(x,y));
-		qi_act->setScale(0);
+		auto qi_act = _object->CreateQiBkg(Vec2(x,y));
 		myframe->addChild(qi_act,34,QI_REMIND_ACT_BKG_TAG_ID);
-		x=x-act_qi->getContentSize().width/2-36;
+
+		x = x-qi_act->getContentSize().width/2-36;
 	}
+    
 	if(_roundManager->_actionToDo&a_HU)//胡牌
 	{	
-		x=x-act_hu->getContentSize().width/2;
-		auto myact_hu=Button::create("hu1.png","hu1.png","hu1.png",UI_TEX_TYPE_PLIST);
+        auto act_hu = Sprite::createWithSpriteFrameName("hu1.png");//胡牌  
+
+        x=x-act_hu->getContentSize().width/2;
+		auto myact_hu = _object->CreateHuButton(Vec2(x,y+6));
 		myact_hu->_ID=no;
 		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::HuPressed,this));
-		myact_hu->setAnchorPoint(Vec2(0.5,0.5));
-		myact_hu->setPosition(Vec2(x,y+6));
 		myframe->addChild(myact_hu,35,HU_REMIND_ACT_TAG_ID);
-		auto hu1_act=Sprite::createWithSpriteFrameName("hu1.png");
-		hu1_act->setAnchorPoint(Vec2(0.5,0.5));
-		hu1_act->setPosition(Vec2(x,y+6));	
-		hu1_act->setOpacity(150);
-		hu1_act->setScale(0);
+
+		auto hu1_act = _object->CreateHuBkg(Vec2(x,y+6));
 		myframe->addChild(hu1_act,34,HU_REMIND_ACT_BKG_TAG_ID);
+
 		x=x-act_hu->getContentSize().width/2-18;
 	}
+    
 	if(_roundManager->_actionToDo&a_MING)//明牌
 	{
-		x=x-act_ming->getContentSize().width/2;
-		auto myact_ming=Button::create("ming.png","ming.png","ming.png",UI_TEX_TYPE_PLIST);
+        auto act_ming = Sprite::createWithSpriteFrameName("ming.png");//明牌
+        x=x-act_ming->getContentSize().width/2;
+        
+		auto myact_ming=_object->CreateMingButton(Vec2(x,y+11));
 		myact_ming->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingPressed,this));
-		myact_ming->setAnchorPoint(Vec2(0.5,0.5));
-		myact_ming->setPosition(Vec2(x,y+11));
 		myframe->addChild(myact_ming,35,MING_REMIND_ACT_TAG_ID);
 
-		auto ming_act=Sprite::createWithSpriteFrameName("ming.png");
-		ming_act->setAnchorPoint(Vec2(0.5,0.5));
-		ming_act->setPosition(Vec2(x,y+11));	
-		ming_act->setOpacity(150);
-		ming_act->setScale(0);
+		auto ming_act=_object->CreateMingBkg(Vec2(x,y+11));
 		myframe->addChild(ming_act,34,MING_REMIND_ACT_BKG_TAG_ID);
+
 		x=x-act_ming->getContentSize().width/2-18;
 	}
-	if(_roundManager->_actionToDo&a_AN_GANG || _roundManager->_actionToDo&a_MING_GANG||_roundManager->_actionToDo&a_SHOU_GANG)//暗杠和明杠,手杠
+	if(_roundManager->_actionToDo&a_AN_GANG 
+        || _roundManager->_actionToDo&a_MING_GANG
+        ||_roundManager->_actionToDo&a_SHOU_GANG)//暗杠和明杠,手杠
 	{
+        auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
 		x=x-act_gang->getContentSize().width/2;
-		auto myact_gang=Button::create("gang1.png","gang1.png","gang1.png",UI_TEX_TYPE_PLIST);
+
+        auto myact_gang=_object->CreateGangButton(Vec2(x,y));
 		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::GangPressed,this));
-		myact_gang->setAnchorPoint(Vec2(0.5,0.5));
-		myact_gang->setPosition(Vec2(x,y));
 		myframe->addChild(myact_gang,35,GANG_REMING_ACT_TAG_ID);
 
-		auto gang1_act=Sprite::createWithSpriteFrameName("gang1.png");
-		gang1_act->setAnchorPoint(Vec2(0.5,0.5));
-		gang1_act->setPosition(Vec2(x,y));	
-		gang1_act->setOpacity(150);
-		gang1_act->setScale(0);
+		auto gang1_act=_object->CreateGangBkg(Vec2(x,y));
 		myframe->addChild(gang1_act,34,GANG_REMING_ACT_BKG_TAG_ID);
-		x=x-act_gang->getContentSize().width/2-18;
+
+        x=x-act_gang->getContentSize().width/2-18;
 	}
+
 	if(_roundManager->_actionToDo&a_PENG)//碰牌
 	{		
+    	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
+
 		x=x-act_peng->getContentSize().width/2;
-		auto myact_peng=Button::create("peng1.png","peng1.png","peng1.png",UI_TEX_TYPE_PLIST);
+		auto myact_peng=_object->CreatePengButton(Vec2(x,y+13));
 		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::PengPressed,this));
-		myact_peng->setAnchorPoint(Vec2(0.5,0.5));
-		myact_peng->setPosition(Vec2(x,y+13));
 		myframe->addChild(myact_peng,35,PENG_REMIND_ACT_TAG_ID);
 
-		auto peng1_act=Sprite::createWithSpriteFrameName("peng1.png");
-		peng1_act->setAnchorPoint(Vec2(0.5,0.5));
-		peng1_act->setPosition(Vec2(x,y+13));	
-		peng1_act->setOpacity(150);
-		peng1_act->setScale(0);
+		auto peng1_act=_object->CreatePengBkg(Vec2(x,y+13));	
 		myframe->addChild(peng1_act,34,PENG_REMIND_ACT_BKG_TAG_ID);
 		x=x-act_peng->getContentSize().width/2-18;
 	}
+
 	if(_roundManager->_actionToDo!=a_JUMP)
 	{
 		_roundManager->_isWaitDecision = true;
