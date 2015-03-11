@@ -262,6 +262,15 @@ Sprite *GObjectFactory::CreateHeadBkg(PlayerDir_t dir) {
     return sprite;
 }
 
+Sprite *GObjectFactory::CreateMingKouSign() {
+    auto MingSign=Sprite::createWithSpriteFrameName("gpts.png");
+    MingSign->setAnchorPoint(Vec2(0.5,0.5));
+    MingSign->setPosition(Vec2(
+        ORIGIN.x+SIZE.width*0.5,
+        ORIGIN.y+SIZE.height*0.2));
+    return MingSign;
+}
+
 Sprite *GObjectFactory::CreateMicIcon() {
 	auto mic = Sprite::createWithSpriteFrameName("maikefeng.png");
 
@@ -599,6 +608,23 @@ Sprite *GObjectFactory::CreateTingSign() {
 
 Sprite *GObjectFactory::_image(const char *file) {
     return Sprite::createWithSpriteFrameName(file);
+}
+
+/*************************************
+    action buttons
+*************************************/
+Node *GObjectFactory::CreateKouCancelButton() {
+    auto ChooseCancel = Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
+    ChooseCancel->setAnchorPoint(Vec2(0.5,0.5));
+    ChooseCancel->setPosition(Vec2(ORIGIN.x+SIZE.width*0.15,ORIGIN.y+SIZE.height*0.25));
+    return ChooseCancel;
+}
+
+Node *GObjectFactory::CreateKouConfirmButton() {
+    auto ChooseEnsure=Button::create("wancheng.png","wancheng.png","wancheng.png",UI_TEX_TYPE_PLIST);
+    ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
+    ChooseEnsure->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));
+    return ChooseEnsure;
 }
 
 /*************************************

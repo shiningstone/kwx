@@ -57,9 +57,6 @@ private:
     void _Show(Node *parent, int childTag,bool flag);
 
     /*Ming*/
-    Node *_CreateKouChooseCancelButton();
-    Node *_CreateKouChooseConfirmButton();
-    Node *_CreateMingSign();
     Node *_NonKouMask(Sprite *card);
     void    MaskNonKouCards();
     void    ListenToKou(int no);

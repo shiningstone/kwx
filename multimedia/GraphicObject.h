@@ -101,6 +101,8 @@ public:
     Sprite *CreateTingSign();
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
+
+    Sprite *CreateMingKouSign();
     
     /* card */
     Size RectSize(TextureId_t id);
@@ -112,6 +114,10 @@ public:
     void LayDownWithFace(Sprite *parent,Card_t kind, float height_x);
 
     Sprite *CreateRiverCard(PlayerDir_t dir,Card_t kind);
+    /* button */
+    Node *CreateKouCancelButton();
+    Node *CreateKouConfirmButton();
+    
 protected:
     static float SCALE;
 

@@ -4004,36 +4004,6 @@ void NetRaceLayer::KouCardsCheck(int no)
 	}
 }
 
-Node *NetRaceLayer::_CreateKouChooseCancelButton() {
-    auto ChooseCancel = Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-    ChooseCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouCancelPressed,this));
-    ChooseCancel->setAnchorPoint(Vec2(0.5,0.5));
-    ChooseCancel->setPosition(Vec2(
-        origin.x+visibleSize.width*0.15,
-        origin.y+visibleSize.height*0.25));
-    return ChooseCancel;
-}
-
-Node *NetRaceLayer::_CreateKouChooseConfirmButton() {
-    auto ChooseEnsure=Button::create("wancheng.png","wancheng.png","wancheng.png",UI_TEX_TYPE_PLIST);
-    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouConfirmPressed,this));
-    ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
-    ChooseEnsure->setPosition(Vec2(
-        origin.x+visibleSize.width*0.8,
-        origin.y+visibleSize.height*0.25));
-    return ChooseEnsure;
-}
-
-
-Node *NetRaceLayer::_CreateMingSign() {
-    auto MingSign=Sprite::createWithSpriteFrameName("gpts.png");
-    MingSign->setAnchorPoint(Vec2(0.5,0.5));
-    MingSign->setPosition(Vec2(
-        origin.x+visibleSize.width*0.5,
-        origin.y+visibleSize.height*0.2));
-    return MingSign;
-}
-
 Node *NetRaceLayer::_NonKouMask(Sprite *card) {
     auto mask = _object->Create(MING_MASK_CARD);
     mask->setAnchorPoint(Vec2(0.5,0.5));
@@ -4070,7 +4040,6 @@ void NetRaceLayer::ListenToKou(int no) {
             cardsInHand[a]->_ID = 1;
         }
 
-        /* BUG FOUND : only one group could be chosen */
         for(int group=0; group<Kou_kindLen; group++) {
             for(int i=0; i<3; i++) {
                 if ( _IsClickedOn(cardsInHand[KouCardsPlace[group][i]], touch) ) {
@@ -4191,10 +4160,14 @@ void NetRaceLayer::ming_kou_Choose(int no)
 	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
     
 	if(no==1) {
-		myframe->addChild(_CreateKouChooseCancelButton(),20,MING_KOU_CANCEL);
-		myframe->addChild(_CreateMingSign(),20,MING_KOU_SIGN);
+        auto kouCancel = _object->CreateKouCancelButton();
+        kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouCancelPressed,this));
+		myframe->addChild(kouCancel,20,MING_KOU_CANCEL);
 
-		auto ChooseEnsure = _CreateKouChooseConfirmButton();
+		myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
+
+		auto ChooseEnsure = _object->CreateKouConfirmButton();
+        ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouConfirmPressed,this));
 		ChooseEnsure->setVisible(false);
 		myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
 
@@ -4216,50 +4189,44 @@ void NetRaceLayer::ming_kou_Choose(int no)
 		}
 	}
 }
+
 void NetRaceLayer::ming_tip_effect(Node *psender)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	_roundManager->_actionToDo=a_MING;
-	//continue_gang_times=0;
-	//_roundManager->_lastAction=a_MING;
+
 	if(psender->_ID==1)
 	{
 		ifMingTime=true;
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
+
 		if(myframe->getChildByTag(MING_KOU_ENSURE))
 			myframe->removeChildByTag(MING_KOU_ENSURE);
+
 		if(myframe->getChildByTag(MING_KOU_SIGN))
 			myframe->removeChildByTag(MING_KOU_SIGN);
+
 		auto MingCancel=Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelPressed,this));
 		MingCancel->setAnchorPoint(Vec2(0.5,0.5));
 		MingCancel->setPosition(Vec2(origin.x+visibleSize.width*0.15,origin.y+visibleSize.height*0.25));
+		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelPressed,this));
 		myframe->addChild(MingCancel,20,MING_CANCEL);
 
-		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-		if(myframe->getChildByTag(MING_KOU_CANCEL))
-			myframe->removeChildByTag(MING_KOU_CANCEL,true);
+        _Remove(myframe,MING_KOU_CANCEL);
 
-		auto callFunc0=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
-		auto callFunc2=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::waitfor_MyTouchShowCard));
-		auto seq1=Sequence::create(callFunc0,callFunc2,NULL);
 		myframe->_ID=1;
-		myframe->runAction(seq1);
+		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::waitfor_MyTouchShowCard)),NULL));
 	}
 	else if(psender->_ID!=1)
 	{
-		//_roundManager->_lastAction=a_MING;
-		int curNo=psender->_ID;
-		auto callFunc2=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::waitfor_ShowCardWithoutTouch));
-		myframe->_ID=curNo;
-		myframe->runAction(callFunc2);
+		myframe->_ID = psender->_ID;
+		myframe->runAction(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::waitfor_ShowCardWithoutTouch)));
 	}
-	/*active_place_indexes 是按照bit 位来只是哪些张牌可以出，如果bit0==1 表示左手起的第一张可以出*/
-	//update_card_list(_roundManager->_curPlayer-1);
-	//scheduleOnce(schedule_selector(NetRaceLayer::waitfor_ShowCardWithoutTouch),0.3);
-	//scheduleOnce(schedule_selector(NetRaceLayer::delete_act_tip),0.3);
 }
 
 void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
@@ -4364,26 +4331,20 @@ void NetRaceLayer::first_response(int no)
 void NetRaceLayer::waitfor_myaction(int no)
 {
     LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,no,_roundManager->_actionToDo);
-
-	float x,y;
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-	//_eventDispatcher->removeEventListenersForTarget(myframe,true);//????
-	if(myframe->getChildByTag(TING_SING_BAR))
-		myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-	//if(myframe->getChildByTag(TING_SING_BUTTON))
-	//{
-	//	ifTriangleHintEnable=false;
-	//	myframe->getChildByTag(TING_SING_BUTTON)->setVisible(false);
-	//}
 
-	y=origin.y+visibleSize.height*0.25;
-	x=origin.x+visibleSize.width*0.85;
 	auto act_qi = Sprite::createWithSpriteFrameName("qi.png");//弃牌
 	auto act_hu =Sprite::createWithSpriteFrameName("hu1.png");//胡牌	
 	auto act_ming = Sprite::createWithSpriteFrameName("ming.png");//明牌
 	auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
 	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
 
+
+    _Show(myframe,TING_SING_BAR,false);
+
+	float x,y;
+	y=origin.y+visibleSize.height*0.25;
+	x=origin.x+visibleSize.width*0.85;
 	if(_roundManager->_actionToDo!=a_JUMP)
 	{
 		auto myact_qi=Button::create("qi.png","qi.png","qi.png",UI_TEX_TYPE_PLIST);
