@@ -4794,7 +4794,6 @@ Vec2 NetRaceLayer::_getLastCardPosition(PlayerDir_t dir) {
             break;
     }
     
-    LOGGER_WRITE("%s: vec %f %f",__FUNCTION__,x,y);
     return Vec2(x,y);
 }
 
@@ -4806,8 +4805,7 @@ void NetRaceLayer::distribute_card_effect()
 	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
 
     Sprite *list_last_one;
-    const Vec2   &lastCardPosition = _getLastCardPosition((PlayerDir_t)_roundManager->_curPlayer);
-    LOGGER_WRITE("%s: vec %f %f",__FUNCTION__,lastCardPosition.x,lastCardPosition.y);
+    const Vec2 &lastCardPosition = _getLastCardPosition((PlayerDir_t)_roundManager->_curPlayer);
 
     if(_roundManager->_curPlayer==1) {
 		list_last_one=_object->Create(FREE_CARD);
@@ -4840,11 +4838,10 @@ void NetRaceLayer::distribute_card_effect()
 		myframe->addChild(list_last_one,0,
 		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
 
-	auto action1=MoveTo::create(0.3,Vec2(list_last_one->getPositionX(),list_last_one->getPositionY()-50));
-	auto seq=Sequence::create(EaseElasticOut::create(action1),NULL);
-	auto last_one_action=TargetedAction::create(list_last_one,seq);
+	auto last_one_action=TargetedAction::create(list_last_one,Sequence::create(
+        EaseElasticOut::create(
+            MoveTo::create(0.3,Vec2(list_last_one->getPositionX(),list_last_one->getPositionY()-50))),NULL));
 
-	//auto callFunc=CallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_list));
 	auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
 	Sequence* seq2;
 	myframe->_ID=_roundManager->_curPlayer;
@@ -4863,70 +4860,57 @@ void NetRaceLayer::call_distribute_card()
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
 
-void NetRaceLayer::distribute_card()
+void NetRaceLayer::ListenToDistributeCard()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-    LOGGER_WRITE("\tadd listener to %s",DISTRIBUTE_DONE_EVENT_TYPE);
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DCI*>(event->getUserData());
+        
 		_roundManager->_lastHandedOutCard = userData->card;
 		_roundManager->_distributedNum    = userData->num;
         _roundManager->_isCardFromOthers = false;
+
 		distribute_card_effect();
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 
-    LOGGER_WRITE("\tadd listener to %s",NOONE_WIN_EVENT_TYPE);
 	auto _noonewinListener = EventListenerCustom::create(NOONE_WIN_EVENT_TYPE, [this](EventCustom * event){
 
 		((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
-		if(this->getChildByTag(ROBOT_TUO_GUAN))
-			this->removeChildByTag(ROBOT_TUO_GUAN,true);	
-		if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
-			this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);
+
+        _Remove(this,ROBOT_TUO_GUAN);
+        _Remove(this,TUOGUAN_CANCEL_BUTTON);
 		//流局特效放在这里，结算也在这里，特效最后一个action dispatch WAIT_START_CALLBACK_EVENT_TYPE
-		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
         _roundManager->SetWin(NONE_WIN,_roundManager->_curPlayer);
 
-		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
 		auto Nowinner=CallFunc::create([=](){
-			auto layer_color=LayerColor::create();
-			layer_color->setColor(Color3B(0,0,0));
-			//layer_color->setColor(Color3B(138,151,123));
-			layer_color->ignoreAnchorPointForPosition(false);
-			layer_color->setAnchorPoint(Vec2(0,0));
-			layer_color->setPosition(Vec2(origin.x,origin.y));
-			layer_color->setContentSize(Size(visibleSize.width,visibleSize.height));
-			layer_color->setOpacity(150);
-			this->addChild(layer_color,10,HUANG_ZHUANG_LAYER);
-
-			auto HuangZhuang=Sprite::create("huangzhuang.png");
-			HuangZhuang->setAnchorPoint(Vec2(0.5,0.5));
-			HuangZhuang->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-			HuangZhuang->setScale(1);
+			this->addChild(_object->CreateHuangZhuangBkg(),10,HUANG_ZHUANG_LAYER);
+			auto HuangZhuang=_object->CreateHuangZhuang();;
 			this->addChild(HuangZhuang,10,HUANG_ZHUANG_FONT);
-			auto hzAction=FadeIn::create(0.5);
-			auto FontAction=TargetedAction::create(HuangZhuang,hzAction);
-			//HuangZhuang->runAction(FadeIn::create(0.5));
+            
+			auto FontAction=TargetedAction::create(HuangZhuang,FadeIn::create(0.5));
 		});
-		auto GoldAccount=CallFunc::create([=](){
-			if(_roundManager->_firstMingNo!=-1)
-				GoldNumInsert(4,3,_roundManager->_firstMingNo);
-		});
+
 		scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
-		this->runAction(Sequence::create(DelayTime::create(0.5),GoldAccount,DelayTime::create(1),Spawn::create(Nowinner,callfunc,NULL),NULL));
+
+		this->runAction(
+            Sequence::create(
+                DelayTime::create(0.5),CallFunc::create([=](){
+    			if(_roundManager->_firstMingNo!=-1)
+    				GoldNumInsert(4,3,_roundManager->_firstMingNo);}),
+    			DelayTime::create(1),
+    			Spawn::create(
+    			    Nowinner,CallFunc::create(this,callfunc_selector(
+    			    NetRaceLayer::showall)),NULL),NULL));
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_noonewinListener,3);
 }
+
 void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type)
 {
     _roundManager->NotifyStart();
 
-	auto curButton=(Button*)pSender;
-	auto VoiceEffect=CallFunc::create([=](){
-		SimpleAudioEngine::sharedEngine()->playEffect("Music/anniu.ogg");	
-	});
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -4935,18 +4919,25 @@ void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType t
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+            auto curButton=(Button*)pSender;
+
 			curButton->setTouchEnabled(false);
-			auto ShadEffect=Sprite::createWithSpriteFrameName("kaishiyouxi2.png");
-			ShadEffect->setAnchorPoint(Vec2(0.5,0.5));
-			ShadEffect->setOpacity(77);
-			ShadEffect->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+
+			auto ShadEffect = _object->CreateStartGame();
 			this->addChild(ShadEffect,2,START_GAME_TAG_ID+1);
-			auto action1=Sequence::create(DelayTime::create(0.1),FadeOut::create(0.2),NULL);
-			auto TargetAction1=TargetedAction::create(curButton,action1);
-			auto action2=Spawn::create(ScaleTo::create(0.3,1.3),FadeOut::create(0.3),NULL);
-			auto TargetAction2=TargetedAction::create(ShadEffect,action2);
-			auto startGame=CallFunc::create(this,callfunc_selector(NetRaceLayer::start_callback));
-			this->runAction(Sequence::create(Spawn::create(TargetAction1,TargetAction2,VoiceEffect,NULL),DelayTime::create(0.2),startGame,NULL));
+
+			this->runAction(
+                Sequence::create(
+                    Spawn::create(
+                        TargetedAction::create(curButton,Sequence::create(
+                            DelayTime::create(0.1),
+                            FadeOut::create(0.2),NULL)),
+                        TargetedAction::create(ShadEffect,Spawn::create(
+                            ScaleTo::create(0.3,1.3),
+                            FadeOut::create(0.3),NULL)),
+                        _voice->Speak("anniu.ogg"),NULL),
+                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::start_callback)),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -4961,9 +4952,7 @@ void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto curButton=(Button*)pSender;
-	auto VoiceEffect=CallFunc::create([=](){
-		SimpleAudioEngine::sharedEngine()->playEffect("Music/anniu.ogg");	
-	});
+
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -4980,17 +4969,19 @@ void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
 			curButton->setTouchEnabled(false);
-			auto ShadEffect=Sprite::createWithSpriteFrameName("zailaiyiju2.png");
-			ShadEffect->setAnchorPoint(Vec2(0.5,0.5));
-			ShadEffect->setOpacity(77);
-			ShadEffect->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-			this->addChild(ShadEffect,2,RACE_RESTART_TAG_ID+1);
-			//auto action1=Sequence::create(DelayTime::create(0.1),FadeOut::create(0.2),NULL);
-			//auto TargetAction1=TargetedAction::create(curButton,action1);
-			auto action2=Spawn::create(ScaleTo::create(0.3,1.3),FadeOut::create(0.3),NULL);
-			auto TargetAction2=TargetedAction::create(ShadEffect,action2);
-			auto startGame=CallFunc::create(this,callfunc_selector(NetRaceLayer::start_callback));
-			this->runAction(Sequence::create(Spawn::create(/*TargetAction1,*/TargetAction2,VoiceEffect,NULL),DelayTime::create(0.2),startGame,NULL));
+            
+			auto restartBtn = _object->CreateRestartGame();
+			this->addChild(restartBtn,2,RACE_RESTART_TAG_ID+1);
+
+			this->runAction(
+                Sequence::create(
+                    Spawn::create(TargetedAction::create(restartBtn,
+                        Spawn::create(
+                            ScaleTo::create(0.3,1.3),
+                            FadeOut::create(0.3),NULL)),
+                        _voice->Speak("anniu.ogg"),NULL),
+                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::start_callback)),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -5008,6 +4999,7 @@ void NetRaceLayer::start_callback()
 		ifResourcePrepared=true;
 		resource_prepare();
 	}
+    
 	if(this->getChildByTag(GAME_BKG_TAG_ID))
 		this->removeChildByTag(GAME_BKG_TAG_ID,true);
 	if(this->getChildByTag(START_GAME_TAG_ID))
@@ -5034,6 +5026,7 @@ void NetRaceLayer::start_callback()
 		this->getChildByTag(MING_STATUS_PNG_1)->setVisible(false);
 	if(this->getChildByTag(MING_STATUS_PNG_2))
 		this->getChildByTag(MING_STATUS_PNG_2)->setVisible(false);
+    
 	for(int a=0;a<4;a++)
 	{
 		while(this->getChildByTag(GOLD_NUM_INSERT_JINBI+a))
@@ -5539,7 +5532,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	myframe->_ID=zhuang;
 	_roundManager->_isCardFromOthers=false;
 
-	distribute_card();
+	ListenToDistributeCard();
 
 	_roundManager->_distributedNum=0;	
 	auto updateFourCards=CallFunc::create([=](){

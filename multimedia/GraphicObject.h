@@ -99,6 +99,12 @@ public:
     LayerColor *CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum);
     LayerColor *CreateTingInfoBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum);
     Sprite *CreateTingSign();
+
+    LayerColor *CreateHuangZhuangBkg();
+    Sprite     *CreateHuangZhuang();
+
+    Sprite *CreateStartGame();
+    Sprite *CreateRestartGame();
     /* player */
     Sprite *CreateHeadBkg(PlayerDir_t dir);
 

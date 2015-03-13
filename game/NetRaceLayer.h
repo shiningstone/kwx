@@ -164,7 +164,7 @@ private:
     Vec2 _getLastCardPosition(PlayerDir_t dir) ;
 	void call_distribute_card();
 	void distribute_card_effect();
-	void distribute_card();
+	void ListenToDistributeCard();
 	void waitfor_otheraction(int no);
 	void distribute_event(const std::string event_type,void* val);
 	void waitfor_response(Node* sender);

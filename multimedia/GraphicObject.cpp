@@ -484,6 +484,46 @@ LayerColor *GObjectFactory::CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int 
     return TingSignBar;
 }
 
+LayerColor *GObjectFactory::CreateHuangZhuangBkg() {
+    auto layerColor = LayerColor::create();
+    
+    layerColor->setColor(Color3B(0,0,0));
+    layerColor->ignoreAnchorPointForPosition(false);
+    layerColor->setAnchorPoint(Vec2(0,0));
+    layerColor->setPosition(Vec2(ORIGIN.x,ORIGIN.y));
+    layerColor->setContentSize(Size(SIZE.width,SIZE.height));
+    layerColor->setOpacity(150);
+
+    return layerColor;
+}
+
+Sprite *GObjectFactory::CreateHuangZhuang(){
+    auto HuangZhuang = Sprite::create("huangzhuang.png");
+    HuangZhuang->setAnchorPoint(Vec2(0.5,0.5));
+    HuangZhuang->setPosition(Vec2(ORIGIN.x+SIZE.width/2,ORIGIN.y+SIZE.height/2));
+    HuangZhuang->setScale(1);
+
+    return HuangZhuang;
+}
+
+Sprite *GObjectFactory::CreateStartGame() {
+    auto sprite = Sprite::createWithSpriteFrameName("kaishiyouxi2.png");
+    sprite->setAnchorPoint(Vec2(0.5,0.5));
+    sprite->setOpacity(77);
+    sprite->setPosition(Vec2(ORIGIN.x+SIZE.width/2,ORIGIN.y+SIZE.height/2));
+
+    return sprite;
+}
+
+Sprite *GObjectFactory::CreateRestartGame() {
+    auto sprite = Sprite::createWithSpriteFrameName("zailaiyiju2.png");
+    sprite->setAnchorPoint(Vec2(0.5,0.5));
+    sprite->setOpacity(77);
+    sprite->setPosition(Vec2(ORIGIN.x+SIZE.width/2,ORIGIN.y+SIZE.height/2));
+
+    return sprite;
+}
+
 LabelAtlas *GObjectFactory::_createNumberSign(int number) {
     char tempForChar[10] = {0};
     
