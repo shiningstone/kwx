@@ -161,6 +161,7 @@ private:
 	BezierTo* BizerMove2(outCardList* outCard,Vec2 location,int time);
 	BezierTo* OthersBizerMove(int no,outCardList* outCard);
 	void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);
+    Vec2 _getLastCardPosition(PlayerDir_t dir) ;
 	void call_distribute_card();
 	void distribute_card_effect();
 	void distribute_card();

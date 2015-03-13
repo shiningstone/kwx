@@ -4509,6 +4509,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				y += 60;
 			}
 		}
+
 		if(_roundManager->_players[sender->_ID]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
 		{
 			if(_roundManager->_players[sender->_ID]->get_robot_hu_target()==SAME_TIAO_TARGET)
@@ -4764,58 +4765,80 @@ void NetRaceLayer::waitfor_response(Node* sender)
 	}
 }
 
+Vec2 NetRaceLayer::_getLastCardPosition(PlayerDir_t dir) {
+	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
+
+    float x = _layout->_playerPosi[dir].basePoint.x;
+    float y = _layout->_playerPosi[dir].basePoint.y;
+
+    switch(dir) {
+        case MIDDLE:
+            if( _roundManager->_lastActionSource==1
+                && (_roundManager->_lastAction==a_AN_GANG||_roundManager->_lastAction==a_SHOU_GANG||_roundManager->_lastAction==a_MING_GANG) ) {
+                x = distributeCardPos.x;
+            } else {
+                x += myframe->getChildByTag(
+                        HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().x+30;
+            }
+            
+            y += 60 + 13*(_roundManager->IsTing(dir));
+            break;
+        case LEFT:
+            y = myframe->getChildByTag(
+                HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-2))->getPosition().y-20;//+5;
+            break;
+        case RIGHT:
+            y = myframe->getChildByTag(
+                HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().y+86;
+            break;
+    }
+    
+    LOGGER_WRITE("%s: vec %f %f",__FUNCTION__,x,y);
+    return Vec2(x,y);
+}
+
 void NetRaceLayer::distribute_card_effect()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
-	Sprite *list_last_one;
-	float x=_layout->_playerPosi[_roundManager->_curPlayer].basePoint.x;
-	float y=_layout->_playerPosi[_roundManager->_curPlayer].basePoint.y;
-	unsigned char ting_flag=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_ting_status();
-	if(_roundManager->_curPlayer==1)
-	{
+
+    Sprite *list_last_one;
+    const Vec2   &lastCardPosition = _getLastCardPosition((PlayerDir_t)_roundManager->_curPlayer);
+    LOGGER_WRITE("%s: vec %f %f",__FUNCTION__,lastCardPosition.x,lastCardPosition.y);
+
+    if(_roundManager->_curPlayer==1) {
 		list_last_one=_object->Create(FREE_CARD);
 		list_last_one->setAnchorPoint(Point(0.0f,0.0f));
-		if(ting_flag==1)
-		{
-			x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().x+30;
-			y += 60+13;
-		}
-		else
-		{
-			x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().x+30;
-			y += 60;
-		}
-		if( _roundManager->_lastActionSource==1&& 
-            (_roundManager->_lastAction==a_AN_GANG||_roundManager->_lastAction==a_SHOU_GANG||_roundManager->_lastAction==a_MING_GANG) )
-			x=distributeCardPos.x;
+        
 		auto s_card=_object->CreateKind((Card_t)_roundManager->_lastHandedOutCard,NORMAL);
-		s_card->setPosition(Vec2(list_last_one->getTextureRect().size.width/2,list_last_one->getTextureRect().size.height*0.4));
+		s_card->setPosition(Vec2(
+            list_last_one->getTextureRect().size.width/2,
+            list_last_one->getTextureRect().size.height*0.4));
 		list_last_one->addChild(s_card);
-	}
-	else if(_roundManager->_curPlayer==2)
-	{
+	} else if(_roundManager->_curPlayer==2) {
 		list_last_one=_object->Create(R_IN_CARD);
 		list_last_one->setAnchorPoint(Point(0,0));
-		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().y+86;
-	}
-	else
-	{
+	} else {
 		list_last_one=_object->Create(L_IN_CARD);
 		list_last_one->setAnchorPoint(Point(0.0f,1.0f));
-		y=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-2))->getPosition().y-20;//+5;
 	}
-	list_last_one->setPosition(Vec2(x,y));
+
+	list_last_one->setPosition(lastCardPosition);
+    
 	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 
 	if(_roundManager->_curPlayer==0)
-		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+		myframe->addChild(list_last_one,30,
+		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
 	else if(_roundManager->_curPlayer==1)
-		myframe->addChild(list_last_one,30,HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+		myframe->addChild(list_last_one,30,
+		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
 	else if(_roundManager->_curPlayer==2)
-		myframe->addChild(list_last_one,0,HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+		myframe->addChild(list_last_one,0,
+		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
 
 	auto action1=MoveTo::create(0.3,Vec2(list_last_one->getPositionX(),list_last_one->getPositionY()-50));
 	auto seq=Sequence::create(EaseElasticOut::create(action1),NULL);
