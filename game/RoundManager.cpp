@@ -143,8 +143,7 @@ int RoundManager::Shuffle() {
     _isWaitDecision = false;
     _isGangHua = false;
     
-    _curEffectCardKind = INVALID;
-    _curEffectCardStatus = INVALID;
+    CancelEffectCard();
 
     _lastAction = INVALID;
     _lastActionWithGold = INVALID;
@@ -189,6 +188,26 @@ bool RoundManager::WaitForAction() {
     return true;
 }
 
+/****************************************
+        effect card
+****************************************/
+void RoundManager::CancelEffectCard() {
+    _curEffectCard.kind = ck_NOT_DEFINED;
+    _curEffectCard.status = c_NOT_DEFINDED;
+}
+
+void RoundManager::SetEffectCard(int kind,int status) {
+    _curEffectCard.kind = (CARD_KIND)kind;
+    _curEffectCard.status = (CARD_STATUS)status;
+}
+
+bool RoundManager::IsCurEffectCard(Card card) {
+    if(card.kind==_curEffectCard.kind && card.status==_curEffectCard.status) {
+        return true;
+    } else {
+        return false;
+    }
+}
 /****************************************
         card handler
 ****************************************/

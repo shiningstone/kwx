@@ -1673,16 +1673,14 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
                 
-				_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-				_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+				_roundManager->CancelEffectCard();
                 
 				delete_ActionEffect();
 				card_list_update(dir);
 			}
 		}
         
-		_roundManager->_curEffectCardKind=card;
-		_roundManager->_curEffectCardStatus=c_PENG;
+        _roundManager->SetEffectCard(card,c_PENG);
         
 		ifEffectTime=true;
 		ifUpdateDuringEffect=true;
@@ -1950,21 +1948,18 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
                 
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
-					_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-					_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+					_roundManager->CancelEffectCard();
 					card_list_update(dir);
 				} else  {
                     int sameCardNum = 0;
 
                     for(int a=list->atcvie_place-1;a>=0;a--) {
-						if(list->data[a].kind==_roundManager->_curEffectCardKind
-                            &&list->data[a].status==_roundManager->_curEffectCardStatus){
+						if( _roundManager->IsCurEffectCard(list->data[a]) ){
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
                             
 							if(sameCardNum==3){
-								_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-								_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+								_roundManager->CancelEffectCard();
 								break;
 							}
 						}
@@ -2047,8 +2042,7 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 			if(ifEffectTime) {
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
-				_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-				_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+                _roundManager->CancelEffectCard();
 				delete_ActionEffect();
 				card_list_update(no);
 			}
@@ -2069,9 +2063,8 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
         if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {/* is no equals _curPlayer ??? */
 			_roundManager->FindGangCards(no,gang);
             outCard = list->data[gang[0]];
-            
-			_roundManager->_curEffectCardKind = outCard.kind;
-			_roundManager->_curEffectCardStatus = c_AN_GANG;
+
+            _roundManager->SetEffectCard(outCard.kind,c_AN_GANG);
 			ifEffectTime=true;
 			ifUpdateDuringEffect=true;
 		} else if(no==1) { /* get gang card from kou cards */
@@ -2282,21 +2275,19 @@ void NetRaceLayer::an_gang_tip_effect(Node *psender)
 				ifEffectTime=false;
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
-					_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-					_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+					_roundManager->CancelEffectCard();
 					card_list_update(no);
 				} else {
 					int sameCardNum=0;
 					for(int a=list->atcvie_place-1;a>=0;a--)
 					{
-						if(list->data[a].kind==_roundManager->_curEffectCardKind&&list->data[a].status==_roundManager->_curEffectCardStatus)
+						if( _roundManager->IsCurEffectCard(list->data[a]) )
 						{
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
 							if(sameCardNum==4)
 							{
-								_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-								_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+								_roundManager->CancelEffectCard();
 								break;
 							}
 						}
@@ -2529,15 +2520,13 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 			if(ifEffectTime) {
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
-				_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-				_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+                _roundManager->CancelEffectCard();
 				delete_ActionEffect();
 				card_list_update(no);
 			}
 		}
-        
-		_roundManager->_curEffectCardKind=GangCard.kind;
-		_roundManager->_curEffectCardStatus=c_MING_GANG;
+
+        _roundManager->SetEffectCard(GangCard.kind,c_MING_GANG);
 		ifEffectTime=true;
 		ifUpdateDuringEffect=true;
 
@@ -2918,8 +2907,7 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 				if(ifUpdateDuringEffect)
 				{
 					ifUpdateDuringEffect=false;
-					_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-					_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+                    _roundManager->CancelEffectCard();
 					card_list_update(no);
 				}
 				else 
@@ -2927,14 +2915,13 @@ void NetRaceLayer::ming_gang_tip_effect(Node *psender)
 					int sameCardNum=0;
 					for(int a=list->atcvie_place-1;a>=0;a--)
 					{
-						if(list->data[a].kind==_roundManager->_curEffectCardKind&&list->data[a].status==_roundManager->_curEffectCardStatus)
+						if( _roundManager->IsCurEffectCard(list->data[a]) )
 						{
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
 							if(sameCardNum==4)
 							{
-								_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-								_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+								_roundManager->CancelEffectCard();
 								break;
 							}
 						}
@@ -3492,8 +3479,7 @@ void NetRaceLayer::card_list_update(int no)
 					x+=30;
 
                 /* the card showing somewhere else */
-                if(list->data[i].kind==_roundManager->_curEffectCardKind
-                    &&list->data[i].status==_roundManager->_curEffectCardStatus)
+                if( _roundManager->IsCurEffectCard(list->data[i]) )
 					p_list[i]->setVisible(false);
 
 
@@ -4269,8 +4255,7 @@ void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 					ifEffectTime=false;
 					ifUpdateDuringEffect=false;
                     
-					_roundManager->_curEffectCardKind=ck_NOT_DEFINED;
-					_roundManager->_curEffectCardStatus=c_NOT_DEFINDED;
+                    _roundManager->CancelEffectCard();
 					delete_ActionEffect();
                     
 					card_list_update(1);

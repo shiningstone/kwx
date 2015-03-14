@@ -49,9 +49,11 @@ public:
     bool _isWaitDecision;
     bool _isCardFromOthers;
 
-    int  _curEffectCardKind;
-    int  _curEffectCardStatus;
-    
+    Card _curEffectCard;
+    void CancelEffectCard();
+    void SetEffectCard(int kind,int status);
+    bool IsCurEffectCard(Card card);
+
     int  _tempActionToDo;
     int  _actionToDo;
         
