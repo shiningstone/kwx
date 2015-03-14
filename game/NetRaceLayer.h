@@ -194,6 +194,7 @@ public:
 	void init_role(Role *s_p[],Raction *p_parter[]);//玩家对象初始化
 	void create_race();//创建比赛场景
 	void update_residue_cards(int no);//更新剩余牌数
+    void _4CardsDistribute(int sequenceNo, float delayRef);
 	void effect_Distribute_Card(int zhuang);//发牌效果
 	/***********callback function***********************/
 	void PengPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--碰牌
@@ -217,7 +218,7 @@ public:
 	void minggang_dispatch(Node *psender);
 	void peng_dispatch(Node *psender);
 
-	void PengEffect(Node *psender);//me--碰牌效果
+    void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void an_gang_tip_effect(Node *psender);//me--暗杠效果
 	void ming_gang_tip_effect(Node *psender);//me--明杠效果
 	void ming_tip_effect(Node *psender);//me--名牌效果
