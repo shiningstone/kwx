@@ -2,6 +2,8 @@
 #ifndef __ROUND_MANAGER__
 #define __ROUND_MANAGER__
 
+
+#include "CardHolder.h"
 #include "./../utils/LogManager.h"
 
 class NetRole;
@@ -34,7 +36,7 @@ public:
     void RenewOutCard();
     void RecordHandOut(int cardIdx);
 
-
+    void Init();
     void InitPlayers();
     bool IsTing(int player);
 
@@ -77,7 +79,7 @@ private:
 
     WinInfo_t   _lastWin;
     NetRole     *_players[PLAYER_NUMBER];
-    bool        _ready[PLAYER_NUMBER];
+    CardHolder  *_cardHolders[PLAYER_NUMBER];
 
     outCardList *_river;
     int         _unDistributedCards[TOTAL_CARD_NUM];

@@ -1,4 +1,5 @@
 
+#include "CSockets.h"
 #include "NetMessenger.h"
 
 NetMessenger::NetMessenger() {

@@ -98,7 +98,15 @@ void RoundManager::RenewOutCard() {
 #include "NetPlayer.h"
 #include "NetRaceRound.h"
 
+void RoundManager::Init() {
+    InitPlayers();
+}
+
 void RoundManager::InitPlayers() {
+    _cardHolders[0] = new CardHolder();
+    _cardHolders[1] = new CardHolder();
+    _cardHolders[2] = new CardHolder();
+
 	_players[0] = new NetPlayer();
 	_players[1] = new NetMe();
 	_players[2] = new NetPlayer();
@@ -125,6 +133,54 @@ int RoundManager::Shuffle() {
 			_unDistributedCards[cur] = tmp;
 		}
 	}
+	////////////////////测试/////////////////////////
+	//[0,3]一条 [4,7]二条 [8,11]三条 [12,15]四条 [16,19]五条 [20,23]六条 [24,27]七条 [28,31]八条 [32,35]九条 
+	//[36,39]一筒 [40,43]二筒 [44,47]三筒 [48,51]四筒 [52,55]五筒 [56,59]六筒 [60,63]七筒 [64,67]八筒 [68,71]九筒
+	//[72,75]红中 [76,79]发财 [80,83]白板
+	int oneSeq[14]={0,0,0,8,9,10,12,16,20,24,28,32,36,39};
+	int twoSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
+	int threeSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
+	_unDistributedCards[40]=0;
+	_unDistributedCards[41]=4;
+	_unDistributedCards[42]=8;
+	_unDistributedCards[43]=12;
+	_unDistributedCards[44]=16;
+	_unDistributedCards[45]=20;
+	_unDistributedCards[46]=24;
+	_unDistributedCards[47]=80;
+	_unDistributedCards[48]=80;
+	_unDistributedCards[49]=80;
+	_unDistributedCards[50]=80;
+	_unDistributedCards[51]=80;
+	int c=0;
+	for(int a=0;a<14;a++)
+	{
+		if(oneSeq[a]<0||oneSeq[a]>83)
+		{
+			CCLOG("ERROR CARDS");
+			return 0;
+		}
+		_unDistributedCards[c++]=oneSeq[a];
+	}
+	for(int a=0;a<13;a++)
+	{
+		if(twoSeq[a]<0||twoSeq[a]>83)
+		{
+			CCLOG("ERROR CARDS");
+			return 0;
+		}
+		_unDistributedCards[c++]=twoSeq[a];
+	}
+	for(int a=0;a<13;a++)
+	{
+		if(threeSeq[a]<0||threeSeq[a]>83)
+		{
+			CCLOG("ERROR CARDS");
+			return 0;
+		}
+		_unDistributedCards[c++]=threeSeq[a];
+	}
+
 
     LOGGER_WRITE("NETWORK: Shuffle should be executed at the server, and it is more reasonable to hide the card sequence to clients");
     char p[TOTAL_CARD_NUM] = {0};

@@ -11,8 +11,11 @@
             用于启动一个进程，收到message时触发回调函数。
 *******************************************************/
 
-#include "CSockets.h"
+
 #include "./../utils/UtilBasic.h"
+
+class CSocket;
+#define SOCKET_BUFF_SIZE 128
 
 class NetMessenger {
 public:
@@ -55,3 +58,4 @@ private:
 };
 
 #endif
+

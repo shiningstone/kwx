@@ -1,12 +1,13 @@
 #ifndef __NET_RACE_LAYER_H__
 #define __NET_RACE_LAYER_H__
 
-#include "NetRaceRound.h"
 #include "ui/CocosGUI.h"
+using namespace CocosDenshion;
+
+#include "NetRaceRound.h"
 #include "account.h"
 #include "Role.h"
 #include "Resources.h"
-using namespace CocosDenshion;
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
@@ -93,6 +94,10 @@ private:
 	int premiumLeast;//底
 	/************************自己手牌全局变量**************************/
 	/************************自己手牌全局变量**************************/
+	/*if use*/
+	//int Angang[4];
+
+
 	bool ifGameStart;
 	bool ifResourcePrepared;
 
@@ -219,8 +224,8 @@ public:
 	void peng_dispatch(Node *psender);
 
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
-	void an_gang_tip_effect(Node *psender);//me--暗杠效果
-	void ming_gang_tip_effect(Node *psender);//me--明杠效果
+	void an_gang_tip_effect(int no,Card_t card,int gang[]);//me--暗杠效果
+	void ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
 	void ming_tip_effect(Node *psender);//me--名牌效果
 	void hu_tip_effect(Node *psender);//me--胡牌效果
 	void qi_tip_effect(Node *psender);//me--弃牌效果

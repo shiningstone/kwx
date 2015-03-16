@@ -19,7 +19,7 @@ class Header;
 class MsgBody;
 class Item;
 class NetMessenger;
-
+class NetRaceLayer;
 /**********************************************************************
 关于下行包接收：
     用户可以自行创建一个线程，将接收到的报文交给Deserialize/Construct依次处理；
@@ -32,9 +32,10 @@ public:
     ~KwxMsg();
     
     /* auto receive */
-    static void StartReceiving();
+    static NetRaceLayer *_receiver;
+    static void StartReceiving(NetRaceLayer *raceLayer=NULL);
     static void StopReceiving();
-    void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
+    void StartReceiving(MsgHandler_t handle, NetRaceLayer *receiver=NULL);               //this method should only be referenced by test cases.
 
     /* upstream */
     int SetAction(INT8U *buf,ActionId_t code);
@@ -79,7 +80,7 @@ protected:
     int AddCardKind(CardType_t code);
     int AddCardKind(int num,Card_t *card);
 
-    static Logger   *_logger;
+    static Logger       *_logger;
 };
 
 #define KWX_INVALID_PCHC          -1

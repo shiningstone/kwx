@@ -1,0 +1,46 @@
+效果是统一放在RoundManager还是Player也可以执行我还没有想好，暂时统一由RoundManager执行。
+CardList也是我希望能够产生的一个类，这个类负责对手上的牌排序，碰杠胡判断等，不过是否实现要看时间是否允许
+下面的接口说明仅介绍了接口之间的调用关系，一些内部的逻辑处理没有涉及
+
+********************************************************************
+RoundManager
+	负责牌局总体进度控制
+	负责界面更新请求
+
+	主要接口介绍
+
+	牌局开始	StartGame
+		资源初始化
+		视图初始化
+		单机版：调用DistributeTo
+		网络版：（无）
+
+	发牌        DistributeTo(Player,Card)        
+		执行发牌特效
+		调用Player.Handin
+
+	发布出牌    InformOutCard(Player, Card)
+		单机版：调用另外两个Player.Handin
+		网络版：发包给server
+
+	接收动作    RecvAction(Player,Card)
+		单机版：调用Player.Act
+		网络版：发包给server
+		
+	发布动作    InformAction(AllPlayer)
+		执行动作特效
+		单机版：调用DistributeTo
+		网络版：（无）
+	
+Player
+
+	抓牌		Handin
+		牌判断(这个有条件的话可以放到CardList中实现)
+		调用Handout 或者 Act
+
+	出牌		Handout
+		调用RoundManager.InformOutCard
+
+	动作		Act
+		调用RoundManager.RecvAction
+
