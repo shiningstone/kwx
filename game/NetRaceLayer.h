@@ -31,8 +31,7 @@ protected:
     GObjectFactory *_object;
 private:
     Logger *_logger;
-    void _LoadPlayerInfo();
-    void _GenerateIds(int ids[3]);
+
     void create_residue_cards();
     void refresh_residue_cards();
     std::string _NumToString( int number );

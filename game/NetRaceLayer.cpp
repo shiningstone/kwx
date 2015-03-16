@@ -82,44 +82,14 @@ void NetRaceLayer::distribute_event(const std::string event_type,void* val)
 	_eventDispatcher->dispatchCustomEvent(event_type,val);
 }
 
-void NetRaceLayer::_GenerateIds(int ids[]) {
-    ids[0]=rand()%16;
-    ids[1]=17;
-    
-    do {
-        ids[2]=rand()%16;
-    } while( ids[2]==ids[0] );
-}
-
-void NetRaceLayer::_LoadPlayerInfo() {
-    Database *database = Database::getInstance();
-    
-    int  ids[3] = {0};
-    _GenerateIds(ids);
-    
-	for(int i=0;i<3;i++)
-	{	
-        _roundManager->_players[i]->set_player_id( ids[i] );
-
-        UserProfile_t user = {0};
-        database->GetUserProfile(ids[i],user);
-
-		_roundManager->_players[i]->set_nick_name(user.name);
-		_roundManager->_players[i]->set_photo(user.photo);
-		_roundManager->_players[i]->set_property(user.property);
-		_roundManager->_players[i]->set_sex(user.sex);
-		_roundManager->_players[i]->set_language(user.language);
-	}
-}
-
 void NetRaceLayer::create_race()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
     _roundManager->InitPlayers();
-    _roundManager->_distributedNum = 0;
+    _roundManager->LoadPlayerInfo();
+	_roundManager->_isGameStart=false;
     
-	ifGameStart=false;
 	ifUpdateDuringEffect=false;
 	ifMingMybeError=false;
 	MyCardChoosedNum=-1;
@@ -133,8 +103,6 @@ void NetRaceLayer::create_race()
     
 	premiumLeast=200;
 	distributeCardPos=Vec2::ZERO;
-	//ifEndGameChoose=false;
-	//tempEffectNode=Node::create();
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tools.plist");
@@ -179,8 +147,6 @@ void NetRaceLayer::create_race()
     /************************
         head image
     ************************/
-    _LoadPlayerInfo();
-
     Sprite *bkg = _object->CreateHeadBkg(LEFT);
     _layout->SetPlayerBkg(LEFT,bkg);
 	this->addChild(_layout->_playerBkg[0],1,LEFT_IMG_BKG_TAG_ID);
@@ -202,19 +168,10 @@ void NetRaceLayer::create_race()
 	StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
 	this->addChild(StartButton,2,START_GAME_TAG_ID);
     
-	for(int id=0;id<3;id++)//更新玩家信息
-	{
-        std::string buffer;
-
-		_roundManager->_players[id]->get_photo(buffer);
-		update_headimage(id,buffer);
-        
-		_roundManager->_players[id]->get_nick_name(buffer);
-		update_nickname(id,buffer);
-
-        int score;
-        _roundManager->_players[id]->get_property(score);
-		GuiUpdateScore(id,score);
+	for(int dir=0;dir<3;dir++) {
+		update_headimage(dir,_roundManager->_cardHolders[dir]->_profile.photo);
+		update_nickname(dir,_roundManager->_cardHolders[dir]->_profile.name);
+		GuiUpdateScore(dir,_roundManager->_cardHolders[dir]->_profile.property);
 	}
 
     for(int i=0;i<4;i++) {
@@ -4318,7 +4275,7 @@ void NetRaceLayer::first_response(int no)
 
 	waitfor_MyTouchShowCard();
 
-	ifGameStart=true;
+	_roundManager->_isGameStart=true;
     
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 	_roundManager->_actionToDo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();
@@ -5132,7 +5089,7 @@ void NetRaceLayer::start_callback()
 	this->addChild(myframe,3,GAME_BKG_TAG_ID);
 
 	distributeCardPos=Vec2::ZERO;
-	ifGameStart=false;
+	_roundManager->_isGameStart=false;
 	ifUpdateDuringEffect=false;
 	ifMingMybeError=false;
 	MyCardChoosedNum=-1;
@@ -7152,7 +7109,6 @@ void NetRaceLayer::race_start_again()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
-        LOGGER_WRITE("got %s",WAIT_START_CALLBACK_EVENT_TYPE);
         _roundManager->Shuffle();
 		_roundManager->_distributedNum = 40;
 	});
@@ -7339,9 +7295,9 @@ void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType typ
 			auto curButton=(Button*)pSender;
 			curButton->setTouchEnabled(false);
 			(this->getChildByTag(GAME_BACK_BAR))->runAction(ScaleTo::create(0,0));
-			//auto ifEndGameChooseFunc=CallFunc::create([=](){ifEndGameChoose=false;});
+
 			auto StartSelfGame=CallFunc::create([=](){
-				if(ifGameStart)
+				if(_roundManager->_isGameStart)
 				{
 					if(!_roundManager->IsTing(1))
 						waitfor_MyTouchShowCard();
@@ -7351,7 +7307,9 @@ void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType typ
 			});
 			if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
 				((Button*)this->getChildByTag(TUOGUAN_CANCEL_BUTTON))->setTouchEnabled(true);
-			this->runAction(Sequence::create(CallFunc::create([=](){this->removeChildByTag(GAME_BACK_BAR,true);}),StartSelfGame,/*ifEndGameChooseFunc,*/NULL));
+			this->runAction(Sequence::create(
+                CallFunc::create([=](){this->removeChildByTag(GAME_BACK_BAR,true);}),
+                StartSelfGame,NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

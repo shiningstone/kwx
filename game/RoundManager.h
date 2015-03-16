@@ -38,8 +38,10 @@ public:
 
     void Init();
     void InitPlayers();
+    void LoadPlayerInfo();
     bool IsTing(int player);
 
+    bool _isGameStart;
     bool _isGangAsking;
     bool _isQiangGangAsking;
     bool _isDoubleHuAsking;
@@ -84,6 +86,8 @@ private:
     outCardList *_river;
     int         _unDistributedCards[TOTAL_CARD_NUM];
     int         _distributedNum;
+
+    void _GenerateIds(int ids[]);
 };
 
 #endif

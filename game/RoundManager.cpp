@@ -120,6 +120,29 @@ void RoundManager::InitPlayers() {
 	_players[2]->get_parter()->set_role_type( INTERNET_PLAYER );
 }
 
+void RoundManager::_GenerateIds(int ids[]) {
+    ids[0]=rand()%16;
+    ids[1]=17;
+    
+    do {
+        ids[2]=rand()%16;
+    } while( ids[2]==ids[0] );
+}
+
+void RoundManager::LoadPlayerInfo() {
+    Database *database = Database::getInstance();
+    
+    int  ids[3] = {0};
+    _GenerateIds(ids);
+    
+	for(int dir=0;dir<3;dir++)
+	{	
+        UserProfile_t profile = {0};
+        database->GetUserProfile(ids[dir],profile);
+        _cardHolders[dir]->Set(&profile);
+	}
+}
+
 bool RoundManager::IsTing(int id) {
     return _players[id]->get_parter()->get_ting_status();
 }
