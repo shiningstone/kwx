@@ -1,6 +1,7 @@
 
 #include "NetRaceLayer.h"
 #include "HelloWorldScene.h"
+#include "RoundManager.h"
 
 #include "NetPlayer.h"
 #include "./../Me.h"
@@ -30,7 +31,7 @@ NetRaceLayer::NetRaceLayer()
     _layout = GameLayout::getInstance(origin,visibleSize);
     _effect = GraphicEffect::getInstance();
     
-    _roundManager = new RoundManager();
+    _roundManager = new RoundManager(this);
     _logger = LOGGER_REGISTER("NetRaceLayer");
 
     
@@ -228,7 +229,16 @@ void NetRaceLayer::startParticleSystem(float delta)
 	m_SmallParticle->isAutoRemoveOnFinish();
 }
 
-void NetRaceLayer::PengPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::PengPressed(Button *button,PlayerDir_t prevPlayer,Card_t card) {
+    button->setTouchEnabled(false);
+    
+    button->_ID = 1;
+    button->runAction(Sequence::create(
+        ScaleTo::create(0.1,1),CallFunc::create([=](){
+        PengEffect((PlayerDir_t)_roundManager->_curPlayer,prevPlayer,card);}),NULL));
+}
+
+void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
     
@@ -242,37 +252,7 @@ void NetRaceLayer::PengPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
     		{
                 LOGGER_WRITE("%s",__FUNCTION__);
-                
-                Card        card;
-                PlayerDir_t prevPlayer;
-
-    			if(_roundManager->_isWaitDecision) {
-    				_roundManager->_isWaitDecision = false;
-    				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
-    				_roundManager->_tempActionToDo = a_JUMP;
-
-                    
-                    continue_gang_times = 0;
-                    _roundManager->_lastAction=a_PENG;
-                    
-                    const int riverLast =_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
-                    
-                    _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
-                    _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-                    
-                    _roundManager->RecordOutCard(card);
-                    _roundManager->RecordOutCard(card);
-
-                    prevPlayer = (PlayerDir_t)_roundManager->_curPlayer;
-                    _roundManager->_curPlayer=1;
-    			}
-
-    			curButton->setTouchEnabled(false);
-                
-                curButton->_ID = 1;
-    			curButton->runAction(Sequence::create(
-                    ScaleTo::create(0.1,1),CallFunc::create([=](){
-                    PengEffect((PlayerDir_t)_roundManager->_curPlayer,prevPlayer,(Card_t)card.kind);}),NULL));
+                _roundManager->RecvPeng(curButton);
     		}
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -382,7 +362,7 @@ void NetRaceLayer::GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 
 				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
 				auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-				continue_gang_times++;
+				_roundManager->_continue_gang_times++;
 				int* Angang=new int[4];
 				Card_t card;
 
@@ -936,7 +916,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 
     CallFunc* BizerVoice = _voice->Speak("give");
 	CallFunc* voiceCall  = _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
-                                _roundManager->_players[_roundManager->_curPlayer]->get_sex());
+                                _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
 
 	Sequence* voiceEffect;
 	Spawn* allEffect = Spawn::create(NULL);
@@ -1605,7 +1585,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                             showAndHideOutcardNotice,
                             inHandMoveToOutHand,
                             _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
-                                _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),
+                                _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),NULL),
                         _voice->Speak("give"),NULL);
 	}
 	else
@@ -1615,7 +1595,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
                     		showAndHideOutcardNotice,
                     		inHandMoveToOutHand,
                     		_voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
-                                _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),
+                                _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),NULL),
                 		_voice->Speak("give"),NULL);
 
 	delete s_res;
@@ -1710,7 +1690,7 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
 	if(dir!=1) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
-                                _voice->SpeakAction(PENG,_roundManager->_players[_roundManager->_curPlayer]->get_sex()),
+                                _voice->SpeakAction(PENG,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                                 simple_tip_effect( _layout->PositionOfActSign(_roundManager->_curPlayer),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
@@ -2025,7 +2005,7 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
             hideReminder,Spawn::create(
                 simple_seq,
                 _voice->SpeakAction(PENG,
-                    _roundManager->_players[_roundManager->_curPlayer]->get_sex()),Spawn::create(
+                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),Spawn::create(
                 hide2CardsInhand),Spawn::create(
                 moveRightCardInHand,
                 moveLeftCardInHand,NULL),Sequence::create(
@@ -2065,7 +2045,7 @@ void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
 		myframe->runAction(Sequence::create(
             Spawn::create(
                 _voice->SpeakAction(GANG,
-                    _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
+                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
@@ -2330,7 +2310,7 @@ void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
                 Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
                     _voice->SpeakAction(GANG,
-                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                     moveFreeCards,
                     Spawn::create(
             		    moveAngangCards,
@@ -2376,7 +2356,7 @@ void NetRaceLayer::QiangGangHuJudge()
         curTingStatus,
         false,
         a_QIANG_GANG,
-        continue_gang_times,
+        _roundManager->_continue_gang_times,
         _roundManager->_isGangHua
     );
 
@@ -2387,7 +2367,7 @@ void NetRaceLayer::QiangGangHuJudge()
         curTingStatus,
         false,
         a_QIANG_GANG,
-        continue_gang_times,
+        _roundManager->_continue_gang_times,
         _roundManager->_isGangHua
     );
 
@@ -2498,7 +2478,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
                 hideOutCard,Spawn::create(
                     simple_seq,
                     _voice->SpeakAction(GANG,
-                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),NULL),CallFunc::create([=](){
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),NULL),CallFunc::create([=](){
     			GoldNumInsert(no,2,_roundManager->_curPlayer);}),
                 update_list_seq,NULL);
 		}
@@ -2506,7 +2486,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
 			gang_seq=Sequence::create(
 			    Spawn::create(
 			        _voice->SpeakAction(GANG,
-                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                     simple_seq,NULL),
                 update_list_seq,NULL);
         
@@ -2901,7 +2881,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
             Spawn::create(
                 simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
                 _voice->SpeakAction(GANG,
-                        _roundManager->_players[_roundManager->_curPlayer]->get_sex()),
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                 hideOutcard,
                 moveFreeCards,
                 Spawn::create(
@@ -2948,7 +2928,7 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	if(_roundManager->_lastAction==a_JUMP)
-		continue_gang_times=0;
+		_roundManager->_continue_gang_times=0;
 	_roundManager->_lastAction=a_JUMP;
 	_roundManager->_actionToDo=a_JUMP;
 	if(_roundManager->_isWaitDecision) {
@@ -4368,7 +4348,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 
 		x=x-act_peng->getContentSize().width/2;
 		auto myact_peng=_object->CreatePengButton(Vec2(x,y+13));
-		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::PengPressed,this));
+		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnPengHandler,this));
 		myframe->addChild(myact_peng,35,PENG_REMIND_ACT_TAG_ID);
 
 		auto peng1_act=_object->CreatePengBkg(Vec2(x,y+13));	
@@ -4384,8 +4364,8 @@ void NetRaceLayer::waitfor_myaction(int no)
 	}
 	if(!_roundManager->_isCardFromOthers)//||(_roundManager->_isCardFromOthers&&_roundManager->_lastAction!=a_JUMP))
 	{
-		if(_roundManager->_lastAction==a_JUMP&&!(_roundManager->_lastActionSource==1&&continue_gang_times!=0))
-			continue_gang_times=0;
+		if(_roundManager->_lastAction==a_JUMP&&!(_roundManager->_lastActionSource==1&&_roundManager->_continue_gang_times!=0))
+			_roundManager->_continue_gang_times=0;
 		_roundManager->_lastAction=a_JUMP;
 		waitfor_MyShowCardInstruct();
 	}
@@ -4406,7 +4386,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	}
 	else if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG)
 	{
-		continue_gang_times++;
+		_roundManager->_continue_gang_times++;
 		_roundManager->_lastActionSource = no;
 		if(_roundManager->_actionToDo&a_AN_GANG) {
 			_roundManager->_actionToDo=a_AN_GANG;
@@ -4500,7 +4480,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	{
         Card card;
 
-        continue_gang_times = 0;
+        _roundManager->_continue_gang_times = 0;
         _roundManager->_lastAction=a_PENG;
         
         const int riverLast =_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
@@ -4521,7 +4501,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	else if(_roundManager->_actionToDo==a_JUMP)
 	{
 		if(_roundManager->_lastAction==a_JUMP)
-			continue_gang_times=0;
+			_roundManager->_continue_gang_times=0;
 		_roundManager->_lastAction=a_JUMP;
 		waitfor_ShowCardWithoutTouch();
 	}
@@ -4537,10 +4517,10 @@ void NetRaceLayer::waitfor_response(Node* sender)
 	if(!_roundManager->_isCardFromOthers)
 	{
 		_roundManager->_isGangHua=false;
-		if(_roundManager->_lastActionSource==sender->_ID&&continue_gang_times!=0)
+		if(_roundManager->_lastActionSource==sender->_ID&&_roundManager->_continue_gang_times!=0)
 			_roundManager->_isGangHua=true;
 		else
-			continue_gang_times=0;
+			_roundManager->_continue_gang_times=0;
         
 		_roundManager->_actionToDo = 
             _roundManager->_players[sender->_ID]->get_parter()->hand_in(
@@ -4549,7 +4529,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
                 curTingStatus,
                 (_roundManager->_distributedNum==TOTAL_CARD_NUM),
                 _roundManager->_lastActionWithGold,
-                continue_gang_times,
+                _roundManager->_continue_gang_times,
                 _roundManager->_isGangHua
             );
         
@@ -4636,7 +4616,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
                 curTingStatus,
                 (_roundManager->_distributedNum==TOTAL_CARD_NUM),
                 _roundManager->_lastActionWithGold,
-                continue_gang_times,
+                _roundManager->_continue_gang_times,
                 _roundManager->_isGangHua
             );
         
@@ -4688,7 +4668,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
                 curTingStatus,
                 (_roundManager->_distributedNum==TOTAL_CARD_NUM),
                 _roundManager->_lastActionWithGold,
-                continue_gang_times,
+                _roundManager->_continue_gang_times,
                 _roundManager->_isGangHua
             );
 		if(no1==1&&ifTuoGuan)
@@ -5104,7 +5084,7 @@ void NetRaceLayer::start_callback()
 	_roundManager->_lastAction=a_JUMP;
 	_roundManager->_lastActionWithGold=a_JUMP;
 	_roundManager->_actionToDo=a_JUMP;
-	continue_gang_times=0;
+	_roundManager->_continue_gang_times=0;
 
     int lastWinner = _roundManager->GetLastWinner();
 	_roundManager->_curPlayer=lastWinner;
@@ -6891,7 +6871,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
 
         CallFunc*HuVoice = _voice->SpeakAction(HU,
-                        _roundManager->_players[_roundManager->_curPlayer]->get_sex());
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
 
         if(no!=1)
 		{
@@ -7239,7 +7219,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 					ifMyShowCardTime=false;
 					_roundManager->_actionToDo=a_JUMP;
 					if(_roundManager->_lastAction==a_JUMP)
-						continue_gang_times=0;
+						_roundManager->_continue_gang_times=0;
 					_roundManager->_lastAction=a_JUMP;
 					waitfor_MyShowCardInstruct();
 				}
@@ -7759,19 +7739,19 @@ typedef enum {
 }GoldKind_t;
 
 void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
-    goldOfPlayer[winner]       = 4*premiumLeast*(continue_gang_times);
-    goldOfPlayer[(winner+1)%3] = -2*premiumLeast*(continue_gang_times);
-    goldOfPlayer[(winner+2)%3] = -2*premiumLeast*(continue_gang_times);
+    goldOfPlayer[winner]       = 4*premiumLeast*(_roundManager->_continue_gang_times);
+    goldOfPlayer[(winner+1)%3] = -2*premiumLeast*(_roundManager->_continue_gang_times);
+    goldOfPlayer[(winner+2)%3] = -2*premiumLeast*(_roundManager->_continue_gang_times);
 }
 
 void NetRaceLayer::_CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]) {
     if (winner==loser) {
-        goldOfPlayer[winner]       = 2*premiumLeast*(continue_gang_times);
-        goldOfPlayer[(winner+1)%3] = -1*premiumLeast*(continue_gang_times);
-        goldOfPlayer[(winner+2)%3] = -1*premiumLeast*(continue_gang_times);
+        goldOfPlayer[winner]       = 2*premiumLeast*(_roundManager->_continue_gang_times);
+        goldOfPlayer[(winner+1)%3] = -1*premiumLeast*(_roundManager->_continue_gang_times);
+        goldOfPlayer[(winner+2)%3] = -1*premiumLeast*(_roundManager->_continue_gang_times);
     } else {
-        goldOfPlayer[winner]       =2*premiumLeast*(continue_gang_times);
-        goldOfPlayer[loser]        =-2*premiumLeast*(continue_gang_times);
+        goldOfPlayer[winner]       =2*premiumLeast*(_roundManager->_continue_gang_times);
+        goldOfPlayer[loser]        =-2*premiumLeast*(_roundManager->_continue_gang_times);
     }
 }
 

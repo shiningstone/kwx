@@ -15,9 +15,9 @@ using namespace CocosDenshion;
 #include "./../multimedia/GameLayout.h"
 #include "./../multimedia/GraphicObject.h"
 #include "./../multimedia/GraphicEffect.h"
-#include "RoundManager.h"
 #include "DataBase.h"
 
+class RoundManager;
 class NetRaceLayer : public cocos2d::Layer
 {
 public:
@@ -119,7 +119,6 @@ private:
 	//bool ifMyTime;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
-	unsigned int continue_gang_times;
 
 	Vec2 distributeCardPos;
     
@@ -201,7 +200,8 @@ public:
     void _4CardsDistribute(int sequenceNo, float delayRef);
 	void effect_Distribute_Card(int zhuang);//·¢ÅÆÐ§¹û
 	/***********callback function***********************/
-	void PengPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÅöÅÆ
+    void PengPressed(Button *button,PlayerDir_t prevPlayer,Card_t card);
+	void BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÅöÅÆ
 	void HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ºúÅÆ
 	void GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--¸ÜÅÆ
 	void QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÆúÅÆ

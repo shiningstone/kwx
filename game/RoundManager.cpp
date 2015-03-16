@@ -7,7 +7,9 @@
 #include "NetRole.h"
 #include "RoundManager.h"
 
-RoundManager::RoundManager() {
+RoundManager::RoundManager(NetRaceLayer *uiManager) {
+    _uiManager = uiManager;
+
     _lastWin.player = INVALID;
 
     _river = NULL;
@@ -315,5 +317,32 @@ int RoundManager::FindGangCards(int dir,int cards[4]) {
     }
 
     return 0;
+}
+
+void RoundManager::RecvPeng(Button *curButton) {
+    Card        card;
+    PlayerDir_t prevPlayer;
+    
+    if(_isWaitDecision) {
+        _isWaitDecision = false;
+        _actionToDo = _tempActionToDo;
+        _tempActionToDo = a_JUMP;
+    
+        _continue_gang_times = 0;
+        _lastAction=a_PENG;
+        
+        const int riverLast =_players[_curPlayer]->get_parter()->getOutCardList()->length;
+        
+        _players[_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
+        _players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
+        
+        RecordOutCard(card);
+        RecordOutCard(card);
+    
+        prevPlayer = (PlayerDir_t)_curPlayer;
+        _curPlayer=1;
+    }
+
+    _uiManager->PengPressed(curButton,prevPlayer,(Card_t)card.kind);
 }
 

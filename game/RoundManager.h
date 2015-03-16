@@ -5,6 +5,7 @@
 
 #include "CardHolder.h"
 #include "./../utils/LogManager.h"
+#include "NetRaceLayer.h"
 
 class NetRole;
 
@@ -24,8 +25,11 @@ typedef struct {
 class RoundManager {
     friend class NetRaceLayer;
 public:
-    RoundManager();
+    RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();
+
+    void RecvPeng(Button *curButton);
+    NetRaceLayer *_uiManager;
     
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
@@ -46,6 +50,7 @@ public:
     bool _isQiangGangAsking;
     bool _isDoubleHuAsking;
     int  _firstMingNo;
+    int  _continue_gang_times;
     int  _qiangGangTargetNo;
     int  _curPlayer;
     bool _isGangHua;
