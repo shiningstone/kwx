@@ -346,3 +346,17 @@ void RoundManager::RecvPeng(Button *curButton) {
     _uiManager->PengPressed(curButton,prevPlayer,(Card_t)card.kind);
 }
 
+void RoundManager::RecvHu(Button *curButton) {
+    if(_isWaitDecision) {
+        _isWaitDecision = false;
+        _actionToDo = _tempActionToDo;
+        _tempActionToDo = a_JUMP;
+    }
+
+    if(_isQiangGangAsking) {
+        _lastActionWithGold = a_QIANG_GANG;
+    }
+
+    _uiManager->HuPressed(curButton, _isQiangGangAsking, _isDoubleHuAsking);
+}
+

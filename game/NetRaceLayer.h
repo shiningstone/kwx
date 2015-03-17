@@ -202,7 +202,8 @@ public:
 	/***********callback function***********************/
     void PengPressed(Button *button,PlayerDir_t prevPlayer,Card_t card);
 	void BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÅöÅÆ
-	void HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ºúÅÆ
+    void HuPressed(Button *button, bool qiangGang, bool doubleHu);
+	void BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ºúÅÆ
 	void GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--¸ÜÅÆ
 	void QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÆúÅÆ
 	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÃûÅÆ

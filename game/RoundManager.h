@@ -29,6 +29,7 @@ public:
     ~RoundManager();
 
     void RecvPeng(Button *curButton);
+    void RecvHu(Button *curButton);
     NetRaceLayer *_uiManager;
     
     PlayerDir_t GetLastWinner();

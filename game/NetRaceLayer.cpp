@@ -263,11 +263,36 @@ void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	}
 }
 
-void NetRaceLayer::HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::HuPressed(Button *button, bool qiangGang, bool doubleHu) {
+    button->setTouchEnabled(false);
+    
+    if(qiangGang) {
+        button->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),
+            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::hu_tip_effect)),NULL));
+    } else if(doubleHu) {
+        auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+            
+        myframe->runAction(Sequence::create(TargetedAction::create(
+            button,ScaleTo::create(0.1,1)),
+            _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),CallFunc::create([=](){  
+            hu_effect_tip(3);
+            distribute_event(DOUBLE_HU_WITH_ME,NULL);}),NULL));
+    } else {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::hu_tip_effect)),NULL));
+    }
+}
+
+void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	_roundManager->_actionToDo = a_HU;
     
 	auto curButton=(Button*)pSender;
+    curButton->_ID = pSender->_ID;
 	int no = pSender->_ID;
 
     switch(type) {
@@ -279,53 +304,7 @@ void NetRaceLayer::HuPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
     		{
                 LOGGER_WRITE("%s",__FUNCTION__);
-                
-    			if(_roundManager->_isWaitDecision) {
-    				_roundManager->_isWaitDecision = false;
-    				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
-    				_roundManager->_tempActionToDo = a_JUMP;
-    			}
-                
-    			curButton->setTouchEnabled(false);
-
-    			if(_roundManager->_isQiangGangAsking) {
-    				_roundManager->_lastActionWithGold = a_QIANG_GANG;
-                    
-    				curButton->_ID = pSender->_ID;
-    				auto clear  = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-    				auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
-                    
-    				curButton->runAction(Sequence::create(
-                        clear,
-                        ScaleTo::create(0.1,1),
-                        effect,NULL));
-    			} 
-                else if(_roundManager->_isDoubleHuAsking) {
-    				auto ButtonAct = TargetedAction::create(curButton,ScaleTo::create(0.1,1));
-
-    				auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
-    				auto shadeAction = _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
-
-    				auto clear = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-
-    				auto huFunc = CallFunc::create([=](){	
-    					hu_effect_tip(3);
-    					distribute_event(DOUBLE_HU_WITH_ME,NULL);});
-                        
-					myframe->runAction(Sequence::create(
-                        ButtonAct,
-                        shadeAction,
-                        clear,
-                        huFunc,NULL));
-    			} 
-                else {
-    				curButton->_ID = pSender->_ID;
-    				auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::hu_tip_effect));
-                    
-    				curButton->runAction(Sequence::create(
-                        ScaleTo::create(0.1,1),
-                        effect,NULL));
-    			}
+                _roundManager->RecvHu(curButton);
     			break;
     		}
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -4302,7 +4281,7 @@ void NetRaceLayer::waitfor_myaction(int no)
         x=x-act_hu->getContentSize().width/2;
 		auto myact_hu = _object->CreateHuButton(Vec2(x,y+6));
 		myact_hu->_ID=no;
-		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::HuPressed,this));
+		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnHuHandler,this));
 		myframe->addChild(myact_hu,35,HU_REMIND_ACT_TAG_ID);
 
 		auto hu1_act = _object->CreateHuBkg(Vec2(x,y+6));
