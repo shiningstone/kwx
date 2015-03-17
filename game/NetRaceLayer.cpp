@@ -44,7 +44,7 @@ NetRaceLayer::NetRaceLayer()
     seat->Set(0x00010203,0x04050607,0x08090a0b,1);
     
     KwxMsg aMsg(UP_STREAM);
-    aMsg.StartReceiving(this);
+    aMsg.StartReceiving();
     len = aMsg.SetAction(buf,(ActionId_t)PENG);
 	/**************************/
 }
@@ -2296,6 +2296,8 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    myframe->_ID = no;
+
 	auto list = _roundManager->_players[no]->get_parter()->get_card_list();
 
 	int riverLast = _roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
@@ -7934,8 +7936,8 @@ void NetRaceLayer::_CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_K
             DelayTime::create(0.42),
             ScaleTo::create(0,1),
             DelayTime::create(0.12),
-            MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(1,size)),
-            MoveTo::create(0.12,_layout->DestPositionOfGangCard(1,size)),NULL));
+            MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(i,size)),
+            MoveTo::create(0.12,_layout->DestPositionOfGangCard(i,size)),NULL));
     }
 }
 
@@ -8027,7 +8029,7 @@ void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND
 		auto OldPos  = OldCard->getPosition();
 		auto OldSize = OldCard->getTextureRect().size;
         
-        cards[i]=_object->Create(FREE_CARD);//gang[0]
+        cards[i]=_object->Create(FREE_CARD);
         cards[i]->setScale(OldCard->getScale());
         cards[i]->setAnchorPoint(Vec2(0,0));
         cards[i]->setPosition(Vec2(OldPos.x,OldPos.y));

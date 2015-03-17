@@ -7,7 +7,6 @@
 #include "MsgFormats.h"
 #include "KwxMsg.h"
 
-#include "./../game/NetRaceLayer.h"
 
 static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
 
@@ -33,17 +32,12 @@ KwxMsg::~KwxMsg() {
     LOGGER_DEREGISTER(_logger);
 }
 
-
-NetRaceLayer *KwxMsg::_receiver = NULL;
-
-void KwxMsg::StartReceiving(MsgHandler_t handle, NetRaceLayer *receiver) {
+void KwxMsg::StartReceiving(MsgHandler_t handle) {
     _messenger->SetHandler(handle);
     _messenger->Start();
-
-    _receiver = receiver;
 }
 
-void KwxMsg::StartReceiving(NetRaceLayer *receiver) {
+void KwxMsg::StartReceiving() {
     if(_messenger==0) {
         _messenger = NetMessenger::getInstance();
     }
@@ -54,8 +48,6 @@ void KwxMsg::StartReceiving(NetRaceLayer *receiver) {
 
     _messenger->SetHandler(_HANDLE_DS_PACKAGES);
     _messenger->Start();
-
-    _receiver = receiver;
 }
 
 void KwxMsg::StopReceiving() {
@@ -307,10 +299,6 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 
     LOGGER_WRITE("%s : %d\n",__FUNCTION__,aMsg.GetRequestCode());
 
-    if(KwxMsg::_receiver!=NULL) {
-        KwxMsg::_receiver->PengEffect((PlayerDir_t)1,(PlayerDir_t)1,(Card_t)1);
-    }
-        
     switch(aMsg.GetRequestCode()) {
         case REQ_GAME_SEND_DIST:
             return 0;
