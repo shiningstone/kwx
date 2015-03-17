@@ -292,28 +292,63 @@ bool RoundManager::IsCurEffectCard(Card card) {
 /****************************************
         card handler
 ****************************************/
-int RoundManager::FindGangCards(int dir,int cards[4]) {
+int RoundManager::FindGangCards(int dir,int cards[4],Card_t target) {
     auto list = _players[dir]->get_parter()->get_card_list();
-    int matchCardNum = 0;
-    int firstMatchCard = 0;
-    
-    for(int i=list->atcvie_place; i<list->len; i++) {
-        for(int j=i+1; j<list->len; j++) {
-            if(list->data[i].kind==list->data[j].kind) {
-                matchCardNum++;
-                if(matchCardNum==3) {
-                    firstMatchCard = i;
-                    break;
+
+    if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
+        if(!IsTing(dir)) {
+            int matchCardNum = 0;
+            int firstMatchCard = 0;
+            
+            for(int i=list->atcvie_place; i<list->len; i++) {
+                for(int j=i+1; j<list->len; j++) {
+                    if(list->data[i].kind==list->data[j].kind) {
+                        matchCardNum++;
+                        if(matchCardNum==3) {
+                            firstMatchCard = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            int idx = 0;
+            for(int i=firstMatchCard; i<list->len; i++) {
+                if(list->data[firstMatchCard].kind==list->data[i].kind) {
+                    cards[idx++] = i;
+                }
+            }
+        } else {
+            cards[3] = list->len-1;
+        
+            int p = 0;
+            for(int i=0; i<list->atcvie_place; i++){
+                if(list->data[i].kind==list->data[cards[3]].kind) {
+                    cards[p++]=i;
+                    if(p==3) {
+                        break;
+                    }
                 }
             }
         }
-    }
-
-    int idx = 0;
-    for(int i=firstMatchCard; i<list->len; i++) {
-        if(list->data[firstMatchCard].kind==list->data[i].kind) {
-            cards[idx++] = i;
-        }
+    } else {
+		int l_len = _isCardFromOthers ? (list->len) : (list->len-1);
+        
+		for(int i=0;i<l_len;i++) {
+			if(target==list->data[i].kind) {
+				if(i==0) {
+					cards[0]=i;
+				} else if(i>0 && target!=list->data[i-1].kind) {
+					cards[0]=i;
+				} else if(i==1 && target==list->data[i-1].kind) {
+					cards[1]=i;
+				} else if(i>1 && target==list->data[i-1].kind && target!=list->data[i-2].kind) {
+					cards[1]=i;
+				} else if(i>1 && target==list->data[i-1].kind && target==list->data[i-2].kind) {
+					cards[2]=i;
+				}
+			}
+		}
     }
 
     return 0;
@@ -358,5 +393,73 @@ void RoundManager::RecvHu(Button *curButton) {
     }
 
     _uiManager->HuPressed(curButton, _isQiangGangAsking, _isDoubleHuAsking);
+}
+
+void RoundManager::RecvGang(Button *curButton) {
+    if(_isGangAsking)//is this judgement neccessary?
+        _isGangAsking = false;
+    
+    if(_isWaitDecision) {
+        _isWaitDecision=false;
+        _actionToDo = _tempActionToDo;
+        _tempActionToDo = a_JUMP;
+    }
+
+	_continue_gang_times++;
+
+    int* gangCardIdx=new int[4];
+    Card_t card;
+    
+	auto list=_players[1]->get_parter()->get_card_list();
+	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
+		_lastActionSource = 1;
+        
+		if(_actionToDo&a_AN_GANG) {
+			_actionToDo=a_AN_GANG;
+			_lastAction=a_AN_GANG;
+			_lastActionWithGold=a_AN_GANG;
+		} else if(_actionToDo&a_SHOU_GANG) {
+			_actionToDo=a_SHOU_GANG;
+			_lastAction=a_SHOU_GANG;
+			_lastActionWithGold=a_SHOU_GANG;
+		}
+        
+        FindGangCards(1,gangCardIdx);
+        card =(Card_t)list->data[gangCardIdx[0]].kind;
+        
+		if( !IsTing(_curPlayer) ) {
+			SetEffectCard(card,c_AN_GANG);
+		}
+
+        _uiManager->GangPressed(curButton,card,gangCardIdx);
+	}
+	else if( _actionToDo & a_MING_GANG ) {
+		_lastActionSource=1;
+		_actionToDo=a_MING_GANG;
+		_lastAction=a_MING_GANG;
+		_lastActionWithGold=a_MING_GANG;
+
+		Card GangCard;
+		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+        
+		if(_isCardFromOthers) {
+			int riverLast = _players[_curPlayer]->get_parter()->getOutCardList()->length;
+			_players[_curPlayer]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
+			_players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
+
+			RecordOutCard(GangCard);
+			RecordOutCard(GangCard);
+			RecordOutCard(GangCard);
+            
+			_curPlayer=1;
+		}else {
+			GangCard=list->data[list->len-1];
+			RecordOutCard(GangCard);
+		}
+
+        FindGangCards(1,gangCardIdx,(Card_t)GangCard.kind);
+
+        _uiManager->GangPressed(curButton,card,gangCardIdx,false,prevPlayer);
+	}
 }
 

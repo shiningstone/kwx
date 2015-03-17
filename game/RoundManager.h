@@ -30,6 +30,7 @@ public:
 
     void RecvPeng(Button *curButton);
     void RecvHu(Button *curButton);
+    void RecvGang(Button *curButton);
     NetRaceLayer *_uiManager;
     
     PlayerDir_t GetLastWinner();
@@ -80,8 +81,7 @@ public:
     bool WaitForDistribute();
     bool WaitForAction();
 
-    
-    int FindGangCards(int dir,int cards[4]);
+    int FindGangCards(int dir,int cards[4],Card_t target=CARD_UNKNONW);
 private:
     Logger *_logger;
 

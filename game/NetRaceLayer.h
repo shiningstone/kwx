@@ -204,7 +204,8 @@ public:
 	void BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÅöÅÆ
     void HuPressed(Button *button, bool qiangGang, bool doubleHu);
 	void BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ºúÅÆ
-	void GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--¸ÜÅÆ
+    void GangPressed(Button *button, Card_t card, int gangCardIdx[], bool isAnGang=true, PlayerDir_t prevPlayer=MIDDLE);
+	void BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--¸ÜÅÆ
 	void QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÆúÅÆ
 	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--ÃûÅÆ
 	/***********callback function***********************/

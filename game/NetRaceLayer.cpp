@@ -313,7 +313,24 @@ void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
 	}
 }
 
-void NetRaceLayer::GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::GangPressed(Button *button, Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
+    button->setTouchEnabled(false);
+    button->_ID=1;
+
+    if(isAnGang) {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){
+            an_gang_tip_effect(MIDDLE,card,gangCardIdx);
+        }),NULL));
+    } else {
+        curButton->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){
+            ming_gang_tip_effect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
+        }),NULL));
+    }
+}
+
+void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 
@@ -326,108 +343,7 @@ void NetRaceLayer::GangPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
     		{
                 LOGGER_WRITE("%s",__FUNCTION__);
-
-    			if(_roundManager->_isGangAsking)//is this judgement neccessary?
-    				_roundManager->_isGangAsking = false;
-                
-    			if(_roundManager->_isWaitDecision) {
-    				_roundManager->_isWaitDecision=false;
-    				_roundManager->_actionToDo = _roundManager->_tempActionToDo;
-    				_roundManager->_tempActionToDo = a_JUMP;
-    			}
-                
-    			curButton->setTouchEnabled(false);
-				curButton->_ID=1;
-
-				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
-				auto list=_roundManager->_players[1]->get_parter()->get_card_list();
-				_roundManager->_continue_gang_times++;
-				int* Angang=new int[4];
-				Card_t card;
-
-				if( _roundManager->_actionToDo & a_AN_GANG || _roundManager->_actionToDo & a_SHOU_GANG ) {
-					_roundManager->_lastActionSource = 1;
-					if(_roundManager->_actionToDo&a_AN_GANG) {
-						_roundManager->_actionToDo=a_AN_GANG;
-						_roundManager->_lastAction=a_AN_GANG;
-						_roundManager->_lastActionWithGold=a_AN_GANG;
-					} else if(_roundManager->_actionToDo&a_SHOU_GANG) {
-						_roundManager->_actionToDo=a_SHOU_GANG;
-						_roundManager->_lastAction=a_SHOU_GANG;
-						_roundManager->_lastActionWithGold=a_SHOU_GANG;
-					}
-					if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {/* is no equals _curPlayer ??? */
-						_roundManager->FindGangCards(1,Angang);
-						card =(Card_t)list->data[Angang[0]].kind;
-						_roundManager->SetEffectCard(card,c_AN_GANG);
-					} else { /* get gang card from kou cards */
-						Angang[3] = list->len-1;
-						int p = 0;
-						for(int i=0; i<list->atcvie_place; i++){
-							if(list->data[i].kind==list->data[Angang[3]].kind)
-								Angang[p++]=i;
-						}
-						card = (Card_t)list->data[Angang[0]].kind;
-					}
-
-					auto angangEffect = CallFunc::create([=](){
-						an_gang_tip_effect(1,card,Angang);
-					});;
-    				curButton->runAction(Sequence::create(
-                        ScaleTo::create(0.1,1),
-                        angangEffect,NULL));
-    			}
-				else if( _roundManager->_actionToDo & a_MING_GANG ) {
-
-					_roundManager->_lastActionSource=1;
-					_roundManager->_actionToDo=a_MING_GANG;
-					_roundManager->_lastAction=a_MING_GANG;
-					_roundManager->_lastActionWithGold=a_MING_GANG;
-
-					Card GangCard;
-					PlayerDir_t prevPlayer = (PlayerDir_t)_roundManager->_curPlayer;
-					if(_roundManager->_isCardFromOthers) {
-						int riverLast = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
-						_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-						_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-
-						_roundManager->RecordOutCard(GangCard);
-						_roundManager->RecordOutCard(GangCard);
-						_roundManager->RecordOutCard(GangCard);
-						_roundManager->_curPlayer=1;
-					}else {
-						GangCard=list->data[list->len-1];
-						_roundManager->RecordOutCard(GangCard);
-					}
-
-					int l_len;
-					if(!_roundManager->_isCardFromOthers)
-						l_len=list->len-1;
-					else
-						l_len=list->len;
-					for(int i=0;i<l_len;i++) {/* is this logic neccessary ??? --- gang[1]=gang[0]+1;gang[2]=gang[1]+1*/
-						if(GangCard.kind==list->data[i].kind) {
-							if(i==0) {
-								Angang[0]=i;
-							} else if(i>0 && GangCard.kind!=list->data[i-1].kind) {
-								Angang[0]=i;
-							} else if(i==1 && GangCard.kind==list->data[i-1].kind) {
-								Angang[1]=i;
-							} else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind!=list->data[i-2].kind) {
-								Angang[1]=i;
-							} else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind==list->data[i-2].kind) {
-								Angang[2]=i;
-							}
-						}
-					}
-
-					auto minggangEffect = CallFunc::create([=](){
-						ming_gang_tip_effect(1,prevPlayer,(Card_t)GangCard.kind,Angang);
-					});
-    				curButton->runAction(Sequence::create(
-                        ScaleTo::create(0.1,1),
-                        minggangEffect,NULL));
-    			}
+                _roundManager->RecvGang(curButton);
     		}
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -4312,7 +4228,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 		x=x-act_gang->getContentSize().width/2;
 
         auto myact_gang=_object->CreateGangButton(Vec2(x,y));
-		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::GangPressed,this));
+		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnGangHandler,this));
 		myframe->addChild(myact_gang,35,GANG_REMING_ACT_TAG_ID);
 
 		auto gang1_act=_object->CreateGangBkg(Vec2(x,y));
@@ -4379,25 +4295,17 @@ void NetRaceLayer::waitfor_otheraction(int no)
 
 		Card_t card;
 		int* Angang=new int[4];
+
+        _roundManager->FindGangCards(no,Angang);
+        card =(Card_t)list->data[Angang[0]].kind;
+
 		if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {/* is no equals _curPlayer ??? */
-			_roundManager->FindGangCards(no,Angang);
-			card =(Card_t)list->data[Angang[0]].kind;
 			_roundManager->SetEffectCard(card,c_AN_GANG);
-		} else { /* get gang card from kou cards */
-			Angang[3] = list->len-1;
-			int p = 0;
-			for(int i=0; i<list->atcvie_place; i++){
-				if(list->data[i].kind==list->data[Angang[3]].kind)
-					Angang[p++]=i;
-			}
-			card = (Card_t)list->data[Angang[0]].kind;
 		}
 
-		auto angangEffect = CallFunc::create([&](){
+		myframe->runAction(CallFunc::create([&](){
 			an_gang_tip_effect(no,card,Angang);
-		});;
-
-		myframe->runAction(angangEffect);
+		}));
 	}
 	else if(_roundManager->_actionToDo&a_MING_GANG)
 	{
