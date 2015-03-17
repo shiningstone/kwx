@@ -354,7 +354,7 @@ void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	}
 }
 
-void NetRaceLayer::QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 
@@ -388,141 +388,102 @@ void NetRaceLayer::QiPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEve
 BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
 {
 	ccBezierConfig config;
-	if((outCard->length-1)<6)
-	{
-		if(location.y<=visibleSize.height*0.4)
-		{
-			if(location.x<visibleSize.width*0.4)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-				config.controlPoint_1=Vec2(location.x+30,location.y+30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
+    
+    Vec2 ctrlPoint1Offset = Vec2(0,0);
+    Vec2 ctrlPoint2Offset = Vec2(0,0);
+
+    int lineNo = _layout->_getRiverLineNo(outCard->length-1);
+    
+	if(lineNo==0) {
+		if(location.y<=visibleSize.height*0.4) {
+			if(location.x<visibleSize.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,30);
+                ctrlPoint2Offset = Vec2(100,-100);
+			} else if(location.x>=visibleSize.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,-100);
 			}
-			else if(location.x>=visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
-			}
-			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-			}
-		}
-		else if(location.y>=visibleSize.height*0.4)
-		{
-			if(location.x<=visibleSize.width*0.4)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-				config.controlPoint_1=Vec2(location.x+100,location.y-100);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y+100);
-			}
-			else if(location.x>=visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-				config.controlPoint_1=Vec2(location.x-100,location.y-100);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y+100);
-			}
-			else if(location.x>visibleSize.width*0.4&&location.x<visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
+		} else if(location.y>=visibleSize.height*0.4) {
+			if(location.x<visibleSize.width*0.4) {
+			    ctrlPoint1Offset = Vec2(100,-100);
+                ctrlPoint2Offset = Vec2(100,100);
+			} else if(location.x>=visibleSize.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-100,-100);
+                ctrlPoint2Offset = Vec2(100,100);
 			}
 		}
+
+        config.endPosition=Vec2(
+            _layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),
+            _layout->_playerPosi[1].riverPoint.y);
+        config.controlPoint_1=Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
+        config.controlPoint_2=Vec2(
+            _layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+ctrlPoint2Offset.x,
+            _layout->_playerPosi[1].riverPoint.y+ctrlPoint2Offset.y);
 	}
-	else if((outCard->length-1)<14)
+	else if(lineNo==1)
 	{
 		if(location.y<=visibleSize.height*0.4)
 		{
-			if(location.x<visibleSize.width*0.4)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-				config.controlPoint_1=Vec2(location.x+30,location.y+30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
-			}
-			else if(location.x>=visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
-			}
-			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			if(location.x<visibleSize.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,30);
+                ctrlPoint2Offset = Vec2(-100,-100);
+			} else if(location.x>=visibleSize.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,-100);
 			}
 		}
 		else if(location.y>=visibleSize.height*0.4)
 		{
-			if(location.x<visibleSize.width*0.4)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-				config.controlPoint_1=Vec2(location.x+30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y+141);
-			}
-			else if(location.x>=visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y+141);
-			}
-			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			if(location.x<visibleSize.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,-30);
+                ctrlPoint2Offset = Vec2(-100,182);
+			} else if(location.x>=visibleSize.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,182);
 			}
 		}
+        
+        config.endPosition=Vec2(
+            _layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),
+            _layout->_playerPosi[1].riverPoint.y-41);
+        config.controlPoint_1=Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
+        config.controlPoint_2=Vec2(
+            _layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+ctrlPoint2Offset.x,
+            _layout->_playerPosi[1].riverPoint.y-41+ctrlPoint2Offset.y);
 	}
 	else
 	{
 		if(location.y<=visibleSize.height*0.4)
 		{
-			if(location.x<visibleSize.width*0.4)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-				config.controlPoint_1=Vec2(location.x+30,location.y+30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
-			}
-			else if(location.x>=visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
-			}
-			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
+			if(location.x<visibleSize.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,30);
+                ctrlPoint2Offset = Vec2(-100,-100);
+			} else if(location.x>=visibleSize.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,-100);
 			}
 		}
 		else if(location.y>=visibleSize.height*0.4)
 		{
-			if(location.x<visibleSize.width*0.4)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-				config.controlPoint_1=Vec2(location.x+30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y+182);
-			}
-			else if(location.x>=visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-				config.controlPoint_1=Vec2(location.x-30,location.y-30);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y+182);
-			}
-			else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-			{
-				config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-				config.controlPoint_1=Vec2(location.x,location.y);
-				config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
+			if(location.x<visibleSize.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,-30);
+                ctrlPoint2Offset = Vec2(-100,264);
+			} else if(location.x>=visibleSize.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,264);
 			}
 		}
+        
+        config.endPosition=Vec2(
+            _layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,
+            _layout->_playerPosi[1].riverPoint.y-82);
+        config.controlPoint_1=Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
+        config.controlPoint_2=Vec2(
+            _layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+ctrlPoint2Offset.x,
+            _layout->_playerPosi[1].riverPoint.y-82+ctrlPoint2Offset.y);
 	}
+    
 	BezierTo *action;
 	if(ccpDistance(location,config.endPosition)<=200)
 	{
@@ -1934,8 +1895,10 @@ void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
 	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
 	delete gang;
+
     if(no!=1) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
@@ -4181,7 +4144,7 @@ void NetRaceLayer::waitfor_myaction(int no)
 	{
 		auto myact_qi = _object->CreateQiButton(Vec2(x,y));
 		myact_qi->_ID = no;
-		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::QiPressed,this));
+		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnQiHandler,this));
 		myframe->addChild(myact_qi,35,QI_REMIND_ACT_TAG_ID);
 
 		auto qi_act = _object->CreateQiBkg(Vec2(x,y));
