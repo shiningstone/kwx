@@ -1,4 +1,4 @@
-
+﻿
 #include "NetRaceLayer.h"
 #include "HelloWorldScene.h"
 #include "RoundManager.h"
@@ -323,7 +323,7 @@ void NetRaceLayer::GangPressed(Button *button, Card_t card, int gangCardIdx[], b
             an_gang_tip_effect(MIDDLE,card,gangCardIdx);
         }),NULL));
     } else {
-        curButton->runAction(Sequence::create(
+        button->runAction(Sequence::create(
             ScaleTo::create(0.1,1),CallFunc::create([=](){
             ming_gang_tip_effect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
         }),NULL));

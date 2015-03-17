@@ -162,7 +162,7 @@ int RoundManager::Shuffle() {
 	//[0,3]一条 [4,7]二条 [8,11]三条 [12,15]四条 [16,19]五条 [20,23]六条 [24,27]七条 [28,31]八条 [32,35]九条 
 	//[36,39]一筒 [40,43]二筒 [44,47]三筒 [48,51]四筒 [52,55]五筒 [56,59]六筒 [60,63]七筒 [64,67]八筒 [68,71]九筒
 	//[72,75]红中 [76,79]发财 [80,83]白板
-	int oneSeq[14]={0,0,0,8,9,10,12,16,20,24,28,32,36,39};
+	int oneSeq[14]={0,0,0,0,9,10,12,16,20,24,28,32,36,39};
 	int twoSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
 	int threeSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
 	_unDistributedCards[40]=0;
@@ -459,7 +459,7 @@ void RoundManager::RecvGang(Button *curButton) {
 
         FindGangCards(1,gangCardIdx,(Card_t)GangCard.kind);
 
-        _uiManager->GangPressed(curButton,card,gangCardIdx,false,prevPlayer);
+        _uiManager->GangPressed(curButton,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
 	}
 }
 
