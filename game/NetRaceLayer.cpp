@@ -202,7 +202,7 @@ bool NetRaceLayer::resource_prepare()
 
 void NetRaceLayer::startParticleSystem(float delta)
 {
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	auto m_Smoke = ParticleSystemQuad::create("Smoke.plist");
 	m_Smoke->setBlendAdditive(true);
 	m_Smoke->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
@@ -272,7 +272,7 @@ void NetRaceLayer::HuPressed(Button *button, bool qiangGang, bool doubleHu) {
             ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::hu_tip_effect)),NULL));
     } else if(doubleHu) {
-        auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+        
             
         myframe->runAction(Sequence::create(TargetedAction::create(
             button,ScaleTo::create(0.1,1)),
@@ -494,7 +494,7 @@ BezierTo* NetRaceLayer::BizerMove2(outCardList* outCard,Vec2 location,int time)
 BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
 {
 	ccBezierConfig config;
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	if(no==2)
 	{
@@ -596,7 +596,7 @@ void NetRaceLayer::ListenToTingButton()
 	};
     
 	TingListener->onTouchEnded=[=](Touch* touch, Event* event) {
-		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+		
 		auto button = (Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
 
         if( !_IsClickedOn(button,touch) ) {
@@ -608,7 +608,7 @@ void NetRaceLayer::ListenToTingButton()
         _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
 	};
     
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
 }
 
@@ -629,7 +629,7 @@ TargetedAction *NetRaceLayer::ShowBigMing(Node *myframe) {
 }
 
 TargetedAction* NetRaceLayer::MingAnimation() {
-    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
 
     _eventDispatcher->removeEventListenersForTarget(myframe,true);
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
@@ -875,7 +875,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 {
     LOGGER_WRITE("%s isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	if(!_roundManager->_isCardFromOthers) {
 		if( ifTuoGuan ||
@@ -900,7 +900,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
 }
 
 bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
-    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
     
     if( ifInsertCardsTime ) {
         ifInsertCardsTime=false;
@@ -950,7 +950,7 @@ bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
-    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
     
 	auto cardsInHand= _roundManager->_players[1]->get_parter()->get_card_list();
 	int  start      = cardsInHand->atcvie_place;
@@ -1053,7 +1053,7 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
-    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
     
     LOGGER_WRITE("%s",__FUNCTION__);
 	//========================PossibleCondition=================//
@@ -1177,7 +1177,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::ListenToCardTouch() {
-    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
     
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
@@ -1251,7 +1251,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
     /*******************
         effect 
     *******************/
-    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+    
     int curPlayer = _roundManager->_curPlayer;
     
 	auto smallCard = _object->CreateKind((Card_t)_roundManager->_lastHandedOutCard,SMALL);
@@ -1427,7 +1427,7 @@ Sprite *NetRaceLayer::_GetEffectCardInHand(Node *myframe, int i,CARD_KIND kindId
 }
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	myframe->_ID = dir;
     LOGGER_WRITE("%s %d",__FUNCTION__,dir);
@@ -1795,7 +1795,7 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
 void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
 	delete gang;
@@ -2161,7 +2161,7 @@ void NetRaceLayer::QiangGangHuJudge()
 			if(_roundManager->IsTing(1)) {
 				_roundManager->_lastActionWithGold=a_QIANG_GANG;
 
-                auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+                
 				myframe->_ID=1;
 				myframe->runAction(CallFunc::create([=](){
                     hu_effect_tip(1);}));
@@ -2186,7 +2186,7 @@ void NetRaceLayer::QiangGangHuJudge()
 	} else {
 		_roundManager->_isCardFromOthers=false;
 
-		auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+		
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
 			GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);}),CallFunc::create([=](){
     		call_distribute_card();}),NULL));
@@ -2196,7 +2196,7 @@ void NetRaceLayer::QiangGangHuJudge()
 void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     myframe->_ID = no;
 
 	auto list = _roundManager->_players[no]->get_parter()->get_card_list();
@@ -2683,7 +2683,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
 void NetRaceLayer::qi_tip_effect(Node *psender)
 {
 	int no=psender->_ID;
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	myframe->_ID=1;
 
     LOGGER_WRITE("%s",__FUNCTION__);
@@ -2761,7 +2761,7 @@ void NetRaceLayer::update_residue_TingCards(int no) {
 
 	int cardNum=hu_NumForEveryCard[Hu_cardOut_place];
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	for(int k=0;k<cardNum;k++)
 	{
 		Sprite* curCardBar;
@@ -2808,7 +2808,7 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 
 	Hu_cardOut_place=CardPlace;
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];
@@ -2824,7 +2824,7 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	_roundManager->_players[1]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
 	Hu_cardOut_place=CardPlace;
@@ -2846,7 +2846,7 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 
 void NetRaceLayer::card_list_update(int no)
 {
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	for(int i=0;i<MAX_HANDIN_NUM;i++) {
         _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
@@ -3370,7 +3370,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 {
     LOGGER_WRITE("%s : %x",__FUNCTION__,(int)sender);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 
 	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
 
@@ -3518,7 +3518,7 @@ void NetRaceLayer::KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 		{
             LOGGER_WRITE("%s",__FUNCTION__);
 
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
             
 			_Remove(myframe,MING_KOU_ENSURE);			
 			_Remove(myframe,MING_KOU_SIGN);
@@ -3564,7 +3564,7 @@ void NetRaceLayer::KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		{
             LOGGER_WRITE("%s",__FUNCTION__);
             
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
             
 			if (myframe->getChildByTag(MING_KOU_SIGN))
 				myframe->removeChildByTag(MING_KOU_SIGN);
@@ -3620,7 +3620,7 @@ void NetRaceLayer::MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 			_roundManager->_players[1]->get_parter()->set_ming_indexes(0);
 			_roundManager->_players[1]->get_parter()->set_ting_status(0);
 
-			auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+			
 			myframe->_ID = _roundManager->_curPlayer;
 			myframe->runAction(Sequence::create(TargetedAction::create(
                 (Button*)pSender,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
@@ -3716,7 +3716,7 @@ Node *NetRaceLayer::_NonKouMask(Sprite *card) {
 }
 
 void NetRaceLayer::MaskNonKouCards() {
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
     CARD_ARRAY *cards = _roundManager->_players[1]->get_parter()->get_card_list();
 
     for(int i=cards->atcvie_place; i<cards->len; i++) {
@@ -3728,7 +3728,7 @@ void NetRaceLayer::MaskNonKouCards() {
 }
 
 void NetRaceLayer::ListenToKou(int no) {
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
     auto cards=_roundManager->_players[no]->get_parter()->get_card_list();
     auto KouListener = EventListenerTouchOneByOne::create();
     KouListener->setSwallowTouches(true);
@@ -3859,7 +3859,7 @@ void NetRaceLayer::ming_kou_Choose(int no)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	if(no==1) {
         auto kouCancel = _object->CreateKouCancelButton();
@@ -3896,7 +3896,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	_roundManager->_actionToDo=a_MING;
 
 	if(psender->_ID==1)
@@ -3949,7 +3949,7 @@ void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 				_roundManager->_tempActionToDo = a_JUMP;
 			}
             
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
 
 			for(int dir=0;dir<3;dir++) {//only once is enough?
 			    _Remove(myframe,PENG_EFFECT_NODE_ID+dir);
@@ -4035,7 +4035,7 @@ void NetRaceLayer::first_response(int no)
 void NetRaceLayer::waitfor_myaction(int no)
 {
     LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,no,_roundManager->_actionToDo);
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 
     _Show(myframe,TING_SING_BAR,false);
 
@@ -4136,7 +4136,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,_roundManager->_actionToDo);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	auto list=_roundManager->_players[no]->get_parter()->get_card_list();
 
 	myframe->_ID=no;
@@ -4288,7 +4288,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
         
 		if((PlayerDir_t)sender->_ID==1)
 		{
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
 			float x=_layout->_playerPosi[1].basePoint.x;
 			float y=_layout->_playerPosi[1].basePoint.y;
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)
@@ -4340,7 +4340,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(_roundManager->_actionToDo&a_HU))
 			{
-				auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+				
 				myframe->_ID=sender->_ID;
 				auto huCallFunc=CallFunc::create([=](){hu_effect_tip(1);});
 				myframe->runAction(huCallFunc);
@@ -4496,7 +4496,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			{
 				if(_roundManager->_players[1]->get_parter()->get_ting_status()==1)//&&_roundManager->_actionToDo&a_HU)
 				{
-					auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+					
 					myframe->_ID=1;
 					auto huCallFunc=CallFunc::create([=](){hu_effect_tip(1);});
 					myframe->runAction(huCallFunc);
@@ -4559,7 +4559,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 }
 
 Vec2 NetRaceLayer::_getLastCardPosition(PlayerDir_t dir) {
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
 
     float x = _layout->_playerPosi[dir].basePoint.x;
@@ -4594,7 +4594,7 @@ void NetRaceLayer::distribute_card_effect()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
 
     Sprite *list_last_one;
@@ -4865,7 +4865,7 @@ void NetRaceLayer::start_dealCardsDelete()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	for(int a=0;a<3;a++)
 	{
@@ -4879,7 +4879,7 @@ void NetRaceLayer::start_dealCardsDelete()
 
 
 void NetRaceLayer::_4CardsDistribute(int sequenceNo, float delayRef) {
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	auto RightHandInSize = _object->Create(R_IN_CARD)->getTextureRect().size.height;
 
     float x = _layout->_playerPosi[0].basePoint.x+10;
@@ -4906,7 +4906,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
 	auto VoiceEffect=CallFunc::create([=](){VoiceId=SimpleAudioEngine::sharedEngine()->playEffect("Music/sort.ogg");});	
 
@@ -6151,7 +6151,7 @@ void NetRaceLayer::raceAccount(float delta)
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResultImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("erqs_resultbox_btn_res.plist");
 	auto raceAccoutLayer=Layer::create();//account::create();
-	//auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	//
 	//myframe->addChild(raceAccoutLayer,30,RACE_ACCOUT_TAG_ID);
 	this->addChild(raceAccoutLayer,11,RACE_ACCOUT_TAG_ID);
 	//raceAccoutLayer->runAction(FadeIn::create(0.3));
@@ -6316,7 +6316,7 @@ void  NetRaceLayer::showall()
     LOGGER_WRITE("%s",__FUNCTION__);
 
     HideClock();
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	float x,y;
 	Sprite *p_list[MAX_HANDIN_NUM];
 
@@ -6564,7 +6564,7 @@ Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
 	bgOfGang->setPosition(v);
 	myframe->addChild(bgOfGang,20,MOJI_EFFECT_TAG_ID);
@@ -6613,7 +6613,7 @@ void NetRaceLayer::hu_effect_tip(int no)
     _Remove(this,ROBOT_TUO_GUAN);
     _Remove(this,TUOGUAN_CANCEL_BUTTON);
     
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
 	scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
 
 	if(no<3) {
@@ -6763,7 +6763,7 @@ void NetRaceLayer::hu_effect_tip(int no)
         _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
         
 		auto _doublehucallListener = EventListenerCustom::create(DOUBLE_HU_WITH_ME, [this](EventCustom * event){
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
 			auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
 			auto DoubleFileFunc=CallFunc::create([=]{
 				_eventDispatcher->removeCustomEventListeners(DOUBLE_HU_WITH_ME);
@@ -6870,7 +6870,7 @@ void NetRaceLayer::tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType 
             
 			if(this->getChildByTag(ROBOT_TUO_GUAN))
 				this->removeChildByTag(ROBOT_TUO_GUAN,true);//TUOGUAN_CANCEL_BUTTON
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
 			auto TuoGuanButton=(Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON);
 			TuoGuanButton->setTouchEnabled(true);
 			TuoGuanButton->setHighlighted(false);
@@ -6906,7 +6906,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 		{
             LOGGER_WRITE("%s",__FUNCTION__);
             
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
 			_eventDispatcher->removeEventListenersForTarget(myframe,true);//???????
 			ifTuoGuan=true;
 			curButton->setTouchEnabled(false);
@@ -7020,7 +7020,7 @@ void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType typ
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+			
 			auto backBUtton=(Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON);
 			backBUtton->setTouchEnabled(true);
 			auto curButton=(Button*)pSender;
@@ -7769,7 +7769,7 @@ void NetRaceLayer::delete_ActionRemind()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+	
         
 	for(int i=0;i<17;i++){
         _Remove(myframe,REMIND_ACT_TAG_ID+i);
@@ -7780,7 +7780,7 @@ void NetRaceLayer::delete_ActionEffect()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+	
     
  	for(int i=0;i<31;i++) {
         _Remove(myframe,MOJI_EFFECT_TAG_ID+i);
@@ -7801,7 +7801,7 @@ void NetRaceLayer::delete_act_tip()
 ****************************************************/
 
 void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
     for (int i=0; i<4; i++ ) {
         auto GangCard = _object->Create(AN_GANG_CARD);
         Size GangCardSize = GangCard->getTextureRect().size;
@@ -7820,7 +7820,7 @@ void NetRaceLayer::_CreateGangCardsMotion(TargetedAction *motions[4]) {
 }
 
 void NetRaceLayer::_CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_KIND kind) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
     for (int i=1;i<4;i++) {
         auto card = _object->Create(PENG_CARD);
         Size size = card->getTextureRect().size;
@@ -7842,7 +7842,7 @@ void NetRaceLayer::_CreateMingGangCardsMotion(TargetedAction *mostions[4],CARD_K
 
 
 void NetRaceLayer::_CreateGangCardInHandMotion(TargetedAction *motions[4],int cardInHand[4],CARD_KIND kind) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
     Size FreeCardSize = _object->RectSize(FREE_CARD);
     auto GangCardSize = _object->RectSize(AN_GANG_CARD);
 
@@ -7897,7 +7897,7 @@ void NetRaceLayer::_AttachKindTextureToFreeCard(Sprite *parent,CARD_KIND kind) {
     
 /* the first is non-peng card*/
 void NetRaceLayer::_CreateMingGangCardInHandMotion(TargetedAction *motions[3], int idxInHand[3], CARD_KIND kind) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
 	float delayTime=0.18;
     
     for (int i=0;i<3;i++) {
@@ -7921,7 +7921,7 @@ void NetRaceLayer::_CreateMingGangCardInHandMotion(TargetedAction *motions[3], i
 }
 
 void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND kind) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
 
     for(int i=0;i<3;i++) {
  		auto OldCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + idxInHand[i]);
@@ -7940,7 +7940,7 @@ void NetRaceLayer::_CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND
 }
 
 void NetRaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int gangType) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
     Size GangCardSize = _object->RectSize(AN_GANG_CARD);
 
     const double delays[2][5] = {
@@ -8029,7 +8029,7 @@ void NetRaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int
 }
 
 Sequence *NetRaceLayer::_HideReminder(int reminderTag, double lastingTime, double shadeScale) {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
     
     auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(reminderTag),
         Sequence::create(
@@ -8052,7 +8052,7 @@ Sequence *NetRaceLayer::_HideReminder(int reminderTag, double lastingTime, doubl
 }
 
 Sequence *NetRaceLayer::_HideQiReminder() {
-    auto myframe = this->getChildByTag(GAME_BKG_TAG_ID);
+    
     
     auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID),
         Sequence::create(
