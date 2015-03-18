@@ -224,6 +224,7 @@ public:
 	void minggang_dispatch(Node *psender);
 	void peng_dispatch(Node *psender);
 
+    TargetedAction* MingAnimation();
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void an_gang_tip_effect(int no,Card_t card,int gang[]);//me--暗杠效果
 	void ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果

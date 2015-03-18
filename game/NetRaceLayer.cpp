@@ -547,6 +547,7 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
 	return action;
 }
 
+/* move to ai */
 void NetRaceLayer::_CollectResouce(HAH *res) {
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
@@ -627,14 +628,54 @@ TargetedAction *NetRaceLayer::ShowBigMing(Node *myframe) {
         ScaleTo::create(0.18,1.2),NULL),NULL));
 }
 
+TargetedAction* NetRaceLayer::MingAnimation() {
+    auto myframe=this->getChildByTag(GAME_BKG_TAG_ID);
+
+    _eventDispatcher->removeEventListenersForTarget(myframe,true);
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
+    
+    while(myframe->getChildByTag(MING_EFFECT_DAMING))
+        myframe->removeChildByTag(MING_EFFECT_DAMING);
+    
+    while(myframe->getChildByTag(MING_EFFECT_ANIMATE))
+        myframe->removeChildByTag(MING_EFFECT_ANIMATE);
+    
+    auto mingSign=Sprite::createWithSpriteFrameName("ming_1.png");
+        mingSign->setAnchorPoint(Vec2(0.5,0.5));
+        mingSign->setScale(0);
+        mingSign->setPosition(_layout->Center());
+
+    myframe->addChild(mingSign,30,MING_EFFECT_ANIMATE);
+    
+    auto MingAnimate = Animation::create();
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_1.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_2.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_3.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_4.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_5.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_6.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_7.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_8.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_9.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_10.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_11.png"));
+        animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_12.png"));
+        animation->setDelayPerUnit(0.1f);
+        animation->setRestoreOriginalFrame(true);
+    
+    auto mingEffectTarget = TargetedAction::create(
+        mingSign,Sequence::create(
+            ScaleTo::create(0,2),
+            Animate::create(MingAnimate),
+            ScaleTo::create(0,0),NULL));
+
+    return mingEffectTarget;
+}
+
 void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
     LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
 
-	if(ifMingTime) {
-		ifMingMybeError=true;
-		ifMingTime=false;
-	}
     
 	if(_roundManager->_isWaitDecision) {
 		_roundManager->_isWaitDecision=false;
@@ -646,6 +687,12 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		_roundManager->_actionToDo = a_JUMP;
 	}
 
+
+	if(ifMingTime) {
+		ifMingMybeError=true;
+		ifMingTime=false;
+	}    
+
     _Remove(myframe, MING_CANCEL);
 
     if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)!=NULL)
@@ -654,132 +701,73 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
     _Show(myframe, TING_SING_BAR, false);
     _Remove(myframe, MING_CANCEL);// why called twice ???
 
-
-	auto cardOut = _object->Create(OUT_CARD);
-	auto show_card_kind = _object->CreateKind((Card_t)_roundManager->_lastHandedOutCard,SMALL);
-	show_card_kind->setPosition(Vec2(
-        cardOut->getTextureRect().size.width/2,
-        cardOut->getTextureRect().size.height*0.65));
-	cardOut->addChild(show_card_kind);
-	cardOut->setAnchorPoint(Vec2(0,1));
-	if(time==1)
+	BezierTo *bizerMotion;
+    auto cardOut = _object->CreateRiverCard(MIDDLE,(Card_t)_roundManager->_lastHandedOutCard);
+    
+	if(time==1) {
 		cardOut->setPosition(location);
-	else
+		bizerMotion = BizerMove1(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
+		                location);
+    }
+	else {
 		cardOut->setPosition(location.x,100);
-	myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
+		bizerMotion = BizerMove2(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
+		                location,time);
+    }
 
-	BezierTo *action;
-	outCardList* outCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList();
-	if(time==1)
-		action = BizerMove1(outCard,location);
-	else
-		action = BizerMove2(outCard,location,time);
+    myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
 
-    CallFunc* BizerVoice = _voice->Speak("give");
-	CallFunc* voiceCall  = _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
+	CallFunc* speakCard  = _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
                                 _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
 
-	Sequence* voiceEffect;
 	Spawn* allEffect = Spawn::create(NULL);
     
 	if(_roundManager->_actionToDo==a_MING && 
         !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-		_eventDispatcher->removeEventListenersForTarget(myframe,true);
-        
-		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
-        
+
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 
-		while(myframe->getChildByTag(MING_EFFECT_DAMING))
-			myframe->removeChildByTag(MING_EFFECT_DAMING);
-        
-		while(myframe->getChildByTag(MING_EFFECT_ANIMATE))
-			myframe->removeChildByTag(MING_EFFECT_ANIMATE);
-
-		auto mingEfeect=Sprite::createWithSpriteFrameName("ming_1.png");
-		mingEfeect->setAnchorPoint(Vec2(0.5,0.5));
-		mingEfeect->setScale(0);
-		mingEfeect->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.5));
-		myframe->addChild(mingEfeect,30,MING_EFFECT_ANIMATE);
-        
-		auto animation = Animation::create();
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_1.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_2.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_3.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_4.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_5.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_6.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_7.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_8.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_9.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_10.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_11.png"));
-		animation->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_12.png"));
-		animation->setDelayPerUnit(0.1f);
-		animation->setRestoreOriginalFrame(true);
-
-		auto MingAnimate = Animate::create(animation);
-		auto MingActionseq=Sequence::create(
-            ScaleTo::create(0,2),
-            MingAnimate,
-            ScaleTo::create(0,0),NULL);
-		auto mingEffectTarget=TargetedAction::create(
-            mingEfeect,
-            MingActionseq);
-		voiceEffect=Sequence::create(Spawn::create(
-            action,
-            voiceCall,NULL),
-            BizerVoice,NULL);
-		auto targetAction=TargetedAction::create(
-            cardOut,
-            voiceEffect);
-
-        auto damingShow = ShowBigMing(myframe);
-        
 		allEffect = Spawn::create(
-            damingShow,
-            mingEffectTarget,
-            targetAction,CallFunc::create([=](){
+            ShowBigMing(myframe),
+            MingAnimation(),TargetedAction::create(
+            cardOut,Sequence::create(Spawn::create(
+                bizerMotion,
+                speakCard,NULL),
+                _voice->Speak("give"),NULL)),CallFunc::create([=](){
             ifInsertCardsTime=true;}),CallFunc::create([=](){
             delete_ActionRemind();}),NULL);
 	}
 	else
 	{
-		allEffect=Spawn::create( TargetedAction::create(cardOut,Sequence::create(Spawn::create(
-            action,
-            voiceCall,NULL),
-            BizerVoice,NULL)),CallFunc::create([=](){
+		allEffect = Spawn::create( 
+            TargetedAction::create(
+            cardOut,Sequence::create(Spawn::create(
+                bizerMotion,
+                speakCard,NULL),
+                _voice->Speak("give"),NULL)),CallFunc::create([=](){
             ifInsertCardsTime=true;}),CallFunc::create([=](){
             delete_ActionRemind();}),NULL);
 	}
     
-	auto riverUpdate = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::update_card_in_river_list));
-	auto waitForResponse = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
-	auto sim = Sequence::create(
-        riverUpdate,CCCallFunc::create([=]() {
-		_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
-        _Show(myframe,TING_SING_BUTTON,true);
-	}),CallFunc::create([=](){
-		if(ifInsertStopped)
-			ifInsertStopped = false;
-		else {
-            _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
-			card_list_update(1);
-		}
-	}),NULL);//callFunc1可优化一下ifInsertStopped ifInsertCardsTime=true;
-	
-	auto seq=Sequence::create(
-        allEffect,
-        DelayTime::create(0.12),CallFunc::create([=](){
-        ifInsertCardsTime=false;}),
-        sim,
-        waitForResponse,
-        NULL);
-        
 	myframe->_ID=1;
 	_roundManager->_isCardFromOthers = true;
-	myframe->runAction(seq);
+    
+	myframe->runAction(Sequence::create(
+        allEffect,
+        DelayTime::create(0.12),CallFunc::create([=](){
+        ifInsertCardsTime=false;}),Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::update_card_in_river_list)),CCCallFunc::create([=]() {
+    		_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
+            _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
+    		if(ifInsertStopped)
+    			ifInsertStopped = false;
+    		else {
+                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
+    			card_list_update(1);
+    		}}),NULL),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::waitfor_response)),
+        NULL));
 }
 
 void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int chosenCard,Touch* touch,int time)
