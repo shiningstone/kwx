@@ -676,7 +676,6 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
     LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
 
-    
 	if(_roundManager->_isWaitDecision) {
 		_roundManager->_isWaitDecision=false;
 		_roundManager->_tempActionToDo=a_JUMP;
@@ -770,6 +769,74 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
         NULL));
 }
 
+Sprite *NetRaceLayer::_getCardInHand(int idx) {
+    return (Sprite *)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + idx);
+}
+
+void NetRaceLayer::_reOrderCardsInHand(int droppedCard) {
+	auto cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    
+    const auto SIZE      = _getCardInHand(0)->getTextureRect().size;
+    
+    const int  LAST      = cards->len-1;
+    /* maybe need to be put into the circulation */
+    const auto LAST_CARD = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST);
+    const auto LAST_POS  = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST)->getPosition();
+    
+    /* need to be optimized !!! */
+    for(int i=cards->atcvie_place; i<LAST; i++) {
+        auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 
+            _roundManager->_curPlayer*20 + i);
+        auto curPos   = card->getPosition();
+        
+        auto RightMove = MoveTo::create(0.3,Vec2(curPos.x+SIZE.width,curPos.y));
+        auto LeftMove  = MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*1.2,curPos.y));
+    
+        auto RightInsertSeq   = Sequence::create(
+            MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
+            MoveTo::create(0.24,Vec2(curPos.x,LAST_POS.y+100)),
+            MoveTo::create(0.06,Vec2(curPos)),NULL);
+        auto LeftInsertSeq   = Sequence::create(
+            MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
+            MoveTo::create(0.24,Vec2(curPos.x-SIZE.width*0.2,LAST_POS.y+100)),
+            MoveTo::create(0.06,Vec2(curPos.x-SIZE.width*0.2,curPos.y)),NULL);
+                    
+        if(i < droppedCard) {
+            if(cards->data[i].kind <= cards->data[LAST].kind)
+                continue;
+            else {
+                if( i==cards->atcvie_place || cards->data[i-1].kind<=cards->data[LAST].kind )
+                    LAST_CARD->runAction(RightInsertSeq);
+                
+                card->runAction(RightMove);
+            }
+        } else if(i==droppedCard) {
+            if(i==cards->atcvie_place) {
+                if(cards->data[i+1].kind>cards->data[LAST].kind)
+                    LAST_CARD->runAction(RightInsertSeq);
+            } else if(i==LAST-1) {
+                if(cards->data[i-1].kind<=cards->data[LAST].kind)
+                    LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x,LAST_POS.y)));
+            } else {
+                if(cards->data[i-1].kind<=cards->data[LAST].kind&&cards->data[i+1].kind>cards->data[LAST].kind)
+                    LAST_CARD->runAction(RightInsertSeq);
+            }
+            
+            card->setScale(0);
+        } else {/* i>chosenCard */
+            if(cards->data[i].kind>cards->data[LAST].kind)
+                card->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
+            else {
+                if(i==LAST-1)
+                    LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
+                else if(cards->data[i+1].kind>cards->data[LAST].kind)
+                    LAST_CARD->runAction(LeftInsertSeq);                    
+                card->runAction(LeftMove);
+            }
+        }
+    }
+}
+
 void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int chosenCard,Touch* touch,int time)
 {
     LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,_roundManager->_isWaitDecision);
@@ -790,66 +857,7 @@ void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int ch
     if( chosenCard == list->len-1 ) {
 		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + chosenCard)->setScale(0);
 	} else {
-        auto firstCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20);
-        const auto SIZE      = firstCard->getTextureRect().size;
-
-        const int  LAST      = list->len-1;
-        /* maybe need to be put into the circulation */
-        const auto LAST_CARD = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST);
-        const auto LAST_POS  = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST)->getPosition();
-
-        /* need to be optimized !!! */
-		for(int i=list->atcvie_place; i<LAST; i++) {
-			auto card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 
-                _roundManager->_curPlayer*20 + i);
-			auto curPos   = card->getPosition();
-            
-			auto RightMove = MoveTo::create(0.3,Vec2(curPos.x+SIZE.width,curPos.y));
-			auto LeftMove  = MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*1.2,curPos.y));
-
-			auto RightInsertSeq   = Sequence::create(
-                MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
-                MoveTo::create(0.24,Vec2(curPos.x,LAST_POS.y+100)),
-                MoveTo::create(0.06,Vec2(curPos)),NULL);
-			auto LeftInsertSeq   = Sequence::create(
-                MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
-                MoveTo::create(0.24,Vec2(curPos.x-SIZE.width*0.2,LAST_POS.y+100)),
-                MoveTo::create(0.06,Vec2(curPos.x-SIZE.width*0.2,curPos.y)),NULL);
-						
-			if(i < chosenCard) {
-				if(list->data[i].kind <= list->data[LAST].kind)
-					continue;
-				else {
-					if( i==list->atcvie_place || list->data[i-1].kind<=list->data[LAST].kind )
-						LAST_CARD->runAction(RightInsertSeq);
-                    
-					card->runAction(RightMove);
-				}
-			} else if(i==chosenCard) {
-				if(i==list->atcvie_place) {
-					if(list->data[i+1].kind>list->data[LAST].kind)
-						LAST_CARD->runAction(RightInsertSeq);
-				} else if(i==LAST-1) {
-					if(list->data[i-1].kind<=list->data[LAST].kind)
-						LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x,LAST_POS.y)));
- 				} else {
-					if(list->data[i-1].kind<=list->data[LAST].kind&&list->data[i+1].kind>list->data[LAST].kind)
-						LAST_CARD->runAction(RightInsertSeq);
-				}
-                
-				card->setScale(0);
-			} else {/* i>chosenCard */
-				if(list->data[i].kind>list->data[LAST].kind)
-					card->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
-				else {
-					if(i==LAST-1)
-						LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
-					else if(list->data[i+1].kind>list->data[LAST].kind)
-						LAST_CARD->runAction(LeftInsertSeq);					
-					card->runAction(LeftMove);
-				}
-			}
-		}
+        _reOrderCardsInHand(chosenCard);
 	}
     
 	if(time==1) {
@@ -871,8 +879,8 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
     
 	if(!_roundManager->_isCardFromOthers) {
 		if( ifTuoGuan ||
-            (_roundManager->IsTing(_roundManager->_curPlayer) 
-            && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
+                (_roundManager->IsTing(_roundManager->_curPlayer) 
+                && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
 			int last = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
 			Vec2 location = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + MIDDLE*20 + last)->getPosition();
             
@@ -4809,7 +4817,7 @@ void NetRaceLayer::start_callback()
     
     distribute_event(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
 
-	auto myframe = LayerColor::create(Color4B(0,0,0,0),visibleSize.width,visibleSize.height);
+	myframe = LayerColor::create(Color4B(0,0,0,0),visibleSize.width,visibleSize.height);
 	myframe->setPosition(Vec2(origin.x, origin.y));
 	this->addChild(myframe,3,GAME_BKG_TAG_ID);
 
@@ -5371,12 +5379,10 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	int PropertyOfPlayer;
-	std::string PhotoOfPlayer;
-	std::string NickNameOfPlayer;
-	_roundManager->_players[no]->get_property(PropertyOfPlayer);
-	_roundManager->_players[no]->get_photo(PhotoOfPlayer);
-	_roundManager->_players[no]->get_nick_name(NickNameOfPlayer);
+	int PropertyOfPlayer = _roundManager->_cardHolders[no]->_profile.property;
+	std::string PhotoOfPlayer = _roundManager->_cardHolders[no]->_profile.photo;
+	std::string NickNameOfPlayer = _roundManager->_cardHolders[no]->_profile.name;
+	
 	char buffer[80];
 	auto Gold=Sprite::createWithSpriteFrameName("result_money.png");//金币1
 	Gold->setAnchorPoint(Vec2(0,0.5));

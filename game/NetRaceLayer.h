@@ -32,6 +32,11 @@ protected:
 private:
     Logger *_logger;
 
+    LayerColor* myframe;
+
+    Sprite *_getCardInHand(int idx);
+    void    _reOrderCardsInHand(int droppedCard);
+
     void create_residue_cards();
     void refresh_residue_cards();
     std::string _NumToString( int number );
