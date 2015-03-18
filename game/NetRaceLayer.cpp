@@ -1032,7 +1032,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
         auto startPos = _getCardInHand(cards.start)->getPosition();
         
         for(int i=cards.start; i<=cards.last; i++) {
-			auto loopCard = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+i);
+			auto loopCard = _getCardInHand(i);
             
 			if(i<chosen) {
 				loopCard->_ID = 1;
@@ -1042,7 +1042,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 				loopCard->_ID=1;
                 loopCard->setScale(1);
 
-				if(i==cards.last && cards.residual==2){
+				if(i==cards.last && cards.residual==2/*my show time*/){
 					loopCard->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start)+30+14,y));
 				} else {
 					loopCard->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start)+14,y));
@@ -1105,8 +1105,6 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::ListenToCardTouch() {
-    
-    
 	auto listener = EventListenerTouchOneByOne::create();
 	listener->setSwallowTouches(true);
     
