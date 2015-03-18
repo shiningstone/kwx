@@ -464,7 +464,8 @@ int GameLayout::_lineNo(int i) {
     }
 }
 
-int GameLayout::_viewIdx(int i) {
+int GameLayout::_viewIdx(int i) {
+
     return _lineIdx(i)-_lineNo(i);
 }
 
@@ -620,7 +621,7 @@ void GameLayout::GetBizerPoints(ccBezierConfig &cfg, int riverIdx, const Vec2 &l
 		}
         
         cfg.endPosition = Vec2(
-            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx))*36,
+            _playerPosi[1].riverPoint.x+_viewIdx(riverIdx)*36,
             _playerPosi[1].riverPoint.y-41*lineNo);
         cfg.controlPoint_1 = Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
         cfg.controlPoint_2 = Vec2(

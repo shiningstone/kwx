@@ -84,7 +84,7 @@ class GameLayout {
         int  _cardsInLine(int line);
         int  _lineNo(int i);
         int  _lineIdx(int i);
-        int  _viewIdx(int idxInLine, int line);
+        int  _viewIdx(int i);
         Vec2 OrigPositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle1PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle2PositionOfRiverCard(PlayerDir_t dir,int idx);
