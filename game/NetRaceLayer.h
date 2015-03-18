@@ -30,12 +30,21 @@ protected:
     GraphicEffect  *_effect;
     GObjectFactory *_object;
 private:
+    typedef struct {
+        CARD_ARRAY *list;
+        int         start;
+        int         last;
+        int         residual;
+    }CardsInfo_t;
+    
     Logger *_logger;
 
     LayerColor* myframe;
 
     Sprite *_getCardInHand(int idx);
     void    _reOrderCardsInHand(int droppedCard);
+    void    _getCardsInfo(CardsInfo_t *info);
+    int     _getChosenCard(int start,int end,Touch *touch);
 
     void create_residue_cards();
     void refresh_residue_cards();
