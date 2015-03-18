@@ -73,6 +73,9 @@ public:
     int  _lastActionWithGold;
     int  _lastActionSource;
 
+    bool _isMyShowTime;
+    int  _myChosenCard;
+    
     int  Shuffle();
     int  NotifyStart();
     bool GetReadyStatus(int tableId);

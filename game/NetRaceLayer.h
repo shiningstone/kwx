@@ -108,7 +108,6 @@ private:
 	bool ifTuoGuan;
 	int  touched;  //only used in waitfor_MyTouchShowCard
 	bool ifChosed;   //only used in waitfor_MyTouchShowCard
-	int MyCardChoosedNum;
 
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;
@@ -116,7 +115,6 @@ private:
 	bool ifInsertCardsTime;
 	bool ifInsertStopped;
 	bool ifEndGameChoose;//是否退出游戏
-	bool ifMyShowCardTime;//出牌阶段
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
 	bool ifMingTime;

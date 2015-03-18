@@ -227,6 +227,8 @@ int RoundManager::Shuffle() {
     _otherOneForDouble = INVALID;
     _isWaitDecision = false;
     _isGangHua = false;
+    _isMyShowTime = false;
+    _myChosenCard = INVALID;
     
     CancelEffectCard();
 
