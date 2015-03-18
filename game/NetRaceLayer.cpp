@@ -388,113 +388,18 @@ void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
 BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
 {
 	ccBezierConfig config;
-    
-    Vec2 ctrlPoint1Offset = Vec2(0,0);
-    Vec2 ctrlPoint2Offset = Vec2(0,0);
 
-    int lineNo = _layout->_getRiverLineNo(outCard->length-1);
-    
-	if(lineNo==0) {
-		if(location.y<=visibleSize.height*0.4) {
-			if(location.x<visibleSize.width*0.4) {
-			    ctrlPoint1Offset = Vec2(30,30);
-                ctrlPoint2Offset = Vec2(100,-100);
-			} else if(location.x>=visibleSize.width*0.6) {
-			    ctrlPoint1Offset = Vec2(-30,-30);
-                ctrlPoint2Offset = Vec2(100,-100);
-			}
-		} else if(location.y>=visibleSize.height*0.4) {
-			if(location.x<visibleSize.width*0.4) {
-			    ctrlPoint1Offset = Vec2(100,-100);
-                ctrlPoint2Offset = Vec2(100,100);
-			} else if(location.x>=visibleSize.width*0.6) {
-			    ctrlPoint1Offset = Vec2(-100,-100);
-                ctrlPoint2Offset = Vec2(100,100);
-			}
-		}
+    _layout->GetBizerPoints(&config, outCard->length-1, location);
 
-        config.endPosition=Vec2(
-            _layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),
-            _layout->_playerPosi[1].riverPoint.y);
-        config.controlPoint_1=Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
-        config.controlPoint_2=Vec2(
-            _layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+ctrlPoint2Offset.x,
-            _layout->_playerPosi[1].riverPoint.y+ctrlPoint2Offset.y);
-	}
-	else if(lineNo==1)
-	{
-		if(location.y<=visibleSize.height*0.4)
-		{
-			if(location.x<visibleSize.width*0.4) {
-			    ctrlPoint1Offset = Vec2(30,30);
-                ctrlPoint2Offset = Vec2(-100,-100);
-			} else if(location.x>=visibleSize.width*0.6) {
-			    ctrlPoint1Offset = Vec2(-30,-30);
-                ctrlPoint2Offset = Vec2(100,-100);
-			}
-		}
-		else if(location.y>=visibleSize.height*0.4)
-		{
-			if(location.x<visibleSize.width*0.4) {
-			    ctrlPoint1Offset = Vec2(30,-30);
-                ctrlPoint2Offset = Vec2(-100,182);
-			} else if(location.x>=visibleSize.width*0.6) {
-			    ctrlPoint1Offset = Vec2(-30,-30);
-                ctrlPoint2Offset = Vec2(100,182);
-			}
-		}
-        
-        config.endPosition=Vec2(
-            _layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),
-            _layout->_playerPosi[1].riverPoint.y-41);
-        config.controlPoint_1=Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
-        config.controlPoint_2=Vec2(
-            _layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+ctrlPoint2Offset.x,
-            _layout->_playerPosi[1].riverPoint.y-41+ctrlPoint2Offset.y);
-	}
-	else
-	{
-		if(location.y<=visibleSize.height*0.4)
-		{
-			if(location.x<visibleSize.width*0.4) {
-			    ctrlPoint1Offset = Vec2(30,30);
-                ctrlPoint2Offset = Vec2(-100,-100);
-			} else if(location.x>=visibleSize.width*0.6) {
-			    ctrlPoint1Offset = Vec2(-30,-30);
-                ctrlPoint2Offset = Vec2(100,-100);
-			}
-		}
-		else if(location.y>=visibleSize.height*0.4)
-		{
-			if(location.x<visibleSize.width*0.4) {
-			    ctrlPoint1Offset = Vec2(30,-30);
-                ctrlPoint2Offset = Vec2(-100,264);
-			} else if(location.x>=visibleSize.width*0.6) {
-			    ctrlPoint1Offset = Vec2(-30,-30);
-                ctrlPoint2Offset = Vec2(100,264);
-			}
-		}
-        
-        config.endPosition=Vec2(
-            _layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,
-            _layout->_playerPosi[1].riverPoint.y-82);
-        config.controlPoint_1=Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
-        config.controlPoint_2=Vec2(
-            _layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+ctrlPoint2Offset.x,
-            _layout->_playerPosi[1].riverPoint.y-82+ctrlPoint2Offset.y);
-	}
-    
 	BezierTo *action;
-	if(ccpDistance(location,config.endPosition)<=200)
-	{
+	if(ccpDistance(location,config.endPosition)<=200){
 		action=BezierTo::create(0.18,config);
-	}
-	else if(ccpDistance(location,config.endPosition)>200)
-	{
+	} else {
 		action=BezierTo::create(0.3,config);
 	}
+    
 	return action;
-}	
+}
 
 BezierTo* NetRaceLayer::BizerMove2(outCardList* outCard,Vec2 location,int time)
 {
@@ -3500,7 +3405,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
                     HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
                 break;
             case 1:
-                myframe->addChild(show_card,_layout->_getRiverLineIdx(i)+1,
+                myframe->addChild(show_card,_layout->_lineIdx(i)+1,
                     HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
                 break;
             case 2:

@@ -436,92 +436,197 @@ float GameLayout::YOfNextCard(PlayerDir_t dir,float originY,Size cardSize) {
 /*************************************
     card in river
 *************************************/
-int GameLayout::_getRiverLineIdx(int i) {
-    if(i<RIVER_CARD_IN_LINE_1) {
-        return i;
-    } else if (i<RIVER_CARD_IN_LINE_2) {
-        return i-RIVER_CARD_IN_LINE_1;
-    } else {
-        return i-RIVER_CARD_IN_LINE_2;
+int GameLayout::_cardsInLine(int line) {
+    switch(line) {
+        case 0:   return RIVER_CARD_IN_LINE_1;
+        case 1:   return RIVER_CARD_IN_LINE_2;
+        case 2:   return 10;
     }
 }
 
-int GameLayout::_getRiverLineNo(int i) {
+int GameLayout::_lineIdx(int i) {
+    if(i<RIVER_CARD_IN_LINE_1) {
+        return i;
+    } else if (i<RIVER_CARD_IN_LINE_1+RIVER_CARD_IN_LINE_2) {
+        return i-RIVER_CARD_IN_LINE_1;
+    } else {
+        return i-RIVER_CARD_IN_LINE_1+RIVER_CARD_IN_LINE_2;
+    }
+}
+
+int GameLayout::_lineNo(int i) {
     if(i<RIVER_CARD_IN_LINE_1) {
         return 0;
-    } else if (i<RIVER_CARD_IN_LINE_2) {
+    } else if (i<RIVER_CARD_IN_LINE_1+RIVER_CARD_IN_LINE_2) {
         return 1;
     } else {
         return 2;
     }
 }
 
+int GameLayout::_viewIdx(int i) {
+    return _lineIdx(i)-_lineNo(i);
+}
+
 Vec2 GameLayout::OrigPositionOfRiverCard(PlayerDir_t dir,int idx) {
-    int lineNo  = _getRiverLineNo(idx);
-    int lineIdx = _getRiverLineIdx(idx);
+    int lineNo  = _lineNo(idx);
     
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo-1));
+                        _playerPosi[dir].riverPoint.y-30*(_viewIdx(idx)-1));
         case MIDDLE:
-            return Vec2(_playerPosi[dir].riverPoint.x+((lineIdx-lineNo)*36)+20,
+            return Vec2(_playerPosi[dir].riverPoint.x+((_viewIdx(idx))*36)+20,
                         _playerPosi[dir].riverPoint.y-41*lineNo+5);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo+1));
+                        _playerPosi[dir].riverPoint.y+30*(_viewIdx(idx)+1));
     }
 }
 
 Vec2 GameLayout::Middle1PositionOfRiverCard(PlayerDir_t dir,int idx) {
-    int lineNo  = _getRiverLineNo(idx);
-    int lineIdx = _getRiverLineIdx(idx);
+    int lineNo  = _lineNo(idx);
     
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo-1)+10);
+                        _playerPosi[dir].riverPoint.y-30*(_viewIdx(idx)-1)+10);
         case MIDDLE:
-            return Vec2(_playerPosi[dir].riverPoint.x+((lineIdx-lineNo)*36)+20,
+            return Vec2(_playerPosi[dir].riverPoint.x+((_viewIdx(idx))*36)+20,
                         _playerPosi[dir].riverPoint.y-41*lineNo+15);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo+1)+10);
+                        _playerPosi[dir].riverPoint.y+30*(_viewIdx(idx)+1)+10);
     }
 }
 
 Vec2 GameLayout::Middle2PositionOfRiverCard(PlayerDir_t dir,int idx) {
-    int lineNo  = _getRiverLineNo(idx);
-    int lineIdx = _getRiverLineIdx(idx);
+    int lineNo  = _lineNo(idx);
     
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo-1));
+                        _playerPosi[dir].riverPoint.y-30*(_viewIdx(idx)-1));
         case MIDDLE:
-            return Vec2(_playerPosi[dir].riverPoint.x+((lineIdx-lineNo)*36)+20,
+            return Vec2(_playerPosi[dir].riverPoint.x+((_viewIdx(idx))*36)+20,
                         _playerPosi[dir].riverPoint.y-41*lineNo+5);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo+1));
+                        _playerPosi[dir].riverPoint.y+30*(_viewIdx(idx)+1));
     }
 }
 
 Vec2 GameLayout::DestPositionOfRiverCard(PlayerDir_t dir,int idx) {
-    int lineNo  = _getRiverLineNo(idx);
-    int lineIdx = _getRiverLineIdx(idx);
+    int lineNo  = _lineNo(idx);
     
     switch(dir) {
         case LEFT:
             return Vec2(_playerPosi[dir].riverPoint.x-48*lineNo,
-                        _playerPosi[dir].riverPoint.y-30*(lineIdx-lineNo));
+                        _playerPosi[dir].riverPoint.y-30*(_viewIdx(idx)));
         case MIDDLE:
-            return Vec2(_playerPosi[dir].riverPoint.x+(lineIdx-lineNo)*36,
+            return Vec2(_playerPosi[dir].riverPoint.x+(_viewIdx(idx))*36,
                         _playerPosi[dir].riverPoint.y-41*lineNo);
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
-                        _playerPosi[dir].riverPoint.y+30*(lineIdx-lineNo));
+                        _playerPosi[dir].riverPoint.y+30*(_viewIdx(idx)));
     }
+}
+
+void GameLayout::GetBizerPoints(ccBezierConfig &cfg, int riverIdx, const Vec2 &location) {
+    Vec2 ctrlPoint1Offset = Vec2(0,0);
+    Vec2 ctrlPoint2Offset = Vec2(0,0);
+
+    int lineNo  = _lineNo(riverIdx);
+    
+	if(lineNo==0) {
+		if(location.y<=SIZE.height*0.4) {
+			if(location.x<SIZE.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,30);
+                ctrlPoint2Offset = Vec2(100,-100);
+			} else if(location.x>=SIZE.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,-100);
+			}
+		} else if(location.y>=SIZE.height*0.4) {
+			if(location.x<SIZE.width*0.4) {
+			    ctrlPoint1Offset = Vec2(100,-100);
+                ctrlPoint2Offset = Vec2(100,100+82*lineNo);
+			} else if(location.x>=SIZE.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-100,-100);
+                ctrlPoint2Offset = Vec2(100,100+82*lineNo);
+			}
+		}
+
+        cfg.endPosition = Vec2(
+            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx))*36),
+            _playerPosi[1].riverPoint.y);
+        cfg.controlPoint_1 = Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
+        cfg.controlPoint_2 = Vec2(
+            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx))*36)+ctrlPoint2Offset.x,
+            _playerPosi[1].riverPoint.y+ctrlPoint2Offset.y);
+	}
+	else if(lineNo==1)
+	{
+		if(location.y<=SIZE.height*0.4)
+		{
+			if(location.x<SIZE.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,30);
+                ctrlPoint2Offset = Vec2(-100,-100);
+			} else if(location.x>=SIZE.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,-100);
+			}
+		}
+		else if(location.y>=SIZE.height*0.4)
+		{
+			if(location.x<SIZE.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,-30);
+                ctrlPoint2Offset = Vec2(-100,100+82*lineNo);
+			} else if(location.x>=SIZE.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,100+82*lineNo);
+			}
+		}
+        
+        cfg.endPosition = Vec2(
+            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx))*36),
+            _playerPosi[1].riverPoint.y-41*lineNo);
+        cfg.controlPoint_1 = Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
+        cfg.controlPoint_2 = Vec2(
+            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx))*36)+ctrlPoint2Offset.x,
+            _playerPosi[1].riverPoint.y-41*lineNo+ctrlPoint2Offset.y);
+	}
+	else
+	{
+		if(location.y<=SIZE.height*0.4)
+		{
+			if(location.x<SIZE.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,30);
+                ctrlPoint2Offset = Vec2(-100,-100);
+			} else if(location.x>=SIZE.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,-100);
+			}
+		}
+		else if(location.y>=SIZE.height*0.4)
+		{
+			if(location.x<SIZE.width*0.4) {
+			    ctrlPoint1Offset = Vec2(30,-30);
+                ctrlPoint2Offset = Vec2(-100,100+82*lineNo);
+			} else if(location.x>=SIZE.width*0.6) {
+			    ctrlPoint1Offset = Vec2(-30,-30);
+                ctrlPoint2Offset = Vec2(100,100+82*lineNo);
+			}
+		}
+        
+        cfg.endPosition = Vec2(
+            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx))*36,
+            _playerPosi[1].riverPoint.y-41*lineNo);
+        cfg.controlPoint_1 = Vec2(location.x+ctrlPoint1Offset.x,location.y+ctrlPoint1Offset.y);
+        cfg.controlPoint_2 = Vec2(
+            _playerPosi[1].riverPoint.x+((_viewIdx(riverIdx)+1)*36)+ctrlPoint2Offset.x,
+            _playerPosi[1].riverPoint.y-41*lineNo+ctrlPoint2Offset.y);
+	}
 }
 
 /*************************************

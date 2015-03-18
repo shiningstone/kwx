@@ -81,15 +81,19 @@ class GameLayout {
         /*************************************
             card in river
         *************************************/
-        int  _getRiverLineNo(int i);
-        int  _getRiverLineIdx(int i);
+        int  _cardsInLine(int line);
+        int  _lineNo(int i);
+        int  _lineIdx(int i);
+        int  _viewIdx(int idxInLine, int line);
         Vec2 OrigPositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle1PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle2PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 DestPositionOfRiverCard(PlayerDir_t dir,int idx);
+        
+        void GetBizerPoints(ccBezierConfig &cfg, int riverIdx, const Vec2 &location);
     private:
         static const int RIVER_CARD_IN_LINE_1 = 6;
-        static const int RIVER_CARD_IN_LINE_2 = 14;
+        static const int RIVER_CARD_IN_LINE_2 = 8;
 
         GameLayout(cocos2d::Point origin, cocos2d::Size size);
         static GameLayout *_instance;
