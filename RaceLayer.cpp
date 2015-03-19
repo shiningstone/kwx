@@ -2987,6 +2987,7 @@ void RaceLayer::peng_tip_effect(Node *psender)//效果逻辑分离
 	int outcard_place=player[cur_player]->get_parter()->getOutCardList()->length;
 	player[cur_player]->get_parter()->getOutCardList()->getCard(card,outcard_place);
 	player[cur_player]->get_parter()->getOutCardList()->deleteItem();
+
 	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1))
 	{
 		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+cur_player*25+outcard_place-1);

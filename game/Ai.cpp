@@ -1,4 +1,6 @@
 
+#include "NetRole.h"
+#include "RoundManager.h"
 #include "Ai.h"
 
 void Ai::_CollectResouce(HAH *res) {
@@ -15,8 +17,6 @@ void Ai::_CollectResouce(HAH *res) {
 
 void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	_CollectResouce(res);
 
 	_roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_hu_cards(target1,len1);
@@ -51,7 +51,6 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 	}
     
 	if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==INTERNET_PLAYER) {
-        LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
 		collect_resources(s_res,list1,list2,&len1,&len2);
 		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
 	}
@@ -81,7 +80,14 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 *************************************/
 Ai* Ai::_instance = NULL;
 
-Ai *Ai::GetInstance(RoundManager *roundManager) {
+Ai::Ai(RoundManager *roundManager) {
+    _roundManager = roundManager;
+}
+
+Ai::~Ai() {
+}
+
+Ai *Ai::getInstance(RoundManager *roundManager) {
     if (_instance==NULL) {
         _instance = new Ai(roundManager);
     }
@@ -89,7 +95,7 @@ Ai *Ai::GetInstance(RoundManager *roundManager) {
     return _instance;
 }
 
-void Ai::DestroyInstance() {
+void Ai::destroyInstance() {
     delete _instance;
     _instance = NULL;
 }

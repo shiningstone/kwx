@@ -24,6 +24,7 @@ typedef struct {
 
 class RoundManager {
     friend class NetRaceLayer;
+    friend class Ai;
 public:
     RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();

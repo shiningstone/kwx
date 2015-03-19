@@ -4,6 +4,7 @@
 
 #include "RaceType.h"
 
+class RoundManager;
 class Ai {
 public:
     void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);

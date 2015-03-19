@@ -43,10 +43,11 @@ private:
 
     LayerColor* myframe;
 
-    Sprite *_getCardInHand(int idx);
+    Sprite *_getCardInHand(PlayerDir_t dir,int idx);
     void    _reOrderCardsInHand(int droppedCard);
     void    _getCardsInfo(CardsInfo_t *info);
     int     _getChosenCard(int start,int end,Touch *touch);
+    TargetedAction *_othersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
 
     void create_residue_cards();
     void refresh_residue_cards();
