@@ -192,14 +192,7 @@ private:
 public:
 	int GoldAccountImmediate[3];
 
-    void _kouCardsRecordClear();
-    void _kouCardsRecordAdd(CARD_KIND kind, int idx[]);
-    bool _kouCardsRecordIncludes(CARD_KIND kind);
     int  _findCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
-
-	CARD kouCards_kind[4];
-	int Kou_kindLen;
-	int KouCardsPlace[4][3];
 
 	unsigned int VoiceId;
 	virtual void init_race_sequence(){};

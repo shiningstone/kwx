@@ -76,6 +76,53 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 }
 
 /*************************************
+        kou card info
+*************************************/
+void Ai::ClearKouCardInfo() {
+    memset(&_bufKouCards,0,sizeof(KouCardInfo_t));
+}
+
+void Ai::AddKouCardGroup(Card_t kind,int *idx) {
+    _bufKouCards.group[_bufKouCards.num].card.kind   = (CARD_KIND)kind;
+    _bufKouCards.group[_bufKouCards.num].card.status = c_KOU_ENABLE;
+
+    _bufKouCards.group[_bufKouCards.num].idxInHand[0] = idx[0];
+    _bufKouCards.group[_bufKouCards.num].idxInHand[1] = idx[1];
+    _bufKouCards.group[_bufKouCards.num].idxInHand[2] = idx[2];
+
+    _bufKouCards.num++;
+}
+
+bool Ai::IsKouCardInclude(Card_t kind) {
+    for(int i=0;i<_bufKouCards.num;i++) {
+        if(_bufKouCards.group[i].card.kind==kind) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int  Ai::KouCardGroupNum() {
+    return _bufKouCards.num;
+}
+
+int  Ai::KouCardIndex(int gIdx,int cIdx) {
+    return _bufKouCards.group[gIdx].idxInHand[cIdx];
+}
+
+CARD_STATUS Ai::KouCardStatus(int gIdx) {
+    return _bufKouCards.group[gIdx].card.status;
+}
+
+void Ai::SetKouCardStatus(int gIdx,CARD_STATUS status) {
+    _bufKouCards.group[gIdx].card.status = status;
+}
+
+Card_t Ai::KouCardKind(int gIdx) {
+    return (Card_t)_bufKouCards.group[gIdx].card.kind;
+}
+/*************************************
         singleton
 *************************************/
 Ai* Ai::_instance = NULL;
