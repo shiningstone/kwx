@@ -104,7 +104,7 @@ private:
 	float s_scale;
 	int s_no;
 	float residue_no_x,residue_no_y;
-	int premiumLeast;//底
+	const int PREMIUM_LEAST;   //底
 	/************************自己手牌全局变量**************************/
 	/************************自己手牌全局变量**************************/
 	/*if use*/
@@ -112,7 +112,7 @@ private:
 
 
 	bool ifGameStart;
-	bool ifResourcePrepared;
+	bool _isResoucePrepared;
 
 	bool ifTuoGuan;
 	int  touched;  //only used in waitfor_MyTouchShowCard

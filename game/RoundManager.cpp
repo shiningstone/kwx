@@ -229,6 +229,7 @@ int RoundManager::Shuffle() {
     _isGangHua = false;
     _isMyShowTime = false;
     _myChosenCard = INVALID;
+    _isTuoGuan = false;
     
     CancelEffectCard();
 

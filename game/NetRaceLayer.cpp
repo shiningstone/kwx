@@ -18,6 +18,7 @@ USING_NS_CC;
 /**************************/
 
 NetRaceLayer::NetRaceLayer()
+:PREMIUM_LEAST(200)
 {
 	s_scale=1.189;
 	s_no=1;
@@ -91,17 +92,7 @@ void NetRaceLayer::create_race()
     _roundManager->LoadPlayerInfo();
 	_roundManager->_isGameStart=false;
     
-	ifUpdateDuringEffect=false;
-	ifMingMybeError=false;
-	ifInsertCardsTime=false;
-	ifInsertStopped=false;
-	ifResourcePrepared=false;
-	ifTuoGuan=false;
-	ifMingTime=false;
-	ifEffectTime=false;
-    
-	premiumLeast=200;
-	distributeCardPos=Vec2::ZERO;
+	_isResoucePrepared=false;
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tools.plist");
@@ -200,7 +191,6 @@ bool NetRaceLayer::resource_prepare()
 
 void NetRaceLayer::startParticleSystem(float delta)
 {
-	
 	auto m_Smoke = ParticleSystemQuad::create("Smoke.plist");
 	m_Smoke->setBlendAdditive(true);
 	m_Smoke->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
@@ -248,10 +238,7 @@ void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-    		{
-                LOGGER_WRITE("%s",__FUNCTION__);
-                _roundManager->RecvPeng(curButton);
-    		}
+            _roundManager->RecvPeng(curButton);
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -300,11 +287,8 @@ void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-    		{
-                LOGGER_WRITE("%s",__FUNCTION__);
-                _roundManager->RecvHu(curButton);
-    			break;
-    		}
+            _roundManager->RecvHu(curButton);
+			break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
     		break;
@@ -339,10 +323,7 @@ void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-    		{
-                LOGGER_WRITE("%s",__FUNCTION__);
-                _roundManager->RecvGang(curButton);
-    		}
+            _roundManager->RecvGang(curButton);
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -364,16 +345,12 @@ void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-
-			curButton->setTouchEnabled(false);
-			curButton->_ID=1;
-			auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::qi_tip_effect));
-			curButton->runAction(Sequence::create(
-                ScaleTo::create(0.1,1),
-                effect,NULL));
-		}
+		curButton->setTouchEnabled(false);
+		curButton->_ID=1;
+		auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::qi_tip_effect));
+		curButton->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),
+            effect,NULL));
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		curButton->setScale(1);
@@ -801,7 +778,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
     LOGGER_WRITE("%s isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
 
 	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
-		if( ifTuoGuan ||
+		if( _roundManager->_isTuoGuan ||
                 (_roundManager->IsTing(_roundManager->_curPlayer) 
                 && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
 			int last = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
@@ -1118,7 +1095,7 @@ void NetRaceLayer::ListenToCardTouch() {
 void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
 {
     _roundManager->AllowMovement();
-	if( !_roundManager->IsTing(MIDDLE) && !ifTuoGuan ) {
+	if( !_roundManager->IsTing(MIDDLE) && !_roundManager->_isTuoGuan ) {
         ListenToCardTouch();
     }
 }
@@ -4277,7 +4254,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			}
 			else
 			{
-				if(ifTuoGuan)
+				if(_roundManager->_isTuoGuan)
 					_roundManager->_actionToDo=a_JUMP;
 				waitfor_myaction((PlayerDir_t)sender->_ID);
 				return;
@@ -4303,7 +4280,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
                 _roundManager->_isGangHua
             );
         
-		if(no==1&&ifTuoGuan)
+		if(no==1&&_roundManager->_isTuoGuan)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
 				action1=a_HU;
@@ -4354,7 +4331,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
                 _roundManager->_continue_gang_times,
                 _roundManager->_isGangHua
             );
-		if(no1==1&&ifTuoGuan)
+		if(no1==1&&_roundManager->_isTuoGuan)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
 				action2=a_HU;
@@ -4717,9 +4694,9 @@ void NetRaceLayer::start_callback()
 {
 	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tileImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
-	if(!ifResourcePrepared)
+	if(!_isResoucePrepared)
 	{
-		ifResourcePrepared=true;
+		_isResoucePrepared=true;
 		resource_prepare();
 	}
 
@@ -4752,15 +4729,15 @@ void NetRaceLayer::start_callback()
 	this->addChild(myframe,3,GAME_BKG_TAG_ID);
 
 	distributeCardPos=Vec2::ZERO;
-	_roundManager->_isGameStart=false;
 	ifUpdateDuringEffect=false;
 	ifMingMybeError=false;
 	ifInsertStopped=false;
 	ifInsertCardsTime=false;
 	ifEffectTime=false;
 	ifMingTime=false;
+	_roundManager->_isGameStart=false;
 	_roundManager->_lastActionSource=-1;
-	ifTuoGuan=false;
+	_roundManager->_isTuoGuan=false;
 	_roundManager->_isGangHua=false;
 	_roundManager->_lastAction=a_JUMP;
 	_roundManager->_lastActionWithGold=a_JUMP;
@@ -6802,7 +6779,7 @@ void NetRaceLayer::tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType 
 			TuoGuanButton->setHighlighted(false);
 			curButton->setTouchEnabled(false);
 			curButton->setScale(0);
-			ifTuoGuan=false;
+			_roundManager->_isTuoGuan=false;
 			auto StartSelfGame=CallFunc::create([=](){
 				if( !_roundManager->IsTing(1) )
 					waitfor_MyTouchShowCard();
@@ -6834,7 +6811,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
             
 			
 			_eventDispatcher->removeEventListenersForTarget(myframe,true);//???????
-			ifTuoGuan=true;
+			_roundManager->_isTuoGuan=true;
 			curButton->setTouchEnabled(false);
 			curButton->setHighlighted(true);
 
@@ -7416,25 +7393,25 @@ typedef enum {
 }GoldKind_t;
 
 void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
-    goldOfPlayer[winner]       = 4*premiumLeast*(_roundManager->_continue_gang_times);
-    goldOfPlayer[(winner+1)%3] = -2*premiumLeast*(_roundManager->_continue_gang_times);
-    goldOfPlayer[(winner+2)%3] = -2*premiumLeast*(_roundManager->_continue_gang_times);
+    goldOfPlayer[winner]       = 4*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+    goldOfPlayer[(winner+1)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+    goldOfPlayer[(winner+2)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
 }
 
 void NetRaceLayer::_CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]) {
     if (winner==loser) {
-        goldOfPlayer[winner]       = 2*premiumLeast*(_roundManager->_continue_gang_times);
-        goldOfPlayer[(winner+1)%3] = -1*premiumLeast*(_roundManager->_continue_gang_times);
-        goldOfPlayer[(winner+2)%3] = -1*premiumLeast*(_roundManager->_continue_gang_times);
+        goldOfPlayer[winner]       = 2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[(winner+1)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[(winner+2)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
     } else {
-        goldOfPlayer[winner]       =2*premiumLeast*(_roundManager->_continue_gang_times);
-        goldOfPlayer[loser]        =-2*premiumLeast*(_roundManager->_continue_gang_times);
+        goldOfPlayer[winner]       =2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[loser]        =-2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
     }
 }
 
 void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner) {
     auto score = _roundManager->_players[winner]->get_parter()->get_card_score();
-    goldOfPlayer[winner] = score*premiumLeast;
+    goldOfPlayer[winner] = score*PREMIUM_LEAST;
     
     if(_roundManager->_curPlayer==winner) {
         goldOfPlayer[(winner+1)%3] = -(goldOfPlayer[winner]/2);
@@ -7453,15 +7430,15 @@ void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int loser) {
         auto score = _roundManager->_players[(loser+i)%3]->get_parter()->get_card_score();
         int  ting  = _roundManager->IsTing((loser+i)%3);
 
-        goldOfPlayer[(loser+i)%3] = score*premiumLeast + score*premiumLeast*ting;
+        goldOfPlayer[(loser+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
     }
 
     goldOfPlayer[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
 }
 
 void NetRaceLayer::_CalcNoneWinGold(int goldOfPlayer[3], int loser) {
-    GoldAccountImmediate[(loser+1)%3] = premiumLeast;
-    GoldAccountImmediate[(loser+2)%3] = premiumLeast;
+    GoldAccountImmediate[(loser+1)%3] = PREMIUM_LEAST;
+    GoldAccountImmediate[(loser+2)%3] = PREMIUM_LEAST;
     GoldAccountImmediate[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
 }
 
