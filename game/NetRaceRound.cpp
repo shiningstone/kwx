@@ -686,7 +686,7 @@ unsigned int NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KI
 	return 0;
 }
 
-int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex)
+int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 {
 	CARD temp_list[MAX_HANDIN_NUM];
 	CARD_KIND temp_list2[MAX_HANDIN_NUM];
@@ -723,7 +723,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex
 		int index;
 		for(int a=0;a<j;a++)
 		{
-			if(temp_list[a].kind==RototHandOutIndex)
+			if(temp_list[a].kind==otherHandedOut)
 			{
 				index=a;
 				break;

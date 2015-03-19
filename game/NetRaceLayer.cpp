@@ -551,66 +551,6 @@ void NetRaceLayer::ListenToTingButton()
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
 }
 
-TargetedAction *NetRaceLayer::ShowBigMing(Node *myframe) {
-    auto damingFont = Sprite::createWithSpriteFrameName("daming.png");
-    
-    damingFont->setAnchorPoint(Vec2(0.5,0.5));
-    damingFont->setOpacity(0);
-    damingFont->setPosition(_layout->PositionOfMingSign());
-
-    myframe->addChild(damingFont,31,MING_EFFECT_DAMING);
-
-    return TargetedAction::create(damingFont,Sequence::create(
-        FadeIn::create(0.18),
-        DelayTime::create(0.36),Spawn::create(
-        FadeOut::create(0.18),
-        ScaleTo::create(0.18,1.2),NULL),NULL));
-}
-
-TargetedAction* NetRaceLayer::MingAnimation() {
-    
-
-    _eventDispatcher->removeEventListenersForTarget(myframe,true);
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
-    
-    while(myframe->getChildByTag(MING_EFFECT_DAMING))
-        myframe->removeChildByTag(MING_EFFECT_DAMING);
-    
-    while(myframe->getChildByTag(MING_EFFECT_ANIMATE))
-        myframe->removeChildByTag(MING_EFFECT_ANIMATE);
-    
-    auto mingSign=Sprite::createWithSpriteFrameName("ming_1.png");
-        mingSign->setAnchorPoint(Vec2(0.5,0.5));
-        mingSign->setScale(0);
-        mingSign->setPosition(_layout->Center());
-
-    myframe->addChild(mingSign,30,MING_EFFECT_ANIMATE);
-    
-    auto MingAnimate = Animation::create();
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_1.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_2.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_3.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_4.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_5.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_6.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_7.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_8.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_9.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_10.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_11.png"));
-        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_12.png"));
-        MingAnimate->setDelayPerUnit(0.1f);
-        MingAnimate->setRestoreOriginalFrame(true);
-    
-    auto mingEffectTarget = TargetedAction::create(
-        mingSign,Sequence::create(
-            ScaleTo::create(0,2),
-            Animate::create(MingAnimate),
-            ScaleTo::create(0,0),NULL));
-
-    return mingEffectTarget;
-}
-
 void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 {
     LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
@@ -666,8 +606,8 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
 
 		allEffect = Spawn::create(
-            ShowBigMing(myframe),
-            MingAnimation(),TargetedAction::create(
+            _ShowBigMing(myframe),
+            _MingAnimation(),TargetedAction::create(
             cardOut,Sequence::create(Spawn::create(
                 bizerMotion,
                 speakCard,NULL),
@@ -1070,51 +1010,22 @@ void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（�
 
 void NetRaceLayer::waitfor_ShowCardWithoutTouch()
 {
-    if ( _roundManager->_curPlayer==1 ) {
+    if ( _roundManager->_curPlayer==1 ) {/* this should never happen */
         return;
     }
 
     LOGGER_WRITE("%s (player=%d)",__FUNCTION__,_roundManager->_curPlayer);
-    /*******************
-        robot action 
-    *******************/
-    HAH *s_res = new HAH;
-	int index;
-    
-	CARD_KIND list1[9];
-	CARD_KIND list2[9];
-	int len1;
-	int len2;
-    
-	if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT) {
-		_ai->collect_resources(s_res,list1,list2,&len1,&len2);
-		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
-	}
-    
-	if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==INTERNET_PLAYER) {
-        LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
-		_ai->collect_resources(s_res,list1,list2,&len1,&len2);
-		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
-	}
 
-    if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-		index = _roundManager->_players[_roundManager->_curPlayer]->chose_card(
-            s_res,TOTAL_CARD_NUM - _roundManager->_distributedNum,list1,list2,len1,len2);
-
-		if( index==-1 || index>_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1 ) {
-			index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
-		}
+    bool canKou = false;
+	int index = _ai->ChooseWorstCard(canKou);
+    
+    if ( canKou ) {
+        _roundManager->_otherHandedOut = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
         
-		if(s_res->hu_nums>=6 && _roundManager->_actionToDo==a_MING && 
-        !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-			RototHandOutIndex = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
-
-			KouCardsCheck(_roundManager->_curPlayer);
-			if(Kou_kindLen>0)
-				ming_kou_Choose(_roundManager->_curPlayer);
-		}
-	} else
-		index = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+        KouCardsCheck(_roundManager->_curPlayer);
+        if(Kou_kindLen>0)
+            ming_kou_Choose(_roundManager->_curPlayer);
+    }
 
     _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index]);
 	_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
@@ -1122,7 +1033,6 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
     /*******************
         effect 
     *******************/
-    
     int curPlayer = _roundManager->_curPlayer;
     
 	auto smallCard = _object->CreateKind((Card_t)_roundManager->_lastHandedOutCard,SMALL);
@@ -3568,8 +3478,9 @@ void NetRaceLayer::KouCardsCheck(int no)
         
         if( !_kouCardsRecordIncludes(curKind) ) {
             int cardIdx[4] = {-1,-1,-1,-1};
+            
             if(_findCards(cardIdx, list, curKind)==3 
-                &&_roundManager->_players[no]->get_parter()->judge_kou_cards(curKind,no,RototHandOutIndex)) {
+                &&_roundManager->_players[no]->get_parter()->judge_kou_cards(curKind,no,_roundManager->_otherHandedOut)) {
                 
                 _kouCardsRecordAdd(curKind,cardIdx);
                 
@@ -3678,7 +3589,7 @@ void NetRaceLayer::ListenToKou(int no) {
         for( a=0; a<Kou_kindLen; a++ ) {
             if(kouCards_kind[a].status!=c_MING_KOU) {
                 if(_roundManager->_players[1]->get_parter()->judge_kou_cards(
-                    kouCards_kind[a].kind, no, RototHandOutIndex))
+                    kouCards_kind[a].kind, no, _roundManager->_otherHandedOut))
                 {
                     cards->data[KouCardsPlace[a][0]].status=c_KOU_ENABLE;
                     cards->data[KouCardsPlace[a][1]].status=c_KOU_ENABLE;
@@ -3733,8 +3644,6 @@ void NetRaceLayer::ListenToKou(int no) {
 void NetRaceLayer::ming_kou_Choose(int no)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-
-	
     
 	if(no==1) {
         auto kouCancel = _object->CreateKouCancelButton();
@@ -3756,7 +3665,7 @@ void NetRaceLayer::ming_kou_Choose(int no)
 		for(int a=0;a<Kou_kindLen;a++)
 		{
 			if(_roundManager->_players[no]->get_parter()->judge_kou_cards(
-                kouCards_kind[a].kind,no,RototHandOutIndex))
+                kouCards_kind[a].kind,no,_roundManager->_otherHandedOut))
 			{
 				for(int b=0;b<3;b++)
 				{
@@ -4714,7 +4623,7 @@ void NetRaceLayer::start_callback()
 
     int lastWinner = _roundManager->GetLastWinner();
 	_roundManager->_curPlayer=lastWinner;
-	RototHandOutIndex=ck_NOT_DEFINED;
+	_roundManager->_otherHandedOut=ck_NOT_DEFINED;
 	_roundManager->_qiangGangTargetNo=-1;
 
     _roundManager->_cardHolders[1]->_isReady = true;
@@ -8000,190 +7909,70 @@ void NetRaceLayer::_reOrderCardsInHand(int droppedCard) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-/****************************************************
-    trash
-****************************************************/
-#ifdef TRASH
-    void NetRaceLayer::_GuiJinBiShowMe(int gold) {
-        Size size   = Director::getInstance()->getVisibleSize();
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
+TargetedAction *NetRaceLayer::_ShowBigMing(Node *myframe) {
+    auto damingFont = Sprite::createWithSpriteFrameName("daming.png");
     
-        char str[15];
-        sprintf(str,"%d",abs(gold));
-        auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-        number->setAnchorPoint(_layout->AnchorOfNumber(1));
-        number->setOpacity(0);
-        number->setPosition(_layout->PositionOfNumber(1));
-        this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
+    damingFont->setAnchorPoint(Vec2(0.5,0.5));
+    damingFont->setOpacity(0);
+    damingFont->setPosition(_layout->PositionOfMingSign());
+
+    myframe->addChild(damingFont,31,MING_EFFECT_DAMING);
+
+    return TargetedAction::create(damingFont,Sequence::create(
+        FadeIn::create(0.18),
+        DelayTime::create(0.36),Spawn::create(
+        FadeOut::create(0.18),
+        ScaleTo::create(0.18,1.2),NULL),NULL));
+}
+
+TargetedAction* NetRaceLayer::_MingAnimation() {
+    _eventDispatcher->removeEventListenersForTarget(myframe,true);
     
-        auto minus = Sprite::create("-.png");
-        minus->setAnchorPoint(_layout->AnchorOfSign(1));
-        minus->setPosition(_layout->PositionOfSign(1));
-        minus->setOpacity(0);
-        this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ming-tx.plist");
     
-        auto plus=Sprite::create("+.png");
-        plus->setAnchorPoint(_layout->AnchorOfSign(1));
-        plus->setPosition(_layout->PositionOfSign(1));
-        plus->setOpacity(0);
-        this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
-        
-        auto jinbi=Sprite::create("jinbi-game.png");
-        jinbi->setAnchorPoint(_layout->AnchorOfGold(1));
-        jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->PositionOfGold(1));
-        this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
+    while(myframe->getChildByTag(MING_EFFECT_DAMING))
+        myframe->removeChildByTag(MING_EFFECT_DAMING);
     
-        if( gold!=0 ) {
-            jinbi->runAction(Sequence::create(
-                DelayTime::create(0),
-                Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfGold(1)),NULL),
+    while(myframe->getChildByTag(MING_EFFECT_ANIMATE))
+        myframe->removeChildByTag(MING_EFFECT_ANIMATE);
+    
+    auto mingSign=Sprite::createWithSpriteFrameName("ming_1.png");
+        mingSign->setAnchorPoint(Vec2(0.5,0.5));
+        mingSign->setScale(0);
+        mingSign->setPosition(_layout->Center());
+
+    myframe->addChild(mingSign,30,MING_EFFECT_ANIMATE);
+    
+    auto MingAnimate = Animation::create();
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_1.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_2.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_3.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_4.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_5.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_6.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_7.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_8.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_9.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_10.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_11.png"));
+        MingAnimate->addSpriteFrame(SpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName("ming_12.png"));
+        MingAnimate->setDelayPerUnit(0.1f);
+        MingAnimate->setRestoreOriginalFrame(true);
+    
+    return TargetedAction::create(
+            mingSign,Sequence::create(
+                ScaleTo::create(0,2),
+                Animate::create(MingAnimate),
                 ScaleTo::create(0,0),NULL));
-            number->runAction(Sequence::create(
-                DelayTime::create(0),
-                Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfNumber(1)),NULL),
-                ScaleTo::create(0,0),NULL));
-            if(gold>0) {
-                plus->runAction(Sequence::create(
-                    DelayTime::create(0),
-                    Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(1)),NULL),
-                    ScaleTo::create(0,0),NULL));
-            } else {
-                minus->runAction(Sequence::create(
-                    DelayTime::create(0),
-                    Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(1)),NULL),
-                    ScaleTo::create(0,0),NULL));
-            }   
-        }
-    }
-    
-    void NetRaceLayer::_GuiJinBiShowLeft(int gold) {
-        Size size   = Director::getInstance()->getVisibleSize();
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
-        char str[15];
-        sprintf(str,"%d",abs(gold));
-        auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-        number->setAnchorPoint(_layout->AnchorOfNumber(0));
-        number->setOpacity(0);
-        number->setPosition(_layout->PositionOfNumber(0));
-        this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
-    
-        auto minus=Sprite::create("-.png");
-        minus->setAnchorPoint(_layout->AnchorOfSign(0));
-        minus->setPosition(_layout->PositionOfSign(0));
-        minus->setOpacity(0);
-        this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
-    
-        auto plus=Sprite::create("+.png");
-        plus->setAnchorPoint(_layout->AnchorOfSign(0));
-        plus->setPosition(_layout->PositionOfSign(0));
-        plus->setOpacity(0);
-        this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
-    
-        auto jinbi=Sprite::create("jinbi-game.png");
-        jinbi->setAnchorPoint(_layout->AnchorOfGold(0));
-        jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->PositionOfGold(0));
-        this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
-    
-        if( gold!=0 ) {
-            jinbi->runAction(Sequence::create(
-                DelayTime::create(0),
-                Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfGold(0)),NULL),
-                ScaleTo::create(0,0),NULL));
-            number->runAction(Sequence::create(
-                DelayTime::create(0),
-                Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfNumber(0)),NULL),
-                ScaleTo::create(0,0),NULL));
-            if(gold>0) {
-                plus->runAction(Sequence::create(
-                    DelayTime::create(0),
-                    Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(0)),NULL),
-                    ScaleTo::create(0,0),NULL));
-            } else {
-                minus->runAction(Sequence::create(
-                    DelayTime::create(0),
-                    Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(0)),NULL),
-                    ScaleTo::create(0,0),NULL));
-            }
-        }
-    }
-    
-    void NetRaceLayer::_GuiJinBiShowRight(int gold) {
-        Size size = Director::getInstance()->getVisibleSize();
-        Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
-        char str[15];
-        sprintf(str,"%d",abs(gold));
-        auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-        number->setAnchorPoint(_layout->AnchorOfNumber(2));
-        number->setOpacity(0);
-        number->setPosition(_layout->PositionOfNumber(2));
-        this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
-    
-        int xoffset = number->getContentSize().width;
-        
-        auto minus=Sprite::create("-.png");
-        minus->setAnchorPoint(_layout->AnchorOfSign(2));
-        minus->setPosition(_layout->PositionOfSign(2,xoffset));
-        minus->setOpacity(0);
-        this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
-    
-        auto plus=Sprite::create("+.png");
-        plus->setAnchorPoint(_layout->AnchorOfSign(2));
-        plus->setPosition(_layout->PositionOfSign(2,xoffset));
-        plus->setOpacity(0);
-        this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
-    
-        auto jinbi=Sprite::create("jinbi-game.png");
-        jinbi->setAnchorPoint(_layout->AnchorOfGold(2));
-        jinbi->setOpacity(0);
-        jinbi->setPosition(_layout->PositionOfGold(2,xoffset));
-        this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
-    
-        if( gold!=0 ) {
-            jinbi->runAction(Sequence::create(
-                DelayTime::create(0),
-                Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfGold(2,xoffset)),NULL),
-                ScaleTo::create(0,0),NULL));
-            number->runAction(Sequence::create(
-                DelayTime::create(0),
-                Spawn::create(FadeIn::create(1.5),
-                MoveTo::create(1.5,_layout->DestOfNumber(2)),NULL),
-                ScaleTo::create(0,0),NULL));
-            if(gold>0) {
-                plus->runAction(Sequence::create(
-                    DelayTime::create(0),
-                    Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(2,xoffset)),NULL),
-                    ScaleTo::create(0,0),NULL));
-            } else {
-                minus->runAction(Sequence::create(
-                    DelayTime::create(0),
-                    Spawn::create(FadeIn::create(1.5),
-                    MoveTo::create(1.5,_layout->DestOfSign(2,xoffset)),NULL),
-                    ScaleTo::create(0,0),NULL));
-            }
-        }
-    }
-#endif
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -47,7 +47,7 @@ private:
     int cards_stable(CARD_KIND clist[],int len);
     long cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     int cal_times(CARD_KIND kind,CARD_KIND data[],int len);
-	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND RototHandOutIndex);
+	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
     int hu_check(CARD_KIND data_kind); //0:not 1:hu
     unsigned int ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);

@@ -76,6 +76,7 @@ public:
     bool _isMyShowTime;
     int  _myChosenCard;
     bool _isTuoGuan;
+    Card_t _otherHandedOut;
     
     int  Shuffle();
     int  NotifyStart();

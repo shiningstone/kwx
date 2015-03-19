@@ -34,6 +34,48 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
     }
 }
 
+int Ai::ChooseWorstCard(bool &kouRequest) {
+    HAH *s_res = new HAH;
+	int index;
+    
+	CARD_KIND list1[9];
+	CARD_KIND list2[9];
+	int len1;
+	int len2;
+
+    kouRequest = false;
+    
+	if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT) {
+		collect_resources(s_res,list1,list2,&len1,&len2);
+		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
+	}
+    
+	if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==INTERNET_PLAYER) {
+        LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+		collect_resources(s_res,list1,list2,&len1,&len2);
+		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
+	}
+
+    if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
+		index = _roundManager->_players[_roundManager->_curPlayer]->chose_card(
+            s_res,TOTAL_CARD_NUM - _roundManager->_distributedNum,list1,list2,len1,len2);
+
+		if( index==-1 || index>_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1 ) {
+			index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+		}
+        
+		if(s_res->hu_nums>=6 
+            && _roundManager->_actionToDo==a_MING 
+            && !_roundManager->IsTing(_roundManager->_curPlayer) ) {
+			kouRequest = true;
+		}
+	} else {
+		index = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+    }
+
+    return index;
+}
+
 /*************************************
         singleton
 *************************************/

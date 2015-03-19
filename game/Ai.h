@@ -7,6 +7,7 @@
 class Ai {
 public:
     void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);
+    int  ChooseWorstCard(bool &kouRequest);
 
 private:
     RoundManager *_roundManager;

@@ -230,6 +230,7 @@ int RoundManager::Shuffle() {
     _isMyShowTime = false;
     _myChosenCard = INVALID;
     _isTuoGuan = false;
+    _otherHandedOut = CARD_UNKNONW;
     
     CancelEffectCard();
 
