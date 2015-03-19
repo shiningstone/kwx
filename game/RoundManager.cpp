@@ -467,3 +467,24 @@ void RoundManager::RecvGang(Button *curButton) {
 	}
 }
 
+void RoundManager::StartGame() {
+    _uiManager = NetRaceLayer::create();
+}
+/*************************************
+        singleton
+*************************************/
+RoundManager* RoundManager::_instance = NULL;
+
+RoundManager *RoundManager::getInstance() {
+    if (_instance==NULL) {
+        _instance = new RoundManager(NULL);
+    }
+
+    return _instance;
+}
+
+void RoundManager::destroyInstance() {
+    delete _instance;
+    _instance = NULL;
+}
+

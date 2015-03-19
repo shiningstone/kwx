@@ -15,13 +15,10 @@ private:
     
     void _CollectResouce(HAH *res);
 
-/***************************************
-        singleton
-***************************************/
+/*************************************
+        kou card info
+*************************************/
 public:
-    static Ai *getInstance(RoundManager *roundManager);
-    static void  destroyInstance();
-
     void ClearKouCardInfo();
     void AddKouCardGroup(Card_t kind,int *idx);
     bool IsKouCardInclude(Card_t kind);
@@ -30,15 +27,25 @@ public:
     CARD_STATUS  KouCardStatus(int gIdx);
     void SetKouCardStatus(int gIdx,CARD_STATUS status);
     Card_t KouCardKind(int gIdx);
+    void KouCardCheck(PlayerDir_t dir);
+    int  _FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
+
+    void MingKouChoose(PlayerDir_t dir);
+/***************************************
+        singleton
+***************************************/
+public:
+    static Ai *getInstance(RoundManager *roundManager);
+    static void  destroyInstance();
 protected:
     Ai(RoundManager *roundManager);
     ~Ai();
 
     static Ai *_instance;
+/*************************************
+        kou card info
+*************************************/
 private:
-    /*************************************
-            kou card info
-    *************************************/
     typedef struct {
         CARD card;
         int  idxInHand[3];

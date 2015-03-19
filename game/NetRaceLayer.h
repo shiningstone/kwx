@@ -43,11 +43,11 @@ private:
 
     LayerColor* myframe;
 
-    Sprite *_getCardInHand(PlayerDir_t dir,int idx);
-    void    _reOrderCardsInHand(int droppedCard);
-    void    _getCardsInfo(CardsInfo_t *info);
-    int     _getChosenCard(int start,int end,Touch *touch);
-    TargetedAction *_othersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
+    Sprite *_GetCardInHand(PlayerDir_t dir,int idx);
+    void    _ReOrderCardsInHand(int droppedCard);
+    void    _GetCardsInfo(CardsInfo_t *info);
+    int     _ChooseCard(int start,int end,Touch *touch);
+    TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
 
     void create_residue_cards();
     void refresh_residue_cards();
@@ -192,8 +192,6 @@ private:
 public:
 	int GoldAccountImmediate[3];
 
-    int  _findCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
-
 	unsigned int VoiceId;
 	virtual void init_race_sequence(){};
 	/*##############################
@@ -248,11 +246,10 @@ public:
 	void raceAccount(float delta);
 	void set_aims_sequence(const int p_aim[]);
 
-	void ming_kou_Choose(int no);
+	void waitfor_MingKouChoose(int no);
 	void KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void KouCardsCheck(int no);
 	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
 	void update_residue_TingCards(int no);

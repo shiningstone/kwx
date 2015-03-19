@@ -122,6 +122,58 @@ void Ai::SetKouCardStatus(int gIdx,CARD_STATUS status) {
 Card_t Ai::KouCardKind(int gIdx) {
     return (Card_t)_bufKouCards.group[gIdx].card.kind;
 }
+
+void Ai::KouCardCheck(PlayerDir_t dir) {
+	CARD_ARRAY *list = _roundManager->_players[dir]->get_parter()->get_card_list();
+
+	ClearKouCardInfo();
+        
+	for(int i=list->atcvie_place; i<list->len; i++){
+	    auto curKind = list->data[i].kind;
+        
+        if( !IsKouCardInclude((Card_t)curKind) ) {
+            int cardIdx[4] = {-1,-1,-1,-1};
+            
+            if(_FindCards(cardIdx, list, curKind)==3 
+                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(curKind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+                
+                AddKouCardGroup((Card_t)curKind,cardIdx);
+                
+                list->data[cardIdx[0]].status=c_KOU_ENABLE;
+                list->data[cardIdx[1]].status=c_KOU_ENABLE;
+                list->data[cardIdx[2]].status=c_KOU_ENABLE;
+            }
+        }
+	}
+}
+
+int Ai::_FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind) {
+    int num = 0;
+    
+    for(int i=list->atcvie_place; i<list->len; i++) {   
+        if(list->data[i].kind==kind) {
+            idx[num++] = i;
+        }
+    }
+
+    return num;
+}
+
+void Ai::MingKouChoose(PlayerDir_t dir) {
+	auto list=_roundManager->_players[dir]->get_parter()->get_card_list();
+    
+	for(int i=0;i<KouCardGroupNum();i++)
+	{
+		if(_roundManager->_players[dir]->get_parter()->judge_kou_cards(
+            (CARD_KIND)KouCardKind(i),dir,(CARD_KIND)_roundManager->_otherHandedOut))
+		{
+			for(int b=0;b<3;b++)
+			{
+				list->data[KouCardIndex(i,b)].status=c_MING_KOU;
+			}
+		}
+	}
+}
 /*************************************
         singleton
 *************************************/

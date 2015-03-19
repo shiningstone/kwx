@@ -26,13 +26,18 @@ class RoundManager {
     friend class NetRaceLayer;
     friend class Ai;
 public:
+    static RoundManager *getInstance();
+    static void  destroyInstance();
+
     RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();
 
     void RecvPeng(Button *curButton);
     void RecvHu(Button *curButton);
     void RecvGang(Button *curButton);
+    
     NetRaceLayer *_uiManager;
+    NetRaceLayer *_raceLayer;
     
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
@@ -88,7 +93,11 @@ public:
     bool WaitForAction();
 
     int FindGangCards(int dir,int cards[4],Card_t target=CARD_UNKNONW);
+
+    /* main process */
+    void StartGame();
 private:
+    static RoundManager *_instance;
     Logger *_logger;
 
     WinInfo_t   _lastWin;
