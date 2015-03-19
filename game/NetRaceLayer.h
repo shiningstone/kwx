@@ -15,6 +15,7 @@ using namespace CocosDenshion;
 #include "./../multimedia/GameLayout.h"
 #include "./../multimedia/GraphicObject.h"
 #include "./../multimedia/GraphicEffect.h"
+#include "Ai.h"
 #include "DataBase.h"
 
 class RoundManager;
@@ -29,6 +30,7 @@ protected:
     GameLayout     *_layout;
     GraphicEffect  *_effect;
     GObjectFactory *_object;
+    Ai             *_ai;
 private:
     typedef struct {
         CARD_ARRAY *list;
@@ -175,7 +177,6 @@ private:
 	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);
 	BezierTo* BizerMove2(outCardList* outCard,Vec2 location,int time);
 	BezierTo* OthersBizerMove(int no,outCardList* outCard);
-	void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);
     Vec2 _getLastCardPosition(PlayerDir_t dir) ;
 	void call_distribute_card();
 	void distribute_card_effect();
