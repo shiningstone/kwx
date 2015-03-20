@@ -75,6 +75,15 @@ typedef enum {
      MENUBTN_GAMEBACK,
 
      BTN_START,
+
+     BTN_CANCEL,
+     BTN_OK,
+
+     BTN_QI,
+     BTN_HU,
+     BTN_MING,
+     BTN_GANG,
+     BTN_PENG,
 }MenuButtonId_t;
 
 class GObjectFactory {
@@ -121,20 +130,8 @@ public:
 
     Sprite *CreateRiverCard(PlayerDir_t dir,Card_t kind);
     /* button */
-    Button *CreateKouCancelButton();
-    Button *CreateKouConfirmButton();
-    Button *CreateMingCancelButton();
-    Button *CreateQiButton(const Vec2 &position);
-    Sprite *CreateQiBkg(const Vec2 &position);
-    Button *CreateHuButton(const Vec2 &position);
-    Sprite *CreateHuBkg(const Vec2 &position);
-    Button *CreateMingButton(const Vec2 &position);
-    Sprite *CreateMingBkg(const Vec2 &position);
-    Button *CreateGangButton(const Vec2 &position);
-    Sprite *CreateGangBkg(const Vec2 &position);
-    Button *CreatePengButton(const Vec2 &position);
-    Sprite *CreatePengBkg(const Vec2 &position);
-    
+    Button *CreateButton(MenuButtonId_t action,const Vec2 &position);
+    Button *CreateBtnBkg(MenuButtonId_t action,const Vec2 &position);
 protected:
     static float SCALE;
 

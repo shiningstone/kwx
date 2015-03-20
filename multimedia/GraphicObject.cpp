@@ -228,9 +228,38 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
             button->setAnchorPoint(Vec2(0.5,0.5));
             button->setPosition(Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2));
             return button; 
+
+        case BTN_CANCEL:
+        case BTN_OK:
+            char *file[] = {
+                "quxiao.png",
+                "wancheng.png",
+            };
+            int offset = id - BTN_CANCEL;
+            
+            auto ChooseEnsure=Button::create(file[offset],file[offset],file[offset],UI_TEX_TYPE_PLIST);
+            ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
+            ChooseEnsure->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));
+            return ChooseEnsure;
     }
 }
 
+Button *GObjectFactory::CreateButton(MenuButtonId_t action,const Vec2 &position) {
+    char *file[] = {
+        "qi.png",
+        "hu1.png",
+        "ming.png",
+        "gang1.png",
+        "peng1.png",
+    };
+    int offset = action - BTN_QI;
+    
+    auto btn = Button::create(file[offset],file[offset],file[offset],UI_TEX_TYPE_PLIST);
+    btn->_ID = dir;
+    btn->setAnchorPoint(Vec2(0.5,0.5));
+    btn->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));
+    return btn;
+}
 
 Sprite *GObjectFactory::CreateHeadBkg(PlayerDir_t dir) {
     Sprite *sprite;
@@ -653,112 +682,21 @@ Sprite *GObjectFactory::_image(const char *file) {
 /*************************************
     action buttons
 *************************************/
-Button *GObjectFactory::CreateKouCancelButton() {
-    auto ChooseCancel = Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-    ChooseCancel->setAnchorPoint(Vec2(0.5,0.5));
-    ChooseCancel->setPosition(Vec2(ORIGIN.x+SIZE.width*0.15,ORIGIN.y+SIZE.height*0.25));
-    return ChooseCancel;
-}
-
-Button *GObjectFactory::CreateMingCancelButton() {
-    auto MingCancel=Button::create("quxiao.png","quxiao.png","quxiao.png",UI_TEX_TYPE_PLIST);
-    MingCancel->setAnchorPoint(Vec2(0.5,0.5));
-    MingCancel->setPosition(Vec2(ORIGIN.x+SIZE.width*0.15,ORIGIN.y+SIZE.height*0.25));
-    return MingCancel;
-}
-
-Button *GObjectFactory::CreateKouConfirmButton() {
-    auto ChooseEnsure=Button::create("wancheng.png","wancheng.png","wancheng.png",UI_TEX_TYPE_PLIST);
-    ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
-    ChooseEnsure->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));
-    return ChooseEnsure;
-}
-
-Button *GObjectFactory::CreateQiButton(const Vec2 &position) {
-    auto qi = Button::create("qi.png","qi.png","qi.png",UI_TEX_TYPE_PLIST);
-    qi->setAnchorPoint(Vec2(0.5,0.5));
-    qi->setPosition(position);
-
-    return qi;
-}
-
-Sprite *GObjectFactory::CreateQiBkg(const Vec2 &position) {
-    auto qiBkg = _image("qi.png");
-    qiBkg->setAnchorPoint(Vec2(0.5,0.5));
-    qiBkg->setOpacity(150);
-    qiBkg->setPosition(position);
-    qiBkg->setScale(0);
-
-    return qiBkg;
-}
-
-Button *GObjectFactory::CreateHuButton(const Vec2 &position) {
-    auto button = Button::create("hu1.png","hu1.png","hu1.png",UI_TEX_TYPE_PLIST);
-    button->setAnchorPoint(Vec2(0.5,0.5));
-    button->setPosition(position);
-
-    return button;
-}
-
-Sprite *GObjectFactory::CreateHuBkg(const Vec2 &position) {
-    auto bkg = _image("hu1.png");
+Button *GObjectFactory::CreateBtnBkg(MenuButtonId_t action,const Vec2 &position) {
+    char *file[] = {
+        "qi.png",
+        "hu1.png",
+        "ming.png",
+        "gang1.png",
+        "peng1.png",
+    };
+    int offset = action - BTN_QI;
+    
+    auto bkg = _image(file[offset]);
+    
     bkg->setAnchorPoint(Vec2(0.5,0.5));
     bkg->setOpacity(150);
-    bkg->setPosition(position);  
-    bkg->setScale(0);
-
-    return bkg;
-}
-
-Button *GObjectFactory::CreateMingButton(const Vec2 &position) {
-    auto button = Button::create("ming.png","ming.png","ming.png",UI_TEX_TYPE_PLIST);
-    button->setAnchorPoint(Vec2(0.5,0.5));
-    button->setPosition(position);
-
-    return button;
-}
-
-Sprite *GObjectFactory::CreateMingBkg(const Vec2 &position) {
-    auto bkg = _image("ming.png");
-    bkg->setAnchorPoint(Vec2(0.5,0.5));
-    bkg->setOpacity(150);
-    bkg->setPosition(position);  
-    bkg->setScale(0);
-
-    return bkg;
-}
-
-Button *GObjectFactory::CreateGangButton(const Vec2 &position) {
-    auto button = Button::create("gang1.png","gang1.png","gang1.png",UI_TEX_TYPE_PLIST);
-    button->setAnchorPoint(Vec2(0.5,0.5));
-    button->setPosition(position);
-
-    return button;
-}
-
-Sprite *GObjectFactory::CreateGangBkg(const Vec2 &position) {
-    auto bkg = _image("gang1.png");
-    bkg->setAnchorPoint(Vec2(0.5,0.5));
-    bkg->setOpacity(150);
-    bkg->setPosition(position);  
-    bkg->setScale(0);
-
-    return bkg;
-}
-
-Button *GObjectFactory::CreatePengButton(const Vec2 &position) {
-    auto button = Button::create("peng1.png","peng1.png","peng1.png",UI_TEX_TYPE_PLIST);
-    button->setAnchorPoint(Vec2(0.5,0.5));
-    button->setPosition(position);
-
-    return button;
-}
-
-Sprite *GObjectFactory::CreatePengBkg(const Vec2 &position) {
-    auto bkg = _image("peng1.png");
-    bkg->setAnchorPoint(Vec2(0.5,0.5));
-    bkg->setOpacity(150);
-    bkg->setPosition(position);  
+    bkg->setPosition(position);
     bkg->setScale(0);
 
     return bkg;
