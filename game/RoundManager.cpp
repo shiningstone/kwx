@@ -224,12 +224,14 @@ int RoundManager::Shuffle() {
     _isWaitDecision = false;
     _isGangHua = false;
     _isMyShowTime = false;
-    _myChosenCard = INVALID;
     _isTuoGuan = false;
     _otherHandedOut = CARD_UNKNONW;
     
     CancelEffectCard();
+    _isMingTime = false;
 
+	_actionToDo=a_JUMP;
+	_continue_gang_times=0;
     _lastAction = INVALID;
     _lastActionWithGold = INVALID;
     _lastActionSource = INVALID;

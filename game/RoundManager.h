@@ -71,6 +71,7 @@ public:
     void SetEffectCard(int kind,int status);
     bool IsCurEffectCard(Card card);
 
+    bool _isMingTime;
     int  _tempActionToDo;
     int  _actionToDo;
         
@@ -80,7 +81,6 @@ public:
     int  _lastActionSource;
 
     bool _isMyShowTime;
-    int  _myChosenCard;
     bool _isTuoGuan;
     Card_t _otherHandedOut;
     

@@ -121,8 +121,10 @@ private:
 	bool _isResoucePrepared;
 
 	bool ifTuoGuan;
+    
 	int  touched;  //only used in waitfor_MyTouchShowCard
 	bool ifChosed;   //only used in waitfor_MyTouchShowCard
+    int  _myChosenCard;
 
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;
@@ -132,7 +134,6 @@ private:
 	bool ifEndGameChoose;//ÊÇ·ñÍË³öÓÎÏ·
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
-	bool ifMingTime;
 	bool ifMingMybeError;
 	//bool ifMyTime;
 	//bool ifTriangleHintEnable;
