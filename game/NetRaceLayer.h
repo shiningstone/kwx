@@ -46,8 +46,12 @@ private:
     Sprite *_GetCardInHand(PlayerDir_t dir,int idx);
     void    _ReOrderCardsInHand(int droppedCard);
     void    _GetCardsInfo(CardsInfo_t *info);
-    int     _ChooseCard(int start,int end,Touch *touch);
+    int     _FindCard(int start,int end,Touch *touch);
     TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
+    
+    void DoubleWin(const WinInfo_t &win);
+    void SingleWin(const WinInfo_t &win);
+    void _OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers);
 
     void create_residue_cards();
     void refresh_residue_cards();

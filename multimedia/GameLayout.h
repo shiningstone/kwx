@@ -22,7 +22,7 @@ class GameLayout {
         /*************************************
             head image
         *************************************/
-        Vec2 AnchorOfHeadBkg(int dir);
+        Vec2 AnchorOfHeadBkg(PlayerDir_t dir);
         void SetPlayerBkg(PlayerDir_t id, Sprite *bkg);
         /*these should be private finally*/
         cocos2d::Sprite *_playerBkg[3];
@@ -39,28 +39,28 @@ class GameLayout {
         /*************************************
             gold count
         *************************************/
-        Vec2 AnchorOfSign(int dir);
-        Vec2 PositionOfSign(int dir,int xOffset = 0);
-        Vec2 DestOfSign(int dir,int xOffset = 0);
-        Vec2 AnchorOfNumber(int dir);
-        Vec2 PositionOfNumber(int dir);
-        Vec2 DestOfNumber(int dir);
-        Vec2 AnchorOfGold(int dir);
-        Vec2 PositionOfGold(int dir,int xOffset = 0);
-        Vec2 DestOfGold(int dir,int xOffset = 0);
+        Vec2 AnchorOfSign(PlayerDir_t dir);
+        Vec2 PositionOfSign(PlayerDir_t dir,int xOffset = 0);
+        Vec2 DestOfSign(PlayerDir_t dir,int xOffset = 0);
+        Vec2 AnchorOfNumber(PlayerDir_t dir);
+        Vec2 PositionOfNumber(PlayerDir_t dir);
+        Vec2 DestOfNumber(PlayerDir_t dir);
+        Vec2 AnchorOfGold(PlayerDir_t dir);
+        Vec2 PositionOfGold(PlayerDir_t dir,int xOffset = 0);
+        Vec2 DestOfGold(PlayerDir_t dir,int xOffset = 0);
         /*************************************
             out card
         *************************************/
-        int  RotateAngleOfOutcard(int dir);
-        Vec2 AnchorOfOutcard(int dir);
-        Vec2 PositionOfOutcard(int dir);
+        int  RotateAngleOfOutcard(PlayerDir_t dir);
+        Vec2 AnchorOfOutcard(PlayerDir_t dir);
+        Vec2 PositionOfOutcard(PlayerDir_t dir);
         /*************************************
             action
         *************************************/
         Vec2 Center();
         Vec2 PositionOfMingSign();
         Vec2 PositionOfMingSignForMe(float zhuangWidth = 0.0);
-        Vec2 PositionOfActSign(int dir);
+        Vec2 PositionOfActSign(PlayerDir_t dir);
 
         Vec2 OrigPositionOfGangCard(int i,Size size);
         Vec2 MiddlePositionOfGangCard(int i,Size size);

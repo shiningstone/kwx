@@ -9,11 +9,11 @@ GameLayout::GameLayout(cocos2d::Point origin, cocos2d::Size size)
 /*************************************
     player
 *************************************/
-Vec2 GameLayout::AnchorOfHeadBkg(int dir) {
+Vec2 GameLayout::AnchorOfHeadBkg(PlayerDir_t dir) {
     switch(dir) {
-        case 0:   return Vec2(0.0f,1.0f);
-        case 1:   return Vec2(0,0);
-        case 2:   return Vec2(1,1);
+        case LEFT:   return Vec2(0.0f,1.0f);
+        case MIDDLE:   return Vec2(0,0);
+        case RIGHT:   return Vec2(1,1);
     }
 }
 
@@ -100,110 +100,110 @@ Vec2 GameLayout::AnchorOfZhuang(PlayerDir_t dir) {
 /*************************************
     gold count
 *************************************/
-Vec2 GameLayout::AnchorOfSign(int dir) {
+Vec2 GameLayout::AnchorOfSign(PlayerDir_t dir) {
     switch(dir) {
-        case 0:   return Vec2(0.5,0.5);
-        case 1:   return Vec2(0.5,0.5);
-        case 2:   return Vec2(1,0.5);
+        case LEFT:   return Vec2(0.5,0.5);
+        case MIDDLE:   return Vec2(0.5,0.5);
+        case RIGHT:   return Vec2(1,0.5);
     }
 }
 
-Vec2 GameLayout::PositionOfSign(int dir,int xOffset) {
+Vec2 GameLayout::PositionOfSign(PlayerDir_t dir,int xOffset) {
     switch(dir) {
-        case 0:   
+        case LEFT:   
             return Vec2(ORIGIN.x + SIZE.width*271/1218,
                         ORIGIN.y + SIZE.height*406/716);
-        case 1:   
+        case MIDDLE:   
             return Vec2(ORIGIN.x + SIZE.width*559/1218,
                         ORIGIN.y + SIZE.height*154/716);
-        case 2:   
+        case RIGHT:   
             return Vec2(ORIGIN.x + SIZE.width*996/1218 - xOffset,
                         ORIGIN.y + SIZE.height*406/716);
     }
 }
 
-Vec2 GameLayout::DestOfSign(int dir,int xOffset) {
+Vec2 GameLayout::DestOfSign(PlayerDir_t dir,int xOffset) {
     switch(dir) {
-        case 0:   
+        case LEFT:   
             return Vec2(ORIGIN.x + SIZE.width*271/1218,
                         ORIGIN.y + SIZE.height*480/716);
-        case 1:   
+        case MIDDLE:   
             return Vec2(ORIGIN.x + SIZE.width*559/1218,
                         ORIGIN.y + SIZE.height*228/716);
-        case 2:   
+        case RIGHT:   
             return Vec2(ORIGIN.x + SIZE.width*996/1218 - xOffset,
                         ORIGIN.y + SIZE.height*480/716);
     }
 }
 
-Vec2 GameLayout::AnchorOfNumber(int dir) {
+Vec2 GameLayout::AnchorOfNumber(PlayerDir_t dir) {
     switch(dir) {
-        case 0:   return Vec2(0,0.5);
-        case 1:   return Vec2(0,0.5);
-        case 2:   return Vec2(1,0.5);
+        case LEFT:   return Vec2(0,0.5);
+        case MIDDLE:   return Vec2(0,0.5);
+        case RIGHT:   return Vec2(1,0.5);
     }
 }
 
-Vec2 GameLayout::PositionOfNumber(int dir) {
+Vec2 GameLayout::PositionOfNumber(PlayerDir_t dir) {
     switch(dir) {
-        case 0:   
+        case LEFT:   
             return Vec2(ORIGIN.x + SIZE.width*291/1218,
                         ORIGIN.y + SIZE.height*406/716);
-        case 1:   
+        case MIDDLE:   
             return Vec2(ORIGIN.x + SIZE.width*578/1218,
                         ORIGIN.y + SIZE.height*154/716);
-        case 2:   
+        case RIGHT:   
             return Vec2(ORIGIN.x + SIZE.width*996/1218,
                         ORIGIN.y + SIZE.height*406/716);
     }
 }
 
-Vec2 GameLayout::DestOfNumber(int dir) {
+Vec2 GameLayout::DestOfNumber(PlayerDir_t dir) {
     switch(dir) {
-        case 0:   
+        case LEFT:   
             return Vec2(ORIGIN.x + SIZE.width*291/1218,
                         ORIGIN.y + SIZE.height*480/716);
-        case 1:   
+        case MIDDLE:   
             return Vec2(ORIGIN.x + SIZE.width*578/1218,
                         ORIGIN.y + SIZE.height*228/716);
-        case 2:   
+        case RIGHT:   
             return Vec2(ORIGIN.x + SIZE.width*996/1218,
                         ORIGIN.y + SIZE.height*480/716);
     }
 }
 
-Vec2 GameLayout::AnchorOfGold(int dir) {
+Vec2 GameLayout::AnchorOfGold(PlayerDir_t dir) {
     switch(dir) {
-        case 0:   return Vec2(0.5,0.5);
-        case 1:   return Vec2(0.5,0.5);
-        case 2:   return Vec2(0.5,0.5);
+        case LEFT:   return Vec2(0.5,0.5);
+        case MIDDLE:   return Vec2(0.5,0.5);
+        case RIGHT:   return Vec2(0.5,0.5);
     }
 }
 
-Vec2 GameLayout::PositionOfGold(int dir,int xOffset) {
+Vec2 GameLayout::PositionOfGold(PlayerDir_t dir,int xOffset) {
     switch(dir) {
-        case 0:   
+        case LEFT:   
             return Vec2(ORIGIN.x + SIZE.width*221/1218,
                         ORIGIN.y + SIZE.height*406/716);
-        case 1:   
+        case MIDDLE:   
             return Vec2(ORIGIN.x + SIZE.width*509/1218,
                         ORIGIN.y + SIZE.height*154/716);
-        case 2:   
+        case RIGHT:   
             return Vec2(ORIGIN.x + SIZE.width*936/1218 - xOffset,
                         ORIGIN.y + SIZE.height*406/716);
                 
     }
 }
 
-Vec2 GameLayout::DestOfGold(int dir,int xOffset) {
+Vec2 GameLayout::DestOfGold(PlayerDir_t dir,int xOffset) {
     switch(dir) {
-        case 0:   
+        case LEFT:   
             return Vec2(ORIGIN.x + SIZE.width*221/1218,
                         ORIGIN.y + SIZE.height*480/716);
-        case 1:   
+        case MIDDLE:   
             return Vec2(ORIGIN.x + SIZE.width*509/1218,
                         ORIGIN.y + SIZE.height*228/716);
-        case 2:   
+        case RIGHT:   
             return Vec2(ORIGIN.x + SIZE.width*936/1218 - xOffset,
                         ORIGIN.y + SIZE.height*480/716);
     }
@@ -212,35 +212,35 @@ Vec2 GameLayout::DestOfGold(int dir,int xOffset) {
 /*************************************
     out card
 *************************************/
-int  GameLayout::RotateAngleOfOutcard(int dir) {
+int  GameLayout::RotateAngleOfOutcard(PlayerDir_t dir) {
     switch(dir) {
-        case 0:
+        case LEFT:
             return 90;
-        case 1:
+        case MIDDLE:
             return 0;
-        case 2:
+        case RIGHT:
             return 270;
         default:
             LOGGER_WRITE("%s Error ! invalid player");
     }
 }
 
-Vec2 GameLayout::AnchorOfOutcard(int dir) {
+Vec2 GameLayout::AnchorOfOutcard(PlayerDir_t dir) {
     switch(dir) {
-        case 0:
+        case LEFT:
             return Vec2(0,0.5);
-        case 2:
+        case RIGHT:
             return Vec2(1,0.5);
         default:
             LOGGER_WRITE("%s Error ! invalid player");
     }
 }
 
-Vec2 GameLayout::PositionOfOutcard(int dir) {
+Vec2 GameLayout::PositionOfOutcard(PlayerDir_t dir) {
     switch(dir) {
-        case 0:
+        case LEFT:
             return Vec2(ORIGIN.x + SIZE.width*0.18, ORIGIN.y + SIZE.height*0.6);
-        case 2:
+        case RIGHT:
             return Vec2(ORIGIN.x + SIZE.width*0.82, ORIGIN.y + SIZE.height*0.6);
         default:
             LOGGER_WRITE("%s Error ! invalid player");
@@ -263,13 +263,13 @@ Vec2 GameLayout::PositionOfMingSignForMe(float zhuangWidth) {
     return Vec2(ORIGIN.x+SIZE.width*255/1218+zhuangWidth, ORIGIN.y+SIZE.height*168/716);
 }
 
-Vec2 GameLayout::PositionOfActSign(int dir) {
+Vec2 GameLayout::PositionOfActSign(PlayerDir_t dir) {
     switch(dir) {
-        case 0:
+        case LEFT:
             return Vec2(ORIGIN.x+SIZE.width*0.206,ORIGIN.y+SIZE.height*0.6);
-        case 1:
+        case MIDDLE:
             return Vec2(ORIGIN.x+SIZE.width/2,ORIGIN.y+SIZE.height/2);
-        case 2:
+        case RIGHT:
             return Vec2(ORIGIN.x+SIZE.width*0.79,ORIGIN.y+SIZE.height*0.6);
         default:
             LOGGER_WRITE("%s Error ! invalid player");
