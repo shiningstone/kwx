@@ -646,7 +646,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 
 void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int chosenCard,Touch* touch,int time)
 {
-    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,ifMingTime,_roundManager->_isWaitDecision);
+    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,_roundManager->_isMingTime,_roundManager->_isWaitDecision);
 
 	if(_roundManager->_isMingTime) {
 		ifMingMybeError=true;
@@ -1126,7 +1126,7 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
                                 _voice->SpeakAction(PENG,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                                simple_tip_effect( _layout->PositionOfActSign(_roundManager->_curPlayer),"peng.png" ),NULL), 
+                                simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::delete_act_tip)),   CCCallFuncN::create(this,callfuncN_selector(
@@ -1402,7 +1402,7 @@ void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card)
 
 
         
-		Spawn *simple_seq = simple_tip_effect( _layout->PositionOfActSign(_roundManager->_curPlayer),"peng.png" );
+		Spawn *simple_seq = simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" );
         
 		auto PengEffectNode = Node::create();
 		PengEffectNode->_ID=1;
@@ -1481,7 +1481,7 @@ void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
             Spawn::create(
                 _voice->SpeakAction(GANG,
                     _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
+                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
@@ -1747,7 +1747,7 @@ void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
     		Sequence::create(
                 hideReminder,
                 Spawn::create(
-                    simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
+                    simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
                     _voice->SpeakAction(GANG,
                         _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                     moveFreeCards,
@@ -1842,9 +1842,9 @@ void NetRaceLayer::QiangGangHuJudge()
     );
 
 	if((action1&a_HU)&&(action2&a_HU)) {
-        WinInfo_t win = {0};
+        WinInfo_t win;
         win.kind = DOUBLE_WIN;
-        win.player = _roundManager->_curPlayer;
+        win.player = (PlayerDir_t)_roundManager->_curPlayer;
         
         if(no1==1) {
             _roundManager->_actionToDo=action1;
@@ -1859,9 +1859,9 @@ void NetRaceLayer::QiangGangHuJudge()
 
         DoubleWin(win);
 	} else if(action1&a_HU||action2&a_HU) {
-        WinInfo_t win = {0};
+        WinInfo_t win;
         win.kind = SINGLE_WIN;
-        win.player = (action1&a_HU) ? no1 : no2;
+        win.player = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
 
         if(no1==1)
             _roundManager->_actionToDo=action1;
@@ -2286,7 +2286,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
             Sequence::create(
                 hideReminder,
             Spawn::create(
-                simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"gang.png"),
+                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
                 _voice->SpeakAction(GANG,
                         _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                 hideOutcard,
@@ -3270,7 +3270,7 @@ void NetRaceLayer::MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
                 NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
                 NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
 				_roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
-				waitfor_myaction(1);}),NULL));
+				waitfor_myaction(MIDDLE);}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -3571,15 +3571,15 @@ void NetRaceLayer::first_response(int no)
 	}
     
 	if(no==1) {
-		waitfor_myaction(no);
+		waitfor_myaction(MIDDLE);
 	} else {
 		waitfor_otheraction(no);
     }
 }
 
-void NetRaceLayer::waitfor_myaction(int no)
+void NetRaceLayer::waitfor_myaction(PlayerDir_t dir)
 {
-    LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,no,_roundManager->_actionToDo);
+    LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,dir,_roundManager->_actionToDo);
     _Show(myframe,TING_SING_BAR,false);
 
 	float x,y;
@@ -3588,8 +3588,8 @@ void NetRaceLayer::waitfor_myaction(int no)
 
 	if(_roundManager->_actionToDo!=a_JUMP)
 	{
-		auto myact_qi = _object->CreateButton(BTN_QI,Vec2(x,y));
-		myact_qi->_ID = no;
+		auto myact_qi = _object->CreateButton(dir,BTN_QI,Vec2(x,y));
+		myact_qi->_ID = dir;
 		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnQiHandler,this));
 		myframe->addChild(myact_qi,35,QI_REMIND_ACT_TAG_ID);
 
@@ -3604,8 +3604,8 @@ void NetRaceLayer::waitfor_myaction(int no)
         auto act_hu = Sprite::createWithSpriteFrameName("hu1.png");//胡牌  
 
         x=x-act_hu->getContentSize().width/2;
-		auto myact_hu = _object->CreateButton(BTN_HU,Vec2(x,y+6));
-		myact_hu->_ID=no;
+		auto myact_hu = _object->CreateButton(dir,BTN_HU,Vec2(x,y+6));
+		myact_hu->_ID=dir;
 		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnHuHandler,this));
 		myframe->addChild(myact_hu,35,HU_REMIND_ACT_TAG_ID);
 
@@ -3620,7 +3620,7 @@ void NetRaceLayer::waitfor_myaction(int no)
         auto act_ming = Sprite::createWithSpriteFrameName("ming.png");//明牌
         x=x-act_ming->getContentSize().width/2;
         
-		auto myact_ming=_object->CreateButton(BTN_MING,Vec2(x,y+11));
+		auto myact_ming=_object->CreateButton(dir,BTN_MING,Vec2(x,y+11));
 		myact_ming->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingPressed,this));
 		myframe->addChild(myact_ming,35,MING_REMIND_ACT_TAG_ID);
 
@@ -3636,7 +3636,7 @@ void NetRaceLayer::waitfor_myaction(int no)
         auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
 		x=x-act_gang->getContentSize().width/2;
 
-        auto myact_gang=_object->CreateButton(BTN_GANG,Vec2(x,y));
+        auto myact_gang=_object->CreateButton(dir,BTN_GANG,Vec2(x,y));
 		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnGangHandler,this));
 		myframe->addChild(myact_gang,35,GANG_REMING_ACT_TAG_ID);
 
@@ -3651,7 +3651,7 @@ void NetRaceLayer::waitfor_myaction(int no)
     	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
 
 		x=x-act_peng->getContentSize().width/2;
-		auto myact_peng=_object->CreateButton(BTN_PENG,Vec2(x,y+13));
+		auto myact_peng=_object->CreateButton(dir,BTN_PENG,Vec2(x,y+13));
 		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnPengHandler,this));
 		myframe->addChild(myact_peng,35,PENG_REMIND_ACT_TAG_ID);
 
@@ -4026,7 +4026,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 					_roundManager->_otherOneForDouble = no;
 					_roundManager->_actionToDo=action2;
 				}					
-				waitfor_myaction(1);
+				waitfor_myaction(MIDDLE);
 				return;
 			}
 		}
@@ -4048,7 +4048,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 						_roundManager->_actionToDo=action1;
 					else
 						_roundManager->_actionToDo=action2;
-					waitfor_myaction(1);
+					waitfor_myaction(MIDDLE);
 					return;
 				}
 			}
@@ -4063,7 +4063,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			if(no==1)
 			{
 				UpdateClock(0,no);
-				waitfor_myaction(no);
+				waitfor_myaction(MIDDLE);
 				return;
 			}
 			else
@@ -4079,7 +4079,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			if(no1==1)
 			{
 				UpdateClock(0,no1);
-				waitfor_myaction(no1);
+				waitfor_myaction(MIDDLE);
 				return;
 			}
 			else
@@ -6150,7 +6150,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 
         if(no!=1)
 		{
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"dahu.png");
+			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(no,3,_roundManager->_curPlayer);	
 			});
@@ -6270,7 +6270,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 			auto ll_action10=TargetedAction::create(this,l_seq10);
 			auto l_spa=Spawn::create(ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
 			
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(_roundManager->_curPlayer),"dahu.png");
+			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(no,3,_roundManager->_curPlayer);	
 			});
@@ -6314,8 +6314,8 @@ void NetRaceLayer::hu_effect_tip(int no)
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(3,3,_roundManager->_curPlayer);	
 			});
-			auto HuFontNo=simple_tip_effect( _layout->PositionOfActSign((_roundManager->_curPlayer+1)%3),"dahu.png");
-			auto HuFontNo1=simple_tip_effect( _layout->PositionOfActSign((_roundManager->_curPlayer+2)%3),"dahu.png");
+			auto HuFontNo=simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+1)%3)),"dahu.png");
+			auto HuFontNo1=simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+2)%3)),"dahu.png");
 			myframe->runAction(Sequence::create(Spawn::create(DoubleFileFunc,callfunc,HuFontNo,HuFontNo1,NULL),GoldAccount,NULL));
 		});
 		_eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
@@ -7111,7 +7111,7 @@ void NetRaceLayer::UpdateGoldAccounts(int goldOfPlayer[3]) {
     }
 }
 
-void NetRaceLayer::GuiJinBiShow(int dir, int gold) {
+void NetRaceLayer::GuiJinBiShow(PlayerDir_t dir, int gold) {
 	Size size = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
@@ -7180,7 +7180,7 @@ void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
         int score;
         _roundManager->_players[id]->get_property(score);
         GuiUpdateScore(id,score);
-        GuiJinBiShow(id,GoldAccountImmediate[id]);        
+        GuiJinBiShow((PlayerDir_t)id,GoldAccountImmediate[id]);        
 	}
 }
 
@@ -7809,8 +7809,8 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
                 DelayTime::create(0.06),
                 ScaleTo::create(0,0),NULL)),NULL);
 
-        goldEffect = Sequence::create(CallFunc::create([=](){
-            GoldNumInsert(dir,2,dir);}),NULL);
+        goldEffect = CallFunc::create([=](){
+            GoldNumInsert(dir,2,dir);});
             
         ActionAfterGang=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
     } else {

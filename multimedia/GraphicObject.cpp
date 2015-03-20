@@ -224,10 +224,12 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
             return Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);
 
         case BTN_START:
-            Button *button = Button::create("kaishiyouxi1.png","kaishiyouxi2.png","kaishiyouxi2.png",UI_TEX_TYPE_PLIST);
-            button->setAnchorPoint(Vec2(0.5,0.5));
-            button->setPosition(Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2));
-            return button; 
+            {
+                Button *button = Button::create("kaishiyouxi1.png","kaishiyouxi2.png","kaishiyouxi2.png",UI_TEX_TYPE_PLIST);
+                button->setAnchorPoint(Vec2(0.5,0.5));
+                button->setPosition(Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2));
+                return button; 
+            }
 
         case BTN_CANCEL:
         case BTN_OK:
@@ -244,7 +246,7 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
     }
 }
 
-Button *GObjectFactory::CreateButton(MenuButtonId_t action,const Vec2 &position) {
+Button *GObjectFactory::CreateButton(PlayerDir_t dir,MenuButtonId_t action,const Vec2 &position) {
     char *file[] = {
         "qi.png",
         "hu1.png",
@@ -267,21 +269,21 @@ Sprite *GObjectFactory::CreateHeadBkg(PlayerDir_t dir) {
     switch(dir) {
         case LEFT:
             sprite = Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
-            sprite->setAnchorPoint( _layout->AnchorOfHeadBkg(0) );
+            sprite->setAnchorPoint( _layout->AnchorOfHeadBkg(LEFT) );
             sprite->setPosition(Vec2(
                 ORIGIN.x + SIZE.width*387/1218 - sprite->getContentSize().width,
                 ORIGIN.y + SIZE.height/2 + sprite->getContentSize().height/2));
             break;
         case MIDDLE:
             sprite=Sprite::createWithSpriteFrameName("touxiangxinxikuang.png");
-            sprite->setAnchorPoint( _layout->AnchorOfHeadBkg(1) );
+            sprite->setAnchorPoint( _layout->AnchorOfHeadBkg(MIDDLE) );
             sprite->setPosition(Vec2(
                 ORIGIN.x + SIZE.width/2 - sprite->getContentSize().width/2,
                 ORIGIN.y + SIZE.height*144/716 - sprite->getContentSize().height*0.5));
             break;
         case RIGHT:
             sprite=Sprite::createWithSpriteFrameName("touxiangxinxikuang2.png");
-            sprite->setAnchorPoint( _layout->AnchorOfHeadBkg(2) );
+            sprite->setAnchorPoint( _layout->AnchorOfHeadBkg(RIGHT) );
             sprite->setPosition(Vec2(
                 ORIGIN.x + SIZE.width*851/1218 + sprite->getContentSize().width*0.8,
                 ORIGIN.y + SIZE.height/2 + sprite->getContentSize().height/2));
@@ -682,7 +684,7 @@ Sprite *GObjectFactory::_image(const char *file) {
 /*************************************
     action buttons
 *************************************/
-Button *GObjectFactory::CreateBtnBkg(MenuButtonId_t action,const Vec2 &position) {
+Sprite *GObjectFactory::CreateBtnBkg(MenuButtonId_t action,const Vec2 &position) {
     char *file[] = {
         "qi.png",
         "hu1.png",

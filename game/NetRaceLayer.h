@@ -52,6 +52,7 @@ private:
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void _OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers);
+    void _UpdateCardsInHand(const CardsInfo_t &cards, int chosen);
 
     void create_residue_cards();
     void refresh_residue_cards();
@@ -68,7 +69,7 @@ private:
     Sprite *_GetEffectCardInHand(Node *myframe, int i,CARD_KIND value );
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
-    void GuiJinBiShow(int dir, int gold);
+    void GuiJinBiShow(PlayerDir_t dir, int gold);
     void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
     void _GuiUpdateScore(LayerColor *layer,int score);
 
@@ -190,7 +191,7 @@ private:
 	void distribute_event(const std::string event_type,void* val);
 	void waitfor_response(Node* sender);
 	void first_response(int no);
-	void waitfor_myaction(int no);
+	void waitfor_myaction(PlayerDir_t dir);
 	void hu_effect_tip(int no);
 	void update_outcard(Node *myframe,Vec2 location,int time);
 	void choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int cardInList,Touch* touch,int time);

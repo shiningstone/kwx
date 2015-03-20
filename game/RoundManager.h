@@ -11,16 +11,6 @@ class NetRole;
 
 #define PLAYER_NUMBER 3
 
-typedef enum {
-    SINGLE_WIN,
-    DOUBLE_WIN,
-    NONE_WIN,
-}WinKind_t;
-
-typedef struct {
-    WinKind_t    kind;
-    PlayerDir_t  player;
-}WinInfo_t;
 
 class RoundManager {
     friend class NetRaceLayer;

@@ -130,8 +130,8 @@ public:
 
     Sprite *CreateRiverCard(PlayerDir_t dir,Card_t kind);
     /* button */
-    Button *CreateButton(MenuButtonId_t action,const Vec2 &position);
-    Button *CreateBtnBkg(MenuButtonId_t action,const Vec2 &position);
+    Button *CreateButton(PlayerDir_t dir,MenuButtonId_t action,const Vec2 &position);
+    Sprite *CreateBtnBkg(MenuButtonId_t action,const Vec2 &position);
 protected:
     static float SCALE;
 

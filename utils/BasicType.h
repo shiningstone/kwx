@@ -56,5 +56,15 @@ typedef enum {
     SEX_MAX,
 }Sex_t;
 
+typedef enum {
+    SINGLE_WIN,
+    DOUBLE_WIN,
+    NONE_WIN,
+}WinKind_t;
+
+typedef struct {
+    WinKind_t    kind;
+    PlayerDir_t  player;
+}WinInfo_t;
 #endif
 
