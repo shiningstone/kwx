@@ -238,10 +238,11 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
                 "wancheng.png",
             };
             int offset = id - BTN_CANCEL;
+            float x = (id==BTN_CANCEL) ? 0.8 : 0.7 ;
             
             auto ChooseEnsure=Button::create(file[offset],file[offset],file[offset],UI_TEX_TYPE_PLIST);
             ChooseEnsure->setAnchorPoint(Vec2(0.5,0.5));
-            ChooseEnsure->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));
+            ChooseEnsure->setPosition(Vec2(ORIGIN.x+SIZE.width*x,ORIGIN.y+SIZE.height*0.25));
             return ChooseEnsure;
     }
 }
@@ -257,9 +258,8 @@ Button *GObjectFactory::CreateButton(PlayerDir_t dir,MenuButtonId_t action,const
     int offset = action - BTN_QI;
     
     auto btn = Button::create(file[offset],file[offset],file[offset],UI_TEX_TYPE_PLIST);
-    btn->_ID = dir;
     btn->setAnchorPoint(Vec2(0.5,0.5));
-    btn->setPosition(Vec2(ORIGIN.x+SIZE.width*0.8,ORIGIN.y+SIZE.height*0.25));
+    btn->setPosition(position);
     return btn;
 }
 
