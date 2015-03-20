@@ -7822,44 +7822,37 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
 
 void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) {
     Sequence *gang_seq;
+    
+    auto hideOutCard = Sequence::create(NULL);
+    auto goldEffect  = CallFunc::create([=](){NULL;});
     CallFunc* ActionAfterGang;
 
     if(isCardFromOthers) {
-        auto outCard = myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
-        auto hideOutCard=Sequence::create(CCCallFunc::create([=](){
-            _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
-        }),TargetedAction::create(outCard,Sequence::create(
-            DelayTime::create(0.06),
-            ScaleTo::create(0,0),NULL)),NULL);
-        
-        ActionAfterGang=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
+        hideOutCard = Sequence::create(CCCallFunc::create([=](){
+            _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
+            myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID),Sequence::create(
+                DelayTime::create(0.06),
+                ScaleTo::create(0,0),NULL)),NULL);
 
-        gang_seq=Sequence::create(
-            hideOutCard,
-            Spawn::create(
-                simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
-                _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),NULL),CallFunc::create([=](){
-            GoldNumInsert(no,2,dir);}),
-            Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::minggang_dispatch)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::update_card_list)),
-                ActionAfterGang,NULL),NULL);
+        goldEffect = Sequence::create(CallFunc::create([=](){
+            GoldNumInsert(dir,2,dir);}),NULL);
+            
+        ActionAfterGang=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
     } else {
         ActionAfterGang=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::QiangGangHuJudge));
-
-        gang_seq=Sequence::create(
-            Spawn::create(
-                _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),
-                simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL),
-            Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::minggang_dispatch)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::update_card_list)),
-                ActionAfterGang,NULL),NULL);
     }
     
-    myframe->runAction(gang_seq);
+    myframe->runAction(Sequence::create(
+        hideOutCard,
+        Spawn::create(
+            simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
+            _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),NULL),
+        goldEffect,
+        Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::minggang_dispatch)),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::update_card_list)),
+            ActionAfterGang,NULL),NULL));
 }
 
 
