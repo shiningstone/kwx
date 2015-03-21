@@ -202,10 +202,9 @@ private:
 	void waitfor_myaction(PlayerDir_t dir);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(int no);
-	void _HandoutEffect(Card_t outCard,Vec2 location,int time);
-    void _HandoutLastCard();
-	void _HandoutCard(CARD_ARRAY *list,int cardInList,Touch* touch,int time);
+	void _HandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
+	void HandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time);
 	int GoldAccountImmediate[3];
 
 	unsigned int VoiceId;
@@ -251,7 +250,7 @@ public:
 	void _AnGangEffect(int no,Card_t card,int gang[]);//me--暗杠效果
 	void _MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
 	void ming_tip_effect(Node *psender);//me--名牌效果
-	void _QiEffect(Node *psender);//me--弃牌效果
+	void _QiEffect(PlayerDir_t dir);//me--弃牌效果
 	void card_list_update(int no);
 	void update_card_list(Node *psender);//更新玩家手牌
 	void update_card_in_river_list(Node* sender);

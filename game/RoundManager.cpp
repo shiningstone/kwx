@@ -491,6 +491,15 @@ void RoundManager::StartGame(Scene *scene) {
     _uiManager->race_start_again();
     
 }
+
+void RoundManager::RecvHandout(int idx,Vec2 touch) {
+    auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
+
+    if( _isTuoGuan || (IsTing(_curPlayer) && !_isGangAsking) ) {
+        _uiManager->HandoutEffect(idx,cardsInHand,touch,2);
+    }
+}
+
 /*************************************
         singleton
 *************************************/
