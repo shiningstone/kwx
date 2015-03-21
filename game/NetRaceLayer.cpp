@@ -145,28 +145,6 @@ void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	}
 }
 
-void NetRaceLayer::HuPressed(Button *button, bool qiangGang, bool doubleHu) {
-    button->setTouchEnabled(false);
-    
-    if(qiangGang) {
-        button->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),
-            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::hu_tip_effect)),NULL));
-    } else if(doubleHu) {
-        myframe->runAction(Sequence::create(TargetedAction::create(
-            button,ScaleTo::create(0.1,1)),
-            _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),CallFunc::create([=](){  
-            hu_effect_tip(3);
-            distribute_event(DOUBLE_HU_WITH_ME,NULL);}),NULL));
-    } else {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::hu_tip_effect)),NULL));
-    }
-}
-
 void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	_roundManager->_actionToDo = a_HU;
@@ -182,29 +160,12 @@ void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvHu(curButton);
+            _roundManager->RecvHu();
 			break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
     		break;
 	}
-}
-
-void NetRaceLayer::GangPressed(Button *button, Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
-    button->setTouchEnabled(false);
-    button->_ID=1;
-
-    if(isAnGang) {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){
-            an_gang_tip_effect(MIDDLE,card,gangCardIdx);
-        }),NULL));
-    } else {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){
-            ming_gang_tip_effect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
-        }),NULL));
-    }
 }
 
 void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
@@ -218,7 +179,7 @@ void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvGang(curButton);
+            _roundManager->RecvGang();
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -240,15 +201,7 @@ void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
-        {
-		    curButton->setTouchEnabled(false);
-		    curButton->_ID=1;
-		    auto effect = CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::qi_tip_effect));
-		    curButton->runAction(Sequence::create(
-                ScaleTo::create(0.1,1),
-                effect,NULL));
-		    break;
-        }
+        _roundManager->RecvQi();
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		curButton->setScale(1);
 		break;
@@ -257,6 +210,74 @@ void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
 	}
 }
 
+/***********************************************
+        effect entrances
+***********************************************/
+void NetRaceLayer::QiEffect() {
+    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
+    curButton->setTouchEnabled(false);
+    curButton->_ID = MIDDLE;
+
+    curButton->runAction(Sequence::create(
+        ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::qi_tip_effect)),NULL));
+}
+
+void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
+    curButton->setTouchEnabled(false);
+    curButton->_ID = MIDDLE;
+    
+    curButton->runAction(Sequence::create(
+        ScaleTo::create(0.1,1),CallFunc::create([=](){  
+        peng_tip_effect(dir,prevDir,card);}),NULL));
+}
+
+void NetRaceLayer::HuEffect(bool qiangGang,bool doubleHu) {
+    Button *button = (Button *)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
+    button->setTouchEnabled(false);
+    
+    if(qiangGang) {
+        button->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),
+            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::hu_tip_effect)),NULL));
+    } else if(doubleHu) {
+        myframe->runAction(Sequence::create(TargetedAction::create(
+            button,ScaleTo::create(0.1,1)),
+            _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),CallFunc::create([=](){  
+            hu_effect_tip(3);
+            distribute_event(DOUBLE_HU_WITH_ME,NULL);}),NULL));
+    } else {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::hu_tip_effect)),NULL));
+    }
+}
+
+void NetRaceLayer::GangEffect(Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
+    Button *button = (Button *)myframe->getChildByTag(GANG_REMING_ACT_TAG_ID);
+    button->setTouchEnabled(false);
+    
+    button->_ID=MIDDLE;
+
+    if(isAnGang) {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){
+            an_gang_tip_effect(MIDDLE,card,gangCardIdx);
+        }),NULL));
+    } else {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){
+            ming_gang_tip_effect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
+        }),NULL));
+    }
+}
+
+/***********************************************
+        
+***********************************************/
 BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
 {
 	ccBezierConfig config;
@@ -1003,7 +1024,8 @@ Sprite *NetRaceLayer::_GetEffectCardInHand(Node *myframe, int i,CARD_KIND kindId
     return effectCard;
 }
 
-void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+
+void NetRaceLayer::peng_tip_effect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
     Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
     curButton->setTouchEnabled(false);
     curButton->_ID = MIDDLE;

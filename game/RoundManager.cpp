@@ -388,7 +388,7 @@ void RoundManager::RecvPeng() {
     _uiManager->PengEffect((PlayerDir_t)_curPlayer,prevPlayer,(Card_t)card.kind);
 }
 
-void RoundManager::RecvHu(Button *curButton) {
+void RoundManager::RecvHu() {
     if(_isWaitDecision) {
         _isWaitDecision = false;
         _actionToDo = _tempActionToDo;
@@ -399,10 +399,10 @@ void RoundManager::RecvHu(Button *curButton) {
         _lastActionWithGold = a_QIANG_GANG;
     }
 
-    _uiManager->HuPressed(curButton, _isQiangGangAsking, _isDoubleHuAsking);
+    _uiManager->HuEffect(_isQiangGangAsking, _isDoubleHuAsking);
 }
 
-void RoundManager::RecvGang(Button *curButton) {
+void RoundManager::RecvGang() {
     if(_isGangAsking)//is this judgement neccessary?
         _isGangAsking = false;
     
@@ -438,7 +438,7 @@ void RoundManager::RecvGang(Button *curButton) {
 			SetEffectCard(card,c_AN_GANG);
 		}
 
-        _uiManager->GangPressed(curButton,card,gangCardIdx);
+        _uiManager->GangEffect(card,gangCardIdx);
 	}
 	else if( _actionToDo & a_MING_GANG ) {
 		_lastActionSource=1;
@@ -466,8 +466,12 @@ void RoundManager::RecvGang(Button *curButton) {
 
         FindGangCards(1,gangCardIdx,(Card_t)GangCard.kind);
 
-        _uiManager->GangPressed(curButton,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
+        _uiManager->GangEffect((Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
 	}
+}
+
+void RoundManager::RecvQi() {
+    _uiManager->QiEffect();
 }
 
 void RoundManager::StartGame(Scene *scene) {

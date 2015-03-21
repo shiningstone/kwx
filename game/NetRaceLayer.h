@@ -200,6 +200,7 @@ private:
 	void waitfor_response(Node* sender);
 	void first_response(int no);
 	void waitfor_myaction(PlayerDir_t dir);
+    void peng_tip_effect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void hu_effect_tip(int no);
 	void update_outcard(Node *myframe,Vec2 location,int time);
 	void choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int cardInList,Touch* touch,int time);
@@ -218,14 +219,17 @@ public:
     void _4CardsDistribute(int sequenceNo, float delayRef);
 	void effect_Distribute_Card(int zhuang);//发牌效果
 	/***********callback function***********************/
-    void PengPressed(Button *button,PlayerDir_t prevPlayer,Card_t card);
-	void BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--碰牌
-    void HuPressed(Button *button, bool qiangGang, bool doubleHu);
-	void BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--胡牌
-    void GangPressed(Button *button, Card_t card, int gangCardIdx[], bool isAnGang=true, PlayerDir_t prevPlayer=MIDDLE);
-	void BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--杠牌
-	void BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--弃牌
-	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//me--名牌
+    void QiEffect();
+    void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
+    void HuEffect(bool qiangGang, bool doubleHu);
+    void GangEffect(Card_t card, int gangCardIdx[], bool isAnGang=true, PlayerDir_t prevPlayer=MIDDLE);
+	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+    
+	void BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	
 	/***********callback function***********************/
 	/*########################
 	diretion:
@@ -243,7 +247,6 @@ public:
 	void peng_dispatch(Node *psender);
 
     TargetedAction* _MingAnimation();
-    void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void an_gang_tip_effect(int no,Card_t card,int gang[]);//me--暗杠效果
 	void ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
 	void ming_tip_effect(Node *psender);//me--名牌效果
