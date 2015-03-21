@@ -4,13 +4,12 @@
 
 
 #include "CardHolder.h"
-#include "./../utils/LogManager.h"
 #include "NetRaceLayer.h"
+#include "./../utils/LogManager.h"
 
 class NetRole;
 
 #define PLAYER_NUMBER 3
-
 
 class RoundManager {
     friend class NetRaceLayer;
@@ -85,7 +84,7 @@ public:
     int FindGangCards(int dir,int cards[4],Card_t target=CARD_UNKNONW);
 
     /* main process */
-    void StartGame();
+    void StartGame(Scene *scene);
 private:
     static RoundManager *_instance;
     Logger *_logger;

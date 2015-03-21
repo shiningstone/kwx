@@ -24,6 +24,9 @@ class NetRaceLayer : public cocos2d::Layer
 public:
 	NetRaceLayer();
 	virtual ~NetRaceLayer();
+    
+    void Set(RoundManager *rm);
+    
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;

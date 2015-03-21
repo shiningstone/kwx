@@ -469,8 +469,15 @@ void RoundManager::RecvGang(Button *curButton) {
 	}
 }
 
-void RoundManager::StartGame() {
+void RoundManager::StartGame(Scene *scene) {
     _uiManager = NetRaceLayer::create();
+    scene->addChild(_uiManager);
+
+    _uiManager->Set(this);
+
+    _uiManager->create_race();
+    _uiManager->race_start_again();
+    
 }
 /*************************************
         singleton

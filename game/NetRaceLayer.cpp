@@ -31,9 +31,6 @@ NetRaceLayer::NetRaceLayer()
     _layout = GameLayout::getInstance(origin,visibleSize);
     _effect = GraphicEffect::getInstance();
     
-    _roundManager = new RoundManager(this);
-    _ai = Ai::getInstance(_roundManager);
-    
     _logger = LOGGER_REGISTER("NetRaceLayer");
 
 	/**************************/
@@ -48,6 +45,11 @@ NetRaceLayer::NetRaceLayer()
     aMsg.StartReceiving();
     len = aMsg.SetAction(buf,(ActionId_t)PENG);
 	/**************************/
+}
+
+void NetRaceLayer::Set(RoundManager *rm) {
+    _roundManager = rm;
+    _ai = Ai::getInstance(_roundManager);
 }
 
 NetRaceLayer::~NetRaceLayer()
@@ -69,10 +71,10 @@ bool NetRaceLayer::init()
 		return false;
 	}
 	srand(time(0));
-
+#if 0
 	create_race();
 	race_start_again();
-
+#endif
 	return true;
 }
 
