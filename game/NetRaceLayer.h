@@ -144,7 +144,7 @@ private:
 	bool ifEndGameChoose;//是否退出游戏
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
-	bool ifMingMybeError;
+	bool ifCardTouchedDuringMing;
 	//bool ifMyTime;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
@@ -200,10 +200,11 @@ private:
 	void waitfor_response(Node* sender);
 	void first_response(int no);
 	void waitfor_myaction(PlayerDir_t dir);
-    void peng_tip_effect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
-	void hu_effect_tip(int no);
-	void update_outcard(Node *myframe,Vec2 location,int time);
-	void choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int cardInList,Touch* touch,int time);
+    void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
+	void _HuEffect(int no);
+	void _HandoutEffect(Card_t outCard,Vec2 location,int time);
+    void _HandoutLastCard();
+	void _HandoutCard(CARD_ARRAY *list,int cardInList,Touch* touch,int time);
 public:
 	int GoldAccountImmediate[3];
 
@@ -221,7 +222,7 @@ public:
 	/***********callback function***********************/
     void QiEffect();
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
-    void HuEffect(bool qiangGang, bool doubleHu);
+    void HuEffect(const WinInfo_t &win,bool qiangGang, bool doubleHu);
     void GangEffect(Card_t card, int gangCardIdx[], bool isAnGang=true, PlayerDir_t prevPlayer=MIDDLE);
 	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
     
@@ -247,11 +248,10 @@ public:
 	void peng_dispatch(Node *psender);
 
     TargetedAction* _MingAnimation();
-	void an_gang_tip_effect(int no,Card_t card,int gang[]);//me--暗杠效果
-	void ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
+	void _AnGangEffect(int no,Card_t card,int gang[]);//me--暗杠效果
+	void _MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
 	void ming_tip_effect(Node *psender);//me--名牌效果
-	void hu_tip_effect(Node *psender);//me--胡牌效果
-	void qi_tip_effect(Node *psender);//me--弃牌效果
+	void _QiEffect(Node *psender);//me--弃牌效果
 	void card_list_update(int no);
 	void update_card_list(Node *psender);//更新玩家手牌
 	void update_card_in_river_list(Node* sender);

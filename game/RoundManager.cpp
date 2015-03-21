@@ -399,7 +399,10 @@ void RoundManager::RecvHu() {
         _lastActionWithGold = a_QIANG_GANG;
     }
 
-    _uiManager->HuEffect(_isQiangGangAsking, _isDoubleHuAsking);
+    /*!!!just for compile reason for now, the value should be set before play effect*/
+    WinInfo_t win;
+
+    _uiManager->HuEffect(win, _isQiangGangAsking, _isDoubleHuAsking);
 }
 
 void RoundManager::RecvGang() {

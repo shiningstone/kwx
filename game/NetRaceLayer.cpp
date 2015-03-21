@@ -122,7 +122,7 @@ void NetRaceLayer::distribute_event(const std::string event_type,void* val)
 }
 
 /***********************************************
-        button handlers
+        buttons
 ***********************************************/
 void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
@@ -210,235 +210,6 @@ void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
 	}
 }
 
-/***********************************************
-        effect entrances
-***********************************************/
-void NetRaceLayer::QiEffect() {
-    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
-    curButton->setTouchEnabled(false);
-    curButton->_ID = MIDDLE;
-
-    curButton->runAction(Sequence::create(
-        ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::qi_tip_effect)),NULL));
-}
-
-void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
-    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
-    curButton->setTouchEnabled(false);
-    curButton->_ID = MIDDLE;
-    
-    curButton->runAction(Sequence::create(
-        ScaleTo::create(0.1,1),CallFunc::create([=](){  
-        peng_tip_effect(dir,prevDir,card);}),NULL));
-}
-
-void NetRaceLayer::HuEffect(bool qiangGang,bool doubleHu) {
-    Button *button = (Button *)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
-    button->setTouchEnabled(false);
-    
-    if(qiangGang) {
-        button->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),
-            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::hu_tip_effect)),NULL));
-    } else if(doubleHu) {
-        myframe->runAction(Sequence::create(TargetedAction::create(
-            button,ScaleTo::create(0.1,1)),
-            _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),CallFunc::create([=](){  
-            hu_effect_tip(3);
-            distribute_event(DOUBLE_HU_WITH_ME,NULL);}),NULL));
-    } else {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::hu_tip_effect)),NULL));
-    }
-}
-
-void NetRaceLayer::GangEffect(Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
-    Button *button = (Button *)myframe->getChildByTag(GANG_REMING_ACT_TAG_ID);
-    button->setTouchEnabled(false);
-    
-    button->_ID=MIDDLE;
-
-    if(isAnGang) {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){
-            an_gang_tip_effect(MIDDLE,card,gangCardIdx);
-        }),NULL));
-    } else {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){
-            ming_gang_tip_effect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
-        }),NULL));
-    }
-}
-
-/***********************************************
-        
-***********************************************/
-BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
-{
-	ccBezierConfig config;
-
-    _layout->GetBizerPoints(config, outCard->length-1, location);
-
-	BezierTo *action;
-	if(ccpDistance(location,config.endPosition)<=200){
-		action=BezierTo::create(0.18,config);
-	} else {
-		action=BezierTo::create(0.3,config);
-	}
-    
-	return action;
-}
-
-BezierTo* NetRaceLayer::BizerMove2(outCardList* outCard,Vec2 location,int time)
-{
-	ccBezierConfig config;
-	if((outCard->length-1)<6)
-	{
-		if(location.x<visibleSize.width*0.4)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)-100,_layout->_playerPosi[1].riverPoint.y-100);
-		}
-		else if(location.x>=visibleSize.width*0.6)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
-		}
-		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
-		}
-	}
-	else if((outCard->length-1)<14)
-	{
-		if(location.x<visibleSize.width*0.4)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-			if(time==2)
-				config.controlPoint_1=Vec2(location.x,200);
-			else
-				config.controlPoint_1=Vec2(location.x+30,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
-		}
-		else if(location.x>=visibleSize.width*0.6)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
-		}
-		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
-		}
-	}
-	else
-	{
-		if(location.x<visibleSize.width*0.4)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-			if(time==2)
-				config.controlPoint_1=Vec2(location.x,200);
-			else
-				config.controlPoint_1=Vec2(location.x+30,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
-		}
-		else if(location.x>=visibleSize.width*0.6)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
-		}
-		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
-		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
-			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
-		}
-	}
-	BezierTo *action;
-	if(ccpDistance(location,config.endPosition)<=200)
-	{
-		if(time==3)
-			action=BezierTo::create(0.18,config);
-		else
-			action=BezierTo::create(0.18,config);
-	}
-	else if(ccpDistance(location,config.endPosition)>200)
-	{
-		if(time==3)
-			action=BezierTo::create(0.3,config);
-		else
-			action=BezierTo::create(0.3,config);
-	}
-	return action;
-}
-
-BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
-{
-	ccBezierConfig config;
-    
-	if(no==2)
-	{
-		int lenForPlayerTwo=_roundManager->_players[2]->get_parter()->get_card_list()->len;
-		auto BizerPosForPlayerTwoTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+lenForPlayerTwo-1)->getPosition();
-		auto BizerPosForPlayerTwo=Vec2(BizerPosForPlayerTwoTemp.x,BizerPosForPlayerTwoTemp.y);
-		if((outCard->length-1)<6)
-		{
-			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y+30*(outCard->length-1));
-			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y+30*(outCard->length-1));
-		}
-		else if((outCard->length-1)<14)
-		{
-			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x+48,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-7));
-			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x+48,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-7));
-		}
-		else
-		{
-			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x+96,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-16));
-			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x+96,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-16));
-		}
-	}
-	else if(no==0)
-	{
-		auto l_list_len=_roundManager->_players[no]->get_parter()->get_card_list()->len-1;
-		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+l_list_len);
-		if((outCard->length-1)<6)
-		{
-			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y-30*(outCard->length-1));
-			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y-30*(outCard->length-1));
-		}
-		else if((outCard->length-1)<14)
-		{
-			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x-48,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-7));
-			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x-48,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-7));
-		}
-		else
-		{
-			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x-96,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-16));
-			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x-96,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-16));
-		}
-	}
-	auto action=BezierTo::create(0.3,config);
-	return action;
-}
-
 void NetRaceLayer::ListenToTingButton()
 {
 	auto TingListener = EventListenerTouchOneByOne::create();
@@ -447,10 +218,7 @@ void NetRaceLayer::ListenToTingButton()
 	TingListener->onTouchBegan=[=](Touch* touch, Event* event) {
 		return true;
 	};
-    
-	TingListener->onTouchMoved=[=](Touch* touch, Event* event) {
-	};
-    
+	TingListener->onTouchMoved=[=](Touch* touch, Event* event) {};
 	TingListener->onTouchEnded=[=](Touch* touch, Event* event) {
 		auto button = (Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
 
@@ -466,22 +234,162 @@ void NetRaceLayer::ListenToTingButton()
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
 }
 
-void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
-{
-    LOGGER_WRITE("%s : %x",__FUNCTION__,myframe);
+/***********************************************
+        effect entrances
+***********************************************/
+void NetRaceLayer::QiEffect() {
+    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
+    curButton->setTouchEnabled(false);
+    curButton->_ID = MIDDLE;
 
+    curButton->runAction(Sequence::create(
+        ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::_QiEffect)),NULL));
+}
+
+void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
+    curButton->setTouchEnabled(false);
+    curButton->_ID = MIDDLE;
+    
+    curButton->runAction(Sequence::create(
+        ScaleTo::create(0.1,1),CallFunc::create([=](){  
+        _PengEffect(dir,prevDir,card);}),NULL));
+}
+
+void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang,bool doubleHu) {
+    Button *button = (Button *)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
+    button->setTouchEnabled(false);
+    
+    if(qiangGang) {
+        button->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),
+            ScaleTo::create(0.1,1),CallFunc::create([=](){  
+            _HuEffect(MIDDLE);}),NULL));
+    } else if(doubleHu) {
+        myframe->runAction(Sequence::create(TargetedAction::create(
+            button,ScaleTo::create(0.1,1)),
+            _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)),CallFunc::create([=](){  
+            _HuEffect(3);
+            distribute_event(DOUBLE_HU_WITH_ME,NULL);}),NULL));
+    } else {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){  
+            _HuEffect(MIDDLE);}),NULL));
+    }
+}
+
+void NetRaceLayer::GangEffect(Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
+    Button *button = (Button *)myframe->getChildByTag(GANG_REMING_ACT_TAG_ID);
+    button->setTouchEnabled(false);
+    
+    button->_ID=MIDDLE;
+
+    if(isAnGang) {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){
+            _AnGangEffect(MIDDLE,card,gangCardIdx);
+        }),NULL));
+    } else {
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),CallFunc::create([=](){
+            _MingGangEffect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
+        }),NULL));
+    }
+}
+
+void NetRaceLayer::waitfor_MyShowCardInstruct()
+{
+    LOGGER_WRITE("%s isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
+
+	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
+		if( _roundManager->_isTuoGuan ||
+                (_roundManager->IsTing(_roundManager->_curPlayer) 
+                && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
+            _HandoutLastCard();
+            
+		} else if( myframe->getChildByTag(GANG_REMING_ACT_TAG_ID) ) {
+			_roundManager->_isGangAsking = true;
+		}
+		else {
+			_roundManager->_isMyShowTime = true;
+        }
+	}
+}
+
+/*********************************************
+        player middle card select
+*********************************************/
+/*****************************/
+/* only used when select card */
+void NetRaceLayer::_GetCardsInfo(CardsInfo_t *info) {
+    info->list  = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    info->start = info->list->atcvie_place;
+    info->last   = info->list->len - 1;
+    info->residual = (info->list->len - info->list->atcvie_place)%3;
+}
+/*****************************/
+
+void NetRaceLayer::_HandoutLastCard() {
+    int last = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+    Vec2 location = _GetCardInHand(MIDDLE,last)->getPosition();
+
+    if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last))
+        myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+last);
+    
+    _roundManager->RecordHandOut(last);
+
+    _HandoutEffect((Card_t)_roundManager->_lastHandedOutCard,location,2);
+}
+
+void NetRaceLayer::_HandoutCard(CARD_ARRAY *list,int chosenCard,Touch* touch,int time)
+{
+    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,_roundManager->_isMingTime,_roundManager->_isWaitDecision);
+
+	if(_roundManager->_isMingTime) {
+		ifCardTouchedDuringMing=true;
+		_roundManager->_isMingTime=false;
+	}
+    
 	if(_roundManager->_isWaitDecision) {
 		_roundManager->_isWaitDecision=false;
 		_roundManager->_tempActionToDo=a_JUMP;
 	}
 
-	if( (_roundManager->_actionToDo&a_MING) && (!ifMingMybeError) ) {
-		ifMingMybeError = false;
+    _roundManager->RecordHandOut(chosenCard);
+
+    _Remove(myframe,MING_CANCEL);
+    _Show(myframe,TING_SING_BAR,false);
+
+    if( chosenCard == list->len-1 ) {
+		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + chosenCard)->setScale(0);
+	} else {
+        _ReOrderCardsInHand(chosenCard);
+	}
+    
+	if(time==1) {
+		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
+			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
+	}
+
+	_HandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch->getLocation(),time);
+}
+
+void NetRaceLayer::_HandoutEffect(Card_t outCard,Vec2 location,int time)
+{
+	if(_roundManager->_isWaitDecision) {
+		_roundManager->_isWaitDecision=false;
+		_roundManager->_tempActionToDo=a_JUMP;
+	}
+
+	if( (_roundManager->_actionToDo&a_MING) && (!ifCardTouchedDuringMing) ) {
+		ifCardTouchedDuringMing = false;
 		_roundManager->_actionToDo = a_JUMP;
 	}
 
 	if(_roundManager->_isMingTime) {
-		ifMingMybeError=true;
+		ifCardTouchedDuringMing=true;
 		_roundManager->_isMingTime=false;
 	}    
 
@@ -494,7 +402,7 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
     _Remove(myframe, MING_CANCEL);// why called twice ???
 
 	BezierTo *bizerMotion;
-    auto cardOut = _object->CreateRiverCard(MIDDLE,(Card_t)_roundManager->_lastHandedOutCard);
+    auto cardOut = _object->CreateRiverCard(MIDDLE,outCard);
     
 	if(time==1) {
 		cardOut->setPosition(location);
@@ -506,11 +414,9 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
 		bizerMotion = BizerMove2(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
 		                location,time);
     }
-
     myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
 
-	CallFunc* speakCard  = _voice->SpeakCard((Card_t)_roundManager->_lastHandedOutCard,
-                                _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
+	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
 
 	Spawn* allEffect = Spawn::create(NULL);
     
@@ -562,76 +468,15 @@ void NetRaceLayer::update_outcard(Node *myframe,Vec2 location,int time)
         NULL));
 }
 
-void NetRaceLayer::choose_and_insert_cards(Node *myframe,CARD_ARRAY *list,int chosenCard,Touch* touch,int time)
-{
-    LOGGER_WRITE("%s (ifMingTime=%d, ifMyActionHint=%d)",__FUNCTION__,_roundManager->_isMingTime,_roundManager->_isWaitDecision);
-
-	if(_roundManager->_isMingTime) {
-		ifMingMybeError=true;
-		_roundManager->_isMingTime=false;
-	}
-    
-	if(_roundManager->_isWaitDecision) {
-		_roundManager->_isWaitDecision=false;
-		_roundManager->_tempActionToDo=a_JUMP;
-	}
-
-    _Remove(myframe,MING_CANCEL);
-    _Show(myframe,TING_SING_BAR,false);
-
-    if( chosenCard == list->len-1 ) {
-		myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + chosenCard)->setScale(0);
-	} else {
-        _ReOrderCardsInHand(chosenCard);
-	}
-    
-	if(time==1) {
-		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
-			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
-	}
-
-    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[chosenCard]);
-	_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(chosenCard);
-
-	update_outcard(myframe,touch->getLocation(),time);
-}
-
-void NetRaceLayer::waitfor_MyShowCardInstruct()
-{
-    LOGGER_WRITE("%s isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
-
-	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
-		if( _roundManager->_isTuoGuan ||
-                (_roundManager->IsTing(_roundManager->_curPlayer) 
-                && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
-			int last = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
-			Vec2 location = _GetCardInHand(MIDDLE,last)->getPosition();
-            
-			if(_GetCardInHand(MIDDLE,last))
-				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID + MIDDLE*20 + last);
-            
-            _roundManager->RecordHandOut(last);
-			update_outcard(myframe,location,2);
-            
-		} else if( myframe->getChildByTag(GANG_REMING_ACT_TAG_ID) ) {
-			_roundManager->_isGangAsking = true;
-		}
-		else {
-			_roundManager->_isMyShowTime = true;
+int NetRaceLayer::_FindCard(int start,int end,Touch *touch) {
+    for(int i=start;i<=end;i++) {
+        if( _IsClickedOn(_GetCardInHand(MIDDLE,i),touch) ) {
+            return i;
         }
-	}
-}
+    }
 
-/*****************************/
-/* only used when select card */
-
-void NetRaceLayer::_GetCardsInfo(CardsInfo_t *info) {
-    info->list  = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-    info->start = info->list->atcvie_place;
-    info->last   = info->list->len - 1;
-    info->residual = (info->list->len - info->list->atcvie_place)%3;
+    return INVALID;
 }
-/*****************************/
 
 bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
     if( ifInsertCardsTime ) {
@@ -679,16 +524,6 @@ bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
     }
     
     return true;
-}
-
-int NetRaceLayer::_FindCard(int start,int end,Touch *touch) {
-    for(int i=start;i<=end;i++) {
-        if( _IsClickedOn(_GetCardInHand(MIDDLE,i),touch) ) {
-            return i;
-        }
-    }
-
-    return INVALID;
 }
 
 void NetRaceLayer::_UpdateCardsInHand(const CardsInfo_t &cards, int chosen) {
@@ -803,7 +638,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 			_roundManager->_isMyShowTime=false;
 			_myChosenCard=-1;
             
-			choose_and_insert_cards(myframe,cards.list,touched,touch,1);
+			_HandoutCard(cards.list,touched,touch,1);
 		} else {
 			_myChosenCard=touched;
 
@@ -855,7 +690,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 							_roundManager->_isMyShowTime=false;
 							_myChosenCard=-1;
 							touched=i;
-							choose_and_insert_cards(myframe,cards.list,touched,touch,2);
+							_HandoutCard(cards.list,touched,touch,2);
 						}
 					} else {
 						loopCard->_ID=100;
@@ -898,7 +733,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 			_roundManager->_isMyShowTime=false;
 			_myChosenCard=-1;
 			touched = chosen;
-			choose_and_insert_cards(myframe,cards.list,touched,touch,3);
+			_HandoutCard(cards.list,touched,touch,3);
 		}
     }
 }
@@ -1025,7 +860,7 @@ Sprite *NetRaceLayer::_GetEffectCardInHand(Node *myframe, int i,CARD_KIND kindId
 }
 
 
-void NetRaceLayer::peng_tip_effect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
     Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
     curButton->setTouchEnabled(false);
     curButton->_ID = MIDDLE;
@@ -1392,7 +1227,7 @@ void NetRaceLayer::peng_tip_effect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t 
 	}
 }
 
-void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
+void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
@@ -1709,7 +1544,7 @@ void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
 
     if(win.player!=MIDDLE) {
         if(_roundManager->IsTing(1)) {
-            hu_effect_tip(3);
+            _HuEffect(3);
             distribute_event(DOUBLE_HU_WITH_ME,NULL);
         } else {
             waitfor_myaction(MIDDLE);
@@ -1724,13 +1559,13 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
         if(_roundManager->IsTing(1)) {
             myframe->_ID = MIDDLE;
             myframe->runAction(CallFunc::create([=](){
-                hu_effect_tip(win.player);}));
+                _HuEffect(win.player);}));
         } else {
             waitfor_myaction(MIDDLE);
         }
 
     } else {
-        hu_effect_tip(win.player);
+        _HuEffect(win.player);
     }
 }
 
@@ -1804,7 +1639,7 @@ void NetRaceLayer::QiangGangHuJudge()
 	}
 }
 
-void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
+void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
 {
     LOGGER_WRITE("%s",__FUNCTION__);
     myframe->_ID = no;
@@ -2249,7 +2084,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
 	}
 }
 
-void NetRaceLayer::qi_tip_effect(Node *psender)
+void NetRaceLayer::_QiEffect(Node *psender)
 {
 	int no=psender->_ID;
 	
@@ -2280,16 +2115,7 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 				myframe->runAction(Sequence::create(
                     shadeFunc,CallFunc::create([=](){
     					_roundManager->_isGangAsking = false;
-
-    					int lastOne = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
-    					Vec2 location = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+lastOne)->getPosition();
-    					if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+lastOne))
-    						myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+1*20+lastOne);
-
-                        _roundManager->RecordOutCard(
-                            _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[lastOne]);
-    					_roundManager->_lastHandedOutCard = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(lastOne);
-    					update_outcard(myframe,location,2);
+    					_HandoutLastCard();
                     }),NULL));
 			} else
 				myframe->runAction(shadeFunc);
@@ -2306,7 +2132,7 @@ void NetRaceLayer::qi_tip_effect(Node *psender)
 				_roundManager->_isDoubleHuAsking=false;
 				myframe->runAction(Sequence::create(
                     shadeFunc,CallFunc::create([=](){
-                    hu_effect_tip(_roundManager->_otherOneForDouble);}),NULL));
+                    _HuEffect(_roundManager->_otherOneForDouble);}),NULL));
 			} else {
 				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 				myframe->runAction(Sequence::create(
@@ -3607,7 +3433,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	
 	if(_roundManager->_actionToDo&a_HU)
 	{
-		hu_effect_tip(no);
+		_HuEffect(no);
 	}
 	else if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG)
 	{
@@ -3634,7 +3460,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 		}
 
 		myframe->runAction(CallFunc::create([&](){
-			an_gang_tip_effect(no,card,Angang);
+			_AnGangEffect(no,card,Angang);
 		}));
 	}
 	else if(_roundManager->_actionToDo&a_MING_GANG)
@@ -3684,7 +3510,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 		}
 
 		auto minggangEffect = CallFunc::create([=](){
-			ming_gang_tip_effect(no,prevPlayer,(Card_t)GangCard.kind,Angang);
+			_MingGangEffect(no,prevPlayer,(Card_t)GangCard.kind,Angang);
 		});
 		myframe->runAction(minggangEffect);
 	}
@@ -3806,7 +3632,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			{
 				
 				myframe->_ID=sender->_ID;
-				auto huCallFunc=CallFunc::create([=](){hu_effect_tip(1);});
+				auto huCallFunc=CallFunc::create([=](){_HuEffect(1);});
 				myframe->runAction(huCallFunc);
 			}
 			else
@@ -3933,7 +3759,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
             HideClock();
 			if((no!=1&&no1!=1)||(no==1||no1==1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
 			{
-				hu_effect_tip(3);
+				_HuEffect(3);
 				distribute_event(DOUBLE_HU_WITH_ME,NULL);
 			}
 			else if((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==0)
@@ -3962,7 +3788,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				{
 					
 					myframe->_ID=1;
-					auto huCallFunc=CallFunc::create([=](){hu_effect_tip(1);});
+					auto huCallFunc=CallFunc::create([=](){_HuEffect(1);});
 					myframe->runAction(huCallFunc);
 				}
 				else
@@ -3976,9 +3802,9 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				}
 			}
 			else if(no!=1&&(action1&a_HU))
-				hu_effect_tip(no);
+				_HuEffect(no);
 			else if(no1!=1&&(action2&a_HU))
-				hu_effect_tip(no1);
+				_HuEffect(no1);
 		}
 		else if(action1!=a_JUMP)//下家
 		{
@@ -4287,7 +4113,7 @@ void NetRaceLayer::start_callback()
 
 	distributeCardPos=Vec2::ZERO;
 	ifUpdateDuringEffect=false;
-	ifMingMybeError=false;
+	ifCardTouchedDuringMing=false;
 	ifInsertStopped=false;
 	ifInsertCardsTime=false;
 	ifEffectTime=false;
@@ -6053,7 +5879,7 @@ Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 }
 
 /* why use different mechanism for single hu and double hu ??? */
-void NetRaceLayer::hu_effect_tip(int no)
+void NetRaceLayer::_HuEffect(int no)
 {
     LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
 
@@ -6259,12 +6085,6 @@ void NetRaceLayer::ListenToDoubleHu() {
     _eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
 }
 
-void NetRaceLayer::hu_tip_effect(Node *psender)
-{
-	int no = psender->_ID;
-		hu_effect_tip(no);
-}
-
 //int NetRaceLayer::get_cur_player_no()
 //{
 //	return _roundManager->_curPlayer;
@@ -6409,7 +6229,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 					else if(_roundManager->_isDoubleHuAsking)
 					{
 						_roundManager->_isDoubleHuAsking = false;
-						auto huFunc=CallFunc::create([=](){hu_effect_tip(_roundManager->_otherOneForDouble);});
+						auto huFunc=CallFunc::create([=](){_HuEffect(_roundManager->_otherOneForDouble);});
 						myframe->runAction(huFunc);
 					}
 					else
@@ -7863,4 +7683,167 @@ void NetRaceLayer::_StartParticleSystem(float delta)
 
 
 
+/***********************************************
+        
+***********************************************/
+BezierTo* NetRaceLayer::BizerMove1(outCardList* outCard,Vec2 location)
+{
+	ccBezierConfig config;
+
+    _layout->GetBizerPoints(config, outCard->length-1, location);
+
+	BezierTo *action;
+	if(ccpDistance(location,config.endPosition)<=200){
+		action=BezierTo::create(0.18,config);
+	} else {
+		action=BezierTo::create(0.3,config);
+	}
+    
+	return action;
+}
+
+BezierTo* NetRaceLayer::BizerMove2(outCardList* outCard,Vec2 location,int time)
+{
+	ccBezierConfig config;
+	if((outCard->length-1)<6)
+	{
+		if(location.x<visibleSize.width*0.4)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)-100,_layout->_playerPosi[1].riverPoint.y-100);
+		}
+		else if(location.x>=visibleSize.width*0.6)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
+		}
+		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)*36),_layout->_playerPosi[1].riverPoint.y);
+		}
+	}
+	else if((outCard->length-1)<14)
+	{
+		if(location.x<visibleSize.width*0.4)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			if(time==2)
+				config.controlPoint_1=Vec2(location.x,200);
+			else
+				config.controlPoint_1=Vec2(location.x+30,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
+		}
+		else if(location.x>=visibleSize.width*0.6)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
+		}
+		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+		}
+	}
+	else
+	{
+		if(location.x<visibleSize.width*0.4)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
+			if(time==2)
+				config.controlPoint_1=Vec2(location.x,200);
+			else
+				config.controlPoint_1=Vec2(location.x+30,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
+		}
+		else if(location.x>=visibleSize.width*0.6)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
+		}
+		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
+		{
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
+			config.controlPoint_1=Vec2(location.x,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->length-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
+		}
+	}
+	BezierTo *action;
+	if(ccpDistance(location,config.endPosition)<=200)
+	{
+		if(time==3)
+			action=BezierTo::create(0.18,config);
+		else
+			action=BezierTo::create(0.18,config);
+	}
+	else if(ccpDistance(location,config.endPosition)>200)
+	{
+		if(time==3)
+			action=BezierTo::create(0.3,config);
+		else
+			action=BezierTo::create(0.3,config);
+	}
+	return action;
+}
+
+BezierTo* NetRaceLayer::OthersBizerMove(int no,outCardList* outCard)
+{
+	ccBezierConfig config;
+    
+	if(no==2)
+	{
+		int lenForPlayerTwo=_roundManager->_players[2]->get_parter()->get_card_list()->len;
+		auto BizerPosForPlayerTwoTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+lenForPlayerTwo-1)->getPosition();
+		auto BizerPosForPlayerTwo=Vec2(BizerPosForPlayerTwoTemp.x,BizerPosForPlayerTwoTemp.y);
+		if((outCard->length-1)<6)
+		{
+			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y+30*(outCard->length-1));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y+30*(outCard->length-1));
+		}
+		else if((outCard->length-1)<14)
+		{
+			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x+48,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-7));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x+48,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-7));
+		}
+		else
+		{
+			config.controlPoint_1=Vec2(BizerPosForPlayerTwo.x-100,BizerPosForPlayerTwo.y);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x+96,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-16));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x+96,_layout->_playerPosi[no].riverPoint.y+30*((outCard->length-1)-16));
+		}
+	}
+	else if(no==0)
+	{
+		auto l_list_len=_roundManager->_players[no]->get_parter()->get_card_list()->len-1;
+		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+l_list_len);
+		if((outCard->length-1)<6)
+		{
+			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y-30*(outCard->length-1));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x,_layout->_playerPosi[no].riverPoint.y-30*(outCard->length-1));
+		}
+		else if((outCard->length-1)<14)
+		{
+			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x-48,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-7));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x-48,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-7));
+		}
+		else
+		{
+			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[no].riverPoint.x-96,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-16));
+			config.endPosition=Vec2(_layout->_playerPosi[no].riverPoint.x-96,_layout->_playerPosi[no].riverPoint.y-30*((outCard->length-1)-16));
+		}
+	}
+	auto action=BezierTo::create(0.3,config);
+	return action;
+}
 
