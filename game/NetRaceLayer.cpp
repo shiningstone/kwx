@@ -7318,22 +7318,22 @@ Sprite *NetRaceLayer::_GetCardInHand(PlayerDir_t dir,int idx) {
 
 void NetRaceLayer::_ReOrderCardsInHand(int droppedCard) {
 	auto cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    /*NOTE : this function is called after handout ,so the position is 1 bigger than length */
+    const int  LAST      = (cards->len-1)+1;
 
-    if(droppedCard==cards->len-1) {
+    if(droppedCard==LAST) {
 		_GetCardInHand(MIDDLE,droppedCard)->setScale(0);
         return;
     }
     
     const auto SIZE      = _GetCardInHand(MIDDLE,0)->getTextureRect().size;
-    
-    const int  LAST      = cards->len-1;
     /* maybe need to be put into the circulation */
-    const auto LAST_CARD = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST);
-    const auto LAST_POS  = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + _roundManager->_curPlayer*20 + LAST)->getPosition();
+    const auto LAST_CARD = _GetCardInHand((PlayerDir_t)_roundManager->_curPlayer,LAST);
+    const auto LAST_POS  = LAST_CARD->getPosition();
     
     /* need to be optimized !!! */
     for(int i=cards->atcvie_place; i<LAST; i++) {
-        auto card = _GetCardInHand(_roundManager->_curPlayer,i);
+        auto card = _GetCardInHand((PlayerDir_t)_roundManager->_curPlayer,i);
         auto curPos   = card->getPosition();
         
         auto RightMove = MoveTo::create(0.3,Vec2(curPos.x+SIZE.width,curPos.y));
