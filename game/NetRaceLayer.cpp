@@ -65,8 +65,7 @@ NetRaceLayer::~NetRaceLayer()
     LOGGER_DEREGISTER(_logger);
 }
 
-bool NetRaceLayer::init()
-{
+bool NetRaceLayer::init() {
 	if(!Layer::init()) {
 		return false;
 	}
@@ -75,20 +74,13 @@ bool NetRaceLayer::init()
 	return true;
 }
 
-void NetRaceLayer::distribute_event(const std::string event_type,void* val)
-{
-    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
-	_eventDispatcher->dispatchCustomEvent(event_type,val);
-}
-
+/************************************************
+                interface 
+************************************************/
 void NetRaceLayer::create_race()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-    _roundManager->InitPlayers();
-    _roundManager->LoadPlayerInfo();
-	_roundManager->_isGameStart=false;
-    
 	_isResoucePrepared=false;
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
@@ -99,65 +91,17 @@ void NetRaceLayer::create_race()
 	this->addChild(_object->CreateTable(s_no), 0);
 	this->addChild(_object->CreateBackground(),1,CENTER_BKG_TAG_ID);
 
-    /************************
-        buttons
-    ************************/
-    GMenu *gMenu = _object->CreateMenu();
-	this->addChild(gMenu->_bkg,4,MENU_BKG_TAG_ID);
-
-	auto buttonImg = Sprite::createWithSpriteFrameName("baomingbisai2.png");
-    
-	auto flagButton = _object->CreateButton(MENUBTN_BAOMING);
-    gMenu->AddItem(flagButton,buttonImg);
-
-	auto robotButton = _object->CreateButton(MENUBTN_TUOGUAN);
-	robotButton->setTouchEnabled(false);
-	robotButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::tuoGuanPressed,this));
-    gMenu->AddItem(robotButton);
-
-    auto setButton = _object->CreateButton(MENUBTN_SHEZHI);
-    gMenu->AddItem(setButton);
-
-	auto mallButton = _object->CreateButton(MENUBTN_SHOP);
-    gMenu->AddItem(mallButton);
-
-	auto backButton = _object->CreateButton(MENUBTN_GAMEBACK);
-	backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::backPressed,this));
-    gMenu->AddItem(backButton);
-
-    /************************
-        residue cards
-    ************************/
-    create_residue_cards();
+    _CreateMeneButtons();
+    _CreateResidueCards();
 	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+    _CreateHeadImage();
 
-    /************************
-        head image
-    ************************/
-    Sprite *bkg = _object->CreateHeadBkg(LEFT);
-    _layout->SetPlayerBkg(LEFT,bkg);
-	this->addChild(_layout->_playerBkg[0],1,LEFT_IMG_BKG_TAG_ID);
-
-    bkg = _object->CreateHeadBkg(RIGHT);
-    _layout->SetPlayerBkg(RIGHT,bkg);
-	this->addChild(_layout->_playerBkg[2],1,RIGHT_IMG_BKG_TAG_ID);
-
-    bkg = _object->CreateHeadBkg(MIDDLE);
-    _layout->SetPlayerBkg(MIDDLE,bkg);
-	this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
-
-    /************************
-        other accessories
-    ************************/
 	this->addChild(_object->CreateMicIcon(),1,MIC_TAG_ID);
 	this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
-	auto StartButton = _object->CreateButton(BTN_START);
-	StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
-	this->addChild(StartButton,2,START_GAME_TAG_ID);
     
 	for(int dir=0;dir<3;dir++) {
-		update_headimage(dir,_roundManager->_cardHolders[dir]->_profile.photo);
-		update_nickname(dir,_roundManager->_cardHolders[dir]->_profile.name);
+		_UpdateHeadImage(dir,_roundManager->_cardHolders[dir]->_profile.photo);
+		_UpdateNickName(dir,_roundManager->_cardHolders[dir]->_profile.name);
 		GuiUpdateScore(dir,_roundManager->_cardHolders[dir]->_profile.property);
 	}
 
@@ -165,70 +109,35 @@ void NetRaceLayer::create_race()
         auto mapai = _object->CreateMaPai(i);
         this->addChild(mapai,2,CARD_ARRAGE_LEFT_TAG_ID + i);
     }
+
+    auto StartButton = _object->CreateButton(BTN_START);
+    StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
+    this->addChild(StartButton,2,START_GAME_TAG_ID);
 }
 
-bool NetRaceLayer::resource_prepare()
+void NetRaceLayer::distribute_event(const std::string event_type,void* val)
 {
-	this->addChild(_object->CreateMingSign(LEFT),2,MING_STATUS_PNG_0);
-	this->addChild(_object->CreateMingSign(MIDDLE),2,MING_STATUS_PNG_1);
-	this->addChild(_object->CreateMingSign(RIGHT),2,MING_STATUS_PNG_2);
-
-    _zhuangSign = _object->CreateZhuangSign();
-	this->addChild(_zhuangSign,1,LAST_WINNER_TAG_ID);
-	this->addChild(_object->CreateClock(),3,ALARM_CLOCK_INDICATOR_TAG_ID);
-
-	this->addChild(_object->CreateClockIndicator(MIDDLE),3,ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
-	this->addChild(_object->CreateClockIndicator(RIGHT),4,ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
-	this->addChild(_object->CreateClockIndicator(LEFT),4,ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
-
-	this->addChild(_object->CreatePlayerPointer(),5,SHOWCARD_INDICATOR_TAG_ID);
-
-	return true;
+    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
+	_eventDispatcher->dispatchCustomEvent(event_type,val);
 }
 
-void NetRaceLayer::startParticleSystem(float delta)
-{
-	auto m_Smoke = ParticleSystemQuad::create("Smoke.plist");
-	m_Smoke->setBlendAdditive(true);
-	m_Smoke->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-	myframe->addChild(m_Smoke,20,PARTICLE_SOMKE);
-	m_Smoke->setLife(0.6);
-	m_Smoke->setEmissionRate(2400);
-	m_Smoke->setDuration(0.18);
-	m_Smoke->isAutoRemoveOnFinish();
-
-	auto m_SmallParticle = CCParticleSystemQuad::create("star.plist");
-	m_SmallParticle->setBlendAdditive(true);
-	m_SmallParticle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-	myframe->addChild(m_SmallParticle, 20,PARTICLE_SMALL);
-	m_SmallParticle->setLife(0.42);
-	m_SmallParticle->setStartSize(40);
-	m_SmallParticle->setEmissionRate(80);
-	m_SmallParticle->setSpeed(500);
-	m_SmallParticle->setSpeedVar(-5);
-	m_SmallParticle->setDuration(0.18);
-	m_SmallParticle->setStartColor(Color4F(1,1,1,1));
-	m_SmallParticle->setStartColorVar(Color4F(0,0,0,0));
-	m_SmallParticle->setEndColor(Color4F(0,0,0,0));
-	m_SmallParticle->setEndColorVar(Color4F(1,1,1,1));
-	m_SmallParticle->isAutoRemoveOnFinish();
-}
-
+/***********************************************
+        button handlers
+***********************************************/
 void NetRaceLayer::PengPressed(Button *button,PlayerDir_t prevPlayer,Card_t card) {
     button->setTouchEnabled(false);
     
-    button->_ID = 1;
+    button->_ID = MIDDLE;
     button->runAction(Sequence::create(
         ScaleTo::create(0.1,1),CallFunc::create([=](){
-        PengEffect((PlayerDir_t)_roundManager->_curPlayer,prevPlayer,card);}),NULL));
+        PengEffect(MIDDLE,prevPlayer,card);}),NULL));
 }
 
 void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
     
-	switch (type)
-	{
+	switch (type) {
     	case cocos2d::ui::Widget::TouchEventType::BEGAN:
     		curButton->setScale(1.2);
     		break;
@@ -254,8 +163,6 @@ void NetRaceLayer::HuPressed(Button *button, bool qiangGang, bool doubleHu) {
             ScaleTo::create(0.1,1),CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::hu_tip_effect)),NULL));
     } else if(doubleHu) {
-        
-            
         myframe->runAction(Sequence::create(TargetedAction::create(
             button,ScaleTo::create(0.1,1)),
             _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
@@ -1107,7 +1014,6 @@ Sprite *NetRaceLayer::_GetEffectCardInHand(Node *myframe, int i,CARD_KIND kindId
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
 	myframe->_ID = dir;
-    LOGGER_WRITE("%s %d",__FUNCTION__,dir);
     
 	const int riverLast =_roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
 	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast)) {
@@ -1754,7 +1660,7 @@ void NetRaceLayer::an_gang_tip_effect(int no,Card_t card,int gang[])
             		    moveAngangCards,
             		    Sequence::create(
             		        DelayTime::create(0.66),CCCallFunc::create([=]() {
-                    		startParticleSystem(0.3);
+                    		_StartParticleSystem(0.3);
                     		}),NULL),
                         bgElementsMotions[0],
                         bgElementsMotions[1],
@@ -2296,7 +2202,7 @@ void NetRaceLayer::ming_gang_tip_effect(int no,PlayerDir_t prevDir, Card_t card,
                         gangCardInHandMotion[0],gangCardInHandMotion[1],gangCardInHandMotion[2],NULL),
                     Sequence::create(
                         DelayTime::create(0.78), CCCallFunc::create([=]() {
-            			startParticleSystem(0.3); }),NULL),
+            			_StartParticleSystem(0.3); }),NULL),
                     bgElementsMotions[0],
                     bgElementsMotions[1],
                     bgElementsMotions[2],
@@ -4330,7 +4236,7 @@ void NetRaceLayer::start_callback()
 	if(!_isResoucePrepared)
 	{
 		_isResoucePrepared=true;
-		resource_prepare();
+		_ResourcePrepare();
 	}
 
     _Remove(this,GAME_BKG_TAG_ID);
@@ -6128,6 +6034,7 @@ Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 
 }
 
+/* why use different mechanism for single hu and double hu ??? */
 void NetRaceLayer::hu_effect_tip(int no)
 {
     LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
@@ -6253,7 +6160,7 @@ void NetRaceLayer::hu_effect_tip(int no)
 			
 			auto ll_action9=Sequence::create(DelayTime::create(0.3),CCCallFunc::create([=]()
 			{
-				startParticleSystem(0.3);	
+				_StartParticleSystem(0.3);	
 			}),NULL);
 
 			auto sorPos=this->getPosition();
@@ -6281,44 +6188,57 @@ void NetRaceLayer::hu_effect_tip(int no)
 			myframe->runAction(hu_seq);
 		}
 	}
-	else if(no==3)//两个对家双响
-	{
+	else if(no==3) {//两个对家双响
         _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
-        
-		auto _doublehucallListener = EventListenerCustom::create(DOUBLE_HU_WITH_ME, [this](EventCustom * event){
-			
-			auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
-			auto DoubleFileFunc=CallFunc::create([=]{
-				_eventDispatcher->removeCustomEventListeners(DOUBLE_HU_WITH_ME);
-				auto yiPaoShuangXiang=Sprite::create("ypsx.png");
-				yiPaoShuangXiang->setAnchorPoint(Vec2(0.5,0.5));
-				yiPaoShuangXiang->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height-yiPaoShuangXiang->getTextureRect().size.height/2));
-				yiPaoShuangXiang->setOpacity(0);
-				myframe->addChild(yiPaoShuangXiang,30);//字
-
-				auto move=MoveTo::create(0.2,Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-				yiPaoShuangXiang->runAction(Sequence::create(Spawn::create(FadeIn::create(0.1),EaseIn::create(move,2),NULL),DelayTime::create(1),FadeOut::create(0.8),NULL));
-
-				auto xian=LayerColor::create();
-				xian->ignoreAnchorPointForPosition(false);
-				xian->setAnchorPoint(Vec2(0.5,0.5));
-				xian->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2-84));
-				xian->setContentSize(Size(600,8));
-				xian->setColor(Color3B(193,63,30));
-				xian->setOpacity(100);
-				xian->setScale(0);
-				myframe->addChild(xian,10);
-				xian->runAction(Sequence::create(DelayTime::create(1.2),ScaleTo::create(0,0),NULL));
-			});
-			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(3,3,_roundManager->_curPlayer);	
-			});
-			auto HuFontNo=simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+1)%3)),"dahu.png");
-			auto HuFontNo1=simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+2)%3)),"dahu.png");
-			myframe->runAction(Sequence::create(Spawn::create(DoubleFileFunc,callfunc,HuFontNo,HuFontNo1,NULL),GoldAccount,NULL));
-		});
-		_eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
+		ListenToDoubleHu();
 	}
+}
+
+void NetRaceLayer::ListenToDoubleHu() {
+    auto _doublehucallListener = EventListenerCustom::create(DOUBLE_HU_WITH_ME, [this](EventCustom * event){
+        
+        auto DoubleFileFunc = CallFunc::create([=]{
+            _eventDispatcher->removeCustomEventListeners(DOUBLE_HU_WITH_ME);
+            
+            auto yiPaoShuangXiang = Sprite::create("ypsx.png");
+            yiPaoShuangXiang->setAnchorPoint(Vec2(0.5,0.5));
+            yiPaoShuangXiang->setPosition(Vec2(
+                origin.x+visibleSize.width/2,
+                origin.y+visibleSize.height - yiPaoShuangXiang->getTextureRect().size.height/2));
+            yiPaoShuangXiang->setOpacity(0);
+            myframe->addChild(yiPaoShuangXiang,30);//字
+    
+            yiPaoShuangXiang->runAction(
+                Sequence::create(
+                    Spawn::create(
+                        FadeIn::create(0.1),
+                        EaseIn::create(
+                            MoveTo::create(0.2,Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2)),2),NULL),
+                    DelayTime::create(1),
+                    FadeOut::create(0.8),NULL));
+    
+            auto xian = LayerColor::create();
+            xian->ignoreAnchorPointForPosition(false);
+            xian->setAnchorPoint(Vec2(0.5,0.5));
+            xian->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2-84));
+            xian->setContentSize(Size(600,8));
+            xian->setColor(Color3B(193,63,30));
+            xian->setOpacity(100);
+            xian->setScale(0);
+            myframe->addChild(xian,10);
+            xian->runAction(Sequence::create(DelayTime::create(1.2),ScaleTo::create(0,0),NULL));
+        });
+        
+        myframe->runAction(Sequence::create(
+            Spawn::create(
+                DoubleFileFunc,CallFunc::create(this,callfunc_selector(
+                NetRaceLayer::showall)),
+                simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+1)%3)),"dahu.png"),
+                simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+2)%3)),"dahu.png"),NULL),CallFunc::create([=](){
+            GoldNumInsert(3,3,_roundManager->_curPlayer);}),NULL));
+    });
+    
+    _eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
 }
 
 void NetRaceLayer::hu_tip_effect(Node *psender)
@@ -6651,7 +6571,7 @@ void NetRaceLayer::Back()
 /***********************************************
             graphical residue cards
 ***********************************************/
-void NetRaceLayer::create_residue_cards() {
+void NetRaceLayer::_CreateResidueCards() {
 	residue_card_bkg=Sprite::createWithSpriteFrameName("Tile_reservedBG.png");
 	residue_card_bkg->setAnchorPoint(Vec2(0.0f,1.0f));
 	residue_card_bkg->setPosition(Vec2(5 + origin.x, visibleSize.height-5+origin.y));
@@ -6917,7 +6837,7 @@ void NetRaceLayer::GuiUpdateScore(int dir,int score)
     _GuiUpdateScore(propertyLayerBar,score);
 }
 
-void NetRaceLayer::update_nickname(int direction,std::string str_Nick)
+void NetRaceLayer::_UpdateNickName(int direction,std::string str_Nick)
 {		
 	if(direction==0)
 	{
@@ -6956,7 +6876,7 @@ void NetRaceLayer::update_nickname(int direction,std::string str_Nick)
 
 }
 
-void NetRaceLayer::update_headimage(int direction,std::string head_photo)
+void NetRaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
 {
 	auto head_image=Sprite::createWithSpriteFrameName(head_photo);
 
@@ -7829,6 +7749,94 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
             ActionAfterGang,NULL),NULL));
 }
 
+/************************************************
+                support
+************************************************/
+void NetRaceLayer::_CreateMeneButtons() {
+    GMenu *gMenu = _object->CreateMenu();
+    this->addChild(gMenu->_bkg,4,MENU_BKG_TAG_ID);
+
+    auto buttonImg = Sprite::createWithSpriteFrameName("baomingbisai2.png");
+    
+    auto flagButton = _object->CreateButton(MENUBTN_BAOMING);
+    gMenu->AddItem(flagButton,buttonImg);
+
+    auto robotButton = _object->CreateButton(MENUBTN_TUOGUAN);
+    robotButton->setTouchEnabled(false);
+    robotButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::tuoGuanPressed,this));
+    gMenu->AddItem(robotButton);
+
+    auto setButton = _object->CreateButton(MENUBTN_SHEZHI);
+    gMenu->AddItem(setButton);
+
+    auto mallButton = _object->CreateButton(MENUBTN_SHOP);
+    gMenu->AddItem(mallButton);
+
+    auto backButton = _object->CreateButton(MENUBTN_GAMEBACK);
+    backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::backPressed,this));
+    gMenu->AddItem(backButton);
+}
+
+void NetRaceLayer::_CreateHeadImage() {
+    Sprite *bkg = _object->CreateHeadBkg(LEFT);
+    _layout->SetPlayerBkg(LEFT,bkg);
+    this->addChild(_layout->_playerBkg[0],1,LEFT_IMG_BKG_TAG_ID);
+
+    bkg = _object->CreateHeadBkg(RIGHT);
+    _layout->SetPlayerBkg(RIGHT,bkg);
+    this->addChild(_layout->_playerBkg[2],1,RIGHT_IMG_BKG_TAG_ID);
+
+    bkg = _object->CreateHeadBkg(MIDDLE);
+    _layout->SetPlayerBkg(MIDDLE,bkg);
+    this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
+}
+
+bool NetRaceLayer::_ResourcePrepare()
+{
+	this->addChild(_object->CreateMingSign(LEFT),2,MING_STATUS_PNG_0);
+	this->addChild(_object->CreateMingSign(MIDDLE),2,MING_STATUS_PNG_1);
+	this->addChild(_object->CreateMingSign(RIGHT),2,MING_STATUS_PNG_2);
+
+    _zhuangSign = _object->CreateZhuangSign();
+	this->addChild(_zhuangSign,1,LAST_WINNER_TAG_ID);
+	this->addChild(_object->CreateClock(),3,ALARM_CLOCK_INDICATOR_TAG_ID);
+
+	this->addChild(_object->CreateClockIndicator(MIDDLE),3,ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+	this->addChild(_object->CreateClockIndicator(RIGHT),4,ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+	this->addChild(_object->CreateClockIndicator(LEFT),4,ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
+
+	this->addChild(_object->CreatePlayerPointer(),5,SHOWCARD_INDICATOR_TAG_ID);
+
+	return true;
+}
+
+void NetRaceLayer::_StartParticleSystem(float delta)
+{
+	auto m_Smoke = ParticleSystemQuad::create("Smoke.plist");
+	m_Smoke->setBlendAdditive(true);
+	m_Smoke->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+	myframe->addChild(m_Smoke,20,PARTICLE_SOMKE);
+	m_Smoke->setLife(0.6);
+	m_Smoke->setEmissionRate(2400);
+	m_Smoke->setDuration(0.18);
+	m_Smoke->isAutoRemoveOnFinish();
+
+	auto m_SmallParticle = CCParticleSystemQuad::create("star.plist");
+	m_SmallParticle->setBlendAdditive(true);
+	m_SmallParticle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+	myframe->addChild(m_SmallParticle, 20,PARTICLE_SMALL);
+	m_SmallParticle->setLife(0.42);
+	m_SmallParticle->setStartSize(40);
+	m_SmallParticle->setEmissionRate(80);
+	m_SmallParticle->setSpeed(500);
+	m_SmallParticle->setSpeedVar(-5);
+	m_SmallParticle->setDuration(0.18);
+	m_SmallParticle->setStartColor(Color4F(1,1,1,1));
+	m_SmallParticle->setStartColorVar(Color4F(0,0,0,0));
+	m_SmallParticle->setEndColor(Color4F(0,0,0,0));
+	m_SmallParticle->setEndColorVar(Color4F(1,1,1,1));
+	m_SmallParticle->isAutoRemoveOnFinish();
+}
 
 
 

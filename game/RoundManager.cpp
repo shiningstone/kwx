@@ -476,6 +476,10 @@ void RoundManager::StartGame(Scene *scene) {
 
     _uiManager->Set(this);
 
+    InitPlayers();
+    LoadPlayerInfo();
+	_isGameStart=false;
+    
     _uiManager->create_race();
     _uiManager->race_start_again();
     

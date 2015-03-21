@@ -56,8 +56,14 @@ private:
     void SingleWin(const WinInfo_t &win);
     void _OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers);
     void _UpdateCardsInHand(const CardsInfo_t &cards, int chosen);
+    void _ShowMenuButtons();
+    void _CreateMeneButtons();
+    void _CreateHeadImage();
+    bool _ResourcePrepare();
+    void _StartParticleSystem(float delta);
+    void ListenToDoubleHu();
 
-    void create_residue_cards();
+    void _CreateResidueCards();
     void refresh_residue_cards();
     std::string _NumToString( int number );
     void _CalcAnGangGold(int winner,int goldOfPlayer[3]);
@@ -160,7 +166,6 @@ private:
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);
-	bool resource_prepare();//码牌准备
 	void race_begin_prepare();//牌局开始效果
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
@@ -176,8 +181,8 @@ private:
 				2 right
 	#######################*/
 	void GuiUpdateScore(int direction,int score);//更新分数
-	void update_nickname(int direction,std::string str_Nick);//更新昵称
-	void update_headimage(int direction,std::string head_photo);//更新头像
+	void _UpdateNickName(int direction,std::string str_Nick);//更新昵称
+	void _UpdateHeadImage(int direction,std::string head_photo);//更新头像
     /*###################################*/
 	void waitfor_ShowCardWithoutTouch();
 	void waitfor_MyTouchShowCard();
@@ -244,7 +249,6 @@ public:
 	void ming_tip_effect(Node *psender);//me--名牌效果
 	void hu_tip_effect(Node *psender);//me--胡牌效果
 	void qi_tip_effect(Node *psender);//me--弃牌效果
-	void startParticleSystem(float delta);//me--例子效果
 	void card_list_update(int no);
 	void update_card_list(Node *psender);//更新玩家手牌
 	void update_card_in_river_list(Node* sender);
