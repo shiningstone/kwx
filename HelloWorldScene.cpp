@@ -120,9 +120,6 @@ void HelloWorld::enterRoomStandAlone()
     RoundManager *rm = RoundManager::getInstance();
     rm->StartGame(scene);
     
-	//auto layer = NetRaceLayer::create();
-    //scene->addChild(layer);
-    
     Director::getInstance()->replaceScene(scene);
 }
 

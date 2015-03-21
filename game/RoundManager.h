@@ -2,9 +2,16 @@
 #ifndef __ROUND_MANAGER__
 #define __ROUND_MANAGER__
 
+#include "cocos2d.h"
+USING_NS_CC;
+#include "ui/CocosGUI.h"
+USING_NS_CC;
+using namespace ui;
+
+#include "RaceType.h"
+#include "OutCardList.h"
 
 #include "CardHolder.h"
-#include "NetRaceLayer.h"
 #include "./../utils/LogManager.h"
 
 class NetRole;

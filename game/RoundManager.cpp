@@ -5,6 +5,7 @@
 #include "Raction.h"
 
 #include "NetRole.h"
+#include "NetRaceLayer.h"
 #include "RoundManager.h"
 
 RoundManager::RoundManager(NetRaceLayer *uiManager) {

@@ -1,5 +1,6 @@
 
 #include "NetRole.h"
+#include "NetRaceLayer.h"
 #include "RoundManager.h"
 #include "Ai.h"
 

@@ -71,10 +71,7 @@ bool NetRaceLayer::init()
 		return false;
 	}
 	srand(time(0));
-#if 0
-	create_race();
-	race_start_again();
-#endif
+	
 	return true;
 }
 
