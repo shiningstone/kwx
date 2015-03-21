@@ -124,15 +124,6 @@ void NetRaceLayer::distribute_event(const std::string event_type,void* val)
 /***********************************************
         button handlers
 ***********************************************/
-void NetRaceLayer::PengPressed(Button *button,PlayerDir_t prevPlayer,Card_t card) {
-    button->setTouchEnabled(false);
-    
-    button->_ID = MIDDLE;
-    button->runAction(Sequence::create(
-        ScaleTo::create(0.1,1),CallFunc::create([=](){
-        PengEffect(MIDDLE,prevPlayer,card);}),NULL));
-}
-
 void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
@@ -144,7 +135,7 @@ void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvPeng(curButton);
+            _roundManager->RecvPeng();
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -1013,6 +1004,11 @@ Sprite *NetRaceLayer::_GetEffectCardInHand(Node *myframe, int i,CARD_KIND kindId
 }
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
+    curButton->setTouchEnabled(false);
+    curButton->_ID = MIDDLE;
+    curButton->runAction(Sequence::create(ScaleTo::create(0.1,1),NULL));
+
 	myframe->_ID = dir;
     
 	const int riverLast =_roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;

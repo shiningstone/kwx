@@ -28,7 +28,7 @@ public:
     RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();
 
-    void RecvPeng(Button *curButton);
+    void RecvPeng();
     void RecvHu(Button *curButton);
     void RecvGang(Button *curButton);
     

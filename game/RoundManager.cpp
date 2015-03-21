@@ -361,7 +361,7 @@ int RoundManager::FindGangCards(int dir,int cards[4],Card_t target) {
     return 0;
 }
 
-void RoundManager::RecvPeng(Button *curButton) {
+void RoundManager::RecvPeng() {
     Card        card;
     PlayerDir_t prevPlayer;
     
@@ -382,10 +382,10 @@ void RoundManager::RecvPeng(Button *curButton) {
         RecordOutCard(card);
     
         prevPlayer = (PlayerDir_t)_curPlayer;
-        _curPlayer=1;
+        _curPlayer=MIDDLE;
     }
 
-    _uiManager->PengPressed(curButton,prevPlayer,(Card_t)card.kind);
+    _uiManager->PengEffect((PlayerDir_t)_curPlayer,prevPlayer,(Card_t)card.kind);
 }
 
 void RoundManager::RecvHu(Button *curButton) {
