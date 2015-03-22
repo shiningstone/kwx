@@ -589,6 +589,8 @@ void RoundManager::QiangGangHuJudge() {
 }
 
 TingInfo_t RoundManager::GetTingInfo(PlayerDir_t dir,int outCarIdx) {
+    TingInfo_t TingInfo;
+    return TingInfo;
 }
 
 /*************************************
