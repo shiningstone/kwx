@@ -33,6 +33,8 @@ public:
     void RecvGang();
     void RecvQi();
     void RecvHandout(int idx,Vec2 touch,int mode);
+
+    void QiangGangHuJudge();
     
     NetRaceLayer *_uiManager;
     NetRaceLayer *_raceLayer;

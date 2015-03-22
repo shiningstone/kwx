@@ -26,6 +26,10 @@ public:
 	virtual ~NetRaceLayer();
     
     void Set(RoundManager *rm);
+
+    void DoubleWin(const WinInfo_t &win);
+    void SingleWin(const WinInfo_t &win);
+    void GangGoldEffect(int winner,int whoGive);
     
 protected:
     RoundManager   *_roundManager;
@@ -52,9 +56,8 @@ private:
     int     _FindCard(int start,int end,Touch *touch);
     TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
     
-    void DoubleWin(const WinInfo_t &win);
-    void SingleWin(const WinInfo_t &win);
     void _OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers);
+    void _UpdateNonChosenCards(const CardsInfo_t &cards, int chosen);
     void _UpdateCardsInHand(const CardsInfo_t &cards, int chosen);
     void _ShowMenuButtons();
     void _CreateMeneButtons();
@@ -75,7 +78,7 @@ private:
     void CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give);
 
     void DispatchAction(Node *psender,ARRAY_ACTION action);
-    Sprite *_GetEffectCardInHand(Node *myframe, int i,CARD_KIND value );
+    Sprite *_CreateEffectCard(int i,CARD_KIND value );
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
     void GuiJinBiShow(PlayerDir_t dir, int gold);
@@ -132,15 +135,15 @@ private:
 
 	bool ifTuoGuan;
     
-	int  touched;  //only used in waitfor_MyTouchShowCard
 	bool ifChosed;   //only used in waitfor_MyTouchShowCard
+	int  _myTouchedCard;  //only used in waitfor_MyTouchShowCard
     int  _myChosenCard;
 
 	CARD_KIND cur_effect_cardKind;
 	CARD_STATUS cur_effect_cardStatus;
 
 	bool ifInsertCardsTime;
-	bool ifInsertStopped;
+	bool _isCardInHandUpdated;
 	bool ifEndGameChoose;//ÊÇ·ñÍË³öÓÎÏ·
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
@@ -275,7 +278,6 @@ public:
 	void BackConfirmPressed(Ref* pSender,ui::Widget::TouchEventType type);
 	void BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
 	void tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
-	void QiangGangHuJudge();
 	void ListenToTingButton();
 
     void distribute_card_event();

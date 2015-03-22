@@ -522,6 +522,71 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _uiManager->HandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
 }
 
+void RoundManager::QiangGangHuJudge() {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	_isCardFromOthers=true;
+	unsigned char curTingStatus=_players[_curPlayer]->get_parter()->get_ting_status();
+    
+	int no1=(_curPlayer+1)%3;
+    unsigned char action1=_players[no1]->get_parter()->hand_in(
+        _lastHandedOutCard,
+        _isCardFromOthers,
+        curTingStatus,
+        false,
+        a_QIANG_GANG,
+        _continue_gang_times,
+        _isGangHua
+    );
+
+	int no2=(_curPlayer+2)%3;
+	unsigned char action2=_players[no2]->get_parter()->hand_in(
+        _lastHandedOutCard,
+        _isCardFromOthers,
+        curTingStatus,
+        false,
+        a_QIANG_GANG,
+        _continue_gang_times,
+        _isGangHua
+    );
+
+	if((action1&a_HU)&&(action2&a_HU)) {
+        WinInfo_t win;
+        win.kind = DOUBLE_WIN;
+        win.player = (PlayerDir_t)_curPlayer;
+        
+        if(no1==1) {
+            _actionToDo=action1;
+            _otherOneForDouble = no2;
+        } else {
+            _actionToDo=action2;
+            _otherOneForDouble = no1;
+        }
+
+        _isDoubleHuAsking = true;
+        _lastActionWithGold=a_QIANG_GANG;
+
+        _uiManager->DoubleWin(win);
+	} else if(action1&a_HU||action2&a_HU) {
+        WinInfo_t win;
+        win.kind = SINGLE_WIN;
+        win.player = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
+
+        if(no1==1)
+            _actionToDo=action1;
+        else
+            _actionToDo=action2;
+
+        _isQiangGangAsking=true;
+        _lastActionWithGold=a_QIANG_GANG;
+        
+        _uiManager->SingleWin(win);
+	} else {
+		_isCardFromOthers=false;
+
+        _uiManager->GangGoldEffect(_qiangGangTargetNo,_curPlayer);
+	}
+}
 /*************************************
         singleton
 *************************************/
