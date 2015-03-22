@@ -314,7 +314,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
             
             Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
             
-            _roundManager->RecvHandout(cards.last,location);
+            _roundManager->RecvHandout(cards.last,location,2);
             
 		} else if( myframe->getChildByTag(GANG_REMING_ACT_TAG_ID) ) {
 			_roundManager->_isGangAsking = true;
@@ -337,34 +337,8 @@ void NetRaceLayer::_GetCardsInfo(CardsInfo_t *info) {
     info->residual = (info->list->len - info->list->atcvie_place)%3;
 }
 /*****************************/
-void NetRaceLayer::HandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time)
+void NetRaceLayer::HandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
 {
-	if(_roundManager->_isMingTime) {
-		ifCardTouchedDuringMing=true;
-		_roundManager->_isMingTime=false;
-	}
-    
-	if(_roundManager->_isWaitDecision) {
-		_roundManager->_isWaitDecision=false;
-		_roundManager->_tempActionToDo=a_JUMP;
-	}
-
-	if( (_roundManager->_actionToDo&a_MING) && (!ifCardTouchedDuringMing) ) {
-		ifCardTouchedDuringMing = false;
-		_roundManager->_actionToDo = a_JUMP;
-	}
-
-    _roundManager->RecordHandOut(chosenCard);
-
-    bool turnToMing = false;
-	if(_roundManager->_actionToDo==a_MING && 
-        !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
-
-        turnToMing = true;
-    }
-
     if(time==2) {
         if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
             myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
@@ -610,8 +584,8 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		if(_roundManager->_isMyShowTime) {
 			_roundManager->_isMyShowTime=false;
 			_myChosenCard=-1;
-            
-			HandoutEffect(touched,cards.list,touch->getLocation(),1);
+
+            _roundManager->RecvHandout(touched,touch->getLocation(),1);
 		} else {
 			_myChosenCard=touched;
 
@@ -663,7 +637,8 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 							_roundManager->_isMyShowTime=false;
 							_myChosenCard=-1;
 							touched=i;
-							HandoutEffect(touched,cards.list,touch->getLocation(),2);
+
+                            _roundManager->RecvHandout(touched,touch->getLocation(),2);
 						}
 					} else {
 						loopCard->_ID=100;
@@ -706,7 +681,8 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 			_roundManager->_isMyShowTime=false;
 			_myChosenCard=-1;
 			touched = chosen;
-			HandoutEffect(touched,cards.list,touch->getLocation(),3);
+
+            _roundManager->RecvHandout(touched,touch->getLocation(),3);
 		}
     }
 }
@@ -2086,8 +2062,8 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
                         _GetCardsInfo(&cards);
                         
                         Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
-                        
-    					HandoutEffect(cards.last,cards.list,location,2);
+
+                        _roundManager->RecvHandout(cards.last,location,2);
                     }),NULL));
 			} else
 				myframe->runAction(shadeFunc);
@@ -4085,7 +4061,6 @@ void NetRaceLayer::start_callback()
 
 	distributeCardPos=Vec2::ZERO;
 	ifUpdateDuringEffect=false;
-	ifCardTouchedDuringMing=false;
 	ifInsertStopped=false;
 	ifInsertCardsTime=false;
 	ifEffectTime=false;

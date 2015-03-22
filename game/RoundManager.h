@@ -32,7 +32,7 @@ public:
     void RecvHu();
     void RecvGang();
     void RecvQi();
-    void RecvHandout(int idx,Vec2 touch);
+    void RecvHandout(int idx,Vec2 touch,int mode);
     
     NetRaceLayer *_uiManager;
     NetRaceLayer *_raceLayer;

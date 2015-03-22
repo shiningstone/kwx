@@ -144,7 +144,6 @@ private:
 	bool ifEndGameChoose;//ÊÇ·ñÍË³öÓÎÏ·
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
-	bool ifCardTouchedDuringMing;
 	//bool ifMyTime;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
@@ -204,7 +203,7 @@ private:
 	void _HuEffect(int no);
 	void _HandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
-	void HandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time);
+	void HandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 
 	unsigned int VoiceId;

@@ -492,12 +492,34 @@ void RoundManager::StartGame(Scene *scene) {
     
 }
 
-void RoundManager::RecvHandout(int idx,Vec2 touch) {
+void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
 
-    if( _isTuoGuan || (IsTing(_curPlayer) && !_isGangAsking) ) {
-        _uiManager->HandoutEffect(idx,cardsInHand,touch,2);
+	if(_isMingTime) {
+		_isMingTime=false;
+	} else {
+        if(_actionToDo&a_MING) {
+            _actionToDo = a_JUMP;
+        }
     }
+    
+	if(_isWaitDecision) {
+		_isWaitDecision=false;
+		_tempActionToDo=a_JUMP;
+	}
+
+    RecordHandOut(idx);
+
+    bool turnToMing = false;
+	if(_actionToDo==a_MING && 
+        !IsTing(_curPlayer) ) {
+		_players[_curPlayer]->get_parter()->LockAllCards();
+		_players[_curPlayer]->get_parter()->set_ting_status(1);
+
+        turnToMing = true;
+    }
+
+    _uiManager->HandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
 }
 
 /*************************************
