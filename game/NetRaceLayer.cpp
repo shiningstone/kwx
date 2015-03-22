@@ -344,7 +344,7 @@ void NetRaceLayer::HandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int 
             myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
         }
     } else {
-        _ReOrderCardsInHand(chosenCard);
+        _ReOrderCardsInHand(chosenCard,list);
     }
     
 	_HandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
@@ -2181,8 +2181,6 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 
 void NetRaceLayer::card_list_update(int no)
 {
-	
-    
 	for(int i=0;i<MAX_HANDIN_NUM;i++) {
         _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
 	}
@@ -7291,8 +7289,7 @@ Sprite *NetRaceLayer::_GetCardInHand(PlayerDir_t dir,int idx) {
     return (Sprite *)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + dir*20 + idx);
 }
 
-void NetRaceLayer::_ReOrderCardsInHand(int droppedCard) {
-	auto cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards) {
     /*NOTE : this function is called after handout ,so the position is 1 bigger than length */
     const int  LAST      = (cards->len-1)+1;
 

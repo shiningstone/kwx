@@ -11,7 +11,7 @@
 RoundManager::RoundManager(NetRaceLayer *uiManager) {
     _uiManager = uiManager;
 
-    _lastWin.player = INVALID;
+    _lastWin.player = INVALID_DIR;
 
     _river = NULL;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
@@ -39,7 +39,7 @@ RoundManager::~RoundManager() {
         winner information
 ***********************************************/
 PlayerDir_t RoundManager::GetLastWinner() {
-    if( _lastWin.player==INVALID ) {
+    if( _lastWin.player==INVALID_DIR ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
         _lastWin.player = MIDDLE;
     }

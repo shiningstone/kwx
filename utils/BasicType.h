@@ -2,6 +2,8 @@
 #ifndef __BASIC_TYPE__
 #define __BASIC_TYPE__
 
+#define INVALID -1
+
 typedef enum {
     LOCAL_GAME,
     NETWORK_GAME,
@@ -11,7 +13,7 @@ typedef enum {
     LEFT,
     MIDDLE,
     RIGHT,
-    INVALID,
+    INVALID_DIR,
 }PlayerDir_t;
 
 typedef enum {
