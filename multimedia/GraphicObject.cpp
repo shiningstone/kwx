@@ -119,10 +119,10 @@ Sprite *GObjectFactory::Create(TextureId_t id, Sprite *son) {
 }
 
 /* only for LEFT/RIGHT */
-void GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind, Card_t isHide) {
+void GObjectFactory::LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind, CartApperance_t isHide) {
     Sprite* cardFace;
     
-    if(isHide==HIDE) {
+    if(isHide==LAYDOWN_HIDE) {
         cardFace = CreateKind((Card_t)kind,SMALL_BLACK);
     } else {
         cardFace = CreateKind((Card_t)kind,SMALL);

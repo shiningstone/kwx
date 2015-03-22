@@ -35,10 +35,12 @@ public:
     void RecvHandout(int idx,Vec2 touch,int mode);
 
     void QiangGangHuJudge();
+    CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
     TingInfo_t GetTingInfo(PlayerDir_t dir,int outCarIdx);
     
+    int _GroupIdx(int idx,CARD_ARRAY *cards);
+
     NetRaceLayer *_uiManager;
-    NetRaceLayer *_raceLayer;
     
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);

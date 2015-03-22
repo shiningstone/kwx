@@ -48,8 +48,6 @@ typedef enum {
     BAI,        
     CARD_MAX,
     CARD_UNKNONW = CARD_MAX,
-    NON_HIDE = CARD_MAX,
-    HIDE,
 }Card_t;
 
 typedef enum {
@@ -68,6 +66,12 @@ typedef struct {
     WinKind_t    kind;
     PlayerDir_t  player;
 }WinInfo_t;
+
+typedef enum {
+    LAYDOWN_HIDE,
+    LAYDOWN_SHOW,
+    NORMAL_APPERANCE,
+}CartApperance_t;
 
 typedef struct {
     Card_t       kind;

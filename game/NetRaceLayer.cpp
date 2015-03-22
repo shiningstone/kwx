@@ -2017,17 +2017,6 @@ Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
     }
 }
 
-int NetRaceLayer::_GroupIdx(int idx,CARD_ARRAY *cards) {
-    if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind==cards->data[idx+3].kind)&&(cards->data[idx].kind!=cards->data[idx+4].kind))
-        return 1;
-    else if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind!=cards->data[idx+3].kind))
-        return 2;
-    else if(cards->data[idx].kind==cards->data[idx+1].kind&&cards->data[idx].kind!=cards->data[idx+2].kind)
-        return 3;
-    else if(cards->data[idx].kind!=cards->data[idx+1].kind)
-        return 4;
-}
-
 float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY) {
     float up = (dir==LEFT)?(-1):1;
     float groupGap = (dir==LEFT)?0.4:0.8;
@@ -2059,7 +2048,7 @@ float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool 
             }
         case c_MING_GANG:
         case c_AN_GANG:
-            int groupIdx = _GroupIdx(idx,cards);
+            int groupIdx = _roundManager->_GroupIdx(idx,cards);
             if( (dir==LEFT&&groupIdx==1) || (dir==RIGHT&&groupIdx==3)) {
                 return up*(refY*0.65);
             } else if (groupIdx==2) {
@@ -2109,30 +2098,10 @@ void NetRaceLayer::card_list_update(int no)
 			if(no==0 || no==2) {
 				p_list[i] = _CreateCardInHand(dir,i,list,(ting_flag==1),Vec2(x,y));
                 
-				if(list->data[i].status==c_FREE) {
-					if(ting_flag==1||_roundManager->IsTing(MIDDLE)) {
-					    if(ting_flag==1) {
-                            _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind);
-                        } else if(ting_flag!=1&&_roundManager->IsTing(MIDDLE)) {
-                            _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind,HIDE);
-                        }
-                    }
-				} else if(list->data[i].status==c_PENG) {
-                    _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind);
-				} else if(list->data[i].status==c_MING_GANG) {
-                    _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind);
-				} else if(list->data[i].status==c_AN_GANG) {
-				    int groupIdx = _GroupIdx(i,list);
-                    if((no==LEFT&&groupIdx==3) || (no==RIGHT&&groupIdx==2)) {
-						if(ting_flag!=1&&_roundManager->IsTing(MIDDLE)) {
-                            if(ting_flag==1) {
-                                _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind);
-                            } else if(ting_flag!=1&&_roundManager->IsTing(MIDDLE)) {
-                                _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind,HIDE);
-                            }
-						}
-					}
-				}
+				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
+                if(apperance!=NORMAL_APPERANCE) {
+                    _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind,apperance);
+                }
 
                 y += _YofNextCard(dir,i,list,(ting_flag==1),p_list[i]->getTextureRect().size.height);
 			}

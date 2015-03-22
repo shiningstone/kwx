@@ -588,6 +588,49 @@ void RoundManager::QiangGangHuJudge() {
 	}
 }
 
+int RoundManager::_GroupIdx(int idx,CARD_ARRAY *cards) {
+    if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind==cards->data[idx+3].kind)&&(cards->data[idx].kind!=cards->data[idx+4].kind))
+        return 1;
+    else if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind!=cards->data[idx+3].kind))
+        return 2;
+    else if(cards->data[idx].kind==cards->data[idx+1].kind&&cards->data[idx].kind!=cards->data[idx+2].kind)
+        return 3;
+    else if(cards->data[idx].kind!=cards->data[idx+1].kind)
+        return 4;
+}
+
+CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
+	CARD_ARRAY *cards = _players[dir]->get_parter()->get_card_list();
+    CARD_STATUS status = cards->data[idx].status;
+
+    bool isTing       = IsTing(dir);
+    bool isMiddleTing = IsTing(MIDDLE);
+    
+    if(status==c_FREE) {
+        if(isTing) {
+            return LAYDOWN_SHOW ;
+        } else if (isMiddleTing) {
+            return LAYDOWN_HIDE ;
+        }
+    } else if(status==c_PENG || status==c_MING_GANG) {
+        return LAYDOWN_SHOW ;
+    } else if(status==c_AN_GANG) {
+        int groupIdx = _GroupIdx(idx,cards);
+        
+        if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
+            if(!isTing && isMiddleTing) {/* here must be a bug */
+                if(isTing) {
+                    return LAYDOWN_SHOW;
+                } else if(!isTing&&isMiddleTing) {
+                    return LAYDOWN_HIDE;
+                }
+            }
+        }
+    }
+
+    return NORMAL_APPERANCE;
+}
+
 TingInfo_t RoundManager::GetTingInfo(PlayerDir_t dir,int outCarIdx) {
     TingInfo_t TingInfo;
     return TingInfo;

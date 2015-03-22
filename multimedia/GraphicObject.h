@@ -125,7 +125,7 @@ public:
     Sprite *Create(TextureId_t id,PlayerDir_t dir,float x,float y);
     Sprite *CreateKind(Card_t type,CardSize_t size = NORMAL);
     Sprite *Create(TextureId_t id,Sprite *son);
-    void LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind,Card_t isHide = NON_HIDE);
+    void LayDownWithFace(PlayerDir_t dir,Sprite *parent,Card_t kind,CartApperance_t isHide  = NORMAL_APPERANCE);
     void LayDownWithFace(Sprite *parent,Card_t kind, float height_x);
 
     Sprite *CreateRiverCard(PlayerDir_t dir,Card_t kind);
