@@ -587,6 +587,10 @@ void RoundManager::QiangGangHuJudge() {
         _uiManager->GangGoldEffect(_qiangGangTargetNo,_curPlayer);
 	}
 }
+
+TingInfo_t RoundManager::GetTingInfo(PlayerDir_t dir,int outCarIdx) {
+}
+
 /*************************************
         singleton
 *************************************/

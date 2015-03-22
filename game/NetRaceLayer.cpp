@@ -1926,65 +1926,32 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
 	}
 }
 
-void NetRaceLayer::update_residue_TingCards(int no) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-    _roundManager->_players[no]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
+/******************************************************
+        ting hint bar
+******************************************************/
+void NetRaceLayer::_UpdateResidueNumOnTingSignBar(PlayerDir_t dir) {
+    _roundManager->_players[dir]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
     
 	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 
-	_roundManager->_players[no]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	_roundManager->_players[no]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
+	_roundManager->_players[dir]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
+	_roundManager->_players[dir]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
 
-	int cardNum=hu_NumForEveryCard[Hu_cardOut_place];
+	int cardNum = hu_NumForEveryCard[Hu_cardOut_place];
 
-	
-	for(int k=0;k<cardNum;k++)
-	{
-		Sprite* curCardBar;
-		switch (no)
-		{
-		case 0:
-			curCardBar=(Sprite*)myframe->getChildByTag(TING_SING_LEFTBAR)->getChildByTag(k+3);
-			break;
-		case 1:
-			curCardBar=(Sprite*)myframe->getChildByTag(TING_SING_BAR)->getChildByTag(k+3);
-			break;
-		case 2:
-			curCardBar=(Sprite*)myframe->getChildByTag(TING_SING_RIGHTBAR)->getChildByTag(k+3);
-			break;
-		default:
-			break;
-		}
-		char tempForChar[10];
-		std::string tempForStr;
-		
+	for(int i=0;i<cardNum;i++) {
+		Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
 		curCardBar->removeChildByTag(2);
 
-		if(hu_residueForEvery[Hu_cardOut_place][k]==0)
-		{
-			sprintf(tempForChar,"%d",hu_residueForEvery[Hu_cardOut_place][k]);
-			tempForStr=tempForChar;
-			auto residueNum=LabelAtlas::create(tempForStr,"fonts/NumMingNotice_grey.png",17, 20, '0');
-			residueNum->setAnchorPoint(Vec2(0.5,0.5));
-			residueNum->setPosition(Vec2(78,24));
-			curCardBar->addChild(residueNum,1,2);
-		}
-		else
-		{
-			sprintf(tempForChar,"%d",hu_residueForEvery[Hu_cardOut_place][k]);
-			tempForStr=tempForChar;
-			auto residueNum=LabelAtlas::create(tempForStr,"fonts/NumMingNotice.png",17, 20, '0');
-			residueNum->setAnchorPoint(Vec2(0.5,0.5));
-			residueNum->setPosition(Vec2(78,24));
-			curCardBar->addChild(residueNum,1,2);
-		}
+        auto residueNum = _CreateNumberSign(hu_residueForEvery[Hu_cardOut_place][i]);
+        curCardBar->addChild(residueNum,1,2);
 	}
 }
-void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
-{
-	Hu_cardOut_place=CardPlace;
+
+void NetRaceLayer::OtherTingHintBar(int curNo,int outCardIdx) {
+	Hu_cardOut_place = outCardIdx;
+    
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];
 	_roundManager->_players[curNo]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);
@@ -1996,22 +1963,23 @@ void NetRaceLayer::OtherTingHintBar(int curNo,int CardPlace)
 
 void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 {
-	_roundManager->_players[1]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
+	_roundManager->_players[MIDDLE]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
+    
 	Hu_cardOut_place=CardPlace;
 	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
 	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-	_roundManager->_players[1]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	_roundManager->_players[1]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-	_roundManager->_players[1]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
-	_roundManager->_players[1]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
+	_roundManager->_players[MIDDLE]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
+	_roundManager->_players[MIDDLE]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
+	_roundManager->_players[MIDDLE]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
+	_roundManager->_players[MIDDLE]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
 
 	int cardNum=hu_NumForEveryCard[CardPlace];
 
-    auto mingSignBar = _object->CreateTingInfoBar(
+    auto tingSignBar = _object->CreateTingInfoBar(
         curPos,(Card_t *)hu_cards[CardPlace],cardNum,huTiemsForEveryOne[CardPlace],hu_residueForEvery[CardPlace]);
-	myframe->addChild(mingSignBar, 30, TING_SING_BAR);
+	myframe->addChild(tingSignBar, 30, TING_SING_BAR);
 }
 
 void NetRaceLayer::card_list_update(int no)
@@ -2020,18 +1988,16 @@ void NetRaceLayer::card_list_update(int no)
         _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
 	}
 
-	float x,y;
-	x = _layout->_playerPosi[no].basePoint.x+10; 
-	y = _layout->_playerPosi[no].basePoint.y+10;
+	float x = _layout->_playerPosi[no].basePoint.x+10; 
+	float y = _layout->_playerPosi[no].basePoint.y+10;
 
 	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
 
-	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
-	if( ting_flag==1 && _roundManager->_firstMingNo==-1 )
+	if( _roundManager->IsTing(no) && _roundManager->_firstMingNo==-1 )
 		_roundManager->_firstMingNo=no;
 
+	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
     LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
-    
 
 	Sprite *p_list[MAX_HANDIN_NUM];
     for(int i=0;i<list->len;i++)
@@ -2525,7 +2491,7 @@ void NetRaceLayer::card_list_update(int no)
 	}
     
 	if(no==1&&myframe->getChildByTag(TING_SING_BUTTON))
-		update_residue_TingCards(1);
+		_UpdateResidueNumOnTingSignBar(MIDDLE);
 }
 
 void NetRaceLayer::update_card_list(Node *psender)
@@ -2689,10 +2655,6 @@ void NetRaceLayer::KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-
-			
-            
 			_Remove(myframe,MING_KOU_ENSURE);			
 			_Remove(myframe,MING_KOU_SIGN);
 
@@ -7549,6 +7511,31 @@ Sprite *NetRaceLayer::_CreateEffectCard(int i,CARD_KIND kindId ) {
     effectCard->addChild(kind,1);
 
     return effectCard;
+}
+
+Sprite* NetRaceLayer::_GetCardOnTingSignBar(PlayerDir_t dir,int cardIdx) {
+    switch (dir) {
+        case LEFT:
+            return (Sprite*)myframe->getChildByTag(TING_SING_LEFTBAR)->getChildByTag(cardIdx+3);
+        case MIDDLE:
+            return (Sprite*)myframe->getChildByTag(TING_SING_BAR)->getChildByTag(cardIdx+3);
+        case RIGHT:
+            return (Sprite*)myframe->getChildByTag(TING_SING_RIGHTBAR)->getChildByTag(cardIdx+3);
+    }
+}
+
+LabelAtlas * NetRaceLayer::_CreateNumberSign(int number) {
+    char strNumber[10];
+    sprintf(strNumber,"%d",number);
+
+    LabelAtlas *residueNum = (number==0)
+        ? LabelAtlas::create(strNumber,"fonts/NumMingNotice_grey.png",17, 20, '0')
+        : LabelAtlas::create(strNumber,"fonts/NumMingNotice.png",17, 20, '0');
+
+    residueNum->setAnchorPoint(Vec2(0.5,0.5));
+    residueNum->setPosition(Vec2(78,24));
+
+    return residueNum;
 }
 
 

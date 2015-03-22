@@ -68,5 +68,16 @@ typedef struct {
     WinKind_t    kind;
     PlayerDir_t  player;
 }WinInfo_t;
+
+typedef struct {
+    Card_t       kind;
+    int          tingNum;
+}TingInfoItem;
+
+typedef struct {
+    int          kindNum;
+    TingInfoItem card[9];/* why 9??? */
+}TingInfo_t;
+
 #endif
 

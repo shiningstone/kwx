@@ -65,6 +65,8 @@ private:
     bool _ResourcePrepare();
     void _StartParticleSystem(float delta);
     void ListenToDoubleHu();
+    LabelAtlas * _CreateNumberSign(int number);
+    Sprite* _GetCardOnTingSignBar(PlayerDir_t dir,int cardIdx);
 
     void _CreateResidueCards();
     void refresh_residue_cards();
@@ -268,7 +270,7 @@ public:
 	void MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
-	void update_residue_TingCards(int no);
+	void _UpdateResidueNumOnTingSignBar(PlayerDir_t dir);
 	void tingHintCreate(Point curPos,int CardPlace);
 	void OtherTingHintBar(int curNo,int CardPlace);
 	virtual bool init();

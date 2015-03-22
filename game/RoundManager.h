@@ -35,6 +35,7 @@ public:
     void RecvHandout(int idx,Vec2 touch,int mode);
 
     void QiangGangHuJudge();
+    TingInfo_t GetTingInfo(PlayerDir_t dir,int outCarIdx);
     
     NetRaceLayer *_uiManager;
     NetRaceLayer *_raceLayer;
