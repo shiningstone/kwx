@@ -33,6 +33,10 @@ public:
     void RecvGang();
     void RecvQi();
     void RecvHandout(int idx,Vec2 touch,int mode);
+    /*internal action*/
+    void RecvKouCancel();
+    void RecvKouConfirm();
+    void RecvMingCancel();
 
     void QiangGangHuJudge();
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);

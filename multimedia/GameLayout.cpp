@@ -424,15 +424,6 @@ int  GameLayout::RotateAngleOfCard(PlayerDir_t dir) {
     }
 }
 
-float GameLayout::YOfNextCard(PlayerDir_t dir,float originY,Size cardSize) {
-    switch(dir) {
-        case LEFT:
-            return originY - cardSize.height*0.65;
-        case RIGHT:
-            return originY + cardSize.height*0.65;
-    }
-}
-
 /*************************************
     card in river
 *************************************/
@@ -465,7 +456,6 @@ int GameLayout::_lineNo(int i) {
 }
 
 int GameLayout::_viewIdx(int i) {
-
     return _lineIdx(i)-_lineNo(i);
 }
 
@@ -530,6 +520,17 @@ Vec2 GameLayout::DestPositionOfRiverCard(PlayerDir_t dir,int idx) {
         case RIGHT:
             return Vec2(_playerPosi[dir].riverPoint.x+48*lineNo,
                         _playerPosi[dir].riverPoint.y+30*(_viewIdx(idx)));
+    }
+}
+
+int  GameLayout::ZorderOfRiverCard(PlayerDir_t dir,int idx) {
+    switch(dir) {
+        case LEFT:
+            return idx+1;
+        case MIDDLE:
+            return _lineIdx(idx)+1;
+        case RIGHT:
+            return 20-idx;
     }
 }
 

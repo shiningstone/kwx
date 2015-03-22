@@ -77,7 +77,6 @@ class GameLayout {
         Vec2 PositionOfNormalCard(PlayerDir_t dir,int x,int y);
         Vec2 AnchorOfFreeCard(PlayerDir_t dir);
         int  RotateAngleOfCard(PlayerDir_t dir);
-        float YOfNextCard(PlayerDir_t dir,float originY,Size cardSize);
         /*************************************
             card in river
         *************************************/
@@ -89,6 +88,7 @@ class GameLayout {
         Vec2 Middle1PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 Middle2PositionOfRiverCard(PlayerDir_t dir,int idx);
         Vec2 DestPositionOfRiverCard(PlayerDir_t dir,int idx);
+        int  ZorderOfRiverCard(PlayerDir_t dir,int idx);
         
         void GetBizerPoints(ccBezierConfig &cfg, int riverIdx, const Vec2 &location);
     private:

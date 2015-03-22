@@ -1982,6 +1982,9 @@ void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
 	myframe->addChild(tingSignBar, 30, TING_SING_BAR);
 }
 
+/********************************************************
+            cards
+********************************************************/
 /* this function is only for others */
 Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
                                         CARD_ARRAY *cards,bool isTing,const Vec2 &refer) {
@@ -2328,12 +2331,7 @@ void NetRaceLayer::update_card_list(Node *psender)
 	card_list_update(no);
 }
 
-void NetRaceLayer::update_card_in_river_list(Node* sender)
-{
-    LOGGER_WRITE("%s : %x",__FUNCTION__,(int)sender);
-
-	
-
+void NetRaceLayer::update_card_in_river_list(Node* sender) {
 	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
 
 	for(int i=0;i<outCard->length;i++) {
@@ -2343,8 +2341,7 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
 	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
 	show_card_indicator->setVisible(true);
 
-	for(int i=0;i<outCard->length;i++)
-	{
+	for(int i=0;i<outCard->length;i++) {
         Card oCard;
         outCard->getCard(oCard,i+1);
         
@@ -2357,117 +2354,43 @@ void NetRaceLayer::update_card_in_river_list(Node* sender)
             MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),NULL)));
         show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)sender->_ID,i));
 
-        switch((PlayerDir_t)sender->_ID) {
-            case 0:
-                myframe->addChild(show_card,i+1,
-                    HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-                break;
-            case 1:
-                myframe->addChild(show_card,_layout->_lineIdx(i)+1,
-                    HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-                break;
-            case 2:
-                myframe->addChild(show_card,20-i,
-                    HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-                break;
-        }
+        myframe->addChild(show_card, 
+            _layout->ZorderOfRiverCard((PlayerDir_t)sender->_ID,i),
+            HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
 	}
 }
 
-void NetRaceLayer::race_begin_prepare()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-    _Remove(this,READY_INDICATE_LEFT_TAG_ID);
-    _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
-    _Remove(this,READY_INDICATE_MID_TAG_ID);
-
-	(Sprite*)this->getChildByTag(LEFT_IMG_BKG_TAG_ID)->runAction(
-        EaseIn::create(MoveTo::create(0.6,Vec2(29,536)),1.5));
-	(Sprite*)this->getChildByTag(RIGHT_IMG_BKG_TAG_ID)->runAction(
-        EaseIn::create(MoveTo::create(0.6,Vec2(1190,536)),1.5));
-	(Sprite*)this->getChildByTag(MID_IMG_BKG_TAG_ID)->runAction(
-        EaseIn::create(MoveTo::create(0.6,Vec2(49,129)),1.5));
-    
-	(Sprite*)this->getChildByTag(MIC_TAG_ID)->runAction(Sequence::create(
-        DelayTime::create(0.65),
-        EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
-    
-	for(int i=CARD_ARRAGE_LEFT_TAG_ID;i<=CARD_ARRAGE_TOP_TAG_ID;i++) {
-		(Sprite*)this->getChildByTag(i)->runAction(
-		    EaseIn::create(FadeOut::create(0.2),2));
+/****************************************
+        ming
+****************************************/
+void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
+    for(int i=cards->atcvie_place;i<cards->len;i++) {
+        Sprite *card = _GetCardInHand(MIDDLE,i);
+        _Remove(card,MING_KOU);
     }
 
-	auto colorLayer=LayerColor::create(Color4B(0,0,0,150),visibleSize.width,visibleSize.height*200/716);
-	colorLayer->setAnchorPoint(Vec2(0.5,0.5));
-	colorLayer->ignoreAnchorPointForPosition(false);
-	colorLayer->setScale(0);
-	colorLayer->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-	this->addChild(colorLayer,4,COLOR_LAYER_TAG_ID);
-
-	auto paijuStart=Sprite::create("paijukaishi.png");
-	paijuStart->setScale(0);
-	paijuStart->setAnchorPoint(Vec2(0.5,0.5));
-	paijuStart->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-	this->addChild(paijuStart,5,RACE_START_TAG_ID);
-
-	auto paijuStart_guang=Sprite::create("paijuStart_guang.png");
-	paijuStart_guang->setAnchorPoint(Vec2(0.5,0.5));
-	paijuStart_guang->setScale(0);
-	paijuStart_guang->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-	this->addChild(paijuStart_guang,6,RACE_LIGHT_TAG_ID);
-
-	paijuStart->runAction(
-        Sequence::create(
-            DelayTime::create(0.7),
-            ScaleTo::create(0,4),
-            Spawn::create(
-                FadeIn::create(0.2),
-                ScaleTo::create(0.2,1),NULL),
-            Spawn::create(
-                _voice->Speak("duijukaishi.ogg"),
-                Sequence::create(
-                    DelayTime::create(0.5),
-                    ScaleTo::create(0.15,0.5),
-                    Spawn::create(
-                        ScaleTo::create(0.3,4),
-                        FadeOut::create(0.3),NULL),NULL),NULL),NULL));
+    auto button = myframe->getChildByTag(MING_KOU_CANCEL);
     
-	colorLayer->runAction(
+    myframe->_ID = MIDDLE;
+    myframe->runAction(
         Sequence::create(
-            DelayTime::create(0.9),
-            ScaleTo::create(0,1),
-            DelayTime::create(0.9),
-            ScaleTo::create(0.4,1,0),NULL));
-    
-	paijuStart_guang->runAction(
-        Sequence::create(
-            DelayTime::create(1.7),
-            Spawn::create(
-                ScaleTo::create(0.3,8,3),
-                FadeIn::create(0.3),NULL),
-                Spawn::create(
-                    ScaleTo::create(0.5,8,0),
-                    FadeOut::create(0.5),NULL),NULL));
-
-    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
-
-    int lastWinner = _roundManager->GetLastWinner();
-    _zhuangSign->setAnchorPoint(_layout->AnchorOfZhuang((PlayerDir_t)lastWinner));
-    _zhuangSign->setPosition(_layout->_playerPosi[lastWinner].zhuangPoint);
-	_zhuangSign->runAction(Sequence::create(
-        DelayTime::create(0.65),
-        EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
-
-	auto MingSignForMe=(Sprite*)this->getChildByTag(MING_STATUS_PNG_1);
-	if(lastWinner!=1) {
-        MingSignForMe->setPosition(_layout->PositionOfMingSignForMe());
-    } else {
-        MingSignForMe->setPosition(_layout->PositionOfMingSignForMe(_zhuangSign->getTextureRect().size.width));
-    }
+            TargetedAction::create(button,
+                ScaleTo::create(0,0)),CallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::ming_tip_effect)),NULL));
 }
 
-void NetRaceLayer::KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::KouConfirmEffect() {
+    auto button = myframe->getChildByTag(MING_KOU_ENSURE);
+
+    myframe->_ID = MIDDLE;
+    myframe->runAction(Sequence::create(TargetedAction::create(
+        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::ming_tip_effect)),NULL));
+}
+
+void NetRaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 	switch (type)
@@ -2478,29 +2401,13 @@ void NetRaceLayer::KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			_Remove(myframe,MING_KOU_ENSURE);			
-			_Remove(myframe,MING_KOU_SIGN);
-
             Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
 
-            Sprite *p_list[MAX_HANDIN_NUM];
-			auto list = _roundManager->_players[1]->get_parter()->get_card_list();
-			for(int i=list->atcvie_place;i<list->len;i++)
-			{
-				list->data[i].status=c_FREE;
-                
-				Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
-				if(card->getChildByTag(MING_KOU))
-					card->removeChildByTag(MING_KOU);
-			}			
+			_Remove(myframe,MING_KOU_ENSURE);			
+			_Remove(myframe,MING_KOU_SIGN);
 			curButton->setTouchEnabled(false);
-            
-			myframe->_ID=1;
-			myframe->runAction(
-                Sequence::create(
-                    TargetedAction::create(curButton,
-                        ScaleTo::create(0,0)),CallFuncN::create(this,callfuncN_selector(
-                    NetRaceLayer::ming_tip_effect)),NULL));
+
+            _roundManager->RecvKouCancel();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -2510,8 +2417,9 @@ void NetRaceLayer::KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 	}	
 }
 
-void NetRaceLayer::KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
+    auto curButton=(Button*)pSender;
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -2520,35 +2428,12 @@ void NetRaceLayer::KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-            
-			
-            
-			if (myframe->getChildByTag(MING_KOU_SIGN))
-				myframe->removeChildByTag(MING_KOU_SIGN);
-
-            auto list = _roundManager->_players[1]->get_parter()->get_card_list();
-			for(int i=list->atcvie_place;i<list->len;i++)
-			{
-				if(list->data[i].status==c_KOU_ENABLE)
-					list->data[i].status=c_FREE;
-			}	
-            
 			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
             
-			_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU);
-			auto ming_indexesCur=_roundManager->_players[1]->get_parter()->ming_check();
-			_roundManager->_players[1]->get_parter()->set_ming_indexes(ming_indexesCur);
-
-			auto curButton=(Button*)pSender;
+            _Remove(myframe,MING_KOU_SIGN);
 			curButton->setTouchEnabled(false);
 
-			myframe->_ID = _roundManager->_curPlayer;
-			myframe->runAction(Sequence::create(TargetedAction::create(
-                curButton,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::ming_tip_effect)),NULL));
+            _roundManager->RecvKouConfirm();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -2557,7 +2442,20 @@ void NetRaceLayer::KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		break;
 	}
 }
-void NetRaceLayer::MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+
+void NetRaceLayer::MingCancelEffect() {
+    auto button = myframe->getChildByTag(MING_CANCEL);
+    
+    myframe->_ID = _roundManager->_curPlayer;
+    myframe->runAction(Sequence::create(TargetedAction::create(
+        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+        _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
+        waitfor_myaction(MIDDLE);}),NULL));
+}
+
+void NetRaceLayer::MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -2567,25 +2465,7 @@ void NetRaceLayer::MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-            
-			_roundManager->_isMingTime=false;
-            
-			_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU_CANCEL);
-			_roundManager->_actionToDo=a_JUMP;
-            
-			_roundManager->_players[1]->get_parter()->MingCancel();
-			_roundManager->_players[1]->get_parter()->set_ming_indexes(0);
-			_roundManager->_players[1]->get_parter()->set_ting_status(0);
-
-			
-			myframe->_ID = _roundManager->_curPlayer;
-			myframe->runAction(Sequence::create(TargetedAction::create(
-                (Button*)pSender,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
-				_roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
-				waitfor_myaction(MIDDLE);}),NULL));
+            _roundManager->RecvMingCancel();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -2748,13 +2628,13 @@ void NetRaceLayer::waitfor_MingKouChoose(int no)
     
 	if(no==MIDDLE) {
         auto kouCancel = _object->CreateButton(BTN_CANCEL);
-        kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouCancelPressed,this));
+        kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouCancelHandler,this));
 		myframe->addChild(kouCancel,20,MING_KOU_CANCEL);
 
 		myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
 
 		auto ChooseEnsure = _object->CreateButton(BTN_OK);
-        ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::KouConfirmPressed,this));
+        ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouConfirmHandler,this));
 		ChooseEnsure->setVisible(false);
 		myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
 
@@ -2780,7 +2660,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 			myframe->removeChildByTag(MING_KOU_SIGN);
 
 		auto MingCancel = _object->CreateButton(BTN_CANCEL);
-		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelPressed,this));
+		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
 		myframe->addChild(MingCancel,20,MING_CANCEL);
 
         _Remove(myframe,MING_KOU_CANCEL);
@@ -2867,6 +2747,11 @@ void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		break;
 	}
 }
+
+
+
+
+
 void NetRaceLayer::first_response(int no)
 {
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
@@ -3693,7 +3578,7 @@ void NetRaceLayer::start_callback()
 
     _roundManager->WaitUntilAllReady();
 
-	race_begin_prepare();                  //牌局开始效果
+	_ReceBeginPrepare();                  //牌局开始效果
 
     int lastWinner = _roundManager->GetLastWinner();
     _roundManager->_actionToDo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
@@ -7198,6 +7083,96 @@ void NetRaceLayer::_CreateHeadImage() {
     bkg = _object->CreateHeadBkg(MIDDLE);
     _layout->SetPlayerBkg(MIDDLE,bkg);
     this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
+}
+
+void NetRaceLayer::_ReceBeginPrepare() {
+    _Remove(this,READY_INDICATE_LEFT_TAG_ID);
+    _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
+    _Remove(this,READY_INDICATE_MID_TAG_ID);
+
+	(Sprite*)this->getChildByTag(LEFT_IMG_BKG_TAG_ID)->runAction(
+        EaseIn::create(MoveTo::create(0.6,Vec2(29,536)),1.5));
+	(Sprite*)this->getChildByTag(RIGHT_IMG_BKG_TAG_ID)->runAction(
+        EaseIn::create(MoveTo::create(0.6,Vec2(1190,536)),1.5));
+	(Sprite*)this->getChildByTag(MID_IMG_BKG_TAG_ID)->runAction(
+        EaseIn::create(MoveTo::create(0.6,Vec2(49,129)),1.5));
+    
+	(Sprite*)this->getChildByTag(MIC_TAG_ID)->runAction(Sequence::create(
+        DelayTime::create(0.65),
+        EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
+    
+	for(int i=CARD_ARRAGE_LEFT_TAG_ID;i<=CARD_ARRAGE_TOP_TAG_ID;i++) {
+		(Sprite*)this->getChildByTag(i)->runAction(
+		    EaseIn::create(FadeOut::create(0.2),2));
+    }
+
+	auto colorLayer=LayerColor::create(Color4B(0,0,0,150),visibleSize.width,visibleSize.height*200/716);
+	colorLayer->setAnchorPoint(Vec2(0.5,0.5));
+	colorLayer->ignoreAnchorPointForPosition(false);
+	colorLayer->setScale(0);
+	colorLayer->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+	this->addChild(colorLayer,4,COLOR_LAYER_TAG_ID);
+
+	auto paijuStart=Sprite::create("paijukaishi.png");
+	paijuStart->setScale(0);
+	paijuStart->setAnchorPoint(Vec2(0.5,0.5));
+	paijuStart->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+	this->addChild(paijuStart,5,RACE_START_TAG_ID);
+
+	auto paijuStart_guang=Sprite::create("paijuStart_guang.png");
+	paijuStart_guang->setAnchorPoint(Vec2(0.5,0.5));
+	paijuStart_guang->setScale(0);
+	paijuStart_guang->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+	this->addChild(paijuStart_guang,6,RACE_LIGHT_TAG_ID);
+
+	paijuStart->runAction(
+        Sequence::create(
+            DelayTime::create(0.7),
+            ScaleTo::create(0,4),
+            Spawn::create(
+                FadeIn::create(0.2),
+                ScaleTo::create(0.2,1),NULL),
+            Spawn::create(
+                _voice->Speak("duijukaishi.ogg"),
+                Sequence::create(
+                    DelayTime::create(0.5),
+                    ScaleTo::create(0.15,0.5),
+                    Spawn::create(
+                        ScaleTo::create(0.3,4),
+                        FadeOut::create(0.3),NULL),NULL),NULL),NULL));
+    
+	colorLayer->runAction(
+        Sequence::create(
+            DelayTime::create(0.9),
+            ScaleTo::create(0,1),
+            DelayTime::create(0.9),
+            ScaleTo::create(0.4,1,0),NULL));
+    
+	paijuStart_guang->runAction(
+        Sequence::create(
+            DelayTime::create(1.7),
+            Spawn::create(
+                ScaleTo::create(0.3,8,3),
+                FadeIn::create(0.3),NULL),
+                Spawn::create(
+                    ScaleTo::create(0.5,8,0),
+                    FadeOut::create(0.5),NULL),NULL));
+
+    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
+
+    int lastWinner = _roundManager->GetLastWinner();
+    _zhuangSign->setAnchorPoint(_layout->AnchorOfZhuang((PlayerDir_t)lastWinner));
+    _zhuangSign->setPosition(_layout->_playerPosi[lastWinner].zhuangPoint);
+	_zhuangSign->runAction(Sequence::create(
+        DelayTime::create(0.65),
+        EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
+
+	auto MingSignForMe=(Sprite*)this->getChildByTag(MING_STATUS_PNG_1);
+	if(lastWinner!=1) {
+        MingSignForMe->setPosition(_layout->PositionOfMingSignForMe());
+    } else {
+        MingSignForMe->setPosition(_layout->PositionOfMingSignForMe(_zhuangSign->getTextureRect().size.width));
+    }
 }
 
 bool NetRaceLayer::_ResourcePrepare()

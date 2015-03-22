@@ -640,6 +640,43 @@ TingInfo_t RoundManager::GetTingInfo(PlayerDir_t dir,int outCarIdx) {
     return TingInfo;
 }
 
+void RoundManager::RecvKouCancel() {
+    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
+    for(int i=cards->atcvie_place;i<cards->len;i++) {
+        cards->data[i].status=c_FREE;
+    }
+
+    _uiManager->KouCancelEffect(cards);
+}
+
+void RoundManager::RecvKouConfirm() {
+    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
+    for(int i=cards->atcvie_place;i<cards->len;i++) {
+        if(cards->data[i].status==c_KOU_ENABLE)
+            cards->data[i].status=c_FREE;
+    }   
+    
+    _players[MIDDLE]->get_parter()->action(_isCardFromOthers,a_KOU);
+    
+    auto ming_indexesCur=_players[MIDDLE]->get_parter()->ming_check();
+    _players[MIDDLE]->get_parter()->set_ming_indexes(ming_indexesCur);
+
+    _uiManager->KouConfirmEffect();
+}
+
+void RoundManager::RecvMingCancel() {
+    _isMingTime=false;
+    
+    _players[1]->get_parter()->action(_isCardFromOthers,a_KOU_CANCEL);
+    _actionToDo=a_JUMP;
+    
+    _players[1]->get_parter()->MingCancel();
+    _players[1]->get_parter()->set_ming_indexes(0);
+    _players[1]->get_parter()->set_ting_status(0);
+
+    _uiManager->MingCancelEffect();
+}
+
 /*************************************
         singleton
 *************************************/

@@ -30,6 +30,9 @@ public:
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void GangGoldEffect(int winner,int whoGive);
+    void KouCancelEffect(CARD_ARRAY *cards);
+    void KouConfirmEffect();
+    void MingCancelEffect();
     
 protected:
     RoundManager   *_roundManager;
@@ -172,7 +175,7 @@ private:
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);
-	void race_begin_prepare();//牌局开始效果
+	void _ReceBeginPrepare();//牌局开始效果
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
 	void start_callback();//功能--开始
@@ -267,9 +270,9 @@ public:
 	void set_aims_sequence(const int p_aim[]);
 
 	void waitfor_MingKouChoose(int no);
-	void KouCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void KouConfirmPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void MingCancelPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
 	void _UpdateResidueNumOnTingSignBar(PlayerDir_t dir);
