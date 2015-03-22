@@ -2484,10 +2484,7 @@ Node *NetRaceLayer::_NonKouMask(Sprite *card) {
     return mask;
 }
 
-void NetRaceLayer::MaskNonKouCards() {
-	
-    CARD_ARRAY *cards = _roundManager->_players[1]->get_parter()->get_card_list();
-
+void NetRaceLayer::_MaskNonKouCards(CARD_ARRAY *cards) {
     for(int i=cards->atcvie_place; i<cards->len; i++) {
         if(cards->data[i].status!=c_KOU_ENABLE) {
             Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
@@ -2496,128 +2493,132 @@ void NetRaceLayer::MaskNonKouCards() {
     }
 }
 
+bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
+    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+
+    Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
+    int groupChosen=-1;
+    
+    for(int i=0;i<cards->len;i++) {
+        cardsInHand[i]=_GetCardInHand(MIDDLE,i);
+        cardsInHand[i]->_ID = MIDDLE;
+    }
+    
+    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
+        for(int i=0; i<3; i++) {
+            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)], touch) ) {
+                groupChosen = group;
+                break;/* BUG : only 1 group can be chosen??? */
+            }
+        }
+    }
+    
+    if(groupChosen!=-1) {
+        for(int i=0; i<3; i++) {
+            cardsInHand[_ai->KouCardIndex(groupChosen,i)]->_ID++;/*==2???*/
+        }
+    }
+    
+    return true;
+}
+
+void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
+    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+
+    Sprite *cardsInHand[MAX_HANDIN_NUM];
+    int a,b,groupChosen=-1;
+    
+    for(int i=0; i<cards->len; i++) {
+        cardsInHand[i]=_GetCardInHand(MIDDLE,i);
+    }
+    
+    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
+        for(int i=0;i<3;i++) {
+            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)],touch) ) {
+                if(cardsInHand[_ai->KouCardIndex(group,i)]->_ID!=1) {
+                    groupChosen = group;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if(groupChosen!=-1) {
+        if(_ai->KouCardStatus(groupChosen)==c_MING_KOU) {
+            _ai->SetKouCardStatus(groupChosen,c_MING_KOU);
+            cards->data[_ai->KouCardIndex(groupChosen,0)].status=c_KOU_ENABLE;
+            cards->data[_ai->KouCardIndex(groupChosen,1)].status=c_KOU_ENABLE;
+            cards->data[_ai->KouCardIndex(groupChosen,2)].status=c_KOU_ENABLE;
+        }
+        else if(_ai->KouCardStatus(groupChosen)==c_KOU_ENABLE)
+        {
+            _ai->SetKouCardStatus(groupChosen,c_MING_KOU);
+            cards->data[_ai->KouCardIndex(groupChosen,0)].status=c_MING_KOU;
+            cards->data[_ai->KouCardIndex(groupChosen,1)].status=c_MING_KOU;
+            cards->data[_ai->KouCardIndex(groupChosen,2)].status=c_MING_KOU;
+        }
+    }
+    
+    for( a=0; a<_ai->KouCardGroupNum(); a++ ) {
+        if(_ai->KouCardStatus(a)!=c_MING_KOU) {
+            if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
+                (CARD_KIND)_ai->KouCardKind(a), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
+            {
+                cards->data[_ai->KouCardIndex(a,0)].status=c_KOU_ENABLE;
+                cards->data[_ai->KouCardIndex(a,1)].status=c_KOU_ENABLE;
+                cards->data[_ai->KouCardIndex(a,2)].status=c_KOU_ENABLE;
+                _ai->SetKouCardStatus(a,c_MING_KOU);
+            } else {
+                cards->data[_ai->KouCardIndex(a,0)].status=c_FREE;
+                cards->data[_ai->KouCardIndex(a,1)].status=c_FREE;
+                cards->data[_ai->KouCardIndex(a,2)].status=c_FREE;
+                _ai->SetKouCardStatus(a,c_FREE);
+            }
+        }
+    }
+    
+    for(a=0;a<_ai->KouCardGroupNum();a++) {
+        for(b=0;b<3;b++) {
+            if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU))
+                cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU);
+            if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU_MASK))
+                cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU_MASK);
+            if(cards->data[_ai->KouCardIndex(a,b)].status==c_MING_KOU) {
+                auto MingKouMark=_object->Create(MING_KOU_CARD);
+                MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
+                MingKouMark->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
+                cardsInHand[_ai->KouCardIndex(a,b)]->addChild(MingKouMark,2,MING_KOU);
+            } else if(cards->data[_ai->KouCardIndex(a,b)].status!=c_KOU_ENABLE) {
+                auto KouNo=_object->Create(MING_MASK_CARD);
+                KouNo->setAnchorPoint(Vec2(0.5,0.5));
+                KouNo->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
+                cardsInHand[_ai->KouCardIndex(a,b)]->addChild(KouNo,2,MING_KOU_MASK);
+            }
+        }
+    }
+    
+    bool ifEnsureVisible=false;
+    for(a=0;a<4;a++) {
+        if(_ai->KouCardStatus(a)==c_MING_KOU) {
+            ifEnsureVisible=true;
+            break;
+        }
+    }
+    
+    if(ifEnsureVisible)
+        myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
+    else
+        myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(false);
+}
+
 void NetRaceLayer::ListenToKou(int no) {
-	
     auto cards=_roundManager->_players[no]->get_parter()->get_card_list();
     auto KouListener = EventListenerTouchOneByOne::create();
     KouListener->setSwallowTouches(true);
     
-    KouListener->onTouchBegan = [=](Touch* touch, Event* event) {
-        Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
-        int groupChosen=-1;
-    
-        for(int a=0;a<cards->len;a++) {
-            cardsInHand[a]=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+a);
-            cardsInHand[a]->_ID = 1;
-        }
-
-        for(int group=0; group<_ai->KouCardGroupNum(); group++) {
-            for(int i=0; i<3; i++) {
-                if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)], touch) ) {
-                    groupChosen = group;
-                }
-            }
-            if(groupChosen!=-1)
-                break;
-        }
-        
-        if(groupChosen!=-1) {
-            for(int i=0; i<3; i++)
-                cardsInHand[_ai->KouCardIndex(groupChosen,i)]->_ID++;
-        }
-        
-        return true;
-    };
-    
-    KouListener->onTouchMoved = [=](Touch* touch, Event* event) {
-    };
-
-    KouListener->onTouchEnded = [=](Touch* touch, Event* event) {/* is begin neccessary ??? */
-        Sprite *cardsInHand[MAX_HANDIN_NUM];
-        int a,b,kindChosen=-1;
-
-        for(int i=0; i<cards->len; i++)
-            cardsInHand[i]=_GetCardInHand(MIDDLE,i);
-        
-        for(int kind=0; kind<_ai->KouCardGroupNum(); kind++) {
-            for(int i=0;i<3;i++) {
-                if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(kind,i)],touch) ) {
-                    if(cardsInHand[_ai->KouCardIndex(kind,i)]->_ID!=1)
-                        kindChosen = kind;
-                }
-            }
-
-            if(kindChosen!=-1)
-                break;
-        }
-        
-        if(kindChosen!=-1) {
-            if(_ai->KouCardStatus(kindChosen)==c_MING_KOU) {
-                _ai->SetKouCardStatus(kindChosen,c_MING_KOU);
-                cards->data[_ai->KouCardIndex(kindChosen,0)].status=c_KOU_ENABLE;
-                cards->data[_ai->KouCardIndex(kindChosen,1)].status=c_KOU_ENABLE;
-                cards->data[_ai->KouCardIndex(kindChosen,2)].status=c_KOU_ENABLE;
-            }
-            else if(_ai->KouCardStatus(kindChosen)==c_KOU_ENABLE)
-            {
-                _ai->SetKouCardStatus(kindChosen,c_MING_KOU);
-                cards->data[_ai->KouCardIndex(kindChosen,0)].status=c_MING_KOU;
-                cards->data[_ai->KouCardIndex(kindChosen,1)].status=c_MING_KOU;
-                cards->data[_ai->KouCardIndex(kindChosen,2)].status=c_MING_KOU;
-            }
-        }
-        
-        for( a=0; a<_ai->KouCardGroupNum(); a++ ) {
-            if(_ai->KouCardStatus(a)!=c_MING_KOU) {
-                if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
-                    (CARD_KIND)_ai->KouCardKind(a), no, (CARD_KIND)_roundManager->_otherHandedOut))
-                {
-                    cards->data[_ai->KouCardIndex(a,0)].status=c_KOU_ENABLE;
-                    cards->data[_ai->KouCardIndex(a,1)].status=c_KOU_ENABLE;
-                    cards->data[_ai->KouCardIndex(a,2)].status=c_KOU_ENABLE;
-                    _ai->SetKouCardStatus(a,c_MING_KOU);
-                } else {
-                    cards->data[_ai->KouCardIndex(a,0)].status=c_FREE;
-                    cards->data[_ai->KouCardIndex(a,1)].status=c_FREE;
-                    cards->data[_ai->KouCardIndex(a,2)].status=c_FREE;
-                    _ai->SetKouCardStatus(a,c_FREE);
-                }
-            }
-        }
-        
-        for(a=0;a<_ai->KouCardGroupNum();a++) {
-            for(b=0;b<3;b++) {
-                if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU))
-                    cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU);
-                if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU_MASK))
-                    cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU_MASK);
-                if(cards->data[_ai->KouCardIndex(a,b)].status==c_MING_KOU) {
-                    auto MingKouMark=_object->Create(MING_KOU_CARD);
-                    MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
-                    MingKouMark->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
-                    cardsInHand[_ai->KouCardIndex(a,b)]->addChild(MingKouMark,2,MING_KOU);
-                } else if(cards->data[_ai->KouCardIndex(a,b)].status!=c_KOU_ENABLE) {
-                    auto KouNo=_object->Create(MING_MASK_CARD);
-                    KouNo->setAnchorPoint(Vec2(0.5,0.5));
-                    KouNo->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
-                    cardsInHand[_ai->KouCardIndex(a,b)]->addChild(KouNo,2,MING_KOU_MASK);
-                }
-            }
-        }
-        
-        bool ifEnsureVisible=false;
-        for(a=0;a<4;a++) {
-            if(_ai->KouCardStatus(a)==c_MING_KOU) {
-                ifEnsureVisible=true;
-                break;
-            }
-        }
-        
-        if(ifEnsureVisible)
-            myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
-        else
-            myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(false);
-    };
+    KouListener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_KouTouchBegan,this);
+    KouListener->onTouchMoved = [=](Touch* touch, Event* event) {};
+    KouListener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_KouTouchEnded,this);
     
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(KouListener, myframe);
 }
@@ -2638,7 +2639,8 @@ void NetRaceLayer::waitfor_MingKouChoose(int no)
 		ChooseEnsure->setVisible(false);
 		myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
 
-        MaskNonKouCards();
+        CARD_ARRAY *cards = _roundManager->_players[1]->get_parter()->get_card_list();
+        _MaskNonKouCards(cards);
         ListenToKou(no);
 	} else {
 		_ai->MingKouChoose((PlayerDir_t)no);

@@ -98,10 +98,13 @@ private:
     void _Show(Node *parent, int childTag,bool flag);
 
     /*Ming*/
+    bool _KouTouchBegan(Touch* touch, Event* event);
+    void _KouTouchEnded(Touch* touch, Event* event);
     Node *_NonKouMask(Sprite *card);
-    void    MaskNonKouCards();
+    void    _MaskNonKouCards(CARD_ARRAY *cards);
     void    ListenToKou(int no);
     TargetedAction *_ShowBigMing(Node *myframe);
+    
     bool _CardTouchBegan(Touch* touch, Event* event);
     void _CardTouchMove(Touch* touch, Event* event);
     void _CardTouchEnd(Touch* touch, Event* event);
