@@ -261,7 +261,7 @@ bool RoundManager::WaitUntilAllReady() {
     return true;
 }
 
-int RoundManager::AllowMovement() {
+int RoundManager::AllowChooseCard() {
     LOGGER_WRITE("enable reaction to player's movement",__FUNCTION__);
     return 0;
 }

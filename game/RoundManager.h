@@ -88,7 +88,7 @@ public:
     int  NotifyStart();
     bool GetReadyStatus(int tableId);
     bool WaitUntilAllReady();
-    int  AllowMovement();
+    int  AllowChooseCard();
     bool WaitForDistribute();
     bool WaitForAction();
 

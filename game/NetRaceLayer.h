@@ -135,8 +135,8 @@ private:
 
 	bool ifTuoGuan;
     
-	bool ifChosed;   //only used in waitfor_MyTouchShowCard
-	int  _myTouchedCard;  //only used in waitfor_MyTouchShowCard
+	bool ifChosed;   //only used in ListenToCardTouch
+	int  _myTouchedCard;  //only used in ListenToCardTouch
     int  _myChosenCard;
 
 	CARD_KIND cur_effect_cardKind;
@@ -187,7 +187,6 @@ private:
 	void _UpdateHeadImage(int direction,std::string head_photo);//¸üÐÂÍ·Ïñ
     /*###################################*/
 	void waitfor_ShowCardWithoutTouch();
-	void waitfor_MyTouchShowCard();
 	void waitfor_MyShowCardInstruct();
 	void start_dealCardsDelete();
 	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);

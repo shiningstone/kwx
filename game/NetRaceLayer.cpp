@@ -301,6 +301,36 @@ void NetRaceLayer::GangEffect(Card_t card, int gangCardIdx[], bool isAnGang, Pla
     }
 }
 
+void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
+    HideClock();
+
+    if(win.player!=MIDDLE) {
+        if(_roundManager->IsTing(1)) {
+            _HuEffect(3);
+            distribute_event(DOUBLE_HU_WITH_ME,NULL);
+        } else {
+            waitfor_myaction(MIDDLE);
+        }
+    }
+}
+
+void NetRaceLayer::SingleWin(const WinInfo_t &win) {
+    HideClock();
+
+    if(win.player==MIDDLE) {
+        if(_roundManager->IsTing(1)) {
+            myframe->_ID = MIDDLE;
+            myframe->runAction(CallFunc::create([=](){
+                _HuEffect(win.player);}));
+        } else {
+            waitfor_myaction(MIDDLE);
+        }
+
+    } else {
+        _HuEffect(win.player);
+    }
+}
+
 void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
         GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
@@ -309,12 +339,10 @@ void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
 
 void NetRaceLayer::waitfor_MyShowCardInstruct()
 {
-    LOGGER_WRITE("%s isCardFromOthers=%d",__FUNCTION__,_roundManager->_isCardFromOthers);
-
 	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
 		if( _roundManager->_isTuoGuan ||
                 (_roundManager->IsTing(_roundManager->_curPlayer) 
-                && !myframe->getChildByTag(GANG_REMING_ACT_TAG_ID)) ) {
+                && !_roundManager->_isGangAsking) ) {
             CardsInfo_t cards;
             _GetCardsInfo(&cards);
             
@@ -322,10 +350,7 @@ void NetRaceLayer::waitfor_MyShowCardInstruct()
             
             _roundManager->RecvHandout(cards.last,location,2);
             
-		} else if( myframe->getChildByTag(GANG_REMING_ACT_TAG_ID) ) {
-			_roundManager->_isGangAsking = true;
-		}
-		else {
+		} else {
 			_roundManager->_isMyShowTime = true;
         }
 	}
@@ -435,14 +460,16 @@ int NetRaceLayer::_FindCard(int start,int end,Touch *touch) {
         choose card
 *******************************************/
 void NetRaceLayer::ListenToCardTouch() {
-    auto listener = EventListenerTouchOneByOne::create();
-    listener->setSwallowTouches(true);
-    
-    listener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_CardTouchBegan,this);
-    listener->onTouchMoved = CC_CALLBACK_2(NetRaceLayer::_CardTouchMove,this);
-    listener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_CardTouchEnd,this);
+	if( !_roundManager->IsTing(MIDDLE) && !_roundManager->_isTuoGuan ) {
+        auto listener = EventListenerTouchOneByOne::create();
+        listener->setSwallowTouches(true);
+        
+        listener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_CardTouchBegan,this);
+        listener->onTouchMoved = CC_CALLBACK_2(NetRaceLayer::_CardTouchMove,this);
+        listener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_CardTouchEnd,this);
 
-    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
+        Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
+   }
 }
 
 bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
@@ -629,14 +656,6 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 
             _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
 		}
-    }
-}
-
-void NetRaceLayer::waitfor_MyTouchShowCard()//正常情况下的出牌监听（非托管和明牌）
-{
-    _roundManager->AllowMovement();
-	if( !_roundManager->IsTing(MIDDLE) && !_roundManager->_isTuoGuan ) {
-        ListenToCardTouch();
     }
 }
 
@@ -1397,36 +1416,6 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 			_roundManager->_curPlayer=no;}),CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::call_distribute_card)),NULL));
 	}
-}
-
-void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
-    HideClock();
-
-    if(win.player!=MIDDLE) {
-        if(_roundManager->IsTing(1)) {
-            _HuEffect(3);
-            distribute_event(DOUBLE_HU_WITH_ME,NULL);
-        } else {
-            waitfor_myaction(MIDDLE);
-        }
-    }
-}
-
-void NetRaceLayer::SingleWin(const WinInfo_t &win) {
-    HideClock();
-
-    if(win.player==MIDDLE) {
-        if(_roundManager->IsTing(1)) {
-            myframe->_ID = MIDDLE;
-            myframe->runAction(CallFunc::create([=](){
-                _HuEffect(win.player);}));
-        } else {
-            waitfor_myaction(MIDDLE);
-        }
-
-    } else {
-        _HuEffect(win.player);
-    }
 }
 
 void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
@@ -3014,7 +3003,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 		myframe->_ID=1;
 		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::waitfor_MyTouchShowCard)),NULL));
+            NetRaceLayer::ListenToCardTouch)),NULL));
 	} else {
 		myframe->_ID = psender->_ID;
 		myframe->runAction(CCCallFunc::create(this,callfunc_selector(
@@ -3103,7 +3092,7 @@ void NetRaceLayer::first_response(int no)
 	_roundManager->_isGameStart=true;
     _roundManager->_actionToDo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();/*why???*/
 
-	waitfor_MyTouchShowCard();
+	ListenToCardTouch();
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 
     if(_roundManager->_actionToDo!=a_JUMP){
@@ -3185,6 +3174,8 @@ void NetRaceLayer::waitfor_myaction(PlayerDir_t dir)
 		myframe->addChild(gang1_act,34,GANG_REMING_ACT_BKG_TAG_ID);
 
         x=x-act_gang->getContentSize().width/2-18;
+
+        _roundManager->_isGangAsking = true;
 	}
 
 	if(_roundManager->_actionToDo&a_PENG)//碰牌
@@ -5951,7 +5942,7 @@ void NetRaceLayer::tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType 
 			_roundManager->_isTuoGuan=false;
 			auto StartSelfGame=CallFunc::create([=](){
 				if( !_roundManager->IsTing(1) )
-					waitfor_MyTouchShowCard();
+					ListenToCardTouch();
 				else
 					ListenToTingButton();
 			});
@@ -6101,7 +6092,7 @@ void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType typ
 				if(_roundManager->_isGameStart)
 				{
 					if(!_roundManager->IsTing(1))
-						waitfor_MyTouchShowCard();
+						ListenToCardTouch();
 					else
 						ListenToTingButton();
 				}
