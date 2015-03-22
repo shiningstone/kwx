@@ -495,6 +495,10 @@ void RoundManager::StartGame(Scene *scene) {
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
 
+    if(_isGangAsking) {
+        _isGangAsking = false;
+    }
+    
 	if(_isMingTime) {
 		_isMingTime=false;
 	} else {
