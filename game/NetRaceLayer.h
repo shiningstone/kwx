@@ -72,6 +72,7 @@ private:
     Sprite* _GetCardOnTingSignBar(PlayerDir_t dir,int cardIdx);
     Sprite *_CreateCardInHand(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,const Vec2 &refer);
     float _YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY);
+	void _QueryKouEffect();
 
     void _CreateResidueCards();
     void refresh_residue_cards();
