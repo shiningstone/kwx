@@ -105,6 +105,7 @@ public:
     Sprite *CreateClock();
     Sprite *CreateClockIndicator(PlayerDir_t dir);
     Sprite *CreatePlayerPointer();
+    Sprite *CreateDistributeCard(PlayerDir_t dir,Card_t kind);
     
     LayerColor *CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum);
     LayerColor *CreateTingInfoBar(Vec2 &referPoint, Card_t *cards,int cardNum,int *winTimes,int *remainingNum);

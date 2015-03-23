@@ -406,6 +406,28 @@ Sprite *GObjectFactory::CreatePlayerPointer() {
     return pointer;
 }
 
+Sprite *GObjectFactory::CreateDistributeCard(PlayerDir_t dir,Card_t kind) {
+    auto Ckind = CreateKind(kind,NORMAL);
+    Sprite *card;
+   
+    switch(dir) {
+        case MIDDLE:
+            card  = Create(FREE_CARD,Ckind);
+            card->setAnchorPoint(Point(0.0f,0.0f));
+            break;
+        case LEFT:
+            card = Create(L_IN_CARD);
+            card->setAnchorPoint(Point(0.0f,1.0f));
+            break;
+        case RIGHT:
+            card = Create(R_IN_CARD);
+            card->setAnchorPoint(Point(0,0));
+            break;
+    }
+
+    return card;
+}
+
 LayerColor *GObjectFactory::CreateTingSignBar(PlayerDir_t dir,Card_t *cards,int cardNum) {
 	Vec2 curPos = _layout->PositionOfTingSignBar((PlayerDir_t)dir);
 

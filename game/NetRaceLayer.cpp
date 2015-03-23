@@ -93,7 +93,7 @@ void NetRaceLayer::create_race()
 
     _CreateMeneButtons();
     _CreateResidueCards();
-	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
     _CreateHeadImage();
 
 	this->addChild(_object->CreateMicIcon(),1,MIC_TAG_ID);
@@ -1463,15 +1463,15 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 		Vec2    basePos;
         
 		if(!_roundManager->_isCardFromOthers) {
-			baseCard=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + list->len-2);
-			basePos=baseCard->getPosition();
+			baseCard = _GetCardInHand(MIDDLE,list->len-2);
+			basePos  = baseCard->getPosition();
             
 			distributeCardPos=Vec2(
                 basePos.x + baseCard->getBoundingBox().size.width + 30 - FreeCardSize.width*ifZeroPointTwo*0.2,
                 basePos.y);
 		} else {
-			baseCard=(Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + list->len-4);
-			basePos=baseCard->getPosition();
+			baseCard = _GetCardInHand(MIDDLE,list->len-4);
+			basePos  = baseCard->getPosition();
 
             if( list->atcvie_place>0 )
 				distributeCardPos = Vec2(
@@ -1484,7 +1484,6 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
 				    basePos.y);
 		}
-
 
         /**********************
             gang cards motions
@@ -3196,54 +3195,39 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
 }
 
 void NetRaceLayer::distribute_card_effect() {
-	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
+	auto cards = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
+    const Vec2 &lastCardPosition = _GetLastCardPosition((PlayerDir_t)_roundManager->_curPlayer,cards->len-1);
 
-    Sprite *list_last_one;
-    const Vec2 &lastCardPosition = _GetLastCardPosition((PlayerDir_t)_roundManager->_curPlayer,list->len-1);
-
-    if(_roundManager->_curPlayer==1) {
-		list_last_one=_object->Create(FREE_CARD);
-		list_last_one->setAnchorPoint(Point(0.0f,0.0f));
-        
-		auto s_card=_object->CreateKind((Card_t)_roundManager->_lastHandedOutCard,NORMAL);
-		s_card->setPosition(Vec2(
-            list_last_one->getTextureRect().size.width/2,
-            list_last_one->getTextureRect().size.height*0.4));
-		list_last_one->addChild(s_card);
-	} else if(_roundManager->_curPlayer==2) {
-		list_last_one=_object->Create(R_IN_CARD);
-		list_last_one->setAnchorPoint(Point(0,0));
-	} else {
-		list_last_one=_object->Create(L_IN_CARD);
-		list_last_one->setAnchorPoint(Point(0.0f,1.0f));
-	}
-
-	list_last_one->setPosition(lastCardPosition);
+    Sprite *lastCard = _object->CreateDistributeCard((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard);
+	lastCard->setPosition(lastCardPosition);
     
-	update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 
 	if(_roundManager->_curPlayer==0)
-		myframe->addChild(list_last_one,30,
-		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+		myframe->addChild(lastCard,
+		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(cards->len));
 	else if(_roundManager->_curPlayer==1)
-		myframe->addChild(list_last_one,30,
-		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+		myframe->addChild(lastCard,
+		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(cards->len));
 	else if(_roundManager->_curPlayer==2)
-		myframe->addChild(list_last_one,0,
-		    HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len));
+		myframe->addChild(lastCard,
+		    0,  HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(cards->len));
 
-	auto last_one_action=TargetedAction::create(list_last_one,Sequence::create(
+	auto last_one_action=TargetedAction::create(lastCard,Sequence::create(
         EaseElasticOut::create(
-            MoveTo::create(0.3,Vec2(list_last_one->getPositionX(),list_last_one->getPositionY()-50))),NULL));
+            MoveTo::create(0.3,Vec2(
+                lastCard->getPositionX(),
+                lastCard->getPositionY()-50))),NULL));
 
-	auto callFunc1=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::waitfor_response));
-	Sequence* seq2;
-	myframe->_ID=_roundManager->_curPlayer;
-	if(_roundManager->_curPlayer!=1)
-		seq2=Sequence::create(last_one_action,DelayTime::create(0.5),callFunc1,NULL);
-	else
-		seq2=Sequence::create(last_one_action,callFunc1,NULL);
-	myframe->runAction(seq2);
+    DelayTime *delay = (_roundManager->_curPlayer!=MIDDLE)
+        ? (DelayTime::create(0.5))
+        : (DelayTime::create(0.0));
+    
+	myframe->_ID = _roundManager->_curPlayer;
+	myframe->runAction(Sequence::create(
+        last_one_action,
+        delay,CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::waitfor_response)),NULL));
 }
 
 void NetRaceLayer::call_distribute_card()
@@ -3355,7 +3339,7 @@ void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType
 			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
             
             refresh_residue_cards();
-			update_residue_cards(84);
+			_UpdateResidueCards(84);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
@@ -3907,15 +3891,15 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	_roundManager->_distributedNum=0;	
 	auto updateFourCards=CallFunc::create([=](){
 		_roundManager->_distributedNum += 4;
-		update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
+		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
 	});
 	auto updateOneCards=CallFunc::create([=](){
 		_roundManager->_distributedNum +=1;
-		update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
+		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
 	});
 	auto updateTwoCards=CallFunc::create([=](){
 		_roundManager->_distributedNum +=2;
-		update_residue_cards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
+		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
 	});
 
 	auto HandDelay=DelayTime::create(0.2);
@@ -5799,7 +5783,7 @@ void NetRaceLayer::refresh_residue_cards() {
     }
 }
 
-void NetRaceLayer::update_residue_cards(int no)
+void NetRaceLayer::_UpdateResidueCards(int no)
 {
     LOGGER_WRITE("%s : %d",__FUNCTION__,no);
 

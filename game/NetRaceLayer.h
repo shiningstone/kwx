@@ -234,7 +234,7 @@ public:
 	##############################*/
 	void init_role(Role *s_p[],Raction *p_parter[]);//玩家对象初始化
 	void create_race();//创建比赛场景
-	void update_residue_cards(int no);//更新剩余牌数
+	void _UpdateResidueCards(int no);//更新剩余牌数
     void _4CardsDistribute(int sequenceNo, float delayRef);
 	void effect_Distribute_Card(int zhuang);//发牌效果
 	/***********callback function***********************/
