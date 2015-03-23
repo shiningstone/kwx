@@ -3194,9 +3194,8 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     return Vec2(x,y);
 }
 
-void NetRaceLayer::distribute_card_effect() {
-	auto cards = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
-    const Vec2 &lastCardPosition = _GetLastCardPosition((PlayerDir_t)_roundManager->_curPlayer,cards->len-1);
+void NetRaceLayer::DistributeCard(int lenOfInHand) {
+    const Vec2 &lastCardPosition = _GetLastCardPosition((PlayerDir_t)_roundManager->_curPlayer,lenOfInHand);
 
     Sprite *lastCard = _object->CreateDistributeCard((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard);
 	lastCard->setPosition(lastCardPosition);
@@ -3205,13 +3204,13 @@ void NetRaceLayer::distribute_card_effect() {
 
 	if(_roundManager->_curPlayer==0)
 		myframe->addChild(lastCard,
-		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(cards->len));
+		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(lenOfInHand+1));
 	else if(_roundManager->_curPlayer==1)
 		myframe->addChild(lastCard,
-		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(cards->len));
+		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(lenOfInHand+1));
 	else if(_roundManager->_curPlayer==2)
 		myframe->addChild(lastCard,
-		    0,  HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(cards->len));
+		    0,  HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(lenOfInHand+1));
 
 	auto last_one_action=TargetedAction::create(lastCard,Sequence::create(
         EaseElasticOut::create(
@@ -3249,7 +3248,8 @@ void NetRaceLayer::ListenToDistributeCard()
 		_roundManager->_distributedNum    = userData->num;
         _roundManager->_isCardFromOthers = false;
 
-		distribute_card_effect();
+        auto cards = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
+		DistributeCard(cards->len-1);
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 

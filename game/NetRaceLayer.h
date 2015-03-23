@@ -212,7 +212,6 @@ private:
 	BezierTo* OthersBizerMove(int no,outCardList* outCard);
     Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
 	void call_distribute_card();
-	void distribute_card_effect();
 	void ListenToDistributeCard();
 	void waitfor_otheraction(int no);
 	void distribute_event(const std::string event_type,void* val);
@@ -222,6 +221,7 @@ private:
 	void _HuEffect(int no);
 	void _HandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
+	void DistributeCard(int lenOfInHand);
 	void waitfor_MyShowCardInstruct();
 	void HandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
