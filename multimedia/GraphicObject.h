@@ -90,6 +90,7 @@ class GObjectFactory {
 public:
     static GObjectFactory *getInstance(cocos2d::Point origin, cocos2d::Size size);
     static void destroyInstance();
+    Sprite *_image(const char *file);
 
     /* global */
     Sprite *CreateTable(int option=1);
@@ -142,7 +143,6 @@ protected:
     static CCSpriteBatchNode * _kind[CARD_MAX];
     static Size              * _rectSize[TEXTURE_NUM];
 
-    Sprite *_image(const char *file);
     LabelAtlas *_createNumberSign(int number);
 private:
     GObjectFactory(cocos2d::Point origin, cocos2d::Size size);

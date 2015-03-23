@@ -36,6 +36,13 @@ public:
 	void QueryKouCards();
 	void QueryMingOutCard();
     
+    void ShowActionButtons();
+    float _AddBtnQi(const Vec2 &ref);
+    float _AddBtnHu(const Vec2 &ref);
+    float _AddBtnMing(const Vec2 &ref);
+    float _AddBtnGang(const Vec2 &ref);
+    float _AddBtnPeng(const Vec2 &ref);
+
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;

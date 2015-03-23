@@ -2751,96 +2751,22 @@ void NetRaceLayer::first_response(int no)
 void NetRaceLayer::waitfor_myaction(PlayerDir_t dir)
 {
     LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,dir,_roundManager->_actionToDo);
-    _Show(myframe,TING_SING_BAR,false);
 
-	float x,y;
-	y=origin.y+visibleSize.height*0.25;
-	x=origin.x+visibleSize.width*0.85;
+    ShowActionButtons();
 
-	if(_roundManager->_actionToDo!=a_JUMP)
-	{
-		auto myact_qi = _object->CreateButton(dir,BTN_QI,Vec2(x,y));
-		myact_qi->_ID = dir;
-		myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnQiHandler,this));
-		myframe->addChild(myact_qi,35,QI_REMIND_ACT_TAG_ID);
-
-		auto qi_act = _object->CreateBtnBkg(BTN_QI,Vec2(x,y));
-		myframe->addChild(qi_act,34,QI_REMIND_ACT_BKG_TAG_ID);
-
-		x = x-qi_act->getContentSize().width/2-36;
-	}
-    
-	if(_roundManager->_actionToDo&a_HU)//胡牌
-	{	
-        auto act_hu = Sprite::createWithSpriteFrameName("hu1.png");//胡牌  
-
-        x=x-act_hu->getContentSize().width/2;
-		auto myact_hu = _object->CreateButton(dir,BTN_HU,Vec2(x,y+6));
-		myact_hu->_ID=dir;
-		myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnHuHandler,this));
-		myframe->addChild(myact_hu,35,HU_REMIND_ACT_TAG_ID);
-
-		auto hu1_act = _object->CreateBtnBkg(BTN_HU,Vec2(x,y+6));
-		myframe->addChild(hu1_act,34,HU_REMIND_ACT_BKG_TAG_ID);
-
-		x=x-act_hu->getContentSize().width/2-18;
-	}
-    
-	if(_roundManager->_actionToDo&a_MING)//明牌
-	{
-        auto act_ming = Sprite::createWithSpriteFrameName("ming.png");//明牌
-        x=x-act_ming->getContentSize().width/2;
-        
-		auto myact_ming=_object->CreateButton(dir,BTN_MING,Vec2(x,y+11));
-		myact_ming->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnMingHandler,this));
-		myframe->addChild(myact_ming,35,MING_REMIND_ACT_TAG_ID);
-
-		auto ming_act=_object->CreateBtnBkg(BTN_MING,Vec2(x,y+11));
-		myframe->addChild(ming_act,34,MING_REMIND_ACT_BKG_TAG_ID);
-
-		x=x-act_ming->getContentSize().width/2-18;
-	}
-	if(_roundManager->_actionToDo&a_AN_GANG 
-        || _roundManager->_actionToDo&a_MING_GANG
-        ||_roundManager->_actionToDo&a_SHOU_GANG)//暗杠和明杠,手杠
-	{
-        auto act_gang = Sprite::createWithSpriteFrameName("gang1.png");//杠牌
-		x=x-act_gang->getContentSize().width/2;
-
-        auto myact_gang=_object->CreateButton(dir,BTN_GANG,Vec2(x,y));
-		myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnGangHandler,this));
-		myframe->addChild(myact_gang,35,GANG_REMING_ACT_TAG_ID);
-
-		auto gang1_act=_object->CreateBtnBkg(BTN_GANG,Vec2(x,y));
-		myframe->addChild(gang1_act,34,GANG_REMING_ACT_BKG_TAG_ID);
-
-        x=x-act_gang->getContentSize().width/2-18;
-
-        _roundManager->_isGangAsking = true;
-	}
-
-	if(_roundManager->_actionToDo&a_PENG)//碰牌
-	{		
-    	auto act_peng = Sprite::createWithSpriteFrameName("peng1.png");//碰牌
-
-		x=x-act_peng->getContentSize().width/2;
-		auto myact_peng=_object->CreateButton(dir,BTN_PENG,Vec2(x,y+13));
-		myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnPengHandler,this));
-		myframe->addChild(myact_peng,35,PENG_REMIND_ACT_TAG_ID);
-
-		auto peng1_act=_object->CreateBtnBkg(BTN_PENG,Vec2(x,y+13));	
-		myframe->addChild(peng1_act,34,PENG_REMIND_ACT_BKG_TAG_ID);
-		x=x-act_peng->getContentSize().width/2-18;
-	}
-
-	if(_roundManager->_actionToDo!=a_JUMP)
-	{
+	if(_roundManager->_actionToDo!=a_JUMP) {
 		_roundManager->_isWaitDecision = true;
 		_roundManager->_tempActionToDo=_roundManager->_actionToDo;
 		_roundManager->_actionToDo=a_JUMP;
 	}
-	if(!_roundManager->_isCardFromOthers)//||(_roundManager->_isCardFromOthers&&_roundManager->_lastAction!=a_JUMP))
-	{
+
+	if(_roundManager->_actionToDo&a_AN_GANG 
+        || _roundManager->_actionToDo&a_MING_GANG
+        ||_roundManager->_actionToDo&a_SHOU_GANG) {
+        _roundManager->_isGangAsking = true;
+	}
+
+	if(!_roundManager->_isCardFromOthers) {
 		if(_roundManager->_lastAction==a_JUMP&&!(_roundManager->_lastActionSource==1&&_roundManager->_continue_gang_times!=0))
 			_roundManager->_continue_gang_times=0;
 		_roundManager->_lastAction=a_JUMP;
@@ -7302,6 +7228,113 @@ LabelAtlas * NetRaceLayer::_CreateNumberSign(int number) {
 }
 
 
+/***********************************************
+        action button show
+***********************************************/
+void NetRaceLayer::ShowActionButtons() {
+    _Show(myframe,TING_SING_BAR,false);
+
+	float y=origin.y+visibleSize.height*0.25;
+	float x=origin.x+visibleSize.width*0.85;
+
+	if(_roundManager->_actionToDo!=a_JUMP) {
+	    float width = _AddBtnQi(Vec2(x,y));
+		x = x-width;
+	}
+    
+	if(_roundManager->_actionToDo&a_HU) {	
+        float width = _AddBtnHu(Vec2(x,y));
+		x = x-width;
+	}
+    
+	if(_roundManager->_actionToDo&a_MING) {
+        float width = _AddBtnMing(Vec2(x,y));
+		x = x-width;
+	}
+    
+	if(_roundManager->_actionToDo&a_AN_GANG 
+        || _roundManager->_actionToDo&a_MING_GANG
+        ||_roundManager->_actionToDo&a_SHOU_GANG) {
+        float width = _AddBtnGang(Vec2(x,y));
+		x = x-width;
+	}
+
+	if(_roundManager->_actionToDo&a_PENG) {		
+        float width = _AddBtnPeng(Vec2(x,y));
+		x = x-width;
+	}
+}
+
+float NetRaceLayer::_AddBtnQi(const Vec2 &ref) {
+    auto picWidth = _object->_image("qi.png")->getContentSize().width;
+
+    auto myact_qi = _object->CreateButton(MIDDLE,BTN_QI,Vec2(ref.x,ref.y));
+    myact_qi->_ID = MIDDLE;
+    myact_qi->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnQiHandler,this));
+    myframe->addChild(myact_qi,35,QI_REMIND_ACT_TAG_ID);
+    
+    auto qi_act = _object->CreateBtnBkg(BTN_QI,Vec2(ref.x,ref.y));
+    myframe->addChild(qi_act,34,QI_REMIND_ACT_BKG_TAG_ID);
+
+    return picWidth/2+36;
+}
+
+float NetRaceLayer::_AddBtnHu(const Vec2 &ref) {
+    auto picWidth = _object->_image("hu1.png")->getContentSize().width;
+    float x = ref.x - picWidth/2;
+    
+    auto myact_hu = _object->CreateButton(MIDDLE,BTN_HU,Vec2(x,ref.y+6));
+    myact_hu->_ID=MIDDLE;
+    myact_hu->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnHuHandler,this));
+    myframe->addChild(myact_hu,35,HU_REMIND_ACT_TAG_ID);
+    
+    auto hu1_act = _object->CreateBtnBkg(BTN_HU,Vec2(x,ref.y+6));
+    myframe->addChild(hu1_act,34,HU_REMIND_ACT_BKG_TAG_ID);
+    
+    return (picWidth+18);
+}
+
+float NetRaceLayer::_AddBtnMing(const Vec2 &ref) {
+    auto picWidth = _object->_image("ming.png")->getContentSize().width;
+    float x = ref.x - picWidth/2;
+    
+    auto myact_ming=_object->CreateButton(MIDDLE,BTN_MING,Vec2(x,ref.y+11));
+    myact_ming->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnMingHandler,this));
+    myframe->addChild(myact_ming,35,MING_REMIND_ACT_TAG_ID);
+    
+    auto ming_act=_object->CreateBtnBkg(BTN_MING,Vec2(x,ref.y+11));
+    myframe->addChild(ming_act,34,MING_REMIND_ACT_BKG_TAG_ID);
+    
+    return (picWidth+18);
+}
+
+float NetRaceLayer::_AddBtnGang(const Vec2 &ref) {
+    auto picWidth = _object->_image("gang1.png")->getContentSize().width;
+    float x = ref.x - picWidth/2;
+    
+    auto myact_gang=_object->CreateButton(MIDDLE,BTN_GANG,Vec2(x,ref.y));
+    myact_gang->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnGangHandler,this));
+    myframe->addChild(myact_gang,35,GANG_REMING_ACT_TAG_ID);
+    
+    auto gang1_act=_object->CreateBtnBkg(BTN_GANG,Vec2(x,ref.y));
+    myframe->addChild(gang1_act,34,GANG_REMING_ACT_BKG_TAG_ID);
+    
+    return (picWidth+18);
+}
+
+float NetRaceLayer::_AddBtnPeng(const Vec2 &ref) {
+    auto picWidth = _object->_image("peng1.png")->getContentSize().width;
+    float x = ref.x - picWidth/2;
+    
+    auto myact_peng=_object->CreateButton(MIDDLE,BTN_PENG,Vec2(x,ref.y+13));
+    myact_peng->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnPengHandler,this));
+    myframe->addChild(myact_peng,35,PENG_REMIND_ACT_TAG_ID);
+    
+    auto peng1_act=_object->CreateBtnBkg(BTN_PENG,Vec2(x,ref.y+13));    
+    myframe->addChild(peng1_act,34,PENG_REMIND_ACT_BKG_TAG_ID);
+
+    return (picWidth+18);
+}
 
 
 
