@@ -2375,8 +2375,8 @@ void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
     myframe->runAction(
         Sequence::create(
             TargetedAction::create(button,
-                ScaleTo::create(0,0)),CallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::ming_tip_effect)),NULL));
+                ScaleTo::create(0,0)),CallFunc::create([=](){
+                ming_tip_effect(MIDDLE);}),NULL));
 }
 
 void NetRaceLayer::KouConfirmEffect() {
@@ -2386,8 +2386,8 @@ void NetRaceLayer::KouConfirmEffect() {
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-        NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::ming_tip_effect)),NULL));
+        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+        ming_tip_effect(MIDDLE);}),NULL));
 }
 
 void NetRaceLayer::MingCancelEffect() {
@@ -2648,11 +2648,10 @@ void NetRaceLayer::waitfor_MingKouChoose(int no) {
 	}
 }
 
-void NetRaceLayer::ming_tip_effect(Node *psender)
-{
+void NetRaceLayer::ming_tip_effect(PlayerDir_t dir) {
 	_roundManager->_actionToDo=a_MING;
 
-	if(psender->_ID==MIDDLE) {
+	if(dir==MIDDLE) {
 		_roundManager->_isMingTime=true;
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
 
@@ -2669,7 +2668,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
             NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::ListenToCardTouch)),NULL));
 	} else {
-		myframe->_ID = psender->_ID;
+		myframe->_ID = dir;
 		myframe->runAction(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::waitfor_ShowCardWithoutTouch)));
 	}
@@ -2734,8 +2733,8 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
             } else {
 				myframe->runAction(Sequence::create(
                     clickEffect,
-                    clearTips, CallFuncN::create(this,callfuncN_selector(
-                    NetRaceLayer::ming_tip_effect)),NULL));
+                    clearTips, CallFunc::create([=](){
+                    ming_tip_effect(MIDDLE);}),NULL));
             }
 		}
 		break;
@@ -2968,8 +2967,8 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	}
 	else if(_roundManager->_actionToDo&a_MING)
 	{
-		auto callFunc=CCCallFuncN::create(this,callfuncN_selector(NetRaceLayer::ming_tip_effect));
-		myframe->runAction(callFunc);
+		myframe->runAction(CallFunc::create([=](){
+                    ming_tip_effect((PlayerDir_t)no);}));
 	}
 	else if(_roundManager->_actionToDo&a_PENG)
 	{
