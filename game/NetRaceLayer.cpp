@@ -337,25 +337,6 @@ void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
         call_distribute_card();}),NULL));
 }
 
-void NetRaceLayer::waitfor_MyShowCardInstruct()
-{
-	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
-		if( _roundManager->_isTuoGuan ||
-                (_roundManager->IsTing(_roundManager->_curPlayer) 
-                && !_roundManager->_isGangAsking) ) {
-            CardsInfo_t cards;
-            _GetCardsInfo(&cards);
-            
-            Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
-            
-            _roundManager->RecvHandout(cards.last,location,2);
-            
-		} else {
-			_roundManager->_isMyShowTime = true;
-        }
-	}
-}
-
 /*********************************************
         player middle card select
 *********************************************/
@@ -657,56 +638,6 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
             _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
 		}
     }
-}
-
-/*******************************************
-        
-*******************************************/
-void NetRaceLayer::waitfor_ShowCardWithoutTouch()
-{
-    if ( _roundManager->_curPlayer==1 ) {/* this should never happen */
-        return;
-    }
-
-    LOGGER_WRITE("%s (player=%d)",__FUNCTION__,_roundManager->_curPlayer);
-
-    bool canKou = false;
-	int index = _ai->ChooseWorstCard(canKou);
-    
-    if ( canKou ) {
-        _roundManager->_otherHandedOut = (Card_t)_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
-        
-        _ai->KouCardCheck((PlayerDir_t)_roundManager->_curPlayer);
-        if(_ai->KouCardGroupNum()>0) {
-            _ai->MingKouChoose((PlayerDir_t)_roundManager->_curPlayer);
-        }
-    }
-
-    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index]);
-	_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
-
-    if(canKou) {
-        OtherTingHintBar(_roundManager->_curPlayer,index);
-
-        /* it is dangerous to raise these lines to upper, since the following will change the card list*/
-        if(_ai->KouCardGroupNum()>0)
-            _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU);
-
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
-
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
-    }
-
-	_roundManager->_isCardFromOthers=true;
-
-    myframe->_ID=_roundManager->_curPlayer;
-	myframe->runAction(Sequence::create(
-        _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou), CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_in_river_list)), CCCallFunc::create([=]() {
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)), CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::waitfor_response)),NULL));
 }
 
 /***************************************************************
@@ -2723,29 +2654,98 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 
 
 
+/*******************************************
+        
+*******************************************/
+
 void NetRaceLayer::first_response(int no)
 {
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
 
     _roundManager->WaitForAction();
-	_roundManager->_isGameStart=true;
+    _roundManager->_isGameStart=true;
     _roundManager->_actionToDo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();/*why???*/
 
-	ListenToCardTouch();
-	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
+    ListenToCardTouch();
+    ((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 
     if(_roundManager->_actionToDo!=a_JUMP){
-		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
-		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
-	}
-    
-	if(no==1) {
-		_roundManager->WaitForMyAction();
-	} else {
-		waitfor_otheraction(no);
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
+        SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
     }
+    
+    if(no==1) {
+        _roundManager->WaitForMyAction();
+    } else {
+        waitfor_otheraction(no);
+    }
+}
+
+void NetRaceLayer::waitfor_ShowCardWithoutTouch() {
+    if ( _roundManager->_curPlayer==1 ) {/* this should never happen */
+        return;
+    }
+
+    LOGGER_WRITE("%s (player=%d)",__FUNCTION__,_roundManager->_curPlayer);
+
+    bool canKou = false;
+	int index = _ai->ChooseWorstCard(canKou);
+    
+    if ( canKou ) {
+        _roundManager->_otherHandedOut = (Card_t)_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
+        
+        _ai->KouCardCheck((PlayerDir_t)_roundManager->_curPlayer);
+        if(_ai->KouCardGroupNum()>0) {
+            _ai->MingKouChoose((PlayerDir_t)_roundManager->_curPlayer);
+        }
+    }
+
+    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index]);
+	_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
+
+    if(canKou) {
+        OtherTingHintBar(_roundManager->_curPlayer,index);
+
+        /* it is dangerous to raise these lines to upper, since the following will change the card list*/
+        if(_ai->KouCardGroupNum()>0)
+            _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU);
+
+        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
+
+        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
+        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
+    }
+
+	_roundManager->_isCardFromOthers=true;
+
+    myframe->_ID=_roundManager->_curPlayer;
+	myframe->runAction(Sequence::create(
+        _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou), CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_in_river_list)), CCCallFunc::create([=]() {
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)), CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::waitfor_response)),NULL));
+}
+
+void NetRaceLayer::waitfor_MyShowCardInstruct()
+{
+	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
+		if( _roundManager->_isTuoGuan ||
+                (_roundManager->IsTing(_roundManager->_curPlayer) 
+                && !_roundManager->_isGangAsking) ) {
+            CardsInfo_t cards;
+            _GetCardsInfo(&cards);
+            
+            Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
+            
+            _roundManager->RecvHandout(cards.last,location,2);
+            
+		} else {
+			_roundManager->_isMyShowTime = true;
+        }
+	}
 }
 
 void NetRaceLayer::waitfor_otheraction(int no)
@@ -2755,14 +2755,12 @@ void NetRaceLayer::waitfor_otheraction(int no)
 
 	myframe->_ID=no;
 	
-	if(_roundManager->_actionToDo&a_HU)
-	{
+	if(_roundManager->_actionToDo&a_HU) {
 		_HuEffect(no);
-	}
-	else if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG)
-	{
+	} else if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG) {
 		_roundManager->_continue_gang_times++;
 		_roundManager->_lastActionSource = no;
+        
 		if(_roundManager->_actionToDo&a_AN_GANG) {
 			_roundManager->_actionToDo=a_AN_GANG;
 			_roundManager->_lastAction=a_AN_GANG;
@@ -2786,9 +2784,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 		myframe->runAction(CallFunc::create([&](){
 			_AnGangEffect(no,card,Angang);
 		}));
-	}
-	else if(_roundManager->_actionToDo&a_MING_GANG)
-	{
+	} else if(_roundManager->_actionToDo&a_MING_GANG) {
 		_roundManager->_lastActionSource=no;
 		_roundManager->_actionToDo=a_MING_GANG;
 		_roundManager->_lastAction=a_MING_GANG;
@@ -2838,13 +2834,10 @@ void NetRaceLayer::waitfor_otheraction(int no)
 		});
 		myframe->runAction(minggangEffect);
 	}
-	else if(_roundManager->_actionToDo&a_MING)
-	{
+	else if(_roundManager->_actionToDo&a_MING) {
 		myframe->runAction(CallFunc::create([=](){
                     _roundManager->RecvMing();}));
-	}
-	else if(_roundManager->_actionToDo&a_PENG)
-	{
+	} else if(_roundManager->_actionToDo&a_PENG) {
         Card card;
 
         _roundManager->_continue_gang_times = 0;
@@ -2864,12 +2857,12 @@ void NetRaceLayer::waitfor_otheraction(int no)
 		auto callFunc = CallFunc::create([=](){
                     _PengEffect((PlayerDir_t)_roundManager->_curPlayer,prevPlayer,(Card_t)card.kind);});
 		myframe->runAction(callFunc);
-	}
-	else if(_roundManager->_actionToDo==a_JUMP)
-	{
-		if(_roundManager->_lastAction==a_JUMP)
+	} else if(_roundManager->_actionToDo==a_JUMP) {
+		if(_roundManager->_lastAction==a_JUMP) {
 			_roundManager->_continue_gang_times=0;
+        }
 		_roundManager->_lastAction=a_JUMP;
+        
 		waitfor_ShowCardWithoutTouch();
 	}
 }
@@ -2880,6 +2873,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
+    
 	unsigned char curTingStatus=_roundManager->_players[sender->_ID]->get_parter()->get_ting_status();
 	if(!_roundManager->_isCardFromOthers)
 	{
@@ -2950,11 +2944,11 @@ void NetRaceLayer::waitfor_response(Node* sender)
 				if(!(_roundManager->_actionToDo&a_HU)&&!(_roundManager->_actionToDo&a_AN_GANG)&&!(_roundManager->_actionToDo&a_SHOU_GANG)&&!(_roundManager->_actionToDo&a_MING_GANG))
 					_roundManager->_actionToDo=a_JUMP;
 		}
+        
 		if((PlayerDir_t)sender->_ID==1)
 		{
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()==1&&(_roundManager->_actionToDo&a_HU))
 			{
-				
 				myframe->_ID=sender->_ID;
 				auto huCallFunc=CallFunc::create([=](){_HuEffect(1);});
 				myframe->runAction(huCallFunc);
@@ -3172,47 +3166,40 @@ void NetRaceLayer::waitfor_response(Node* sender)
 	}
 }
 
-Vec2 NetRaceLayer::_getLastCardPosition(PlayerDir_t dir) {
-	
-	auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
-
+/***************************************************
+        distribute
+***************************************************/
+Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     float x = _layout->_playerPosi[dir].basePoint.x;
     float y = _layout->_playerPosi[dir].basePoint.y;
 
     switch(dir) {
         case MIDDLE:
-            if( _roundManager->_lastActionSource==1
+            if( _roundManager->_lastActionSource==MIDDLE
                 && (_roundManager->_lastAction==a_AN_GANG||_roundManager->_lastAction==a_SHOU_GANG||_roundManager->_lastAction==a_MING_GANG) ) {
                 x = distributeCardPos.x;
             } else {
-                x += myframe->getChildByTag(
-                        HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().x+30;
+                x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
             }
             
             y += 60 + 13*(_roundManager->IsTing(dir));
             break;
         case LEFT:
-            y = myframe->getChildByTag(
-                HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-2))->getPosition().y-20;//+5;
+            y = _GetCardInHand(LEFT,cardLen-1)->getPosition().y-20;//+5;
             break;
         case RIGHT:
-            y = myframe->getChildByTag(
-                HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(list->len-1))->getPosition().y+86;
+            y = _GetCardInHand(RIGHT,cardLen)->getPosition().y+86;
             break;
     }
     
     return Vec2(x,y);
 }
 
-void NetRaceLayer::distribute_card_effect()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	
+void NetRaceLayer::distribute_card_effect() {
 	auto list=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
 
     Sprite *list_last_one;
-    const Vec2 &lastCardPosition = _getLastCardPosition((PlayerDir_t)_roundManager->_curPlayer);
+    const Vec2 &lastCardPosition = _GetLastCardPosition((PlayerDir_t)_roundManager->_curPlayer,list->len-1);
 
     if(_roundManager->_curPlayer==1) {
 		list_last_one=_object->Create(FREE_CARD);
@@ -5159,46 +5146,58 @@ void  NetRaceLayer::showall()
 
 Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	
 	auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
 	bgOfGang->setPosition(v);
 	myframe->addChild(bgOfGang,20,MOJI_EFFECT_TAG_ID);
 	bgOfGang->setScale(0);
+
 	auto tipOfPeng=Sprite::createWithSpriteFrameName(act_name);
 	tipOfPeng->setPosition(Vec2(bgOfGang->getTextureRect().size.width/2,bgOfGang->getTextureRect().size.height/2));
 	bgOfGang->addChild(tipOfPeng);
 	tipOfPeng->setScale(0);
-	//auto seqActionOfTip=Sequence::create(DelayTime::create(0.8),Spawn::create(ScaleTo::create(0.3,0.8),FadeOut::create(0.3),NULL),NULL);
-	//auto seqActionOfTip1=Sequence::create(EaseElasticOut::create(ScaleTo::create(0.3,1)),DelayTime::create(0.5),Spawn::create(ScaleTo::create(0.3,0.8),FadeOut::create(0.3),NULL),NULL);
-	//auto action1=TargetedAction::create(bgOfGang,seqActionOfTip);
-	//auto action2=TargetedAction::create(tipOfPeng,seqActionOfTip1);
-	auto seqActionOfTip=Sequence::create(ScaleTo::create(0,1),DelayTime::create(0.6),Spawn::create(ScaleTo::create(0.18,0.8),FadeOut::create(0.18),NULL),NULL);
-	auto seqActionOfTip1=Sequence::create(ScaleTo::create(0,1.5),DelayTime::create(0.12),EaseElasticOut::create(ScaleTo::create(0.18,1)),DelayTime::create(0.3),Spawn::create(ScaleTo::create(0.18,0.8),FadeOut::create(0.18),NULL),NULL);
-	auto action1=TargetedAction::create(bgOfGang,seqActionOfTip);
-	auto action2=TargetedAction::create(tipOfPeng,seqActionOfTip1);
+    
+	auto action1 = TargetedAction::create(
+        bgOfGang,Sequence::create(
+            ScaleTo::create(0,1),
+            DelayTime::create(0.6),
+            Spawn::create(
+                ScaleTo::create(0.18,0.8),
+                FadeOut::create(0.18),NULL),NULL));
+	auto action2 = TargetedAction::create(
+        tipOfPeng,Sequence::create(
+            ScaleTo::create(0,1.5),
+            DelayTime::create(0.12),
+            EaseElasticOut::create(ScaleTo::create(0.18,1)),
+            DelayTime::create(0.3),
+            Spawn::create(
+                ScaleTo::create(0.18,0.8),
+                FadeOut::create(0.18),NULL),NULL));
 
 	auto bgOfGang1=Sprite::createWithSpriteFrameName("mojixx.png");
 	bgOfGang1->setPosition(v);
 	myframe->addChild(bgOfGang1,21,MOJI1_EFFECT_TAG_ID);
+    
 	auto tipOfPeng1=Sprite::createWithSpriteFrameName(act_name);
 	tipOfPeng1->setPosition(Vec2(bgOfGang1->getTextureRect().size.width/2,bgOfGang1->getTextureRect().size.height/2));
 	bgOfGang1->addChild(tipOfPeng1);
 	bgOfGang1->setScale(0);
-	//auto actionOfTip=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(ScaleTo::create(0.3,1.5),FadeOut::create(0.3),NULL),NULL);
-	//auto actionOfTip1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(ScaleTo::create(0.3,1.5),FadeOut::create(0.3),NULL),NULL);
-	//auto action3=TargetedAction::create(bgOfGang1,actionOfTip);
-	//auto action4=TargetedAction::create(tipOfPeng1,actionOfTip1);
-	auto actionOfTip=Sequence::create(DelayTime::create(0.12),ScaleTo::create(0,1),Spawn::create(ScaleTo::create(0.18,1.5),FadeOut::create(0.18),NULL),NULL);
-	auto actionOfTip1=Sequence::create(DelayTime::create(0.12),ScaleTo::create(0,1),Spawn::create(ScaleTo::create(0.18,1.5),FadeOut::create(0.18),NULL),NULL);
-	auto action3=TargetedAction::create(bgOfGang1,actionOfTip);
-	auto action4=TargetedAction::create(tipOfPeng1,actionOfTip1);
+    
+	auto action3 = TargetedAction::create(
+        bgOfGang1,Sequence::create(
+            DelayTime::create(0.12),
+            ScaleTo::create(0,1),
+            Spawn::create(
+                ScaleTo::create(0.18,1.5),
+                FadeOut::create(0.18),NULL),NULL));
+	auto action4 = TargetedAction::create(
+        tipOfPeng1,Sequence::create(
+            DelayTime::create(0.12),
+            ScaleTo::create(0,1),
+            Spawn::create(
+                ScaleTo::create(0.18,1.5),
+                FadeOut::create(0.18),NULL),NULL));
 	
-	auto spa=Spawn::create(action1,action2,action3,action4,NULL);
-
-	return spa;
-
+	return Spawn::create(action1,action2,action3,action4,NULL);
 }
 
 /* why use different mechanism for single hu and double hu ??? */
@@ -5562,8 +5561,9 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 						myframe->runAction(curFunc);
 					}
 				}
-				else
+				else {
 					waitfor_MyShowCardInstruct();
+                }
 			}
 			else
 			{
@@ -5574,6 +5574,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 					if(_roundManager->_lastAction==a_JUMP)
 						_roundManager->_continue_gang_times=0;
 					_roundManager->_lastAction=a_JUMP;
+
 					waitfor_MyShowCardInstruct();
 				}
 			}
@@ -6084,12 +6085,6 @@ void NetRaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
 		_layout->_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
 	}
 }
-
-typedef enum {
-    AN_GANG = 1,
-    MING_GANG,
-    HU_WIN,
-}GoldKind_t;
 
 void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
     goldOfPlayer[winner]       = 4*PREMIUM_LEAST*(_roundManager->_continue_gang_times);

@@ -37,12 +37,6 @@ public:
 	void QueryMingOutCard();
     
     void ShowActionButtons();
-    float _AddBtnQi(const Vec2 &ref);
-    float _AddBtnHu(const Vec2 &ref);
-    float _AddBtnMing(const Vec2 &ref);
-    float _AddBtnGang(const Vec2 &ref);
-    float _AddBtnPeng(const Vec2 &ref);
-
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
@@ -51,6 +45,12 @@ protected:
     GObjectFactory *_object;
     Ai             *_ai;
 private:
+    float _AddBtnQi(const Vec2 &ref);
+    float _AddBtnHu(const Vec2 &ref);
+    float _AddBtnMing(const Vec2 &ref);
+    float _AddBtnGang(const Vec2 &ref);
+    float _AddBtnPeng(const Vec2 &ref);
+
     typedef struct {
         CARD_ARRAY *list;
         int         start;
@@ -210,7 +210,7 @@ private:
 	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);
 	BezierTo* BizerMove2(outCardList* outCard,Vec2 location,int time);
 	BezierTo* OthersBizerMove(int no,outCardList* outCard);
-    Vec2 _getLastCardPosition(PlayerDir_t dir) ;
+    Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
 	void call_distribute_card();
 	void distribute_card_effect();
 	void ListenToDistributeCard();

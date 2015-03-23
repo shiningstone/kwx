@@ -83,5 +83,11 @@ typedef struct {
     TingInfoItem card[9];/* why 9??? */
 }TingInfo_t;
 
+typedef enum {
+    AN_GANG = 1,
+    MING_GANG,
+    HU_WIN,
+}GoldKind_t;
+
 #endif
 
