@@ -2748,32 +2748,6 @@ void NetRaceLayer::first_response(int no)
     }
 }
 
-void NetRaceLayer::waitfor_myaction(PlayerDir_t dir)
-{
-    LOGGER_WRITE("%s : %d, _roundManager->_actionToDo = %d",__FUNCTION__,dir,_roundManager->_actionToDo);
-
-    ShowActionButtons();
-
-	if(_roundManager->_actionToDo!=a_JUMP) {
-		_roundManager->_isWaitDecision = true;
-		_roundManager->_tempActionToDo=_roundManager->_actionToDo;
-		_roundManager->_actionToDo=a_JUMP;
-	}
-
-	if(_roundManager->_actionToDo&a_AN_GANG 
-        || _roundManager->_actionToDo&a_MING_GANG
-        ||_roundManager->_actionToDo&a_SHOU_GANG) {
-        _roundManager->_isGangAsking = true;
-	}
-
-	if(!_roundManager->_isCardFromOthers) {
-		if(_roundManager->_lastAction==a_JUMP&&!(_roundManager->_lastActionSource==1&&_roundManager->_continue_gang_times!=0))
-			_roundManager->_continue_gang_times=0;
-		_roundManager->_lastAction=a_JUMP;
-		waitfor_MyShowCardInstruct();
-	}
-}
-
 void NetRaceLayer::waitfor_otheraction(int no)
 {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,_roundManager->_actionToDo);
@@ -2989,7 +2963,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			{
 				if(_roundManager->_isTuoGuan)
 					_roundManager->_actionToDo=a_JUMP;
-				waitfor_myaction((PlayerDir_t)sender->_ID);
+				_roundManager->WaitForMyAction();
 				return;
 			}
 		}

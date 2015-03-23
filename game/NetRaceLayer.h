@@ -218,7 +218,6 @@ private:
 	void distribute_event(const std::string event_type,void* val);
 	void waitfor_response(Node* sender);
 	void first_response(int no);
-	void waitfor_myaction(PlayerDir_t dir);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(int no);
 	void _HandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
