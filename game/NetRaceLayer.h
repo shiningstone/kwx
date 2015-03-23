@@ -33,6 +33,8 @@ public:
     void KouCancelEffect(CARD_ARRAY *cards);
     void KouConfirmEffect();
     void MingCancelEffect();
+	void QueryKouCards();
+	void QueryMingOutCard();
     
 protected:
     RoundManager   *_roundManager;
@@ -72,7 +74,6 @@ private:
     Sprite* _GetCardOnTingSignBar(PlayerDir_t dir,int cardIdx);
     Sprite *_CreateCardInHand(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,const Vec2 &refer);
     float _YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY);
-	void _QueryKouEffect();
 
     void _CreateResidueCards();
     void refresh_residue_cards();
@@ -261,7 +262,6 @@ public:
     TargetedAction* _MingAnimation();
 	void _AnGangEffect(int no,Card_t card,int gang[]);//me--暗杠效果
 	void _MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
-	void ming_tip_effect(PlayerDir_t dir);//me--名牌效果
 	void _QiEffect(PlayerDir_t dir);//me--弃牌效果
 	void card_list_update(int no);
 	void update_card_list(Node *psender);//更新玩家手牌
@@ -273,7 +273,6 @@ public:
 	void raceAccount(float delta);
 	void set_aims_sequence(const int p_aim[]);
 
-	void waitfor_MingKouChoose(int no);
 	void BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);

@@ -38,6 +38,7 @@ public:
     void RecvKouCancel();
     void RecvKouConfirm();
     void RecvMingCancel();
+	void RecvMing();
 
     void QiangGangHuJudge();
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);

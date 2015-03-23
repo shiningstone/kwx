@@ -678,7 +678,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch()
         
         _ai->KouCardCheck((PlayerDir_t)_roundManager->_curPlayer);
         if(_ai->KouCardGroupNum()>0) {
-            waitfor_MingKouChoose(_roundManager->_curPlayer);
+            _ai->MingKouChoose((PlayerDir_t)_roundManager->_curPlayer);
         }
     }
 
@@ -2376,7 +2376,7 @@ void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
         Sequence::create(
             TargetedAction::create(button,
                 ScaleTo::create(0,0)),CallFunc::create([=](){
-                ming_tip_effect(MIDDLE);}),NULL));
+                _roundManager->RecvMing();}),NULL));
 }
 
 void NetRaceLayer::KouConfirmEffect() {
@@ -2387,7 +2387,7 @@ void NetRaceLayer::KouConfirmEffect() {
         button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
-        ming_tip_effect(MIDDLE);}),NULL));
+        _roundManager->RecvMing();}),NULL));
 }
 
 void NetRaceLayer::MingCancelEffect() {
@@ -2623,7 +2623,7 @@ void NetRaceLayer::ListenToKou(int no) {
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(KouListener, myframe);
 }
 
-void NetRaceLayer::_QueryKouEffect() {
+void NetRaceLayer::QueryKouCards() {
     auto kouCancel = _object->CreateButton(BTN_CANCEL);
     kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouCancelHandler,this));
     myframe->addChild(kouCancel,20,MING_KOU_CANCEL);
@@ -2640,38 +2640,22 @@ void NetRaceLayer::_QueryKouEffect() {
     ListenToKou(MIDDLE);
 }
 
-void NetRaceLayer::waitfor_MingKouChoose(int no) {
-	if(no==MIDDLE) {
-        _QueryKouEffect();
-	} else {
-		_ai->MingKouChoose((PlayerDir_t)no);
-	}
-}
-
-void NetRaceLayer::ming_tip_effect(PlayerDir_t dir) {
-	_roundManager->_actionToDo=a_MING;
-
-	if(dir==MIDDLE) {
-		_roundManager->_isMingTime=true;
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
-
-        _Remove(myframe,MING_KOU_ENSURE);
-        _Remove(myframe,MING_KOU_SIGN);
-        _Remove(myframe,MING_KOU_CANCEL);
-
-		auto MingCancel = _object->CreateButton(BTN_CANCEL);
-		MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
-		myframe->addChild(MingCancel,20,MING_CANCEL);
-
-		myframe->_ID=MIDDLE;
-		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::ListenToCardTouch)),NULL));
-	} else {
-		myframe->_ID = dir;
-		myframe->runAction(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::waitfor_ShowCardWithoutTouch)));
-	}
+void NetRaceLayer::QueryMingOutCard() {
+    _roundManager->_isMingTime=true;
+    _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
+    
+    _Remove(myframe,MING_KOU_ENSURE);
+    _Remove(myframe,MING_KOU_SIGN);
+    _Remove(myframe,MING_KOU_CANCEL);
+    
+    auto MingCancel = _object->CreateButton(BTN_CANCEL);
+    MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
+    myframe->addChild(MingCancel,20,MING_CANCEL);
+    
+    myframe->_ID=MIDDLE;
+    myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        NetRaceLayer::ListenToCardTouch)),NULL));
 }
 
 void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
@@ -2723,19 +2707,12 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 			_eventDispatcher->removeEventListenersForTarget(myframe,true);
             
 			auto clearTips = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
-            
-			_ai->KouCardCheck(MIDDLE);
-            if(_ai->KouCardGroupNum()>0) {
-				myframe->runAction(Sequence::create(
-                    clickEffect,
-                    clearTips, CallFunc::create([=](){
-                    waitfor_MingKouChoose(MIDDLE);}),NULL));
-            } else {
-				myframe->runAction(Sequence::create(
-                    clickEffect,
-                    clearTips, CallFunc::create([=](){
-                    ming_tip_effect(MIDDLE);}),NULL));
-            }
+
+            myframe->runAction(Sequence::create(
+                clickEffect,
+                clearTips,,NULL));
+
+            _roundManager->RecvMing();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -2968,7 +2945,7 @@ void NetRaceLayer::waitfor_otheraction(int no)
 	else if(_roundManager->_actionToDo&a_MING)
 	{
 		myframe->runAction(CallFunc::create([=](){
-                    ming_tip_effect((PlayerDir_t)no);}));
+                    _roundManager->RecvMing();}));
 	}
 	else if(_roundManager->_actionToDo&a_PENG)
 	{

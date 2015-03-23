@@ -678,6 +678,22 @@ void RoundManager::RecvMingCancel() {
     _uiManager->MingCancelEffect();
 }
 
+void RoundManager::RecvMing() {
+	_actionToDo=a_MING;
+
+    _ai->KouCardCheck(_curPlayer);
+
+    if(_curPlayer==MIDDLE) {
+        if(_ai->KouCardGroupNum()>0) {
+            _uiManager->QueryKouCards();
+        } else {
+            _uiManager->QueryMingOutCard();
+        }
+    } else {
+        _uiManager->waitfor_ShowCardWithoutTouch();
+    }
+}
+
 /*************************************
         singleton
 *************************************/
