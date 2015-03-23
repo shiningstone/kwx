@@ -2604,7 +2604,8 @@ void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
             break;
         }
     }
-    
+
+    Node *node = myframe->getChildByTag(MING_KOU_ENSURE);
     if(ifEnsureVisible)
         myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
     else
@@ -2706,9 +2707,8 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
                         ScaleTo::create(0,1),Spawn::create(
                         FadeOut::create(0.3),
                         ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),NULL));
-
-            _roundManager->RecvMing();
+                NetRaceLayer::delete_act_tip)),CCCallFunc::create([=](){
+                _roundManager->RecvMing();}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -6470,9 +6470,6 @@ void NetRaceLayer::UpdateClock(int time,int dir){
 void NetRaceLayer::delete_ActionRemind()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-
-	
-        
 	for(int i=0;i<17;i++){
         _Remove(myframe,REMIND_ACT_TAG_ID+i);
 	}
@@ -6481,9 +6478,6 @@ void NetRaceLayer::delete_ActionRemind()
 void NetRaceLayer::delete_ActionEffect()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
-
-	
-    
  	for(int i=0;i<31;i++) {
         _Remove(myframe,MOJI_EFFECT_TAG_ID+i);
 	}
