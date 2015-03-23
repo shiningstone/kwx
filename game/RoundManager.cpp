@@ -695,6 +695,8 @@ void RoundManager::RecvMing() {
 }
 
 void RoundManager::WaitForMyAction() {
+    _uiManager->ShowActionButtons();
+
 	if(_actionToDo!=a_JUMP) {
 		_isWaitDecision = true;
 		_tempActionToDo=_actionToDo;
@@ -715,8 +717,6 @@ void RoundManager::WaitForMyAction() {
 		_lastAction=a_JUMP;
 		_uiManager->waitfor_MyShowCardInstruct();
 	}
-    
-    _uiManager->ShowActionButtons();
 }
 
 /*************************************
