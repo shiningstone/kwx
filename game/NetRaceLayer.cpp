@@ -2689,28 +2689,24 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 				}
 			}
 
-            Button *button = (Button*)pSender;
-            button->_ID=1;
-			button->setTouchEnabled(false);
-			auto hideButton = TargetedAction::create(button,ScaleTo::create(0,0));
-
-			myframe->_ID=1;
-
-			auto icon = (Sprite*)myframe->getChildByTag(MING_REMIND_ACT_BKG_TAG_ID);
-			auto iconShade = TargetedAction::create(icon,Sequence::create(
-                ScaleTo::create(0,1),Spawn::create(
-                FadeOut::create(0.3),
-                ScaleTo::create(0.3,1.3),NULL),NULL));
-
-			auto clickEffect = Spawn::create(hideButton,iconShade,NULL);
-
 			_eventDispatcher->removeEventListenersForTarget(myframe,true);
-            
-			auto clearTips = CCCallFunc::create(this,callfunc_selector(NetRaceLayer::delete_act_tip));
 
+            Button *button = (Button*)pSender;
+			auto icon = (Sprite*)myframe->getChildByTag(MING_REMIND_ACT_BKG_TAG_ID);
+
+            button->_ID = MIDDLE;
+			button->setTouchEnabled(false);
+            
+			myframe->_ID = MIDDLE;
             myframe->runAction(Sequence::create(
-                clickEffect,
-                clearTips,,NULL));
+                Spawn::create(
+                    TargetedAction::create(button,
+                        ScaleTo::create(0,0)),
+                    TargetedAction::create(icon,Sequence::create(
+                        ScaleTo::create(0,1),Spawn::create(
+                        FadeOut::create(0.3),
+                        ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
+                NetRaceLayer::delete_act_tip)),,NULL));
 
             _roundManager->RecvMing();
 		}
