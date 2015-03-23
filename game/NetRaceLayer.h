@@ -129,6 +129,7 @@ public:
 	void UpdateClock(int time,int direction);
     void HideClock();
 
+    void waitfor_ShowCardWithoutTouch();
 
     
 private:
@@ -198,7 +199,6 @@ private:
 	void _UpdateNickName(int direction,std::string str_Nick);//更新昵称
 	void _UpdateHeadImage(int direction,std::string head_photo);//更新头像
     /*###################################*/
-	void waitfor_ShowCardWithoutTouch();
 	void waitfor_MyShowCardInstruct();
 	void start_dealCardsDelete();
 	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);

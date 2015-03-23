@@ -681,7 +681,7 @@ void RoundManager::RecvMingCancel() {
 void RoundManager::RecvMing() {
 	_actionToDo=a_MING;
 
-    _ai->KouCardCheck(_curPlayer);
+    _ai->KouCardCheck((PlayerDir_t)_curPlayer);
 
     if(_curPlayer==MIDDLE) {
         if(_ai->KouCardGroupNum()>0) {

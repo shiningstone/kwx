@@ -2706,7 +2706,7 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
                         ScaleTo::create(0,1),Spawn::create(
                         FadeOut::create(0.3),
                         ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),,NULL));
+                NetRaceLayer::delete_act_tip)),NULL));
 
             _roundManager->RecvMing();
 		}
