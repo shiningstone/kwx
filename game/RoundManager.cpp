@@ -694,6 +694,31 @@ void RoundManager::RecvMing() {
     }
 }
 
+void RoundManager::WaitForMyAction() {
+	if(_actionToDo!=a_JUMP) {
+		_isWaitDecision = true;
+		_tempActionToDo=_actionToDo;
+		_actionToDo=a_JUMP;
+	}
+
+	if(_actionToDo&a_AN_GANG 
+        || _actionToDo&a_MING_GANG
+        ||_actionToDo&a_SHOU_GANG) {
+        _isGangAsking = true;
+	}
+
+	if(!_isCardFromOthers) {
+		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
+			_continue_gang_times=0;
+        }
+
+		_lastAction=a_JUMP;
+		_uiManager->waitfor_MyShowCardInstruct();
+	}
+    
+    _uiManager->ShowActionButtons();
+}
+
 /*************************************
         singleton
 *************************************/

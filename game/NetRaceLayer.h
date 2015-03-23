@@ -206,7 +206,6 @@ private:
 	void _UpdateNickName(int direction,std::string str_Nick);//更新昵称
 	void _UpdateHeadImage(int direction,std::string head_photo);//更新头像
     /*###################################*/
-	void waitfor_MyShowCardInstruct();
 	void start_dealCardsDelete();
 	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);
 	BezierTo* BizerMove2(outCardList* outCard,Vec2 location,int time);
@@ -224,6 +223,7 @@ private:
 	void _HuEffect(int no);
 	void _HandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
+	void waitfor_MyShowCardInstruct();
 	void HandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 

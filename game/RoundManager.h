@@ -40,6 +40,8 @@ public:
     void RecvMingCancel();
 	void RecvMing();
 
+    void WaitForMyAction();
+
     void QiangGangHuJudge();
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
     TingInfo_t GetTingInfo(PlayerDir_t dir,int outCarIdx);

@@ -309,7 +309,7 @@ void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
             _HuEffect(3);
             distribute_event(DOUBLE_HU_WITH_ME,NULL);
         } else {
-            waitfor_myaction(MIDDLE);
+            _roundManager->WaitForMyAction();
         }
     }
 }
@@ -323,7 +323,7 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
             myframe->runAction(CallFunc::create([=](){
                 _HuEffect(win.player);}));
         } else {
-            waitfor_myaction(MIDDLE);
+            _roundManager->WaitForMyAction();
         }
 
     } else {
@@ -1101,7 +1101,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                 NetRaceLayer::peng_dispatch)), 
             CCCallFunc::create([=](){
     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
-    			waitfor_myaction(dir);}), 
+    			_roundManager->WaitForMyAction();}), 
             CallFunc::create([=](){
                 _roundManager->_isMyShowTime=true;}),
             NULL));
@@ -2399,7 +2399,7 @@ void NetRaceLayer::MingCancelEffect() {
         NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
         _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
-        waitfor_myaction(MIDDLE);}),NULL));
+        _roundManager->WaitForMyAction();}),NULL));
 }
 
 void NetRaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
@@ -2742,7 +2742,7 @@ void NetRaceLayer::first_response(int no)
 	}
     
 	if(no==1) {
-		waitfor_myaction(MIDDLE);
+		_roundManager->WaitForMyAction();
 	} else {
 		waitfor_otheraction(no);
     }
@@ -3125,7 +3125,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 					_roundManager->_otherOneForDouble = no;
 					_roundManager->_actionToDo=action2;
 				}					
-				waitfor_myaction(MIDDLE);
+				_roundManager->WaitForMyAction();
 				return;
 			}
 		}
@@ -3147,7 +3147,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 						_roundManager->_actionToDo=action1;
 					else
 						_roundManager->_actionToDo=action2;
-					waitfor_myaction(MIDDLE);
+					_roundManager->WaitForMyAction();
 					return;
 				}
 			}
@@ -3162,7 +3162,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			if(no==1)
 			{
 				UpdateClock(0,no);
-				waitfor_myaction(MIDDLE);
+				_roundManager->WaitForMyAction();
 				return;
 			}
 			else
@@ -3178,7 +3178,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			if(no1==1)
 			{
 				UpdateClock(0,no1);
-				waitfor_myaction(MIDDLE);
+				_roundManager->WaitForMyAction();
 				return;
 			}
 			else
