@@ -22,7 +22,8 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
     for(int i=0;i<PLAYER_NUMBER;i++) {
         _players[i] = NULL;
     }
-    
+
+    _ai = Ai::getInstance(this);
     _logger = LOGGER_REGISTER("RoundManager");
 }
 

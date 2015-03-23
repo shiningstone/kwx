@@ -234,7 +234,7 @@ public:
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
     void HuEffect(const WinInfo_t &win,bool qiangGang, bool doubleHu);
     void GangEffect(Card_t card, int gangCardIdx[], bool isAnGang=true, PlayerDir_t prevPlayer=MIDDLE);
-	void MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
     
 	void BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);

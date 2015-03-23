@@ -24,6 +24,7 @@ class RoundManager {
 public:
     static RoundManager *getInstance();
     static void  destroyInstance();
+    Ai             *_ai;
 
     RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();

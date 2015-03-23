@@ -2678,7 +2678,7 @@ void NetRaceLayer::ming_tip_effect(Node *psender)
 	}
 }
 
-void NetRaceLayer::MingPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -2823,7 +2823,7 @@ void NetRaceLayer::waitfor_myaction(PlayerDir_t dir)
         x=x-act_ming->getContentSize().width/2;
         
 		auto myact_ming=_object->CreateButton(dir,BTN_MING,Vec2(x,y+11));
-		myact_ming->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingPressed,this));
+		myact_ming->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnMingHandler,this));
 		myframe->addChild(myact_ming,35,MING_REMIND_ACT_TAG_ID);
 
 		auto ming_act=_object->CreateBtnBkg(BTN_MING,Vec2(x,y+11));
