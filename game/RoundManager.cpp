@@ -719,6 +719,10 @@ void RoundManager::WaitForMyAction() {
 	}
 }
 
+void RoundManager::DistributeCard() {
+
+}
+
 /*************************************
         singleton
 *************************************/

@@ -41,6 +41,7 @@ public:
 	void RecvMing();
 
     void WaitForMyAction();
+    void DistributeCard();
 
     void QiangGangHuJudge();
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);

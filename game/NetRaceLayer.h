@@ -192,8 +192,8 @@ private:
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
 	void start_callback();//功能--开始
-	void restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type);
-	void start_touchCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type);
+	void BtnStartHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void backPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
 	void tuoGuanPressed(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);//功能--机器人
 	/*######################
@@ -206,12 +206,12 @@ private:
 	void _UpdateNickName(int direction,std::string str_Nick);//更新昵称
 	void _UpdateHeadImage(int direction,std::string head_photo);//更新头像
     /*###################################*/
-	void start_dealCardsDelete();
+	void _DeleteStartDealCards();
 	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);
 	BezierTo* BizerMove2(outCardList* outCard,Vec2 location,int time);
 	BezierTo* OthersBizerMove(int no,outCardList* outCard);
     Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
-	void call_distribute_card();
+	void Call_DistributeCard();
 	void ListenToDistributeCard();
 	void waitfor_otheraction(int no);
 	void distribute_event(const std::string event_type,void* val);

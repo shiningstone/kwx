@@ -111,7 +111,7 @@ void NetRaceLayer::create_race()
     }
 
     auto StartButton = _object->CreateButton(BTN_START);
-    StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::start_touchCallBack,this));
+    StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnStartHandler,this));
     this->addChild(StartButton,2,START_GAME_TAG_ID);
 }
 
@@ -334,7 +334,7 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
 void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
         GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
-        call_distribute_card();}),NULL));
+        Call_DistributeCard();}),NULL));
 }
 
 /*********************************************
@@ -1056,7 +1056,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
             NetRaceLayer::update_card_list)),
             _voice->Speak("down"), CCCallFunc::create([=](){
 			_roundManager->_curPlayer=no;}),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::call_distribute_card)),NULL),NULL));
+            NetRaceLayer::Call_DistributeCard)),NULL),NULL));
 	}
 	else {
 		for(int NodeNum=0;NodeNum<3;NodeNum++) {
@@ -1345,7 +1345,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
 			_roundManager->_curPlayer=no;}),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::call_distribute_card)),NULL));
+            NetRaceLayer::Call_DistributeCard)),NULL));
 	}
 }
 
@@ -1783,7 +1783,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
             dis_action=CallFunc::create([=](){
                             _roundManager->QiangGangHuJudge();});
         } else
-            dis_action=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
+            dis_action=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::Call_DistributeCard));
         
 		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::minggang_dispatch)),
@@ -1840,7 +1840,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
                     shadeFunc,Spawn::create(CallFunc::create([=](){
     					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
     					_roundManager->_qiangGangTargetNo=-1;/*!!! could this be called before runAction */}),CCCallFunc::create(this,callfunc_selector(
-                        NetRaceLayer::call_distribute_card)),NULL),NULL));
+                        NetRaceLayer::Call_DistributeCard)),NULL),NULL));
 			} else if(_roundManager->_isDoubleHuAsking) {
 				_roundManager->_isDoubleHuAsking=false;
 				myframe->runAction(Sequence::create(
@@ -1850,7 +1850,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
 				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 				myframe->runAction(Sequence::create(
                     shadeFunc,CCCallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::call_distribute_card)),NULL));
+                    NetRaceLayer::Call_DistributeCard)),NULL));
 			}
 		}
 	}
@@ -3160,7 +3160,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			_roundManager->_actionToDo=action1;
 			_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 			UpdateClock(0,_roundManager->_curPlayer);
-			call_distribute_card();
+			Call_DistributeCard();
 		}
 	}
 }
@@ -3229,16 +3229,11 @@ void NetRaceLayer::DistributeCard(int lenOfInHand) {
         NetRaceLayer::waitfor_response)),NULL));
 }
 
-void NetRaceLayer::call_distribute_card()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-    _roundManager->WaitForDistribute();
-    
+void NetRaceLayer::Call_DistributeCard() {
 	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
 
-void NetRaceLayer::ListenToDistributeCard()
-{
+void NetRaceLayer::ListenToDistributeCard() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
@@ -3259,7 +3254,7 @@ void NetRaceLayer::ListenToDistributeCard()
 
         _Remove(this,ROBOT_TUO_GUAN);
         _Remove(this,TUOGUAN_CANCEL_BUTTON);
-		//流局特效放在这里，结算也在这里，特效最后一个action dispatch WAIT_START_CALLBACK_EVENT_TYPE
+		
         _roundManager->SetWin(NONE_WIN,_roundManager->_curPlayer);
 
 		auto Nowinner=CallFunc::create([=](){
@@ -3285,8 +3280,10 @@ void NetRaceLayer::ListenToDistributeCard()
 	_eventDispatcher->addEventListenerWithFixedPriority(_noonewinListener,3);
 }
 
-void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type)
-{
+/***************************************************
+        start game
+***************************************************/
+void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
     _roundManager->NotifyStart();
 
 	switch (type)
@@ -3298,11 +3295,10 @@ void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType t
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
             auto curButton=(Button*)pSender;
-
 			curButton->setTouchEnabled(false);
 
-			auto ShadEffect = _object->CreateStartGame();
-			this->addChild(ShadEffect,2,START_GAME_TAG_ID+1);
+			auto startIcon = _object->CreateStartGame();
+			this->addChild(startIcon,2,START_GAME_TAG_ID+1);
 
 			this->runAction(
                 Sequence::create(
@@ -3310,7 +3306,7 @@ void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType t
                         TargetedAction::create(curButton,Sequence::create(
                             DelayTime::create(0.1),
                             FadeOut::create(0.2),NULL)),
-                        TargetedAction::create(ShadEffect,Spawn::create(
+                        TargetedAction::create(startIcon,Spawn::create(
                             ScaleTo::create(0.3,1.3),
                             FadeOut::create(0.3),NULL)),
                         _voice->Speak("anniu.ogg"),NULL),
@@ -3325,8 +3321,7 @@ void NetRaceLayer::start_touchCallBack(Ref* pSender,ui::Widget::TouchEventType t
 	}
 }
 
-void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType type)
-{
+void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto curButton=(Button*)pSender;
@@ -3353,8 +3348,8 @@ void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType
 
 			this->runAction(
                 Sequence::create(
-                    Spawn::create(TargetedAction::create(restartBtn,
-                        Spawn::create(
+                    Spawn::create(TargetedAction::create(
+                        restartBtn,Spawn::create(
                             ScaleTo::create(0.3,1.3),
                             FadeOut::create(0.3),NULL)),
                         _voice->Speak("anniu.ogg"),NULL),
@@ -3370,10 +3365,9 @@ void NetRaceLayer::restart_touchCallBack(Ref* pSender,ui::Widget::TouchEventType
 }
 void NetRaceLayer::start_callback()
 {
-	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("tileImage.plist");
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
-	if(!_isResoucePrepared)
-	{
+
+	if(!_isResoucePrepared) {
 		_isResoucePrepared=true;
 		_ResourcePrepare();
 	}
@@ -3431,23 +3425,15 @@ void NetRaceLayer::start_callback()
 	}
 }
 	
-void NetRaceLayer::start_dealCardsDelete()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	for(int a=0;a<3;a++)
-	{
-		for(int b=0;b<4;b++)
-		{
-			if(myframe->getChildByTag(START_CARDS_IN_TAG_ID+a*b))
-				myframe->removeChildByTag(START_CARDS_IN_TAG_ID+a*b);
+void NetRaceLayer::_DeleteStartDealCards() {
+	for(int i=0;i<3;i++) {
+		for(int j=0;j<4;j++) {
+            _Remove(myframe,START_CARDS_IN_TAG_ID+i*j);
 		}
 	}
 }
 
-
 void NetRaceLayer::_4CardsDistribute(int sequenceNo, float delayRef) {
-	
 	auto RightHandInSize = _object->Create(R_IN_CARD)->getTextureRect().size.height;
 
     float x = _layout->_playerPosi[0].basePoint.x+10;
@@ -3932,7 +3918,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		card_list_update(1);}),CallFunc::create([=](){
 		card_list_update(2);}),NULL),CallFunc::create([=](){
 		UpdateClock(0,zhuang);}),CallFunc::create(this,callfunc_selector(
-        NetRaceLayer::start_dealCardsDelete)),CCCallFunc::create([=](){
+        NetRaceLayer::_DeleteStartDealCards)),CCCallFunc::create([=](){
 		first_response(zhuang);
 	}),NULL));
 }
@@ -4873,7 +4859,7 @@ void NetRaceLayer::raceAccount(float delta)
 	this->addChild(ShowoutOnce,11,SHINE_TAG_ID);
 
 	auto PlayOnceAgin=Button::create("zailaiyiju1.png","zailaiyiju2.png","zailaiyiju2.png",UI_TEX_TYPE_PLIST);
-	PlayOnceAgin->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::restart_touchCallBack,this));
+	PlayOnceAgin->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnRestartHandler,this));
 	PlayOnceAgin->setAnchorPoint(Vec2(0.5,0.5));
 	PlayOnceAgin->setPosition(Vec2(origin.x+visibleSize.width*0.6247948,origin.y+visibleSize.height*0.075419));
 	this->addChild(PlayOnceAgin,11,RACE_RESTART_TAG_ID);
@@ -5528,7 +5514,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 							GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
 							_roundManager->_qiangGangTargetNo=-1;
 						});
-						auto curFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
+						auto curFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::Call_DistributeCard));
 						auto curSeq=Sequence::create(GoldAccount,curFunc,NULL);
 						myframe->runAction(curSeq);
 					}
@@ -5541,7 +5527,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 					else
 					{
 						_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
-						auto curFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
+						auto curFunc=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::Call_DistributeCard));
 						myframe->runAction(curFunc);
 					}
 				}
@@ -6868,7 +6854,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
         goldEffect = CallFunc::create([=](){
             GoldNumInsert(dir,2,dir);});
             
-        ActionAfterGang=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::call_distribute_card));
+        ActionAfterGang=CCCallFunc::create(this,callfunc_selector(NetRaceLayer::Call_DistributeCard));
     } else {
         ActionAfterGang=CallFunc::create([=](){
                             _roundManager->QiangGangHuJudge();});
