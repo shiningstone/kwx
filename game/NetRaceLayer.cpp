@@ -3832,7 +3832,7 @@ void NetRaceLayer:: display_callback(cocos2d::Ref* pSender) {
         gold show
 ***********************************************************/
 Label *NetRaceLayer::_CreateName(const char *name) {
-    auto NickName=Label::create(name,"Arial",28);//�ǳ�3
+    auto NickName=Label::create(name,"Arial",28);
     NickName->setAnchorPoint(Vec2(0.5,0.5));
     NickName->setPosition(Vec2(70,60));
     return NickName;
@@ -3854,7 +3854,7 @@ Sprite *NetRaceLayer::_CreateGoldImage() {
     return gold;
 }
 
-LabelAtlas *NetRaceLayer::_CreateNumberLabel(int number,Sprite *gold) {
+LabelAtlas *NetRaceLayer::_CreatePropertyNumber(int number,Sprite *gold) {
     std::string strNumber = _NumToString(number);
     auto label = LabelAtlas::create(strNumber,"fonts/result_money_number.png",17,23,'.');
     label->setAnchorPoint(Vec2(0,0.5));
@@ -3862,7 +3862,7 @@ LabelAtlas *NetRaceLayer::_CreateNumberLabel(int number,Sprite *gold) {
     return label;
 }
 
-Sprite *NetRaceLayer::_CreateNumberUnit(int number,LabelAtlas *label) {
+Sprite *NetRaceLayer::_CreatePropertyUnit(int number,LabelAtlas *label) {
     Sprite* unit = NULL;
     if(number>=100000&&number<100000000) {
         unit=Sprite::createWithSpriteFrameName("wan-hand.png");
@@ -3906,87 +3906,79 @@ void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *paren
     parent->addChild(_CreateHeadImage(profile.photo),2,ACCOUNT_IMAGE);
     auto gold = _CreateGoldImage();
     parent->addChild(gold,2,ACCOUNT_JINBI);
-    auto label = _CreateNumberLabel(profile.property,gold);
+    auto label = _CreatePropertyNumber(profile.property,gold);
     parent->addChild(label,2,ACCOUNT_PROPRETY);
-    auto unit = _CreateNumberUnit(profile.property,label);
+    auto unit = _CreatePropertyUnit(profile.property,label);
     if(unit!=NULL) {
-        parent->addChild(_CreateNumberUnit(profile.property,label),ACCOUNT_PROPRETY_UNIT);
+        parent->addChild(unit,ACCOUNT_PROPRETY_UNIT);
     }
     parent->addChild(_CreateHu(),2,ACCOUNT_HU_FONT);
     parent->addChild(_CreateZiMo(),2,ACCOUNT_ZIMO_FONT);
     parent->addChild(_CreateFangPao(),2,ACCOUNT_DIANPAO_FONT);
 }
 
+Sprite *NetRaceLayer::_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent) {
+    Sprite *sign = NULL;
+    
+    if(gold>0) {
+        sign = Sprite::createWithSpriteFrameName("fen_add.png");
+    } else {
+        sign = Sprite::createWithSpriteFrameName("fen_sub.png");
+    }
+    sign->setAnchorPoint(Vec2(0,0.5));
+    
+    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+        sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,parent->getContentSize().height/2));
+    else
+        sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
+
+    if(gold!=0) {
+        sign->setVisible(true);
+    }
+
+    return sign;
+}
+
+LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerColor *parent) {
+    char char_AccoutnGold[80];
+    std::string str_AccountGold;
+    sprintf(char_AccoutnGold,"%d",abs(gold));
+    str_AccountGold = char_AccoutnGold;
+    LabelAtlas* propertyOfIncrease = NULL;
+
+    if(gold>0) {
+        propertyOfIncrease = LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
+    } else {
+        propertyOfIncrease = LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
+    }
+
+    propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
+    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
+        propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,parent->getContentSize().height/2));
+    else
+        propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
+
+    if(gold!=0) {
+        propertyOfIncrease->setVisible(true);
+    }
+
+    return propertyOfIncrease;
+}
+
 void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
 
-	auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
-	signPlus->setAnchorPoint(Vec2(0,0.5));
-
-	if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
-	else
-		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-	signPlus->setVisible(false);
-	BarOfPlayer->addChild(signPlus,2,ACCOUNT_ADD_SYMBOL);
-
-	auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
-	signMinus->setAnchorPoint(Vec2(0,0.5));
-	if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
-	else
-		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-	signMinus->setVisible(false);
-	BarOfPlayer->addChild(signMinus,2,ACCOUNT_MINUS_SYMBOL);
-
-	/*================================结算金钱========================================*/
     WinInfo_t win;
     _roundManager->GetWin(win);
 
-	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==-1) )
-	{
-		char char_AccoutnGold[80];
-		std::string str_AccountGold;
-		sprintf(char_AccoutnGold,"%d",abs(GoldAccountImmediate[no]));
-		str_AccountGold=char_AccoutnGold;
-		LabelAtlas* propertyOfIncrease;
-		if(GoldAccountImmediate[no]>0)
-		{
-			signPlus->setVisible(true);
-			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
-			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-			if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
-				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,BarOfPlayer->getContentSize().height/2));
-			else
-				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
+	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
+        auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        BarOfPlayer->addChild(sign,2,ACCOUNT_DIANPAO_FONT);
 
-			if(GoldAccountImmediate[no]!=0)
-				propertyOfIncrease->setVisible(true);
-			else
-				propertyOfIncrease->setVisible(false);
-
-			BarOfPlayer->addChild(propertyOfIncrease,2,ACCOUNT_WINGOLD_NUM);
-		}
-		else if(GoldAccountImmediate[no]<0)
-		{
-			signMinus->setVisible(true);
-			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
-			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-			if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
-				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,BarOfPlayer->getContentSize().height/2));
-			else
-				propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
-			if(GoldAccountImmediate[no]!=0)
-				propertyOfIncrease->setVisible(true);
-			else
-				propertyOfIncrease->setVisible(false);
-			BarOfPlayer->addChild(propertyOfIncrease,2,ACCOUNT_WINGOLD_NUM);
-		}
+        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
 	}
-	/*================================结算金钱========================================*/
-	//auto pos1=Vec2(20,22);//金币&&数字0，0.5
-	//auto pos2=Vec2(70,60);//昵称//0.5，0.5
-	//auto pos3=Vec2(20,80);//头像0，0
+
 	auto BaoZhuang=Sprite::createWithSpriteFrameName("jiesuanbaozhuang.png");//包庄
 	BaoZhuang->setAnchorPoint(Vec2(0.5,0.5));
 	BaoZhuang->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));

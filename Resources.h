@@ -54,6 +54,7 @@
 #define ACCOUNT_HU_FONT						5
 #define ACCOUNT_ZIMO_FONT					6
 #define ACCOUNT_DIANPAO_FONT				7
+#define ACCOUNT_SYMBOL					    8
 #define ACCOUNT_ADD_SYMBOL					8
 #define ACCOUNT_MINUS_SYMBOL				9
 #define ACCOUNT_WINGOLD_NUM					10
