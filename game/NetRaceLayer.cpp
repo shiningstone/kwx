@@ -3219,7 +3219,7 @@ void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType typ
 			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
             
             refresh_residue_cards();
-			_UpdateResidueCards(84);
+			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
@@ -3495,6 +3495,8 @@ PlayerDir_t NetRaceLayer::NextPlayer(PlayerDir_t dir) {
 void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
+	auto VoiceEffect=_voice->Speak("sort.ogg");	
+
 	float timeXH[PLAYER_NUM];
     timeXH[zhuang] = 0.7;
     timeXH[(zhuang+1)%PLAYER_NUM] = 0.7+0.2;
@@ -3503,10 +3505,9 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 	Sprite* lastTwo[2];
 	
 	auto ListOfNo1=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    auto cardWidth = _object->RectSize(FREE_CARD).width;
 
 	int a,b;
-
-    auto cardWidth = _object->RectSize(FREE_CARD).width;
 	//自己
     /************************************
         one batch from center to hand
@@ -3674,33 +3675,39 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 	/**********************************************************
         distribute to right player
     **********************************************************/
-	auto RightHandIn=_object->Create(R_IN_CARD);
-	auto RightCardIn=_object->Create(LR_IN_CARD);
-	auto RightHandInSize=RightHandIn->getTextureRect().size.height;
-	auto RightCardInSize=RightCardIn->getTextureRect().size.height;
+    auto cardHeight=_object->RectSize(LR_IN_CARD).height;
+
+	auto rHandinHeight=_object->RectSize(R_IN_CARD).height;
+
+	Point RinghtHandoutEnd=Vec2(
+        _layout->_playerPosi[2].basePoint.x+10,
+        _layout->_playerPosi[2].basePoint.y+10);
+
 	Sprite* RobotHandCard[4];
 	Vec2 RightHandPosition[4];
 	for (a=0;a<4;a++)
 	{
 		RobotHandCard[a]=_object->Create(LR_IN_CARD);
 		RobotHandCard[a]->setAnchorPoint(Vec2(0.5,0));
-		RobotHandCard[a]->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.5-RightCardInSize*1.65+RightCardInSize*a*0.65));
+		RobotHandCard[a]->setPosition(Vec2(
+            origin.x+visibleSize.width*0.5,
+            origin.y+visibleSize.height*0.5-cardHeight*1.65+cardHeight*a*0.65));
 		RobotHandCard[a]->setScale(0);
 		myframe->addChild(RobotHandCard[a],6-a,START_CARDS_IN_TAG_ID+2*a);
 		RightHandPosition[a]=RobotHandCard[a]->getPosition();
 	}
-	Point RinghtHandoutEnd=Vec2(_layout->_playerPosi[2].basePoint.x+10,_layout->_playerPosi[2].basePoint.y+10);
-	for(a=0;a<4;a++)
+    
+    for(a=0;a<4;a++)
 	{
 		for (b=0;b<4;b++)
 		{
 			changingPosition[b]=RinghtHandoutEnd.y;
 		}
 		x=RinghtHandoutEnd.x;
-		changingPosition[0]+=RightHandInSize*(a*0.4+0.6);				
-		changingPosition[1]+=RightHandInSize*((a+4)*0.4+0.6);			
-		changingPosition[2]+=RightHandInSize*((a+8)*0.4+0.6);	
-		changingPosition[3]+=RightHandInSize*((13+a)*0.4+0.6);
+		changingPosition[0]+=rHandinHeight*(a*0.4+0.6);				
+		changingPosition[1]+=rHandinHeight*((a+4)*0.4+0.6);			
+		changingPosition[2]+=rHandinHeight*((a+8)*0.4+0.6);	
+		changingPosition[3]+=rHandinHeight*((13+a)*0.4+0.6);
 		auto outTime1=Sequence::create(DelayTime::create(timeXH[2]),ScaleTo::create(0,1),MoveTo::create(0.2f,Vec2(x,changingPosition[0])),VoiceEffect,Spawn::create(ScaleTo::create(0,0),MoveTo::create(0,Vec2(RightHandPosition[a].x,RightHandPosition[a].y)),NULL),NULL);
 		auto outTime2=Sequence::create(DelayTime::create(0.4),ScaleTo::create(0,1),MoveTo::create(0.2f,Vec2(x,changingPosition[1])),VoiceEffect,Spawn::create(ScaleTo::create(0,0),MoveTo::create(0,Vec2(RightHandPosition[a].x,RightHandPosition[a].y)),NULL),NULL);
 		auto outTime3=Sequence::create(DelayTime::create(0.4),ScaleTo::create(0,1),MoveTo::create(0.2f,Vec2(x,changingPosition[2])),VoiceEffect,Spawn::create(ScaleTo::create(0,0),MoveTo::create(0,Vec2(RightHandPosition[a].x,RightHandPosition[a].y)),NULL),NULL);
@@ -3717,17 +3724,25 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
     for(a=0;a<4;a++) {
         _RightBatchDistribute(a,timeXH[2],(zhuang==2)?14:13);
     }
+    
 	/**********************************************************
         distribute to left player
     **********************************************************/
-	Point LeftHandoutEnd=Vec2(_layout->_playerPosi[0].basePoint.x+10,_layout->_playerPosi[0].basePoint.y+10);
+    auto lHandinHeight=_object->RectSize(L_IN_CARD).height;
+
+	Point LeftHandoutEnd=Vec2(
+        _layout->_playerPosi[0].basePoint.x+10,
+        _layout->_playerPosi[0].basePoint.y+10);
+    
 	Sprite* LeftRobotHandCard[4];
 	Vec2 LeftHandPosition[4];
 	for (a=0;a<4;a++)
 	{
 		LeftRobotHandCard[a]=_object->Create(LR_IN_CARD);
 		LeftRobotHandCard[a]->setAnchorPoint(Vec2(0.5f,0.5f));
-		LeftRobotHandCard[a]->setPosition(Vec2(origin.x+visibleSize.width*0.5,origin.y+visibleSize.height*0.5+RightCardInSize*1.2-RightCardInSize*a*0.6));
+		LeftRobotHandCard[a]->setPosition(Vec2(
+            origin.x+visibleSize.width*0.5,
+            origin.y+visibleSize.height*0.5+cardHeight*1.2-cardHeight*a*0.6));
 		LeftRobotHandCard[a]->setScale(0);
 		myframe->addChild(LeftRobotHandCard[a],3,START_CARDS_IN_TAG_ID+3*a);
 		LeftHandPosition[a]=LeftRobotHandCard[a]->getPosition();
@@ -3740,10 +3755,10 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 			changingPosition[b]=LeftHandoutEnd.y;
 		}
 		x=LeftHandoutEnd.x;
-		changingPosition[0]-=RightHandInSize*a*0.6;				
-		changingPosition[1]-=RightHandInSize*(a+4)*0.6;			
-		changingPosition[2]-=RightHandInSize*(a+8)*0.6;	
-		changingPosition[3]-=((RightHandInSize*13+a*RightHandInSize)*0.6+13.6);
+		changingPosition[0]-=lHandinHeight*a*0.6;				
+		changingPosition[1]-=lHandinHeight*(a+4)*0.6;			
+		changingPosition[2]-=lHandinHeight*(a+8)*0.6;	
+		changingPosition[3]-=((lHandinHeight*13+a*lHandinHeight)*0.6+13.6);
 		auto outTime1=Sequence::create(DelayTime::create(timeXH[0]),ScaleTo::create(0,1),MoveTo::create(0.2f,Vec2(x,changingPosition[0])),VoiceEffect,Spawn::create(ScaleTo::create(0,0),MoveTo::create(0,Vec2(LeftHandPosition[a].x,LeftHandPosition[a].y)),NULL),NULL);
 		auto outTime2=Sequence::create(DelayTime::create(0.4),ScaleTo::create(0,1),MoveTo::create(0.2f,Vec2(x,changingPosition[1])),VoiceEffect,Spawn::create(ScaleTo::create(0,0),MoveTo::create(0,Vec2(LeftHandPosition[a].x,LeftHandPosition[a].y)),NULL),NULL);
 		auto outTime3=Sequence::create(DelayTime::create(0.4),ScaleTo::create(0,1),MoveTo::create(0.2f,Vec2(x,changingPosition[2])),VoiceEffect,Spawn::create(ScaleTo::create(0,0),MoveTo::create(0,Vec2(LeftHandPosition[a].x,LeftHandPosition[a].y)),NULL),NULL);
@@ -3758,58 +3773,21 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 
 	}
 
-	for(a=0;a<4;a++)
-	{
+	for(a=0;a<4;a++) {
 	    _LeftBatchDistribute(a,timeXH[0],(zhuang==0)?14:13);
     }
 	/**********************************************************
         
     **********************************************************/
-	myframe->_ID=zhuang;
 	_roundManager->_isCardFromOthers=false;
-
-	ListenToDistributeCard();
-
 	_roundManager->_distributedNum=0;	
-	auto updateFourCards=CallFunc::create([=](){
-		_roundManager->_distributedNum += 4;
-		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
-	});
-	auto updateOneCards=CallFunc::create([=](){
-		_roundManager->_distributedNum +=1;
-		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
-	});
-	auto updateTwoCards=CallFunc::create([=](){
-		_roundManager->_distributedNum +=2;
-		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
-	});
-
-	auto HandDelay=DelayTime::create(0.2);
-	auto HandFourSeq=Sequence::create(updateFourCards,HandDelay,NULL);
-	auto HandOneSeq=Sequence::create(updateOneCards,HandDelay,NULL);
-	auto HandTwoSeq=Sequence::create(updateTwoCards,HandDelay,NULL);
-	auto firstRoundDistribute = Sequence::create(
-        DelayTime::create(0.7),
-        HandFourSeq,
-        HandFourSeq,
-        HandFourSeq,
-        
-        HandFourSeq,
-		HandFourSeq,
-		HandFourSeq,
-
-        HandFourSeq,
-		HandFourSeq,
-		HandFourSeq,
-
-        HandTwoSeq,
-		HandOneSeq,
-		HandOneSeq,NULL);
-
 	_roundManager->_actionToDo=a_JUMP;
     
+	ListenToDistributeCard();
+
+	myframe->_ID = zhuang;
 	myframe->runAction(Sequence::create(
-        firstRoundDistribute,Spawn::create(CallFunc::create([=](){
+        _FisrtRoundResidueUpdate(),Spawn::create(CallFunc::create([=](){
 		card_list_update(0);}),CallFunc::create([=](){
 		card_list_update(1);}),CallFunc::create([=](){
 		card_list_update(2);}),NULL),CallFunc::create([=](){
@@ -3819,14 +3797,39 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 	}),NULL));
 }
 
-void NetRaceLayer:: display_callback(cocos2d::Ref* pSender)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
+Sequence *NetRaceLayer::_FisrtRoundResidueUpdate() {
+	auto updateFourCards=CallFunc::create([=](){
+		_roundManager->_distributedNum += 4;
+		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
+	});
+	auto updateTwoCards=CallFunc::create([=](){
+		_roundManager->_distributedNum +=2;
+		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
+	});
+	auto updateOneCards=CallFunc::create([=](){
+		_roundManager->_distributedNum +=1;
+		_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);		
+	});
 
+	auto HandDelay   = DelayTime::create(0.2);
+	auto HandFourSeq = Sequence::create(updateFourCards,HandDelay,NULL);
+	auto HandOneSeq  = Sequence::create(updateOneCards,HandDelay,NULL);
+	auto HandTwoSeq  = Sequence::create(updateTwoCards,HandDelay,NULL);
 
+	return Sequence::create(
+        DelayTime::create(0.7),
+        HandFourSeq,HandFourSeq,HandFourSeq,
+        HandFourSeq,HandFourSeq,HandFourSeq,
+        HandFourSeq,HandFourSeq,HandFourSeq,
+
+        HandTwoSeq, HandOneSeq, HandOneSeq,NULL);
 }
-void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
-{
+
+void NetRaceLayer:: display_callback(cocos2d::Ref* pSender) {
+    LOGGER_WRITE("%s",__FUNCTION__);
+}
+
+void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	int PropertyOfPlayer = _roundManager->_cardHolders[no]->_profile.property;

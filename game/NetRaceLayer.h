@@ -242,6 +242,7 @@ public:
     void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
     void _LeftBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
 	void FirstRoundDistributeEffect(int zhuang);//·¢ÅÆÐ§¹û
+    Sequence *_FisrtRoundResidueUpdate();
 	/***********callback function***********************/
     void QiEffect();
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
