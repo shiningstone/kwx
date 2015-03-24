@@ -59,8 +59,8 @@ void RoundManager::GetWin(WinInfo_t &info) {
 
 bool RoundManager::IsWinner(int no, int curPlayer, int FirstMingPlayer) {
 	if((_lastWin.kind==SINGLE_WIN&&
-            ((_lastWin.player==curPlayer && _lastWin.player!=no)||
-            (_lastWin.player!=curPlayer && no!=_lastWin.player && no!=curPlayer)))
+                ((_lastWin.player==curPlayer && _lastWin.player!=no)
+                ||(_lastWin.player!=curPlayer && no!=_lastWin.player && no!=curPlayer)))
         ||(_lastWin.kind==NONE_WIN && FirstMingPlayer!=-1 && no!=FirstMingPlayer)) {
         return true;
     } else {
