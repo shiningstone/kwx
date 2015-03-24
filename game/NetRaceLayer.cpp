@@ -3831,128 +3831,151 @@ void NetRaceLayer:: display_callback(cocos2d::Ref* pSender) {
 /***********************************************************
         gold show
 ***********************************************************/
-Label *NetRaceLayer::_CreateName(const char *name) {
-    auto NickName=Label::create(name,"Arial",28);//昵称3
-    NickName->setAnchorPoint(Vec2(0.5,0.5));
-    NickName->setPosition(Vec2(70,60));
-    return NickName;
-}
-
-Sprite *NetRaceLayer::_CreateHeadImage(const char *file) {
-    auto headPhoto=Sprite::createWithSpriteFrameName(file);//头像4
-    headPhoto->setScaleX(100/headPhoto->getTextureRect().size.width);
-    headPhoto->setScaleY(100/headPhoto->getTextureRect().size.height);
-    headPhoto->setAnchorPoint(Vec2(0,0));
-    headPhoto->setPosition(Vec2(20,80));
-    return headPhoto;
-}
-
-Sprite *NetRaceLayer::_CreateGoldImage() {
-	auto gold = Sprite::createWithSpriteFrameName("result_money.png");//金币1
-	gold->setAnchorPoint(Vec2(0,0.5));
-	gold->setPosition(Vec2(15,22));
-    return gold;
-}
-
-LabelAtlas *NetRaceLayer::_CreateNumberLabel(int number,Sprite *gold) {
-	std::string strNumber = _NumToString(number);
-	auto label = LabelAtlas::create(strNumber,"fonts/result_money_number.png",17,23,'.');
-	label->setAnchorPoint(Vec2(0,0.5));
-	label->setPosition(Vec2(gold->getPosition().x+gold->getTextureRect().size.width+5, 22));
-    return label;
-}
-
-Sprite *NetRaceLayer::_CreateNumberUnit(int number,LabelAtlas *label) {
-	Sprite* unit = NULL;
-    if(number>=100000&&number<100000000) {
-        unit=Sprite::createWithSpriteFrameName("wan-hand.png");
-        unit->setAnchorPoint(Vec2(0,0.5));
-        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
-    }
-    else if(number>=100000000) {
-        unit=Sprite::createWithSpriteFrameName("yi-hand.png");
-        unit->setAnchorPoint(Vec2(0,0.5));
-        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
-    }
-    return unit;
-}
-
-Sprite *NetRaceLayer::_CreateHu() {
-    auto Win=Sprite::createWithSpriteFrameName("jiesuanhu.png");//胡5
-    Win->setAnchorPoint(Vec2(0.5,0.5));
-    Win->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-    Win->setVisible(false);
-    return Win;
-}
-
-Sprite *NetRaceLayer::_CreateZiMo() {
-    auto selfDrawn=Sprite::createWithSpriteFrameName("jiesuanzimo.png");//自摸6
-    selfDrawn->setAnchorPoint(Vec2(0.5,0.5));
-    selfDrawn->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-    selfDrawn->setVisible(false);
-    return selfDrawn;
-}
-
-Sprite *NetRaceLayer::_CreateFangPao() {
-    auto PointGun1=Sprite::createWithSpriteFrameName("jiesuanfangpao.png");//点炮7
-    PointGun1->setAnchorPoint(Vec2(0.5,0.5));
-    PointGun1->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-    PointGun1->setVisible(false);
-    return PointGun1;
-}
-
-void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *parent) {
-    parent->addChild(_CreateName(profile.name),2,ACCOUNT_NIKENAME);
-    parent->addChild(_CreateHeadImage(profile.photo),2,ACCOUNT_IMAGE);
-	auto gold = _CreateGoldImage();
-	parent->addChild(gold,2,ACCOUNT_JINBI);
-	auto label = _CreateNumberLabel(profile.property,gold);
-	parent->addChild(label,2,ACCOUNT_PROPRETY);
-    parent->addChild(_CreateNumberUnit(profile.property,label),ACCOUNT_PROPRETY_UNIT);
-    parent->addChild(_CreateHu(),2,ACCOUNT_HU_FONT);
-    parent->addChild(_CreateZiMo(),2,ACCOUNT_ZIMO_FONT);
-    parent->addChild(_CreateFangPao(),2,ACCOUNT_DIANPAO_FONT);
-
-}
-
-void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
+void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no)
+{
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
+	int PropertyOfPlayer = _roundManager->_cardHolders[no]->_profile.property;
+	std::string PhotoOfPlayer = _roundManager->_cardHolders[no]->_profile.photo;
+	std::string NickNameOfPlayer = _roundManager->_cardHolders[no]->_profile.name;
+	
+	char buffer[80];
+	auto Gold=Sprite::createWithSpriteFrameName("result_money.png");//金币1
+	Gold->setAnchorPoint(Vec2(0,0.5));
+	Gold->setPosition(Vec2(15,22));
+	BarOfPlayer->addChild(Gold,2,ACCOUNT_JINBI);
 
-    auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
-    signPlus->setAnchorPoint(Vec2(0,0.5));
+	//===================================万，亿=====================================//
+	LabelAtlas* labelOfProperty;
+	std::string stringOfProperty;
+	Sprite* propertyUnit;
 
-    if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-        signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
-    else
-        signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-    signPlus->setVisible(false);
-    BarOfPlayer->addChild(signPlus,2,ACCOUNT_ADD_SYMBOL);
+	float NumQian=1000,NumWan=10000,NumShiWan=100000,NumBaiWan=1000000,NumQianWan=10000000,NumYi=100000000;
+	float tempProperty;
+	int tempXiapShu;
+	if(PropertyOfPlayer<NumShiWan)
+	{
+		sprintf(buffer,"%d",PropertyOfPlayer);
+	}
+	else if(PropertyOfPlayer>=NumShiWan&&PropertyOfPlayer<NumQianWan)
+	{
+		tempXiapShu=PropertyOfPlayer%1000;
+		if(tempXiapShu>=500)
+			tempProperty=(float)(PropertyOfPlayer-500)/10000;
+		else
+			tempProperty=(float)PropertyOfPlayer/10000;
+		tempXiapShu=PropertyOfPlayer%10000;
+		if(tempXiapShu>=1000)
+			sprintf(buffer,"%.1f",tempProperty);
+		else
+			sprintf(buffer,"%.0f",tempProperty);
+	}
+	else if(PropertyOfPlayer>=NumQianWan&&PropertyOfPlayer<NumYi)
+	{
+		tempXiapShu=PropertyOfPlayer%10000;
+		if(tempXiapShu>=5000)
+			tempProperty=(float)(PropertyOfPlayer-500)/10000;
+		else
+			tempProperty=(float)PropertyOfPlayer/10000;
+		sprintf(buffer,"%.0f",tempProperty);
+	}
+	else if(PropertyOfPlayer>=NumYi)
+	{
+		tempXiapShu=PropertyOfPlayer%10000000;
+		if(tempXiapShu>=5000000)
+			tempProperty=(float)(PropertyOfPlayer-5000000)/100000000;
+		else
+			tempProperty=(float)PropertyOfPlayer/100000000;
+		tempXiapShu=PropertyOfPlayer%100000000;
+		if(tempXiapShu>=10000000)
+			sprintf(buffer,"%.1f",tempProperty);
+		else
+			sprintf(buffer,"%.0f",tempProperty);
+	}
+	stringOfProperty=buffer;
+	labelOfProperty=LabelAtlas::create(stringOfProperty,"fonts/result_money_number.png",17,23,'.');
+	labelOfProperty->setAnchorPoint(Vec2(0,0.5));
+	labelOfProperty->setPosition(Vec2(Gold->getPosition().x+Gold->getTextureRect().size.width+5,22));
+	BarOfPlayer->addChild(labelOfProperty,2,ACCOUNT_PROPRETY);
 
-    auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
-    signMinus->setAnchorPoint(Vec2(0,0.5));
-    if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-        signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
-    else
-        signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-    signMinus->setVisible(false);
-    BarOfPlayer->addChild(signMinus,2,ACCOUNT_MINUS_SYMBOL);
+	if(PropertyOfPlayer>=NumShiWan&&PropertyOfPlayer<NumYi)
+	{
+		propertyUnit=Sprite::createWithSpriteFrameName("wan-hand.png");
+		propertyUnit->setAnchorPoint(Vec2(0,0.5));
+		propertyUnit->setPosition(Vec2(labelOfProperty->getPosition().x+labelOfProperty->getContentSize().width+5,22));
+		BarOfPlayer->addChild(propertyUnit,ACCOUNT_PROPRETY_UNIT);
+	}
+	else if(PropertyOfPlayer>=NumYi)
+	{
+		propertyUnit=Sprite::createWithSpriteFrameName("yi-hand.png");
+		propertyUnit->setAnchorPoint(Vec2(0,0.5));
+		propertyUnit->setPosition(Vec2(labelOfProperty->getPosition().x+labelOfProperty->getContentSize().width+5,22));
+		BarOfPlayer->addChild(propertyUnit,ACCOUNT_PROPRETY_UNIT);
+	}
+	//===================================万，亿=====================================//
+	auto NickName=Label::create(NickNameOfPlayer,"Arial",28);//昵称3
+	NickName->setAnchorPoint(Vec2(0.5,0.5));
+	NickName->setPosition(Vec2(70,60));
+	BarOfPlayer->addChild(NickName,2,ACCOUNT_NIKENAME);
 
+	auto headPhoto=Sprite::createWithSpriteFrameName(PhotoOfPlayer);//头像4
+	headPhoto->setScaleX(100/headPhoto->getTextureRect().size.width);
+	headPhoto->setScaleY(100/headPhoto->getTextureRect().size.height);
+	headPhoto->setAnchorPoint(Vec2(0,0));
+	headPhoto->setPosition(Vec2(20,80));
+	BarOfPlayer->addChild(headPhoto,2,ACCOUNT_IMAGE);
+
+	auto Win=Sprite::createWithSpriteFrameName("jiesuanhu.png");//胡5
+	Win->setAnchorPoint(Vec2(0.5,0.5));
+	Win->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+	Win->setVisible(false);
+	BarOfPlayer->addChild(Win,2,ACCOUNT_HU_FONT);
+
+	auto selfDrawn=Sprite::createWithSpriteFrameName("jiesuanzimo.png");//自摸6
+	selfDrawn->setAnchorPoint(Vec2(0.5,0.5));
+	selfDrawn->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+	selfDrawn->setVisible(false);
+	BarOfPlayer->addChild(selfDrawn,2,ACCOUNT_ZIMO_FONT);
+
+	auto PointGun1=Sprite::createWithSpriteFrameName("jiesuanfangpao.png");//点炮7
+	PointGun1->setAnchorPoint(Vec2(0.5,0.5));
+	PointGun1->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+	PointGun1->setVisible(false);
+	BarOfPlayer->addChild(PointGun1,2,ACCOUNT_DIANPAO_FONT);
+
+	auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
+	signPlus->setAnchorPoint(Vec2(0,0.5));
+
+	if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
+	else
+		signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
+	signPlus->setVisible(false);
+	BarOfPlayer->addChild(signPlus,2,ACCOUNT_ADD_SYMBOL);
+
+	auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
+	signMinus->setAnchorPoint(Vec2(0,0.5));
+	if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
+	else
+		signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
+	signMinus->setVisible(false);
+	BarOfPlayer->addChild(signMinus,2,ACCOUNT_MINUS_SYMBOL);
+
+	/*================================结算金钱========================================*/
     WinInfo_t win;
     _roundManager->GetWin(win);
 
-	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
+	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==-1) )
+	{
 		char char_AccoutnGold[80];
 		std::string str_AccountGold;
 		sprintf(char_AccoutnGold,"%d",abs(GoldAccountImmediate[no]));
 		str_AccountGold=char_AccoutnGold;
-        
 		LabelAtlas* propertyOfIncrease;
-		if(GoldAccountImmediate[no]>0) {
-		    auto signPlus = BarOfPlayer->getChildByTag(ACCOUNT_ADD_SYMBOL);
+		if(GoldAccountImmediate[no]>0)
+		{
 			signPlus->setVisible(true);
-            
 			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
 			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
 			if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
@@ -3966,10 +3989,10 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 				propertyOfIncrease->setVisible(false);
 
 			BarOfPlayer->addChild(propertyOfIncrease,2,ACCOUNT_WINGOLD_NUM);
-		} else if(GoldAccountImmediate[no]<0) {
-		    auto signMinus = BarOfPlayer->getChildByTag(ACCOUNT_ADD_SYMBOL);
+		}
+		else if(GoldAccountImmediate[no]<0)
+		{
 			signMinus->setVisible(true);
-            
 			auto propertyOfIncrease=LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
 			propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
 			if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
