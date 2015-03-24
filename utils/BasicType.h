@@ -3,6 +3,7 @@
 #define __BASIC_TYPE__
 
 #define INVALID -1
+#define PLAYER_NUM  3
 
 typedef enum {
     LOCAL_GAME,

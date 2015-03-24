@@ -86,6 +86,7 @@ GObjectFactory::GObjectFactory(cocos2d::Point origin, cocos2d::Size size)
     }
 }
 
+/* theses objects need to be clear when application quit */
 Size GObjectFactory::RectSize(TextureId_t id) {
     if(_rectSize[id]==NULL) {
         _rectSize[id] = new Size((Create(id))->getTextureRect().size);
@@ -706,6 +707,19 @@ Sprite *GObjectFactory::_image(const char *file) {
 /*************************************
     action buttons
 *************************************/
+Sprite *GObjectFactory::_image(MenuButtonId_t action) {
+    char *file[] = {
+        "qi.png",
+        "hu1.png",
+        "ming.png",
+        "gang1.png",
+        "peng1.png",
+    };
+    int offset = action - BTN_QI;
+    
+    return _image(file[offset]);    
+}
+
 Sprite *GObjectFactory::CreateBtnBkg(MenuButtonId_t action,const Vec2 &position) {
     char *file[] = {
         "qi.png",

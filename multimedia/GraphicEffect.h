@@ -13,6 +13,7 @@ class GraphicEffect {
         static void destroyInstance();
 
         TargetedAction *Shade(Node* target);
+		Sequence *MoveDistributeCard(const Vec2 &orig,const Vec2 &dest);
     private:
         GraphicEffect();
         static GraphicEffect *_instance;

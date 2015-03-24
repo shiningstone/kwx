@@ -3456,68 +3456,49 @@ void NetRaceLayer::_4CardsDistribute(int sequenceNo, float delayRef) {
     }
 }
 
+PlayerDir_t NetRaceLayer::NextPlayer(PlayerDir_t dir) {
+    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
+}
+
 void NetRaceLayer::effect_Distribute_Card(int zhuang)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
+	float timeXH[PLAYER_NUM];
+    timeXH[zhuang] = 0.7;
+    timeXH[(zhuang+1)%PLAYER_NUM] = 0.7+0.2;
+    timeXH[(zhuang+2)%PLAYER_NUM] = 0.7+0.2+0.2;
 
-	
-    
-	auto VoiceEffect=CallFunc::create([=](){VoiceId=SimpleAudioEngine::sharedEngine()->playEffect("Music/sort.ogg");});	
-
-	float timeXH[3];
-	switch (zhuang)
-	{
-    	case 1:
-    		timeXH[1]=0.7;
-    		timeXH[2]=0.9;
-    		timeXH[0]=1.1;
-    		break;
-    	case 2:
-    		timeXH[1]=1.1;
-    		timeXH[2]=0.7;
-    		timeXH[0]=0.9;
-    		break;
-    	case 0:
-    		timeXH[1]=0.9;
-    		timeXH[2]=1.1;
-    		timeXH[0]=0.7;
-    		break;
-    	default:
-    		break;
-	}
 	Sprite* p_list[4];
 	Sprite* lastTwo[2];
 	
-	auto ListOfNo1=_roundManager->_players[1]->get_parter()->get_card_list();
+	auto ListOfNo1=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
 
 	int a,b;
 	float x,y;
 	//自己
-	auto Card_inSize = _object->Create(IN_CARD)->getTextureRect().size.width;
-	Point HandoutEnd=Vec2(
-        _layout->_playerPosi[1].basePoint.x+10,
-        _layout->_playerPosi[1].basePoint.y+110);
-
 	auto Mehand_in=_object->Create(FREE_CARD);
 	auto Hand_inSize = Mehand_in->getTextureRect().size.width;
     
-	Sprite* meHandCard[4];
-	Vec2 meHandPosition[4];
-	for (a=0;a<4;a++)
-	{
+	Sprite* meHandCard[DIST_BATCH_CARDS];
+	Vec2 meHandPosition[DIST_BATCH_CARDS];
+	auto disCardWidth = _object->RectSize(IN_CARD).width;
+
+	for (a=0;a<DIST_BATCH_CARDS;a++) {
+		meHandPosition[a] = _layout->PositionOfNewDistributeCard(a,disCardWidth);
+
 		meHandCard[a]=_object->Create(IN_CARD);
 		meHandCard[a]->setAnchorPoint(Vec2(0,0.5));
-		meHandCard[a]->setPosition(Vec2(origin.x+visibleSize.width/2-Card_inSize*2+Card_inSize*a,origin.y+visibleSize.height*0.5));
+		meHandCard[a]->setPosition(meHandPosition[a]);
 		meHandCard[a]->setScale(0);
 		myframe->addChild(meHandCard[a],3,START_CARDS_IN_TAG_ID+a);	
-        
-		meHandPosition[a]=meHandCard[a]->getPosition();
 	}
 
-    
-	float changingPosition[4];
-	for(a=0;a<4;a++)
-	{
+	float changingPosition[DIST_BATCH_CARDS];
+	Point HandoutEnd=Vec2(
+        _layout->_playerPosi[MIDDLE].basePoint.x+10,
+        _layout->_playerPosi[MIDDLE].basePoint.y+110);
+
+	for(a=0;a<DIST_BATCH_CARDS;a++) {
 		for (b=0;b<4;b++) {
 			changingPosition[b]=HandoutEnd.x;
 		}
@@ -3529,46 +3510,31 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		changingPosition[3]+=(Hand_inSize*13+a*Hand_inSize+30);
         
 		auto outTime1=Sequence::create(
-            DelayTime::create(timeXH[1]),
-            ScaleTo::create(0,1),
-            MoveTo::create(0.2f,Vec2(changingPosition[0],y)),
-            VoiceEffect,
-            Spawn::create(
-                ScaleTo::create(0,0),
-                MoveTo::create(0,Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL),NULL);
-		auto outTime2=Sequence::create(
-            DelayTime::create(0.4),
-            ScaleTo::create(0,1),
-            MoveTo::create(0.2f,Vec2(changingPosition[1],y)),
-            VoiceEffect,
-            Spawn::create(
-                ScaleTo::create(0,0),
-                MoveTo::create(0,Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL),NULL);
-		auto outTime3=Sequence::create(
-            DelayTime::create(0.4),
-            ScaleTo::create(0,1),
-            MoveTo::create(0.2f,Vec2(changingPosition[2],y)),
-            VoiceEffect,
-            Spawn::create(
-                ScaleTo::create(0,0),
-                MoveTo::create(0,Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL),NULL);
+            DelayTime::create(timeXH[1]-0.3),
+            _effect->MoveDistributeCard(Vec2(changingPosition[0],y),
+                Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL);
+
+		auto outTime2 = _effect->MoveDistributeCard(Vec2(changingPosition[1],y),
+            Vec2(meHandPosition[a].x,meHandPosition[a].y));
+		auto outTime3 = _effect->MoveDistributeCard(Vec2(changingPosition[2],y),
+            Vec2(meHandPosition[a].x,meHandPosition[a].y));
+
 		Sequence* outTime4;
 
 		if( (zhuang==1&&a<2)||(zhuang!=1&&a<1) )
-			outTime4=Sequence::create(
-    			DelayTime::create(0.4),
-    			ScaleTo::create(0,1),
-    			MoveTo::create(0.2f,Vec2(changingPosition[3],y)),
-    			VoiceEffect,
-    			Spawn::create(
-        			ScaleTo::create(0,0),
-        			MoveTo::create(0,Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL),NULL);
+			outTime4 = _effect->MoveDistributeCard(Vec2(changingPosition[3],y),
+                Vec2(meHandPosition[a].x,meHandPosition[a].y));
 		else
 			outTime4=Sequence::create(
     			DelayTime::create(0.4),NULL);
 
 		meHandCard[a]->runAction(Sequence::create(outTime1,outTime2,outTime3,outTime4,NULL));
 	}
+
+
+
+
+
     
 	auto xmeCardStart=_layout->_playerPosi[1].basePoint.x+10;
 	auto ymeCardStart=_layout->_playerPosi[1].basePoint.y+10;

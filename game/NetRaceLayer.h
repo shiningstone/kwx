@@ -37,6 +37,7 @@ public:
 	void QueryMingOutCard();
     
     void ShowActionButtons();
+    PlayerDir_t NextPlayer(PlayerDir_t dir);
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
@@ -50,6 +51,7 @@ private:
     float _AddBtnMing(const Vec2 &ref);
     float _AddBtnGang(const Vec2 &ref);
     float _AddBtnPeng(const Vec2 &ref);
+    const static int DIST_BATCH_CARDS=4;   /*card number of distribute batch*/
 
     typedef struct {
         CARD_ARRAY *list;

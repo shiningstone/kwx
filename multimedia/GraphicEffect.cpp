@@ -15,6 +15,17 @@ TargetedAction *GraphicEffect::Shade(Node* target) {
                 ScaleTo::create(0.3,1.5),NULL),NULL));
 }
 
+Sequence *GraphicEffect::MoveDistributeCard(const Vec2 &orig,const Vec2 &dest) {
+    return Sequence::create(
+            DelayTime::create(0.4),
+            ScaleTo::create(0,1),
+            MoveTo::create(0.2f,orig),
+            _voice->Speak("sort"),
+            Spawn::create(
+                ScaleTo::create(0,0),
+                MoveTo::create(0,dest),NULL),NULL)
+}
+
 /*************************************
     singleton
 *************************************/
