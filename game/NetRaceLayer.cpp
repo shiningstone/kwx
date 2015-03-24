@@ -3473,12 +3473,11 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 	auto ListOfNo1=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
 
 	int a,b;
-	//自己
-	auto Mehand_in=_object->Create(FREE_CARD);
-	auto Hand_inSize = Mehand_in->getTextureRect().size.width;
 
+    auto cardWidth = _object->RectSize(FREE_CARD).width;
+	//自己
     /************************************
-        from center to hand
+        one batch from center to hand
     ************************************/
 	Sprite* meHandCard[DIST_BATCH_CARDS];
 	Vec2 meHandPosition[DIST_BATCH_CARDS];
@@ -3499,16 +3498,16 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
         _layout->_playerPosi[MIDDLE].basePoint.x+10,
         _layout->_playerPosi[MIDDLE].basePoint.y+110);
 
-	for(a=0;a<DIST_BATCH_CARDS;a++) {
-		for (b=0;b<4;b++) {
+	for(a=0;a<DIST_BATCHES;a++) {
+		for (b=0;b<DIST_BATCH_CARDS;b++) {
 			changingPosition[b]=HandoutEnd.x;
 		}
 		y=HandoutEnd.y;
 
-        changingPosition[0]+=Hand_inSize*a;
-		changingPosition[1]+=Hand_inSize*(a*2)+Hand_inSize;
-		changingPosition[2]+=Hand_inSize*(a*3)+Hand_inSize*2;
-		changingPosition[3]+=(Hand_inSize*13+a*Hand_inSize+30);
+        changingPosition[0]+=cardWidth*a;
+		changingPosition[1]+=cardWidth*(a*2)+cardWidth;
+		changingPosition[2]+=cardWidth*(a*3)+cardWidth*2;
+		changingPosition[3]+=(cardWidth*13+a*cardWidth+30);
         
 		auto outTime1=Sequence::create(
             DelayTime::create(timeXH[1]-0.3),
@@ -3540,28 +3539,31 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
     float x,y;
     const Vec2 &REF = Vec2(_layout->_playerPosi[1].basePoint.x+10,
                             _layout->_playerPosi[1].basePoint.y+10);
-    
+
 	for(a=0;a<DIST_BATCHES;a++)
 	{
 		if(a==0)//DealayTime::create(0.9)
 		{
-			for(int i=0;i<4;i++)
+			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{				
                 auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[0+3*i].kind,NORMAL);
 
 				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
                 
-				p_list[i]->setPosition(Vec2(REF.x+p_list[i]->getTextureRect().size.width*i, REF.y));
+				p_list[i]->setPosition(Vec2(REF.x+cardWidth*i, REF.y));
 				p_list[i]->setScale(0);
 
                 myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+1*20+i);
 
                 auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.2),ScaleTo::create(0,1),NULL);
-				auto cardSize=Mehand_in->getTextureRect().size;
-				auto mv1=MoveTo::create(0.2,Vec2(REF.x+cardSize.width*i*2, REF.y));
+				auto mv1=MoveTo::create(0.2,Vec2(
+                    REF.x+cardWidth*i*2, 
+                    REF.y));
 				auto delay1=DelayTime::create(0.4);
-				auto mv2=MoveTo::create(0.2,Vec2(REF.x+cardSize.width*i*3, REF.y));
+				auto mv2=MoveTo::create(0.2,Vec2(
+                    REF.x+cardWidth*i*3, 
+                    REF.y));
 				auto delay2=DelayTime::create(0.4);
 				auto list_seq1=Sequence::create(DelayTime::create(timeXH[1]+0.2),delay1,mv1,delay2,mv2,NULL);
 				auto list_spa=Spawn::create(list_seq0,list_seq1,NULL);
@@ -3570,21 +3572,19 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==1)//DelayTime::create(1.5)
 		{
-			for(int i=0;i<4;i++)
+			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{
-				auto cardSize=Mehand_in->getTextureRect().size;
-
 				auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[1+3*i].kind,NORMAL);
                 p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
-				p_list[i]->setPosition(Vec2(REF.x+cardSize.width*1.0*i*2+cardSize.width, REF.y));
+				p_list[i]->setPosition(Vec2(REF.x+cardWidth*1.0*i*2+cardWidth, REF.y));
 				p_list[i]->setScale(0);
 
 				myframe->addChild(p_list[i],i+5,HAND_IN_CARDS_TAG_ID+1*20+4+i);
 
 				auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.8),ScaleTo::create(0,1),NULL);
 				auto mv1=MoveTo::create(0.2,Vec2(
-                    REF.x+cardSize.width*i*3+cardSize.width, 
+                    REF.x+cardWidth*i*3+cardWidth, 
                     REF.y));
 				auto delay1=DelayTime::create(0.4);
 				auto list_seq1=Sequence::create(DelayTime::create(timeXH[1]+0.8),delay1,mv1,NULL);
@@ -3594,14 +3594,14 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 		else if(a==2)//DelayTime::create(2.1)
 		{
-			for(int i=0;i<4;i++)
+			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{
 				auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[2+3*i].kind,NORMAL);
 
 				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
 				p_list[i]->setPosition(Vec2(
-                    REF.x+Mehand_in->getTextureRect().size.width*(i*3)+Mehand_in->getTextureRect().size.width*1.0*2, 
+                    REF.x + cardWidth*(i*3) + cardWidth*1.0*2, 
                     REF.y));
 				p_list[i]->setScale(0);
 
@@ -3617,7 +3617,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 			lastTwo[0]=_object->Create(FREE_CARD,s_card);
 			lastTwo[0]->setAnchorPoint(Vec2(0.0f,0.0f));
 			lastTwo[0]->setPosition(Vec2(
-                REF.x+Mehand_in->getTextureRect().size.width*1.0*12, 
+                REF.x + cardWidth*1.0*12, 
                 REF.y));
 			lastTwo[0]->setScale(0);
 			myframe->addChild(lastTwo[0],0+13,HAND_IN_CARDS_TAG_ID+1*20+12);
@@ -3629,7 +3629,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 				lastTwo[1]=_object->Create(FREE_CARD,s_card);
 				lastTwo[1]->setAnchorPoint(Vec2(0.0f,0.0f));
 				lastTwo[1]->setPosition(Vec2(
-                    REF.x+Mehand_in->getTextureRect().size.width*1.0*13+30,
+                    REF.x + cardWidth*1.0*13 + 30,
                     REF.y));
 				lastTwo[1]->setScale(0);
 				myframe->addChild(lastTwo[1],0+18,HAND_IN_CARDS_TAG_ID+1*20+13);
