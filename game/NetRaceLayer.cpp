@@ -3492,8 +3492,7 @@ PlayerDir_t NetRaceLayer::NextPlayer(PlayerDir_t dir) {
     return (PlayerDir_t)((dir+1)%PLAYER_NUM);
 }
 
-void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
-{
+void NetRaceLayer::FirstRoundDistributeEffect(int zhuang) {
     LOGGER_WRITE("%s",__FUNCTION__);
 	auto VoiceEffect=_voice->Speak("sort.ogg");	
 
@@ -3535,7 +3534,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 		for (b=0;b<DIST_BATCH_CARDS;b++) {
 			changingPosition[b]=HandoutEnd.x;
 		}
-		y=HandoutEnd.y;
+		float y=HandoutEnd.y;
 
         changingPosition[0]+=cardWidth*a;
 		changingPosition[1]+=cardWidth*(a*2)+cardWidth;
@@ -3864,15 +3863,17 @@ LabelAtlas *NetRaceLayer::_CreateNumberLabel(int number,Sprite *gold) {
 }
 
 Sprite *NetRaceLayer::_CreateNumberUnit(int number,LabelAtlas *label) {
-	Sprite* unit;
+	Sprite* unit = NULL;
     if(number>=100000&&number<100000000) {
         unit=Sprite::createWithSpriteFrameName("wan-hand.png");
+        unit->setAnchorPoint(Vec2(0,0.5));
+        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
     }
     else if(number>=100000000) {
         unit=Sprite::createWithSpriteFrameName("yi-hand.png");
+        unit->setAnchorPoint(Vec2(0,0.5));
+        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
     }
-    unit->setAnchorPoint(Vec2(0,0.5));
-    unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
     return unit;
 }
 
@@ -3912,30 +3913,31 @@ void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *paren
     parent->addChild(_CreateZiMo(),2,ACCOUNT_ZIMO_FONT);
     parent->addChild(_CreateFangPao(),2,ACCOUNT_DIANPAO_FONT);
 
-    auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
-    signPlus->setAnchorPoint(Vec2(0,0.5));
-
-    if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-        signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,parent->getContentSize().height/2));
-    else
-        signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-    signPlus->setVisible(false);
-    parent->addChild(signPlus,2,ACCOUNT_ADD_SYMBOL);
-
-    auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
-    signMinus->setAnchorPoint(Vec2(0,0.5));
-    if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-        signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,parent->getContentSize().height/2));
-    else
-        signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-    signMinus->setVisible(false);
-    parent->addChild(signMinus,2,ACCOUNT_MINUS_SYMBOL);
 }
 
 void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
+
+    auto signPlus=Sprite::createWithSpriteFrameName("fen_add.png");//+8
+    signPlus->setAnchorPoint(Vec2(0,0.5));
+
+    if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+        signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
+    else
+        signPlus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
+    signPlus->setVisible(false);
+    BarOfPlayer->addChild(signPlus,2,ACCOUNT_ADD_SYMBOL);
+
+    auto signMinus=Sprite::createWithSpriteFrameName("fen_sub.png");//9
+    signMinus->setAnchorPoint(Vec2(0,0.5));
+    if( _roundManager->IsWinner(no, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+        signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,BarOfPlayer->getContentSize().height/2));
+    else
+        signMinus->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
+    signMinus->setVisible(false);
+    BarOfPlayer->addChild(signMinus,2,ACCOUNT_MINUS_SYMBOL);
 
     WinInfo_t win;
     _roundManager->GetWin(win);

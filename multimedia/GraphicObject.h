@@ -145,6 +145,7 @@ protected:
     static Size              * _rectSize[TEXTURE_NUM];
 
     LabelAtlas *_createNumberSign(int number);
+    Sprite *_image(MenuButtonId_t action);
 private:
     GObjectFactory(cocos2d::Point origin, cocos2d::Size size);
     static GObjectFactory *_instance;

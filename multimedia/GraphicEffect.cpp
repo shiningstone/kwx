@@ -1,8 +1,9 @@
 
+#include "VoiceEffect.h"
 #include "GraphicEffect.h"
 
 GraphicEffect::GraphicEffect() {
-
+    _voice = VoiceEffect::getInstance();
 }
 
 TargetedAction *GraphicEffect::Shade(Node* target) {
@@ -23,7 +24,7 @@ Sequence *GraphicEffect::MoveDistributeCard(const Vec2 &orig,const Vec2 &dest) {
             _voice->Speak("sort"),
             Spawn::create(
                 ScaleTo::create(0,0),
-                MoveTo::create(0,dest),NULL),NULL)
+                MoveTo::create(0,dest),NULL),NULL);
 }
 
 /*************************************

@@ -7,6 +7,7 @@ USING_NS_CC;
 
 #include "./../utils/LogManager.h"
 
+class VoiceEffect;
 class GraphicEffect {
     public:
         static GraphicEffect *getInstance();
@@ -18,6 +19,7 @@ class GraphicEffect {
         GraphicEffect();
         static GraphicEffect *_instance;
 
+        VoiceEffect *_voice;
         Logger *_logger;
 };
 

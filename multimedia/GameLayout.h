@@ -36,7 +36,7 @@ class GameLayout {
         Vec2 PositionOfClock();
         Vec2 PositionOfClockIndicator(PlayerDir_t dir);
         Vec2 AnchorOfZhuang(PlayerDir_t dir);
-		Vec2 PositionOfNewDistributeCard(int idx);
+		Vec2 PositionOfNewDistributeCard(int idx,float cardWidth);
         /*************************************
             gold count
         *************************************/

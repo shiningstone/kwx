@@ -189,6 +189,15 @@ private:
 	int aim[3];
 	CARD_KIND dist_card;
 private:
+    Label *_CreateName(const char *name);
+    Sprite *_CreateHeadImage(const char *file);
+    Sprite *_CreateGoldImage();
+    LabelAtlas *_CreateNumberLabel(int number,Sprite *gold);
+    Sprite *_CreateNumberUnit(int number,LabelAtlas *label);
+    Sprite *_CreateHu();
+    Sprite *_CreateZiMo();
+    Sprite *_CreateFangPao();
+    void _CreateAccountPanel(const UserProfile_t &profile, Node *parent);
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);

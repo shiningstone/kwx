@@ -98,8 +98,7 @@ Vec2 GameLayout::AnchorOfZhuang(PlayerDir_t dir) {
 }
 
 Vec2 GameLayout::PositionOfNewDistributeCard(int idx,float cardWidth) {
-    return Vec2(ORIGIN.x+SIZE.width/2 - cardWidth*2 + cardWidth*idx,
-                ORIGIN.y+SIZE.height*0.5)
+    return Vec2(ORIGIN.x+SIZE.width/2 - cardWidth*2 + cardWidth*idx,ORIGIN.y+SIZE.height*0.5);
 }
 
 /*************************************
