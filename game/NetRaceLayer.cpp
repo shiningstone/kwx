@@ -3306,7 +3306,7 @@ void NetRaceLayer::start_callback()
 	if(_roundManager->_actionToDo!=a_TIMEOUT) {
 		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
 		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		effect_Distribute_Card(lastWinner);//牌局开始发牌效果。
+		FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果。
 	}
 }
 	
@@ -3433,25 +3433,47 @@ void NetRaceLayer::ListenToDistributeCard() {
 	_eventDispatcher->addEventListenerWithFixedPriority(_noonewinListener,3);
 }
 
-void NetRaceLayer::_4CardsDistribute(int sequenceNo, float delayRef) {
-	auto RightHandInSize = _object->Create(R_IN_CARD)->getTextureRect().size.height;
+void NetRaceLayer::_LeftBatchDistribute(int batchIdx, float delayRef) {
+	auto cardHeight = _object->RectSize(R_IN_CARD).height;
 
-    float x = _layout->_playerPosi[0].basePoint.x+10;
-    float y = _layout->_playerPosi[0].basePoint.y+10;
-    y-= (RightHandInSize*0.5)*(sequenceNo);
-    
-    for(int i=0;i<4;i++) {
+    float x = _layout->_playerPosi[LEFT].basePoint.x+10;
+    float y = _layout->_playerPosi[LEFT].basePoint.y+10;
+
+    y -= (cardHeight*0.5)*(batchIdx);
+    for(int i=0;i<DIST_BATCH_CARDS;i++) {
         Sprite *sprite = _object->Create(L_IN_CARD);
-        sprite=_object->Create(L_IN_CARD);
         sprite->setAnchorPoint(Vec2(0.0f,1.0f));
         sprite->setPosition(Vec2(x-10,y-8));
     
-        y -= ((sprite->getTextureRect().size.height)*0.5);
+        y -= (cardHeight*0.5);
     
-        myframe->addChild(sprite,i + 1 + 4*sequenceNo,HAND_IN_CARDS_TAG_ID + i + 4*sequenceNo);
+        myframe->addChild(sprite,i+4*batchIdx+1,HAND_IN_CARDS_TAG_ID + i+4*batchIdx);
         sprite->setScale(0);
         sprite->runAction(Sequence::create(
-            DelayTime::create(delayRef + 0.2 + 0.6*sequenceNo),
+            DelayTime::create(delayRef + 0.2 + 0.6*batchIdx),
+            ScaleTo::create(0,1),NULL));
+    }
+}
+
+void NetRaceLayer::_RightBatchDistribute(int batchIdx, float delayRef) {
+    auto cardHeight = _object->RectSize(R_IN_CARD).height;
+
+    float x = _layout->_playerPosi[RIGHT].basePoint.x+10;
+    float y = _layout->_playerPosi[RIGHT].basePoint.y+10;
+
+    y += (cardHeight*0.5)*4*batchIdx;
+    for(int i=0;i<DIST_BATCH_CARDS;i++) {
+        Sprite *sprite = _object->Create(R_IN_CARD);
+        sprite->setAnchorPoint(Vec2(0.0f,0.0f));
+        sprite->setPosition(Vec2(x-10,y-8));
+    
+        y += (cardHeight*0.5);
+
+        /* 15: assuming maximum length */
+        myframe->addChild(sprite,15-(i+4*batchIdx+1),HAND_IN_CARDS_TAG_ID + 2*20 + i+4*batchIdx);
+        sprite->setScale(0);
+        sprite->runAction(Sequence::create(
+            DelayTime::create(delayRef + 0.2 + 0.6*batchIdx),
             ScaleTo::create(0,1),NULL));
     }
 }
@@ -3460,7 +3482,7 @@ PlayerDir_t NetRaceLayer::NextPlayer(PlayerDir_t dir) {
     return (PlayerDir_t)((dir+1)%PLAYER_NUM);
 }
 
-void NetRaceLayer::effect_Distribute_Card(int zhuang)
+void NetRaceLayer::FirstRoundDistributeEffect(int zhuang)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 	float timeXH[PLAYER_NUM];
@@ -3533,7 +3555,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 
 
     /************************************
-        
+        distribute to middle player
     ************************************/
     Sprite* p_list[4];
     float x,y;
@@ -3639,7 +3661,9 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		}
 	}
     
-	//右手
+	/**********************************************************
+        distribute to right player
+    **********************************************************/
 	auto RightHandIn=_object->Create(R_IN_CARD);
 	auto RightCardIn=_object->Create(LR_IN_CARD);
 	auto RightHandInSize=RightHandIn->getTextureRect().size.height;
@@ -3680,83 +3704,36 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		RobotHandCard[a]->runAction(Sequence::create(outTime1,outTime2,outTime3,outTime4,NULL));
 	}
 	int RightLen=_roundManager->_players[2]->get_parter()->get_card_list()->len+1;
-	for(a=0;a<4;a++)
-	{
-		if(a==0)//DealayTime::create(1.1)
-		{
-			x=_layout->_playerPosi[2].basePoint.x+10;
-			y=_layout->_playerPosi[2].basePoint.y+10;
-			for(int i=0;i<4;i++)
-			{
-				p_list[i]=_object->Create(R_IN_CARD);
-				p_list[i]->setAnchorPoint(Point(0,0));
-				p_list[i]->setPosition(Vec2(x-10,y-8));
-				y+=((p_list[i]->getTextureRect().size.height)*0.5);
-				myframe->addChild(p_list[i],RightLen-i,HAND_IN_CARDS_TAG_ID+2*20+i);
-				p_list[i]->setScale(0);
-				p_list[i]->runAction(Sequence::create(DelayTime::create(timeXH[2]+0.2),ScaleTo::create(0,1),NULL));
-			}
-		}
-		else if(a==1)//DelayTime::create(1.7)
-		{
-			x=_layout->_playerPosi[2].basePoint.x+10;
-			y=_layout->_playerPosi[2].basePoint.y+10;
-			y+=((RightHandIn->getTextureRect().size.height)*0.5)*4;
-			for(int i=0;i<4;i++)
-			{
-				p_list[i]=_object->Create(R_IN_CARD);
-				p_list[i]->setAnchorPoint(Vec2(0,0));
-				p_list[i]->setPosition(Vec2(x-10,y-8));
-				y+=((p_list[i]->getTextureRect().size.height)*0.5);
-				myframe->addChild(p_list[i],RightLen-4-i,HAND_IN_CARDS_TAG_ID+2*20+4+i);
-				p_list[i]->setScale(0);
-				p_list[i]->runAction(Sequence::create(DelayTime::create(timeXH[2]+0.8),ScaleTo::create(0,1),NULL));
-			}
-		}
-		else if(a==2)//DelayTime::create(2.3)
-		{
-			x=_layout->_playerPosi[2].basePoint.x+10;
-			y=_layout->_playerPosi[2].basePoint.y+10;
-			y+=((RightHandIn->getTextureRect().size.height)*0.5)*8;
-			for(int i=0;i<4;i++)
-			{
-				p_list[i]=_object->Create(R_IN_CARD);
-				p_list[i]->setAnchorPoint(Vec2(0,0));
-				p_list[i]->setPosition(Vec2(x-10,y-8));
-				y+=((p_list[i]->getTextureRect().size.height)*0.5);
-				myframe->addChild(p_list[i],RightLen-8-i,HAND_IN_CARDS_TAG_ID+2*20+8+i);
-				p_list[i]->setScale(0);
-				p_list[i]->runAction(Sequence::create(DelayTime::create(timeXH[2]+1.4),ScaleTo::create(0,1),NULL));
-			}
-		}
-		else if(a==3)//DelayTime(2.9)
-		{	
-			x=_layout->_playerPosi[2].basePoint.x+10;
-			y=_layout->_playerPosi[2].basePoint.y+10;
-			y+=((RightHandIn->getTextureRect().size.height)*0.5)*12;
-			lastTwo[0]=_object->Create(R_IN_CARD);
-			lastTwo[0]->setAnchorPoint(Vec2(0,0));
-			lastTwo[0]->setPosition(Vec2(x-10,y-8));
-			myframe->addChild(lastTwo[0],RightLen-12,HAND_IN_CARDS_TAG_ID+2*20+12);
-			lastTwo[0]->setScale(0);	
-			lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[2]+2),ScaleTo::create(0,1),NULL));
-			if(zhuang==2)
-			{
-				y=_layout->_playerPosi[2].basePoint.y+10;
-				y+=((RightHandIn->getTextureRect().size.height)*0.5)*13;
-				lastTwo[1]=_object->Create(R_IN_CARD);
-				lastTwo[1]->setAnchorPoint(Vec2(0,0));
-				lastTwo[1]->setPosition(Vec2(x-10,y-8));
-				myframe->addChild(lastTwo[1],RightLen-13,HAND_IN_CARDS_TAG_ID+2*20+13);
-				lastTwo[1]->setScale(0);	
-				lastTwo[1]->runAction(Sequence::create(DelayTime::create(timeXH[2]+2),ScaleTo::create(0,1),NULL));
-			}
-		}
+
+
+    for(a=0;a<3;a++) {
+        _RightBatchDistribute(a,timeXH[2]);
+    }
+
+	x=_layout->_playerPosi[2].basePoint.x+10;
+	y=_layout->_playerPosi[2].basePoint.y+10;
+	y+=((RightHandIn->getTextureRect().size.height)*0.5)*12;
+	lastTwo[0]=_object->Create(R_IN_CARD);
+	lastTwo[0]->setAnchorPoint(Vec2(0,0));
+	lastTwo[0]->setPosition(Vec2(x-10,y-8));
+	myframe->addChild(lastTwo[0],RightLen-12,HAND_IN_CARDS_TAG_ID+2*20+12);
+	lastTwo[0]->setScale(0);	
+	lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[2]+2),ScaleTo::create(0,1),NULL));
+    
+	if(zhuang==2) {
+		y=_layout->_playerPosi[2].basePoint.y+10;
+		y+=((RightHandIn->getTextureRect().size.height)*0.5)*13;
+		lastTwo[1]=_object->Create(R_IN_CARD);
+		lastTwo[1]->setAnchorPoint(Vec2(0,0));
+		lastTwo[1]->setPosition(Vec2(x-10,y-8));
+		myframe->addChild(lastTwo[1],RightLen-13,HAND_IN_CARDS_TAG_ID+2*20+13);
+		lastTwo[1]->setScale(0);	
+		lastTwo[1]->runAction(Sequence::create(DelayTime::create(timeXH[2]+2),ScaleTo::create(0,1),NULL));
 	}
 
-
-    /* left */
-	//左手
+	/**********************************************************
+        distribute to left player
+    **********************************************************/
 	Point LeftHandoutEnd=Vec2(_layout->_playerPosi[0].basePoint.x+10,_layout->_playerPosi[0].basePoint.y+10);
 	Sprite* LeftRobotHandCard[4];
 	Vec2 LeftHandPosition[4];
@@ -3769,7 +3746,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		myframe->addChild(LeftRobotHandCard[a],3,START_CARDS_IN_TAG_ID+3*a);
 		LeftHandPosition[a]=LeftRobotHandCard[a]->getPosition();
 	}
-	//float changingPosition[4];
+
 	for(a=0;a<4;a++)
 	{
 		for (b = 0; b < 4; b++)
@@ -3797,7 +3774,7 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 
 	for(a=0;a<3;a++)
 	{
-	    _4CardsDistribute(a,timeXH[0]);
+	    _LeftBatchDistribute(a,timeXH[0]);
     }
 
 	x=_layout->_playerPosi[0].basePoint.x+10;
@@ -3823,6 +3800,12 @@ void NetRaceLayer::effect_Distribute_Card(int zhuang)
 		lastTwo[1]->runAction(Sequence::create(DelayTime::create(timeXH[0]+2),ScaleTo::create(0,1),NULL));
 	}
 
+
+
+
+	/**********************************************************
+        
+    **********************************************************/
 	myframe->_ID=zhuang;
 	_roundManager->_isCardFromOthers=false;
 

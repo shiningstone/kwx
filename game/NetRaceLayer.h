@@ -239,8 +239,9 @@ public:
 	void init_role(Role *s_p[],Raction *p_parter[]);//玩家对象初始化
 	void create_race();//创建比赛场景
 	void _UpdateResidueCards(int no);//更新剩余牌数
-    void _4CardsDistribute(int sequenceNo, float delayRef);
-	void effect_Distribute_Card(int zhuang);//发牌效果
+    void _RightBatchDistribute(int batchIdx, float delayRef);
+    void _LeftBatchDistribute(int batchIdx, float delayRef);
+	void FirstRoundDistributeEffect(int zhuang);//发牌效果
 	/***********callback function***********************/
     void QiEffect();
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
