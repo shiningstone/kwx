@@ -239,8 +239,8 @@ public:
 	void init_role(Role *s_p[],Raction *p_parter[]);//玩家对象初始化
 	void create_race();//创建比赛场景
 	void _UpdateResidueCards(int no);//更新剩余牌数
-    void _RightBatchDistribute(int batchIdx, float delayRef);
-    void _LeftBatchDistribute(int batchIdx, float delayRef);
+    void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
+    void _LeftBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
 	void FirstRoundDistributeEffect(int zhuang);//发牌效果
 	/***********callback function***********************/
     void QiEffect();
