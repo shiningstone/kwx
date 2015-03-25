@@ -29,9 +29,9 @@ public:
     RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();
 
-    void RecvPeng();
-    void RecvHu();
-    void RecvGang();
+    void RecvPeng(PlayerDir_t dir);
+    void RecvHu(PlayerDir_t dir);
+    void RecvGang(PlayerDir_t dir);
     void RecvQi();
     void RecvHandout(int idx,Vec2 touch,int mode);
     /*internal action*/

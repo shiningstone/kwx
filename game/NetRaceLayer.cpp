@@ -135,7 +135,7 @@ void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvPeng();
+            _roundManager->RecvPeng(MIDDLE);
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -160,7 +160,7 @@ void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touch
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvHu();
+            _roundManager->RecvHu(MIDDLE);
 			break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -179,7 +179,7 @@ void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvGang();
+            _roundManager->RecvGang(MIDDLE);
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -239,11 +239,13 @@ void NetRaceLayer::ListenToTingButton()
 ***********************************************/
 void NetRaceLayer::QiEffect() {
     _effect->Hide(QI_REMIND_ACT_TAG_ID);
+
     _QiEffect(MIDDLE);
 }
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
     _effect->Hide(PENG_REMIND_ACT_TAG_ID);
+    
     _PengEffect(dir,prevDir,card);
 }
 
@@ -263,22 +265,13 @@ void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
     }
 }
 
-void NetRaceLayer::GangEffect(Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
-    Button *button = (Button *)myframe->getChildByTag(GANG_REMING_ACT_TAG_ID);
-    button->setTouchEnabled(false);
+void NetRaceLayer::GangEffect(PlayerDir_t winner,Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
+    _effect->Hide(GANG_REMING_ACT_TAG_ID);
     
-    button->_ID=MIDDLE;
-
     if(isAnGang) {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){
-            _AnGangEffect(MIDDLE,card,gangCardIdx);
-        }),NULL));
+        _AnGangEffect(winner,card,gangCardIdx);
     } else {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){
-            _MingGangEffect(MIDDLE,prevPlayer,(Card_t)card,gangCardIdx);
-        }),NULL));
+        _MingGangEffect(winner,prevPlayer,(Card_t)card,gangCardIdx);
     }
 }
 

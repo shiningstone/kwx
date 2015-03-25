@@ -362,7 +362,7 @@ int RoundManager::FindGangCards(int dir,int cards[4],Card_t target) {
     return 0;
 }
 
-void RoundManager::RecvPeng() {
+void RoundManager::RecvPeng(PlayerDir_t dir) {
     Card        card;
     PlayerDir_t prevPlayer;
     
@@ -383,13 +383,13 @@ void RoundManager::RecvPeng() {
         RecordOutCard(card);
     
         prevPlayer = (PlayerDir_t)_curPlayer;
-        _curPlayer=MIDDLE;
+        _curPlayer=dir;
     }
 
     _uiManager->PengEffect((PlayerDir_t)_curPlayer,prevPlayer,(Card_t)card.kind);
 }
 
-void RoundManager::RecvHu() {
+void RoundManager::RecvHu(PlayerDir_t dir) {
     if(_isWaitDecision) {
         _isWaitDecision = false;
         _actionToDo = _tempActionToDo;
@@ -402,7 +402,7 @@ void RoundManager::RecvHu() {
 
     /*!!!just for compile reason for now, the value should be set before play effect*/
     WinInfo_t win;
-    win.player = (PlayerDir_t)_curPlayer;
+    win.player = (PlayerDir_t)dir;
     if(_isDoubleHuAsking) {
         win.kind = DOUBLE_WIN;
     }
@@ -410,7 +410,7 @@ void RoundManager::RecvHu() {
     _uiManager->HuEffect(win, _isQiangGangAsking);
 }
 
-void RoundManager::RecvGang() {
+void RoundManager::RecvGang(PlayerDir_t dir) {
     if(_isGangAsking)//is this judgement neccessary?
         _isGangAsking = false;
     
@@ -425,9 +425,9 @@ void RoundManager::RecvGang() {
     int* gangCardIdx=new int[4];
     Card_t card;
     
-	auto list=_players[1]->get_parter()->get_card_list();
+	auto list=_players[dir]->get_parter()->get_card_list();
 	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
-		_lastActionSource = 1;
+		_lastActionSource = dir;
         
 		if(_actionToDo&a_AN_GANG) {
 			_actionToDo=a_AN_GANG;
@@ -439,17 +439,17 @@ void RoundManager::RecvGang() {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        FindGangCards(1,gangCardIdx);
+        FindGangCards(dir,gangCardIdx);
         card =(Card_t)list->data[gangCardIdx[0]].kind;
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
 		}
 
-        _uiManager->GangEffect(card,gangCardIdx);
+        _uiManager->GangEffect(dir,card,gangCardIdx);
 	}
 	else if( _actionToDo & a_MING_GANG ) {
-		_lastActionSource=1;
+		_lastActionSource=dir;
 		_actionToDo=a_MING_GANG;
 		_lastAction=a_MING_GANG;
 		_lastActionWithGold=a_MING_GANG;
@@ -466,15 +466,15 @@ void RoundManager::RecvGang() {
 			RecordOutCard(GangCard);
 			RecordOutCard(GangCard);
             
-			_curPlayer=1;
+			_curPlayer=dir;
 		}else {
 			GangCard=list->data[list->len-1];
 			RecordOutCard(GangCard);
 		}
 
-        FindGangCards(1,gangCardIdx,(Card_t)GangCard.kind);
+        FindGangCards(dir,gangCardIdx,(Card_t)GangCard.kind);
 
-        _uiManager->GangEffect((Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
+        _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
 	}
 }
 
