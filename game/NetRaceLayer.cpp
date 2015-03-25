@@ -238,13 +238,8 @@ void NetRaceLayer::ListenToTingButton()
         effect entrances
 ***********************************************/
 void NetRaceLayer::QiEffect() {
-    Button *curButton = (Button *)myframe->getChildByTag(QI_REMIND_ACT_TAG_ID);
-    curButton->setTouchEnabled(false);
-    curButton->_ID = MIDDLE;
-
-    curButton->runAction(Sequence::create(
-        ScaleTo::create(0.1,1),CallFunc::create([=](){  
-        _QiEffect(MIDDLE);}),NULL));
+    _effect->Hide(QI_REMIND_ACT_TAG_ID);
+    _QiEffect(MIDDLE);
 }
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {

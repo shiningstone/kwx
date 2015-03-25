@@ -90,5 +90,7 @@ typedef enum {
     HU_WIN,
 }GoldKind_t;
 
+typedef int TagId_t;
+
 #endif
 

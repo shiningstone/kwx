@@ -6,6 +6,18 @@ GraphicEffect::GraphicEffect() {
     _voice = VoiceEffect::getInstance();
 }
 
+void GraphicEffect::Hide(Node *parent,TagId_t buttonTag) {
+    Button *button = (Button *)parent->getChildByTag(buttonTag);
+
+    if(button!=NULL) {
+        button->setTouchEnabled(false);
+        button->_ID = MIDDLE;
+        
+        button->runAction(Sequence::create(
+            ScaleTo::create(0.1,1),NULL));
+    }
+}
+
 TargetedAction *GraphicEffect::Shade(Node* target) {
     return TargetedAction::create(target,
         Sequence::create(
