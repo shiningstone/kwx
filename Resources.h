@@ -22,7 +22,7 @@
 #define INT_TOTAL_SCORE					"total_score"
 #define INT_RANK_INFO					"rank"
 
-#define START_CALLBACK_EVENT_TYPE		"start_callback"
+#define START_CALLBACK_EVENT_TYPE		"start_game"
 #define WAIT_START_CALLBACK_EVENT_TYPE	"wait_race_again"
 #define NOONE_WIN_EVENT_TYPE			"noone_win"
 #define DISTRIBUTE_CALL_EVENT_TYPE		"distribute_card_call"

@@ -17,6 +17,9 @@ USING_NS_CC;
 #include "./../protocol/EnvVariables.h"
 /**************************/
 
+/************************************************
+                init 
+************************************************/
 NetRaceLayer::NetRaceLayer()
 :PREMIUM_LEAST(200)
 {
@@ -75,7 +78,7 @@ bool NetRaceLayer::init() {
 }
 
 /************************************************
-                interface 
+                start 
 ************************************************/
 void NetRaceLayer::create_race()
 {
@@ -115,2520 +118,89 @@ void NetRaceLayer::create_race()
     this->addChild(StartButton,2,START_GAME_TAG_ID);
 }
 
-void NetRaceLayer::distribute_event(const std::string event_type,void* val)
+void NetRaceLayer::start_game()
 {
-    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
-	_eventDispatcher->dispatchCustomEvent(event_type,val);
-}
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
 
-/***********************************************
-        buttons
-***********************************************/
-void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
+	if(!_isResoucePrepared) {
+		_isResoucePrepared=true;
+		_ResourcePrepare();
+	}
+
+    _Remove(this,GAME_BKG_TAG_ID);
+    _Remove(this,START_GAME_TAG_ID);
+    _Remove(this,START_GAME_TAG_ID+1);
+    _Remove(this,RACE_RESTART_TAG_ID);
+    _Remove(this,RACE_RESTART_TAG_ID+1);
+    _Remove(this,SHINE_TAG_ID);
+    _Remove(this,SHINE_TAG_ID+1);
+    _Remove(this,RACE_ACCOUT_TAG_ID);
+    _Remove(this,HUANG_ZHUANG_LAYER);
+    _Remove(this,HUANG_ZHUANG_FONT);
+
+    _Show(this,MING_STATUS_PNG_0,false);
+    _Show(this,MING_STATUS_PNG_1,false);
+    _Show(this,MING_STATUS_PNG_2,false);
     
-	switch (type) {
-    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-    		curButton->setScale(1.2);
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::MOVED:
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvPeng(MIDDLE);
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-    		curButton->setScale(1);
-    		break;
-    	default:
-    		break;
+	for(int i=0;i<4;i++) {
+		while(this->getChildByTag(GOLD_NUM_INSERT_JINBI+i))
+			this->removeChildByTag(GOLD_NUM_INSERT_JINBI+i,true);
+	}
+    
+    _roundManager->RenewOutCard();
+    
+    _DistributeEvent(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
+
+	myframe = LayerColor::create(Color4B(0,0,0,0),visibleSize.width,visibleSize.height);
+	myframe->setPosition(Vec2(origin.x, origin.y));
+	this->addChild(myframe,3,GAME_BKG_TAG_ID);
+
+	distributeCardPos=Vec2::ZERO;
+	ifUpdateDuringEffect=false;
+	_isCardInHandUpdated=false;
+	ifInsertCardsTime=false;
+	ifEffectTime=false;
+    _myChosenCard = -1;
+    
+	_roundManager->_isGameStart=false;
+    _roundManager->_cardHolders[1]->_isReady = true;
+	GuiShowReady(1);
+    _roundManager->NotifyStart();
+
+    _roundManager->WaitUntilAllReady();
+
+	_ReceBeginPrepare();                  //牌局开始效果
+
+    int lastWinner = _roundManager->GetLastWinner();
+    _roundManager->_actionToDo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
+	if(_roundManager->_actionToDo!=a_TIMEOUT) {
+		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
+		FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果。
 	}
 }
 
-void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	_roundManager->_actionToDo = a_HU;
-    
-	auto curButton=(Button*)pSender;
-    curButton->_ID = pSender->_ID;
-	int no = pSender->_ID;
-
-    switch(type) {
-    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-    		curButton->setScale(1.2);
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::MOVED:
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvHu(MIDDLE);
-			break;
-    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-    		curButton->setScale(1);
-    		break;
-	}
-}
-
-void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
-
-	switch (type){
-    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-    		curButton->setScale(1.2);
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::MOVED:
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _roundManager->RecvGang(MIDDLE);
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-    		curButton->setScale(1);
-    		break;
-    	default:
-    		break;
-	}
-}
-
-void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
-
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		curButton->setScale(1.2);
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-        _roundManager->RecvQi();
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		curButton->setScale(1);
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::ListenToTingButton()
-{
-	auto TingListener = EventListenerTouchOneByOne::create();
-	TingListener->setSwallowTouches(false);
-    
-	TingListener->onTouchBegan=[=](Touch* touch, Event* event) {
-		return true;
-	};
-	TingListener->onTouchMoved=[=](Touch* touch, Event* event) {};
-	TingListener->onTouchEnded=[=](Touch* touch, Event* event) {
-		auto button = (Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
-
-        if( !_IsClickedOn(button,touch) ) {
-            ifTingSignBarVisible=false;
-		} else {
-			ifTingSignBarVisible = !ifTingSignBarVisible;
-		}
-
-        _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
-	};
-    
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
-}
-
-/***********************************************
-        effect entrances
-***********************************************/
-void NetRaceLayer::QiEffect() {
-    _effect->Hide(myframe,QI_REMIND_ACT_TAG_ID);
-
-    _QiEffect(MIDDLE);
-}
-
-void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
-    _effect->Hide(myframe,PENG_REMIND_ACT_TAG_ID);
-    
-    _PengEffect(dir,prevDir,card);
-}
-
-void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
-    _effect->Hide(myframe,HU_REMIND_ACT_TAG_ID);
-    
-    if(qiangGang) {
-        delete_act_tip();
-        _HuEffect(win.player);
-    } else if(win.kind==DOUBLE_WIN) {
-        _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
-        delete_act_tip();
-        _HuEffect(3);   /*why use event rather than call*/
-        distribute_event(DOUBLE_HU_WITH_ME,NULL);
-    } else {
-        _HuEffect(win.player);
-    }
-}
-
-void NetRaceLayer::GangEffect(PlayerDir_t winner,Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
-    _effect->Hide(myframe,GANG_REMING_ACT_TAG_ID);
-    
-    if(isAnGang) {
-        _AnGangEffect(winner,card,gangCardIdx);
-    } else {
-        _MingGangEffect(winner,prevPlayer,(Card_t)card,gangCardIdx);
-    }
-}
-
-void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
-    HideClock();
-
-    if(win.player!=MIDDLE) {
-        if(_roundManager->IsTing(1)) {
-            _HuEffect(3);
-            distribute_event(DOUBLE_HU_WITH_ME,NULL);
-        } else {
-            _roundManager->WaitForMyAction();
-        }
-    }
-}
-
-void NetRaceLayer::SingleWin(const WinInfo_t &win) {
-    HideClock();
-
-    if(win.player==MIDDLE) {
-        if(_roundManager->IsTing(MIDDLE)) {
-            _HuEffect(win.player);
-        } else {
-            _roundManager->WaitForMyAction();
-        }
-
-    } else {
-        _HuEffect(win.player);
-    }
-}
-
-void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
-    myframe->runAction(Sequence::create(CallFunc::create([=](){
-        GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
-        _roundManager->DistributeCard();}),NULL));
-}
-
-/*********************************************
-        player middle card select
-*********************************************/
-/*****************************/
-/* only used when select card */
-void NetRaceLayer::_GetCardsInfo(CardsInfo_t *info) {
-    info->list  = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-    info->start = info->list->atcvie_place;
-    info->last   = info->list->len - 1;
-    info->residual = (info->list->len - info->list->atcvie_place)%3;
-}
-/*****************************/
-void NetRaceLayer::HandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
-{
-    if(time==2) {
-        if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
-            myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
-        }
-    } else {
-        _ReOrderCardsInHand(chosenCard,list);
-    }
-    
-	_HandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
-}
-
-void NetRaceLayer::_HandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToMing)
-{
-	if(time==1) {
-		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
-			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
-	}
-
-    if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)!=NULL)
-		myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);// why without true/false
-
-    _Show(myframe, TING_SING_BAR, false);
-    _Remove(myframe, MING_CANCEL);// why called twice ???
-
-	BezierTo *bizerMotion;
-    auto cardOut = _object->CreateRiverCard(MIDDLE,outCard);
-    
-	if(time==1) {
-		cardOut->setPosition(touch);
-		bizerMotion = BizerMove1(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
-		                touch);
-    }
-	else {
-		cardOut->setPosition(touch.x,100);
-		bizerMotion = BizerMove2(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
-		                touch,time);
-    }
-    myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
-
-	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
-
-    Spawn* mingEffect = turnToMing?
-                (Spawn::create(
-                    _ShowBigMing(myframe),
-                    _MingAnimation(),NULL))
-                :(Spawn::create(CallFunc::create([=](){;}),NULL));
-        
-	Spawn* allEffect = Spawn::create(
-            mingEffect,TargetedAction::create(
-            cardOut,Sequence::create(Spawn::create(
-                bizerMotion,
-                speakCard,NULL),
-                _voice->Speak("give"),NULL)),CallFunc::create([=](){
-            ifInsertCardsTime=true;}),CallFunc::create([=](){
-            delete_ActionRemind();}),NULL);
-
-	myframe->_ID=1;
-	_roundManager->_isCardFromOthers = true;
-    
-	myframe->runAction(Sequence::create(
-        allEffect,
-        DelayTime::create(0.12),CallFunc::create([=](){
-        ifInsertCardsTime=false;}),Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::update_card_in_river_list)),CCCallFunc::create([=]() {
-    		_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
-            _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
-    		if(_isCardInHandUpdated)
-    			_isCardInHandUpdated = false;
-    		else {
-                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
-    			card_list_update(1);
-    		}}),NULL),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::waitfor_response)),
-        NULL));
-}
-
-int NetRaceLayer::_FindCard(int start,int end,Touch *touch) {
-    for(int i=start;i<=end;i++) {
-        if( _IsClickedOn(_GetCardInHand(MIDDLE,i),touch) ) {
-            return i;
-        }
-    }
-
-    return INVALID;
-}
-
-/*******************************************
-        choose card
-*******************************************/
-void NetRaceLayer::ListenToCardTouch() {
-	if( !_roundManager->IsTing(MIDDLE) && !_roundManager->_isTuoGuan ) {
-        auto listener = EventListenerTouchOneByOne::create();
-        listener->setSwallowTouches(true);
-        
-        listener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_CardTouchBegan,this);
-        listener->onTouchMoved = CC_CALLBACK_2(NetRaceLayer::_CardTouchMove,this);
-        listener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_CardTouchEnd,this);
-
-        Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
-   }
-}
-
-bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
-    if( ifInsertCardsTime ) {
-        ifInsertCardsTime=false;
-        
-        card_list_update(MIDDLE);
-        _isCardInHandUpdated=true;
-    }
-    
-    if( ifEffectTime && ifUpdateDuringEffect ) {
-        ifUpdateDuringEffect=false;
-        card_list_update(MIDDLE);
-    }
-
-    ifChosed=false;
-    
-    if( touch->getLocation().y > visibleSize.height*0.173 ) {
-        /* why is there TING_SING_BAR if non-ting??? from others??? */
-        while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(1)))
-            myframe->removeChildByTag(TING_SING_BAR);
-        
-        float x1,y1;
-        x1 = _layout->_playerPosi[MIDDLE].basePoint.x+10;
-        y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
-
-        CardsInfo_t cards = {0};
-        _GetCardsInfo(&cards);
-        
-        const auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
-        const auto cardSize = _object->RectSize(FREE_CARD);
-
-        for(int i=cards.start; i<=cards.last; i++) {
-            auto card = _GetCardInHand(MIDDLE,i);
-            card->_ID = 1;
-            card->setScale(1);
-            card->setAnchorPoint(Vec2(0,0));
-
-            if(i==cards.last && cards.residual==2) {
-                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start)+30,y1));
-            } else {
-                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start),y1));
-            }
-        }
-        
-        _myChosenCard = INVALID;
-    }
-    
-    return true;
-}
-
-void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
-    CardsInfo_t cards = {0};
-    _GetCardsInfo(&cards);
-    
-	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && touch->getLocation().y>visibleSize.height*0.173) {
-		myframe->getChildByTag(CHOOSE_CARD_TAG_ID)->setPosition(touch->getLocation());
-		_myChosenCard = _myTouchedCard;
-		return;
-	} 
-    
-    for(int i=cards.start; i<=cards.last; i++) {
-        _GetCardInHand(MIDDLE,i)->setOpacity(255);
-	}
-    
-	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL) {
-		myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
-    }
-    
-    int chosen = _FindCard(cards.start, cards.last, touch);
-    if(chosen!=INVALID) {
-        _UpdateCardsInHand(cards,chosen);
-    } else if(touch->getLocation().y>visibleSize.height*0.173) {
-		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)==NULL && ifChosed==true) {
-			int  kind = _roundManager->_players[MIDDLE]->get_parter()->get_card_list()->data[_myTouchedCard].kind;
-
-			auto freeCard = _object->Create(FREE_CARD);
-			auto card = _object->CreateKind((Card_t)kind,NORMAL);
-            
-			freeCard->addChild(card);
-			card->setPosition(Vec2(
-                freeCard->getTextureRect().size.width/2,
-                freeCard->getTextureRect().size.height*0.4));
-			freeCard->setScale(1.2);
-			freeCard->setPosition(touch->getLocation());
-
-			myframe->addChild(freeCard,35,CHOOSE_CARD_TAG_ID);
-			_GetCardInHand(MIDDLE,_myTouchedCard)->setOpacity(150);
-
-			while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)))
-				myframe->removeChildByTag(TING_SING_BAR,true);
-            
-			_myChosenCard = _myTouchedCard;
-		}
-	}
-}
-
-void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
-    CardsInfo_t cards = {0};
-    _GetCardsInfo(&cards);
-    
-	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL 
-        && (touch->getLocation().y>visibleSize.height*0.2)) {
-		if(_roundManager->_isMyShowTime) {
-			_roundManager->_isMyShowTime=false;
-            
-			_myChosenCard=INVALID;
-
-            _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),1);
-		} else {
-			_myChosenCard=_myTouchedCard;
-
-            _GetCardInHand(MIDDLE,_myTouchedCard)->setOpacity(255);
-            _Remove(myframe,CHOOSE_CARD_TAG_ID);
-		}
-		return;
-	}
-    
-    for(int i=cards.start; i<=cards.last; i++) {
-		_GetCardInHand(MIDDLE,i)->setOpacity(255);
-    }
-
-    _Remove(myframe,CHOOSE_CARD_TAG_ID);
-    
-	int chosen = _FindCard(cards.start, cards.last, touch);
-    if(chosen!=INVALID) {
-        _UpdateNonChosenCards(cards,chosen);
-
-		float x = _layout->_playerPosi[MIDDLE].basePoint.x+10;
-		float y = _layout->_playerPosi[MIDDLE].basePoint.y+10;
-		auto cardSize = _object->RectSize(FREE_CARD);
-        auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
-
-        _myChosenCard = chosen;
-
-        Sprite *loopCard = _GetCardInHand(MIDDLE,chosen);
-		bool ChooseConfirm = false;
-
-        if(chosen==cards.last) {
-            if(loopCard->_ID!=100) {
-                loopCard->_ID=100;
-                
-                if(cards.residual==1)
-                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen-cards.start),y+10));
-                else if(cards.residual==2)
-                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen-cards.start)+30,y+10));
-                
-                if(loopCard->getScale()==1) {
-                    loopCard->runAction(_voice->Speak("select"));
-                }
-                
-                loopCard->setScale(1.2);
-            } else {
-                ChooseConfirm=true;
-            }
-        } else {
-            if(loopCard->_ID!=100) {
-                loopCard->_ID=100;
-                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards.start),y+10));
-                if(loopCard->getScale()==1)
-                    loopCard->runAction(_voice->Speak("select"));
-                loopCard->setScale(1.2);
-            } else {
-                ChooseConfirm=true;
-            }
-        }
-
-        if(chosen!=cards.last) {/* why??? */
-            if(_roundManager->_actionToDo==a_MING && !_roundManager->IsTing(MIDDLE)
-                && _roundManager->_isMingTime ) {
-                while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)) )
-                    myframe->removeChildByTag(TING_SING_BAR);
-                
-                Point curPos=loopCard->getPosition();
-                tingHintCreate(curPos,chosen);
-            }
-        }
-        
-		if(ChooseConfirm && _roundManager->_isMyShowTime) {
-			_roundManager->_isMyShowTime=false;
-            
-			_myChosenCard=INVALID;
-			_myTouchedCard = chosen;
-
-            _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
-		}
-    }
-}
-
-/***************************************************************
-        interface with player
-***************************************************************/
-void NetRaceLayer::peng_dispatch(Node *psender){
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	int no=psender->_ID;
-    
-	_roundManager->_isCardFromOthers=true;
-	_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_PENG);
-}
-
-void NetRaceLayer::minggang_dispatch(Node *psender)
+/* !!!this function not used right now, it should be called somewhere */
+void NetRaceLayer::race_start_again()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
-	int no=psender->_ID;
+	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
+        _roundManager->Shuffle();
+		_roundManager->_distributedNum = 40;
+	});
 
-    _roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING_GANG);
-}
+	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);
 
-void NetRaceLayer::angang_dispatch(Node *psender)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	int no=psender->_ID;
-
-    if(_roundManager->_actionToDo&a_AN_GANG)
-		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_AN_GANG);
-	else if(_roundManager->_actionToDo&a_SHOU_GANG)
-		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_SHOU_GANG);
-}
-
-
-/*************************************************************
-        effect
-*************************************************************/
-void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
-	myframe->_ID = dir;
-    
-	const int riverLast =_roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
-	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast)) {
-		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast);
-	}
-
-	auto outCard = myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
-    auto hideOutcard = Spawn::create(CCCallFunc::create([=](){
-			_Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
-            outCard,Sequence::create(
-                DelayTime::create(0.1),
-                ScaleTo::create(0,0),NULL)),NULL);
-		
-	if(dir!=1) {
-		myframe->runAction(Sequence::create( 
-                            Spawn::create(
-                                _voice->SpeakAction(PENG,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                                simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" ),NULL), 
-                            hideOutcard, 
-                            Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                                NetRaceLayer::delete_act_tip)),   CCCallFuncN::create(this,callfuncN_selector(
-                                NetRaceLayer::peng_dispatch)),    CCCallFuncN::create(this,callfuncN_selector(
-                                NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
-                    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
-                				waitfor_otheraction(dir);}),NULL),NULL));
-	} else {
-		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
-			myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);
-			if(ifEffectTime) {
-				ifEffectTime=false;
-				ifUpdateDuringEffect=false;
-                
-				_roundManager->CancelEffectCard();
-                
-				delete_ActionEffect();
-				card_list_update(dir);
-			}
-		}
-        
-        _roundManager->SetEffectCard(card,c_PENG);
-        
-		ifEffectTime=true;
-		ifUpdateDuringEffect=true;
-
-        /****************
-            hide reminder
-        ****************/
-        auto hideReminder = _HideReminder(PENG_REMIND_ACT_BKG_TAG_ID, 0.18, 1.2);
-	
-        /****************
-            move 3 cards
-        ****************/
-        Sprite *showCards[3] = {0};
-        for(int i=0;i<3;i++) {
-            showCards[i] = _object->Create(PENG_CARD);
-            auto kind = _object->CreateKind(card,MIDDLE_SIZE);
-            kind->setAnchorPoint(Vec2(0.5,0.5));
-            kind->setPosition(Vec2(
-                showCards[i]->getTextureRect().size.width/2,
-                showCards[i]->getTextureRect().size.height*0.65));
-            showCards[i]->addChild(kind);
-            showCards[i]->setAnchorPoint(Vec2(0,0));
-            showCards[i]->setScale(0);
-            myframe->addChild(showCards[i],20,SINGLE_ACTION_EFFECT_TAG_ID+i);
-        }
-
-        const Vec2 REFERENCE = Vec2(origin.x+visibleSize.width*0.445, origin.y+visibleSize.height*0.255);
-        const Size SIZE      = showCards[0]->getTextureRect().size;
-
-		showCards[0]->setPosition( outCard->getPosition() );
-		showCards[1]->setPosition( REFERENCE );
-		showCards[2]->setPosition( Vec2(REFERENCE.x + SIZE.width*0.98, REFERENCE.y) );
-
-		auto action1 = Sequence::create(
-            DelayTime::create(0.48),
-            ScaleTo::create(0,1),
-            MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),
-			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96 + 150, REFERENCE.y)),
-			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),NULL);
-		auto p_seq1 = TargetedAction::create(showCards[0],action1);
-
-		auto action2=Sequence::create(
-            DelayTime::create(0.48),
-            ScaleTo::create(0,1),
-            DelayTime::create(0.12),
-			MoveTo::create(0.12,Vec2(REFERENCE.x - 150, REFERENCE.y)),
-			MoveTo::create(0.12,REFERENCE),NULL);
-		auto p_seq2 = TargetedAction::create(showCards[1],action2);
-
-        auto action3=Sequence::create(
-            DelayTime::create(0.48),
-            ScaleTo::create(0,1),
-            DelayTime::create(0.12),
-			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98 - 150, REFERENCE.y)),
-			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98,       REFERENCE.y)),NULL);
-		auto p_seq3 = TargetedAction::create(showCards[2],action3);
-
-        auto move3PengCards = Spawn::create(p_seq1,p_seq2,p_seq3,NULL);
-
-        /****************
-            move 2 peng cards in hand
-        ****************/
-		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
-        
-		int firstMatch = 0;
-		int secondMatch = 0;
-		for(int i=list->atcvie_place;i<list->len;i++) {
-			if(card==list->data[i].kind) {
-				if(i==0) {
-					firstMatch = 0;
-				} else if(card!=list->data[i-1].kind) {
-					firstMatch = i;
-				} else if(card==list->data[i-1].kind) {
-					secondMatch = i;
-					break;
-				}
-			}
-		}
-
-		int ifZeroPointTwo=0;
-		if(_myChosenCard!=-1) {
-			if(_myChosenCard > secondMatch) {
-				_myChosenCard += 1;
-            }
-			else if(_myChosenCard== secondMatch || _myChosenCard==firstMatch) {
-				ifZeroPointTwo = 1;
-				_myChosenCard = -1;
-			}
-			else if(_myChosenCard<firstMatch)
-				_myChosenCard += 3;
-		}
-
-		auto LeftPengCard = _CreateEffectCard(firstMatch, (CARD_KIND)card);
-		myframe->addChild(LeftPengCard,20,EFFET_NEWCATD1_TAG);
-		auto moveLeftCardInHand = TargetedAction::create(LeftPengCard,Sequence::create(
-            DelayTime::create(0.18),
-            ScaleTo::create(0,0.6),
-            MoveTo::create(0.18,Vec2(
-                origin.x+visibleSize.width*0.45,
-                origin.y+visibleSize.height*0.26)),
-			DelayTime::create(0.12),
-			ScaleTo::create(0,0),NULL));
-
-		auto RightPengCard = _CreateEffectCard(secondMatch, (CARD_KIND)card);
-		myframe->addChild(RightPengCard,20,EFFET_NEWCATD2_TAG);
-
-        /* in case these values are changed during being moved */
-		auto OldRightPos = RightPengCard->getPosition();
-		auto OldCardSize = RightPengCard->getTextureRect().size;
-        
-		auto moveRightCardInHand = TargetedAction::create(RightPengCard,Sequence::create(
-            DelayTime::create(0.18),
-            Spawn::create(
-                ScaleTo::create(0,0.6),
-                MoveTo::create(0,Vec2(
-                    OldRightPos.x-OldCardSize.width*0.4,
-                    OldRightPos.y)),NULL),
-			MoveTo::create(0.18,Vec2(
-			    origin.x+visibleSize.width*0.45+OldCardSize.width*0.6,
-			    origin.y+visibleSize.height*0.26)),
-			DelayTime::create(0.12),
-			ScaleTo::create(0,0),NULL));
-
-        /****************
-            delete 2 peng cards in hand 
-        ****************/
-		auto cardPengSize = _object->RectSize(PENG_CARD);
-        
-        const float GAP = (list->atcvie_place==0)? 0.5 : 0;
-        
-		Vector<FiniteTimeAction *> hide2CardsInhand;
-
-		for(int i=list->atcvie_place;i<list->len;i++) {
-			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
-            Sequence *seq;
-
-            if(i==firstMatch||i==secondMatch) {
-				seq = Sequence::create(
-                    ScaleTo::create(0,0),NULL);
-            } else {
-				auto curPos   = s_card->getPosition();
-				auto cardSize = s_card->getTextureRect().size;
-
-                if (i<firstMatch) {
-                    seq = Sequence::create(
-                        DelayTime::create(0.18),
-                        MoveTo::create(0.3,Vec2(
-                            curPos.x + cardPengSize.width*(3.5+GAP),
-                            curPos.y)),NULL);
-                } else {
-                    seq = Sequence::create(
-                        DelayTime::create(0.18),
-                        MoveTo::create(0.3,Vec2(
-                            curPos.x + (cardPengSize.width*(3.5+GAP)) - cardSize.width*(2 + ifZeroPointTwo*0.2),
-                            curPos.y)),NULL);
-                }
-            }
-            
-            hide2CardsInhand.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
-		}
-        
-        /****************
-            tag update 
-        ****************/
-		for(int a=list->len-1; a>=list->atcvie_place; a--) {
-			int curTag = HAND_IN_CARDS_TAG_ID + 1*20 + a;
-            
-			if(!myframe->getChildByTag(curTag))
-				continue;
-            
-			auto curCard = (Sprite*)myframe->getChildByTag(curTag);
-            
-			if(a>secondMatch)
-				curCard->setTag(curTag+1);
-			else if(a==secondMatch)
-				curCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-			else if(a==firstMatch)
-				curCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-			else if(a<firstMatch && a>list->atcvie_place)
-				curCard->setTag(curTag+3);
-            else if(a==list->atcvie_place) {
-				curCard->setTag(curTag+3);
-            }
-		}
-        /* why not set this value directly??? */
-        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + list->atcvie_place);
-        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_TWO))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + list->atcvie_place+1);
-
-        auto EmptyCard=_object->Create(FREE_CARD);
-        EmptyCard->setAnchorPoint(Vec2(1,1));
-        EmptyCard->setScale(0);
-        EmptyCard->setPosition(Vec2::ZERO);
-        myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID + 1*20 + list->atcvie_place+2);
-
-        /****************
-            background effect
-        ****************/
-		auto light = Sprite::createWithSpriteFrameName("Q3.png");
-		light->setPosition(Vec2(origin.x+visibleSize.width*0.445+showCards[0]->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
-		myframe->addChild(light,23,IMG_Q3_EFFECT_TAG_ID);
-		light->setOpacity(60);
-		light->setScale(0);
-		BlendFunc tmp_oBlendFunc = {GL_SRC_ALPHA, GL_ONE};
-		light->setBlendFunc(tmp_oBlendFunc);
-		auto lightEffect = TargetedAction::create(light, Sequence::create(
-    		DelayTime::create(0.84),
-    		ScaleTo::create(0,1),
-    		DelayTime::create(0.48),
-    		FadeOut::create(0),NULL));
-
-		auto circle=Sprite::createWithSpriteFrameName("Q15.png");
-		circle->setPosition(Vec2(origin.x+visibleSize.width*0.445+showCards[0]->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
-		circle->setTag(4);
-		circle->setScale(2.0);
-		circle->setScale(0);
-		myframe->addChild(circle,21,IMG_Q15_EFFECT_TAG_ID);
-		auto circleEffect = TargetedAction::create(circle,Sequence::create(
-            DelayTime::create(0.84),
-            ScaleTo::create(0,1.8), Spawn::create(
-                ScaleTo::create(0.48,2.0),
-                FadeOut::create(0.48),NULL),NULL));
-
-		auto fire = Sprite::createWithSpriteFrameName("G1.png");
-		fire->setPosition( Vec2(
-            origin.x + visibleSize.width*0.445 + showCards[0]->getTextureRect().size.width*1.96,
-            origin.y + visibleSize.height*0.315));
-		fire->setTag(4);
-		fire->setScale(0);
-		myframe->addChild(fire,23,IMG_G1_EFFECT_TAG_ID);
-
-		auto animation = Animation::create();
-		animation->addSpriteFrameWithFile("G1.png");
-		animation->addSpriteFrameWithFile("G2.png");
-		animation->addSpriteFrameWithFile("G3.png");
-		animation->addSpriteFrameWithFile("G4.png");
-		animation->setDelayPerUnit(0.1f);
-		animation->setRestoreOriginalFrame(true);
-		auto fireAnimation = Animate::create(animation);
-		auto fireEffect = TargetedAction::create(fire,Sequence::create(
-            DelayTime::create(0.84),
-            ScaleTo::create(0,1),
-            fireAnimation,
-            ScaleTo::create(0,0),NULL));
-        
-		auto backGoundEffect = Spawn::create(
-            lightEffect,
-            circleEffect,
-            fireEffect,NULL);
-
-
-
-        
-		Spawn *simple_seq = simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" );
-        
-		auto PengEffectNode = Node::create();
-		PengEffectNode->_ID=1;
-		myframe->addChild(PengEffectNode,1,PENG_EFFECT_NODE_ID);
-        
-		auto callFunc_update_list = CCCallFunc::create([=](){
-			if(ifEffectTime) {
-
-                ifEffectTime=false;
-                
-				if(ifUpdateDuringEffect) {
-					ifUpdateDuringEffect=false;
-					_roundManager->CancelEffectCard();
-					card_list_update(dir);
-				} else  {
-                    int sameCardNum = 0;
-
-                    for(int a=list->atcvie_place-1;a>=0;a--) {
-						if( _roundManager->IsCurEffectCard(list->data[a]) ){
-							sameCardNum++;
-							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
-                            
-							if(sameCardNum==3){
-								_roundManager->CancelEffectCard();
-								break;
-							}
-						}
-					}
-				}
-			}
+	auto _calldistributeListener = EventListenerCustom::create(DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
+			distribute_card_event();
 		});
-
-		PengEffectNode->runAction(Sequence::create(
-            hideReminder,Spawn::create(
-                simple_seq,
-                _voice->SpeakAction(PENG,
-                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),Spawn::create(
-                hide2CardsInhand),Spawn::create(
-                moveRightCardInHand,
-                moveLeftCardInHand,NULL),Sequence::create(
-                    DelayTime::create(0.42),
-                    hideOutcard,NULL),Spawn::create(
-                backGoundEffect,
-                move3PengCards,NULL),Sequence::create(
-                DelayTime::create(0.84),
-                _voice->Speak("paizhuangji"),NULL),NULL),Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_ActionEffect)),
-            callFunc_update_list,CallFunc::create([=](){
-			if(myframe->getChildByTag(PENG_EFFECT_NODE_ID))
-				myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);}),/*actcheckagain,*/NULL),NULL));
-        
-        /***************************************
-            it is unneccessary for net-game???
-        ***************************************/
-		myframe->runAction( Sequence::create( 
-            CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::peng_dispatch)), 
-            CCCallFunc::create([=](){
-    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
-    			_roundManager->WaitForMyAction();}), 
-            CallFunc::create([=](){
-                _roundManager->_isMyShowTime=true;}),
-            NULL));
-	}
+	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
 }
-
-void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
-{
-	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
-	delete gang;
-
-    if(no!=1) {
-		myframe->runAction(Sequence::create(
-            Spawn::create(
-                _voice->SpeakAction(GANG,
-                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
-			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::update_card_list)),
-            _voice->Speak("down"), CCCallFunc::create([=](){
-			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
-            _roundManager->DistributeCard();}),NULL),NULL));
-	}
-	else {
-		for(int NodeNum=0;NodeNum<3;NodeNum++) {
-            _Remove(myframe,PENG_EFFECT_NODE_ID+NodeNum);
-            
-			if(ifEffectTime) {
-				ifEffectTime=false;
-				ifUpdateDuringEffect=false;
-                _roundManager->CancelEffectCard();
-				delete_ActionEffect();
-				card_list_update(no);
-			}
-		}
-
-		ifEffectTime=true;
-		ifUpdateDuringEffect=true;
-        /**********************
-            clear screen
-        **********************/
-        auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
-
-        /**********************
-            logical
-        **********************/
-		auto list = _roundManager->_players[no]->get_parter()->get_card_list();
-        Card outCard;
-
-		int ifZeroPointTwo=0;
-		int ifLeft=0;
-		if(_myChosenCard!=-1) {
-			if(_myChosenCard<list->len-5)
-				ifLeft=1;
-			if(_myChosenCard==GangCardsPlace[3]
-                ||_myChosenCard==GangCardsPlace[2]
-                ||_myChosenCard==GangCardsPlace[1]
-                ||_myChosenCard==GangCardsPlace[0]) {
-				if(_myChosenCard!=(list->len-1))
-					ifZeroPointTwo=1;
-				_myChosenCard=-1;
-			} else if(_myChosenCard<GangCardsPlace[3]
-			            &&_myChosenCard>GangCardsPlace[2])
-				_myChosenCard+=1;
-			else if(_myChosenCard<GangCardsPlace[0])
-				_myChosenCard+=4;
-		}
-
-        /**********************
-            move 4 cards
-        **********************/
-        TargetedAction *moveGangCardEffect[4];
-        _CreateGangCardsMotion(moveGangCardEffect);
-
-        /**********************
-            move 4 cards in hand
-        **********************/
-        Size FreeCardSize = _object->RectSize(FREE_CARD);
-		auto curKindOfGang = list->data[GangCardsPlace[0]].kind;
-
-        TargetedAction *moveGangCardInHand[4];
-        _CreateGangCardInHandMotion(moveGangCardInHand, GangCardsPlace, curKindOfGang);
-
-		auto moveAngangCards = Spawn::create(
-            moveGangCardEffect[0],moveGangCardEffect[1],moveGangCardEffect[2],moveGangCardEffect[3],
-            moveGangCardInHand[0],moveGangCardInHand[1],moveGangCardInHand[2],moveGangCardInHand[3],NULL);
-
-        /**********************
-            move free cards in hand
-        **********************/
-        /* is there any possible that a card is activated and its status is FREE ??? */
-        int actionStartPlace=0;
-		for(int i=0;i<=list->atcvie_place;i++)
-			if(list->data[i].status==c_MING_KOU || list->data[i].status==c_FREE) {
-				actionStartPlace = i;
-				break;
-			}
-        auto GangCardSize = _object->RectSize(AN_GANG_CARD);
-
-        const float GAP = (list->atcvie_place==0)?(0.5):(0.0);
-        
-		Vector<FiniteTimeAction *>gang_list_seq;
-		Spawn* moveFreeCards;
-        
-		if( card==list->data[list->len-1].kind ) {
-            int i;
-            for(i=actionStartPlace;i<list->len-1;i++)
-			{
-                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-                TargetedAction *motion;
-                
-				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE))
-				{
-					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            DelayTime::create(0.18),
-                            MoveTo::create(0.3,Vec2(
-                                curPos.x+GangCardSize.width*(3.5+GAP),
-                                curPos.y)),NULL));
-				}
-				else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2])
-				{
-					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            ScaleTo::create(0,0),NULL));
-				}
-				else if(i>GangCardsPlace[2])
-				{
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            DelayTime::create(0.18),
-                            MoveTo::create(0.3,Vec2(
-                                curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2)),
-                                curPos.y)),NULL));
-				}
-
-                gang_list_seq.insert(i-actionStartPlace,motion);
-			}
-            
-			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+list->len-1),
-                Sequence::create(
-                    DelayTime::create(0.18),
-                    ScaleTo::create(0,0),NULL));
-            
-            gang_list_seq.insert(i-actionStartPlace,motion);
-		} else {
-			for(int i=actionStartPlace;i<=list->len-1;i++)
-			{
-                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-                TargetedAction *motion;
-                
-				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE)) {
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            DelayTime::create(0.18),
-                            MoveTo::create(0.3,Vec2(
-                                curPos.x + GangCardSize.width*(3.5+GAP),
-                                curPos.y)),NULL));
-				} else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2]) {
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            ScaleTo::create(0,0),NULL));
-				} else if(i==GangCardsPlace[3]) {
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            ScaleTo::create(0,0),NULL));
-                } else if(i>GangCardsPlace[3]) {
-                    MoveTo* actionMove;
-                    if( (i==list->len-1) && (card!=list->data[list->len-1].kind)) {
-						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i-1)->getPosition();
-						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
-                        
-						actionMove = MoveTo::create(0.3,Vec2(
-                            curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2))-instanceBetween,
-                            curPos.y));
-					}
-					else
-						actionMove = MoveTo::create(0.3,Vec2(
-						    curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2)),
-						    curPos.y));
-                    
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                        Sequence::create(
-                            DelayTime::create(0.18),
-                            actionMove,NULL));
-				}
-
-                gang_list_seq.insert(i-actionStartPlace,motion);
-			}
-		}
-        
-        moveFreeCards = Spawn::create(gang_list_seq);
-
-        /**********************
-            update tag
-        **********************/
-		for(int i=list->len-1;i>=0;i--) {
-			int curTag=HAND_IN_CARDS_TAG_ID+1*20+i;
-            
-			if(!myframe->getChildByTag(curTag))
-				continue;
-            
-			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
-            
-			if( GangCardsPlace[0]<list->atcvie_place ) {/* peng cards transfer to gang cards */
-				if(i==GangCardsPlace[3])
-					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-				else if(i>GangCardsPlace[2] && i<GangCardsPlace[3]) {
-                    EveryCard->setTag(curTag+1);
-                    
-                    if(i==GangCardsPlace[2]+1) {       /* insert 1 addition gang card*/
-                        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+GangCardsPlace[2]+1);
-                        break;
-                    }
-                }
-			} else {/* gang directly */
-				if(i>GangCardsPlace[2] && i<GangCardsPlace[3]) {
-					EveryCard->setTag(curTag+1);      /*right shift*/
-                } else if(i==GangCardsPlace[3]||i==GangCardsPlace[2]||i==GangCardsPlace[1]||i==GangCardsPlace[0]) {
-					if(i==GangCardsPlace[3])
-						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-					if(i==GangCardsPlace[2])
-						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_THREE);
-					if(i==GangCardsPlace[1])
-						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-					if(i==GangCardsPlace[0])
-						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-				} else if(i>=list->atcvie_place && i<GangCardsPlace[0]) {
-					EveryCard->setTag(curTag+4);      /* leave for 4 space for gang cards*/
-                    
-                    if(i==list->atcvie_place) {       /* insert 4 gang cards*/
-                        for(int b=0;b<4;b++)
-                            ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
-                        break;
-                    }
-                }
-			}
-		}
-
-        /**********************
-            background effect
-        **********************/
-        TargetedAction *bgElementsMotions[5];
-        _CreateBackgroundElementMotion(bgElementsMotions,0);
-
-        /* final effect */
-		auto callFunc_update_list=CCCallFunc::create([=](){
-			if(ifEffectTime) {
-				ifEffectTime=false;
-				if(ifUpdateDuringEffect) {
-					ifUpdateDuringEffect=false;
-					_roundManager->CancelEffectCard();
-					card_list_update(no);
-				} else {
-					int sameCardNum=0;
-					for(int a=list->atcvie_place-1;a>=0;a--)
-					{
-						if( _roundManager->IsCurEffectCard(list->data[a]) )
-						{
-							sameCardNum++;
-							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
-							if(sameCardNum==4)
-							{
-								_roundManager->CancelEffectCard();
-								break;
-							}
-						}
-					}
-				}
-			}
-		});
-
-		auto AnGangEffectNode = Node::create();
-		AnGangEffectNode->_ID=1;
-		myframe->addChild(AnGangEffectNode,1,AN_GANG_EFFECT_NODE);
-        
-		AnGangEffectNode->runAction( 
-    		Sequence::create(
-                hideReminder,
-                Spawn::create(
-                    simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
-                    _voice->SpeakAction(GANG,
-                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                    moveFreeCards,
-                    Spawn::create(
-            		    moveAngangCards,
-            		    Sequence::create(
-            		        DelayTime::create(0.66),CCCallFunc::create([=]() {
-                    		_StartParticleSystem(0.3);
-                    		}),NULL),
-                        bgElementsMotions[0],
-                        bgElementsMotions[1],
-                        bgElementsMotions[2],
-                        bgElementsMotions[3],
-                        bgElementsMotions[4],NULL),
-            		Sequence::create(
-                        DelayTime::create(0.66),CallFunc::create([=](){
-                        _voice->Speak("paizhuangji");}),NULL),NULL),
-                Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::delete_ActionEffect)),
-                    callFunc_update_list,
-                    _voice->Speak("lanpai"),NULL),CallFunc::create([=](){
-                _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
-        
-		myframe->_ID=1;
-		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::angang_dispatch)),
-            DelayTime::create(0.48), CallFunc::create([=](){
-			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
-			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
-            _roundManager->DistributeCard();}),NULL));
-	}
-}
-
-void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
-{
-    myframe->_ID = no;
-
-	auto list = _roundManager->_players[no]->get_parter()->get_card_list();
-
-	int riverLast = _roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
-	if(_roundManager->_isCardFromOthers) {
-        if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25 + riverLast))
-        {
-            myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25 + riverLast);
-        }
-	}
-    
-    if(no!=MIDDLE){
-        if(!_roundManager->_isCardFromOthers) {
-            _roundManager->_qiangGangTargetNo = _roundManager->_curPlayer;
-        }
-        
-        _OthersMingGangEffect((PlayerDir_t)_roundManager->_curPlayer,_roundManager->_isCardFromOthers);
-	} else {
-		for(int node=0;node<3;node++) {
-		    _Remove(myframe,PENG_EFFECT_NODE_ID+node);
-
-			if(ifEffectTime) {
-				ifEffectTime=false;
-				ifUpdateDuringEffect=false;
-                
-                _roundManager->CancelEffectCard();
-				delete_ActionEffect();
-				card_list_update(no);
-			}
-		}
-
-        _roundManager->SetEffectCard(card,c_MING_GANG);
-		ifEffectTime=true;
-		ifUpdateDuringEffect=true;
-
-        /**********************
-            clear screen
-        **********************/
-        auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
-
-        /**********************
-            hide out card
-        **********************/
-		Size FreeCardSize = _object->RectSize(FREE_CARD);
-
-		Sprite   *s_curOutCard;
-		Sequence *hideOutcard;
-
-		if( !_roundManager->_isCardFromOthers ) {
-			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20 + list->len-1);//gang1
-			lastInHand->runAction(ScaleTo::create(0,0));
-			
-			s_curOutCard=_object->Create(FREE_CARD);
-			s_curOutCard->setAnchorPoint(Vec2(0,0));
-			s_curOutCard->setPosition(Vec2(
-                lastInHand->getPosition().x,
-                lastInHand->getPosition().y));
-			auto kind = _object->CreateKind((Card_t)card,NORMAL);
-			kind->setAnchorPoint(Vec2(0.5,0.5));
-			kind->setPosition(Vec2(
-                s_curOutCard->getTextureRect().size.width/2,
-                s_curOutCard->getTextureRect().size.height*0.4));
-			s_curOutCard->addChild(kind,1);
-            
-			myframe->addChild(s_curOutCard,29,EFFET_NEWCATD1_TAG);
-			lastInHand->runAction(ScaleTo::create(0,0));
-            
-			if(s_curOutCard) {
-				hideOutcard = Sequence::create(DelayTime::create(0.06),NULL);
-			}
-		}
-		else {
-			s_curOutCard = (Sprite*)myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
-            
-			hideOutcard = Sequence::create(Spawn::create(CCCallFunc::create([=]() {
-			    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
-                s_curOutCard,Sequence::create(
-                    DelayTime::create(0.06),
-                    ScaleTo::create(0,0),NULL)),NULL),NULL);
-		}
-        
-        /**********************
-            
-        **********************/
-        int ifZeroPointTwo=0;
-        int ifLeft=0;
-        if(_myChosenCard!=-1) {
-            if(_myChosenCard<list->len-4)
-                ifLeft=1;
-            
-            if(!_roundManager->_isCardFromOthers) {
-                if(_myChosenCard>gang[2])
-                    _myChosenCard+=1;
-            } else {
-                if(_myChosenCard>gang[2])
-                    _myChosenCard+=1;
-                else if(_myChosenCard==gang[0]||_myChosenCard==gang[1]||_myChosenCard==gang[2]) {
-                    ifZeroPointTwo=1;
-                    _myChosenCard=-1;
-                }
-                else if(_myChosenCard<gang[0])
-                    _myChosenCard+=4;
-            }
-        }
-            
-		auto Pengsize = _object->RectSize(PENG_CARD);
-        
-		Sprite* baseCard;
-		Vec2    basePos;
-        
-		if(!_roundManager->_isCardFromOthers) {
-			baseCard = _GetCardInHand(MIDDLE,list->len-2);
-			basePos  = baseCard->getPosition();
-            
-			distributeCardPos=Vec2(
-                basePos.x + baseCard->getBoundingBox().size.width + 30 - FreeCardSize.width*ifZeroPointTwo*0.2,
-                basePos.y);
-		} else {
-			baseCard = _GetCardInHand(MIDDLE,list->len-4);
-			basePos  = baseCard->getPosition();
-
-            if( list->atcvie_place>0 )
-				distributeCardPos = Vec2(
-				    basePos.x + Pengsize.width*3.5 + 30 
-				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
-				    basePos.y);
-			else
-				distributeCardPos = Vec2(
-				    basePos.x + Pengsize.width*4 + 30 
-				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
-				    basePos.y);
-		}
-
-        /**********************
-            gang cards motions
-        **********************/
-        TargetedAction *gangCardsMotion[4];
-        Sequence *gangCard0Motion;
-
-		auto show_card = _object->Create(PENG_CARD);
-		auto cardPengSize = show_card->getTextureRect().size;
-
-        _AttachKindTexture(show_card,(CARD_KIND)card);
-        
-		show_card->setAnchorPoint(Vec2(0,0));
-		if(!_roundManager->_isCardFromOthers) {
-			show_card->setPosition(_layout->OrigPositionOfGangCard(0,cardPengSize));
-		} else {
-			show_card->setPosition(s_curOutCard->getPosition());
-		}
-		show_card->setScale(0);
-		myframe->addChild(show_card,29,SINGLE_ACTION_EFFECT_TAG_ID);
-
-		if(_roundManager->_isCardFromOthers) {
-			gangCardsMotion[0] = TargetedAction::create(show_card,Sequence::create(
-                DelayTime::create(0.42),
-                ScaleTo::create(0,1),
-                MoveTo::create(0.12,Vec2(
-                    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,
-                    origin.y+visibleSize.height*0.255)),
-				MoveTo::create(0.12,Vec2(
-				    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98+150,
-				    origin.y+visibleSize.height*0.255)),
-				MoveTo::create(0.12,Vec2(
-				    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,
-				    origin.y+visibleSize.height*0.255)),NULL)),NULL;
-            gangCard0Motion = Sequence::create(gangCardsMotion[0],NULL);
-		} else {
-			gangCardsMotion[0] = TargetedAction::create(s_curOutCard,Sequence::create(
-                    DelayTime::create(0.42),
-                    ScaleTo::create(0,0.6),
-                    MoveTo::create(0.12,_layout->OrigPositionOfGangCard(0,cardPengSize)),
-                    ScaleTo::create(0,0),NULL));
-            gangCard0Motion = Sequence::create(
-                gangCardsMotion[0],
-                TargetedAction::create(show_card,Sequence::create(
-                    ScaleTo::create(0,1),
-                    MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(0,cardPengSize)),
-    				MoveTo::create(0.12,_layout->DestPositionOfGangCard(0,cardPengSize)),NULL)),NULL);
-		}
-
-        _CreateMingGangCardsMotion(gangCardsMotion,(CARD_KIND)card);
-
-        /**********************
-            move cards in hand
-        **********************/
-		Sequence*Gang2Card_seq;
-		Sequence* Gang3Card_seq;
-		Sequence* Gang4Card_seq;
-        float delayTime=0.18;
-
-        TargetedAction *gangCardInHandMotion[3];
-        Sprite *gangCard[3];
-
-        if(!_roundManager->_isCardFromOthers) {
-            _CreateMingGangCardInHandMotion(gangCardInHandMotion,gang,(CARD_KIND)card);
-		} else {
-		    _CreateFreeCard(gangCard,gang,(CARD_KIND)card);
-
-            if(list->atcvie_place>=0)/* active_place can less than 0 ???? */
-			{
-                auto OldGang2Pos = gangCard[0]->getPosition();
-                auto OldGang3Pos = gangCard[1]->getPosition();
-                auto OldGang4Pos = gangCard[2]->getPosition();
-                
-				gangCardInHandMotion[0]=TargetedAction::create(gangCard[0],Sequence::create(
-                    DelayTime::create(delayTime),
-                    ScaleTo::create(0,0.6),MoveTo::create(0.18,Vec2(
-        				origin.x+visibleSize.width*0.5-gangCard[0]->getTextureRect().size.width*0.6*1.96,
-        				origin.y+visibleSize.height*0.26)),
-                    DelayTime::create(0.06),
-                    ScaleTo::create(0,0),NULL));
-
-				gangCardInHandMotion[1]=TargetedAction::create(gangCard[1],Sequence::create(
-                    DelayTime::create(delayTime),Spawn::create(
-                        ScaleTo::create(0,0.6),
-                        MoveTo::create(0,Vec2(OldGang3Pos.x-FreeCardSize.width*0.4,OldGang3Pos.y)),NULL),
-                    MoveTo::create(0.18,Vec2(
-        				origin.x+visibleSize.width*0.5-gangCard[1]->getTextureRect().size.width*0.6*0.98,
-        				origin.y+visibleSize.height*0.26)),
-                    DelayTime::create(0.06),
-                    ScaleTo::create(0,0),NULL));
-
-				gangCardInHandMotion[2]=TargetedAction::create(gangCard[2],Sequence::create(
-                    DelayTime::create(delayTime),Spawn::create(
-                        ScaleTo::create(0,0.6),
-                        MoveTo::create(0,Vec2(OldGang4Pos.x-FreeCardSize.width*0.8,OldGang4Pos.y)),NULL),
-                    MoveTo::create(0.18,Vec2(
-        				origin.x+visibleSize.width*0.5,
-        				origin.y+visibleSize.height*0.26)),
-                    DelayTime::create(0.06),
-                    ScaleTo::create(0,0),NULL));
-			}
-		}
-
-        /**********************
-            move free cards in hand
-        **********************/
-		int actionStartPlace=0;
-		for(int a=0;a<=list->atcvie_place;a++)
-			if(list->data[a].status==c_MING_KOU||list->data[a].status==c_FREE)
-			{
-				actionStartPlace=a;
-				break;
-			}
-		actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
-            
-		Vector<FiniteTimeAction *>gang_list_seq;
-        
-		if(!_roundManager->_isCardFromOthers) {
-			for(int i=actionStartPlace; i<=gang[0]; i++) {/* right shift */
-				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-
-				auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
-                    Sequence::create(
-                    DelayTime::create(delayTime),
-                    MoveTo::create(0.3,Vec2(
-                        curPos.x+cardPengSize.width*3.5,
-                        curPos.y)),NULL));
-				gang_list_seq.insert(i-actionStartPlace,action);
-             }
-			for(int i=gang[0]; i<=gang[2]; i++) {/*hide gang cards*/
-				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                        ScaleTo::create(0,0),NULL)));
-			}
-		}
-		else {
-            const float GAP = (list->atcvie_place==0)?0.5:0.0;
-            
-			for(int i=actionStartPlace;i<gang[0];i++) {/* right shift */
-                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-
-                gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                        DelayTime::create(delayTime),
-                        MoveTo::create(0.3,Vec2(
-                            curPos.x+cardPengSize.width*(3.5+GAP),
-                            curPos.y)),NULL)));
-			}
-            for(int i=gang[0];i<=gang[2];i++) {/* hide */
-				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                        ScaleTo::create(0,0),NULL)));
-			} 
-            for(int i=gang[2]+1;i<list->len;i++) {/* right shift */
-				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
-                
-                gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
-                        DelayTime::create(delayTime),
-                        MoveTo::create(0.3,Vec2(
-                            curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
-                            curPos.y)),NULL)));
-			}
-		}
-
-        Spawn *moveFreeCards = Spawn::create(gang_list_seq);
-        /**********************
-            update tag
-        **********************/
-		for(int a=list->len-1;a>=0;a--) {
-			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
-			if(!myframe->getChildByTag(curTag))
-				continue;
-            
-			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
-			if(!_roundManager->_isCardFromOthers) {
-				if(a==list->len-1)
-					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-				else if(a<list->len-1&&a>gang[2])
-					EveryCard->setTag(curTag+1);
-				if(a==(gang[2]+1)) {
-					((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
-				}
-			} else {
-				if(gang[0]<list->atcvie_place) {
-					if(a>gang[2])
-						EveryCard->setTag(curTag+1);
-                    
-					if(a==gang[2]+1) {
-						auto EmptyCard=_object->Create(FREE_CARD);
-						EmptyCard->setAnchorPoint(Vec2(1,1));
-						EmptyCard->setScale(0);
-						EmptyCard->setPosition(Vec2::ZERO);
-						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
-					}
-				} else {
-					if(a>gang[2])
-						EveryCard->setTag(curTag+1);
-					else if(a<=gang[2]&&a>=gang[0]) {
-						if(a==gang[2])
-							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_THREE);
-						if(a==gang[1])
-							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-						if(a==gang[0])
-							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-					} else if(a<gang[0]&&a>=list->atcvie_place)
-						EveryCard->setTag(curTag+4);
-                    
-					if(a==list->atcvie_place)
-					{
-						for(int b=0;b<3;b++)
-							((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
-
-						auto EmptyCard=_object->Create(FREE_CARD);
-						EmptyCard->setAnchorPoint(Vec2(1,1));
-						EmptyCard->setScale(0);
-						EmptyCard->setPosition(Vec2::ZERO);
-						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+3);
-					}
-				}
-			}
-		}
-
-        /**********************
-            background effect
-        **********************/
-        TargetedAction *bgElementsMotions[5];
-        _CreateBackgroundElementMotion(bgElementsMotions, 1);
-
-        /* final effect */
-		auto callFunc_update_list = CCCallFunc::create([=](){
-			if(ifEffectTime)
-			{
-				ifEffectTime=false;
-				if(ifUpdateDuringEffect)
-				{
-					ifUpdateDuringEffect=false;
-                    _roundManager->CancelEffectCard();
-					card_list_update(no);
-				}
-				else 
-				{
-					int sameCardNum=0;
-					for(int a=list->atcvie_place-1;a>=0;a--)
-					{
-						if( _roundManager->IsCurEffectCard(list->data[a]) )
-						{
-							sameCardNum++;
-							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
-							if(sameCardNum==4)
-							{
-								_roundManager->CancelEffectCard();
-								break;
-							}
-						}
-					}
-				}
-			}
-		});
-
-		auto MingGangEffectNode = Node::create();
-		myframe->addChild(MingGangEffectNode,1,MING_GANG_EFFECT_NODE);
-
-		MingGangEffectNode->_ID=1;
-		MingGangEffectNode->runAction(
-            Sequence::create(
-                hideReminder,
-            Spawn::create(
-                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
-                _voice->SpeakAction(GANG,
-                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                hideOutcard,
-                moveFreeCards,
-                Spawn::create(
-                    Spawn::create(
-                        gangCard0Motion,gangCardsMotion[1],gangCardsMotion[2],gangCardsMotion[3],
-                        gangCardInHandMotion[0],gangCardInHandMotion[1],gangCardInHandMotion[2],NULL),
-                    Sequence::create(
-                        DelayTime::create(0.78), CCCallFunc::create([=]() {
-            			_StartParticleSystem(0.3); }),NULL),
-                    bgElementsMotions[0],
-                    bgElementsMotions[1],
-                    bgElementsMotions[2],
-                    bgElementsMotions[3],
-                    bgElementsMotions[4],NULL),
-                Sequence::create(
-                    DelayTime::create(0.78),CallFunc::create([=](){
-                    _voice->Speak("paizhuangji");}),NULL),NULL),
-            Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_ActionEffect)),
-                callFunc_update_list,CallFunc::create([=](){
-                _Remove(myframe,MING_GANG_EFFECT_NODE);}),NULL),NULL));
-
-        CallFunc* dis_action;
-        if(!_roundManager->_isCardFromOthers) {
-            _roundManager->_qiangGangTargetNo=no;
-            dis_action=CallFunc::create([=](){
-                            _roundManager->QiangGangHuJudge();});
-        } else
-            dis_action=CallFunc::create([=](){
-                            _roundManager->DistributeCard();});
-        
-		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::minggang_dispatch)),
-            DelayTime::create(0.48),CallFunc::create([=](){
-			if(_roundManager->_isCardFromOthers)
-				GoldNumInsert(no,2,_roundManager->_curPlayer);}),dis_action,NULL));
-	}
-}
-
-void NetRaceLayer::_QiEffect(PlayerDir_t dir)
-{
-	myframe->_ID = MIDDLE;
-
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	if(_roundManager->_lastAction==a_JUMP)
-		_roundManager->_continue_gang_times=0;
-	_roundManager->_lastAction=a_JUMP;
-	_roundManager->_actionToDo=a_JUMP;
-	if(_roundManager->_isWaitDecision) {
-		_roundManager->_isWaitDecision=false;
-		_roundManager->_tempActionToDo=a_JUMP;
-	}
-
-    /********************************
-        hide reminder
-    ********************************/
-	auto shadeFunc =_HideQiReminder();
-    
-    /********************************
-        
-    ********************************/
-	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && dir==MIDDLE) {
-		if(!_roundManager->_isCardFromOthers) {
-			if(_roundManager->_isGangAsking) {
-				myframe->runAction(Sequence::create(
-                    shadeFunc,CallFunc::create([=](){
-    					_roundManager->_isGangAsking = false;
-                        
-                        CardsInfo_t cards;
-                        _GetCardsInfo(&cards);
-                        
-                        Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
-
-                        _roundManager->RecvHandout(cards.last,location,2);
-                    }),NULL));
-			} else
-				myframe->runAction(shadeFunc);
-		} else {
-			if(_roundManager->_isQiangGangAsking) {
-				_roundManager->_isQiangGangAsking=false;
-
-				myframe->runAction(Sequence::create(
-                    shadeFunc,Spawn::create(CallFunc::create([=](){
-    					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
-    					_roundManager->_qiangGangTargetNo=-1;/*!!! could this be called before runAction */}),CallFunc::create([=](){
-                        _roundManager->DistributeCard();}),NULL),NULL));
-			} else if(_roundManager->_isDoubleHuAsking) {
-				_roundManager->_isDoubleHuAsking=false;
-				myframe->runAction(Sequence::create(
-                    shadeFunc,CallFunc::create([=](){
-                    _HuEffect(_roundManager->_otherOneForDouble);}),NULL));
-			} else {
-				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
-				myframe->runAction(Sequence::create(
-                    shadeFunc,CallFunc::create([=](){
-                    _roundManager->DistributeCard();}),NULL));
-			}
-		}
-	}
-}
-
-/******************************************************
-        ting hint bar
-******************************************************/
-void NetRaceLayer::_UpdateResidueNumOnTingSignBar(PlayerDir_t dir) {
-    _roundManager->_players[dir]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
-    
-	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
-
-	_roundManager->_players[dir]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	_roundManager->_players[dir]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-
-	int cardNum = hu_NumForEveryCard[Hu_cardOut_place];
-
-	for(int i=0;i<cardNum;i++) {
-		Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
-		curCardBar->removeChildByTag(2);
-
-        auto residueNum = _CreateNumberSign(hu_residueForEvery[Hu_cardOut_place][i]);
-        curCardBar->addChild(residueNum,1,2);
-	}
-}
-
-void NetRaceLayer::OtherTingHintBar(int curNo,int outCardIdx) {
-	Hu_cardOut_place = outCardIdx;
-    
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];
-	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];
-	_roundManager->_players[curNo]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);
-	_roundManager->_players[curNo]->get_parter()->get_hu_cards(hu_cards);
-
-    auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,(Card_t *)hu_cards[outCardIdx],hu_NumForEveryCard[outCardIdx]);
-    myframe->addChild(tingSignBar,30,TING_SING_LEFTBAR+curNo/2);
-}
-
-void NetRaceLayer::tingHintCreate(Point curPos,int CardPlace)
-{
-	_roundManager->_players[MIDDLE]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
-    
-	Hu_cardOut_place=CardPlace;
-	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
-	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
-	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-	_roundManager->_players[MIDDLE]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	_roundManager->_players[MIDDLE]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-	_roundManager->_players[MIDDLE]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
-	_roundManager->_players[MIDDLE]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
-
-	int cardNum=hu_NumForEveryCard[CardPlace];
-
-    auto tingSignBar = _object->CreateTingInfoBar(
-        curPos,(Card_t *)hu_cards[CardPlace],cardNum,huTiemsForEveryOne[CardPlace],hu_residueForEvery[CardPlace]);
-	myframe->addChild(tingSignBar, 30, TING_SING_BAR);
-}
-
-/********************************************************
-            cards
-********************************************************/
-/* this function is only for others */
-Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
-                                        CARD_ARRAY *cards,bool isTing,const Vec2 &refer) {
-    switch( cards->data[idx].status ) {
-        case c_FREE:
-            {
-                Sprite *card;
-                
-                if(isTing) {
-                    card = _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
-                } else if(!isTing&&_roundManager->IsTing(MIDDLE)) {
-                    card = _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
-                } else {
-                    TextureId_t texture = (dir==LEFT)?L_IN_CARD:R_IN_CARD;
-                    card = _object->Create(texture,dir,refer.x,refer.y);
-                    card->setAnchorPoint(_layout->AnchorOfFreeCard(dir));
-                }
-
-                return card;
-            }
-        case c_AN_GANG:
-            if(cards->data[idx].kind==cards->data[idx+1].kind
-                &&cards->data[idx].kind!=cards->data[idx+2].kind
-                &&!isTing&&_roundManager->IsTing(MIDDLE))
-                return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
-            else
-                return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
-        case c_MING_KOU:
-            return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
-        case c_PENG:
-        case c_MING_GANG:
-            return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
-    }
-}
-
-float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY) {
-    float up = (dir==LEFT)?(-1):1;
-    float groupGap = (dir==LEFT)?0.4:0.8;
-    
-    switch(cards->data[idx].status) {
-        case c_FREE:
-            if(isTing||_roundManager->IsTing(MIDDLE)) {
-                return up*(refY*0.65);
-            } else {
-                return up*(refY*0.5);
-            }
-        case c_MING_KOU:
-            return up*(refY*0.65);
-        case c_PENG:
-            if(isTing||_roundManager->IsTing(MIDDLE)) {
-                if(cards->data[idx+1].status==c_FREE||cards->data[idx+1].status==c_MING_KOU)
-                    return up*refY;
-                else if(cards->data[idx+1].kind!=cards->data[idx].kind)
-                    return up*(refY*0.65+5);
-                else 
-                    return up*(refY*0.65);
-            } else {
-                if(cards->data[idx+1].status==c_FREE)
-                    return up*(refY*groupGap);
-                else if(cards->data[idx+1].kind!=cards->data[idx].kind)
-                    return up*(refY*0.65+5);
-                else
-                    return up*(refY*0.65);
-            }
-        case c_MING_GANG:
-        case c_AN_GANG:
-            int groupIdx = _roundManager->_GroupIdx(idx,cards);
-            if( (dir==LEFT&&groupIdx==1) || (dir==RIGHT&&groupIdx==3)) {
-                return up*(refY*0.65);
-            } else if (groupIdx==2) {
-                return -up*13;
-            } else if( (dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==1)) {
-                return up*(refY*0.65+13);
-            } else {
-                if(_roundManager->IsTing(MIDDLE)||isTing==1) {
-                    if(cards->data[idx+1].status==c_FREE||cards->data[idx+1].status==c_MING_KOU)
-                        return up*refY;
-                    else
-                        return up*(refY*0.65+5);
-                } else {
-                    if(cards->data[idx+1].status==c_FREE)
-                        return up*(refY*groupGap);
-                    else
-                        return up*(refY*0.65+5);
-                }
-            }
-    }
-}
-
-void NetRaceLayer::card_list_update(int no)
-{
-	for(int i=0;i<MAX_HANDIN_NUM;i++) {
-        _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
-	}
-
-	float x = _layout->_playerPosi[no].basePoint.x+10; 
-	float y = _layout->_playerPosi[no].basePoint.y+10;
-
-	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
-
-	if( _roundManager->IsTing(no) && _roundManager->_firstMingNo==-1 )
-		_roundManager->_firstMingNo=no;
-
-	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
-    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
-
-	Sprite *p_list[MAX_HANDIN_NUM];
-    PlayerDir_t dir = (PlayerDir_t)no;
-    
-    for(int i=0;i<list->len;i++)
-	{
-		if(list->data[i].kind!=ck_NOT_DEFINED )
-		{
-			if(no==0 || no==2) {
-				p_list[i] = _CreateCardInHand(dir,i,list,(ting_flag==1),Vec2(x,y));
-                
-				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
-                if(apperance!=NORMAL_APPERANCE) {
-                    _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind,apperance);
-                }
-
-                y += _YofNextCard(dir,i,list,(ting_flag==1),p_list[i]->getTextureRect().size.height);
-			}
-			else if(no==1)
-			{
-				if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
-				{
-					if(ting_flag==1)
-						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)no,x,y);
-					else
-						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)no,x,y);
-				}
-				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
-				{
-					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
-				}
-				else if(list->data[i].status==c_AN_GANG)
-				{
-					if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
-					else
-						p_list[i]=_object->Create(AN_GANG_CARD,(PlayerDir_t)no,x,y);
-				}
-                
-                /* the card being chosen */
-				if(_myChosenCard==i) {
-					p_list[i]->setScale(1.2);
-					p_list[i]->setPosition(Vec2(x,y+10));
-					x+=p_list[i]->getTextureRect().size.width*0.2;
-				}
-
-                /* the second last card before handout*/
-                int residualCardsNum = (list->len-list->atcvie_place)%3;
-				if(residualCardsNum==2 && i==list->len-2)
-					x+=30;
-
-                /* the card showing somewhere else */
-                if( _roundManager->IsCurEffectCard(list->data[i]) )
-					p_list[i]->setVisible(false);
-
-
-                if(list->data[i].status==c_FREE)
-				{
-					if(ting_flag==1)
-					{
-					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.6);
-					}
-					else
-					{
-					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.4);
-					}
-                    
-					if(ting_flag==1||(_roundManager->_actionToDo==a_MING&&ting_flag==0))
-					{
-						if(list->data[i].can_play==cps_YES)
-						{
-							auto MingCps_yesMask=_object->Create(MING_BKG);
-							MingCps_yesMask->setAnchorPoint(Vec2(0.5,0.5));
-							MingCps_yesMask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
-                                p_list[i]->getTextureRect().size.height/2));
-							p_list[i]->addChild(MingCps_yesMask,2,MING_KOU_MASK);
-						}
-						else if(list->data[i].can_play==cps_NO)
-						{
-							Sprite* mask;
-							mask=_object->Create(MING_MASK_CARD);
-							mask->setAnchorPoint(Vec2(0.5,1));
-							mask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
-                                p_list[i]->getTextureRect().size.height));
-							p_list[i]->addChild(mask,2,MING_KOU_MASK);
-						}
-					}
-                    
-					x+=p_list[i]->getTextureRect().size.width*1.0;
-				}
-				else if(list->data[i].status==c_MING_KOU)
-				{
-					if(ting_flag!=1)
-					{
-						auto KouSign=_object->Create(MING_KOU_CARD);
-						KouSign->setAnchorPoint(Vec2(0.5,0.5));
-						KouSign->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
-                            p_list[i]->getTextureRect().size.height/2));
-						p_list[i]->addChild(KouSign,2);
-
-					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.4);
-                        
-						x += p_list[i]->getTextureRect().size.width*1;
-					}
-					else
-					{
-					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.6);
-
-                        x += p_list[i]->getTextureRect().size.width*1;
-					}
-				}
-				else if(list->data[i].status==c_PENG)
-				{
-					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-					s_card->setAnchorPoint(Vec2(0.5,0.5));
-					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-					p_list[i]->addChild(s_card,1);
-                    
-					if(list->data[i+1].status==c_FREE)
-						x += p_list[i]->getTextureRect().size.width*2;
-					else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
-						x += p_list[i]->getTextureRect().size.width*1.5;
-					else
-						x += p_list[i]->getTextureRect().size.width*1.0;
-				}
-				else if(list->data[i].status==c_MING_GANG)
-				{
-					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-					s_card->setAnchorPoint(Vec2(0.5,0.5));
-					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-					p_list[i]->addChild(s_card,1);
-                    
-					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-						x+=p_list[i]->getTextureRect().size.width*1.0;
-					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-						y+=17;
-					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-					{
-						x+=p_list[i]->getTextureRect().size.width*1.0;
-						y-=17;
-					}
-					else if(list->data[i].kind!=list->data[i+1].kind)//4
-					{
-						if(list->data[i+1].status==c_FREE)
-							x += p_list[i]->getTextureRect().size.width*2;
-						else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
-							x += p_list[i]->getTextureRect().size.width*1.5;
-						else
-							x += p_list[i]->getTextureRect().size.width*1.0;
-					}
-				}
-				else if(list->data[i].status==c_AN_GANG)
-				{
-					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-						x+=p_list[i]->getTextureRect().size.width*1.0;
-					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-						y+=17;
-					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
-						x+=p_list[i]->getTextureRect().size.width*1.0;
-						y-=17;
-					}
-					else if(list->data[i].kind!=list->data[i+1].kind)//4
-					{
-						if(list->data[i+1].status==c_FREE)
-							x += p_list[i]->getTextureRect().size.width*2;
-						else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
-							x += p_list[i]->getTextureRect().size.width*1.5;
-						else
-							x += p_list[i]->getTextureRect().size.width*1.0;
-					}
-				}
-			}
-
-
-
-			if(no!=2) {//each one lay above the previous ones
-                if(!_GetCardInHand((PlayerDir_t)no,i)) {
-                    myframe->addChild(p_list[i],i+1,        HAND_IN_CARDS_TAG_ID+no*20+i);
-                }
-            }
-			else {//each one lay below the previous ones
-                if(!_GetCardInHand((PlayerDir_t)no,i)) {
-    				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
-                }
-            }
-			if(no==1
-                &&_roundManager->_actionToDo==a_MING
-                &&_roundManager->_players[1]->get_parter()->get_ting_status()!=1
-                &&list->data[i].can_play==cps_YES) {
-				p_list[i]->setZOrder(30);
-            }
-            
-			p_list[i]->_ID=1;
-
-            if(no==1 && _myChosenCard==i)
-				p_list[i]->_ID=100;
-		}//for each card
-	}
-    
-	if(no==1&&ting_flag!=0)
-	{
-		if(!myframe->getChildByTag(TING_SING_BUTTON))
-		{
-			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-            
-			auto Ting_Sign = _object->CreateTingSign();
-			myframe->addChild(Ting_Sign,1,TING_SING_BUTTON);
-
-            while(myframe->getChildByTag(TING_SING_BAR))
-				myframe->removeChildByTag(TING_SING_BAR);
-
-            tingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
-			myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-			ifTingSignBarVisible=false;
-			ListenToTingButton();
-
-            card_list_update(0);
-			card_list_update(2);
-		}
-	}
-    
-	if(no==1&&myframe->getChildByTag(TING_SING_BUTTON))
-		_UpdateResidueNumOnTingSignBar(MIDDLE);
-}
-
-void NetRaceLayer::update_card_list(Node *psender)
-{
-    int no = psender->_ID;
-    
-	if(_roundManager->IsTing(no)) {
-        _Show(this,MING_STATUS_PNG_0+no,true);
-	}
-    
-	card_list_update(no);
-}
-
-void NetRaceLayer::update_card_in_river_list(Node* sender) {
-	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
-
-	for(int i=0;i<outCard->length;i++) {
-	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-	}
-    
-	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
-	show_card_indicator->setVisible(true);
-
-	for(int i=0;i<outCard->length;i++) {
-        Card oCard;
-        outCard->getCard(oCard,i+1);
-        
-        auto show_card = _object->CreateRiverCard((PlayerDir_t)sender->_ID,(Card_t)oCard.kind);
-        show_card_indicator->stopAllActions();
-        
-        show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard((PlayerDir_t)sender->_ID,i));                      
-        show_card_indicator->runAction(RepeatForever::create(Sequence::create(
-            MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),
-            MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),NULL)));
-        show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)sender->_ID,i));
-
-        myframe->addChild(show_card, 
-            _layout->ZorderOfRiverCard((PlayerDir_t)sender->_ID,i),
-            HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
-	}
-}
-
-/****************************************
-        ming
-****************************************/
-void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        Sprite *card = _GetCardInHand(MIDDLE,i);
-        _Remove(card,MING_KOU);
-    }
-
-    auto button = myframe->getChildByTag(MING_KOU_CANCEL);
-    
-    myframe->_ID = MIDDLE;
-    myframe->runAction(
-        Sequence::create(
-            TargetedAction::create(button,
-                ScaleTo::create(0,0)),CallFunc::create([=](){
-                _roundManager->RecvMing();}),NULL));
-}
-
-void NetRaceLayer::KouConfirmEffect() {
-    auto button = myframe->getChildByTag(MING_KOU_ENSURE);
-
-    myframe->_ID = MIDDLE;
-    myframe->runAction(Sequence::create(TargetedAction::create(
-        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
-        _roundManager->RecvMing();}),NULL));
-}
-
-void NetRaceLayer::MingCancelEffect() {
-    auto button = myframe->getChildByTag(MING_CANCEL);
-    
-    myframe->_ID = _roundManager->_curPlayer;
-    myframe->runAction(Sequence::create(TargetedAction::create(
-        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
-        _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
-        _roundManager->WaitForMyAction();}),NULL));
-}
-
-void NetRaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-
-			_Remove(myframe,MING_KOU_ENSURE);			
-			_Remove(myframe,MING_KOU_SIGN);
-			curButton->setTouchEnabled(false);
-
-            _roundManager->RecvKouCancel();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}	
-}
-
-void NetRaceLayer::BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-    auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-            
-            _Remove(myframe,MING_KOU_SIGN);
-			curButton->setTouchEnabled(false);
-
-            _roundManager->RecvKouConfirm();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            _roundManager->RecvMingCancel();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-Node *NetRaceLayer::_NonKouMask(Sprite *card) {
-    auto mask = _object->Create(MING_MASK_CARD);
-    mask->setAnchorPoint(Vec2(0.5,0.5));
-    mask->setPosition(card->getTextureRect().size.width/2,card->getTextureRect().size.height/2);
-    card->addChild(mask,2,MING_KOU_MASK);
-
-    return mask;
-}
-
-void NetRaceLayer::_MaskNonKouCards(CARD_ARRAY *cards) {
-    for(int i=cards->atcvie_place; i<cards->len; i++) {
-        if(cards->data[i].status!=c_KOU_ENABLE) {
-            Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
-            _NonKouMask(card);
-        }
-    }
-}
-
-bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
-    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-
-    Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
-    int groupChosen=-1;
-    
-    for(int i=0;i<cards->len;i++) {
-        cardsInHand[i]=_GetCardInHand(MIDDLE,i);
-        cardsInHand[i]->_ID = MIDDLE;
-    }
-    
-    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
-        for(int i=0; i<3; i++) {
-            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)], touch) ) {
-                groupChosen = group;
-                break;/* BUG : only 1 group can be chosen??? */
-            }
-        }
-    }
-    
-    if(groupChosen!=-1) {
-        for(int i=0; i<3; i++) {
-            cardsInHand[_ai->KouCardIndex(groupChosen,i)]->_ID++;/*==2???*/
-        }
-    }
-    
-    return true;
-}
-
-void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
-    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-
-    Sprite *cardsInHand[MAX_HANDIN_NUM];
-    int a,b,groupChosen=-1;
-    
-    for(int i=0; i<cards->len; i++) {
-        cardsInHand[i]=_GetCardInHand(MIDDLE,i);
-    }
-    
-    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
-        for(int i=0;i<3;i++) {
-            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)],touch) ) {
-                if(cardsInHand[_ai->KouCardIndex(group,i)]->_ID!=1) {
-                    groupChosen = group;
-                    break;
-                }
-            }
-        }
-    }
-    
-    if(groupChosen!=-1) {
-        if(_ai->KouCardStatus(groupChosen)==c_MING_KOU) {
-            _ai->SetKouCardStatus(groupChosen,c_MING_KOU);
-            cards->data[_ai->KouCardIndex(groupChosen,0)].status=c_KOU_ENABLE;
-            cards->data[_ai->KouCardIndex(groupChosen,1)].status=c_KOU_ENABLE;
-            cards->data[_ai->KouCardIndex(groupChosen,2)].status=c_KOU_ENABLE;
-        }
-        else if(_ai->KouCardStatus(groupChosen)==c_KOU_ENABLE)
-        {
-            _ai->SetKouCardStatus(groupChosen,c_MING_KOU);
-            cards->data[_ai->KouCardIndex(groupChosen,0)].status=c_MING_KOU;
-            cards->data[_ai->KouCardIndex(groupChosen,1)].status=c_MING_KOU;
-            cards->data[_ai->KouCardIndex(groupChosen,2)].status=c_MING_KOU;
-        }
-    }
-    
-    for( a=0; a<_ai->KouCardGroupNum(); a++ ) {
-        if(_ai->KouCardStatus(a)!=c_MING_KOU) {
-            if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
-                (CARD_KIND)_ai->KouCardKind(a), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
-            {
-                cards->data[_ai->KouCardIndex(a,0)].status=c_KOU_ENABLE;
-                cards->data[_ai->KouCardIndex(a,1)].status=c_KOU_ENABLE;
-                cards->data[_ai->KouCardIndex(a,2)].status=c_KOU_ENABLE;
-                _ai->SetKouCardStatus(a,c_MING_KOU);
-            } else {
-                cards->data[_ai->KouCardIndex(a,0)].status=c_FREE;
-                cards->data[_ai->KouCardIndex(a,1)].status=c_FREE;
-                cards->data[_ai->KouCardIndex(a,2)].status=c_FREE;
-                _ai->SetKouCardStatus(a,c_FREE);
-            }
-        }
-    }
-    
-    for(a=0;a<_ai->KouCardGroupNum();a++) {
-        for(b=0;b<3;b++) {
-            if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU))
-                cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU);
-            if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU_MASK))
-                cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU_MASK);
-            if(cards->data[_ai->KouCardIndex(a,b)].status==c_MING_KOU) {
-                auto MingKouMark=_object->Create(MING_KOU_CARD);
-                MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
-                MingKouMark->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
-                cardsInHand[_ai->KouCardIndex(a,b)]->addChild(MingKouMark,2,MING_KOU);
-            } else if(cards->data[_ai->KouCardIndex(a,b)].status!=c_KOU_ENABLE) {
-                auto KouNo=_object->Create(MING_MASK_CARD);
-                KouNo->setAnchorPoint(Vec2(0.5,0.5));
-                KouNo->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
-                cardsInHand[_ai->KouCardIndex(a,b)]->addChild(KouNo,2,MING_KOU_MASK);
-            }
-        }
-    }
-    
-    bool ifEnsureVisible=false;
-    for(a=0;a<4;a++) {
-        if(_ai->KouCardStatus(a)==c_MING_KOU) {
-            ifEnsureVisible=true;
-            break;
-        }
-    }
-
-    Node *node = myframe->getChildByTag(MING_KOU_ENSURE);
-    if(ifEnsureVisible)
-        myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
-    else
-        myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(false);
-}
-
-void NetRaceLayer::ListenToKou(int no) {
-    auto cards=_roundManager->_players[no]->get_parter()->get_card_list();
-    auto KouListener = EventListenerTouchOneByOne::create();
-    KouListener->setSwallowTouches(true);
-    
-    KouListener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_KouTouchBegan,this);
-    KouListener->onTouchMoved = [=](Touch* touch, Event* event) {};
-    KouListener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_KouTouchEnded,this);
-    
-    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(KouListener, myframe);
-}
-
-void NetRaceLayer::QueryKouCards() {
-    auto kouCancel = _object->CreateButton(BTN_CANCEL);
-    kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouCancelHandler,this));
-    myframe->addChild(kouCancel,20,MING_KOU_CANCEL);
-    
-    myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
-    
-    auto ChooseEnsure = _object->CreateButton(BTN_OK);
-    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouConfirmHandler,this));
-    ChooseEnsure->setVisible(false);
-    myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
-    
-    CARD_ARRAY *cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-    _MaskNonKouCards(cards);
-    ListenToKou(MIDDLE);
-}
-
-void NetRaceLayer::QueryMingOutCard() {
-    _roundManager->_isMingTime=true;
-    _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
-    
-    _Remove(myframe,MING_KOU_ENSURE);
-    _Remove(myframe,MING_KOU_SIGN);
-    _Remove(myframe,MING_KOU_CANCEL);
-    
-    auto MingCancel = _object->CreateButton(BTN_CANCEL);
-    MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
-    myframe->addChild(MingCancel,20,MING_CANCEL);
-    
-    myframe->_ID=MIDDLE;
-    myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-        NetRaceLayer::ListenToCardTouch)),NULL));
-}
-
-void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		((Button*)pSender)->setScale(1.2);
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            if(_roundManager->_isWaitDecision) {
-				_roundManager->_isWaitDecision = false;
-				_roundManager->_actionToDo =_roundManager->_tempActionToDo;
-				_roundManager->_tempActionToDo = a_JUMP;
-			}
-            
-			for(int dir=0;dir<3;dir++) {//only once is enough?
-			    _Remove(myframe,PENG_EFFECT_NODE_ID+dir);
-                
-				if(ifEffectTime) {
-					ifEffectTime=false;
-					ifUpdateDuringEffect=false;
-                    
-                    _roundManager->CancelEffectCard();
-					delete_ActionEffect();
-                    
-					card_list_update(1);
-				}
-			}
-
-			_eventDispatcher->removeEventListenersForTarget(myframe,true);
-
-            Button *button = (Button*)pSender;
-			auto icon = (Sprite*)myframe->getChildByTag(MING_REMIND_ACT_BKG_TAG_ID);
-
-            button->_ID = MIDDLE;
-			button->setTouchEnabled(false);
-            
-			myframe->_ID = MIDDLE;
-            myframe->runAction(Sequence::create(
-                Spawn::create(
-                    TargetedAction::create(button,
-                        ScaleTo::create(0,0)),
-                    TargetedAction::create(icon,Sequence::create(
-                        ScaleTo::create(0,1),Spawn::create(
-                        FadeOut::create(0.3),
-                        ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),CCCallFunc::create([=](){
-                _roundManager->RecvMing();}),NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		((Button*)pSender)->setScale(1);
-		break;
-	default:
-		break;
-	}
-}
-
-
-
-
 
 /*******************************************
         
 *******************************************/
-
 void NetRaceLayer::first_response(int no)
 {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
@@ -2677,7 +249,7 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch() {
 	_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
 
     if(canKou) {
-        OtherTingHintBar(_roundManager->_curPlayer,index);
+        _TingHintBarOfOthers(_roundManager->_curPlayer,index);
 
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
         if(_ai->KouCardGroupNum()>0)
@@ -3049,7 +621,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			if((no!=1&&no1!=1)||(no==1||no1==1&&_roundManager->_players[1]->get_parter()->get_ting_status()==1))
 			{
 				_HuEffect(3);
-				distribute_event(DOUBLE_HU_WITH_ME,NULL);
+				_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
 			}
 			else if((no==1||no1==1)&&_roundManager->_players[1]->get_parter()->get_ting_status()==0)
 			{
@@ -3137,158 +709,385 @@ void NetRaceLayer::waitfor_response(Node* sender)
 	}
 }
 
-/***************************************************
-        start game
-***************************************************/
-void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
-    _roundManager->NotifyStart();
 
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            auto curButton=(Button*)pSender;
-			curButton->setTouchEnabled(false);
 
-			auto startIcon = _object->CreateStartGame();
-			this->addChild(startIcon,2,START_GAME_TAG_ID+1);
+/***********************************************
+        effect entrances
+***********************************************/
+void NetRaceLayer::QiEffect() {
+    _effect->Hide(myframe,QI_REMIND_ACT_TAG_ID);
 
-			this->runAction(
-                Sequence::create(
-                    Spawn::create(
-                        TargetedAction::create(curButton,Sequence::create(
-                            DelayTime::create(0.1),
-                            FadeOut::create(0.2),NULL)),
-                        TargetedAction::create(startIcon,Spawn::create(
-                            ScaleTo::create(0.3,1.3),
-                            FadeOut::create(0.3),NULL)),
-                        _voice->Speak("anniu.ogg"),NULL),
-                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::start_callback)),NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
+    _QiEffect(MIDDLE);
 }
 
-void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto curButton=(Button*)pSender;
-
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		{
-			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON))->setTouchEnabled(true);
-			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
-            
-            refresh_residue_cards();
-			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			curButton->setTouchEnabled(false);
-            
-			auto restartBtn = _object->CreateRestartGame();
-			this->addChild(restartBtn,2,RACE_RESTART_TAG_ID+1);
-
-			this->runAction(
-                Sequence::create(
-                    Spawn::create(TargetedAction::create(
-                        restartBtn,Spawn::create(
-                            ScaleTo::create(0.3,1.3),
-                            FadeOut::create(0.3),NULL)),
-                        _voice->Speak("anniu.ogg"),NULL),
-                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::start_callback)),NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
+void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+    _effect->Hide(myframe,PENG_REMIND_ACT_TAG_ID);
+    
+    _PengEffect(dir,prevDir,card);
 }
-void NetRaceLayer::start_callback()
+
+void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
+    _effect->Hide(myframe,HU_REMIND_ACT_TAG_ID);
+    
+    if(qiangGang) {
+        delete_act_tip();
+        _HuEffect(win.player);
+    } else if(win.kind==DOUBLE_WIN) {
+        _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
+        delete_act_tip();
+        _HuEffect(3);   /*why use event rather than call*/
+        _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
+    } else {
+        _HuEffect(win.player);
+    }
+}
+
+void NetRaceLayer::GangEffect(PlayerDir_t winner,Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
+    _effect->Hide(myframe,GANG_REMING_ACT_TAG_ID);
+    
+    if(isAnGang) {
+        _AnGangEffect(winner,card,gangCardIdx);
+    } else {
+        _MingGangEffect(winner,prevPlayer,(Card_t)card,gangCardIdx);
+    }
+}
+
+void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
+    HideClock();
+
+    if(win.player!=MIDDLE) {
+        if(_roundManager->IsTing(1)) {
+            _HuEffect(3);
+            _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
+        } else {
+            _roundManager->WaitForMyAction();
+        }
+    }
+}
+
+void NetRaceLayer::SingleWin(const WinInfo_t &win) {
+    HideClock();
+
+    if(win.player==MIDDLE) {
+        if(_roundManager->IsTing(MIDDLE)) {
+            _HuEffect(win.player);
+        } else {
+            _roundManager->WaitForMyAction();
+        }
+
+    } else {
+        _HuEffect(win.player);
+    }
+}
+
+void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
+    myframe->runAction(Sequence::create(CallFunc::create([=](){
+        GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
+        _roundManager->DistributeCard();}),NULL));
+}
+
+void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
 {
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
-
-	if(!_isResoucePrepared) {
-		_isResoucePrepared=true;
-		_ResourcePrepare();
-	}
-
-    _Remove(this,GAME_BKG_TAG_ID);
-    _Remove(this,START_GAME_TAG_ID);
-    _Remove(this,START_GAME_TAG_ID+1);
-    _Remove(this,RACE_RESTART_TAG_ID);
-    _Remove(this,RACE_RESTART_TAG_ID+1);
-    _Remove(this,SHINE_TAG_ID);
-    _Remove(this,SHINE_TAG_ID+1);
-    _Remove(this,RACE_ACCOUT_TAG_ID);
-    _Remove(this,HUANG_ZHUANG_LAYER);
-    _Remove(this,HUANG_ZHUANG_FONT);
-
-    _Show(this,MING_STATUS_PNG_0,false);
-    _Show(this,MING_STATUS_PNG_1,false);
-    _Show(this,MING_STATUS_PNG_2,false);
+    if(time==2) {
+        if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
+            myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
+        }
+    } else {
+        _ReOrderCardsInHand(chosenCard,list);
+    }
     
-	for(int i=0;i<4;i++) {
-		while(this->getChildByTag(GOLD_NUM_INSERT_JINBI+i))
-			this->removeChildByTag(GOLD_NUM_INSERT_JINBI+i,true);
-	}
-    
-    _roundManager->RenewOutCard();
-    
-    distribute_event(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
-
-	myframe = LayerColor::create(Color4B(0,0,0,0),visibleSize.width,visibleSize.height);
-	myframe->setPosition(Vec2(origin.x, origin.y));
-	this->addChild(myframe,3,GAME_BKG_TAG_ID);
-
-	distributeCardPos=Vec2::ZERO;
-	ifUpdateDuringEffect=false;
-	_isCardInHandUpdated=false;
-	ifInsertCardsTime=false;
-	ifEffectTime=false;
-    _myChosenCard = -1;
-    
-	_roundManager->_isGameStart=false;
-    _roundManager->_cardHolders[1]->_isReady = true;
-	GuiShowReady(1);
-    _roundManager->NotifyStart();
-
-    _roundManager->WaitUntilAllReady();
-
-	_ReceBeginPrepare();                  //牌局开始效果
-
-    int lastWinner = _roundManager->GetLastWinner();
-    _roundManager->_actionToDo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
-	if(_roundManager->_actionToDo!=a_TIMEOUT) {
-		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果。
-	}
+	_MyHandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
 }
-	
-void NetRaceLayer::_DeleteStartDealCards() {
-	for(int i=0;i<3;i++) {
-		for(int j=0;j<4;j++) {
-            _Remove(myframe,START_CARDS_IN_TAG_ID+i*j);
+
+void NetRaceLayer::card_list_update(int no)
+{
+	for(int i=0;i<MAX_HANDIN_NUM;i++) {
+        _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
+	}
+
+	float x = _layout->_playerPosi[no].basePoint.x+10; 
+	float y = _layout->_playerPosi[no].basePoint.y+10;
+
+	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
+
+	if( _roundManager->IsTing(no) && _roundManager->_firstMingNo==-1 )
+		_roundManager->_firstMingNo=no;
+
+	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
+    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
+
+	Sprite *p_list[MAX_HANDIN_NUM];
+    PlayerDir_t dir = (PlayerDir_t)no;
+    
+    for(int i=0;i<list->len;i++)
+	{
+		if(list->data[i].kind!=ck_NOT_DEFINED )
+		{
+			if(no==0 || no==2) {
+				p_list[i] = _CreateCardInHand(dir,i,list,(ting_flag==1),Vec2(x,y));
+                
+				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
+                if(apperance!=NORMAL_APPERANCE) {
+                    _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind,apperance);
+                }
+
+                y += _YofNextCard(dir,i,list,(ting_flag==1),p_list[i]->getTextureRect().size.height);
+			}
+			else if(no==1)
+			{
+				if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
+				{
+					if(ting_flag==1)
+						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)no,x,y);
+					else
+						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)no,x,y);
+				}
+				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
+				{
+					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
+				}
+				else if(list->data[i].status==c_AN_GANG)
+				{
+					if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
+						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
+					else
+						p_list[i]=_object->Create(AN_GANG_CARD,(PlayerDir_t)no,x,y);
+				}
+                
+                /* the card being chosen */
+				if(_myChosenCard==i) {
+					p_list[i]->setScale(1.2);
+					p_list[i]->setPosition(Vec2(x,y+10));
+					x+=p_list[i]->getTextureRect().size.width*0.2;
+				}
+
+                /* the second last card before handout*/
+                int residualCardsNum = (list->len-list->atcvie_place)%3;
+				if(residualCardsNum==2 && i==list->len-2)
+					x+=30;
+
+                /* the card showing somewhere else */
+                if( _roundManager->IsCurEffectCard(list->data[i]) )
+					p_list[i]->setVisible(false);
+
+
+                if(list->data[i].status==c_FREE)
+				{
+					if(ting_flag==1)
+					{
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.6);
+					}
+					else
+					{
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.4);
+					}
+                    
+					if(ting_flag==1||(_roundManager->_actionToDo==a_MING&&ting_flag==0))
+					{
+						if(list->data[i].can_play==cps_YES)
+						{
+							auto MingCps_yesMask=_object->Create(MING_BKG);
+							MingCps_yesMask->setAnchorPoint(Vec2(0.5,0.5));
+							MingCps_yesMask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                                p_list[i]->getTextureRect().size.height/2));
+							p_list[i]->addChild(MingCps_yesMask,2,MING_KOU_MASK);
+						}
+						else if(list->data[i].can_play==cps_NO)
+						{
+							Sprite* mask;
+							mask=_object->Create(MING_MASK_CARD);
+							mask->setAnchorPoint(Vec2(0.5,1));
+							mask->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                                p_list[i]->getTextureRect().size.height));
+							p_list[i]->addChild(mask,2,MING_KOU_MASK);
+						}
+					}
+                    
+					x+=p_list[i]->getTextureRect().size.width*1.0;
+				}
+				else if(list->data[i].status==c_MING_KOU)
+				{
+					if(ting_flag!=1)
+					{
+						auto KouSign=_object->Create(MING_KOU_CARD);
+						KouSign->setAnchorPoint(Vec2(0.5,0.5));
+						KouSign->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,
+                            p_list[i]->getTextureRect().size.height/2));
+						p_list[i]->addChild(KouSign,2);
+
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.4);
+                        
+						x += p_list[i]->getTextureRect().size.width*1;
+					}
+					else
+					{
+					    _object->LayDownWithFace(p_list[i], (Card_t)list->data[i].kind, 0.6);
+
+                        x += p_list[i]->getTextureRect().size.width*1;
+					}
+				}
+				else if(list->data[i].status==c_PENG)
+				{
+					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+					s_card->setAnchorPoint(Vec2(0.5,0.5));
+					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+					p_list[i]->addChild(s_card,1);
+                    
+					if(list->data[i+1].status==c_FREE)
+						x += p_list[i]->getTextureRect().size.width*2;
+					else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
+						x += p_list[i]->getTextureRect().size.width*1.5;
+					else
+						x += p_list[i]->getTextureRect().size.width*1.0;
+				}
+				else if(list->data[i].status==c_MING_GANG)
+				{
+					auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+					s_card->setAnchorPoint(Vec2(0.5,0.5));
+					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+					p_list[i]->addChild(s_card,1);
+                    
+					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+						x+=p_list[i]->getTextureRect().size.width*1.0;
+					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+						y+=17;
+					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+					{
+						x+=p_list[i]->getTextureRect().size.width*1.0;
+						y-=17;
+					}
+					else if(list->data[i].kind!=list->data[i+1].kind)//4
+					{
+						if(list->data[i+1].status==c_FREE)
+							x += p_list[i]->getTextureRect().size.width*2;
+						else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
+							x += p_list[i]->getTextureRect().size.width*1.5;
+						else
+							x += p_list[i]->getTextureRect().size.width*1.0;
+					}
+				}
+				else if(list->data[i].status==c_AN_GANG)
+				{
+					if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+						x+=p_list[i]->getTextureRect().size.width*1.0;
+					else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+						y+=17;
+					else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+					{
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+						s_card->setAnchorPoint(Vec2(0.5,0.5));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+						p_list[i]->addChild(s_card,1);
+						x+=p_list[i]->getTextureRect().size.width*1.0;
+						y-=17;
+					}
+					else if(list->data[i].kind!=list->data[i+1].kind)//4
+					{
+						if(list->data[i+1].status==c_FREE)
+							x += p_list[i]->getTextureRect().size.width*2;
+						else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
+							x += p_list[i]->getTextureRect().size.width*1.5;
+						else
+							x += p_list[i]->getTextureRect().size.width*1.0;
+					}
+				}
+			}
+
+
+
+			if(no!=2) {//each one lay above the previous ones
+                if(!_GetCardInHand((PlayerDir_t)no,i)) {
+                    myframe->addChild(p_list[i],i+1,        HAND_IN_CARDS_TAG_ID+no*20+i);
+                }
+            }
+			else {//each one lay below the previous ones
+                if(!_GetCardInHand((PlayerDir_t)no,i)) {
+    				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
+                }
+            }
+			if(no==1
+                &&_roundManager->_actionToDo==a_MING
+                &&_roundManager->_players[1]->get_parter()->get_ting_status()!=1
+                &&list->data[i].can_play==cps_YES) {
+				p_list[i]->setZOrder(30);
+            }
+            
+			p_list[i]->_ID=1;
+
+            if(no==1 && _myChosenCard==i)
+				p_list[i]->_ID=100;
+		}//for each card
+	}
+    
+	if(no==1&&ting_flag!=0)
+	{
+		if(!myframe->getChildByTag(TING_SING_BUTTON))
+		{
+			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+            
+			auto Ting_Sign = _object->CreateTingSign();
+			myframe->addChild(Ting_Sign,1,TING_SING_BUTTON);
+
+            while(myframe->getChildByTag(TING_SING_BAR))
+				myframe->removeChildByTag(TING_SING_BAR);
+
+            _TingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
+			myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
+			ifTingSignBarVisible=false;
+			ListenToTingButton();
+
+            card_list_update(0);
+			card_list_update(2);
 		}
 	}
+    
+	if(no==1&&myframe->getChildByTag(TING_SING_BUTTON))
+		_UpdateTingNum(MIDDLE);
 }
+
+void NetRaceLayer::update_card_list(Node *psender)
+{
+    int no = psender->_ID;
+    
+	if(_roundManager->IsTing(no)) {
+        _Show(this,MING_STATUS_PNG_0+no,true);
+	}
+    
+	card_list_update(no);
+}
+
+void NetRaceLayer::update_card_in_river_list(Node* sender) {
+	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
+
+	for(int i=0;i<outCard->length;i++) {
+	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+	}
+    
+	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
+	show_card_indicator->setVisible(true);
+
+	for(int i=0;i<outCard->length;i++) {
+        Card oCard;
+        outCard->getCard(oCard,i+1);
+        
+        auto show_card = _object->CreateRiverCard((PlayerDir_t)sender->_ID,(Card_t)oCard.kind);
+        show_card_indicator->stopAllActions();
+        
+        show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard((PlayerDir_t)sender->_ID,i));                      
+        show_card_indicator->runAction(RepeatForever::create(Sequence::create(
+            MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),
+            MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),NULL)));
+        show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)sender->_ID,i));
+
+        myframe->addChild(show_card, 
+            _layout->ZorderOfRiverCard((PlayerDir_t)sender->_ID,i),
+            HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+	}
+}
+
+
+
+
 
 /***************************************************
         distribute
@@ -3355,7 +1154,7 @@ void NetRaceLayer::DistributeCard(int lenOfInHand) {
 }
 
 void NetRaceLayer::Call_DistributeCard() {
-	distribute_event(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
+	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
 }
 
 void NetRaceLayer::ListenToDistributeCard() {
@@ -3458,10 +1257,6 @@ void NetRaceLayer::_RightBatchDistribute(int batchIdx, float delayRef, int cardL
             DelayTime::create(delayRef + 0.2 + 0.6*batchIdx),
             ScaleTo::create(0,1),NULL));
     }
-}
-
-PlayerDir_t NetRaceLayer::NextPlayer(PlayerDir_t dir) {
-    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
 }
 
 void NetRaceLayer::FirstRoundDistributeEffect(int zhuang) {
@@ -4970,222 +2765,6 @@ void  NetRaceLayer::showall()
 	}
 }
 
-Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
-{
-	auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
-	bgOfGang->setPosition(v);
-	myframe->addChild(bgOfGang,20,MOJI_EFFECT_TAG_ID);
-	bgOfGang->setScale(0);
-
-	auto tipOfPeng=Sprite::createWithSpriteFrameName(act_name);
-	tipOfPeng->setPosition(Vec2(bgOfGang->getTextureRect().size.width/2,bgOfGang->getTextureRect().size.height/2));
-	bgOfGang->addChild(tipOfPeng);
-	tipOfPeng->setScale(0);
-    
-	auto action1 = TargetedAction::create(
-        bgOfGang,Sequence::create(
-            ScaleTo::create(0,1),
-            DelayTime::create(0.6),
-            Spawn::create(
-                ScaleTo::create(0.18,0.8),
-                FadeOut::create(0.18),NULL),NULL));
-	auto action2 = TargetedAction::create(
-        tipOfPeng,Sequence::create(
-            ScaleTo::create(0,1.5),
-            DelayTime::create(0.12),
-            EaseElasticOut::create(ScaleTo::create(0.18,1)),
-            DelayTime::create(0.3),
-            Spawn::create(
-                ScaleTo::create(0.18,0.8),
-                FadeOut::create(0.18),NULL),NULL));
-
-	auto bgOfGang1=Sprite::createWithSpriteFrameName("mojixx.png");
-	bgOfGang1->setPosition(v);
-	myframe->addChild(bgOfGang1,21,MOJI1_EFFECT_TAG_ID);
-    
-	auto tipOfPeng1=Sprite::createWithSpriteFrameName(act_name);
-	tipOfPeng1->setPosition(Vec2(bgOfGang1->getTextureRect().size.width/2,bgOfGang1->getTextureRect().size.height/2));
-	bgOfGang1->addChild(tipOfPeng1);
-	bgOfGang1->setScale(0);
-    
-	auto action3 = TargetedAction::create(
-        bgOfGang1,Sequence::create(
-            DelayTime::create(0.12),
-            ScaleTo::create(0,1),
-            Spawn::create(
-                ScaleTo::create(0.18,1.5),
-                FadeOut::create(0.18),NULL),NULL));
-	auto action4 = TargetedAction::create(
-        tipOfPeng1,Sequence::create(
-            DelayTime::create(0.12),
-            ScaleTo::create(0,1),
-            Spawn::create(
-                ScaleTo::create(0.18,1.5),
-                FadeOut::create(0.18),NULL),NULL));
-	
-	return Spawn::create(action1,action2,action3,action4,NULL);
-}
-
-/* why use different mechanism for single hu and double hu ??? */
-void NetRaceLayer::_HuEffect(int no)
-{
-    LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
-
-	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
-
-    _Remove(this,ROBOT_TUO_GUAN);
-    _Remove(this,TUOGUAN_CANCEL_BUTTON);
-    
-	scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
-
-	if(no<3) {
-        _roundManager->SetWin(SINGLE_WIN,no);
-        
-		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
-
-        CallFunc*HuVoice = _voice->SpeakAction(HU,
-                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
-
-        if(no!=1)
-		{
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
-			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(no,3,_roundManager->_curPlayer);	
-			});
-			auto hu_seq=Sequence::create(Spawn::create(HuVoice,simple_seq,NULL),GoldAccount,callfunc,NULL);
-			myframe->runAction(hu_seq);
-		}
-		else
-		{
-			Sequence* g_seq1;
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1) {
-			    g_seq1 = _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5);
-			}
-
-			auto centerExplode=Sprite::createWithSpriteFrameName("101.png");
-			centerExplode->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(centerExplode,30,IMG_101_EFFECT_TAG_ID);
-			centerExplode->setOpacity(200);
-			centerExplode->setScale(0);
-			auto animation = Animation::create();
-			animation->addSpriteFrameWithFile("101.png");
-			animation->addSpriteFrameWithFile("103.png");
-			animation->addSpriteFrameWithFile("105.png");
-			animation->addSpriteFrameWithFile("106.png");
-			animation->setDelayPerUnit(0.05f);
-			animation->setRestoreOriginalFrame(true);
-			auto action = Animate::create(animation);
-			auto action1=Repeat::create(action,3);
-			auto l_seq1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(callfunc,action1,NULL),FadeOut::create(0.1),NULL);
-			//auto l_seq1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),action1,FadeOut::create(0.1),NULL);
-			auto ll_action1=TargetedAction::create(centerExplode,l_seq1);
-
-			auto lightCircle=Sprite::createWithSpriteFrameName("4.png");
-			lightCircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(lightCircle,29,IMG_4_EFFECT_TAG_ID);
-			lightCircle->setRotation(90);
-			lightCircle->setScaleX(0);
-			lightCircle->setScaleY(0);
-			lightCircle->setOpacity(150);
-			BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
-			lightCircle->setBlendFunc(tmp_oBlendFunc);
-			auto l_seq2=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.2,0.6),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,0.4,4.0)),EaseSineIn::create(FadeOut::create(0.5)),NULL),NULL);
-			auto ll_action2=TargetedAction::create(lightCircle,l_seq2);
-
-			auto lightCircle2=Sprite::createWithSpriteFrameName("Q13.png");
-			lightCircle2->setAnchorPoint(Vec2(0.5,0));
-			lightCircle2->setOpacity(180);
-			lightCircle2->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
-			myframe->addChild(lightCircle2,30,IMG_Q13_EFFECT_TAG_ID);
-			lightCircle2->setScale(0);
-			auto l_seq3=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.5)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action3=TargetedAction::create(lightCircle2,l_seq3);
-
-			auto lightCircle3=Sprite::createWithSpriteFrameName("Q13.png");
-			lightCircle3->setAnchorPoint(Vec2(0.5,0));
-			lightCircle2->setOpacity(180);
-			lightCircle3->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
-			myframe->addChild(lightCircle3,30,IMG_Q13_2_EFFECT_TAG_ID);
-			lightCircle3->setScale(0);
-			auto l_seq4=Sequence::create(DelayTime::create(0.5),ScaleTo::create(0,0.26),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.5)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action4=TargetedAction::create(lightCircle3,l_seq4);
-			
-			auto lightCircle4=Sprite::createWithSpriteFrameName("888.png");
-			lightCircle4->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			lightCircle4->setScale(0);
-			myframe->addChild(lightCircle4,29,IMG_888_EFFECT_TAG_ID);
-			lightCircle4->setBlendFunc(tmp_oBlendFunc);
-			auto l_seq5=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(EaseSineOut::create(ScaleTo::create(0.3,5.5)),FadeOut::create(0.3),NULL),NULL);
-			auto ll_action5=TargetedAction::create(lightCircle4,l_seq5);
-
-			auto star=Sprite::createWithSpriteFrameName("104.png");
-			star->setAnchorPoint(Vec2(0.5,0));
-			star->setScale(0);
-			star->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(star,29,IMG_104_EFFECT_TAG_ID);
-			auto l_seq6=Sequence::create(DelayTime::create(0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,0.7)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action6=TargetedAction::create(star,l_seq6);
-			
-			auto flame=Sprite::createWithSpriteFrameName("444.png");
-			flame->setAnchorPoint(Vec2(0,0.5));
-			flame->setRotation(-90);
-			flame->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(flame,29,IMG_444_EFFECT_TAG_ID);
-			flame->setBlendFunc(tmp_oBlendFunc);
-			flame->setScale(0);
-			auto l_seq7=Sequence::create(DelayTime::create(0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.0)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action7=TargetedAction::create(flame,l_seq7);
-
-			auto firecircle=Sprite::createWithSpriteFrameName("666.png");
-			firecircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			firecircle->setTag(4);
-			firecircle->setScale(0);
-			firecircle->setOpacity(200);
-			myframe->addChild(firecircle,29,IMG_666_EFFECT_TAG_ID);
-			auto actionScale=ScaleTo::create(0.5,1.0);
-			auto c_fadeOut=FadeOut::create(0.5);
-			auto c_seq1=Spawn::create(EaseSineOut::create(actionScale),c_fadeOut,NULL);
-			firecircle->setOpacity(100);
-			firecircle->setBlendFunc(tmp_oBlendFunc);
-			auto l_seq8=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.1),c_seq1,NULL);
-			auto ll_action8=TargetedAction::create(firecircle,l_seq8);
-			
-			auto ll_action9=Sequence::create(DelayTime::create(0.3),CCCallFunc::create([=]()
-			{
-				_StartParticleSystem(0.3);	
-			}),NULL);
-
-			auto sorPos=this->getPosition();
-			auto pShake1 = MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y+10));
-			auto pShake2 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto pShake3 = MoveTo::create(0.1,Vec2(sorPos.x-10,sorPos.y-10));
-			auto pShake4 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto pShake5 = MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y));
-			auto pShake6 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto pShake7 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y+10));
-			auto pShake8 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto l_seq10=Sequence::create(DelayTime::create(0.3),pShake1,pShake2,pShake3,pShake4,pShake5,pShake6,pShake7,pShake8,NULL);
-			auto ll_action10=TargetedAction::create(this,l_seq10);
-			auto l_spa=Spawn::create(ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
-			
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
-			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(no,3,_roundManager->_curPlayer);	
-			});
-			Spawn* hu_seq;
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1)
-				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,Sequence::create(g_seq1,l_spa,NULL),NULL);
-			else
-				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,l_spa,NULL);
-			myframe->runAction(hu_seq);
-		}
-	}
-	else if(no==3) {//两个对家双响
-        _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
-		ListenToDoubleHu();
-	}
-}
-
 void NetRaceLayer::ListenToDoubleHu() {
     auto _doublehucallListener = EventListenerCustom::create(DOUBLE_HU_WITH_ME, [this](EventCustom * event){
         
@@ -5264,26 +2843,90 @@ void NetRaceLayer::distribute_card_event()
     }   
 }
 
-void NetRaceLayer::race_start_again()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
+/***********************************************************
+        button accessosaries
+***********************************************************/
+void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
+    _roundManager->NotifyStart();
 
-	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
-        _roundManager->Shuffle();
-		_roundManager->_distributedNum = 40;
-	});
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
 
-	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);
+			auto startIcon = _object->CreateStartGame();
+			this->addChild(startIcon,2,START_GAME_TAG_ID+1);
 
-	auto _calldistributeListener = EventListenerCustom::create(DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
-			distribute_card_event();
-		});
-	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
+			this->runAction(
+                Sequence::create(
+                    Spawn::create(
+                        TargetedAction::create(curButton,Sequence::create(
+                            DelayTime::create(0.1),
+                            FadeOut::create(0.2),NULL)),
+                        TargetedAction::create(startIcon,Spawn::create(
+                            ScaleTo::create(0.3,1.3),
+                            FadeOut::create(0.3),NULL)),
+                        _voice->Speak("anniu.ogg"),NULL),
+                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::start_game)),NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
 
-/***********************************************************
-        button action
-***********************************************************/
+void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	auto curButton=(Button*)pSender;
+
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		{
+			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON))->setTouchEnabled(true);
+			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
+            
+            refresh_residue_cards();
+			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			curButton->setTouchEnabled(false);
+            
+			auto restartBtn = _object->CreateRestartGame();
+			this->addChild(restartBtn,2,RACE_RESTART_TAG_ID+1);
+
+			this->runAction(
+                Sequence::create(
+                    Spawn::create(TargetedAction::create(
+                        restartBtn,Spawn::create(
+                            ScaleTo::create(0.3,1.3),
+                            FadeOut::create(0.3),NULL)),
+                        _voice->Speak("anniu.ogg"),NULL),
+                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::start_game)),NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
 void NetRaceLayer::BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
@@ -6731,6 +4374,71 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
             ActionAfterGang,NULL),NULL));
 }
 
+void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToMing)
+{
+	if(time==1) {
+		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
+			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
+	}
+
+    if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)!=NULL)
+		myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);// why without true/false
+
+    _Show(myframe, TING_SING_BAR, false);
+    _Remove(myframe, MING_CANCEL);// why called twice ???
+
+	BezierTo *bizerMotion;
+    auto cardOut = _object->CreateRiverCard(MIDDLE,outCard);
+    
+	if(time==1) {
+		cardOut->setPosition(touch);
+		bizerMotion = BizerMove1(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
+		                touch);
+    }
+	else {
+		cardOut->setPosition(touch.x,100);
+		bizerMotion = BizerMove2(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
+		                touch,time);
+    }
+    myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
+
+	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
+
+    Spawn* mingEffect = turnToMing?
+                (Spawn::create(
+                    _ShowBigMing(myframe),
+                    _MingAnimation(),NULL))
+                :(Spawn::create(CallFunc::create([=](){;}),NULL));
+        
+	Spawn* allEffect = Spawn::create(
+            mingEffect,TargetedAction::create(
+            cardOut,Sequence::create(Spawn::create(
+                bizerMotion,
+                speakCard,NULL),
+                _voice->Speak("give"),NULL)),CallFunc::create([=](){
+            ifInsertCardsTime=true;}),CallFunc::create([=](){
+            delete_ActionRemind();}),NULL);
+
+	myframe->_ID=1;
+	_roundManager->_isCardFromOthers = true;
+    
+	myframe->runAction(Sequence::create(
+        allEffect,
+        DelayTime::create(0.12),CallFunc::create([=](){
+        ifInsertCardsTime=false;}),Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::update_card_in_river_list)),CCCallFunc::create([=]() {
+    		_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
+            _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
+    		if(_isCardInHandUpdated)
+    			_isCardInHandUpdated = false;
+    		else {
+                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
+    			card_list_update(1);
+    		}}),NULL),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::waitfor_response)),
+        NULL));
+}
+
 /************************************************
                 support
 ************************************************/
@@ -6967,10 +4675,10 @@ void NetRaceLayer::_UpdateCardsInHand(const CardsInfo_t &cards, int chosen) {
                 myframe->removeChildByTag(TING_SING_BAR);
 
                 auto appearPoint=loopCard->getPosition();
-                tingHintCreate(appearPoint,chosen);
+                _TingHintCreate(appearPoint,chosen);
             } else if (!myframe->getChildByTag(TING_SING_BAR)) {
                 auto appearPoint=loopCard->getPosition();
-                tingHintCreate(appearPoint,chosen);
+                _TingHintCreate(appearPoint,chosen);
             }
              
             ifChosed = true;
@@ -7133,8 +4841,2301 @@ float NetRaceLayer::_AddBtnPeng(const Vec2 &ref) {
     return (picWidth+18);
 }
 
+/***********************************************
+        action buttons
+***********************************************/
+void NetRaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+    
+	switch (type) {
+    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+    		curButton->setScale(1.2);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::MOVED:
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::ENDED:
+            _roundManager->RecvPeng(MIDDLE);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+    		curButton->setScale(1);
+    		break;
+    	default:
+    		break;
+	}
+}
+
+void NetRaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	_roundManager->_actionToDo = a_HU;
+    
+	auto curButton=(Button*)pSender;
+    curButton->_ID = pSender->_ID;
+	int no = pSender->_ID;
+
+    switch(type) {
+    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+    		curButton->setScale(1.2);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::MOVED:
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::ENDED:
+            _roundManager->RecvHu(MIDDLE);
+			break;
+    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+    		curButton->setScale(1);
+    		break;
+	}
+}
+
+void NetRaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+
+	switch (type){
+    	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+    		curButton->setScale(1.2);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::MOVED:
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::ENDED:
+            _roundManager->RecvGang(MIDDLE);
+    		break;
+    	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+    		curButton->setScale(1);
+    		break;
+    	default:
+    		break;
+	}
+}
+
+void NetRaceLayer::BtnQiHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		curButton->setScale(1.2);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+        _roundManager->RecvQi();
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		curButton->setScale(1);
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::ListenToTingButton() {
+	auto TingListener = EventListenerTouchOneByOne::create();
+	TingListener->setSwallowTouches(false);
+    
+	TingListener->onTouchBegan=[=](Touch* touch, Event* event) {
+		return true;
+	};
+	TingListener->onTouchMoved=[=](Touch* touch, Event* event) {};
+	TingListener->onTouchEnded=[=](Touch* touch, Event* event) {
+		auto button = (Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
+
+        if( !_IsClickedOn(button,touch) ) {
+            ifTingSignBarVisible=false;
+		} else {
+			ifTingSignBarVisible = !ifTingSignBarVisible;
+		}
+
+        _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
+	};
+    
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
+}
+
+/***************************************************************
+        interface with player
+***************************************************************/
+void NetRaceLayer::peng_dispatch(Node *psender){
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	int no=psender->_ID;
+    
+	_roundManager->_isCardFromOthers=true;
+	_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_PENG);
+}
+
+void NetRaceLayer::minggang_dispatch(Node *psender)
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	int no=psender->_ID;
+
+    _roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING_GANG);
+}
+
+void NetRaceLayer::angang_dispatch(Node *psender)
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	int no=psender->_ID;
+
+    if(_roundManager->_actionToDo&a_AN_GANG)
+		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_AN_GANG);
+	else if(_roundManager->_actionToDo&a_SHOU_GANG)
+		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_SHOU_GANG);
+}
 
 
+/*********************************************
+        choose card
+*********************************************/
+void NetRaceLayer::ListenToCardTouch() {
+    if( !_roundManager->IsTing(MIDDLE) && !_roundManager->_isTuoGuan ) {
+        auto listener = EventListenerTouchOneByOne::create();
+        listener->setSwallowTouches(true);
+        
+        listener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_CardTouchBegan,this);
+        listener->onTouchMoved = CC_CALLBACK_2(NetRaceLayer::_CardTouchMove,this);
+        listener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_CardTouchEnd,this);
+
+        Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener,myframe);
+   }
+}
+
+/*****************************/
+/* only used when select card */
+void NetRaceLayer::_GetCardsInfo(CardsInfo_t *info) {
+    info->list  = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    info->start = info->list->atcvie_place;
+    info->last   = info->list->len - 1;
+    info->residual = (info->list->len - info->list->atcvie_place)%3;
+}
+/*****************************/
+int NetRaceLayer::_FindCard(int start,int end,Touch *touch) {
+    for(int i=start;i<=end;i++) {
+        if( _IsClickedOn(_GetCardInHand(MIDDLE,i),touch) ) {
+            return i;
+        }
+    }
+
+    return INVALID;
+}
+
+bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
+    if( ifInsertCardsTime ) {
+        ifInsertCardsTime=false;
+        
+        card_list_update(MIDDLE);
+        _isCardInHandUpdated=true;
+    }
+    
+    if( ifEffectTime && ifUpdateDuringEffect ) {
+        ifUpdateDuringEffect=false;
+        card_list_update(MIDDLE);
+    }
+
+    ifChosed=false;
+    
+    if( touch->getLocation().y > visibleSize.height*0.173 ) {
+        /* why is there TING_SING_BAR if non-ting??? from others??? */
+        while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(1)))
+            myframe->removeChildByTag(TING_SING_BAR);
+        
+        float x1,y1;
+        x1 = _layout->_playerPosi[MIDDLE].basePoint.x+10;
+        y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
+
+        CardsInfo_t cards = {0};
+        _GetCardsInfo(&cards);
+        
+        const auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
+        const auto cardSize = _object->RectSize(FREE_CARD);
+
+        for(int i=cards.start; i<=cards.last; i++) {
+            auto card = _GetCardInHand(MIDDLE,i);
+            card->_ID = 1;
+            card->setScale(1);
+            card->setAnchorPoint(Vec2(0,0));
+
+            if(i==cards.last && cards.residual==2) {
+                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start)+30,y1));
+            } else {
+                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start),y1));
+            }
+        }
+        
+        _myChosenCard = INVALID;
+    }
+    
+    return true;
+}
+
+void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
+    CardsInfo_t cards = {0};
+    _GetCardsInfo(&cards);
+    
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && touch->getLocation().y>visibleSize.height*0.173) {
+		myframe->getChildByTag(CHOOSE_CARD_TAG_ID)->setPosition(touch->getLocation());
+		_myChosenCard = _myTouchedCard;
+		return;
+	} 
+    
+    for(int i=cards.start; i<=cards.last; i++) {
+        _GetCardInHand(MIDDLE,i)->setOpacity(255);
+	}
+    
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL) {
+		myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
+    }
+    
+    int chosen = _FindCard(cards.start, cards.last, touch);
+    if(chosen!=INVALID) {
+        _UpdateCardsInHand(cards,chosen);
+    } else if(touch->getLocation().y>visibleSize.height*0.173) {
+		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)==NULL && ifChosed==true) {
+			int  kind = _roundManager->_players[MIDDLE]->get_parter()->get_card_list()->data[_myTouchedCard].kind;
+
+			auto freeCard = _object->Create(FREE_CARD);
+			auto card = _object->CreateKind((Card_t)kind,NORMAL);
+            
+			freeCard->addChild(card);
+			card->setPosition(Vec2(
+                freeCard->getTextureRect().size.width/2,
+                freeCard->getTextureRect().size.height*0.4));
+			freeCard->setScale(1.2);
+			freeCard->setPosition(touch->getLocation());
+
+			myframe->addChild(freeCard,35,CHOOSE_CARD_TAG_ID);
+			_GetCardInHand(MIDDLE,_myTouchedCard)->setOpacity(150);
+
+			while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)))
+				myframe->removeChildByTag(TING_SING_BAR,true);
+            
+			_myChosenCard = _myTouchedCard;
+		}
+	}
+}
+
+void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
+    CardsInfo_t cards = {0};
+    _GetCardsInfo(&cards);
+    
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL 
+        && (touch->getLocation().y>visibleSize.height*0.2)) {
+		if(_roundManager->_isMyShowTime) {
+			_roundManager->_isMyShowTime=false;
+            
+			_myChosenCard=INVALID;
+
+            _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),1);
+		} else {
+			_myChosenCard=_myTouchedCard;
+
+            _GetCardInHand(MIDDLE,_myTouchedCard)->setOpacity(255);
+            _Remove(myframe,CHOOSE_CARD_TAG_ID);
+		}
+		return;
+	}
+    
+    for(int i=cards.start; i<=cards.last; i++) {
+		_GetCardInHand(MIDDLE,i)->setOpacity(255);
+    }
+
+    _Remove(myframe,CHOOSE_CARD_TAG_ID);
+    
+	int chosen = _FindCard(cards.start, cards.last, touch);
+    if(chosen!=INVALID) {
+        _UpdateNonChosenCards(cards,chosen);
+
+		float x = _layout->_playerPosi[MIDDLE].basePoint.x+10;
+		float y = _layout->_playerPosi[MIDDLE].basePoint.y+10;
+		auto cardSize = _object->RectSize(FREE_CARD);
+        auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
+
+        _myChosenCard = chosen;
+
+        Sprite *loopCard = _GetCardInHand(MIDDLE,chosen);
+		bool ChooseConfirm = false;
+
+        if(chosen==cards.last) {
+            if(loopCard->_ID!=100) {
+                loopCard->_ID=100;
+                
+                if(cards.residual==1)
+                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen-cards.start),y+10));
+                else if(cards.residual==2)
+                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen-cards.start)+30,y+10));
+                
+                if(loopCard->getScale()==1) {
+                    loopCard->runAction(_voice->Speak("select"));
+                }
+                
+                loopCard->setScale(1.2);
+            } else {
+                ChooseConfirm=true;
+            }
+        } else {
+            if(loopCard->_ID!=100) {
+                loopCard->_ID=100;
+                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards.start),y+10));
+                if(loopCard->getScale()==1)
+                    loopCard->runAction(_voice->Speak("select"));
+                loopCard->setScale(1.2);
+            } else {
+                ChooseConfirm=true;
+            }
+        }
+
+        if(chosen!=cards.last) {/* why??? */
+            if(_roundManager->_actionToDo==a_MING && !_roundManager->IsTing(MIDDLE)
+                && _roundManager->_isMingTime ) {
+                while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)) )
+                    myframe->removeChildByTag(TING_SING_BAR);
+                
+                Point curPos=loopCard->getPosition();
+                _TingHintCreate(curPos,chosen);
+            }
+        }
+        
+		if(ChooseConfirm && _roundManager->_isMyShowTime) {
+			_roundManager->_isMyShowTime=false;
+            
+			_myChosenCard=INVALID;
+			_myTouchedCard = chosen;
+
+            _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
+		}
+    }
+}
+
+/*************************************************************
+        action effect
+*************************************************************/
+void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
+	myframe->_ID = dir;
+    
+	const int riverLast =_roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
+	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast)) {
+		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast);
+	}
+
+	auto outCard = myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
+    auto hideOutcard = Spawn::create(CCCallFunc::create([=](){
+			_Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
+            outCard,Sequence::create(
+                DelayTime::create(0.1),
+                ScaleTo::create(0,0),NULL)),NULL);
+		
+	if(dir!=1) {
+		myframe->runAction(Sequence::create( 
+                            Spawn::create(
+                                _voice->SpeakAction(PENG,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
+                                simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" ),NULL), 
+                            hideOutcard, 
+                            Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                                NetRaceLayer::delete_act_tip)),   CCCallFuncN::create(this,callfuncN_selector(
+                                NetRaceLayer::peng_dispatch)),    CCCallFuncN::create(this,callfuncN_selector(
+                                NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
+                    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+                				waitfor_otheraction(dir);}),NULL),NULL));
+	} else {
+		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
+			myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);
+			if(ifEffectTime) {
+				ifEffectTime=false;
+				ifUpdateDuringEffect=false;
+                
+				_roundManager->CancelEffectCard();
+                
+				delete_ActionEffect();
+				card_list_update(dir);
+			}
+		}
+        
+        _roundManager->SetEffectCard(card,c_PENG);
+        
+		ifEffectTime=true;
+		ifUpdateDuringEffect=true;
+
+        /****************
+            hide reminder
+        ****************/
+        auto hideReminder = _HideReminder(PENG_REMIND_ACT_BKG_TAG_ID, 0.18, 1.2);
+	
+        /****************
+            move 3 cards
+        ****************/
+        Sprite *showCards[3] = {0};
+        for(int i=0;i<3;i++) {
+            showCards[i] = _object->Create(PENG_CARD);
+            auto kind = _object->CreateKind(card,MIDDLE_SIZE);
+            kind->setAnchorPoint(Vec2(0.5,0.5));
+            kind->setPosition(Vec2(
+                showCards[i]->getTextureRect().size.width/2,
+                showCards[i]->getTextureRect().size.height*0.65));
+            showCards[i]->addChild(kind);
+            showCards[i]->setAnchorPoint(Vec2(0,0));
+            showCards[i]->setScale(0);
+            myframe->addChild(showCards[i],20,SINGLE_ACTION_EFFECT_TAG_ID+i);
+        }
+
+        const Vec2 REFERENCE = Vec2(origin.x+visibleSize.width*0.445, origin.y+visibleSize.height*0.255);
+        const Size SIZE      = showCards[0]->getTextureRect().size;
+
+		showCards[0]->setPosition( outCard->getPosition() );
+		showCards[1]->setPosition( REFERENCE );
+		showCards[2]->setPosition( Vec2(REFERENCE.x + SIZE.width*0.98, REFERENCE.y) );
+
+		auto action1 = Sequence::create(
+            DelayTime::create(0.48),
+            ScaleTo::create(0,1),
+            MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96 + 150, REFERENCE.y)),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*1.96,       REFERENCE.y)),NULL);
+		auto p_seq1 = TargetedAction::create(showCards[0],action1);
+
+		auto action2=Sequence::create(
+            DelayTime::create(0.48),
+            ScaleTo::create(0,1),
+            DelayTime::create(0.12),
+			MoveTo::create(0.12,Vec2(REFERENCE.x - 150, REFERENCE.y)),
+			MoveTo::create(0.12,REFERENCE),NULL);
+		auto p_seq2 = TargetedAction::create(showCards[1],action2);
+
+        auto action3=Sequence::create(
+            DelayTime::create(0.48),
+            ScaleTo::create(0,1),
+            DelayTime::create(0.12),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98 - 150, REFERENCE.y)),
+			MoveTo::create(0.12,Vec2(REFERENCE.x + SIZE.width*0.98,       REFERENCE.y)),NULL);
+		auto p_seq3 = TargetedAction::create(showCards[2],action3);
+
+        auto move3PengCards = Spawn::create(p_seq1,p_seq2,p_seq3,NULL);
+
+        /****************
+            move 2 peng cards in hand
+        ****************/
+		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
+        
+		int firstMatch = 0;
+		int secondMatch = 0;
+		for(int i=list->atcvie_place;i<list->len;i++) {
+			if(card==list->data[i].kind) {
+				if(i==0) {
+					firstMatch = 0;
+				} else if(card!=list->data[i-1].kind) {
+					firstMatch = i;
+				} else if(card==list->data[i-1].kind) {
+					secondMatch = i;
+					break;
+				}
+			}
+		}
+
+		int ifZeroPointTwo=0;
+		if(_myChosenCard!=-1) {
+			if(_myChosenCard > secondMatch) {
+				_myChosenCard += 1;
+            }
+			else if(_myChosenCard== secondMatch || _myChosenCard==firstMatch) {
+				ifZeroPointTwo = 1;
+				_myChosenCard = -1;
+			}
+			else if(_myChosenCard<firstMatch)
+				_myChosenCard += 3;
+		}
+
+		auto LeftPengCard = _CreateEffectCard(firstMatch, (CARD_KIND)card);
+		myframe->addChild(LeftPengCard,20,EFFET_NEWCATD1_TAG);
+		auto moveLeftCardInHand = TargetedAction::create(LeftPengCard,Sequence::create(
+            DelayTime::create(0.18),
+            ScaleTo::create(0,0.6),
+            MoveTo::create(0.18,Vec2(
+                origin.x+visibleSize.width*0.45,
+                origin.y+visibleSize.height*0.26)),
+			DelayTime::create(0.12),
+			ScaleTo::create(0,0),NULL));
+
+		auto RightPengCard = _CreateEffectCard(secondMatch, (CARD_KIND)card);
+		myframe->addChild(RightPengCard,20,EFFET_NEWCATD2_TAG);
+
+        /* in case these values are changed during being moved */
+		auto OldRightPos = RightPengCard->getPosition();
+		auto OldCardSize = RightPengCard->getTextureRect().size;
+        
+		auto moveRightCardInHand = TargetedAction::create(RightPengCard,Sequence::create(
+            DelayTime::create(0.18),
+            Spawn::create(
+                ScaleTo::create(0,0.6),
+                MoveTo::create(0,Vec2(
+                    OldRightPos.x-OldCardSize.width*0.4,
+                    OldRightPos.y)),NULL),
+			MoveTo::create(0.18,Vec2(
+			    origin.x+visibleSize.width*0.45+OldCardSize.width*0.6,
+			    origin.y+visibleSize.height*0.26)),
+			DelayTime::create(0.12),
+			ScaleTo::create(0,0),NULL));
+
+        /****************
+            delete 2 peng cards in hand 
+        ****************/
+		auto cardPengSize = _object->RectSize(PENG_CARD);
+        
+        const float GAP = (list->atcvie_place==0)? 0.5 : 0;
+        
+		Vector<FiniteTimeAction *> hide2CardsInhand;
+
+		for(int i=list->atcvie_place;i<list->len;i++) {
+			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
+            Sequence *seq;
+
+            if(i==firstMatch||i==secondMatch) {
+				seq = Sequence::create(
+                    ScaleTo::create(0,0),NULL);
+            } else {
+				auto curPos   = s_card->getPosition();
+				auto cardSize = s_card->getTextureRect().size;
+
+                if (i<firstMatch) {
+                    seq = Sequence::create(
+                        DelayTime::create(0.18),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x + cardPengSize.width*(3.5+GAP),
+                            curPos.y)),NULL);
+                } else {
+                    seq = Sequence::create(
+                        DelayTime::create(0.18),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x + (cardPengSize.width*(3.5+GAP)) - cardSize.width*(2 + ifZeroPointTwo*0.2),
+                            curPos.y)),NULL);
+                }
+            }
+            
+            hide2CardsInhand.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
+		}
+        
+        /****************
+            tag update 
+        ****************/
+		for(int a=list->len-1; a>=list->atcvie_place; a--) {
+			int curTag = HAND_IN_CARDS_TAG_ID + 1*20 + a;
+            
+			if(!myframe->getChildByTag(curTag))
+				continue;
+            
+			auto curCard = (Sprite*)myframe->getChildByTag(curTag);
+            
+			if(a>secondMatch)
+				curCard->setTag(curTag+1);
+			else if(a==secondMatch)
+				curCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
+			else if(a==firstMatch)
+				curCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
+			else if(a<firstMatch && a>list->atcvie_place)
+				curCard->setTag(curTag+3);
+            else if(a==list->atcvie_place) {
+				curCard->setTag(curTag+3);
+            }
+		}
+        /* why not set this value directly??? */
+        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + list->atcvie_place);
+        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_TWO))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + list->atcvie_place+1);
+
+        auto EmptyCard=_object->Create(FREE_CARD);
+        EmptyCard->setAnchorPoint(Vec2(1,1));
+        EmptyCard->setScale(0);
+        EmptyCard->setPosition(Vec2::ZERO);
+        myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID + 1*20 + list->atcvie_place+2);
+
+        /****************
+            background effect
+        ****************/
+		auto light = Sprite::createWithSpriteFrameName("Q3.png");
+		light->setPosition(Vec2(origin.x+visibleSize.width*0.445+showCards[0]->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
+		myframe->addChild(light,23,IMG_Q3_EFFECT_TAG_ID);
+		light->setOpacity(60);
+		light->setScale(0);
+		BlendFunc tmp_oBlendFunc = {GL_SRC_ALPHA, GL_ONE};
+		light->setBlendFunc(tmp_oBlendFunc);
+		auto lightEffect = TargetedAction::create(light, Sequence::create(
+    		DelayTime::create(0.84),
+    		ScaleTo::create(0,1),
+    		DelayTime::create(0.48),
+    		FadeOut::create(0),NULL));
+
+		auto circle=Sprite::createWithSpriteFrameName("Q15.png");
+		circle->setPosition(Vec2(origin.x+visibleSize.width*0.445+showCards[0]->getTextureRect().size.width*1.96,origin.y+visibleSize.height*0.315));
+		circle->setTag(4);
+		circle->setScale(2.0);
+		circle->setScale(0);
+		myframe->addChild(circle,21,IMG_Q15_EFFECT_TAG_ID);
+		auto circleEffect = TargetedAction::create(circle,Sequence::create(
+            DelayTime::create(0.84),
+            ScaleTo::create(0,1.8), Spawn::create(
+                ScaleTo::create(0.48,2.0),
+                FadeOut::create(0.48),NULL),NULL));
+
+		auto fire = Sprite::createWithSpriteFrameName("G1.png");
+		fire->setPosition( Vec2(
+            origin.x + visibleSize.width*0.445 + showCards[0]->getTextureRect().size.width*1.96,
+            origin.y + visibleSize.height*0.315));
+		fire->setTag(4);
+		fire->setScale(0);
+		myframe->addChild(fire,23,IMG_G1_EFFECT_TAG_ID);
+
+		auto animation = Animation::create();
+		animation->addSpriteFrameWithFile("G1.png");
+		animation->addSpriteFrameWithFile("G2.png");
+		animation->addSpriteFrameWithFile("G3.png");
+		animation->addSpriteFrameWithFile("G4.png");
+		animation->setDelayPerUnit(0.1f);
+		animation->setRestoreOriginalFrame(true);
+		auto fireAnimation = Animate::create(animation);
+		auto fireEffect = TargetedAction::create(fire,Sequence::create(
+            DelayTime::create(0.84),
+            ScaleTo::create(0,1),
+            fireAnimation,
+            ScaleTo::create(0,0),NULL));
+        
+		auto backGoundEffect = Spawn::create(
+            lightEffect,
+            circleEffect,
+            fireEffect,NULL);
+
+
+
+        
+		Spawn *simple_seq = simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" );
+        
+		auto PengEffectNode = Node::create();
+		PengEffectNode->_ID=1;
+		myframe->addChild(PengEffectNode,1,PENG_EFFECT_NODE_ID);
+        
+		auto callFunc_update_list = CCCallFunc::create([=](){
+			if(ifEffectTime) {
+
+                ifEffectTime=false;
+                
+				if(ifUpdateDuringEffect) {
+					ifUpdateDuringEffect=false;
+					_roundManager->CancelEffectCard();
+					card_list_update(dir);
+				} else  {
+                    int sameCardNum = 0;
+
+                    for(int a=list->atcvie_place-1;a>=0;a--) {
+						if( _roundManager->IsCurEffectCard(list->data[a]) ){
+							sameCardNum++;
+							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
+                            
+							if(sameCardNum==3){
+								_roundManager->CancelEffectCard();
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+
+		PengEffectNode->runAction(Sequence::create(
+            hideReminder,Spawn::create(
+                simple_seq,
+                _voice->SpeakAction(PENG,
+                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),Spawn::create(
+                hide2CardsInhand),Spawn::create(
+                moveRightCardInHand,
+                moveLeftCardInHand,NULL),Sequence::create(
+                    DelayTime::create(0.42),
+                    hideOutcard,NULL),Spawn::create(
+                backGoundEffect,
+                move3PengCards,NULL),Sequence::create(
+                DelayTime::create(0.84),
+                _voice->Speak("paizhuangji"),NULL),NULL),Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_ActionEffect)),
+            callFunc_update_list,CallFunc::create([=](){
+			if(myframe->getChildByTag(PENG_EFFECT_NODE_ID))
+				myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);}),/*actcheckagain,*/NULL),NULL));
+        
+        /***************************************
+            it is unneccessary for net-game???
+        ***************************************/
+		myframe->runAction( Sequence::create( 
+            CCCallFuncN::create(this,callfuncN_selector(
+                NetRaceLayer::peng_dispatch)), 
+            CCCallFunc::create([=](){
+    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+    			_roundManager->WaitForMyAction();}), 
+            CallFunc::create([=](){
+                _roundManager->_isMyShowTime=true;}),
+            NULL));
+	}
+}
+
+void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
+{
+	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
+	delete gang;
+
+    if(no!=1) {
+		myframe->runAction(Sequence::create(
+            Spawn::create(
+                _voice->SpeakAction(GANG,
+                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
+                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
+			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
+            NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::update_card_list)),
+            _voice->Speak("down"), CCCallFunc::create([=](){
+			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
+            _roundManager->DistributeCard();}),NULL),NULL));
+	}
+	else {
+		for(int NodeNum=0;NodeNum<3;NodeNum++) {
+            _Remove(myframe,PENG_EFFECT_NODE_ID+NodeNum);
+            
+			if(ifEffectTime) {
+				ifEffectTime=false;
+				ifUpdateDuringEffect=false;
+                _roundManager->CancelEffectCard();
+				delete_ActionEffect();
+				card_list_update(no);
+			}
+		}
+
+		ifEffectTime=true;
+		ifUpdateDuringEffect=true;
+        /**********************
+            clear screen
+        **********************/
+        auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
+
+        /**********************
+            logical
+        **********************/
+		auto list = _roundManager->_players[no]->get_parter()->get_card_list();
+        Card outCard;
+
+		int ifZeroPointTwo=0;
+		int ifLeft=0;
+		if(_myChosenCard!=-1) {
+			if(_myChosenCard<list->len-5)
+				ifLeft=1;
+			if(_myChosenCard==GangCardsPlace[3]
+                ||_myChosenCard==GangCardsPlace[2]
+                ||_myChosenCard==GangCardsPlace[1]
+                ||_myChosenCard==GangCardsPlace[0]) {
+				if(_myChosenCard!=(list->len-1))
+					ifZeroPointTwo=1;
+				_myChosenCard=-1;
+			} else if(_myChosenCard<GangCardsPlace[3]
+			            &&_myChosenCard>GangCardsPlace[2])
+				_myChosenCard+=1;
+			else if(_myChosenCard<GangCardsPlace[0])
+				_myChosenCard+=4;
+		}
+
+        /**********************
+            move 4 cards
+        **********************/
+        TargetedAction *moveGangCardEffect[4];
+        _CreateGangCardsMotion(moveGangCardEffect);
+
+        /**********************
+            move 4 cards in hand
+        **********************/
+        Size FreeCardSize = _object->RectSize(FREE_CARD);
+		auto curKindOfGang = list->data[GangCardsPlace[0]].kind;
+
+        TargetedAction *moveGangCardInHand[4];
+        _CreateGangCardInHandMotion(moveGangCardInHand, GangCardsPlace, curKindOfGang);
+
+		auto moveAngangCards = Spawn::create(
+            moveGangCardEffect[0],moveGangCardEffect[1],moveGangCardEffect[2],moveGangCardEffect[3],
+            moveGangCardInHand[0],moveGangCardInHand[1],moveGangCardInHand[2],moveGangCardInHand[3],NULL);
+
+        /**********************
+            move free cards in hand
+        **********************/
+        /* is there any possible that a card is activated and its status is FREE ??? */
+        int actionStartPlace=0;
+		for(int i=0;i<=list->atcvie_place;i++)
+			if(list->data[i].status==c_MING_KOU || list->data[i].status==c_FREE) {
+				actionStartPlace = i;
+				break;
+			}
+        auto GangCardSize = _object->RectSize(AN_GANG_CARD);
+
+        const float GAP = (list->atcvie_place==0)?(0.5):(0.0);
+        
+		Vector<FiniteTimeAction *>gang_list_seq;
+		Spawn* moveFreeCards;
+        
+		if( card==list->data[list->len-1].kind ) {
+            int i;
+            for(i=actionStartPlace;i<list->len-1;i++)
+			{
+                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                TargetedAction *motion;
+                
+				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE))
+				{
+					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            DelayTime::create(0.18),
+                            MoveTo::create(0.3,Vec2(
+                                curPos.x+GangCardSize.width*(3.5+GAP),
+                                curPos.y)),NULL));
+				}
+				else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2])
+				{
+					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            ScaleTo::create(0,0),NULL));
+				}
+				else if(i>GangCardsPlace[2])
+				{
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            DelayTime::create(0.18),
+                            MoveTo::create(0.3,Vec2(
+                                curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2)),
+                                curPos.y)),NULL));
+				}
+
+                gang_list_seq.insert(i-actionStartPlace,motion);
+			}
+            
+			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+list->len-1),
+                Sequence::create(
+                    DelayTime::create(0.18),
+                    ScaleTo::create(0,0),NULL));
+            
+            gang_list_seq.insert(i-actionStartPlace,motion);
+		} else {
+			for(int i=actionStartPlace;i<=list->len-1;i++)
+			{
+                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                TargetedAction *motion;
+                
+				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE)) {
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            DelayTime::create(0.18),
+                            MoveTo::create(0.3,Vec2(
+                                curPos.x + GangCardSize.width*(3.5+GAP),
+                                curPos.y)),NULL));
+				} else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2]) {
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            ScaleTo::create(0,0),NULL));
+				} else if(i==GangCardsPlace[3]) {
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            ScaleTo::create(0,0),NULL));
+                } else if(i>GangCardsPlace[3]) {
+                    MoveTo* actionMove;
+                    if( (i==list->len-1) && (card!=list->data[list->len-1].kind)) {
+						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i-1)->getPosition();
+						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
+                        
+						actionMove = MoveTo::create(0.3,Vec2(
+                            curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2))-instanceBetween,
+                            curPos.y));
+					}
+					else
+						actionMove = MoveTo::create(0.3,Vec2(
+						    curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2)),
+						    curPos.y));
+                    
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                        Sequence::create(
+                            DelayTime::create(0.18),
+                            actionMove,NULL));
+				}
+
+                gang_list_seq.insert(i-actionStartPlace,motion);
+			}
+		}
+        
+        moveFreeCards = Spawn::create(gang_list_seq);
+
+        /**********************
+            update tag
+        **********************/
+		for(int i=list->len-1;i>=0;i--) {
+			int curTag=HAND_IN_CARDS_TAG_ID+1*20+i;
+            
+			if(!myframe->getChildByTag(curTag))
+				continue;
+            
+			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
+            
+			if( GangCardsPlace[0]<list->atcvie_place ) {/* peng cards transfer to gang cards */
+				if(i==GangCardsPlace[3])
+					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
+				else if(i>GangCardsPlace[2] && i<GangCardsPlace[3]) {
+                    EveryCard->setTag(curTag+1);
+                    
+                    if(i==GangCardsPlace[2]+1) {       /* insert 1 addition gang card*/
+                        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+GangCardsPlace[2]+1);
+                        break;
+                    }
+                }
+			} else {/* gang directly */
+				if(i>GangCardsPlace[2] && i<GangCardsPlace[3]) {
+					EveryCard->setTag(curTag+1);      /*right shift*/
+                } else if(i==GangCardsPlace[3]||i==GangCardsPlace[2]||i==GangCardsPlace[1]||i==GangCardsPlace[0]) {
+					if(i==GangCardsPlace[3])
+						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
+					if(i==GangCardsPlace[2])
+						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_THREE);
+					if(i==GangCardsPlace[1])
+						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
+					if(i==GangCardsPlace[0])
+						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
+				} else if(i>=list->atcvie_place && i<GangCardsPlace[0]) {
+					EveryCard->setTag(curTag+4);      /* leave for 4 space for gang cards*/
+                    
+                    if(i==list->atcvie_place) {       /* insert 4 gang cards*/
+                        for(int b=0;b<4;b++)
+                            ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
+                        break;
+                    }
+                }
+			}
+		}
+
+        /**********************
+            background effect
+        **********************/
+        TargetedAction *bgElementsMotions[5];
+        _CreateBackgroundElementMotion(bgElementsMotions,0);
+
+        /* final effect */
+		auto callFunc_update_list=CCCallFunc::create([=](){
+			if(ifEffectTime) {
+				ifEffectTime=false;
+				if(ifUpdateDuringEffect) {
+					ifUpdateDuringEffect=false;
+					_roundManager->CancelEffectCard();
+					card_list_update(no);
+				} else {
+					int sameCardNum=0;
+					for(int a=list->atcvie_place-1;a>=0;a--)
+					{
+						if( _roundManager->IsCurEffectCard(list->data[a]) )
+						{
+							sameCardNum++;
+							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
+							if(sameCardNum==4)
+							{
+								_roundManager->CancelEffectCard();
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+
+		auto AnGangEffectNode = Node::create();
+		AnGangEffectNode->_ID=1;
+		myframe->addChild(AnGangEffectNode,1,AN_GANG_EFFECT_NODE);
+        
+		AnGangEffectNode->runAction( 
+    		Sequence::create(
+                hideReminder,
+                Spawn::create(
+                    simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
+                    _voice->SpeakAction(GANG,
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
+                    moveFreeCards,
+                    Spawn::create(
+            		    moveAngangCards,
+            		    Sequence::create(
+            		        DelayTime::create(0.66),CCCallFunc::create([=]() {
+                    		_StartParticleSystem(0.3);
+                    		}),NULL),
+                        bgElementsMotions[0],
+                        bgElementsMotions[1],
+                        bgElementsMotions[2],
+                        bgElementsMotions[3],
+                        bgElementsMotions[4],NULL),
+            		Sequence::create(
+                        DelayTime::create(0.66),CallFunc::create([=](){
+                        _voice->Speak("paizhuangji");}),NULL),NULL),
+                Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::delete_ActionEffect)),
+                    callFunc_update_list,
+                    _voice->Speak("lanpai"),NULL),CallFunc::create([=](){
+                _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
+        
+		myframe->_ID=1;
+		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::angang_dispatch)),
+            DelayTime::create(0.48), CallFunc::create([=](){
+			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
+			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
+            _roundManager->DistributeCard();}),NULL));
+	}
+}
+
+void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
+{
+    myframe->_ID = no;
+
+	auto list = _roundManager->_players[no]->get_parter()->get_card_list();
+
+	int riverLast = _roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
+	if(_roundManager->_isCardFromOthers) {
+        if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25 + riverLast))
+        {
+            myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25 + riverLast);
+        }
+	}
+    
+    if(no!=MIDDLE){
+        if(!_roundManager->_isCardFromOthers) {
+            _roundManager->_qiangGangTargetNo = _roundManager->_curPlayer;
+        }
+        
+        _OthersMingGangEffect((PlayerDir_t)_roundManager->_curPlayer,_roundManager->_isCardFromOthers);
+	} else {
+		for(int node=0;node<3;node++) {
+		    _Remove(myframe,PENG_EFFECT_NODE_ID+node);
+
+			if(ifEffectTime) {
+				ifEffectTime=false;
+				ifUpdateDuringEffect=false;
+                
+                _roundManager->CancelEffectCard();
+				delete_ActionEffect();
+				card_list_update(no);
+			}
+		}
+
+        _roundManager->SetEffectCard(card,c_MING_GANG);
+		ifEffectTime=true;
+		ifUpdateDuringEffect=true;
+
+        /**********************
+            clear screen
+        **********************/
+        auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
+
+        /**********************
+            hide out card
+        **********************/
+		Size FreeCardSize = _object->RectSize(FREE_CARD);
+
+		Sprite   *s_curOutCard;
+		Sequence *hideOutcard;
+
+		if( !_roundManager->_isCardFromOthers ) {
+			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20 + list->len-1);//gang1
+			lastInHand->runAction(ScaleTo::create(0,0));
+			
+			s_curOutCard=_object->Create(FREE_CARD);
+			s_curOutCard->setAnchorPoint(Vec2(0,0));
+			s_curOutCard->setPosition(Vec2(
+                lastInHand->getPosition().x,
+                lastInHand->getPosition().y));
+			auto kind = _object->CreateKind((Card_t)card,NORMAL);
+			kind->setAnchorPoint(Vec2(0.5,0.5));
+			kind->setPosition(Vec2(
+                s_curOutCard->getTextureRect().size.width/2,
+                s_curOutCard->getTextureRect().size.height*0.4));
+			s_curOutCard->addChild(kind,1);
+            
+			myframe->addChild(s_curOutCard,29,EFFET_NEWCATD1_TAG);
+			lastInHand->runAction(ScaleTo::create(0,0));
+            
+			if(s_curOutCard) {
+				hideOutcard = Sequence::create(DelayTime::create(0.06),NULL);
+			}
+		}
+		else {
+			s_curOutCard = (Sprite*)myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
+            
+			hideOutcard = Sequence::create(Spawn::create(CCCallFunc::create([=]() {
+			    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
+                s_curOutCard,Sequence::create(
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL)),NULL),NULL);
+		}
+        
+        /**********************
+            
+        **********************/
+        int ifZeroPointTwo=0;
+        int ifLeft=0;
+        if(_myChosenCard!=-1) {
+            if(_myChosenCard<list->len-4)
+                ifLeft=1;
+            
+            if(!_roundManager->_isCardFromOthers) {
+                if(_myChosenCard>gang[2])
+                    _myChosenCard+=1;
+            } else {
+                if(_myChosenCard>gang[2])
+                    _myChosenCard+=1;
+                else if(_myChosenCard==gang[0]||_myChosenCard==gang[1]||_myChosenCard==gang[2]) {
+                    ifZeroPointTwo=1;
+                    _myChosenCard=-1;
+                }
+                else if(_myChosenCard<gang[0])
+                    _myChosenCard+=4;
+            }
+        }
+            
+		auto Pengsize = _object->RectSize(PENG_CARD);
+        
+		Sprite* baseCard;
+		Vec2    basePos;
+        
+		if(!_roundManager->_isCardFromOthers) {
+			baseCard = _GetCardInHand(MIDDLE,list->len-2);
+			basePos  = baseCard->getPosition();
+            
+			distributeCardPos=Vec2(
+                basePos.x + baseCard->getBoundingBox().size.width + 30 - FreeCardSize.width*ifZeroPointTwo*0.2,
+                basePos.y);
+		} else {
+			baseCard = _GetCardInHand(MIDDLE,list->len-4);
+			basePos  = baseCard->getPosition();
+
+            if( list->atcvie_place>0 )
+				distributeCardPos = Vec2(
+				    basePos.x + Pengsize.width*3.5 + 30 
+				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
+				    basePos.y);
+			else
+				distributeCardPos = Vec2(
+				    basePos.x + Pengsize.width*4 + 30 
+				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
+				    basePos.y);
+		}
+
+        /**********************
+            gang cards motions
+        **********************/
+        TargetedAction *gangCardsMotion[4];
+        Sequence *gangCard0Motion;
+
+		auto show_card = _object->Create(PENG_CARD);
+		auto cardPengSize = show_card->getTextureRect().size;
+
+        _AttachKindTexture(show_card,(CARD_KIND)card);
+        
+		show_card->setAnchorPoint(Vec2(0,0));
+		if(!_roundManager->_isCardFromOthers) {
+			show_card->setPosition(_layout->OrigPositionOfGangCard(0,cardPengSize));
+		} else {
+			show_card->setPosition(s_curOutCard->getPosition());
+		}
+		show_card->setScale(0);
+		myframe->addChild(show_card,29,SINGLE_ACTION_EFFECT_TAG_ID);
+
+		if(_roundManager->_isCardFromOthers) {
+			gangCardsMotion[0] = TargetedAction::create(show_card,Sequence::create(
+                DelayTime::create(0.42),
+                ScaleTo::create(0,1),
+                MoveTo::create(0.12,Vec2(
+                    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,
+                    origin.y+visibleSize.height*0.255)),
+				MoveTo::create(0.12,Vec2(
+				    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98+150,
+				    origin.y+visibleSize.height*0.255)),
+				MoveTo::create(0.12,Vec2(
+				    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,
+				    origin.y+visibleSize.height*0.255)),NULL)),NULL;
+            gangCard0Motion = Sequence::create(gangCardsMotion[0],NULL);
+		} else {
+			gangCardsMotion[0] = TargetedAction::create(s_curOutCard,Sequence::create(
+                    DelayTime::create(0.42),
+                    ScaleTo::create(0,0.6),
+                    MoveTo::create(0.12,_layout->OrigPositionOfGangCard(0,cardPengSize)),
+                    ScaleTo::create(0,0),NULL));
+            gangCard0Motion = Sequence::create(
+                gangCardsMotion[0],
+                TargetedAction::create(show_card,Sequence::create(
+                    ScaleTo::create(0,1),
+                    MoveTo::create(0.12,_layout->MiddlePositionOfGangCard(0,cardPengSize)),
+    				MoveTo::create(0.12,_layout->DestPositionOfGangCard(0,cardPengSize)),NULL)),NULL);
+		}
+
+        _CreateMingGangCardsMotion(gangCardsMotion,(CARD_KIND)card);
+
+        /**********************
+            move cards in hand
+        **********************/
+		Sequence*Gang2Card_seq;
+		Sequence* Gang3Card_seq;
+		Sequence* Gang4Card_seq;
+        float delayTime=0.18;
+
+        TargetedAction *gangCardInHandMotion[3];
+        Sprite *gangCard[3];
+
+        if(!_roundManager->_isCardFromOthers) {
+            _CreateMingGangCardInHandMotion(gangCardInHandMotion,gang,(CARD_KIND)card);
+		} else {
+		    _CreateFreeCard(gangCard,gang,(CARD_KIND)card);
+
+            if(list->atcvie_place>=0)/* active_place can less than 0 ???? */
+			{
+                auto OldGang2Pos = gangCard[0]->getPosition();
+                auto OldGang3Pos = gangCard[1]->getPosition();
+                auto OldGang4Pos = gangCard[2]->getPosition();
+                
+				gangCardInHandMotion[0]=TargetedAction::create(gangCard[0],Sequence::create(
+                    DelayTime::create(delayTime),
+                    ScaleTo::create(0,0.6),MoveTo::create(0.18,Vec2(
+        				origin.x+visibleSize.width*0.5-gangCard[0]->getTextureRect().size.width*0.6*1.96,
+        				origin.y+visibleSize.height*0.26)),
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL));
+
+				gangCardInHandMotion[1]=TargetedAction::create(gangCard[1],Sequence::create(
+                    DelayTime::create(delayTime),Spawn::create(
+                        ScaleTo::create(0,0.6),
+                        MoveTo::create(0,Vec2(OldGang3Pos.x-FreeCardSize.width*0.4,OldGang3Pos.y)),NULL),
+                    MoveTo::create(0.18,Vec2(
+        				origin.x+visibleSize.width*0.5-gangCard[1]->getTextureRect().size.width*0.6*0.98,
+        				origin.y+visibleSize.height*0.26)),
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL));
+
+				gangCardInHandMotion[2]=TargetedAction::create(gangCard[2],Sequence::create(
+                    DelayTime::create(delayTime),Spawn::create(
+                        ScaleTo::create(0,0.6),
+                        MoveTo::create(0,Vec2(OldGang4Pos.x-FreeCardSize.width*0.8,OldGang4Pos.y)),NULL),
+                    MoveTo::create(0.18,Vec2(
+        				origin.x+visibleSize.width*0.5,
+        				origin.y+visibleSize.height*0.26)),
+                    DelayTime::create(0.06),
+                    ScaleTo::create(0,0),NULL));
+			}
+		}
+
+        /**********************
+            move free cards in hand
+        **********************/
+		int actionStartPlace=0;
+		for(int a=0;a<=list->atcvie_place;a++)
+			if(list->data[a].status==c_MING_KOU||list->data[a].status==c_FREE)
+			{
+				actionStartPlace=a;
+				break;
+			}
+		actionStartPlace = (actionStartPlace>gang[0])?gang[0]:actionStartPlace;
+            
+		Vector<FiniteTimeAction *>gang_list_seq;
+        
+		if(!_roundManager->_isCardFromOthers) {
+			for(int i=actionStartPlace; i<=gang[0]; i++) {/* right shift */
+				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+
+				auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+                    Sequence::create(
+                    DelayTime::create(delayTime),
+                    MoveTo::create(0.3,Vec2(
+                        curPos.x+cardPengSize.width*3.5,
+                        curPos.y)),NULL));
+				gang_list_seq.insert(i-actionStartPlace,action);
+             }
+			for(int i=gang[0]; i<=gang[2]; i++) {/*hide gang cards*/
+				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        ScaleTo::create(0,0),NULL)));
+			}
+		}
+		else {
+            const float GAP = (list->atcvie_place==0)?0.5:0.0;
+            
+			for(int i=actionStartPlace;i<gang[0];i++) {/* right shift */
+                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+
+                gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        DelayTime::create(delayTime),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x+cardPengSize.width*(3.5+GAP),
+                            curPos.y)),NULL)));
+			}
+            for(int i=gang[0];i<=gang[2];i++) {/* hide */
+				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        ScaleTo::create(0,0),NULL)));
+			} 
+            for(int i=gang[2]+1;i<list->len;i++) {/* right shift */
+				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                
+                gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                        DelayTime::create(delayTime),
+                        MoveTo::create(0.3,Vec2(
+                            curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
+                            curPos.y)),NULL)));
+			}
+		}
+
+        Spawn *moveFreeCards = Spawn::create(gang_list_seq);
+        /**********************
+            update tag
+        **********************/
+		for(int a=list->len-1;a>=0;a--) {
+			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
+			if(!myframe->getChildByTag(curTag))
+				continue;
+            
+			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
+			if(!_roundManager->_isCardFromOthers) {
+				if(a==list->len-1)
+					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
+				else if(a<list->len-1&&a>gang[2])
+					EveryCard->setTag(curTag+1);
+				if(a==(gang[2]+1)) {
+					((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
+				}
+			} else {
+				if(gang[0]<list->atcvie_place) {
+					if(a>gang[2])
+						EveryCard->setTag(curTag+1);
+                    
+					if(a==gang[2]+1) {
+						auto EmptyCard=_object->Create(FREE_CARD);
+						EmptyCard->setAnchorPoint(Vec2(1,1));
+						EmptyCard->setScale(0);
+						EmptyCard->setPosition(Vec2::ZERO);
+						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
+					}
+				} else {
+					if(a>gang[2])
+						EveryCard->setTag(curTag+1);
+					else if(a<=gang[2]&&a>=gang[0]) {
+						if(a==gang[2])
+							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_THREE);
+						if(a==gang[1])
+							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
+						if(a==gang[0])
+							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
+					} else if(a<gang[0]&&a>=list->atcvie_place)
+						EveryCard->setTag(curTag+4);
+                    
+					if(a==list->atcvie_place)
+					{
+						for(int b=0;b<3;b++)
+							((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
+
+						auto EmptyCard=_object->Create(FREE_CARD);
+						EmptyCard->setAnchorPoint(Vec2(1,1));
+						EmptyCard->setScale(0);
+						EmptyCard->setPosition(Vec2::ZERO);
+						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+3);
+					}
+				}
+			}
+		}
+
+        /**********************
+            background effect
+        **********************/
+        TargetedAction *bgElementsMotions[5];
+        _CreateBackgroundElementMotion(bgElementsMotions, 1);
+
+        /* final effect */
+		auto callFunc_update_list = CCCallFunc::create([=](){
+			if(ifEffectTime)
+			{
+				ifEffectTime=false;
+				if(ifUpdateDuringEffect)
+				{
+					ifUpdateDuringEffect=false;
+                    _roundManager->CancelEffectCard();
+					card_list_update(no);
+				}
+				else 
+				{
+					int sameCardNum=0;
+					for(int a=list->atcvie_place-1;a>=0;a--)
+					{
+						if( _roundManager->IsCurEffectCard(list->data[a]) )
+						{
+							sameCardNum++;
+							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
+							if(sameCardNum==4)
+							{
+								_roundManager->CancelEffectCard();
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+
+		auto MingGangEffectNode = Node::create();
+		myframe->addChild(MingGangEffectNode,1,MING_GANG_EFFECT_NODE);
+
+		MingGangEffectNode->_ID=1;
+		MingGangEffectNode->runAction(
+            Sequence::create(
+                hideReminder,
+            Spawn::create(
+                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
+                _voice->SpeakAction(GANG,
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
+                hideOutcard,
+                moveFreeCards,
+                Spawn::create(
+                    Spawn::create(
+                        gangCard0Motion,gangCardsMotion[1],gangCardsMotion[2],gangCardsMotion[3],
+                        gangCardInHandMotion[0],gangCardInHandMotion[1],gangCardInHandMotion[2],NULL),
+                    Sequence::create(
+                        DelayTime::create(0.78), CCCallFunc::create([=]() {
+            			_StartParticleSystem(0.3); }),NULL),
+                    bgElementsMotions[0],
+                    bgElementsMotions[1],
+                    bgElementsMotions[2],
+                    bgElementsMotions[3],
+                    bgElementsMotions[4],NULL),
+                Sequence::create(
+                    DelayTime::create(0.78),CallFunc::create([=](){
+                    _voice->Speak("paizhuangji");}),NULL),NULL),
+            Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                NetRaceLayer::delete_ActionEffect)),
+                callFunc_update_list,CallFunc::create([=](){
+                _Remove(myframe,MING_GANG_EFFECT_NODE);}),NULL),NULL));
+
+        CallFunc* dis_action;
+        if(!_roundManager->_isCardFromOthers) {
+            _roundManager->_qiangGangTargetNo=no;
+            dis_action=CallFunc::create([=](){
+                            _roundManager->QiangGangHuJudge();});
+        } else
+            dis_action=CallFunc::create([=](){
+                            _roundManager->DistributeCard();});
+        
+		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::minggang_dispatch)),
+            DelayTime::create(0.48),CallFunc::create([=](){
+			if(_roundManager->_isCardFromOthers)
+				GoldNumInsert(no,2,_roundManager->_curPlayer);}),dis_action,NULL));
+	}
+}
+
+/* why use different mechanism for single hu and double hu ??? */
+void NetRaceLayer::_HuEffect(int no)
+{
+    LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
+
+	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
+
+    _Remove(this,ROBOT_TUO_GUAN);
+    _Remove(this,TUOGUAN_CANCEL_BUTTON);
+    
+	scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
+
+	if(no<3) {
+        _roundManager->SetWin(SINGLE_WIN,no);
+        
+		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
+
+        CallFunc*HuVoice = _voice->SpeakAction(HU,
+                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
+
+        if(no!=1)
+		{
+			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
+			auto GoldAccount=CallFunc::create([=](){
+				GoldNumInsert(no,3,_roundManager->_curPlayer);	
+			});
+			auto hu_seq=Sequence::create(Spawn::create(HuVoice,simple_seq,NULL),GoldAccount,callfunc,NULL);
+			myframe->runAction(hu_seq);
+		}
+		else
+		{
+			Sequence* g_seq1;
+			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1) {
+			    g_seq1 = _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5);
+			}
+
+			auto centerExplode=Sprite::createWithSpriteFrameName("101.png");
+			centerExplode->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+			myframe->addChild(centerExplode,30,IMG_101_EFFECT_TAG_ID);
+			centerExplode->setOpacity(200);
+			centerExplode->setScale(0);
+			auto animation = Animation::create();
+			animation->addSpriteFrameWithFile("101.png");
+			animation->addSpriteFrameWithFile("103.png");
+			animation->addSpriteFrameWithFile("105.png");
+			animation->addSpriteFrameWithFile("106.png");
+			animation->setDelayPerUnit(0.05f);
+			animation->setRestoreOriginalFrame(true);
+			auto action = Animate::create(animation);
+			auto action1=Repeat::create(action,3);
+			auto l_seq1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(callfunc,action1,NULL),FadeOut::create(0.1),NULL);
+			//auto l_seq1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),action1,FadeOut::create(0.1),NULL);
+			auto ll_action1=TargetedAction::create(centerExplode,l_seq1);
+
+			auto lightCircle=Sprite::createWithSpriteFrameName("4.png");
+			lightCircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+			myframe->addChild(lightCircle,29,IMG_4_EFFECT_TAG_ID);
+			lightCircle->setRotation(90);
+			lightCircle->setScaleX(0);
+			lightCircle->setScaleY(0);
+			lightCircle->setOpacity(150);
+			BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
+			lightCircle->setBlendFunc(tmp_oBlendFunc);
+			auto l_seq2=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.2,0.6),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,0.4,4.0)),EaseSineIn::create(FadeOut::create(0.5)),NULL),NULL);
+			auto ll_action2=TargetedAction::create(lightCircle,l_seq2);
+
+			auto lightCircle2=Sprite::createWithSpriteFrameName("Q13.png");
+			lightCircle2->setAnchorPoint(Vec2(0.5,0));
+			lightCircle2->setOpacity(180);
+			lightCircle2->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
+			myframe->addChild(lightCircle2,30,IMG_Q13_EFFECT_TAG_ID);
+			lightCircle2->setScale(0);
+			auto l_seq3=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.5)),FadeOut::create(0.5),NULL),NULL);
+			auto ll_action3=TargetedAction::create(lightCircle2,l_seq3);
+
+			auto lightCircle3=Sprite::createWithSpriteFrameName("Q13.png");
+			lightCircle3->setAnchorPoint(Vec2(0.5,0));
+			lightCircle2->setOpacity(180);
+			lightCircle3->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
+			myframe->addChild(lightCircle3,30,IMG_Q13_2_EFFECT_TAG_ID);
+			lightCircle3->setScale(0);
+			auto l_seq4=Sequence::create(DelayTime::create(0.5),ScaleTo::create(0,0.26),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.5)),FadeOut::create(0.5),NULL),NULL);
+			auto ll_action4=TargetedAction::create(lightCircle3,l_seq4);
+			
+			auto lightCircle4=Sprite::createWithSpriteFrameName("888.png");
+			lightCircle4->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+			lightCircle4->setScale(0);
+			myframe->addChild(lightCircle4,29,IMG_888_EFFECT_TAG_ID);
+			lightCircle4->setBlendFunc(tmp_oBlendFunc);
+			auto l_seq5=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(EaseSineOut::create(ScaleTo::create(0.3,5.5)),FadeOut::create(0.3),NULL),NULL);
+			auto ll_action5=TargetedAction::create(lightCircle4,l_seq5);
+
+			auto star=Sprite::createWithSpriteFrameName("104.png");
+			star->setAnchorPoint(Vec2(0.5,0));
+			star->setScale(0);
+			star->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+			myframe->addChild(star,29,IMG_104_EFFECT_TAG_ID);
+			auto l_seq6=Sequence::create(DelayTime::create(0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,0.7)),FadeOut::create(0.5),NULL),NULL);
+			auto ll_action6=TargetedAction::create(star,l_seq6);
+			
+			auto flame=Sprite::createWithSpriteFrameName("444.png");
+			flame->setAnchorPoint(Vec2(0,0.5));
+			flame->setRotation(-90);
+			flame->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+			myframe->addChild(flame,29,IMG_444_EFFECT_TAG_ID);
+			flame->setBlendFunc(tmp_oBlendFunc);
+			flame->setScale(0);
+			auto l_seq7=Sequence::create(DelayTime::create(0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.0)),FadeOut::create(0.5),NULL),NULL);
+			auto ll_action7=TargetedAction::create(flame,l_seq7);
+
+			auto firecircle=Sprite::createWithSpriteFrameName("666.png");
+			firecircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+			firecircle->setTag(4);
+			firecircle->setScale(0);
+			firecircle->setOpacity(200);
+			myframe->addChild(firecircle,29,IMG_666_EFFECT_TAG_ID);
+			auto actionScale=ScaleTo::create(0.5,1.0);
+			auto c_fadeOut=FadeOut::create(0.5);
+			auto c_seq1=Spawn::create(EaseSineOut::create(actionScale),c_fadeOut,NULL);
+			firecircle->setOpacity(100);
+			firecircle->setBlendFunc(tmp_oBlendFunc);
+			auto l_seq8=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.1),c_seq1,NULL);
+			auto ll_action8=TargetedAction::create(firecircle,l_seq8);
+			
+			auto ll_action9=Sequence::create(DelayTime::create(0.3),CCCallFunc::create([=]()
+			{
+				_StartParticleSystem(0.3);	
+			}),NULL);
+
+			auto sorPos=this->getPosition();
+			auto pShake1 = MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y+10));
+			auto pShake2 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
+			auto pShake3 = MoveTo::create(0.1,Vec2(sorPos.x-10,sorPos.y-10));
+			auto pShake4 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
+			auto pShake5 = MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y));
+			auto pShake6 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
+			auto pShake7 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y+10));
+			auto pShake8 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
+			auto l_seq10=Sequence::create(DelayTime::create(0.3),pShake1,pShake2,pShake3,pShake4,pShake5,pShake6,pShake7,pShake8,NULL);
+			auto ll_action10=TargetedAction::create(this,l_seq10);
+			auto l_spa=Spawn::create(ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
+			
+			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
+			auto GoldAccount=CallFunc::create([=](){
+				GoldNumInsert(no,3,_roundManager->_curPlayer);	
+			});
+			Spawn* hu_seq;
+			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1)
+				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,Sequence::create(g_seq1,l_spa,NULL),NULL);
+			else
+				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,l_spa,NULL);
+			myframe->runAction(hu_seq);
+		}
+	}
+	else if(no==3) {//两个对家双响
+        _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
+		ListenToDoubleHu();
+	}
+}
+
+void NetRaceLayer::_QiEffect(PlayerDir_t dir)
+{
+	myframe->_ID = MIDDLE;
+
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	if(_roundManager->_lastAction==a_JUMP)
+		_roundManager->_continue_gang_times=0;
+	_roundManager->_lastAction=a_JUMP;
+	_roundManager->_actionToDo=a_JUMP;
+	if(_roundManager->_isWaitDecision) {
+		_roundManager->_isWaitDecision=false;
+		_roundManager->_tempActionToDo=a_JUMP;
+	}
+
+    /********************************
+        hide reminder
+    ********************************/
+	auto shadeFunc =_HideQiReminder();
+    
+    /********************************
+        
+    ********************************/
+	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && dir==MIDDLE) {
+		if(!_roundManager->_isCardFromOthers) {
+			if(_roundManager->_isGangAsking) {
+				myframe->runAction(Sequence::create(
+                    shadeFunc,CallFunc::create([=](){
+    					_roundManager->_isGangAsking = false;
+                        
+                        CardsInfo_t cards;
+                        _GetCardsInfo(&cards);
+                        
+                        Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
+
+                        _roundManager->RecvHandout(cards.last,location,2);
+                    }),NULL));
+			} else
+				myframe->runAction(shadeFunc);
+		} else {
+			if(_roundManager->_isQiangGangAsking) {
+				_roundManager->_isQiangGangAsking=false;
+
+				myframe->runAction(Sequence::create(
+                    shadeFunc,Spawn::create(CallFunc::create([=](){
+    					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
+    					_roundManager->_qiangGangTargetNo=-1;/*!!! could this be called before runAction */}),CallFunc::create([=](){
+                        _roundManager->DistributeCard();}),NULL),NULL));
+			} else if(_roundManager->_isDoubleHuAsking) {
+				_roundManager->_isDoubleHuAsking=false;
+				myframe->runAction(Sequence::create(
+                    shadeFunc,CallFunc::create([=](){
+                    _HuEffect(_roundManager->_otherOneForDouble);}),NULL));
+			} else {
+				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
+				myframe->runAction(Sequence::create(
+                    shadeFunc,CallFunc::create([=](){
+                    _roundManager->DistributeCard();}),NULL));
+			}
+		}
+	}
+}
+
+/********************************************************
+            cards
+********************************************************/
+/* this function is only for others */
+Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
+                                        CARD_ARRAY *cards,bool isTing,const Vec2 &refer) {
+    switch( cards->data[idx].status ) {
+        case c_FREE:
+            {
+                Sprite *card;
+                
+                if(isTing) {
+                    card = _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
+                } else if(!isTing&&_roundManager->IsTing(MIDDLE)) {
+                    card = _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
+                } else {
+                    TextureId_t texture = (dir==LEFT)?L_IN_CARD:R_IN_CARD;
+                    card = _object->Create(texture,dir,refer.x,refer.y);
+                    card->setAnchorPoint(_layout->AnchorOfFreeCard(dir));
+                }
+
+                return card;
+            }
+        case c_AN_GANG:
+            if(cards->data[idx].kind==cards->data[idx+1].kind
+                &&cards->data[idx].kind!=cards->data[idx+2].kind
+                &&!isTing&&_roundManager->IsTing(MIDDLE))
+                return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
+            else
+                return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
+        case c_MING_KOU:
+            return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
+        case c_PENG:
+        case c_MING_GANG:
+            return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
+    }
+}
+
+float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY) {
+    float up = (dir==LEFT)?(-1):1;
+    float groupGap = (dir==LEFT)?0.4:0.8;
+    
+    switch(cards->data[idx].status) {
+        case c_FREE:
+            if(isTing||_roundManager->IsTing(MIDDLE)) {
+                return up*(refY*0.65);
+            } else {
+                return up*(refY*0.5);
+            }
+        case c_MING_KOU:
+            return up*(refY*0.65);
+        case c_PENG:
+            if(isTing||_roundManager->IsTing(MIDDLE)) {
+                if(cards->data[idx+1].status==c_FREE||cards->data[idx+1].status==c_MING_KOU)
+                    return up*refY;
+                else if(cards->data[idx+1].kind!=cards->data[idx].kind)
+                    return up*(refY*0.65+5);
+                else 
+                    return up*(refY*0.65);
+            } else {
+                if(cards->data[idx+1].status==c_FREE)
+                    return up*(refY*groupGap);
+                else if(cards->data[idx+1].kind!=cards->data[idx].kind)
+                    return up*(refY*0.65+5);
+                else
+                    return up*(refY*0.65);
+            }
+        case c_MING_GANG:
+        case c_AN_GANG:
+            int groupIdx = _roundManager->_GroupIdx(idx,cards);
+            if( (dir==LEFT&&groupIdx==1) || (dir==RIGHT&&groupIdx==3)) {
+                return up*(refY*0.65);
+            } else if (groupIdx==2) {
+                return -up*13;
+            } else if( (dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==1)) {
+                return up*(refY*0.65+13);
+            } else {
+                if(_roundManager->IsTing(MIDDLE)||isTing==1) {
+                    if(cards->data[idx+1].status==c_FREE||cards->data[idx+1].status==c_MING_KOU)
+                        return up*refY;
+                    else
+                        return up*(refY*0.65+5);
+                } else {
+                    if(cards->data[idx+1].status==c_FREE)
+                        return up*(refY*groupGap);
+                    else
+                        return up*(refY*0.65+5);
+                }
+            }
+    }
+}
+
+/******************************************************
+        ting hint bar
+******************************************************/
+void NetRaceLayer::_UpdateTingNum(PlayerDir_t dir) {
+    _roundManager->_players[dir]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
+    
+	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
+	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
+
+	_roundManager->_players[dir]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
+	_roundManager->_players[dir]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
+
+	int cardNum = hu_NumForEveryCard[Hu_cardOut_place];
+
+	for(int i=0;i<cardNum;i++) {
+		Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
+		curCardBar->removeChildByTag(2);
+
+        auto residueNum = _CreateNumberSign(hu_residueForEvery[Hu_cardOut_place][i]);
+        curCardBar->addChild(residueNum,1,2);
+	}
+}
+
+void NetRaceLayer::_TingHintBarOfOthers(int curNo,int outCardIdx) {
+	Hu_cardOut_place = outCardIdx;
+    
+	int hu_NumForEveryCard[MAX_HANDIN_NUM];
+	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];
+	_roundManager->_players[curNo]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);
+	_roundManager->_players[curNo]->get_parter()->get_hu_cards(hu_cards);
+
+    auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,(Card_t *)hu_cards[outCardIdx],hu_NumForEveryCard[outCardIdx]);
+    myframe->addChild(tingSignBar,30,TING_SING_LEFTBAR+curNo/2);
+}
+
+void NetRaceLayer::_TingHintCreate(Point curPos,int CardPlace)
+{
+	_roundManager->_players[MIDDLE]->get_parter()->get_ming_reserved_cards_num(_roundManager->_river);
+    
+	Hu_cardOut_place=CardPlace;
+	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
+	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
+	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
+	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
+	_roundManager->_players[MIDDLE]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
+	_roundManager->_players[MIDDLE]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
+	_roundManager->_players[MIDDLE]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
+	_roundManager->_players[MIDDLE]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
+
+	int cardNum=hu_NumForEveryCard[CardPlace];
+
+    auto tingSignBar = _object->CreateTingInfoBar(
+        curPos,(Card_t *)hu_cards[CardPlace],cardNum,huTiemsForEveryOne[CardPlace],hu_residueForEvery[CardPlace]);
+	myframe->addChild(tingSignBar, 30, TING_SING_BAR);
+}
+
+/****************************************
+        ming
+****************************************/
+void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
+    for(int i=cards->atcvie_place;i<cards->len;i++) {
+        Sprite *card = _GetCardInHand(MIDDLE,i);
+        _Remove(card,MING_KOU);
+    }
+
+    auto button = myframe->getChildByTag(MING_KOU_CANCEL);
+    
+    myframe->_ID = MIDDLE;
+    myframe->runAction(
+        Sequence::create(
+            TargetedAction::create(button,
+                ScaleTo::create(0,0)),CallFunc::create([=](){
+                _roundManager->RecvMing();}),NULL));
+}
+
+void NetRaceLayer::KouConfirmEffect() {
+    auto button = myframe->getChildByTag(MING_KOU_ENSURE);
+
+    myframe->_ID = MIDDLE;
+    myframe->runAction(Sequence::create(TargetedAction::create(
+        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+        _roundManager->RecvMing();}),NULL));
+}
+
+void NetRaceLayer::MingCancelEffect() {
+    auto button = myframe->getChildByTag(MING_CANCEL);
+    
+    myframe->_ID = _roundManager->_curPlayer;
+    myframe->runAction(Sequence::create(TargetedAction::create(
+        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+        _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
+        _roundManager->WaitForMyAction();}),NULL));
+}
+
+void NetRaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+
+			_Remove(myframe,MING_KOU_ENSURE);			
+			_Remove(myframe,MING_KOU_SIGN);
+			curButton->setTouchEnabled(false);
+
+            _roundManager->RecvKouCancel();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}	
+}
+
+void NetRaceLayer::BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+    auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+            
+            _Remove(myframe,MING_KOU_SIGN);
+			curButton->setTouchEnabled(false);
+
+            _roundManager->RecvKouConfirm();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            _roundManager->RecvMingCancel();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+Node *NetRaceLayer::_NonKouMask(Sprite *card) {
+    auto mask = _object->Create(MING_MASK_CARD);
+    mask->setAnchorPoint(Vec2(0.5,0.5));
+    mask->setPosition(card->getTextureRect().size.width/2,card->getTextureRect().size.height/2);
+    card->addChild(mask,2,MING_KOU_MASK);
+
+    return mask;
+}
+
+void NetRaceLayer::_MaskNonKouCards(CARD_ARRAY *cards) {
+    for(int i=cards->atcvie_place; i<cards->len; i++) {
+        if(cards->data[i].status!=c_KOU_ENABLE) {
+            Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
+            _NonKouMask(card);
+        }
+    }
+}
+
+bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
+    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+
+    Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
+    int groupChosen=-1;
+    
+    for(int i=0;i<cards->len;i++) {
+        cardsInHand[i]=_GetCardInHand(MIDDLE,i);
+        cardsInHand[i]->_ID = MIDDLE;
+    }
+    
+    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
+        for(int i=0; i<3; i++) {
+            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)], touch) ) {
+                groupChosen = group;
+                break;/* BUG : only 1 group can be chosen??? */
+            }
+        }
+    }
+    
+    if(groupChosen!=-1) {
+        for(int i=0; i<3; i++) {
+            cardsInHand[_ai->KouCardIndex(groupChosen,i)]->_ID++;/*==2???*/
+        }
+    }
+    
+    return true;
+}
+
+void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
+    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+
+    Sprite *cardsInHand[MAX_HANDIN_NUM];
+    int a,b,groupChosen=-1;
+    
+    for(int i=0; i<cards->len; i++) {
+        cardsInHand[i]=_GetCardInHand(MIDDLE,i);
+    }
+    
+    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
+        for(int i=0;i<3;i++) {
+            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)],touch) ) {
+                if(cardsInHand[_ai->KouCardIndex(group,i)]->_ID!=1) {
+                    groupChosen = group;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if(groupChosen!=-1) {
+        if(_ai->KouCardStatus(groupChosen)==c_MING_KOU) {
+            _ai->SetKouCardStatus(groupChosen,c_MING_KOU);
+            cards->data[_ai->KouCardIndex(groupChosen,0)].status=c_KOU_ENABLE;
+            cards->data[_ai->KouCardIndex(groupChosen,1)].status=c_KOU_ENABLE;
+            cards->data[_ai->KouCardIndex(groupChosen,2)].status=c_KOU_ENABLE;
+        }
+        else if(_ai->KouCardStatus(groupChosen)==c_KOU_ENABLE)
+        {
+            _ai->SetKouCardStatus(groupChosen,c_MING_KOU);
+            cards->data[_ai->KouCardIndex(groupChosen,0)].status=c_MING_KOU;
+            cards->data[_ai->KouCardIndex(groupChosen,1)].status=c_MING_KOU;
+            cards->data[_ai->KouCardIndex(groupChosen,2)].status=c_MING_KOU;
+        }
+    }
+    
+    for( a=0; a<_ai->KouCardGroupNum(); a++ ) {
+        if(_ai->KouCardStatus(a)!=c_MING_KOU) {
+            if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
+                (CARD_KIND)_ai->KouCardKind(a), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
+            {
+                cards->data[_ai->KouCardIndex(a,0)].status=c_KOU_ENABLE;
+                cards->data[_ai->KouCardIndex(a,1)].status=c_KOU_ENABLE;
+                cards->data[_ai->KouCardIndex(a,2)].status=c_KOU_ENABLE;
+                _ai->SetKouCardStatus(a,c_MING_KOU);
+            } else {
+                cards->data[_ai->KouCardIndex(a,0)].status=c_FREE;
+                cards->data[_ai->KouCardIndex(a,1)].status=c_FREE;
+                cards->data[_ai->KouCardIndex(a,2)].status=c_FREE;
+                _ai->SetKouCardStatus(a,c_FREE);
+            }
+        }
+    }
+    
+    for(a=0;a<_ai->KouCardGroupNum();a++) {
+        for(b=0;b<3;b++) {
+            if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU))
+                cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU);
+            if(cardsInHand[_ai->KouCardIndex(a,b)]->getChildByTag(MING_KOU_MASK))
+                cardsInHand[_ai->KouCardIndex(a,b)]->removeChildByTag(MING_KOU_MASK);
+            if(cards->data[_ai->KouCardIndex(a,b)].status==c_MING_KOU) {
+                auto MingKouMark=_object->Create(MING_KOU_CARD);
+                MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
+                MingKouMark->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
+                cardsInHand[_ai->KouCardIndex(a,b)]->addChild(MingKouMark,2,MING_KOU);
+            } else if(cards->data[_ai->KouCardIndex(a,b)].status!=c_KOU_ENABLE) {
+                auto KouNo=_object->Create(MING_MASK_CARD);
+                KouNo->setAnchorPoint(Vec2(0.5,0.5));
+                KouNo->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(a,b)]->getTextureRect().size.height/2));
+                cardsInHand[_ai->KouCardIndex(a,b)]->addChild(KouNo,2,MING_KOU_MASK);
+            }
+        }
+    }
+    
+    bool ifEnsureVisible=false;
+    for(a=0;a<4;a++) {
+        if(_ai->KouCardStatus(a)==c_MING_KOU) {
+            ifEnsureVisible=true;
+            break;
+        }
+    }
+
+    Node *node = myframe->getChildByTag(MING_KOU_ENSURE);
+    if(ifEnsureVisible)
+        myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
+    else
+        myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(false);
+}
+
+void NetRaceLayer::ListenToKou(int no) {
+    auto cards=_roundManager->_players[no]->get_parter()->get_card_list();
+    auto KouListener = EventListenerTouchOneByOne::create();
+    KouListener->setSwallowTouches(true);
+    
+    KouListener->onTouchBegan = CC_CALLBACK_2(NetRaceLayer::_KouTouchBegan,this);
+    KouListener->onTouchMoved = [=](Touch* touch, Event* event) {};
+    KouListener->onTouchEnded = CC_CALLBACK_2(NetRaceLayer::_KouTouchEnded,this);
+    
+    Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(KouListener, myframe);
+}
+
+void NetRaceLayer::QueryKouCards() {
+    auto kouCancel = _object->CreateButton(BTN_CANCEL);
+    kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouCancelHandler,this));
+    myframe->addChild(kouCancel,20,MING_KOU_CANCEL);
+    
+    myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
+    
+    auto ChooseEnsure = _object->CreateButton(BTN_OK);
+    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouConfirmHandler,this));
+    ChooseEnsure->setVisible(false);
+    myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
+    
+    CARD_ARRAY *cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    _MaskNonKouCards(cards);
+    ListenToKou(MIDDLE);
+}
+
+void NetRaceLayer::QueryMingOutCard() {
+    _roundManager->_isMingTime=true;
+    _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
+    
+    _Remove(myframe,MING_KOU_ENSURE);
+    _Remove(myframe,MING_KOU_SIGN);
+    _Remove(myframe,MING_KOU_CANCEL);
+    
+    auto MingCancel = _object->CreateButton(BTN_CANCEL);
+    MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
+    myframe->addChild(MingCancel,20,MING_CANCEL);
+    
+    myframe->_ID=MIDDLE;
+    myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        NetRaceLayer::ListenToCardTouch)),NULL));
+}
+
+void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		((Button*)pSender)->setScale(1.2);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            if(_roundManager->_isWaitDecision) {
+				_roundManager->_isWaitDecision = false;
+				_roundManager->_actionToDo =_roundManager->_tempActionToDo;
+				_roundManager->_tempActionToDo = a_JUMP;
+			}
+            
+			for(int dir=0;dir<3;dir++) {//only once is enough?
+			    _Remove(myframe,PENG_EFFECT_NODE_ID+dir);
+                
+				if(ifEffectTime) {
+					ifEffectTime=false;
+					ifUpdateDuringEffect=false;
+                    
+                    _roundManager->CancelEffectCard();
+					delete_ActionEffect();
+                    
+					card_list_update(1);
+				}
+			}
+
+			_eventDispatcher->removeEventListenersForTarget(myframe,true);
+
+            Button *button = (Button*)pSender;
+			auto icon = (Sprite*)myframe->getChildByTag(MING_REMIND_ACT_BKG_TAG_ID);
+
+            button->_ID = MIDDLE;
+			button->setTouchEnabled(false);
+            
+			myframe->_ID = MIDDLE;
+            myframe->runAction(Sequence::create(
+                Spawn::create(
+                    TargetedAction::create(button,
+                        ScaleTo::create(0,0)),
+                    TargetedAction::create(icon,Sequence::create(
+                        ScaleTo::create(0,1),Spawn::create(
+                        FadeOut::create(0.3),
+                        ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
+                NetRaceLayer::delete_act_tip)),CCCallFunc::create([=](){
+                _roundManager->RecvMing();}),NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		((Button*)pSender)->setScale(1);
+		break;
+	default:
+		break;
+	}
+}
+
+
+/***********************************************
+        general support
+***********************************************/
+void NetRaceLayer::_DistributeEvent(const std::string event_type,void* val) {
+    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
+	_eventDispatcher->dispatchCustomEvent(event_type,val);
+}
+
+PlayerDir_t NetRaceLayer::_NextPlayer(PlayerDir_t dir) {
+    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
+}
+
+
+
+void NetRaceLayer::_DeleteStartDealCards() {
+	for(int i=0;i<3;i++) {
+		for(int j=0;j<4;j++) {
+            _Remove(myframe,START_CARDS_IN_TAG_ID+i*j);
+		}
+	}
+}
+
+Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
+{
+	auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
+	bgOfGang->setPosition(v);
+	myframe->addChild(bgOfGang,20,MOJI_EFFECT_TAG_ID);
+	bgOfGang->setScale(0);
+
+	auto tipOfPeng=Sprite::createWithSpriteFrameName(act_name);
+	tipOfPeng->setPosition(Vec2(bgOfGang->getTextureRect().size.width/2,bgOfGang->getTextureRect().size.height/2));
+	bgOfGang->addChild(tipOfPeng);
+	tipOfPeng->setScale(0);
+    
+	auto action1 = TargetedAction::create(
+        bgOfGang,Sequence::create(
+            ScaleTo::create(0,1),
+            DelayTime::create(0.6),
+            Spawn::create(
+                ScaleTo::create(0.18,0.8),
+                FadeOut::create(0.18),NULL),NULL));
+	auto action2 = TargetedAction::create(
+        tipOfPeng,Sequence::create(
+            ScaleTo::create(0,1.5),
+            DelayTime::create(0.12),
+            EaseElasticOut::create(ScaleTo::create(0.18,1)),
+            DelayTime::create(0.3),
+            Spawn::create(
+                ScaleTo::create(0.18,0.8),
+                FadeOut::create(0.18),NULL),NULL));
+
+	auto bgOfGang1=Sprite::createWithSpriteFrameName("mojixx.png");
+	bgOfGang1->setPosition(v);
+	myframe->addChild(bgOfGang1,21,MOJI1_EFFECT_TAG_ID);
+    
+	auto tipOfPeng1=Sprite::createWithSpriteFrameName(act_name);
+	tipOfPeng1->setPosition(Vec2(bgOfGang1->getTextureRect().size.width/2,bgOfGang1->getTextureRect().size.height/2));
+	bgOfGang1->addChild(tipOfPeng1);
+	bgOfGang1->setScale(0);
+    
+	auto action3 = TargetedAction::create(
+        bgOfGang1,Sequence::create(
+            DelayTime::create(0.12),
+            ScaleTo::create(0,1),
+            Spawn::create(
+                ScaleTo::create(0.18,1.5),
+                FadeOut::create(0.18),NULL),NULL));
+	auto action4 = TargetedAction::create(
+        tipOfPeng1,Sequence::create(
+            DelayTime::create(0.12),
+            ScaleTo::create(0,1),
+            Spawn::create(
+                ScaleTo::create(0.18,1.5),
+                FadeOut::create(0.18),NULL),NULL));
+	
+	return Spawn::create(action1,action2,action3,action4,NULL);
+}
 
 
 

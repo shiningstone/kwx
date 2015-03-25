@@ -528,7 +528,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
         turnToMing = true;
     }
 
-    _uiManager->HandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
+    _uiManager->MyHandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
 }
 
 void RoundManager::QiangGangHuJudge() {

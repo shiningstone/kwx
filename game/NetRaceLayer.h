@@ -37,7 +37,7 @@ public:
 	void QueryMingOutCard();
     
     void ShowActionButtons();
-    PlayerDir_t NextPlayer(PlayerDir_t dir);
+    PlayerDir_t _NextPlayer(PlayerDir_t dir);
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
@@ -208,7 +208,7 @@ private:
 	void _ReceBeginPrepare();//牌局开始效果
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
-	void start_callback();//功能--开始
+	void start_game();//功能--开始
 	void BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void BtnStartHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnBackHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
@@ -230,17 +230,17 @@ private:
     Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
 	void ListenToDistributeCard();
 	void waitfor_otheraction(int no);
-	void distribute_event(const std::string event_type,void* val);
+	void _DistributeEvent(const std::string event_type,void* val);
 	void waitfor_response(Node* sender);
 	void first_response(int no);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(int no);
-	void _HandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
+	void _MyHandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
 	void Call_DistributeCard();
 	void DistributeCard(int lenOfInHand);
 	void waitfor_MyShowCardInstruct();
-	void HandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
+	void MyHandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 
 	unsigned int VoiceId;
@@ -303,9 +303,9 @@ public:
 	void MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
-	void _UpdateResidueNumOnTingSignBar(PlayerDir_t dir);
-	void tingHintCreate(Point curPos,int CardPlace);
-	void OtherTingHintBar(int curNo,int CardPlace);
+	void _UpdateTingNum(PlayerDir_t dir);
+	void _TingHintCreate(Point curPos,int CardPlace);
+	void _TingHintBarOfOthers(int curNo,int CardPlace);
 	virtual bool init();
 	int Hu_cardOut_place;
 	void Back();
