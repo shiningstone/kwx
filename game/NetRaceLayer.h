@@ -39,6 +39,7 @@ public:
     void ShowActionButtons();
     PlayerDir_t _NextPlayer(PlayerDir_t dir);
     Vec2 GetCardPositionInHand(int idx);
+    void OthersHandoutEffect(PlayerDir_t dir);
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
@@ -140,8 +141,6 @@ private:
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();
-
-    void waitfor_ShowCardWithoutTouch();
 
     
 private:
@@ -302,7 +301,7 @@ public:
 	void ming_winCards_Hint(Point curPosition);
 	void _UpdateTingNum(PlayerDir_t dir);
 	void _TingHintCreate(Point curPos,int CardPlace);
-	void _TingHintBarOfOthers(int curNo,int CardPlace);
+	void TingHintBarOfOthers(int curNo,int CardPlace);
 	virtual bool init();
 	int Hu_cardOut_place;
 	void Back();

@@ -204,44 +204,9 @@ Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
     return _GetCardInHand(MIDDLE,idx)->getPosition();
 }
 
-void NetRaceLayer::waitfor_ShowCardWithoutTouch() {
-    if ( _roundManager->_curPlayer==1 ) {/* this should never happen */
-        return;
-    }
-
-    LOGGER_WRITE("%s (player=%d)",__FUNCTION__,_roundManager->_curPlayer);
-
-    bool canKou = false;
-	int index = _ai->ChooseWorstCard(canKou);
+void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir) {
+    myframe->_ID = dir;
     
-    if ( canKou ) {
-        _roundManager->_otherHandedOut = (Card_t)_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index].kind;
-        
-        _ai->KouCardCheck((PlayerDir_t)_roundManager->_curPlayer);
-        if(_ai->KouCardGroupNum()>0) {
-            _ai->MingKouChoose((PlayerDir_t)_roundManager->_curPlayer);
-        }
-    }
-
-    _roundManager->RecordOutCard(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[index]);
-	_roundManager->_lastHandedOutCard=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->hand_out(index);
-
-    if(canKou) {
-        _TingHintBarOfOthers(_roundManager->_curPlayer,index);
-
-        /* it is dangerous to raise these lines to upper, since the following will change the card list*/
-        if(_ai->KouCardGroupNum()>0)
-            _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_KOU);
-
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
-
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->LockAllCards();
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->set_ting_status(1);
-    }
-
-	_roundManager->_isCardFromOthers=true;
-
-    myframe->_ID=_roundManager->_curPlayer;
 	myframe->runAction(Sequence::create(
         _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou), CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_in_river_list)), CCCallFunc::create([=]() {
@@ -6409,7 +6374,7 @@ void NetRaceLayer::_UpdateTingNum(PlayerDir_t dir) {
 	}
 }
 
-void NetRaceLayer::_TingHintBarOfOthers(int curNo,int outCardIdx) {
+void NetRaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
 	Hu_cardOut_place = outCardIdx;
     
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];

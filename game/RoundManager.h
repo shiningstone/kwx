@@ -43,6 +43,7 @@ public:
     void WaitForMyAction();
     void WaitForMyChoose();
     void WaitForOthersAction(PlayerDir_t dir);
+    void WaitForOthersChoose();
     void DistributeCard();
 
     void QiangGangHuJudge();

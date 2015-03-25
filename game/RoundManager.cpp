@@ -697,7 +697,7 @@ void RoundManager::RecvMing() {
             _uiManager->QueryMingOutCard();
         }
     } else {
-        _uiManager->waitfor_ShowCardWithoutTouch();
+        WaitForOthersChoose();
     }
 }
 
@@ -845,8 +845,46 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
         _lastAction=a_JUMP;
         
-        _uiManager->waitfor_ShowCardWithoutTouch();
+        WaitForOthersChoose();
     }
+}
+
+void RoundManager::WaitForOthersChoose() {
+    if ( _curPlayer==1 ) {/* this should never happen */
+        return;
+    }
+
+    bool canKou = false;
+	int index = _ai->ChooseWorstCard(canKou);
+    
+    if ( canKou ) {
+        _otherHandedOut = (Card_t)_players[_curPlayer]->get_parter()->get_card_list()->data[index].kind;
+        
+        _ai->KouCardCheck((PlayerDir_t)_curPlayer);
+        if(_ai->KouCardGroupNum()>0) {
+            _ai->MingKouChoose((PlayerDir_t)_curPlayer);
+        }
+    }
+
+    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[index]);
+	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
+
+    if(canKou) {
+        _uiManager->TingHintBarOfOthers(_curPlayer,index);
+
+        /* it is dangerous to raise these lines to upper, since the following will change the card list*/
+        if(_ai->KouCardGroupNum()>0)
+            _players[_curPlayer]->get_parter()->action(_isCardFromOthers,a_KOU);
+
+        _players[_curPlayer]->get_parter()->action(_isCardFromOthers,a_MING);
+
+        _players[_curPlayer]->get_parter()->LockAllCards();
+        _players[_curPlayer]->get_parter()->set_ting_status(1);
+    }
+
+	_isCardFromOthers=true;
+
+    _uiManager->OthersHandoutEffect(_curPlayer);
 }
 
 void RoundManager::DistributeCard() {
