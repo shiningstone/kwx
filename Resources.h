@@ -74,7 +74,7 @@
 #define HAND_OUT_CARDS_TAG_ID				300//£¨300£¬360£©
 
 #define GAME_BKG_TAG_ID 					200//myframe->tag
-			//delete_act_tip   actionRemind//
+			//_DeleteActionTip   actionRemind//
 #define REMIND_ACT_TAG_ID 					500//
 #define QI_REMIND_ACT_TAG_ID				501//qi
 #define QI_REMIND_ACT_BKG_TAG_ID			502//

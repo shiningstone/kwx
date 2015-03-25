@@ -87,7 +87,7 @@ private:
     float _YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY);
 
     void _CreateResidueCards();
-    void refresh_residue_cards();
+    void _InitResidueCards();
     std::string _NumToString( int number );
     void _CalcAnGangGold(int winner,int goldOfPlayer[3]);
     void _CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]);
@@ -276,9 +276,9 @@ public:
 		2 show right indicator
 		-1 show none indicator
 	#########################*/
-	void delete_act_tip();//É¾³ýÐ§¹û²ÐÁô
-	void delete_ActionRemind();
-	void delete_ActionEffect();
+	void _DeleteActionTip();//É¾³ýÐ§¹û²ÐÁô
+	void _DeleteActionReminder();
+	void _DeleteActionEffect();
     
 	void angang_dispatch(Node *psender);
 	void minggang_dispatch(Node *psender);
@@ -314,7 +314,7 @@ public:
 	void BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void ListenToTingButton();
 
-    void distribute_card_event();
+    void _DispatchDistributeCardEvents();
     void race_start_again();
 public:
 	CREATE_FUNC(NetRaceLayer);

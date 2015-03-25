@@ -193,7 +193,7 @@ void NetRaceLayer::race_start_again()
 	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);
 
 	auto _calldistributeListener = EventListenerCustom::create(DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
-			distribute_card_event();
+			_DispatchDistributeCardEvents();
 		});
 	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
 }
@@ -730,11 +730,11 @@ void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
     _effect->Hide(myframe,HU_REMIND_ACT_TAG_ID);
     
     if(qiangGang) {
-        delete_act_tip();
+        _DeleteActionTip();
         _HuEffect(win.player);
     } else if(win.kind==DOUBLE_WIN) {
         _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
-        delete_act_tip();
+        _DeleteActionTip();
         _HuEffect(3);   /*why use event rather than call*/
         _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
     } else {
@@ -1155,6 +1155,19 @@ void NetRaceLayer::DistributeCard(int lenOfInHand) {
 
 void NetRaceLayer::Call_DistributeCard() {
 	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
+}
+
+void NetRaceLayer::_DispatchDistributeCardEvents()
+{
+	if(_roundManager->_distributedNum<TOTAL_CARD_NUM) {
+        DCI scard;
+		scard.card = CARD_KIND(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4);
+		scard.num = _roundManager->_distributedNum;
+		_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
+	}
+	else {
+		_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
+    }   
 }
 
 void NetRaceLayer::ListenToDistributeCard() {
@@ -2828,21 +2841,6 @@ void NetRaceLayer::set_aims_sequence(const int p_aim[])
 		aim[i]=p_aim[i];
 }
 
-void NetRaceLayer::distribute_card_event()
-{
-	if(_roundManager->_distributedNum<TOTAL_CARD_NUM) {
-        DCI scard;
-		scard.card = CARD_KIND(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4);
-		scard.num = _roundManager->_distributedNum;
-		_eventDispatcher->dispatchCustomEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
-        LOGGER_WRITE("%s : %s",__FUNCTION__,DISTRIBUTE_DONE_EVENT_TYPE);
-	}
-	else {
-		_eventDispatcher->dispatchCustomEvent(NOONE_WIN_EVENT_TYPE,NULL);
-        LOGGER_WRITE("%s : %s",__FUNCTION__,NOONE_WIN_EVENT_TYPE);
-    }   
-}
-
 /***********************************************************
         button accessosaries
 ***********************************************************/
@@ -2896,7 +2894,7 @@ void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType typ
 			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON))->setTouchEnabled(true);
 			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
             
-            refresh_residue_cards();
+            _InitResidueCards();
 			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 		}
 		break;
@@ -2999,7 +2997,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
             
 			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision)
 			{
-				delete_act_tip();
+				_DeleteActionTip();
 				_roundManager->_isWaitDecision=false;
 				_roundManager->_tempActionToDo=a_JUMP;
                 
@@ -3217,29 +3215,10 @@ void NetRaceLayer::_CreateResidueCards() {
 	residue_card_warning->setPosition(Vec2(origin.x+5,origin.y+visibleSize.height-5));
 	this->addChild(residue_card_warning,2,RESERVED_BKG_CHILD_TAG_ID+5);
 
-	auto residue_card=Sprite::createWithSpriteFrameName("Tile_reserved.png");
-	residue_card->setAnchorPoint(Vec2(0.0f,0.5f));
-	residue_card->setScale(0.9);
-	residue_card->setPosition(Vec2(residue_card_bkg->getTextureRect().size.width/10,
-        residue_card_bkg->getTextureRect().size.height/2-3.5));
-	residue_card_bkg->addChild(residue_card,0,RESERVED_BKG_CHILD_TAG_ID+4);
-
-	auto residue_card2=Sprite::createWithSpriteFrameName("Tile_reserved.png");
-	residue_card2->setAnchorPoint(Vec2(0.0f,0.5f));
-	residue_card2->setScale(0.9);
-	residue_card2->setPosition(Vec2(residue_card_bkg->getTextureRect().size.width/10,
-        residue_card_bkg->getTextureRect().size.height/2+3.5));
-	residue_card_bkg->addChild(residue_card2,0,RESERVED_BKG_CHILD_TAG_ID+3);
-
-	auto residue_card1=Sprite::createWithSpriteFrameName("Tile_reserved.png");
-	residue_card1->setAnchorPoint(Vec2(0.0f,0.5f));
-	residue_card1->setScale(0.9);
-	residue_card1->setPosition(Vec2(residue_card_bkg->getTextureRect().size.width/10+19.4,
-        residue_card_bkg->getTextureRect().size.height/2-3.5));
-	residue_card_bkg->addChild(residue_card1,0,RESERVED_BKG_CHILD_TAG_ID+2);
+	_InitResidueCards();
 }
 
-void NetRaceLayer::refresh_residue_cards() {
+void NetRaceLayer::_InitResidueCards() {
     if(!residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+4))
     {
         auto residue_card=Sprite::createWithSpriteFrameName("Tile_reserved.png");
@@ -3769,31 +3748,6 @@ void NetRaceLayer::_ClockAddTime( Sprite *clock, int time ) {
     clock->addChild(labelTime,0,ALARM_CLOCK_CHILD_NUM_TAG_ID);
 }
 
-void NetRaceLayer::_Remove(Node *parent, int childTag) {
-    if(parent->getChildByTag(childTag)) {// this judgement is not necessary becaust the interface will do the same thing!!!
-        parent->removeChildByTag(childTag,true);
-    }
-}
-
-void NetRaceLayer::_Show(Node *parent, int childTag, bool flag) {
-    if(parent->getChildByTag(childTag)) {
-        parent->getChildByTag(childTag)->setVisible(flag);
-    }
-}
-
-bool NetRaceLayer::_IsClickedOn(Node* button,Touch* touch) {
-    float x      = button->getPosition().x;
-    float y      = button->getPosition().y;
-    Size size    = button->getContentSize();
-    Rect rect    = Rect(x,y,size.width,size.height);
-    
-    if( rect.containsPoint( touch->getLocation() ) ) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
 void NetRaceLayer::HideClock() {
     Node* indicator[4] = {0};
     
@@ -3831,31 +3785,6 @@ void NetRaceLayer::UpdateClock(int time,int dir){
     indicator[(dir+1)%3]->setVisible(false);
     indicator[(dir+2)%3]->setVisible(false);
 }
-
-void NetRaceLayer::delete_ActionRemind()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-	for(int i=0;i<17;i++){
-        _Remove(myframe,REMIND_ACT_TAG_ID+i);
-	}
-}
-
-void NetRaceLayer::delete_ActionEffect()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
- 	for(int i=0;i<31;i++) {
-        _Remove(myframe,MOJI_EFFECT_TAG_ID+i);
-	}
-}
-
-void NetRaceLayer::delete_act_tip()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	delete_ActionRemind();
-    delete_ActionEffect();    
-}
-
 
 /****************************************************
     effect position
@@ -4119,7 +4048,7 @@ Sequence *NetRaceLayer::_HideQiReminder() {
 
     return Sequence::create(
             shadeAction,CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_ActionRemind)),NULL);
+            NetRaceLayer::_DeleteActionReminder)),NULL);
 }
 
 Sprite *NetRaceLayer::_GetCardInHand(PlayerDir_t dir,int idx) {
@@ -4368,7 +4297,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
             _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),NULL),
         goldEffect,
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::_DeleteActionTip)),CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::minggang_dispatch)),CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::update_card_list)),
             ActionAfterGang,NULL),NULL));
@@ -4417,7 +4346,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
                 speakCard,NULL),
                 _voice->Speak("give"),NULL)),CallFunc::create([=](){
             ifInsertCardsTime=true;}),CallFunc::create([=](){
-            delete_ActionRemind();}),NULL);
+            _DeleteActionReminder();}),NULL);
 
 	myframe->_ID=1;
 	_roundManager->_isCardFromOthers = true;
@@ -5234,7 +5163,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                                 simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                                NetRaceLayer::delete_act_tip)),   CCCallFuncN::create(this,callfuncN_selector(
+                                NetRaceLayer::_DeleteActionTip)),   CCCallFuncN::create(this,callfuncN_selector(
                                 NetRaceLayer::peng_dispatch)),    CCCallFuncN::create(this,callfuncN_selector(
                                 NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
@@ -5248,7 +5177,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                 
 				_roundManager->CancelEffectCard();
                 
-				delete_ActionEffect();
+				_DeleteActionEffect();
 				card_list_update(dir);
 			}
 		}
@@ -5553,7 +5482,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                 move3PengCards,NULL),Sequence::create(
                 DelayTime::create(0.84),
                 _voice->Speak("paizhuangji"),NULL),NULL),Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_ActionEffect)),
+            NetRaceLayer::_DeleteActionEffect)),
             callFunc_update_list,CallFunc::create([=](){
 			if(myframe->getChildByTag(PENG_EFFECT_NODE_ID))
 				myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);}),/*actcheckagain,*/NULL),NULL));
@@ -5585,7 +5514,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
                     _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)), CCCallFuncN::create(this,callfuncN_selector(
+            NetRaceLayer::_DeleteActionTip)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::update_card_list)),
             _voice->Speak("down"), CCCallFunc::create([=](){
@@ -5600,7 +5529,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
                 _roundManager->CancelEffectCard();
-				delete_ActionEffect();
+				_DeleteActionEffect();
 				card_list_update(no);
 			}
 		}
@@ -5868,7 +5797,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
                         DelayTime::create(0.66),CallFunc::create([=](){
                         _voice->Speak("paizhuangji");}),NULL),NULL),
                 Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::delete_ActionEffect)),
+                    NetRaceLayer::_DeleteActionEffect)),
                     callFunc_update_list,
                     _voice->Speak("lanpai"),NULL),CallFunc::create([=](){
                 _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
@@ -5912,7 +5841,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 				ifUpdateDuringEffect=false;
                 
                 _roundManager->CancelEffectCard();
-				delete_ActionEffect();
+				_DeleteActionEffect();
 				card_list_update(no);
 			}
 		}
@@ -6307,7 +6236,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
                     DelayTime::create(0.78),CallFunc::create([=](){
                     _voice->Speak("paizhuangji");}),NULL),NULL),
             Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_ActionEffect)),
+                NetRaceLayer::_DeleteActionEffect)),
                 callFunc_update_list,CallFunc::create([=](){
                 _Remove(myframe,MING_GANG_EFFECT_NODE);}),NULL),NULL));
 
@@ -6725,7 +6654,7 @@ void NetRaceLayer::KouConfirmEffect() {
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+        NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->RecvMing();}),NULL));
 }
 
@@ -6736,7 +6665,7 @@ void NetRaceLayer::MingCancelEffect() {
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
-        NetRaceLayer::delete_act_tip)),CallFunc::create([=](){
+        NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
         _roundManager->WaitForMyAction();}),NULL));
 }
@@ -7023,7 +6952,7 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 					ifUpdateDuringEffect=false;
                     
                     _roundManager->CancelEffectCard();
-					delete_ActionEffect();
+					_DeleteActionEffect();
                     
 					card_list_update(1);
 				}
@@ -7046,7 +6975,7 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
                         ScaleTo::create(0,1),Spawn::create(
                         FadeOut::create(0.3),
                         ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
-                NetRaceLayer::delete_act_tip)),CCCallFunc::create([=](){
+                NetRaceLayer::_DeleteActionTip)),CCCallFunc::create([=](){
                 _roundManager->RecvMing();}),NULL));
 		}
 		break;
@@ -7062,45 +6991,27 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 /***********************************************
         general support
 ***********************************************/
-void NetRaceLayer::_DistributeEvent(const std::string event_type,void* val) {
-    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
-	_eventDispatcher->dispatchCustomEvent(event_type,val);
-}
-
-PlayerDir_t NetRaceLayer::_NextPlayer(PlayerDir_t dir) {
-    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
-}
-
-
-
-void NetRaceLayer::_DeleteStartDealCards() {
-	for(int i=0;i<3;i++) {
-		for(int j=0;j<4;j++) {
-            _Remove(myframe,START_CARDS_IN_TAG_ID+i*j);
-		}
-	}
-}
-
+    
 Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 {
-	auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
-	bgOfGang->setPosition(v);
-	myframe->addChild(bgOfGang,20,MOJI_EFFECT_TAG_ID);
-	bgOfGang->setScale(0);
+    auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
+    bgOfGang->setPosition(v);
+    myframe->addChild(bgOfGang,20,MOJI_EFFECT_TAG_ID);
+    bgOfGang->setScale(0);
 
-	auto tipOfPeng=Sprite::createWithSpriteFrameName(act_name);
-	tipOfPeng->setPosition(Vec2(bgOfGang->getTextureRect().size.width/2,bgOfGang->getTextureRect().size.height/2));
-	bgOfGang->addChild(tipOfPeng);
-	tipOfPeng->setScale(0);
+    auto tipOfPeng=Sprite::createWithSpriteFrameName(act_name);
+    tipOfPeng->setPosition(Vec2(bgOfGang->getTextureRect().size.width/2,bgOfGang->getTextureRect().size.height/2));
+    bgOfGang->addChild(tipOfPeng);
+    tipOfPeng->setScale(0);
     
-	auto action1 = TargetedAction::create(
+    auto action1 = TargetedAction::create(
         bgOfGang,Sequence::create(
             ScaleTo::create(0,1),
             DelayTime::create(0.6),
             Spawn::create(
                 ScaleTo::create(0.18,0.8),
                 FadeOut::create(0.18),NULL),NULL));
-	auto action2 = TargetedAction::create(
+    auto action2 = TargetedAction::create(
         tipOfPeng,Sequence::create(
             ScaleTo::create(0,1.5),
             DelayTime::create(0.12),
@@ -7110,33 +7021,97 @@ Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
                 ScaleTo::create(0.18,0.8),
                 FadeOut::create(0.18),NULL),NULL));
 
-	auto bgOfGang1=Sprite::createWithSpriteFrameName("mojixx.png");
-	bgOfGang1->setPosition(v);
-	myframe->addChild(bgOfGang1,21,MOJI1_EFFECT_TAG_ID);
+    auto bgOfGang1=Sprite::createWithSpriteFrameName("mojixx.png");
+    bgOfGang1->setPosition(v);
+    myframe->addChild(bgOfGang1,21,MOJI1_EFFECT_TAG_ID);
     
-	auto tipOfPeng1=Sprite::createWithSpriteFrameName(act_name);
-	tipOfPeng1->setPosition(Vec2(bgOfGang1->getTextureRect().size.width/2,bgOfGang1->getTextureRect().size.height/2));
-	bgOfGang1->addChild(tipOfPeng1);
-	bgOfGang1->setScale(0);
+    auto tipOfPeng1=Sprite::createWithSpriteFrameName(act_name);
+    tipOfPeng1->setPosition(Vec2(bgOfGang1->getTextureRect().size.width/2,bgOfGang1->getTextureRect().size.height/2));
+    bgOfGang1->addChild(tipOfPeng1);
+    bgOfGang1->setScale(0);
     
-	auto action3 = TargetedAction::create(
+    auto action3 = TargetedAction::create(
         bgOfGang1,Sequence::create(
             DelayTime::create(0.12),
             ScaleTo::create(0,1),
             Spawn::create(
                 ScaleTo::create(0.18,1.5),
                 FadeOut::create(0.18),NULL),NULL));
-	auto action4 = TargetedAction::create(
+    auto action4 = TargetedAction::create(
         tipOfPeng1,Sequence::create(
             DelayTime::create(0.12),
             ScaleTo::create(0,1),
             Spawn::create(
                 ScaleTo::create(0.18,1.5),
                 FadeOut::create(0.18),NULL),NULL));
-	
-	return Spawn::create(action1,action2,action3,action4,NULL);
+    
+    return Spawn::create(action1,action2,action3,action4,NULL);
 }
 
+
+void NetRaceLayer::_DistributeEvent(const std::string event_type,void* val) {
+    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
+	_eventDispatcher->dispatchCustomEvent(event_type,val);
+}
+
+PlayerDir_t NetRaceLayer::_NextPlayer(PlayerDir_t dir) {
+    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
+}
+
+void NetRaceLayer::_DeleteStartDealCards() {
+	for(int i=0;i<3;i++) {
+		for(int j=0;j<4;j++) {
+            _Remove(myframe,START_CARDS_IN_TAG_ID+i*j);
+		}
+	}
+}
+
+void NetRaceLayer::_DeleteActionReminder()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+	for(int i=0;i<17;i++){
+        _Remove(myframe,REMIND_ACT_TAG_ID+i);
+	}
+}
+
+void NetRaceLayer::_DeleteActionEffect()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+ 	for(int i=0;i<31;i++) {
+        _Remove(myframe,MOJI_EFFECT_TAG_ID+i);
+	}
+}
+
+void NetRaceLayer::_DeleteActionTip()
+{
+	_DeleteActionReminder();
+    _DeleteActionEffect();    
+}
+
+void NetRaceLayer::_Remove(Node *parent, int childTag) {
+    if(parent->getChildByTag(childTag)) {// this judgement is not necessary becaust the interface will do the same thing!!!
+        parent->removeChildByTag(childTag,true);
+    }
+}
+
+void NetRaceLayer::_Show(Node *parent, int childTag, bool flag) {
+    if(parent->getChildByTag(childTag)) {
+        parent->getChildByTag(childTag)->setVisible(flag);
+    }
+}
+
+bool NetRaceLayer::_IsClickedOn(Node* button,Touch* touch) {
+    float x      = button->getPosition().x;
+    float y      = button->getPosition().y;
+    Size size    = button->getContentSize();
+    Rect rect    = Rect(x,y,size.width,size.height);
+    
+    if( rect.containsPoint( touch->getLocation() ) ) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 
 /***********************************************
