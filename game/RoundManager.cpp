@@ -239,6 +239,8 @@ int RoundManager::Shuffle() {
 
     _curPlayer = GetLastWinner();
 
+    _distributedNum = 40;
+
     return 0;
 }
 
@@ -256,6 +258,13 @@ bool RoundManager::WaitUntilAllReady() {
     return true;
 }
 
+
+void RoundManager::set_aims_sequence(const int p_aim[])
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+	for(int i=0;i<3;i++)
+		aim[i]=p_aim[i];
+}
 
 /****************************************
         effect card
@@ -462,7 +471,7 @@ void RoundManager::RecvQi() {
     _uiManager->QiEffect();
 }
 
-void RoundManager::StartGame(Scene *scene) {
+void RoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
     scene->addChild(_uiManager);
 
@@ -473,8 +482,22 @@ void RoundManager::StartGame(Scene *scene) {
 	_isGameStart=false;
     
     _uiManager->create_race();
-    _uiManager->race_start_again();
-    
+}
+
+void RoundManager::StartGame() {
+	_isGameStart=false;
+    _cardHolders[MIDDLE]->_isReady = true;
+    WaitUntilAllReady();
+
+    RenewOutCard();
+
+    int lastWinner = GetLastWinner();
+    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
+	if(_actionToDo!=a_TIMEOUT) {
+		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
+		_uiManager->FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果�?
+	}
 }
 
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
@@ -699,7 +722,22 @@ void RoundManager::WaitForMyAction() {
         }
 
 		_lastAction=a_JUMP;
-		_uiManager->waitfor_MyShowCardInstruct();
+		WaitForMyChoose();
+	}
+}
+
+void RoundManager::WaitForMyChoose() {
+	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
+		if( _isTuoGuan ||
+                (IsTing(_curPlayer) 
+                && !_isGangAsking) ) {
+            auto cards = _players[MIDDLE]->get_parter()->get_card_list();
+            Vec2 location = _uiManager->GetCardPositionInHand(cards->len-1);
+            RecvHandout(cards->len-1,location,2);
+            
+		} else {
+			_isMyShowTime = true;
+        }
 	}
 }
 

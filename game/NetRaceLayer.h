@@ -38,6 +38,7 @@ public:
     
     void ShowActionButtons();
     PlayerDir_t _NextPlayer(PlayerDir_t dir);
+    Vec2 GetCardPositionInHand(int idx);
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
@@ -186,7 +187,6 @@ private:
 
 	cocos2d::Size visibleSize;
 	cocos2d::Point origin;
-	int aim[3];
 	CARD_KIND dist_card;
 private:
     Label *_CreateName(const char *name);
@@ -205,7 +205,7 @@ private:
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);
-	void _ReceBeginPrepare();//牌局开始效果
+	void _RaceBeginPrepare();//牌局开始效果
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
 	void start_game();//功能--开始
@@ -231,7 +231,7 @@ private:
 	void ListenToDistributeCard();
 	void _DistributeEvent(const std::string event_type,void* val);
 	void waitfor_response(Node* sender);
-	void first_response(int no);
+	void _FirstResponse(int no);
 	void _MyHandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
@@ -295,7 +295,6 @@ public:
 	//int get_cur_player_no();
 	//void set_cur_player_no(int no);
 	void raceAccount(float delta);
-	void set_aims_sequence(const int p_aim[]);
 
 	void BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
@@ -314,7 +313,6 @@ public:
 	void ListenToTingButton();
 
     void _DispatchDistributeCardEvents();
-    void race_start_again();
 public:
 	CREATE_FUNC(NetRaceLayer);
 };

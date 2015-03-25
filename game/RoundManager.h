@@ -41,6 +41,7 @@ public:
 	void RecvMing();
 
     void WaitForMyAction();
+    void WaitForMyChoose();
     void WaitForOthersAction(PlayerDir_t dir);
     void DistributeCard();
 
@@ -102,12 +103,16 @@ public:
     bool WaitUntilAllReady();
 
     int FindGangCards(int dir,int cards[4],Card_t target=CARD_UNKNONW);
+	void set_aims_sequence(const int p_aim[]);
 
     /* main process */
-    void StartGame(Scene *scene);
+    void CreateRace(Scene *scene);
+    void StartGame();
 private:
     static RoundManager *_instance;
     Logger *_logger;
+
+	int         aim[PLAYER_NUMBER];
 
     WinInfo_t   _lastWin;
     NetRole     *_players[PLAYER_NUMBER];

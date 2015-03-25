@@ -78,7 +78,7 @@ bool NetRaceLayer::init() {
 }
 
 /************************************************
-                start 
+            main process
 ************************************************/
 void NetRaceLayer::create_race()
 {
@@ -116,6 +116,16 @@ void NetRaceLayer::create_race()
     auto StartButton = _object->CreateButton(BTN_START);
     StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnStartHandler,this));
     this->addChild(StartButton,2,START_GAME_TAG_ID);
+
+    _eventDispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(
+        WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
+        _roundManager->Shuffle();}), 
+        3);
+
+    _eventDispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(
+        DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
+        _DispatchDistributeCardEvents();}), 
+        2);
 }
 
 void NetRaceLayer::start_game()
@@ -147,8 +157,6 @@ void NetRaceLayer::start_game()
 			this->removeChildByTag(GOLD_NUM_INSERT_JINBI+i,true);
 	}
     
-    _roundManager->RenewOutCard();
-    
     _DistributeEvent(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
 
 	myframe = LayerColor::create(Color4B(0,0,0,0),visibleSize.width,visibleSize.height);
@@ -162,45 +170,13 @@ void NetRaceLayer::start_game()
 	ifEffectTime=false;
     _myChosenCard = -1;
     
-	_roundManager->_isGameStart=false;
-    _roundManager->_cardHolders[1]->_isReady = true;
+	_RaceBeginPrepare();                  //牌局开始效果
+
 	GuiShowReady(1);
-
-    _roundManager->WaitUntilAllReady();
-
-	_ReceBeginPrepare();                  //牌局开始效果
-
-    int lastWinner = _roundManager->GetLastWinner();
-    _roundManager->_actionToDo = _roundManager->_players[(lastWinner)%3]->init(&(_roundManager->_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始化
-	if(_roundManager->_actionToDo!=a_TIMEOUT) {
-		_roundManager->_players[(lastWinner+1)%3]->init(&(_roundManager->_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_roundManager->_players[(lastWinner+2)%3]->init(&(_roundManager->_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果。
-	}
+    _roundManager->StartGame();
 }
 
-/* !!!this function not used right now, it should be called somewhere */
-void NetRaceLayer::race_start_again()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto _waitstartListener = EventListenerCustom::create(WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
-        _roundManager->Shuffle();
-		_roundManager->_distributedNum = 40;
-	});
-
-	_eventDispatcher->addEventListenerWithFixedPriority(_waitstartListener, 3);
-
-	auto _calldistributeListener = EventListenerCustom::create(DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
-			_DispatchDistributeCardEvents();
-		});
-	_eventDispatcher->addEventListenerWithFixedPriority(_calldistributeListener, 2);
-}
-
-/*******************************************
-        
-*******************************************/
-void NetRaceLayer::first_response(int no)
+void NetRaceLayer::_FirstResponse(int no)
 {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
@@ -222,6 +198,10 @@ void NetRaceLayer::first_response(int no)
     } else {
         _roundManager->WaitForOthersAction((PlayerDir_t)no);
     }
+}
+
+Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
+    return _GetCardInHand(MIDDLE,idx)->getPosition();
 }
 
 void NetRaceLayer::waitfor_MyShowCardInstruct()
@@ -1447,7 +1427,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang) {
 		card_list_update(2);}),NULL),CallFunc::create([=](){
 		UpdateClock(0,zhuang);}),CallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteStartDealCards)),CCCallFunc::create([=](){
-		first_response(zhuang);
+		_FirstResponse(zhuang);
 	}),NULL));
 }
 
@@ -2698,22 +2678,6 @@ void NetRaceLayer::ListenToDoubleHu() {
     });
     
     _eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
-}
-
-//int NetRaceLayer::get_cur_player_no()
-//{
-//	return _roundManager->_curPlayer;
-//}
-//void NetRaceLayer::set_cur_player_no(int no)
-//{
-//	_roundManager->_curPlayer=no;
-//}
-
-void NetRaceLayer::set_aims_sequence(const int p_aim[])
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-	for(int i=0;i<3;i++)
-		aim[i]=p_aim[i];
 }
 
 /***********************************************************
@@ -4283,7 +4247,7 @@ void NetRaceLayer::_CreateHeadImage() {
     this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
 }
 
-void NetRaceLayer::_ReceBeginPrepare() {
+void NetRaceLayer::_RaceBeginPrepare() {
     _Remove(this,READY_INDICATE_LEFT_TAG_ID);
     _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
     _Remove(this,READY_INDICATE_MID_TAG_ID);

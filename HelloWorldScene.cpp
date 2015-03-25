@@ -118,7 +118,7 @@ void HelloWorld::enterRoomStandAlone()
     TextureCache::sharedTextureCache()->removeAllTextures();
 
     RoundManager *rm = RoundManager::getInstance();
-    rm->StartGame(scene);
+    rm->CreateRace(scene);
     
     Director::getInstance()->replaceScene(scene);
 }
