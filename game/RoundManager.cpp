@@ -724,7 +724,7 @@ void RoundManager::WaitForMyAction() {
 }
 
 void RoundManager::DistributeCard() {
-
+    _uiManager->Call_DistributeCard();
 }
 
 /*************************************
