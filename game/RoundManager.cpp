@@ -402,8 +402,12 @@ void RoundManager::RecvHu() {
 
     /*!!!just for compile reason for now, the value should be set before play effect*/
     WinInfo_t win;
+    win.player = (PlayerDir_t)_curPlayer;
+    if(_isDoubleHuAsking) {
+        win.kind = DOUBLE_WIN;
+    }
 
-    _uiManager->HuEffect(win, _isQiangGangAsking, _isDoubleHuAsking);
+    _uiManager->HuEffect(win, _isQiangGangAsking);
 }
 
 void RoundManager::RecvGang() {

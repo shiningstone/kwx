@@ -243,37 +243,23 @@ void NetRaceLayer::QiEffect() {
 }
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
-    Button *curButton = (Button *)myframe->getChildByTag(PENG_REMIND_ACT_TAG_ID);
-    if(curButton) {
-        curButton->setTouchEnabled(false);
-        curButton->_ID = MIDDLE;
-        
-        curButton->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){  
-            _PengEffect(dir,prevDir,card);}),NULL));
-    }
+    _effect->Hide(PENG_REMIND_ACT_TAG_ID);
+    _PengEffect(dir,prevDir,card);
 }
 
-void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang,bool doubleHu) {
-    Button *button = (Button *)myframe->getChildByTag(HU_REMIND_ACT_TAG_ID);
-    button->setTouchEnabled(false);
+void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
+    _effect->Hide(HU_REMIND_ACT_TAG_ID);
     
     if(qiangGang) {
-        button->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),
-            ScaleTo::create(0.1,1),CallFunc::create([=](){  
-            _HuEffect(MIDDLE);}),NULL));
-    } else if(doubleHu) {
-        myframe->runAction(Sequence::create(TargetedAction::create(
-            button,ScaleTo::create(0.1,1)),
-            _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID)),CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::delete_act_tip)),CallFunc::create([=](){  
-            _HuEffect(3);
-            distribute_event(DOUBLE_HU_WITH_ME,NULL);}),NULL));
+        delete_act_tip();
+        _HuEffect(win.player);
+    } else if(win.kind==DOUBLE_WIN) {
+        _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
+        delete_act_tip();
+        _HuEffect(3);   /*why use event rather than call*/
+        distribute_event(DOUBLE_HU_WITH_ME,NULL);
     } else {
-        button->runAction(Sequence::create(
-            ScaleTo::create(0.1,1),CallFunc::create([=](){  
-            _HuEffect(MIDDLE);}),NULL));
+        _HuEffect(win.player);
     }
 }
 

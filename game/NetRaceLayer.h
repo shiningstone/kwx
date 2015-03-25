@@ -257,7 +257,7 @@ public:
 	/***********callback function***********************/
     void QiEffect();
     void PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
-    void HuEffect(const WinInfo_t &win,bool qiangGang, bool doubleHu);
+    void HuEffect(const WinInfo_t &win,bool qiangGang);
     void GangEffect(Card_t card, int gangCardIdx[], bool isAnGang=true, PlayerDir_t prevPlayer=MIDDLE);
 	void BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
     
