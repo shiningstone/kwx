@@ -238,19 +238,19 @@ void NetRaceLayer::ListenToTingButton()
         effect entrances
 ***********************************************/
 void NetRaceLayer::QiEffect() {
-    _effect->Hide(QI_REMIND_ACT_TAG_ID);
+    _effect->Hide(myframe,QI_REMIND_ACT_TAG_ID);
 
     _QiEffect(MIDDLE);
 }
 
 void NetRaceLayer::PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
-    _effect->Hide(PENG_REMIND_ACT_TAG_ID);
+    _effect->Hide(myframe,PENG_REMIND_ACT_TAG_ID);
     
     _PengEffect(dir,prevDir,card);
 }
 
 void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
-    _effect->Hide(HU_REMIND_ACT_TAG_ID);
+    _effect->Hide(myframe,HU_REMIND_ACT_TAG_ID);
     
     if(qiangGang) {
         delete_act_tip();
@@ -266,7 +266,7 @@ void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
 }
 
 void NetRaceLayer::GangEffect(PlayerDir_t winner,Card_t card, int gangCardIdx[], bool isAnGang, PlayerDir_t prevPlayer) {
-    _effect->Hide(GANG_REMING_ACT_TAG_ID);
+    _effect->Hide(myframe,GANG_REMING_ACT_TAG_ID);
     
     if(isAnGang) {
         _AnGangEffect(winner,card,gangCardIdx);
@@ -4001,7 +4001,7 @@ void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *p
 		}
 	}
 
-    if((win.kind==SINGLE_WIN && win.player==no) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=no))
+    if((win.kind==SINGLE_WIN && win.player==dir) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=dir))
     {
         if(_roundManager->_isCardFromOthers)
         {
@@ -4032,7 +4032,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
         BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
 	}
 
-    _ShowCards((PlayerDir_t)no,win);
+    _ShowCards((PlayerDir_t)no,win,BarOfPlayer);
     
 	int tagNum=BarOfPlayer->getTag();
 	if(_roundManager->IsTing(tagNum)&&
