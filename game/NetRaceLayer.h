@@ -238,7 +238,6 @@ public:
 	void _HuEffect(int no);
 	void Call_DistributeCard();
 	void DistributeCard(int lenOfInHand);
-	void waitfor_MyShowCardInstruct();
 	void MyHandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 

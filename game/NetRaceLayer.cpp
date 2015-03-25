@@ -204,25 +204,6 @@ Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
     return _GetCardInHand(MIDDLE,idx)->getPosition();
 }
 
-void NetRaceLayer::waitfor_MyShowCardInstruct()
-{
-	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
-		if( _roundManager->_isTuoGuan ||
-                (_roundManager->IsTing(_roundManager->_curPlayer) 
-                && !_roundManager->_isGangAsking) ) {
-            CardsInfo_t cards;
-            _GetCardsInfo(&cards);
-            
-            Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
-            
-            _roundManager->RecvHandout(cards.last,location,2);
-            
-		} else {
-			_roundManager->_isMyShowTime = true;
-        }
-	}
-}
-
 void NetRaceLayer::waitfor_ShowCardWithoutTouch() {
     if ( _roundManager->_curPlayer==1 ) {/* this should never happen */
         return;
@@ -2867,7 +2848,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 					}
 				}
 				else {
-					waitfor_MyShowCardInstruct();
+					_roundManager->WaitForMyChoose();
                 }
 			}
 			else
@@ -2880,7 +2861,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 						_roundManager->_continue_gang_times=0;
 					_roundManager->_lastAction=a_JUMP;
 
-					waitfor_MyShowCardInstruct();
+					_roundManager->WaitForMyChoose();
 				}
 			}
 			//else if(ifMyTime)
