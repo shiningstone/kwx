@@ -197,9 +197,11 @@ private:
     Sprite *_CreateHu();
     Sprite *_CreateZiMo();
     Sprite *_CreateFangPao();
+    Sprite *_CreateBaozhuang();
     void _CreateAccountPanel(const UserProfile_t &profile, Node *parent);
     Sprite *_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent);
     LabelAtlas *_CreatePropertyChange(PlayerDir_t dir,int gold,LayerColor *parent);
+    void _ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent);
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);
@@ -209,8 +211,8 @@ private:
 	void start_callback();//功能--开始
 	void BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void BtnStartHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void backPressed(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
-	void tuoGuanPressed(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);//功能--机器人
+	void BtnBackHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
+	void BtnTuoGuanHandler(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);//功能--机器人
 	/*######################
 	diretion:
 				0 left
@@ -307,9 +309,9 @@ public:
 	virtual bool init();
 	int Hu_cardOut_place;
 	void Back();
-	void BackConfirmPressed(Ref* pSender,ui::Widget::TouchEventType type);
-	void BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
-	void tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType type);
+	void BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType type);
+	void BtnBackCancelHandler(Ref* pSender,ui::Widget::TouchEventType type);
+	void BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void ListenToTingButton();
 
     void distribute_card_event();

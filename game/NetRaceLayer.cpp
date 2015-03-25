@@ -817,8 +817,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         /****************
             delete 2 peng cards in hand 
         ****************/
-		auto cardPeng = _object->Create(PENG_CARD);
-		auto cardPengSize = cardPeng->getTextureRect().size;
+		auto cardPengSize = _object->RectSize(PENG_CARD);
         
         const float GAP = (list->atcvie_place==0)? 0.5 : 0;
         
@@ -3874,6 +3873,14 @@ Sprite *NetRaceLayer::_CreateFangPao() {
     return PointGun1;
 }
 
+Sprite *NetRaceLayer::_CreateBaozhuang() {
+	auto BaoZhuang=Sprite::createWithSpriteFrameName("jiesuanbaozhuang.png");//包庄
+	BaoZhuang->setAnchorPoint(Vec2(0.5,0.5));
+	BaoZhuang->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+	BaoZhuang->setVisible(false);
+    return BaoZhuang;
+}
+
 void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *parent) {
     parent->addChild(_CreateName(profile.name),2,ACCOUNT_NIKENAME);
     parent->addChild(_CreateHeadImage(profile.photo),2,ACCOUNT_IMAGE);
@@ -3888,6 +3895,7 @@ void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *paren
     parent->addChild(_CreateHu(),2,ACCOUNT_HU_FONT);
     parent->addChild(_CreateZiMo(),2,ACCOUNT_ZIMO_FONT);
     parent->addChild(_CreateFangPao(),2,ACCOUNT_DIANPAO_FONT);
+    parent->addChild(_CreateBaozhuang(),2,ACCOUNT_BAOZHUANG_FONT);
 }
 
 Sprite *NetRaceLayer::_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent) {
@@ -3938,43 +3946,26 @@ LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerCo
     return propertyOfIncrease;
 }
 
-void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
-	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
-
-    WinInfo_t win;
-    _roundManager->GetWin(win);
-
-	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
-        auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
-        BarOfPlayer->addChild(sign,2,ACCOUNT_DIANPAO_FONT);
-
-        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
-        BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
-	}
-
-	auto BaoZhuang=Sprite::createWithSpriteFrameName("jiesuanbaozhuang.png");//包庄
-	BaoZhuang->setAnchorPoint(Vec2(0.5,0.5));
-	BaoZhuang->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-	BaoZhuang->setVisible(false);
-	BarOfPlayer->addChild(BaoZhuang,2,ACCOUNT_BAOZHUANG_FONT);
-
-	auto posOfCards=Vec2(162,180);//牌0，1
-
+void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent) {
+	auto posOfCards = Vec2(162,180);//牌0，1
+	float x = posOfCards.x;
+	float y = posOfCards.y - _object->RectSize(PENG_CARD).height/2;
+    
 	Sprite *show_card_list[MAX_HANDIN_NUM];
-	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
-	auto tempCard=_object->Create(PENG_CARD);
-	float x=posOfCards.x;
-	float y=posOfCards.y-tempCard->getTextureRect().size.height/2;
+	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
+    
 	for(int i=0;i<list->len;i++)
 	{
 		show_card_list[i]=_object->Create(PENG_CARD);
 		show_card_list[i]->setAnchorPoint(Vec2(0,0.5));
 		show_card_list[i]->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(show_card_list[i],2);
+		parent->addChild(show_card_list[i],2);
 		auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
 		s_card->setAnchorPoint(Vec2(0.5,0.5));
 		s_card->setPosition(Vec2(show_card_list[i]->getTextureRect().size.width/2,show_card_list[i]->getTextureRect().size.height*0.6));
 		show_card_list[i]->addChild(s_card,1);
+
+        
 		if(list->data[i].status==c_PENG||list->data[i].status==c_MING_KOU)
 		{
 			if(list->data[i].kind!=list->data[i+1].kind)
@@ -4003,37 +3994,54 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 		}
 		else if(list->data[i].status==c_FREE)
 		{
-			if( win.kind==SINGLE_WIN && win.player==no && win.player==_roundManager->_curPlayer && i==(list->len-2) )
+			if( win.kind==SINGLE_WIN && win.player==dir && win.player==_roundManager->_curPlayer && i==(list->len-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
-	if((win.kind==SINGLE_WIN && win.player==no) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=no))
-	{
-		if(_roundManager->_isCardFromOthers)
-		{
-			auto winCard=_object->Create(PENG_CARD);
-			winCard->setAnchorPoint(Vec2(0,0.5));
-			winCard->setPosition(Vec2(x+30,y));
-			BarOfPlayer->addChild(winCard,2);
 
-			auto s_card=_object->CreateKind((Card_t)list->data[list->len].kind,MIDDLE_SIZE);
-			s_card->setAnchorPoint(Vec2(0.5,0.5));
-			s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
-			winCard->addChild(s_card,1);
-		}
+    if((win.kind==SINGLE_WIN && win.player==no) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=no))
+    {
+        if(_roundManager->_isCardFromOthers)
+        {
+            auto winCard=_object->Create(PENG_CARD);
+            winCard->setAnchorPoint(Vec2(0,0.5));
+            winCard->setPosition(Vec2(x+30,y));
+            auto s_card=_object->CreateKind((Card_t)list->data[list->len].kind,MIDDLE_SIZE);
+            s_card->setAnchorPoint(Vec2(0.5,0.5));
+            s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
+            winCard->addChild(s_card,1);
+
+            parent->addChild(winCard,2);
+        }
+    }
+}
+
+void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
+	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
+
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+
+	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
+        auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        BarOfPlayer->addChild(sign,2,ACCOUNT_DIANPAO_FONT);
+
+        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
 	}
 
-	float Extra_x=162;
-	//float Extra_x=origin.x+visibleSize.width*0.17;
-	float Extra_y=origin.y+visibleSize.height*0.1256-10;
+    _ShowCards((PlayerDir_t)no,win);
+    
 	int tagNum=BarOfPlayer->getTag();
-	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
-	if(tingStatus==1&&
+	if(_roundManager->IsTing(tagNum)&&
         ((win.kind==SINGLE_WIN && ((win.player==_roundManager->_curPlayer&&tagNum!=win.player)||(win.player!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
         (win.kind==DOUBLE_WIN && tagNum==_roundManager->_curPlayer)))
 	{
+        float Extra_x=162;
+        float Extra_y=origin.y+visibleSize.height*0.1256-10;
+
 		auto mingFlag=Sprite::createWithSpriteFrameName("result_mpbh.png");
 		mingFlag->setAnchorPoint(Vec2(0,0.5));
 		mingFlag->setPosition(Vec2(Extra_x,Extra_y));
@@ -5272,7 +5280,7 @@ void NetRaceLayer::race_start_again()
 /***********************************************************
         button action
 ***********************************************************/
-void NetRaceLayer::tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 	switch (type)
@@ -5310,7 +5318,7 @@ void NetRaceLayer::tuoGuanCancelPressed(Ref* pSender,ui::Widget::TouchEventType 
 	}
 }
 
-void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 {
     auto curButton=(Button*)pSender;
 	switch (type)
@@ -5328,7 +5336,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 			curButton->setHighlighted(true);
 
 			auto TuoGuanCancel=Button::create("quxiaotuoguan2.png","quxiaotuoguan1.png","quxiaotuoguan2.png",UI_TEX_TYPE_PLIST);
-			TuoGuanCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::tuoGuanCancelPressed,this));
+			TuoGuanCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnTuoGuanCancelHandler,this));
 			TuoGuanCancel->setAnchorPoint(Vec2(0.5,0.5));
 			TuoGuanCancel->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*60/716));
 			this->addChild(TuoGuanCancel,19,TUOGUAN_CANCEL_BUTTON);
@@ -5403,7 +5411,7 @@ void NetRaceLayer::tuoGuanPressed(Ref* pSender,ui::Widget::TouchEventType type)
 	}
 }
 
-void NetRaceLayer::BackConfirmPressed(Ref* pSender,ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -5428,7 +5436,7 @@ void NetRaceLayer::BackConfirmPressed(Ref* pSender,ui::Widget::TouchEventType ty
 	}
 }
 
-void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnBackCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
@@ -5468,7 +5476,7 @@ void NetRaceLayer::BackCancelPressed(Ref* pSender,ui::Widget::TouchEventType typ
 	}
 }
 
-void NetRaceLayer::backPressed(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+void NetRaceLayer::BtnBackHandler(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 	auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");});
@@ -5533,13 +5541,13 @@ void NetRaceLayer::Back()
 	backChooseBar->addChild(kindOfHu,2);
 
 	auto ensureBut=Button::create("tuichu2.png","tuichu.png","tuichu.png",UI_TEX_TYPE_PLIST);//退出
-	ensureBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BackConfirmPressed,this));
+	ensureBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackConfirmHandler,this));
 	ensureBut->setAnchorPoint(Vec2(0.5,0.5));
 	ensureBut->setPosition(Vec2(backChooseBar->getContentSize().width*0.75-15,backChooseBar->getContentSize().height*0.3));
 	backChooseBar->addChild(ensureBut);
 
 	auto BackBut=Button::create("jixuyouxi2.png","jixuyouxi.png","jixuyouxi.png",UI_TEX_TYPE_PLIST);//继续游戏
-	BackBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BackCancelPressed,this));
+	BackBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackCancelHandler,this));
 	BackBut->setAnchorPoint(Vec2(0.5,0.5));
 	BackBut->setPosition(Vec2(backChooseBar->getContentSize().width*0.25+15,backChooseBar->getContentSize().height*0.3));
 	backChooseBar->addChild(BackBut);
@@ -6733,7 +6741,7 @@ void NetRaceLayer::_CreateMeneButtons() {
 
     auto robotButton = _object->CreateButton(MENUBTN_TUOGUAN);
     robotButton->setTouchEnabled(false);
-    robotButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::tuoGuanPressed,this));
+    robotButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnTuoGuanHandler,this));
     gMenu->AddItem(robotButton);
 
     auto setButton = _object->CreateButton(MENUBTN_SHEZHI);
@@ -6743,7 +6751,7 @@ void NetRaceLayer::_CreateMeneButtons() {
     gMenu->AddItem(mallButton);
 
     auto backButton = _object->CreateButton(MENUBTN_GAMEBACK);
-    backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::backPressed,this));
+    backButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackHandler,this));
     gMenu->AddItem(backButton);
 }
 
