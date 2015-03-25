@@ -209,7 +209,6 @@ int RoundManager::Shuffle() {
 	}
 
 
-    LOGGER_WRITE("NETWORK: Shuffle should be executed at the server, and it is more reasonable to hide the card sequence to clients");
     char p[TOTAL_CARD_NUM] = {0};
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
         p[i] = (_unDistributedCards[i])/4;
@@ -243,11 +242,6 @@ int RoundManager::Shuffle() {
     return 0;
 }
 
-int RoundManager::NotifyStart() {
-    LOGGER_WRITE("NETWORK %s : send notification to server",__FUNCTION__);
-    return 0;
-}
-
 bool RoundManager::GetReadyStatus(int seatId) {
     LOGGER_WRITE("NETWORK : %s %d",__FUNCTION__,seatId);
     return true;
@@ -262,20 +256,6 @@ bool RoundManager::WaitUntilAllReady() {
     return true;
 }
 
-int RoundManager::AllowChooseCard() {
-    LOGGER_WRITE("enable reaction to player's movement",__FUNCTION__);
-    return 0;
-}
-
-bool RoundManager::WaitForDistribute() {
-    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
-    return true;
-}
-
-bool RoundManager::WaitForAction() {
-    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
-    return true;
-}
 
 /****************************************
         effect card
@@ -721,6 +701,114 @@ void RoundManager::WaitForMyAction() {
 		_lastAction=a_JUMP;
 		_uiManager->waitfor_MyShowCardInstruct();
 	}
+}
+
+void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
+    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
+    auto list=_players[dir]->get_parter()->get_card_list();
+
+    if(_actionToDo&a_HU) {
+        _uiManager->_HuEffect(dir);
+    } else if(_actionToDo&a_AN_GANG||_actionToDo&a_SHOU_GANG) {
+        _continue_gang_times++;
+        _lastActionSource = dir;
+        
+        if(_actionToDo&a_AN_GANG) {
+            _actionToDo=a_AN_GANG;
+            _lastAction=a_AN_GANG;
+            _lastActionWithGold=a_AN_GANG;
+        } else if(_actionToDo&a_SHOU_GANG) {
+            _actionToDo=a_SHOU_GANG;
+            _lastAction=a_SHOU_GANG;
+            _lastActionWithGold=a_SHOU_GANG;
+        }
+
+        Card_t card;
+        int* Angang=new int[4];
+
+        FindGangCards(dir,Angang);
+        card =(Card_t)list->data[Angang[0]].kind;
+
+        if( !IsTing(dir) ) {/* is dir equals dir ??? */
+            SetEffectCard(card,c_AN_GANG);
+        }
+
+        _uiManager->_AnGangEffect(dir,card,Angang);
+    } else if(_actionToDo&a_MING_GANG) {
+        _lastActionSource=dir;
+        _actionToDo=a_MING_GANG;
+        _lastAction=a_MING_GANG;
+        _lastActionWithGold=a_MING_GANG;
+
+        Card GangCard;
+        PlayerDir_t prevPlayer = (PlayerDir_t)dir;
+        if(_isCardFromOthers) {
+            int riverLast = _players[dir]->get_parter()->getOutCardList()->length;
+            _players[dir]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
+            _players[dir]->get_parter()->getOutCardList()->deleteItem();
+
+            RecordOutCard(GangCard);
+            RecordOutCard(GangCard);
+            RecordOutCard(GangCard);
+            _curPlayer=dir;
+        }else {
+            GangCard=list->data[list->len-1];
+            RecordOutCard(GangCard);
+        }
+
+        int l_len;
+        if(!_isCardFromOthers)
+            l_len=list->len-1;
+        else
+            l_len=list->len;
+
+        int* Angang=new int[4];
+        for(int i=0;i<l_len;i++) {/* is this logic neccessary ??? --- gang[1]=gang[0]+1;gang[2]=gang[1]+1*/
+            if(GangCard.kind==list->data[i].kind) {
+                if(i==0) {
+                    Angang[0]=i;
+                } else if(i>0 && GangCard.kind!=list->data[i-1].kind) {
+                    Angang[0]=i;
+                } else if(i==1 && GangCard.kind==list->data[i-1].kind) {
+                    Angang[1]=i;
+                } else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind!=list->data[i-2].kind) {
+                    Angang[1]=i;
+                } else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind==list->data[i-2].kind) {
+                    Angang[2]=i;
+                }
+            }
+        }
+
+        _uiManager->_MingGangEffect(dir,prevPlayer,(Card_t)GangCard.kind,Angang);
+    }
+    else if(_actionToDo&a_MING) {
+        RecvMing();
+    } else if(_actionToDo&a_PENG) {
+        Card card;
+
+        _continue_gang_times = 0;
+        _lastAction=a_PENG;
+        
+        const int riverLast =_players[dir]->get_parter()->getOutCardList()->length;
+        
+        _players[dir]->get_parter()->getOutCardList()->getCard(card,riverLast);
+        _players[dir]->get_parter()->getOutCardList()->deleteItem();
+        
+        RecordOutCard(card);
+        RecordOutCard(card);
+        
+        PlayerDir_t prevPlayer = (PlayerDir_t)dir;
+        _curPlayer = dir;
+
+        _uiManager->_PengEffect((PlayerDir_t)dir,prevPlayer,(Card_t)card.kind);
+    } else if(_actionToDo==a_JUMP) {
+        if(_lastAction==a_JUMP) {
+            _continue_gang_times=0;
+        }
+        _lastAction=a_JUMP;
+        
+        _uiManager->waitfor_ShowCardWithoutTouch();
+    }
 }
 
 void RoundManager::DistributeCard() {

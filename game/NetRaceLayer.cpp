@@ -165,7 +165,6 @@ void NetRaceLayer::start_game()
 	_roundManager->_isGameStart=false;
     _roundManager->_cardHolders[1]->_isReady = true;
 	GuiShowReady(1);
-    _roundManager->NotifyStart();
 
     _roundManager->WaitUntilAllReady();
 
@@ -207,7 +206,6 @@ void NetRaceLayer::first_response(int no)
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
 
-    _roundManager->WaitForAction();
     _roundManager->_isGameStart=true;
     _roundManager->_actionToDo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();/*why???*/
 
@@ -222,8 +220,27 @@ void NetRaceLayer::first_response(int no)
     if(no==1) {
         _roundManager->WaitForMyAction();
     } else {
-        waitfor_otheraction(no);
+        _roundManager->WaitForOthersAction((PlayerDir_t)no);
     }
+}
+
+void NetRaceLayer::waitfor_MyShowCardInstruct()
+{
+	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
+		if( _roundManager->_isTuoGuan ||
+                (_roundManager->IsTing(_roundManager->_curPlayer) 
+                && !_roundManager->_isGangAsking) ) {
+            CardsInfo_t cards;
+            _GetCardsInfo(&cards);
+            
+            Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
+            
+            _roundManager->RecvHandout(cards.last,location,2);
+            
+		} else {
+			_roundManager->_isMyShowTime = true;
+        }
+	}
 }
 
 void NetRaceLayer::waitfor_ShowCardWithoutTouch() {
@@ -270,144 +287,6 @@ void NetRaceLayer::waitfor_ShowCardWithoutTouch() {
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_list)), CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::waitfor_response)),NULL));
-}
-
-void NetRaceLayer::waitfor_MyShowCardInstruct()
-{
-	if(!_roundManager->_isCardFromOthers) {/* is this judgement neccessary??? */
-		if( _roundManager->_isTuoGuan ||
-                (_roundManager->IsTing(_roundManager->_curPlayer) 
-                && !_roundManager->_isGangAsking) ) {
-            CardsInfo_t cards;
-            _GetCardsInfo(&cards);
-            
-            Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
-            
-            _roundManager->RecvHandout(cards.last,location,2);
-            
-		} else {
-			_roundManager->_isMyShowTime = true;
-        }
-	}
-}
-
-void NetRaceLayer::waitfor_otheraction(int no)
-{
-    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,no,_roundManager->_actionToDo);
-	auto list=_roundManager->_players[no]->get_parter()->get_card_list();
-
-	myframe->_ID=no;
-	
-	if(_roundManager->_actionToDo&a_HU) {
-		_HuEffect(no);
-	} else if(_roundManager->_actionToDo&a_AN_GANG||_roundManager->_actionToDo&a_SHOU_GANG) {
-		_roundManager->_continue_gang_times++;
-		_roundManager->_lastActionSource = no;
-        
-		if(_roundManager->_actionToDo&a_AN_GANG) {
-			_roundManager->_actionToDo=a_AN_GANG;
-			_roundManager->_lastAction=a_AN_GANG;
-			_roundManager->_lastActionWithGold=a_AN_GANG;
-		} else if(_roundManager->_actionToDo&a_SHOU_GANG) {
-			_roundManager->_actionToDo=a_SHOU_GANG;
-			_roundManager->_lastAction=a_SHOU_GANG;
-			_roundManager->_lastActionWithGold=a_SHOU_GANG;
-		}
-
-		Card_t card;
-		int* Angang=new int[4];
-
-        _roundManager->FindGangCards(no,Angang);
-        card =(Card_t)list->data[Angang[0]].kind;
-
-		if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {/* is no equals _curPlayer ??? */
-			_roundManager->SetEffectCard(card,c_AN_GANG);
-		}
-
-		myframe->runAction(CallFunc::create([&](){
-			_AnGangEffect(no,card,Angang);
-		}));
-	} else if(_roundManager->_actionToDo&a_MING_GANG) {
-		_roundManager->_lastActionSource=no;
-		_roundManager->_actionToDo=a_MING_GANG;
-		_roundManager->_lastAction=a_MING_GANG;
-		_roundManager->_lastActionWithGold=a_MING_GANG;
-
-		Card GangCard;
-		PlayerDir_t prevPlayer = (PlayerDir_t)_roundManager->_curPlayer;
-		if(_roundManager->_isCardFromOthers) {
-			int riverLast = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
-			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-			_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-
-			_roundManager->RecordOutCard(GangCard);
-			_roundManager->RecordOutCard(GangCard);
-			_roundManager->RecordOutCard(GangCard);
-			_roundManager->_curPlayer=no;
-		}else {
-			GangCard=list->data[list->len-1];
-			_roundManager->RecordOutCard(GangCard);
-		}
-
-		int l_len;
-		if(!_roundManager->_isCardFromOthers)
-			l_len=list->len-1;
-		else
-			l_len=list->len;
-
-		int* Angang=new int[4];
-		for(int i=0;i<l_len;i++) {/* is this logic neccessary ??? --- gang[1]=gang[0]+1;gang[2]=gang[1]+1*/
-			if(GangCard.kind==list->data[i].kind) {
-				if(i==0) {
-					Angang[0]=i;
-				} else if(i>0 && GangCard.kind!=list->data[i-1].kind) {
-					Angang[0]=i;
-				} else if(i==1 && GangCard.kind==list->data[i-1].kind) {
-					Angang[1]=i;
-				} else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind!=list->data[i-2].kind) {
-					Angang[1]=i;
-				} else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind==list->data[i-2].kind) {
-					Angang[2]=i;
-				}
-			}
-		}
-
-		auto minggangEffect = CallFunc::create([=](){
-			_MingGangEffect(no,prevPlayer,(Card_t)GangCard.kind,Angang);
-		});
-		myframe->runAction(minggangEffect);
-	}
-	else if(_roundManager->_actionToDo&a_MING) {
-		myframe->runAction(CallFunc::create([=](){
-                    _roundManager->RecvMing();}));
-	} else if(_roundManager->_actionToDo&a_PENG) {
-        Card card;
-
-        _roundManager->_continue_gang_times = 0;
-        _roundManager->_lastAction=a_PENG;
-        
-        const int riverLast =_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->length;
-        
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
-        _roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-        
-        _roundManager->RecordOutCard(card);
-        _roundManager->RecordOutCard(card);
-        
-        PlayerDir_t prevPlayer = (PlayerDir_t)_roundManager->_curPlayer;
-        _roundManager->_curPlayer = no;
-
-		auto callFunc = CallFunc::create([=](){
-                    _PengEffect((PlayerDir_t)_roundManager->_curPlayer,prevPlayer,(Card_t)card.kind);});
-		myframe->runAction(callFunc);
-	} else if(_roundManager->_actionToDo==a_JUMP) {
-		if(_roundManager->_lastAction==a_JUMP) {
-			_roundManager->_continue_gang_times=0;
-        }
-		_roundManager->_lastAction=a_JUMP;
-        
-		waitfor_ShowCardWithoutTouch();
-	}
 }
 
 void NetRaceLayer::waitfor_response(Node* sender)
@@ -506,7 +385,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 		}
 		else
 		{
-			waitfor_otheraction((PlayerDir_t)sender->_ID);
+			_roundManager->WaitForOthersAction((PlayerDir_t)sender->_ID);
 			return;
 		}
 	}
@@ -679,7 +558,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			else
 			{
 				UpdateClock(0,no);
-				waitfor_otheraction(no);
+				_roundManager->WaitForOthersAction((PlayerDir_t)no);
 				return;
 			}
 		}
@@ -695,7 +574,7 @@ void NetRaceLayer::waitfor_response(Node* sender)
 			else
 			{
 				UpdateClock(0,no1);
-				waitfor_otheraction(no1);
+				_roundManager->WaitForOthersAction((PlayerDir_t)no1);
 				return;
 			}
 		}
@@ -1084,10 +963,6 @@ void NetRaceLayer::update_card_in_river_list(Node* sender) {
             HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
 	}
 }
-
-
-
-
 
 /***************************************************
         distribute
@@ -2845,8 +2720,6 @@ void NetRaceLayer::set_aims_sequence(const int p_aim[])
         button accessosaries
 ***********************************************************/
 void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
-    _roundManager->NotifyStart();
-
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -5167,7 +5040,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                                 NetRaceLayer::peng_dispatch)),    CCCallFuncN::create(this,callfuncN_selector(
                                 NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
-                				waitfor_otheraction(dir);}),NULL),NULL));
+                				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
 		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
 			myframe->removeChildByTag(PENG_EFFECT_NODE_ID,true);
@@ -5490,15 +5363,11 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         /***************************************
             it is unneccessary for net-game???
         ***************************************/
-		myframe->runAction( Sequence::create( 
-            CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::peng_dispatch)), 
-            CCCallFunc::create([=](){
+		myframe->runAction( Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
+                NetRaceLayer::peng_dispatch)),CCCallFunc::create([=](){
     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
-    			_roundManager->WaitForMyAction();}), 
-            CallFunc::create([=](){
-                _roundManager->_isMyShowTime=true;}),
-            NULL));
+    			_roundManager->WaitForMyAction();}),CallFunc::create([=](){
+                _roundManager->_isMyShowTime=true;}),NULL));
 	}
 }
 

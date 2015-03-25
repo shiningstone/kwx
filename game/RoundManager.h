@@ -41,6 +41,7 @@ public:
 	void RecvMing();
 
     void WaitForMyAction();
+    void WaitForOthersAction(PlayerDir_t dir);
     void DistributeCard();
 
     void QiangGangHuJudge();
@@ -97,12 +98,8 @@ public:
     Card_t _otherHandedOut;
     
     int  Shuffle();
-    int  NotifyStart();
     bool GetReadyStatus(int tableId);
     bool WaitUntilAllReady();
-    int  AllowChooseCard();
-    bool WaitForDistribute();
-    bool WaitForAction();
 
     int FindGangCards(int dir,int cards[4],Card_t target=CARD_UNKNONW);
 
