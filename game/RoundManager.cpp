@@ -884,7 +884,7 @@ void RoundManager::WaitForOthersChoose() {
 
 	_isCardFromOthers=true;
 
-    _uiManager->OthersHandoutEffect(_curPlayer);
+    _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
 
 void RoundManager::DistributeCard() {

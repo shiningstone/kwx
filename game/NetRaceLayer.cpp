@@ -204,7 +204,7 @@ Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
     return _GetCardInHand(MIDDLE,idx)->getPosition();
 }
 
-void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir) {
+void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
     myframe->_ID = dir;
     
 	myframe->runAction(Sequence::create(

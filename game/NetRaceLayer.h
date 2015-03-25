@@ -39,7 +39,7 @@ public:
     void ShowActionButtons();
     PlayerDir_t _NextPlayer(PlayerDir_t dir);
     Vec2 GetCardPositionInHand(int idx);
-    void OthersHandoutEffect(PlayerDir_t dir);
+    void OthersHandoutEffect(PlayerDir_t dir,bool canKou);
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
