@@ -3915,6 +3915,8 @@ Sprite *NetRaceLayer::_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent)
 
     if(gold!=0) {
         sign->setVisible(true);
+    } else {
+        sign->setVisible(false);
     }
 
     return sign;
@@ -3941,6 +3943,8 @@ LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerCo
 
     if(gold!=0) {
         propertyOfIncrease->setVisible(true);
+    } else {
+        propertyOfIncrease->setVisible(false);
     }
 
     return propertyOfIncrease;
