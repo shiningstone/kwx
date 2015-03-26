@@ -887,6 +887,291 @@ void RoundManager::WaitForOthersChoose() {
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
 
+void RoundManager::WaitForResponse(PlayerDir_t dir) {
+    unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
+    
+    if(!_isCardFromOthers)
+    {
+        _isGangHua=false;
+        if(_lastActionSource==dir&&_continue_gang_times!=0)
+            _isGangHua=true;
+        else
+            _continue_gang_times=0;
+        
+        _actionToDo = 
+            _players[dir]->get_parter()->hand_in(
+                _lastHandedOutCard,
+                _isCardFromOthers,
+                curTingStatus,
+                (_distributedNum==TOTAL_CARD_NUM),
+                _lastActionWithGold,
+                _continue_gang_times,
+                _isGangHua
+            );
+        
+#if 0/*NO USE???*/
+        if((PlayerDir_t)dir==MIDDLE) {
+            float x=_layout->_playerPosi[MIDDLE].basePoint.x;
+            float y=_layout->_playerPosi[MIDDLE].basePoint.y;
+            if(_players[MIDDLE]->get_parter()->get_ting_status()==1)
+            {
+                x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_curPlayer*20+(_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
+                y += 60+13;
+            } else {
+                x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_curPlayer*20+(_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
+                y += 60;
+            }
+        }
+#endif
+
+        if(_players[dir]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
+        {
+            if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
+                    _actionToDo=a_JUMP;
+            }
+            else if(_players[dir]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
+                    _actionToDo=a_JUMP;
+            }
+            else if(_players[dir]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
+                    _actionToDo=a_JUMP;
+        }
+        
+        if(_players[dir]->get_parter()->get_role_type()==INTERNET_PLAYER)
+        {
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+            if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
+                    _actionToDo=a_JUMP;
+            }
+            else if(_players[dir]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
+                    _actionToDo=a_JUMP;
+            }
+            else if(_players[dir]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
+                    _actionToDo=a_JUMP;
+        }
+        
+        if((PlayerDir_t)dir==MIDDLE)
+        {
+            if(_players[MIDDLE]->get_parter()->get_ting_status()==1&&(_actionToDo&a_HU)){
+                _uiManager->_HuEffect(MIDDLE);
+            }else{
+                if(_isTuoGuan)
+                    _actionToDo=a_JUMP;
+                WaitForMyAction();
+            }
+        }else{
+            WaitForOthersAction((PlayerDir_t)dir);
+        }
+    }else{
+        int no=((PlayerDir_t)dir+1)%3;
+        unsigned char action1 = 
+            _players[no]->get_parter()->hand_in(
+                _lastHandedOutCard,
+                _isCardFromOthers,
+                curTingStatus,
+                (_distributedNum==TOTAL_CARD_NUM),
+                _lastActionWithGold,
+                _continue_gang_times,
+                _isGangHua
+            );
+        
+        if(no==1&&_isTuoGuan)
+        {
+            if(_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
+                action1=a_HU;
+            else
+                action1=a_JUMP;
+        }
+        
+        if(_players[no]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
+        {
+            if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1 = a_JUMP;
+            }
+            else if(_players[no]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1 = a_JUMP;
+            }
+            else if(_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1=a_JUMP;
+        }
+        
+        if(_players[no]->get_parter()->get_role_type()==INTERNET_PLAYER)
+        {
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+            if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1 = a_JUMP;
+            }
+            else if(_players[no]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1 = a_JUMP;
+            }
+            else if(_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1=a_JUMP;
+        }
+        
+        int no1=((PlayerDir_t)dir+2)%3;
+        
+        unsigned char action2=
+            _players[no1]->get_parter()->hand_in(
+                _lastHandedOutCard,
+                _isCardFromOthers,
+                curTingStatus,
+                (_distributedNum==TOTAL_CARD_NUM),
+                _lastActionWithGold,
+                _continue_gang_times,
+                _isGangHua
+            );
+        if(no1==1&&_isTuoGuan)
+        {
+            if(_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
+                action2=a_HU;
+            else
+                action2=a_JUMP;
+        }
+        if(_players[no1]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
+        {
+            if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+                    action2 = a_JUMP;
+            }
+            else if(_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+                    action2 = a_JUMP;
+            }
+            else if(_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+                    action2=a_JUMP;
+        }
+        
+        if(_players[no1]->get_parter()->get_role_type()==INTERNET_PLAYER)
+        {
+            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+            if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+                    action2 = a_JUMP;
+            }
+            else if(_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+                    action2 = a_JUMP;
+            }
+            else if(_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
+                    action2=a_JUMP;
+        }
+        
+        if((action1&a_HU)&&(action2&a_HU))
+        {
+            _uiManager->HideClock();
+            if((no!=1&&no1!=1)||(no==1||no1==1&&_players[1]->get_parter()->get_ting_status()==1))
+            {
+                _uiManager->_HuEffect(3);
+                _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
+            }
+            else if((no==1||no1==1)&&_players[1]->get_parter()->get_ting_status()==0)
+            {
+                _isDoubleHuAsking = true;
+                if(no==1)
+                {
+                    _otherOneForDouble = no1;
+                    _actionToDo=action1;
+                }
+                else
+                {
+                    _otherOneForDouble = no;
+                    _actionToDo=action2;
+                }                   
+                WaitForMyAction();
+                return;
+            }
+        }
+        else if(action1&a_HU||action2&a_HU)//点炮
+        {
+            _uiManager->HideClock();
+            if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
+            {
+                if(_players[1]->get_parter()->get_ting_status()==1)//&&_actionToDo&a_HU)
+                {
+                    _uiManager->_HuEffect(1);
+                }
+                else
+                {
+                    if(no==1)
+                        _actionToDo=action1;
+                    else
+                        _actionToDo=action2;
+                    WaitForMyAction();
+                    return;
+                }
+            }
+            else if(no!=1&&(action1&a_HU))
+                _uiManager->_HuEffect(no);
+            else if(no1!=1&&(action2&a_HU))
+                _uiManager->_HuEffect(no1);
+        }
+        else if(action1!=a_JUMP)//下家
+        {
+            _actionToDo=action1;
+            if(no==1)
+            {
+                _uiManager->UpdateClock(0,no);
+                WaitForMyAction();
+                return;
+            }
+            else
+            {
+                _uiManager->UpdateClock(0,no);
+                WaitForOthersAction((PlayerDir_t)no);
+                return;
+            }
+        }
+        else if(action2!=a_JUMP)//上家
+        {
+            _actionToDo=action2;
+            if(no1==1)
+            {
+                _uiManager->UpdateClock(0,no1);
+                WaitForMyAction();
+                return;
+            }
+            else
+            {
+                _uiManager->UpdateClock(0,no1);
+                WaitForOthersAction((PlayerDir_t)no1);
+                return;
+            }
+        }
+        else if(action1==action2&&action1==a_JUMP)
+        {
+            _actionToDo=action1;
+            _curPlayer=(_curPlayer+1)%3;
+            _uiManager->UpdateClock(0,_curPlayer);
+            DistributeCard();
+        }
+    }
+}
+
 void RoundManager::DistributeCard() {
     _uiManager->Call_DistributeCard();
 }

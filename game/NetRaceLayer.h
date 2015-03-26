@@ -229,7 +229,6 @@ private:
     Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
 	void ListenToDistributeCard();
 	void _DistributeEvent(const std::string event_type,void* val);
-	void waitfor_response(Node* sender);
 	void _FirstResponse(int no);
 	void _MyHandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
