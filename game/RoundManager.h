@@ -44,7 +44,7 @@ public:
     void WaitForMyChoose();
     void WaitForOthersAction(PlayerDir_t dir);
     void WaitForOthersChoose();
-    void WaitForResponse();
+    void WaitForResponse(PlayerDir_t dir);
     void DistributeCard();
 
     void QiangGangHuJudge();
