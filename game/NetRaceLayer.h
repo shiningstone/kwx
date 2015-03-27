@@ -285,7 +285,7 @@ public:
 	void _MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
 	void _QiEffect(PlayerDir_t dir);//me--弃牌效果
 	void _CardInHandUpdateEffect(PlayerDir_t dir);
-	void update_card_in_river_list(Node* sender);
+	void _CardRiverUpdateEffect(PlayerDir_t dir);
 	void showall();
 	void GuiShowReady(int direction);
 	//int get_cur_player_no();

@@ -206,10 +206,10 @@ void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
     myframe->_ID = dir;
     
 	myframe->runAction(Sequence::create(
-        _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou), CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_in_river_list)), CCCallFunc::create([=]() {
+        _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
+		_CardRiverUpdateEffect(dir);}), CCCallFunc::create([=]() {
 		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFunc::create([=]() {
-        NetRaceLayer::_CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
+        _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
 
@@ -551,11 +551,11 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		_UpdateTingNum(MIDDLE);
 }
 
-void NetRaceLayer::update_card_in_river_list(Node* sender) {
-	outCardList* outCard = _roundManager->_players[sender->_ID]->get_parter()->getOutCardList();
+void NetRaceLayer::_CardRiverUpdateEffect(PlayerDir_t dir) {
+	outCardList* outCard = _roundManager->_players[dir]->get_parter()->getOutCardList();
 
 	for(int i=0;i<outCard->length;i++) {
-	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+dir*25+i);
 	}
     
 	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
@@ -565,18 +565,18 @@ void NetRaceLayer::update_card_in_river_list(Node* sender) {
         Card oCard;
         outCard->getCard(oCard,i+1);
         
-        auto show_card = _object->CreateRiverCard((PlayerDir_t)sender->_ID,(Card_t)oCard.kind);
+        auto show_card = _object->CreateRiverCard((PlayerDir_t)dir,(Card_t)oCard.kind);
         show_card_indicator->stopAllActions();
         
-        show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard((PlayerDir_t)sender->_ID,i));                      
+        show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard((PlayerDir_t)dir,i));                      
         show_card_indicator->runAction(RepeatForever::create(Sequence::create(
-            MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),
-            MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)sender->_ID,i)),NULL)));
-        show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)sender->_ID,i));
+            MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard((PlayerDir_t)dir,i)),
+            MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)dir,i)),NULL)));
+        show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)dir,i));
 
         myframe->addChild(show_card, 
-            _layout->ZorderOfRiverCard((PlayerDir_t)sender->_ID,i),
-            HAND_OUT_CARDS_TAG_ID+sender->_ID*25+i);
+            _layout->ZorderOfRiverCard((PlayerDir_t)dir,i),
+            HAND_OUT_CARDS_TAG_ID+dir*25+i);
 	}
 }
 
@@ -3772,7 +3772,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)),CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::minggang_dispatch)),CCCallFunc::create([=]() {
-            NetRaceLayer::_CardInHandUpdateEffect(dir);}),
+            _CardInHandUpdateEffect(dir);}),
             ActionAfterGang,NULL),NULL));
 }
 
@@ -3827,9 +3827,9 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
 	myframe->runAction(Sequence::create(
         allEffect,
         DelayTime::create(0.12),CallFunc::create([=](){
-        ifInsertCardsTime=false;}),Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::update_card_in_river_list)),CCCallFunc::create([=]() {
-    		_roundManager->_players[1]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
+        ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
+    		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
+    		_roundManager->_players[MIDDLE]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
@@ -4638,7 +4638,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::_DeleteActionTip)),   CCCallFuncN::create(this,callfuncN_selector(
                                 NetRaceLayer::peng_dispatch)),    CCCallFunc::create([=]() {
-                                NetRaceLayer::_CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
+                                _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
@@ -4985,7 +4985,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CCCallFuncN::create(this,callfuncN_selector(
             NetRaceLayer::angang_dispatch)), CCCallFunc::create([=]() {
-            NetRaceLayer::_CardInHandUpdateEffect((PlayerDir_t)no);}),
+            _CardInHandUpdateEffect((PlayerDir_t)no);}),
             _voice->Speak("down"), CCCallFunc::create([=](){
 			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
             _roundManager->DistributeCard();}),NULL),NULL));
@@ -6122,7 +6122,7 @@ void NetRaceLayer::KouConfirmEffect() {
     myframe->_ID = MIDDLE;
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
-        NetRaceLayer::_CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
+        _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->RecvMing();}),NULL));
 }
@@ -6133,7 +6133,7 @@ void NetRaceLayer::MingCancelEffect() {
     myframe->_ID = _roundManager->_curPlayer;
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
-        NetRaceLayer::_CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
+        _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
         _roundManager->WaitForMyAction();}),NULL));
@@ -6392,7 +6392,7 @@ void NetRaceLayer::QueryMingOutCard() {
     
     myframe->_ID=MIDDLE;
     myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
-        NetRaceLayer::_CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
+        _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::ListenToCardTouch)),NULL));
 }
 
