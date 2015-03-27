@@ -208,8 +208,8 @@ void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
 	myframe->runAction(Sequence::create(
         _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou), CCCallFuncN::create(this,callfuncN_selector(
         NetRaceLayer::update_card_in_river_list)), CCCallFunc::create([=]() {
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)), CCCallFunc::create([=]() {
+		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFunc::create([=]() {
+        NetRaceLayer::_CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
 
@@ -301,59 +301,62 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,in
 	_MyHandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
 }
 
-void NetRaceLayer::card_list_update(int no)
+void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 {
+	if(_roundManager->IsTing(dir)) {
+        _Show(this,MING_STATUS_PNG_0+dir,true);
+	}
+    
 	for(int i=0;i<MAX_HANDIN_NUM;i++) {
-        _Remove(myframe,HAND_IN_CARDS_TAG_ID+no*20+i);
+        _Remove(myframe,HAND_IN_CARDS_TAG_ID+dir*20+i);
 	}
 
-	float x = _layout->_playerPosi[no].basePoint.x+10; 
-	float y = _layout->_playerPosi[no].basePoint.y+10;
+	float x = _layout->_playerPosi[dir].basePoint.x+10; 
+	float y = _layout->_playerPosi[dir].basePoint.y+10;
 
-	CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
+	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
 
-	if( _roundManager->IsTing(no) && _roundManager->_firstMingNo==-1 )
-		_roundManager->_firstMingNo=no;
+	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==-1 )
+		_roundManager->_firstMingNo=dir;
 
-	unsigned char ting_flag = _roundManager->_players[no]->get_parter()->get_ting_status();
-    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,no,ting_flag);
+	unsigned char ting_flag = _roundManager->_players[dir]->get_parter()->get_ting_status();
+    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,dir,ting_flag);
 
 	Sprite *p_list[MAX_HANDIN_NUM];
-    PlayerDir_t dir = (PlayerDir_t)no;
     
     for(int i=0;i<list->len;i++)
 	{
 		if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
-			if(no==0 || no==2) {
+			if(dir==LEFT || dir==RIGHT) {
 				p_list[i] = _CreateCardInHand(dir,i,list,(ting_flag==1),Vec2(x,y));
                 
 				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
                 if(apperance!=NORMAL_APPERANCE) {
-                    _object->LayDownWithFace((PlayerDir_t)no, p_list[i], (Card_t)list->data[i].kind,apperance);
+                    _object->LayDownWithFace((PlayerDir_t)dir, p_list[i], (Card_t)list->data[i].kind,apperance);
                 }
 
                 y += _YofNextCard(dir,i,list,(ting_flag==1),p_list[i]->getTextureRect().size.height);
 			}
-			else if(no==1)
+			else if(dir==MIDDLE)
 			{
 				if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
 				{
 					if(ting_flag==1)
-						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)no,x,y);
+						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)dir,x,y);
 					else
-						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)no,x,y);
+						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)dir,x,y);
 				}
 				else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
 				{
-					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
+					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)dir,x,y);
 				}
 				else if(list->data[i].status==c_AN_GANG)
 				{
 					if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)no,x,y);
+						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)dir,x,y);
 					else
-						p_list[i]=_object->Create(AN_GANG_CARD,(PlayerDir_t)no,x,y);
+						p_list[i]=_object->Create(AN_GANG_CARD,(PlayerDir_t)dir,x,y);
 				}
                 
                 /* the card being chosen */
@@ -497,31 +500,32 @@ void NetRaceLayer::card_list_update(int no)
 
 
 
-			if(no!=2) {//each one lay above the previous ones
-                if(!_GetCardInHand((PlayerDir_t)no,i)) {
-                    myframe->addChild(p_list[i],i+1,        HAND_IN_CARDS_TAG_ID+no*20+i);
+			if(dir!=RIGHT) {//each one lay above the previous ones
+                if(!_GetCardInHand((PlayerDir_t)dir,i)) {
+                    myframe->addChild(p_list[i],i+1,        HAND_IN_CARDS_TAG_ID+dir*20+i);
                 }
             }
 			else {//each one lay below the previous ones
-                if(!_GetCardInHand((PlayerDir_t)no,i)) {
-    				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
+                if(!_GetCardInHand((PlayerDir_t)dir,i)) {
+    				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+dir*20+i);
                 }
             }
-			if(no==1
+            
+			if(dir==MIDDLE
                 &&_roundManager->_actionToDo==a_MING
-                &&_roundManager->_players[1]->get_parter()->get_ting_status()!=1
+                &&_roundManager->_players[MIDDLE]->get_parter()->get_ting_status()!=1
                 &&list->data[i].can_play==cps_YES) {
 				p_list[i]->setZOrder(30);
             }
             
-			p_list[i]->_ID=1;
+			p_list[i]->_ID=MIDDLE;
 
-            if(no==1 && _myChosenCard==i)
+            if(dir==MIDDLE && _myChosenCard==i)
 				p_list[i]->_ID=100;
 		}//for each card
 	}
     
-	if(no==1&&ting_flag!=0)
+	if(dir==1&&ting_flag!=0)
 	{
 		if(!myframe->getChildByTag(TING_SING_BUTTON))
 		{
@@ -538,24 +542,13 @@ void NetRaceLayer::card_list_update(int no)
 			ifTingSignBarVisible=false;
 			ListenToTingButton();
 
-            card_list_update(0);
-			card_list_update(2);
+            _CardInHandUpdateEffect(LEFT);
+			_CardInHandUpdateEffect(RIGHT);
 		}
 	}
     
-	if(no==1&&myframe->getChildByTag(TING_SING_BUTTON))
+	if(dir==MIDDLE&&myframe->getChildByTag(TING_SING_BUTTON))
 		_UpdateTingNum(MIDDLE);
-}
-
-void NetRaceLayer::update_card_list(Node *psender)
-{
-    int no = psender->_ID;
-    
-	if(_roundManager->IsTing(no)) {
-        _Show(this,MING_STATUS_PNG_0+no,true);
-	}
-    
-	card_list_update(no);
 }
 
 void NetRaceLayer::update_card_in_river_list(Node* sender) {
@@ -1065,9 +1058,9 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang) {
 	myframe->_ID = zhuang;
 	myframe->runAction(Sequence::create(
         _FisrtRoundResidueUpdate(),Spawn::create(CallFunc::create([=](){
-		card_list_update(0);}),CallFunc::create([=](){
-		card_list_update(1);}),CallFunc::create([=](){
-		card_list_update(2);}),NULL),CallFunc::create([=](){
+		_CardInHandUpdateEffect(LEFT);}),CallFunc::create([=](){
+		_CardInHandUpdateEffect(MIDDLE);}),CallFunc::create([=](){
+		_CardInHandUpdateEffect(RIGHT);}),NULL),CallFunc::create([=](){
 		UpdateClock(0,zhuang);}),CallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteStartDealCards)),CCCallFunc::create([=](){
 		_FirstResponse(zhuang);
@@ -3778,8 +3771,8 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
         goldEffect,
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::minggang_dispatch)),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::update_card_list)),
+            NetRaceLayer::minggang_dispatch)),CCCallFunc::create([=]() {
+            NetRaceLayer::_CardInHandUpdateEffect(dir);}),
             ActionAfterGang,NULL),NULL));
 }
 
@@ -3842,7 +3835,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
     			_isCardInHandUpdated = false;
     		else {
                 _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
-    			card_list_update(1);
+    			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(MIDDLE);}),
         NULL));
@@ -4435,13 +4428,13 @@ bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
     if( ifInsertCardsTime ) {
         ifInsertCardsTime=false;
         
-        card_list_update(MIDDLE);
+        _CardInHandUpdateEffect(MIDDLE);
         _isCardInHandUpdated=true;
     }
     
     if( ifEffectTime && ifUpdateDuringEffect ) {
         ifUpdateDuringEffect=false;
-        card_list_update(MIDDLE);
+        _CardInHandUpdateEffect(MIDDLE);
     }
 
     ifChosed=false;
@@ -4644,8 +4637,8 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::_DeleteActionTip)),   CCCallFuncN::create(this,callfuncN_selector(
-                                NetRaceLayer::peng_dispatch)),    CCCallFuncN::create(this,callfuncN_selector(
-                                NetRaceLayer::update_card_list)), CCCallFunc::create([=](){
+                                NetRaceLayer::peng_dispatch)),    CCCallFunc::create([=]() {
+                                NetRaceLayer::_CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
@@ -4658,7 +4651,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 				_roundManager->CancelEffectCard();
                 
 				_DeleteActionEffect();
-				card_list_update(dir);
+				_CardInHandUpdateEffect(dir);
 			}
 		}
         
@@ -4929,7 +4922,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
 					_roundManager->CancelEffectCard();
-					card_list_update(dir);
+					_CardInHandUpdateEffect(dir);
 				} else  {
                     int sameCardNum = 0;
 
@@ -4991,8 +4984,8 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
                 simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::angang_dispatch)), CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::update_card_list)),
+            NetRaceLayer::angang_dispatch)), CCCallFunc::create([=]() {
+            NetRaceLayer::_CardInHandUpdateEffect((PlayerDir_t)no);}),
             _voice->Speak("down"), CCCallFunc::create([=](){
 			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
             _roundManager->DistributeCard();}),NULL),NULL));
@@ -5006,7 +4999,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 				ifUpdateDuringEffect=false;
                 _roundManager->CancelEffectCard();
 				_DeleteActionEffect();
-				card_list_update(no);
+				_CardInHandUpdateEffect((PlayerDir_t)no);
 			}
 		}
 
@@ -5226,7 +5219,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
 					_roundManager->CancelEffectCard();
-					card_list_update(no);
+					_CardInHandUpdateEffect((PlayerDir_t)no);
 				} else {
 					int sameCardNum=0;
 					for(int a=list->atcvie_place-1;a>=0;a--)
@@ -5318,7 +5311,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
                 
                 _roundManager->CancelEffectCard();
 				_DeleteActionEffect();
-				card_list_update(no);
+				_CardInHandUpdateEffect((PlayerDir_t)no);
 			}
 		}
 
@@ -5661,7 +5654,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 				{
 					ifUpdateDuringEffect=false;
                     _roundManager->CancelEffectCard();
-					card_list_update(no);
+					_CardInHandUpdateEffect((PlayerDir_t)no);
 				}
 				else 
 				{
@@ -6128,8 +6121,8 @@ void NetRaceLayer::KouConfirmEffect() {
 
     myframe->_ID = MIDDLE;
     myframe->runAction(Sequence::create(TargetedAction::create(
-        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
+        NetRaceLayer::_CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->RecvMing();}),NULL));
 }
@@ -6139,8 +6132,8 @@ void NetRaceLayer::MingCancelEffect() {
     
     myframe->_ID = _roundManager->_curPlayer;
     myframe->runAction(Sequence::create(TargetedAction::create(
-        button,ScaleTo::create(0,0)),CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+        button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
+        NetRaceLayer::_CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
         _roundManager->WaitForMyAction();}),NULL));
@@ -6398,8 +6391,8 @@ void NetRaceLayer::QueryMingOutCard() {
     myframe->addChild(MingCancel,20,MING_CANCEL);
     
     myframe->_ID=MIDDLE;
-    myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-        NetRaceLayer::update_card_list)),CCCallFunc::create(this,callfunc_selector(
+    myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
+        NetRaceLayer::_CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::ListenToCardTouch)),NULL));
 }
 
@@ -6430,7 +6423,7 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
                     _roundManager->CancelEffectCard();
 					_DeleteActionEffect();
                     
-					card_list_update(1);
+					_CardInHandUpdateEffect(MIDDLE);
 				}
 			}
 

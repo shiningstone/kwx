@@ -838,7 +838,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         PlayerDir_t prevPlayer = (PlayerDir_t)dir;
         _curPlayer = dir;
 
-        _uiManager->_PengEffect((PlayerDir_t)dir,prevPlayer,(Card_t)card.kind);
+        _uiManager->PengEffect((PlayerDir_t)dir,prevPlayer,(Card_t)card.kind);
     } else if(_actionToDo==a_JUMP) {
         if(_lastAction==a_JUMP) {
             _continue_gang_times=0;
@@ -909,21 +909,6 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _isGangHua
             );
         
-#if 0/*NO USE???*/
-        if((PlayerDir_t)dir==MIDDLE) {
-            float x=_layout->_playerPosi[MIDDLE].basePoint.x;
-            float y=_layout->_playerPosi[MIDDLE].basePoint.y;
-            if(_players[MIDDLE]->get_parter()->get_ting_status()==1)
-            {
-                x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_curPlayer*20+(_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
-                y += 60+13;
-            } else {
-                x += myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+_curPlayer*20+(_players[1]->get_parter()->get_card_list()->len-2))->getPosition().x+30;
-                y += 60;
-            }
-        }
-#endif
-
         if(_players[dir]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
         {
             if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
