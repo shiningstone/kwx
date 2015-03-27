@@ -664,7 +664,7 @@ void RoundManager::RecvKouConfirm() {
             cards->data[i].status=c_FREE;
     }   
     
-    _players[MIDDLE]->get_parter()->action(_isCardFromOthers,a_KOU);
+    UpdateCards(MIDDLE,a_KOU);
     
     auto ming_indexesCur=_players[MIDDLE]->get_parter()->ming_check();
     _players[MIDDLE]->get_parter()->set_ming_indexes(ming_indexesCur);
@@ -675,7 +675,7 @@ void RoundManager::RecvKouConfirm() {
 void RoundManager::RecvMingCancel() {
     _isMingTime=false;
     
-    _players[1]->get_parter()->action(_isCardFromOthers,a_KOU_CANCEL);
+    UpdateCards(MIDDLE,a_KOU_CANCEL);
     _actionToDo=a_JUMP;
     
     _players[1]->get_parter()->MingCancel();
@@ -874,9 +874,9 @@ void RoundManager::WaitForOthersChoose() {
 
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
         if(_ai->KouCardGroupNum()>0)
-            _players[_curPlayer]->get_parter()->action(_isCardFromOthers,a_KOU);
+            UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
 
-        _players[_curPlayer]->get_parter()->action(_isCardFromOthers,a_MING);
+        UpdateCards((PlayerDir_t)_curPlayer,a_MING);
 
         _players[_curPlayer]->get_parter()->LockAllCards();
         _players[_curPlayer]->get_parter()->set_ting_status(1);
@@ -1159,6 +1159,20 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 
 void RoundManager::DistributeCard() {
     _uiManager->Call_DistributeCard();
+}
+
+void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {
+    if(action==a_PENG) {
+        _isCardFromOthers = true;
+    }
+
+    if(_actionToDo&a_AN_GANG) {
+        _players[dir]->get_parter()->action(_isCardFromOthers,a_AN_GANG);
+    } else if(_actionToDo&a_SHOU_GANG) {
+        _players[dir]->get_parter()->action(_isCardFromOthers,a_SHOU_GANG);
+    } else {
+        _players[dir]->get_parter()->action(_isCardFromOthers,action);
+    }
 }
 
 /*************************************

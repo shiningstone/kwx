@@ -208,7 +208,7 @@ void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
 	myframe->runAction(Sequence::create(
         _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
 		_CardRiverUpdateEffect(dir);}), CCCallFunc::create([=]() {
-		_roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);}),CCCallFunc::create([=]() {
+        _roundManager->UpdateCards((PlayerDir_t)_roundManager->_curPlayer,a_JUMP);}),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
@@ -3770,8 +3770,8 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
             _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),NULL),
         goldEffect,
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::_DeleteActionTip)),CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::minggang_dispatch)),CCCallFunc::create([=]() {
+            NetRaceLayer::_DeleteActionTip)),CCCallFunc::create([=]() {
+            _roundManager->UpdateCards(dir,a_MING_GANG);}),CCCallFunc::create([=]() {
             _CardInHandUpdateEffect(dir);}),
             ActionAfterGang,NULL),NULL));
 }
@@ -3829,7 +3829,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
         DelayTime::create(0.12),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
-    		_roundManager->_players[MIDDLE]->get_parter()->action(_roundManager->_isCardFromOthers,a_JUMP);
+            _roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
@@ -4355,40 +4355,6 @@ void NetRaceLayer::ListenToTingButton() {
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
 }
 
-/***************************************************************
-        interface with player
-***************************************************************/
-void NetRaceLayer::peng_dispatch(Node *psender){
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	int no=psender->_ID;
-    
-	_roundManager->_isCardFromOthers=true;
-	_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_PENG);
-}
-
-void NetRaceLayer::minggang_dispatch(Node *psender)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	int no=psender->_ID;
-
-    _roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING_GANG);
-}
-
-void NetRaceLayer::angang_dispatch(Node *psender)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	int no=psender->_ID;
-
-    if(_roundManager->_actionToDo&a_AN_GANG)
-		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_AN_GANG);
-	else if(_roundManager->_actionToDo&a_SHOU_GANG)
-		_roundManager->_players[no]->get_parter()->action(_roundManager->_isCardFromOthers,a_SHOU_GANG);
-}
-
-
 /*********************************************
         choose card
 *********************************************/
@@ -4636,8 +4602,8 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                                 simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
-                                NetRaceLayer::_DeleteActionTip)),   CCCallFuncN::create(this,callfuncN_selector(
-                                NetRaceLayer::peng_dispatch)),    CCCallFunc::create([=]() {
+                                NetRaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
+                                _roundManager->UpdateCards(dir,a_PENG);}),    CCCallFunc::create([=]() {
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
@@ -4963,8 +4929,8 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         /***************************************
             it is unneccessary for net-game???
         ***************************************/
-		myframe->runAction( Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-                NetRaceLayer::peng_dispatch)),CCCallFunc::create([=](){
+		myframe->runAction( Sequence::create(CallFunc::create([=](){
+                _roundManager->UpdateCards(dir,a_PENG);}),CCCallFunc::create([=](){
     			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
     			_roundManager->WaitForMyAction();}),CallFunc::create([=](){
                 _roundManager->_isMyShowTime=true;}),NULL));
@@ -4983,8 +4949,8 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
                     _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
-            NetRaceLayer::_DeleteActionTip)), CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::angang_dispatch)), CCCallFunc::create([=]() {
+            NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
+            _roundManager->UpdateCards((PlayerDir_t)no,a_AN_GANG);}), CCCallFunc::create([=]() {
             _CardInHandUpdateEffect((PlayerDir_t)no);}),
             _voice->Speak("down"), CCCallFunc::create([=](){
 			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
@@ -5271,9 +5237,9 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
                     _voice->Speak("lanpai"),NULL),CallFunc::create([=](){
                 _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
         
-		myframe->_ID=1;
-		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::angang_dispatch)),
+		myframe->_ID=MIDDLE;
+		myframe->runAction(Sequence::create(CallFunc::create([=](){
+            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
 			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
@@ -5718,8 +5684,8 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
             dis_action=CallFunc::create([=](){
                             _roundManager->DistributeCard();});
         
-		myframe->runAction(Sequence::create(CCCallFuncN::create(this,callfuncN_selector(
-            NetRaceLayer::minggang_dispatch)),
+		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
+            _roundManager->UpdateCards((PlayerDir_t)no,a_MING_GANG);}),
             DelayTime::create(0.48),CallFunc::create([=](){
 			if(_roundManager->_isCardFromOthers)
 				GoldNumInsert(no,2,_roundManager->_curPlayer);}),dis_action,NULL));
@@ -6380,7 +6346,7 @@ void NetRaceLayer::QueryKouCards() {
 
 void NetRaceLayer::QueryMingOutCard() {
     _roundManager->_isMingTime=true;
-    _roundManager->_players[_roundManager->_curPlayer]->get_parter()->action(_roundManager->_isCardFromOthers,a_MING);
+    _roundManager->UpdateCards((PlayerDir_t)_roundManager->_curPlayer,a_MING);
     
     _Remove(myframe,MING_KOU_ENSURE);
     _Remove(myframe,MING_KOU_SIGN);

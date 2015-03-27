@@ -275,10 +275,6 @@ public:
 	void _DeleteActionTip();//删除效果残留
 	void _DeleteActionReminder();
 	void _DeleteActionEffect();
-    
-	void angang_dispatch(Node *psender);
-	void minggang_dispatch(Node *psender);
-	void peng_dispatch(Node *psender);
 
     TargetedAction* _MingAnimation();
 	void _AnGangEffect(int no,Card_t card,int gang[]);//me--暗杠效果
