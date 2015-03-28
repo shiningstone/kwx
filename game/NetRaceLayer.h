@@ -207,7 +207,7 @@ private:
 	void _RaceBeginPrepare();//牌局开始效果
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
-	void start_game();//功能--开始
+	void StartGame();//功能--开始
 	void BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void BtnStartHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnBackHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
@@ -243,10 +243,10 @@ public:
 	virtual void init_race_sequence(){};
 	/*##############################
 	   everytime when enter game,first call init_role(player) 
-	   function,then create_race();
+	   function,then CreateRace();
 	##############################*/
 	void init_role(Role *s_p[],Raction *p_parter[]);//玩家对象初始化
-	void create_race();//创建比赛场景
+	void CreateRace();//创建比赛场景
 	void _UpdateResidueCards(int no);//更新剩余牌数
     void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
     void _LeftBatchDistribute(int batchIdx, float delayRef, int cardLen=13);

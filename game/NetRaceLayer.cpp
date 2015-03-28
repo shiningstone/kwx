@@ -80,7 +80,7 @@ bool NetRaceLayer::init() {
 /************************************************
             main process
 ************************************************/
-void NetRaceLayer::create_race()
+void NetRaceLayer::CreateRace()
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
@@ -128,7 +128,7 @@ void NetRaceLayer::create_race()
         2);
 }
 
-void NetRaceLayer::start_game()
+void NetRaceLayer::StartGame()
 {
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
 
@@ -2345,7 +2345,7 @@ void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type)
                             FadeOut::create(0.3),NULL)),
                         _voice->Speak("anniu.ogg"),NULL),
                     DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::start_game)),NULL));
+                    NetRaceLayer::StartGame)),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -2388,7 +2388,7 @@ void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType typ
                             FadeOut::create(0.3),NULL)),
                         _voice->Speak("anniu.ogg"),NULL),
                     DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::start_game)),NULL));
+                    NetRaceLayer::StartGame)),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

@@ -481,7 +481,7 @@ void RoundManager::CreateRace(Scene *scene) {
     LoadPlayerInfo();
 	_isGameStart=false;
     
-    _uiManager->create_race();
+    _uiManager->CreateRace();
 }
 
 void RoundManager::StartGame() {
