@@ -206,9 +206,9 @@ void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
     myframe->_ID = dir;
     
 	myframe->runAction(Sequence::create(
-        _OthersShowCardEffect((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
+        _OthersShowCardEffect(dir,(Card_t)_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
 		_CardRiverUpdateEffect(dir);}), CCCallFunc::create([=]() {
-        _roundManager->UpdateCards((PlayerDir_t)_roundManager->_curPlayer,a_JUMP);}),CCCallFunc::create([=]() {
+        _roundManager->UpdateCards(dir,a_JUMP);}),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
@@ -316,11 +316,10 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
 	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
 
-	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==-1 )
+	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==INVALID )
 		_roundManager->_firstMingNo=dir;
 
 	unsigned char ting_flag = _roundManager->_players[dir]->get_parter()->get_ting_status();
-    LOGGER_WRITE("NETWORK : %s : %d(Ting %d)",__FUNCTION__,dir,ting_flag);
 
 	Sprite *p_list[MAX_HANDIN_NUM];
     
@@ -525,7 +524,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		}//for each card
 	}
     
-	if(dir==1&&ting_flag!=0)
+	if(dir==MIDDLE&&ting_flag!=0)
 	{
 		if(!myframe->getChildByTag(TING_SING_BUTTON))
 		{
@@ -4598,8 +4597,8 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 	if(dir!=1) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
-                                _voice->SpeakAction(PENG,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                                simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" ),NULL), 
+                                _voice->SpeakAction(PENG,_roundManager->_cardHolders[dir]->GetSex()),
+                                simple_tip_effect( _layout->PositionOfActSign(dir),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::_DeleteActionTip)),   CallFunc::create([=](){

@@ -359,21 +359,21 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
         _isWaitDecision = false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
-    
-        _continue_gang_times = 0;
-        _lastAction=a_PENG;
-        
-        const int riverLast =_players[_curPlayer]->get_parter()->getOutCardList()->length;
-        
-        _players[_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
-        _players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-        
-        RecordOutCard(card);
-        RecordOutCard(card);
-    
-        prevPlayer = (PlayerDir_t)_curPlayer;
-        _curPlayer=dir;
     }
+    
+    _continue_gang_times = 0;
+    _lastAction=a_PENG;
+    
+    const int riverLast =_players[_curPlayer]->get_parter()->getOutCardList()->length;
+    
+    _players[_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
+    _players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
+    
+    RecordOutCard(card);
+    RecordOutCard(card);
+
+    prevPlayer = (PlayerDir_t)_curPlayer;
+    _curPlayer=dir;
 
     _uiManager->PengEffect((PlayerDir_t)_curPlayer,prevPlayer,(Card_t)card.kind);
 }
