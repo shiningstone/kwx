@@ -1152,13 +1152,13 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             _actionToDo=action1;
             _curPlayer=(_curPlayer+1)%3;
             _uiManager->UpdateClock(0,_curPlayer);
-            DistributeCard();
+            DistributeTo((PlayerDir_t)_curPlayer);
         }
     }
 }
 
-void RoundManager::DistributeCard() {
-    _uiManager->Call_DistributeCard();
+void RoundManager::DistributeTo(PlayerDir_t dir) {
+    _uiManager->Call_DistributeCard(dir);
 }
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {

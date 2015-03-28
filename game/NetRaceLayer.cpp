@@ -285,7 +285,7 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
 void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
         GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
-        _roundManager->DistributeCard();}),NULL));
+        _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
 }
 
 void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
@@ -608,23 +608,23 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     return Vec2(x,y);
 }
 
-void NetRaceLayer::DistributeCard(int lenOfInHand) {
-    const Vec2 &lastCardPosition = _GetLastCardPosition((PlayerDir_t)_roundManager->_curPlayer,lenOfInHand);
+void NetRaceLayer::DistributeTo(PlayerDir_t dir,int lenOfInHand) {
+    const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
 
-    Sprite *lastCard = _object->CreateDistributeCard((PlayerDir_t)_roundManager->_curPlayer,(Card_t)_roundManager->_lastHandedOutCard);
+    Sprite *lastCard = _object->CreateDistributeCard(dir,(Card_t)_roundManager->_lastHandedOutCard);
 	lastCard->setPosition(lastCardPosition);
     
 	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 
-	if(_roundManager->_curPlayer==0)
-		myframe->addChild(lastCard,
-		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(lenOfInHand+1));
-	else if(_roundManager->_curPlayer==1)
-		myframe->addChild(lastCard,
-		    30, HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(lenOfInHand+1));
-	else if(_roundManager->_curPlayer==2)
-		myframe->addChild(lastCard,
-		    0,  HAND_IN_CARDS_TAG_ID+_roundManager->_curPlayer*20+(lenOfInHand+1));
+    switch(dir) {
+        case LEFT:
+        case MIDDLE:
+            myframe->addChild(lastCard,30, HAND_IN_CARDS_TAG_ID+dir*20+(lenOfInHand+1));
+            break;
+        case RIGHT:
+            myframe->addChild(lastCard,0,  HAND_IN_CARDS_TAG_ID+dir*20+(lenOfInHand+1));
+            break;
+    }
 
 	auto last_one_action=TargetedAction::create(lastCard,Sequence::create(
         EaseElasticOut::create(
@@ -632,19 +632,20 @@ void NetRaceLayer::DistributeCard(int lenOfInHand) {
                 lastCard->getPositionX(),
                 lastCard->getPositionY()-50))),NULL));
 
-    DelayTime *delay = (_roundManager->_curPlayer!=MIDDLE)
+    DelayTime *delay = (dir!=MIDDLE)
         ? (DelayTime::create(0.5))
         : (DelayTime::create(0.0));
     
-	myframe->_ID = _roundManager->_curPlayer;
+	myframe->_ID = dir;
 	myframe->runAction(Sequence::create(
         last_one_action,
         delay,CCCallFunc::create([=]() {
-		_roundManager->WaitForResponse((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+		_roundManager->WaitForResponse(dir);}),NULL));
 }
 
-void NetRaceLayer::Call_DistributeCard() {
-	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,NULL);
+void NetRaceLayer::Call_DistributeCard(PlayerDir_t dir) {
+    PlayerDir_t receiver = dir;
+	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,&receiver);
 }
 
 void NetRaceLayer::_DispatchDistributeCardEvents()
@@ -671,7 +672,7 @@ void NetRaceLayer::ListenToDistributeCard() {
         _roundManager->_isCardFromOthers = false;
 
         auto cards = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
-		DistributeCard(cards->len-1);
+		DistributeTo((PlayerDir_t)_roundManager->_curPlayer,cards->len-1);
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 
@@ -2485,7 +2486,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 						});
 						auto curSeq=Sequence::create(
                             GoldAccount,CallFunc::create([=](){
-                            _roundManager->DistributeCard();}),NULL);
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL);
 						myframe->runAction(curSeq);
 					}
 					else if(_roundManager->_isDoubleHuAsking)
@@ -2498,7 +2499,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 					{
 						_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 						myframe->runAction(CallFunc::create([=](){
-                            _roundManager->DistributeCard();}));
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}));
 					}
 				}
 				else {
@@ -3756,7 +3757,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
             GoldNumInsert(dir,2,dir);});
             
         ActionAfterGang=CallFunc::create([=](){
-                            _roundManager->DistributeCard();});
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);});
     } else {
         ActionAfterGang=CallFunc::create([=](){
                             _roundManager->QiangGangHuJudge();});
@@ -4953,7 +4954,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
             _CardInHandUpdateEffect((PlayerDir_t)no);}),
             _voice->Speak("down"), CCCallFunc::create([=](){
 			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
-            _roundManager->DistributeCard();}),NULL),NULL));
+            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
 	}
 	else {
 		for(int NodeNum=0;NodeNum<3;NodeNum++) {
@@ -5242,7 +5243,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
 			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
-            _roundManager->DistributeCard();}),NULL));
+            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
 	}
 }
 
@@ -5681,7 +5682,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
                             _roundManager->QiangGangHuJudge();});
         } else
             dis_action=CallFunc::create([=](){
-                            _roundManager->DistributeCard();});
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);});
         
 		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
             _roundManager->UpdateCards((PlayerDir_t)no,a_MING_GANG);}),
@@ -5898,7 +5899,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
                     shadeFunc,Spawn::create(CallFunc::create([=](){
     					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
     					_roundManager->_qiangGangTargetNo=-1;/*!!! could this be called before runAction */}),CallFunc::create([=](){
-                        _roundManager->DistributeCard();}),NULL),NULL));
+                        _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
 			} else if(_roundManager->_isDoubleHuAsking) {
 				_roundManager->_isDoubleHuAsking=false;
 				myframe->runAction(Sequence::create(
@@ -5908,7 +5909,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
 				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 				myframe->runAction(Sequence::create(
                     shadeFunc,CallFunc::create([=](){
-                    _roundManager->DistributeCard();}),NULL));
+                    _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
 			}
 		}
 	}

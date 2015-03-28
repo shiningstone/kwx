@@ -234,8 +234,8 @@ public:
 	void _DistributeEvent(const std::string event_type,void* val);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(int no);
-	void Call_DistributeCard();
-	void DistributeCard(int lenOfInHand);
+	void Call_DistributeCard(PlayerDir_t dir);
+	void DistributeTo(PlayerDir_t dir, int lenOfInHand);
 	void MyHandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 
