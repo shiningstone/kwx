@@ -351,6 +351,36 @@ int RoundManager::FindGangCards(int dir,int cards[4],Card_t target) {
     return 0;
 }
 
+
+void RoundManager::CreateRace(Scene *scene) {
+    _uiManager = NetRaceLayer::create();
+    scene->addChild(_uiManager);
+
+    _uiManager->Set(this);
+
+    InitPlayers();
+    LoadPlayerInfo();
+	_isGameStart=false;
+    
+    _uiManager->CreateRace();
+}
+
+void RoundManager::StartGame() {
+	_isGameStart=false;
+    _cardHolders[MIDDLE]->_isReady = true;
+    WaitUntilAllReady();
+
+    RenewOutCard();
+
+    int lastWinner = GetLastWinner();
+    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
+	if(_actionToDo!=a_TIMEOUT) {
+		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
+		_uiManager->FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果�?
+	}
+}
+
 void RoundManager::RecvPeng(PlayerDir_t dir) {
     Card        card;
     PlayerDir_t prevPlayer;
@@ -373,9 +403,9 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     RecordOutCard(card);
 
     prevPlayer = (PlayerDir_t)_curPlayer;
-    _curPlayer=dir;
+    _curPlayer = dir;
 
-    _uiManager->PengEffect((PlayerDir_t)_curPlayer,prevPlayer,(Card_t)card.kind);
+    _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
 }
 
 void RoundManager::RecvHu(PlayerDir_t dir) {
@@ -469,35 +499,6 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 
 void RoundManager::RecvQi() {
     _uiManager->QiEffect();
-}
-
-void RoundManager::CreateRace(Scene *scene) {
-    _uiManager = NetRaceLayer::create();
-    scene->addChild(_uiManager);
-
-    _uiManager->Set(this);
-
-    InitPlayers();
-    LoadPlayerInfo();
-	_isGameStart=false;
-    
-    _uiManager->CreateRace();
-}
-
-void RoundManager::StartGame() {
-	_isGameStart=false;
-    _cardHolders[MIDDLE]->_isReady = true;
-    WaitUntilAllReady();
-
-    RenewOutCard();
-
-    int lastWinner = GetLastWinner();
-    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
-	if(_actionToDo!=a_TIMEOUT) {
-		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		_uiManager->FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果�?
-	}
 }
 
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
@@ -822,23 +823,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     else if(_actionToDo&a_MING) {
         RecvMing();
     } else if(_actionToDo&a_PENG) {
-        Card card;
-
-        _continue_gang_times = 0;
-        _lastAction=a_PENG;
-        
-        const int riverLast =_players[dir]->get_parter()->getOutCardList()->length;
-        
-        _players[dir]->get_parter()->getOutCardList()->getCard(card,riverLast);
-        _players[dir]->get_parter()->getOutCardList()->deleteItem();
-        
-        RecordOutCard(card);
-        RecordOutCard(card);
-        
-        PlayerDir_t prevPlayer = (PlayerDir_t)dir;
-        _curPlayer = dir;
-
-        _uiManager->PengEffect((PlayerDir_t)dir,prevPlayer,(Card_t)card.kind);
+        RecvPeng(dir);
     } else if(_actionToDo==a_JUMP) {
         if(_lastAction==a_JUMP) {
             _continue_gang_times=0;
