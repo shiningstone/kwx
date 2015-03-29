@@ -3310,7 +3310,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
-			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
+			_roundManager->_curPlayer = no;}),CallFunc::create([=](){
             _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
 	}
 }
