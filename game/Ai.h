@@ -26,6 +26,8 @@ public:
     int  KouCardIndex(int group,int idx);
     CARD_STATUS  KouCardStatus(int gIdx);
     void SetKouCardStatus(int gIdx,CARD_STATUS status);
+    void SwitchGroupStatus(int group,CARD_ARRAY *cards);
+    void Refresh(CARD_ARRAY *cards);
     Card_t KouCardKind(int gIdx);
     void KouCardCheck(PlayerDir_t dir);
     int  _FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);

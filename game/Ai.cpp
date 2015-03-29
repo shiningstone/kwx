@@ -120,6 +120,41 @@ void Ai::SetKouCardStatus(int gIdx,CARD_STATUS status) {
     _bufKouCards.group[gIdx].card.status = status;
 }
 
+void Ai::SwitchGroupStatus(int group,CARD_ARRAY *cards) {
+    if(KouCardStatus(group)==c_MING_KOU) {
+        SetKouCardStatus(group,c_KOU_ENABLE);
+        cards->data[KouCardIndex(group,0)].status=c_KOU_ENABLE;
+        cards->data[KouCardIndex(group,1)].status=c_KOU_ENABLE;
+        cards->data[KouCardIndex(group,2)].status=c_KOU_ENABLE;
+    }
+    else if(KouCardStatus(group)==c_KOU_ENABLE) {
+        SetKouCardStatus(group,c_MING_KOU);
+        cards->data[KouCardIndex(group,0)].status=c_MING_KOU;
+        cards->data[KouCardIndex(group,1)].status=c_MING_KOU;
+        cards->data[KouCardIndex(group,2)].status=c_MING_KOU;
+    }
+}
+
+void Ai::Refresh(CARD_ARRAY *cards) {
+    for( int group=0; group<KouCardGroupNum(); group++ ) {
+        if(KouCardStatus(group)!=c_MING_KOU) {
+            if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
+                (CARD_KIND)KouCardKind(group), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
+            {
+                cards->data[KouCardIndex(group,0)].status=c_KOU_ENABLE;
+                cards->data[KouCardIndex(group,1)].status=c_KOU_ENABLE;
+                cards->data[KouCardIndex(group,2)].status=c_KOU_ENABLE;
+                SetKouCardStatus(group,c_KOU_ENABLE);
+            } else {
+                cards->data[KouCardIndex(group,0)].status=c_FREE;
+                cards->data[KouCardIndex(group,1)].status=c_FREE;
+                cards->data[KouCardIndex(group,2)].status=c_FREE;
+                SetKouCardStatus(group,c_FREE);
+            }
+        }
+    }
+}
+
 Card_t Ai::KouCardKind(int gIdx) {
     return (Card_t)_bufKouCards.group[gIdx].card.kind;
 }
