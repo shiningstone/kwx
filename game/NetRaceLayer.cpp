@@ -121,11 +121,6 @@ void NetRaceLayer::CreateRace()
         WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
         _roundManager->Shuffle();}), 
         3);
-
-    _eventDispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(
-        DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
-        _DispatchDistributeCardEvents(event->getUserData());}), 
-        2);
 }
 
 void NetRaceLayer::StartGame()
@@ -608,7 +603,7 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     return Vec2(x,y);
 }
 
-void NetRaceLayer::DistributeTo(PlayerDir_t dir,int lenOfInHand) {
+void NetRaceLayer::_DistributeCard(PlayerDir_t dir,int lenOfInHand) {
     const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
 
     Sprite *lastCard = _object->CreateDistributeCard(dir,(Card_t)_roundManager->_lastHandedOutCard);
@@ -643,28 +638,6 @@ void NetRaceLayer::DistributeTo(PlayerDir_t dir,int lenOfInHand) {
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
 
-void NetRaceLayer::Call_DistributeCard(PlayerDir_t dir,Card_t card,int num) {
-    DistributeInfo_t distInfo;
-    
-    distInfo.target = dir;
-    distInfo.card   = card;
-    distInfo.distNum = num;
-
-	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,&distInfo);
-}
-
-void NetRaceLayer::_DispatchDistributeCardEvents(void *data)
-{
-    DistributeInfo_t *distInfo = static_cast<DistributeInfo_t *>(data);
-    
-	if(distInfo->distNum<TOTAL_CARD_NUM) {
-		_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,distInfo);
-	}
-	else {
-		_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
-    }   
-}
-
 void NetRaceLayer::ListenToDistributeCard() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
@@ -677,7 +650,7 @@ void NetRaceLayer::ListenToDistributeCard() {
         auto target = userData->target;
         
         auto cards = _roundManager->_players[target]->get_parter()->get_card_list();
-		DistributeTo(target,cards->len-1);
+		_DistributeCard(target,cards->len-1);
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 

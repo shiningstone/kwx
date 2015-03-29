@@ -1158,9 +1158,17 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 }
 
 void RoundManager::DistributeTo(PlayerDir_t dir) {
-    Card_t card = (Card_t)(_unDistributedCards[_distributedNum++]/4);
-    
-    _uiManager->Call_DistributeCard(dir,card,_distributedNum);
+    if(_distributedNum<TOTAL_CARD_NUM) {
+        DistributeInfo_t distInfo;
+        
+        distInfo.target = dir;
+        distInfo.card   = (Card_t)(_unDistributedCards[_distributedNum++]/4);
+        distInfo.distNum = _distributedNum;
+        
+        _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
+    } else {
+		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
+    }
 }
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {

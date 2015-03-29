@@ -18,6 +18,12 @@ using namespace CocosDenshion;
 #include "Ai.h"
 #include "DataBase.h"
 
+typedef struct {
+    PlayerDir_t target;
+    Card_t      card;
+    int         distNum;
+}DistributeInfo_t;
+
 class RoundManager;
 class NetRaceLayer : public cocos2d::Layer
 {
@@ -63,12 +69,6 @@ private:
         int         last;
         int         residual;
     }CardsInfo_t;
-
-    typedef struct {
-        PlayerDir_t target;
-        Card_t      card;
-        int         distNum;
-    }DistributeInfo_t;
     
     Logger *_logger;
 
@@ -240,8 +240,7 @@ public:
 	void _DistributeEvent(const std::string event_type,void* val);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(int no);
-	void Call_DistributeCard(PlayerDir_t dir,Card_t card,int num);
-	void DistributeTo(PlayerDir_t dir, int lenOfInHand);
+	void _DistributeCard(PlayerDir_t dir, int lenOfInHand);
 	void MyHandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 
@@ -310,7 +309,6 @@ public:
 	void BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void ListenToTingButton();
 
-    void _DispatchDistributeCardEvents(void *distInfo);
 public:
 	CREATE_FUNC(NetRaceLayer);
 };
