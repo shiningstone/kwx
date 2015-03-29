@@ -1073,1180 +1073,6 @@ Sequence *NetRaceLayer::_FisrtRoundResidueUpdate() {
         HandTwoSeq, HandOneSeq, HandOneSeq,NULL);
 }
 
-void NetRaceLayer:: display_callback(cocos2d::Ref* pSender) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-}
-
-/***********************************************************
-        gold show
-***********************************************************/
-Label *NetRaceLayer::_CreateName(const char *name) {
-    auto NickName=Label::create(name,"Arial",28);
-    NickName->setAnchorPoint(Vec2(0.5,0.5));
-    NickName->setPosition(Vec2(70,60));
-    return NickName;
-}
-
-Sprite *NetRaceLayer::_CreateHeadImage(const char *file) {
-    auto headPhoto=Sprite::createWithSpriteFrameName(file);//ͷ��4
-    headPhoto->setScaleX(100/headPhoto->getTextureRect().size.width);
-    headPhoto->setScaleY(100/headPhoto->getTextureRect().size.height);
-    headPhoto->setAnchorPoint(Vec2(0,0));
-    headPhoto->setPosition(Vec2(20,80));
-    return headPhoto;
-}
-
-Sprite *NetRaceLayer::_CreateGoldImage() {
-    auto gold = Sprite::createWithSpriteFrameName("result_money.png");//���1
-    gold->setAnchorPoint(Vec2(0,0.5));
-    gold->setPosition(Vec2(15,22));
-    return gold;
-}
-
-LabelAtlas *NetRaceLayer::_CreatePropertyNumber(int number,Sprite *gold) {
-    std::string strNumber = _NumToString(number);
-    auto label = LabelAtlas::create(strNumber,"fonts/result_money_number.png",17,23,'.');
-    label->setAnchorPoint(Vec2(0,0.5));
-    label->setPosition(Vec2(gold->getPosition().x+gold->getTextureRect().size.width+5, 22));
-    return label;
-}
-
-Sprite *NetRaceLayer::_CreatePropertyUnit(int number,LabelAtlas *label) {
-    Sprite* unit = NULL;
-    if(number>=100000&&number<100000000) {
-        unit=Sprite::createWithSpriteFrameName("wan-hand.png");
-        unit->setAnchorPoint(Vec2(0,0.5));
-        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
-    }
-    else if(number>=100000000) {
-        unit=Sprite::createWithSpriteFrameName("yi-hand.png");
-        unit->setAnchorPoint(Vec2(0,0.5));
-        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
-    }
-    return unit;
-}
-
-Sprite *NetRaceLayer::_CreateHu() {
-    auto Win=Sprite::createWithSpriteFrameName("jiesuanhu.png");//��5
-    Win->setAnchorPoint(Vec2(0.5,0.5));
-    Win->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-    Win->setVisible(false);
-    return Win;
-}
-
-Sprite *NetRaceLayer::_CreateZiMo() {
-    auto selfDrawn=Sprite::createWithSpriteFrameName("jiesuanzimo.png");//����6
-    selfDrawn->setAnchorPoint(Vec2(0.5,0.5));
-    selfDrawn->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-    selfDrawn->setVisible(false);
-    return selfDrawn;
-}
-
-Sprite *NetRaceLayer::_CreateFangPao() {
-    auto PointGun1=Sprite::createWithSpriteFrameName("jiesuanfangpao.png");//����7
-    PointGun1->setAnchorPoint(Vec2(0.5,0.5));
-    PointGun1->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-    PointGun1->setVisible(false);
-    return PointGun1;
-}
-
-Sprite *NetRaceLayer::_CreateBaozhuang() {
-	auto BaoZhuang=Sprite::createWithSpriteFrameName("jiesuanbaozhuang.png");//包庄
-	BaoZhuang->setAnchorPoint(Vec2(0.5,0.5));
-	BaoZhuang->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
-	BaoZhuang->setVisible(false);
-    return BaoZhuang;
-}
-
-void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *parent) {
-    parent->addChild(_CreateName(profile.name),2,ACCOUNT_NIKENAME);
-    parent->addChild(_CreateHeadImage(profile.photo),2,ACCOUNT_IMAGE);
-    auto gold = _CreateGoldImage();
-    parent->addChild(gold,2,ACCOUNT_JINBI);
-    auto label = _CreatePropertyNumber(profile.property,gold);
-    parent->addChild(label,2,ACCOUNT_PROPRETY);
-    auto unit = _CreatePropertyUnit(profile.property,label);
-    if(unit!=NULL) {
-        parent->addChild(unit,ACCOUNT_PROPRETY_UNIT);
-    }
-    parent->addChild(_CreateHu(),2,ACCOUNT_HU_FONT);
-    parent->addChild(_CreateZiMo(),2,ACCOUNT_ZIMO_FONT);
-    parent->addChild(_CreateFangPao(),2,ACCOUNT_DIANPAO_FONT);
-    parent->addChild(_CreateBaozhuang(),2,ACCOUNT_BAOZHUANG_FONT);
-}
-
-Sprite *NetRaceLayer::_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent) {
-    Sprite *sign = NULL;
-    
-    if(gold>0) {
-        sign = Sprite::createWithSpriteFrameName("fen_add.png");
-    } else {
-        sign = Sprite::createWithSpriteFrameName("fen_sub.png");
-    }
-    sign->setAnchorPoint(Vec2(0,0.5));
-    
-    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
-        sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,parent->getContentSize().height/2));
-    else
-        sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
-
-    if(gold!=0) {
-        sign->setVisible(true);
-    } else {
-        sign->setVisible(false);
-    }
-
-    return sign;
-}
-
-LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerColor *parent) {
-    char char_AccoutnGold[80];
-    std::string str_AccountGold;
-    sprintf(char_AccoutnGold,"%d",abs(gold));
-    str_AccountGold = char_AccoutnGold;
-    LabelAtlas* propertyOfIncrease = NULL;
-
-    if(gold>0) {
-        propertyOfIncrease = LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
-    } else {
-        propertyOfIncrease = LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
-    }
-
-    propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
-        propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,parent->getContentSize().height/2));
-    else
-        propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
-
-    if(gold!=0) {
-        propertyOfIncrease->setVisible(true);
-    } else {
-        propertyOfIncrease->setVisible(false);
-    }
-
-    return propertyOfIncrease;
-}
-
-void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent) {
-	auto posOfCards = Vec2(162,180);//牌0，1
-	float x = posOfCards.x;
-	float y = posOfCards.y - _object->RectSize(PENG_CARD).height/2;
-    
-	Sprite *show_card_list[MAX_HANDIN_NUM];
-	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
-    
-	for(int i=0;i<list->len;i++)
-	{
-		show_card_list[i]=_object->Create(PENG_CARD);
-		show_card_list[i]->setAnchorPoint(Vec2(0,0.5));
-		show_card_list[i]->setPosition(Vec2(x,y));
-		parent->addChild(show_card_list[i],2);
-		auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-		s_card->setAnchorPoint(Vec2(0.5,0.5));
-		s_card->setPosition(Vec2(show_card_list[i]->getTextureRect().size.width/2,show_card_list[i]->getTextureRect().size.height*0.6));
-		show_card_list[i]->addChild(s_card,1);
-
-        
-		if(list->data[i].status==c_PENG||list->data[i].status==c_MING_KOU)
-		{
-			if(list->data[i].kind!=list->data[i+1].kind)
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*1.1;
-			}
-			else if(list->data[i].kind==list->data[i+1].kind && list->data[i+1].status==c_FREE)
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*1.1;
-			}
-			else
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*0.95;
-			}
-		}
-		else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
-		{
-			if(list->data[i].kind!=list->data[i+1].kind)
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*1.1;
-			}
-			else
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*0.95;
-			}
-		}
-		else if(list->data[i].status==c_FREE)
-		{
-			if( win.kind==SINGLE_WIN && win.player==dir && win.player==_roundManager->_curPlayer && i==(list->len-2) )
-				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
-			else
-				x+=show_card_list[i]->getTextureRect().size.width*0.95;
-		}
-	}
-
-    if((win.kind==SINGLE_WIN && win.player==dir) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=dir))
-    {
-        if(_roundManager->_isCardFromOthers)
-        {
-            auto winCard=_object->Create(PENG_CARD);
-            winCard->setAnchorPoint(Vec2(0,0.5));
-            winCard->setPosition(Vec2(x+30,y));
-            auto s_card=_object->CreateKind((Card_t)list->data[list->len].kind,MIDDLE_SIZE);
-            s_card->setAnchorPoint(Vec2(0.5,0.5));
-            s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
-            winCard->addChild(s_card,1);
-
-            parent->addChild(winCard,2);
-        }
-    }
-}
-
-void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
-	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
-
-    WinInfo_t win;
-    _roundManager->GetWin(win);
-
-	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
-        auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
-        BarOfPlayer->addChild(sign,2,ACCOUNT_DIANPAO_FONT);
-
-        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
-        BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
-	}
-
-    _ShowCards((PlayerDir_t)no,win,BarOfPlayer);
-    
-	int tagNum=BarOfPlayer->getTag();
-	if(_roundManager->IsTing(tagNum)&&
-        ((win.kind==SINGLE_WIN && ((win.player==_roundManager->_curPlayer&&tagNum!=win.player)||(win.player!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
-        (win.kind==DOUBLE_WIN && tagNum==_roundManager->_curPlayer)))
-	{
-        float Extra_x=162;
-        float Extra_y=origin.y+visibleSize.height*0.1256-10;
-
-		auto mingFlag=Sprite::createWithSpriteFrameName("result_mpbh.png");
-		mingFlag->setAnchorPoint(Vec2(0,0.5));
-		mingFlag->setPosition(Vec2(Extra_x,Extra_y));
-		BarOfPlayer->addChild(mingFlag);
-	}
-}
-void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	//float x=origin.x+visibleSize.width*0.17;
-	float x=162;
-	float y=origin.y+visibleSize.height*0.1256-10;
-	int tagNum=BarOfPlayer->getTag();
-	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
-	auto curScore=_roundManager->_players[tagNum]->get_parter()->get_card_score();
-
-    WinInfo_t win;
-    _roundManager->GetWin(win);
-    
-	if((win.kind==SINGLE_WIN&&(win.player==_roundManager->_curPlayer&&curScore==2)||(win.player!=_roundManager->_curPlayer&&tagNum==win.player&&curScore==1))
-        ||(win.kind==DOUBLE_WIN&&tagNum!=_roundManager->_curPlayer&&curScore==1))
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("ph-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("1","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_MING)
-	{
-		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.player)||(win.kind==DOUBLE_WIN&&(tagNum!=_roundManager->_curPlayer))))
-		{
-			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-			kindOfHuBkg->setPosition(Vec2(x,y));
-			BarOfPlayer->addChild(kindOfHuBkg);
-			auto kindOfHu = Sprite::createWithSpriteFrameName("m-js.png");//番型种类图片
-			kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-			kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-			kindOfHuBkg->addChild(kindOfHu);
-			auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-			timesOfHu->setAnchorPoint(Vec2(0,0.5));
-			timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-			kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-			auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-			fanFont->setAnchorPoint(Point(0.0f,0.5f));
-			fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-			kindOfHuBkg->addChild(fanFont);
-			x+=kindOfHuBkg->getTextureRect().size.width+22;
-			if(x>=900)
-			{
-				x=origin.x+visibleSize.width*0.17;
-				y=origin.y+visibleSize.height*0.1256-10-56;
-			}
-		}
-	}
-	if((num&RH_HAIDILAO)&&win.kind==SINGLE_WIN)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("hdl-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_QINYISE)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("qys-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_SIPENG)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("pph-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_QIANGGANG)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("qgh-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_GANGHUA)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("gskh-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_GANGPAO) // undefinded
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("gsp-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_SHOUYIZHUA)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("szy-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_DASANYUAN)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("dsy-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_XIAOSANYUAN)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("xsy-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_MINGSIGUI)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("msg-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_ANSIGUI)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("asg-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_QIDUI)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("qd-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_SANYUANQIDUI)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("syqd-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("32","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_KAWUXIN)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("kwx-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_HAOHUAQIDUI)//双龙七对
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("hhqd-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("8","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_CHAOHAOHUAQIDUI)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("slqd-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("32","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-	if(num&RH_CHAOCHAOHAOHUAQIDUI)
-	{
-		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHuBkg->setPosition(Vec2(x,y));
-		BarOfPlayer->addChild(kindOfHuBkg);
-		auto kindOfHu = Sprite::createWithSpriteFrameName("cjhhqd-js.png");//番型种类图片
-		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(kindOfHu);
-		auto timesOfHu=LabelAtlas::create("128","fonts/result_fan_number.png",22, 30, '0');//番数
-		timesOfHu->setAnchorPoint(Vec2(0,0.5));
-		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
-		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-		fanFont->setAnchorPoint(Point(0.0f,0.5f));
-		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
-		kindOfHuBkg->addChild(fanFont);
-		x+=kindOfHuBkg->getTextureRect().size.width+22;
-		if(x>=900)
-		{
-			x=origin.x+visibleSize.width*0.17;
-			y=origin.y+visibleSize.height*0.1256-10-56;
-		}
-	}
-}
-void NetRaceLayer::raceAccount(float delta)
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
-	show_card_indicator->setVisible(false);
-	while(this->getChildByTag(GAME_BACK_BAR))
-		this->removeChildByTag(GAME_BACK_BAR);
-	if(this->getChildByTag(ROBOT_TUO_GUAN))
-		this->removeChildByTag(ROBOT_TUO_GUAN,true);	
-	if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
-		this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResultImage.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("erqs_resultbox_btn_res.plist");
-	auto raceAccoutLayer=Layer::create();//account::create();
-	//
-	//myframe->addChild(raceAccoutLayer,30,RACE_ACCOUT_TAG_ID);
-	this->addChild(raceAccoutLayer,11,RACE_ACCOUT_TAG_ID);
-	//raceAccoutLayer->runAction(FadeIn::create(0.3));
-	auto BackGround=Sprite::create("racetable.png");//结算背景
-	BackGround->setScale(1.189);
-	BackGround->setAnchorPoint(Vec2(0.5,0.5));
-	BackGround->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2 ));
-	raceAccoutLayer->addChild(BackGround,0);
-
-	auto Striae1=Sprite::create("tiaotu4.png");//下条纹
-	Striae1->setAnchorPoint(Vec2(0.5,0));
-	Striae1->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+0));
-	raceAccoutLayer->addChild(Striae1,1);
-
-	auto Striae2=Sprite::create("tiaotu3.png");//上条纹
-	Striae2->setAnchorPoint(Vec2(0.5,1));
-	int i=Striae2->getTextureRect().size.height;
-	Striae2->setScaleY(201.6/Striae2->getTextureRect().size.height);
-	Striae2->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*0.718435));
-	raceAccoutLayer->addChild(Striae2,1);
-
-	auto zhuangPic=Sprite::create("tileImage/zhuang.png");//119  23
-	zhuangPic->setAnchorPoint(Vec2(0.5,0.5));
-	zhuangPic->setScale(0.8);
-	//zhuangPic->setPosition(Vec2(origin.x+visibleSize.width*156/1218,origin.y+visibleSize.height*575/716));
-	zhuangPic->setPosition(Vec2(119,origin.y+visibleSize.height-25));
-	raceAccoutLayer->addChild(zhuangPic,3);
-
-	auto BarOfPlayer0=LayerColor::create();
-	BarOfPlayer0->setContentSize(Size(visibleSize.width,visibleSize.height*196.5/716));
-	raceAccoutLayer->addChild(BarOfPlayer0,2,ACCOUNTBAR_PLAYERZERO);
-
-	auto BarOfPlayer1=LayerColor::create();
-	BarOfPlayer1->setContentSize(Size(visibleSize.width,visibleSize.height*196.5/716));
-	raceAccoutLayer->addChild(BarOfPlayer1,2,ACCOUNTBAR_PLAYERONE);
-
-	auto BarOfPlayer2=LayerColor::create();
-	BarOfPlayer2->setContentSize(Size(visibleSize.width,visibleSize.height*196.5/716));
-	raceAccoutLayer->addChild(BarOfPlayer2,2,ACCOUNTBAR_PLAYERTWO);	
-
-	Vec2 AccountPlace[3];
-	AccountPlace[0]=Vec2(origin.x,origin.y+visibleSize.height*519.5/716);
-	AccountPlace[1]=Vec2(origin.x,origin.y+visibleSize.height*315.25/716);
-	AccountPlace[2]=Vec2(origin.x,origin.y+visibleSize.height*111/716);
-
-    int lastWinner = _roundManager->GetLastWinner();
-	raceAccoutLayer->getChildByTag(lastWinner)->setPosition(AccountPlace[0]);
-	raceAccoutLayer->getChildByTag((lastWinner+1)%3)->setPosition(AccountPlace[1]);
-	raceAccoutLayer->getChildByTag((lastWinner+2)%3)->setPosition(AccountPlace[2]);
-
-	unsigned int num;
-	unsigned int numDoubule;
-    
-    WinInfo_t win;
-    _roundManager->GetWin(win);
-
-    auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.player); 
-    auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.player+1)%3);
-    auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.player+2)%3);
-
-    switch(win.kind) {
-        case SINGLE_WIN:
-            _roundManager->_players[win.player]->get_parter()->get_Hu_Flag(&num);
-            AccountShows(WinBar,win.player);
-            AccountShows(WinBarPlus,(win.player+1)%3);
-            AccountShows(WinBarMinus,(win.player+2)%3);
-            if(win.player==_roundManager->_curPlayer)
-                WinBar->getChildByTag(ACCOUNT_ZIMO_FONT)->setVisible(true);
-            else
-            {
-                WinBar->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
-                raceAccoutLayer->getChildByTag(_roundManager->_curPlayer)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
-            }
-            AccountHuKind(WinBar,num);
-            break;
-        case DOUBLE_WIN:
-            _roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_Hu_Flag(&num);
-            _roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
-            AccountShows(WinBar,_roundManager->_curPlayer);
-            AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
-            AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
-            
-            WinBar->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
-            WinBarPlus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
-            WinBarMinus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
-            AccountHuKind(WinBarPlus,num);
-            AccountHuKind(WinBarMinus,numDoubule);
-            break;
-        case NONE_WIN:
-            if(_roundManager->_firstMingNo!=-1)
-            {
-                AccountShows(WinBar,_roundManager->_firstMingNo);
-                AccountShows(WinBarPlus,(_roundManager->_firstMingNo+1)%3);
-                AccountShows(WinBarMinus,(_roundManager->_firstMingNo+2)%3);
-            
-                WinBar->getChildByTag(ACCOUNT_BAOZHUANG_FONT)->setVisible(true);
-            
-                //float BHx=origin.x+visibleSize.width*0.17;
-                float BHx=162;
-                float BHy=origin.y+visibleSize.height*0.1256-10;
-            
-                auto kindOfHuBkgPlus = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-                kindOfHuBkgPlus->setAnchorPoint(Point(0.0f,0.5f));
-                kindOfHuBkgPlus->setPosition(Vec2(BHx,BHy));
-                WinBarPlus->addChild(kindOfHuBkgPlus);
-                auto kindOfHuPlus= Sprite::createWithSpriteFrameName("bh-js.png");//番型种类图片
-                kindOfHuPlus->setAnchorPoint(Point(0.0f,0.5f));
-                kindOfHuPlus->setPosition(Vec2(17,kindOfHuBkgPlus->getTextureRect().size.height/2));
-                kindOfHuBkgPlus->addChild(kindOfHuPlus);
-                auto timesOfHuPlus=LabelAtlas::create("1","fonts/result_fan_number.png",22, 30, '0');//番数
-                timesOfHuPlus->setAnchorPoint(Vec2(0,0.5));
-                timesOfHuPlus->setPosition(Vec2(160,kindOfHuBkgPlus->getTextureRect().size.height/2));
-                kindOfHuBkgPlus->addChild(timesOfHuPlus);//result_fx_text
-                auto fanFontPlus= Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-                fanFontPlus->setAnchorPoint(Point(0.0f,0.5f));
-                fanFontPlus->setPosition(Vec2(timesOfHuPlus->getPosition().x+timesOfHuPlus->getContentSize().width+6,kindOfHuBkgPlus->getTextureRect().size.height/2));
-                kindOfHuBkgPlus->addChild(fanFontPlus);
-            
-                auto kindOfHuBkgMinus= Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
-                kindOfHuBkgMinus->setAnchorPoint(Point(0.0f,0.5f));
-                kindOfHuBkgMinus->setPosition(Vec2(BHx,BHy));
-                WinBarMinus->addChild(kindOfHuBkgMinus);
-                auto kindOfHu = Sprite::createWithSpriteFrameName("bh-js.png");//番型种类图片
-                kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
-                kindOfHu->setPosition(Vec2(17,kindOfHuBkgMinus->getTextureRect().size.height/2));
-                kindOfHuBkgMinus->addChild(kindOfHu);
-                auto timesOfHu=LabelAtlas::create("1","fonts/result_fan_number.png",22, 30, '0');//番数
-                timesOfHu->setAnchorPoint(Vec2(0,0.5));
-                timesOfHu->setPosition(Vec2(160,kindOfHuBkgMinus->getTextureRect().size.height/2));
-                kindOfHuBkgMinus->addChild(timesOfHu);//result_fx_text
-                auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
-                fanFont->setAnchorPoint(Point(0.0f,0.5f));
-                fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkgMinus->getTextureRect().size.height/2));
-                kindOfHuBkgMinus->addChild(fanFont);
-            }
-            else
-            {
-                AccountShows(WinBar,_roundManager->_curPlayer);
-                AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
-                AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
-            }
-            break;
-    }
-
-	_eventDispatcher->removeCustomEventListeners(DISTRIBUTE_DONE_EVENT_TYPE);
-	_eventDispatcher->removeCustomEventListeners(NOONE_WIN_EVENT_TYPE);
-	auto ShowoutOnce=Button::create("xuanyaoyixia1.png","xuanyaoyixia2.png","xuanyaoyixia2.png",UI_TEX_TYPE_PLIST);//炫耀一下
-	ShowoutOnce->addTouchEventListener(CC_CALLBACK_1(NetRaceLayer::display_callback,this));
-	ShowoutOnce->setAnchorPoint(Vec2(0.5,0.5));
-	ShowoutOnce->setPosition(Vec2(origin.x+visibleSize.width*0.2996716,origin.y+visibleSize.height*0.075419));
-	this->addChild(ShowoutOnce,11,SHINE_TAG_ID);
-
-	auto PlayOnceAgin=Button::create("zailaiyiju1.png","zailaiyiju2.png","zailaiyiju2.png",UI_TEX_TYPE_PLIST);
-	PlayOnceAgin->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnRestartHandler,this));
-	PlayOnceAgin->setAnchorPoint(Vec2(0.5,0.5));
-	PlayOnceAgin->setPosition(Vec2(origin.x+visibleSize.width*0.6247948,origin.y+visibleSize.height*0.075419));
-	this->addChild(PlayOnceAgin,11,RACE_RESTART_TAG_ID);
-}
-
-void  NetRaceLayer::showall()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-    HideClock();
-	
-	float x,y;
-	Sprite *p_list[MAX_HANDIN_NUM];
-
-    int winner = _roundManager->GetLastWinner();
-	for(int a=0;a<3;a++)
-	{
-		int no = (winner+a)%3;
-        
-		CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
-		for(int ik=0;ik<MAX_HANDIN_NUM;ik++)
-		{
-			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik))
-				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik,true);
-		}
-		x=_layout->_playerPosi[no].basePoint.x+10; 
-		y=_layout->_playerPosi[no].basePoint.y+10;
-		for(int i=0;i<list->len;i++)
-		{
-			if(list->data[i].kind!=ck_NOT_DEFINED )
-			{
-				if(no==0)
-				{
-					if(list->data[i].status==c_AN_GANG)
-					{
-						if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)
-						{
-							p_list[i]=_object->Create(LR_OUT_CARD);
-							p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-							p_list[i]->setPosition(Vec2(x-10,y-8));
-							auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-							s_card->setRotation(90);
-							s_card->setScale(0.9);
-							p_list[i]->addChild(s_card);
-						}
-						else
-						{
-							p_list[i]=_object->Create(LR_AN_GANG_CARD);
-							p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-							p_list[i]->setPosition(Vec2(x-10,y-8));
-						}
-					}
-					else
-					{
-						p_list[i]=_object->Create(LR_OUT_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-						s_card->setRotation(90);
-						s_card->setScale(0.9);
-						p_list[i]->addChild(s_card);
-					}
-					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
-						y-=((p_list[i]->getTextureRect().size.height)*0.65);
-					else if(list->data[i].status==c_PENG)
-					{
-						if((list->data[i+1].kind!=list->data[i].kind)||((list->data[i+1].kind==list->data[i].kind)&&(list->data[i+1].status!=list->data[i].status)))
-							y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						else
-							y-=((p_list[i]->getTextureRect().size.height)*0.65);
-					}
-					else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
-					{
-						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-							y-=((p_list[i]->getTextureRect().size.height)*0.65);
-						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-							y+=13;
-						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-							y-=(((p_list[i]->getTextureRect().size.height)*0.65)+13);
-						else if(list->data[i].kind!=list->data[i+1].kind)//4
-						{
-							if(list->data[i+1].kind!=list->data[i].kind)
-								y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
-							else
-								y-=((p_list[i]->getTextureRect().size.height)*0.65);
-						}
-					}
-				}
-				else if(no==1)
-				{
-					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
-						p_list[i]=_object->Create(MING_CARD);
-					else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
-						p_list[i]=_object->Create(PENG_CARD);
-					else if(list->data[i].status==c_AN_GANG)
-					{
-						if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
-							p_list[i]=_object->Create(PENG_CARD);
-						else
-							p_list[i]=_object->Create(AN_GANG_CARD);
-					}
-					p_list[i]->setAnchorPoint(Vec2(0,0));
-					p_list[i]->setPosition(Vec2(x,y));
-					if(list->data[i].status==c_FREE)
-					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
-						x+=p_list[i]->getTextureRect().size.width*1.0;
-					}
-					else if(list->data[i].status==c_MING_KOU)
-					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
-						x += p_list[i]->getTextureRect().size.width*1;
-					}
-					else if(list->data[i].status==c_PENG)
-					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
-						if(list->data[i+1].status==c_FREE)
-							x += p_list[i]->getTextureRect().size.width*2;
-						else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
-							x += p_list[i]->getTextureRect().size.width*1.5;
-						else
-							x += p_list[i]->getTextureRect().size.width*1.0;
-					}
-					else if(list->data[i].status==c_MING_GANG)
-					{
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-						s_card->setAnchorPoint(Vec2(0.5,0.5));
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-						p_list[i]->addChild(s_card,1);
-						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-							x+=p_list[i]->getTextureRect().size.width*1.0;
-						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-							y+=17;
-						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-						{
-							x+=p_list[i]->getTextureRect().size.width*1.0;
-							y-=17;
-						}
-						else if(list->data[i].kind!=list->data[i+1].kind)//4
-						{
-							if(list->data[i+1].status==c_FREE)
-								x += p_list[i]->getTextureRect().size.width*2;
-							else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
-								x += p_list[i]->getTextureRect().size.width*1.5;
-							else
-								x += p_list[i]->getTextureRect().size.width*1.0;
-						}
-					}
-					else if(list->data[i].status==c_AN_GANG)
-					{
-						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-							x+=p_list[i]->getTextureRect().size.width*1.0;
-						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-							y+=17;
-						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-						{
-							auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
-							s_card->setAnchorPoint(Vec2(0.5,0.5));
-							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
-							p_list[i]->addChild(s_card,1);
-							x+=p_list[i]->getTextureRect().size.width*1.0;
-							y-=17;
-						}
-						else if(list->data[i].kind!=list->data[i+1].kind)//4
-						{
-							if(list->data[i+1].status==c_FREE)
-								x += p_list[i]->getTextureRect().size.width*2;
-							else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
-								x += p_list[i]->getTextureRect().size.width*1.5;
-							else
-								x += p_list[i]->getTextureRect().size.width*1.0;
-						}
-					}
-				}
-				else if(no==2)
-				{
-					if(list->data[i].status==c_AN_GANG)
-					{
-						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-						{
-							p_list[i]=_object->Create(LR_OUT_CARD);
-							p_list[i]->setAnchorPoint(Vec2(0.3,0));
-							p_list[i]->setPosition(Vec2(x-10,y-8));
-							auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-							s_card->setRotation(-90);
-							s_card->setScale(0.9);
-							p_list[i]->addChild(s_card);
-						}
-						else
-						{
-							p_list[i]=_object->Create(LR_AN_GANG_CARD);
-							p_list[i]->setAnchorPoint(Vec2(0.3,0));
-							p_list[i]->setPosition(Vec2(x-10,y-8));
-						}
-					}
-					else
-					{
-						p_list[i]=_object->Create(LR_OUT_CARD);
-						p_list[i]->setAnchorPoint(Vec2(0.3,0));
-						p_list[i]->setPosition(Vec2(x-10,y-8));
-						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
-						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
-						s_card->setRotation(-90);
-						s_card->setScale(0.9);
-						p_list[i]->addChild(s_card);
-					}
-					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
-						y+=((p_list[i]->getTextureRect().size.height)*0.65);
-					else if(list->data[i].status==c_PENG)
-					{
-						if((list->data[i+1].kind!=list->data[i].kind)||((list->data[i+1].kind==list->data[i].kind)&&(list->data[i+1].status!=list->data[i].status)))
-							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-						else
-							y+=((p_list[i]->getTextureRect().size.height)*0.65);
-					}
-					else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
-					{
-						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
-							y+=(p_list[i]->getTextureRect().size.height*0.65+13);
-						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
-							y-=13;
-						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
-							y+=((p_list[i]->getTextureRect().size.height)*0.65);
-						else if(list->data[i].kind!=list->data[i+1].kind)//4
-						{
-							if(list->data[i+1].kind!=list->data[i].kind)
-								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
-							else
-								y+=((p_list[i]->getTextureRect().size.height)*0.65);
-						}
-					}
-				}
-				if(no!=2)
-					myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+no*20+i);
-				else if(no==2)
-					myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
-				p_list[i]->_ID=1;
-			}
-		}
-	}
-}
-
 void NetRaceLayer::ListenToDoubleHu() {
     auto _doublehucallListener = EventListenerCustom::create(DOUBLE_HU_WITH_ME, [this](EventCustom * event){
         
@@ -2292,361 +1118,6 @@ void NetRaceLayer::ListenToDoubleHu() {
     });
     
     _eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
-}
-
-/***********************************************************
-        button accessosaries
-***********************************************************/
-void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            auto curButton=(Button*)pSender;
-			curButton->setTouchEnabled(false);
-
-			auto startIcon = _object->CreateStartGame();
-			this->addChild(startIcon,2,START_GAME_TAG_ID+1);
-
-			this->runAction(
-                Sequence::create(
-                    Spawn::create(
-                        TargetedAction::create(curButton,Sequence::create(
-                            DelayTime::create(0.1),
-                            FadeOut::create(0.2),NULL)),
-                        TargetedAction::create(startIcon,Spawn::create(
-                            ScaleTo::create(0.3,1.3),
-                            FadeOut::create(0.3),NULL)),
-                        _voice->Speak("anniu.ogg"),NULL),
-                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::StartGame)),NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	auto curButton=(Button*)pSender;
-
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		{
-			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON))->setTouchEnabled(true);
-			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
-            
-            _InitResidueCards();
-			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			curButton->setTouchEnabled(false);
-            
-			auto restartBtn = _object->CreateRestartGame();
-			this->addChild(restartBtn,2,RACE_RESTART_TAG_ID+1);
-
-			this->runAction(
-                Sequence::create(
-                    Spawn::create(TargetedAction::create(
-                        restartBtn,Spawn::create(
-                            ScaleTo::create(0.3,1.3),
-                            FadeOut::create(0.3),NULL)),
-                        _voice->Speak("anniu.ogg"),NULL),
-                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
-                    NetRaceLayer::StartGame)),NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-            
-			if(this->getChildByTag(ROBOT_TUO_GUAN))
-				this->removeChildByTag(ROBOT_TUO_GUAN,true);//TUOGUAN_CANCEL_BUTTON
-			
-			auto TuoGuanButton=(Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON);
-			TuoGuanButton->setTouchEnabled(true);
-			TuoGuanButton->setHighlighted(false);
-			curButton->setTouchEnabled(false);
-			curButton->setScale(0);
-			_roundManager->_isTuoGuan=false;
-			auto StartSelfGame=CallFunc::create([=](){
-				if( !_roundManager->IsTing(1) )
-					ListenToCardTouch();
-				else
-					ListenToTingButton();
-			});
-			myframe->runAction(Sequence::create(CallFunc::create([=](){this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);}),StartSelfGame,NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
-{
-    auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			_eventDispatcher->removeEventListenersForTarget(myframe,true);//???????
-
-			_roundManager->_isTuoGuan=true;
-			curButton->setTouchEnabled(false);
-			curButton->setHighlighted(true);
-
-			auto TuoGuanCancel=Button::create("quxiaotuoguan2.png","quxiaotuoguan1.png","quxiaotuoguan2.png",UI_TEX_TYPE_PLIST);
-			TuoGuanCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnTuoGuanCancelHandler,this));
-			TuoGuanCancel->setAnchorPoint(Vec2(0.5,0.5));
-			TuoGuanCancel->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*60/716));
-			this->addChild(TuoGuanCancel,19,TUOGUAN_CANCEL_BUTTON);
-
-			auto layer_color=LayerColor::create();
-			layer_color->setColor(Color3B(0,0,0));
-			layer_color->ignoreAnchorPointForPosition(false);
-			layer_color->setAnchorPoint(Vec2(0,0));
-			layer_color->setPosition(Vec2(origin.x,origin.y));
-			layer_color->setContentSize(Size(visibleSize.width,visibleSize.height*120/716));
-			layer_color->setOpacity(150);
-			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
-            
-			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision)
-			{
-				_DeleteActionTip();
-				_roundManager->_isWaitDecision=false;
-				_roundManager->_tempActionToDo=a_JUMP;
-                
-				if(_roundManager->_isCardFromOthers)
-				{
-					if(_roundManager->_isQiangGangAsking)
-					{
-						_roundManager->_isQiangGangAsking=false;
-                        
-						auto GoldAccount=CallFunc::create([=](){
-							GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
-							_roundManager->_qiangGangTargetNo=-1;
-						});
-						auto curSeq=Sequence::create(
-                            GoldAccount,CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL);
-						myframe->runAction(curSeq);
-					}
-					else if(_roundManager->_isDoubleHuAsking)
-					{
-						_roundManager->_isDoubleHuAsking = false;
-						auto huFunc=CallFunc::create([=](){_HuEffect(_roundManager->_otherOneForDouble);});
-						myframe->runAction(huFunc);
-					}
-					else
-					{
-						_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
-						myframe->runAction(CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}));
-					}
-				}
-				else {
-					_roundManager->WaitForMyChoose();
-                }
-			}
-			else
-			{
-				if(_roundManager->_isMyShowTime)
-				{
-					_roundManager->_isMyShowTime=false;
-					_roundManager->_actionToDo=a_JUMP;
-					if(_roundManager->_lastAction==a_JUMP)
-						_roundManager->_continue_gang_times=0;
-					_roundManager->_lastAction=a_JUMP;
-
-					_roundManager->WaitForMyChoose();
-				}
-			}
-			//else if(ifMyTime)
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType type)
-{
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			auto curButton=(Button*)pSender;
-			curButton->setTouchEnabled(false);
-			auto scene = Scene::create();
-			auto startLayer=HelloWorld::create();
-			scene->addChild(startLayer,1);
-			Director::sharedDirector()->replaceScene(scene);
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::BtnBackCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
-{
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			
-			auto backBUtton=(Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON);
-			backBUtton->setTouchEnabled(true);
-			auto curButton=(Button*)pSender;
-			curButton->setTouchEnabled(false);
-			(this->getChildByTag(GAME_BACK_BAR))->runAction(ScaleTo::create(0,0));
-
-			auto StartSelfGame=CallFunc::create([=](){
-				if(_roundManager->_isGameStart)
-				{
-					if(!_roundManager->IsTing(1))
-						ListenToCardTouch();
-					else
-						ListenToTingButton();
-				}
-			});
-			if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
-				((Button*)this->getChildByTag(TUOGUAN_CANCEL_BUTTON))->setTouchEnabled(true);
-			this->runAction(Sequence::create(
-                CallFunc::create([=](){this->removeChildByTag(GAME_BACK_BAR,true);}),
-                StartSelfGame,NULL));
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::BtnBackHandler(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
-	auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");});
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			curButton->setTouchEnabled(false);
-			Back();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
-}
-
-void NetRaceLayer::Back()
-{
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("GlobalUI.plist");
-
-	if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
-		((Button*)this->getChildByTag(TUOGUAN_CANCEL_BUTTON))->setTouchEnabled(false);
-	while(this->getChildByTag(GAME_BACK_BAR))
-		this->removeChildByTag(GAME_BACK_BAR);
-
-	auto backChooseBkg=LayerColor::create();
-	backChooseBkg->setContentSize(Size(visibleSize.width,visibleSize.height));
-	backChooseBkg->setColor(Color3B(28,120,135));
-	//backChooseBkg->setColor(Color3B(114,83,52));
-	backChooseBkg->setOpacity(50);
-	backChooseBkg->setPosition(Vec2::ZERO);
-	this->addChild(backChooseBkg,20,GAME_BACK_BAR);
-
-	EventListenerTouchOneByOne* backChooseListener=EventListenerTouchOneByOne::create();
-	backChooseListener->setSwallowTouches(true);
-	backChooseListener->onTouchBegan=[=](Touch* touch, Event* event){return true;};
-	backChooseListener->onTouchMoved=[=](Touch* touch, Event* event){};
-	backChooseListener->onTouchEnded=[=](Touch* touch, Event* event){};
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(backChooseListener,backChooseBkg);
-
-	auto backChooseBar=Sprite::createWithSpriteFrameName("gameprompt.png");
-	backChooseBar->ignoreAnchorPointForPosition(false);
-	backChooseBar->setAnchorPoint(Vec2(0.5,0.5));
-	backChooseBar->setPosition(Vec2(backChooseBkg->getContentSize().width/2,backChooseBkg->getContentSize().height/2));
-	backChooseBkg->addChild(backChooseBar,0);
-
-	auto strings = CCDictionary::createWithContentsOfFile("fonts/NewString.xml");
-	auto nameofTishi = ((CCString*)strings->objectForKey("GameBackString"))->getCString();
-	auto kindOfHu = LabelTTF::create(nameofTishi, "Arial", 40);
-	kindOfHu->setColor(Color3B(114,83,52));
-	kindOfHu->setAnchorPoint(Vec2(0.5,0.5));
-	kindOfHu->ignoreAnchorPointForPosition(false);
-	kindOfHu->setPosition(Vec2(backChooseBar->getContentSize().width/2,backChooseBar->getContentSize().height*0.6+20));
-	backChooseBar->addChild(kindOfHu,2);
-
-	auto ensureBut=Button::create("tuichu2.png","tuichu.png","tuichu.png",UI_TEX_TYPE_PLIST);//退出
-	ensureBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackConfirmHandler,this));
-	ensureBut->setAnchorPoint(Vec2(0.5,0.5));
-	ensureBut->setPosition(Vec2(backChooseBar->getContentSize().width*0.75-15,backChooseBar->getContentSize().height*0.3));
-	backChooseBar->addChild(ensureBut);
-
-	auto BackBut=Button::create("jixuyouxi2.png","jixuyouxi.png","jixuyouxi.png",UI_TEX_TYPE_PLIST);//继续游戏
-	BackBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackCancelHandler,this));
-	BackBut->setAnchorPoint(Vec2(0.5,0.5));
-	BackBut->setPosition(Vec2(backChooseBar->getContentSize().width*0.25+15,backChooseBar->getContentSize().height*0.3));
-	backChooseBar->addChild(BackBut);
 }
 
 /***********************************************
@@ -2779,387 +1250,6 @@ void NetRaceLayer::_UpdateResidueCards(int no)
 		}
 	}
 }
-
-/*****************************************************
-        player information
-*****************************************************/
-std::string NetRaceLayer::_NumToString( int number ) {
-    char buf[80] = {0};
-	float tempProperty;
-	int tempXiapShu;
-
-	if(number<100000) {
-		sprintf(buf,"%d",number);
-	} else if( number>=100000 && number<10000000 ) {
-		tempXiapShu = number%1000;
-        
-		if(tempXiapShu>=500)
-			tempProperty=(float)(number-500)/10000;
-		else
-			tempProperty=(float)number/10000;
-        
-		tempXiapShu=number%10000;
-
-        if(tempXiapShu>=1000)
-			sprintf(buf,"%.1f",tempProperty);
-		else
-			sprintf(buf,"%.0f",tempProperty);
-	} else if(number>=10000000&&number<100000000) {
-		tempXiapShu=number%10000;
-		if(tempXiapShu>=5000)
-			tempProperty=(float)(number-500)/10000;
-		else
-			tempProperty=(float)number/10000;
-		sprintf(buf,"%.0f",tempProperty);
-	} else if(number>=100000000) {
-		tempXiapShu=number%10000000;
-		if(tempXiapShu>=5000000)
-			tempProperty=(float)(number-5000000)/100000000;
-		else
-			tempProperty=(float)number/100000000;
-        
-		tempXiapShu=number%100000000;
-		if(tempXiapShu>=10000000)
-			sprintf(buf,"%.1f",tempProperty);
-		else
-			sprintf(buf,"%.0f",tempProperty);
-	}
-
-    return std::string(buf);
-}
-
-void NetRaceLayer::_GuiUpdateScore(LayerColor *layer,int score) {
-	LabelAtlas* label = LabelAtlas::create(
-        _NumToString(score),
-        "fonts/Head_Beans_Number.png",14,20,'.');  
-	Sprite* propertyUnit;
-
-	if( score < 100000 )
-	{
-		label->setAnchorPoint(Vec2(0.5,0.5));
-		label->setPosition(Vec2(layer->getContentSize().width/2,layer->getContentSize().height/2));
-		layer->addChild(label,1);
-	}
-	if( score>=100000 && score<100000000 )
-	{
-		propertyUnit=Sprite::createWithSpriteFrameName("wan-hand.png");
-		propertyUnit->setAnchorPoint(Vec2(1,0.5));
-		float curMargins=(layer->getContentSize().width-propertyUnit->getTextureRect().size.width-label->getContentSize().width)/2;
-		propertyUnit->setPosition(Vec2(layer->getContentSize().width-curMargins,layer->getContentSize().height/2));
-		layer->addChild(propertyUnit,1);
-        
-		label->setAnchorPoint(Vec2(0,0.5));
-		label->setPosition(Vec2(curMargins,layer->getContentSize().height/2));
-		layer->addChild(label,1);
-	}
-	else if( score>=100000000 )
-	{
-		propertyUnit=Sprite::createWithSpriteFrameName("yi-hand.png");
-		propertyUnit->setAnchorPoint(Vec2(1,0.5));
-		float curMargins=(layer->getContentSize().width-propertyUnit->getTextureRect().size.width-label->getContentSize().width)/2;
-		propertyUnit->setPosition(Vec2(layer->getContentSize().width-curMargins,layer->getContentSize().height/2));
-		layer->addChild(propertyUnit,1);
-
-        label->setAnchorPoint(Vec2(0,0.5));
-		label->setPosition(Vec2(curMargins,layer->getContentSize().height/2));
-		layer->addChild(label,1);
-	}
-}
-
-void NetRaceLayer::GuiUpdateScore(int dir,int score)
-{
-    if( !_layout->_playerBkg[dir] ) {
-        return;
-    }
-
-	LayerColor *propertyLayerBar = LayerColor::create();
-	propertyLayerBar->ignoreAnchorPointForPosition(false);
-
-    if(_layout->_playerBkg[dir]->getChildByTag(SCORE_TAG_ID))
-        _layout->_playerBkg[dir]->removeChildByTag(SCORE_TAG_ID,true);
-
-    propertyLayerBar->setAnchorPoint(Vec2(0.5,0.5));
-    
-	if(dir==0) {
-		propertyLayerBar->setContentSize( Size(_layout->_playerBkg[0]->getTextureRect().size.width, 25) );
-		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*0.5,
-            _layout->_playerBkg[0]->getTextureRect().size.height * 0.1));
-	} else if(dir==1) {
-		propertyLayerBar->setContentSize( Size(140, 25) );
-		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[1]->getTextureRect().size.width*0.6635,
-            _layout->_playerBkg[1]->getTextureRect().size.height*0.3));
-	} else if(dir==2) {
-		propertyLayerBar->setContentSize( Size(_layout->_playerBkg[2]->getTextureRect().size.width, 25) );
-		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*0.5,
-            _layout->_playerBkg[2]->getTextureRect().size.height * 0.1));
-	}
-    
-    _layout->_playerBkg[dir]->addChild(propertyLayerBar,1,SCORE_TAG_ID);
-    
-    _GuiUpdateScore(propertyLayerBar,score);
-}
-
-void NetRaceLayer::_UpdateNickName(int direction,std::string str_Nick)
-{		
-	if(direction==0)
-	{
-		if(!_layout->_playerBkg[0])
-			return;
-		if(_layout->_playerBkg[0]->getChildByTag(NICK_NAME_TAG_ID))
-			_layout->_playerBkg[0]->removeChildByTag(NICK_NAME_TAG_ID,true);
-
-		auto left_Name=Label::create(str_Nick,"Arial",20);
-		left_Name->setPosition(Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*0.5,_layout->_playerBkg[0]->getTextureRect().size.height*0.265));
-		_layout->_playerBkg[0]->addChild(left_Name,1,NICK_NAME_TAG_ID);
-	}
-	else if(direction==1)
-	{
-		if(!_layout->_playerBkg[1])
-			return;
-		if(_layout->_playerBkg[1]->getChildByTag(NICK_NAME_TAG_ID))
-			_layout->_playerBkg[1]->removeChildByTag(NICK_NAME_TAG_ID,true);
-
-		auto myName=Label::create(str_Nick,"Arial",20);
-		myName->setPosition(Vec2(_layout->_playerBkg[1]->getTextureRect().size.width*0.65,_layout->_playerBkg[1]->getTextureRect().size.height*0.7));
-		_layout->_playerBkg[1]->addChild(myName,1,NICK_NAME_TAG_ID);
-
-	}
-	else if(direction==2)
-	{
-		if(!_layout->_playerBkg[2])
-			return;
-		if(_layout->_playerBkg[2]->getChildByTag(NICK_NAME_TAG_ID))
-			_layout->_playerBkg[2]->removeChildByTag(NICK_NAME_TAG_ID,true);
-
-		auto Right_Name=Label::create(str_Nick,"Arial",20);
-		Right_Name->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*0.5,_layout->_playerBkg[2]->getTextureRect().size.height*0.265));
-		_layout->_playerBkg[2]->addChild(Right_Name,1,NICK_NAME_TAG_ID);
-	}
-
-}
-
-void NetRaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
-{
-	auto head_image=Sprite::createWithSpriteFrameName(head_photo);
-
-	if(direction==0)
-	{
-		if(!_layout->_playerBkg[0])
-			return;
-
-		if(_layout->_playerBkg[0]->getChildByTag(HEAD_IMG_TAG_ID))
-			_layout->_playerBkg[0]->removeChildByTag(HEAD_IMG_TAG_ID,true);
-
-		head_image->setScaleX(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
-		head_image->setScaleY(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
-		head_image->setAnchorPoint(Vec2(0.5f,1.0f));
-		head_image->setPosition(Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*1/2,_layout->_playerBkg[0]->getTextureRect().size.height*23/24));
-		_layout->_playerBkg[0]->addChild(head_image,1,HEAD_IMG_TAG_ID);
-	}
-	else if(direction==1)
-	{
-		if(!_layout->_playerBkg[1])
-			return;
-		if(_layout->_playerBkg[1]->getChildByTag(HEAD_IMG_TAG_ID))
-			_layout->_playerBkg[1]->removeChildByTag(HEAD_IMG_TAG_ID,true);
-
-		float head_scale;
-		head_scale=(_layout->_playerBkg[1]->getTextureRect().size.height*5)/(6*head_image->getTextureRect().size.height);
-		head_image->setScaleX(head_scale);
-		head_image->setScaleY(head_scale);
-		head_image->setAnchorPoint(Vec2(0.0f,0.5f));
-		head_image->setPosition(Vec2(_layout->_playerBkg[1]->getTextureRect().size.width/39,_layout->_playerBkg[1]->getTextureRect().size.height*1/2));
-		_layout->_playerBkg[1]->addChild(head_image,1,HEAD_IMG_TAG_ID);
-	}
-	else if(direction==2)
-	{
-		if(!_layout->_playerBkg[2])
-			return;
-		if(_layout->_playerBkg[2]->getChildByTag(HEAD_IMG_TAG_ID))
-			_layout->_playerBkg[2]->removeChildByTag(HEAD_IMG_TAG_ID,true);
-
-		head_image->setScaleX(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
-		head_image->setScaleY(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
-		head_image->setAnchorPoint(Vec2(0.5f,1.0f));
-		head_image->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*1/2,_layout->_playerBkg[2]->getTextureRect().size.height*23/24));
-		_layout->_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
-	}
-}
-
-void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
-    goldOfPlayer[winner]       = 4*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-    goldOfPlayer[(winner+1)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-    goldOfPlayer[(winner+2)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-}
-
-void NetRaceLayer::_CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]) {
-    if (winner==loser) {
-        goldOfPlayer[winner]       = 2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-        goldOfPlayer[(winner+1)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-        goldOfPlayer[(winner+2)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-    } else {
-        goldOfPlayer[winner]       =2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-        goldOfPlayer[loser]        =-2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-    }
-}
-
-void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner) {
-    auto score = _roundManager->_players[winner]->get_parter()->get_card_score();
-    goldOfPlayer[winner] = score*PREMIUM_LEAST;
-    
-    if(_roundManager->_curPlayer==winner) {
-        goldOfPlayer[(winner+1)%3] = -(goldOfPlayer[winner]/2);
-        goldOfPlayer[(winner+2)%3] = -(goldOfPlayer[winner]/2);
-    } else {
-        goldOfPlayer[_roundManager->_curPlayer] = -goldOfPlayer[winner];
-    }
-    
-    goldOfPlayer[(winner+1)%3] = goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+1)%3]*_roundManager->IsTing((winner+1)%3);
-    goldOfPlayer[(winner+2)%3] = goldOfPlayer[(winner+2)%3] + goldOfPlayer[(winner+2)%3]*_roundManager->IsTing((winner+2)%3);
-    goldOfPlayer[winner] = - (goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+2)%3]);
-}
-
-void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int loser) {
-    for(int i=1;i<3;i++) {
-        auto score = _roundManager->_players[(loser+i)%3]->get_parter()->get_card_score();
-        int  ting  = _roundManager->IsTing((loser+i)%3);
-
-        goldOfPlayer[(loser+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
-    }
-
-    goldOfPlayer[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
-}
-
-void NetRaceLayer::_CalcNoneWinGold(int goldOfPlayer[3], int loser) {
-    GoldAccountImmediate[(loser+1)%3] = PREMIUM_LEAST;
-    GoldAccountImmediate[(loser+2)%3] = PREMIUM_LEAST;
-    GoldAccountImmediate[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
-}
-
-void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
-    WinInfo_t win;
-    _roundManager->GetWin(win);
-    
-    switch(win.kind) {
-        case SINGLE_WIN:
-            _CalcSingleWinGold(goldOfPlayer,win.player);
-            break;
-        case DOUBLE_WIN:
-            _CalcDoubleWinGold(goldOfPlayer,win.player);
-            break;
-        case NONE_WIN:
-            _CalcNoneWinGold(goldOfPlayer,win.player);
-            break;
-    }
-}
-
-void NetRaceLayer::CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give) {
-	goldOfPlayer[0]=0;
-	goldOfPlayer[1]=0;
-	goldOfPlayer[2]=0;
-
-	if(Gold_kind==AN_GANG) {
-		_CalcAnGangGold(GoldWinner,goldOfPlayer);
-	} else if(Gold_kind==MING_GANG) {
-        _CalcMingGangGold(GoldWinner,who_give,goldOfPlayer);
-	} else if(Gold_kind==HU_WIN) {
-    	_CalcHuGold(goldOfPlayer);
-	}
-}
-
-void NetRaceLayer::_UpdateGouldAccount(int id,int gold) {
-    Database *database = Database::getInstance();
-
-    int total;
-    _roundManager->_players[id]->get_property(total);
-    total += gold;
-    _roundManager->_players[id]->set_property(total);
-    
-    int globalId = 0;
-    _roundManager->_players[id]->get_player_id(globalId);
-    database->SetProperty(globalId,total);
-}
-
-void NetRaceLayer::UpdateGoldAccounts(int goldOfPlayer[3]) {
-    for(int i=0;i<3;i++) {
-        _UpdateGouldAccount(i,goldOfPlayer[i]);
-    }
-}
-
-void NetRaceLayer::GuiJinBiShow(PlayerDir_t dir, int gold) {
-	Size size = Director::getInstance()->getVisibleSize();
-	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-	char str[15];
-	sprintf(str,"%d",abs(gold));
-	auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
-	number->setAnchorPoint(_layout->AnchorOfNumber(dir));
-	number->setOpacity(0);
-	number->setPosition(_layout->PositionOfNumber(dir));
-	this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
-
-    int xoffset = number->getContentSize().width;
-    
-	auto minus=Sprite::create("-.png");
-	minus->setAnchorPoint(_layout->AnchorOfSign(dir));
-	minus->setPosition(_layout->PositionOfSign(dir,xoffset));
-	minus->setOpacity(0);
-	this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
-
-	auto plus=Sprite::create("+.png");
-	plus->setAnchorPoint(_layout->AnchorOfSign(dir));
-	plus->setPosition(_layout->PositionOfSign(dir,xoffset));
-	plus->setOpacity(0);
-	this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
-
-	auto jinbi=Sprite::create("jinbi-game.png");
-	jinbi->setAnchorPoint(_layout->AnchorOfGold(dir));
-	jinbi->setOpacity(0);
-	jinbi->setPosition(_layout->PositionOfGold(dir,xoffset));
-	this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
-
-    Sprite *symbol;
-    if( gold>0 ) {
-        symbol = plus;
-    } else if( gold<0 ) {
-        symbol = minus;
-    } else {// is the upper procedures necessary when gold==0 ???
-        return ;
-    }
-
-	jinbi->runAction(Sequence::create(
-        DelayTime::create(0),
-        Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->DestOfGold(dir,xoffset)),NULL),
-        ScaleTo::create(0,0),NULL));
-    
-	number->runAction(Sequence::create(
-        DelayTime::create(0),
-        Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->DestOfNumber(dir)),NULL),
-        ScaleTo::create(0,0),NULL));
-
-    symbol->runAction(Sequence::create(
-        DelayTime::create(0),
-        Spawn::create(FadeIn::create(1.5),
-        MoveTo::create(1.5,_layout->DestOfSign(dir,xoffset)),NULL),
-        ScaleTo::create(0,0),NULL));
-}
-
-void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
-{
-    CalculateGoldNum(GoldAccountImmediate,GoldWinner,Gold_kind,who_give);
-    UpdateGoldAccounts(GoldAccountImmediate);
-
-	for(int id=0;id<3;id++) {
-        int score;
-        _roundManager->_players[id]->get_property(score);
-        GuiUpdateScore(id,score);
-        GuiJinBiShow((PlayerDir_t)id,GoldAccountImmediate[id]);        
-	}
-}
-
-
 
 void NetRaceLayer::GuiShowReady(int dir)
 {
@@ -6400,6 +4490,1914 @@ void NetRaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	}
 }
 
+void NetRaceLayer:: display_callback(cocos2d::Ref* pSender) {
+    LOGGER_WRITE("%s",__FUNCTION__);
+}
+
+/*****************************************************
+        player information
+*****************************************************/
+std::string NetRaceLayer::_NumToString( int number ) {
+    char buf[80] = {0};
+	float tempProperty;
+	int tempXiapShu;
+
+	if(number<100000) {
+		sprintf(buf,"%d",number);
+	} else if( number>=100000 && number<10000000 ) {
+		tempXiapShu = number%1000;
+        
+		if(tempXiapShu>=500)
+			tempProperty=(float)(number-500)/10000;
+		else
+			tempProperty=(float)number/10000;
+        
+		tempXiapShu=number%10000;
+
+        if(tempXiapShu>=1000)
+			sprintf(buf,"%.1f",tempProperty);
+		else
+			sprintf(buf,"%.0f",tempProperty);
+	} else if(number>=10000000&&number<100000000) {
+		tempXiapShu=number%10000;
+		if(tempXiapShu>=5000)
+			tempProperty=(float)(number-500)/10000;
+		else
+			tempProperty=(float)number/10000;
+		sprintf(buf,"%.0f",tempProperty);
+	} else if(number>=100000000) {
+		tempXiapShu=number%10000000;
+		if(tempXiapShu>=5000000)
+			tempProperty=(float)(number-5000000)/100000000;
+		else
+			tempProperty=(float)number/100000000;
+        
+		tempXiapShu=number%100000000;
+		if(tempXiapShu>=10000000)
+			sprintf(buf,"%.1f",tempProperty);
+		else
+			sprintf(buf,"%.0f",tempProperty);
+	}
+
+    return std::string(buf);
+}
+
+void NetRaceLayer::_GuiUpdateScore(LayerColor *layer,int score) {
+	LabelAtlas* label = LabelAtlas::create(
+        _NumToString(score),
+        "fonts/Head_Beans_Number.png",14,20,'.');  
+	Sprite* propertyUnit;
+
+	if( score < 100000 )
+	{
+		label->setAnchorPoint(Vec2(0.5,0.5));
+		label->setPosition(Vec2(layer->getContentSize().width/2,layer->getContentSize().height/2));
+		layer->addChild(label,1);
+	}
+	if( score>=100000 && score<100000000 )
+	{
+		propertyUnit=Sprite::createWithSpriteFrameName("wan-hand.png");
+		propertyUnit->setAnchorPoint(Vec2(1,0.5));
+		float curMargins=(layer->getContentSize().width-propertyUnit->getTextureRect().size.width-label->getContentSize().width)/2;
+		propertyUnit->setPosition(Vec2(layer->getContentSize().width-curMargins,layer->getContentSize().height/2));
+		layer->addChild(propertyUnit,1);
+        
+		label->setAnchorPoint(Vec2(0,0.5));
+		label->setPosition(Vec2(curMargins,layer->getContentSize().height/2));
+		layer->addChild(label,1);
+	}
+	else if( score>=100000000 )
+	{
+		propertyUnit=Sprite::createWithSpriteFrameName("yi-hand.png");
+		propertyUnit->setAnchorPoint(Vec2(1,0.5));
+		float curMargins=(layer->getContentSize().width-propertyUnit->getTextureRect().size.width-label->getContentSize().width)/2;
+		propertyUnit->setPosition(Vec2(layer->getContentSize().width-curMargins,layer->getContentSize().height/2));
+		layer->addChild(propertyUnit,1);
+
+        label->setAnchorPoint(Vec2(0,0.5));
+		label->setPosition(Vec2(curMargins,layer->getContentSize().height/2));
+		layer->addChild(label,1);
+	}
+}
+
+void NetRaceLayer::GuiUpdateScore(int dir,int score)
+{
+    if( !_layout->_playerBkg[dir] ) {
+        return;
+    }
+
+	LayerColor *propertyLayerBar = LayerColor::create();
+	propertyLayerBar->ignoreAnchorPointForPosition(false);
+
+    if(_layout->_playerBkg[dir]->getChildByTag(SCORE_TAG_ID))
+        _layout->_playerBkg[dir]->removeChildByTag(SCORE_TAG_ID,true);
+
+    propertyLayerBar->setAnchorPoint(Vec2(0.5,0.5));
+    
+	if(dir==0) {
+		propertyLayerBar->setContentSize( Size(_layout->_playerBkg[0]->getTextureRect().size.width, 25) );
+		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*0.5,
+            _layout->_playerBkg[0]->getTextureRect().size.height * 0.1));
+	} else if(dir==1) {
+		propertyLayerBar->setContentSize( Size(140, 25) );
+		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[1]->getTextureRect().size.width*0.6635,
+            _layout->_playerBkg[1]->getTextureRect().size.height*0.3));
+	} else if(dir==2) {
+		propertyLayerBar->setContentSize( Size(_layout->_playerBkg[2]->getTextureRect().size.width, 25) );
+		propertyLayerBar->setPosition( Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*0.5,
+            _layout->_playerBkg[2]->getTextureRect().size.height * 0.1));
+	}
+    
+    _layout->_playerBkg[dir]->addChild(propertyLayerBar,1,SCORE_TAG_ID);
+    
+    _GuiUpdateScore(propertyLayerBar,score);
+}
+
+void NetRaceLayer::_UpdateNickName(int direction,std::string str_Nick)
+{		
+	if(direction==0)
+	{
+		if(!_layout->_playerBkg[0])
+			return;
+		if(_layout->_playerBkg[0]->getChildByTag(NICK_NAME_TAG_ID))
+			_layout->_playerBkg[0]->removeChildByTag(NICK_NAME_TAG_ID,true);
+
+		auto left_Name=Label::create(str_Nick,"Arial",20);
+		left_Name->setPosition(Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*0.5,_layout->_playerBkg[0]->getTextureRect().size.height*0.265));
+		_layout->_playerBkg[0]->addChild(left_Name,1,NICK_NAME_TAG_ID);
+	}
+	else if(direction==1)
+	{
+		if(!_layout->_playerBkg[1])
+			return;
+		if(_layout->_playerBkg[1]->getChildByTag(NICK_NAME_TAG_ID))
+			_layout->_playerBkg[1]->removeChildByTag(NICK_NAME_TAG_ID,true);
+
+		auto myName=Label::create(str_Nick,"Arial",20);
+		myName->setPosition(Vec2(_layout->_playerBkg[1]->getTextureRect().size.width*0.65,_layout->_playerBkg[1]->getTextureRect().size.height*0.7));
+		_layout->_playerBkg[1]->addChild(myName,1,NICK_NAME_TAG_ID);
+
+	}
+	else if(direction==2)
+	{
+		if(!_layout->_playerBkg[2])
+			return;
+		if(_layout->_playerBkg[2]->getChildByTag(NICK_NAME_TAG_ID))
+			_layout->_playerBkg[2]->removeChildByTag(NICK_NAME_TAG_ID,true);
+
+		auto Right_Name=Label::create(str_Nick,"Arial",20);
+		Right_Name->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*0.5,_layout->_playerBkg[2]->getTextureRect().size.height*0.265));
+		_layout->_playerBkg[2]->addChild(Right_Name,1,NICK_NAME_TAG_ID);
+	}
+
+}
+
+void NetRaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
+{
+	auto head_image=Sprite::createWithSpriteFrameName(head_photo);
+
+	if(direction==0)
+	{
+		if(!_layout->_playerBkg[0])
+			return;
+
+		if(_layout->_playerBkg[0]->getChildByTag(HEAD_IMG_TAG_ID))
+			_layout->_playerBkg[0]->removeChildByTag(HEAD_IMG_TAG_ID,true);
+
+		head_image->setScaleX(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setScaleY(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setAnchorPoint(Vec2(0.5f,1.0f));
+		head_image->setPosition(Vec2(_layout->_playerBkg[0]->getTextureRect().size.width*1/2,_layout->_playerBkg[0]->getTextureRect().size.height*23/24));
+		_layout->_playerBkg[0]->addChild(head_image,1,HEAD_IMG_TAG_ID);
+	}
+	else if(direction==1)
+	{
+		if(!_layout->_playerBkg[1])
+			return;
+		if(_layout->_playerBkg[1]->getChildByTag(HEAD_IMG_TAG_ID))
+			_layout->_playerBkg[1]->removeChildByTag(HEAD_IMG_TAG_ID,true);
+
+		float head_scale;
+		head_scale=(_layout->_playerBkg[1]->getTextureRect().size.height*5)/(6*head_image->getTextureRect().size.height);
+		head_image->setScaleX(head_scale);
+		head_image->setScaleY(head_scale);
+		head_image->setAnchorPoint(Vec2(0.0f,0.5f));
+		head_image->setPosition(Vec2(_layout->_playerBkg[1]->getTextureRect().size.width/39,_layout->_playerBkg[1]->getTextureRect().size.height*1/2));
+		_layout->_playerBkg[1]->addChild(head_image,1,HEAD_IMG_TAG_ID);
+	}
+	else if(direction==2)
+	{
+		if(!_layout->_playerBkg[2])
+			return;
+		if(_layout->_playerBkg[2]->getChildByTag(HEAD_IMG_TAG_ID))
+			_layout->_playerBkg[2]->removeChildByTag(HEAD_IMG_TAG_ID,true);
+
+		head_image->setScaleX(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setScaleY(_layout->_playerBkg[0]->getTextureRect().size.width*0.85/head_image->getTextureRect().size.width);
+		head_image->setAnchorPoint(Vec2(0.5f,1.0f));
+		head_image->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*1/2,_layout->_playerBkg[2]->getTextureRect().size.height*23/24));
+		_layout->_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
+	}
+}
+
+void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
+    goldOfPlayer[winner]       = 4*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+    goldOfPlayer[(winner+1)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+    goldOfPlayer[(winner+2)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+}
+
+void NetRaceLayer::_CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]) {
+    if (winner==loser) {
+        goldOfPlayer[winner]       = 2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[(winner+1)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[(winner+2)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+    } else {
+        goldOfPlayer[winner]       =2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[loser]        =-2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+    }
+}
+
+void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner) {
+    auto score = _roundManager->_players[winner]->get_parter()->get_card_score();
+    goldOfPlayer[winner] = score*PREMIUM_LEAST;
+    
+    if(_roundManager->_curPlayer==winner) {
+        goldOfPlayer[(winner+1)%3] = -(goldOfPlayer[winner]/2);
+        goldOfPlayer[(winner+2)%3] = -(goldOfPlayer[winner]/2);
+    } else {
+        goldOfPlayer[_roundManager->_curPlayer] = -goldOfPlayer[winner];
+    }
+    
+    goldOfPlayer[(winner+1)%3] = goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+1)%3]*_roundManager->IsTing((winner+1)%3);
+    goldOfPlayer[(winner+2)%3] = goldOfPlayer[(winner+2)%3] + goldOfPlayer[(winner+2)%3]*_roundManager->IsTing((winner+2)%3);
+    goldOfPlayer[winner] = - (goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+2)%3]);
+}
+
+void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int loser) {
+    for(int i=1;i<3;i++) {
+        auto score = _roundManager->_players[(loser+i)%3]->get_parter()->get_card_score();
+        int  ting  = _roundManager->IsTing((loser+i)%3);
+
+        goldOfPlayer[(loser+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
+    }
+
+    goldOfPlayer[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
+}
+
+void NetRaceLayer::_CalcNoneWinGold(int goldOfPlayer[3], int loser) {
+    GoldAccountImmediate[(loser+1)%3] = PREMIUM_LEAST;
+    GoldAccountImmediate[(loser+2)%3] = PREMIUM_LEAST;
+    GoldAccountImmediate[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
+}
+
+void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+    
+    switch(win.kind) {
+        case SINGLE_WIN:
+            _CalcSingleWinGold(goldOfPlayer,win.player);
+            break;
+        case DOUBLE_WIN:
+            _CalcDoubleWinGold(goldOfPlayer,win.player);
+            break;
+        case NONE_WIN:
+            _CalcNoneWinGold(goldOfPlayer,win.player);
+            break;
+    }
+}
+
+void NetRaceLayer::CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give) {
+	goldOfPlayer[0]=0;
+	goldOfPlayer[1]=0;
+	goldOfPlayer[2]=0;
+
+	if(Gold_kind==AN_GANG) {
+		_CalcAnGangGold(GoldWinner,goldOfPlayer);
+	} else if(Gold_kind==MING_GANG) {
+        _CalcMingGangGold(GoldWinner,who_give,goldOfPlayer);
+	} else if(Gold_kind==HU_WIN) {
+    	_CalcHuGold(goldOfPlayer);
+	}
+}
+
+void NetRaceLayer::_UpdateGouldAccount(int id,int gold) {
+    Database *database = Database::getInstance();
+
+    int total;
+    _roundManager->_players[id]->get_property(total);
+    total += gold;
+    _roundManager->_players[id]->set_property(total);
+    
+    int globalId = 0;
+    _roundManager->_players[id]->get_player_id(globalId);
+    database->SetProperty(globalId,total);
+}
+
+void NetRaceLayer::UpdateGoldAccounts(int goldOfPlayer[3]) {
+    for(int i=0;i<3;i++) {
+        _UpdateGouldAccount(i,goldOfPlayer[i]);
+    }
+}
+
+void NetRaceLayer::GuiJinBiShow(PlayerDir_t dir, int gold) {
+	Size size = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
+
+	char str[15];
+	sprintf(str,"%d",abs(gold));
+	auto number=LabelAtlas::create(std::string(str),"fonts/moneyMessage.png",28,39,'0');
+	number->setAnchorPoint(_layout->AnchorOfNumber(dir));
+	number->setOpacity(0);
+	number->setPosition(_layout->PositionOfNumber(dir));
+	this->addChild(number,6,GOLD_NUM_INSERT_NUMBER);
+
+    int xoffset = number->getContentSize().width;
+    
+	auto minus=Sprite::create("-.png");
+	minus->setAnchorPoint(_layout->AnchorOfSign(dir));
+	minus->setPosition(_layout->PositionOfSign(dir,xoffset));
+	minus->setOpacity(0);
+	this->addChild(minus,6,GOLD_NUM_INSERT_JIANHAO);
+
+	auto plus=Sprite::create("+.png");
+	plus->setAnchorPoint(_layout->AnchorOfSign(dir));
+	plus->setPosition(_layout->PositionOfSign(dir,xoffset));
+	plus->setOpacity(0);
+	this->addChild(plus,6,GOLD_NUM_INSERT_JIAHAO);
+
+	auto jinbi=Sprite::create("jinbi-game.png");
+	jinbi->setAnchorPoint(_layout->AnchorOfGold(dir));
+	jinbi->setOpacity(0);
+	jinbi->setPosition(_layout->PositionOfGold(dir,xoffset));
+	this->addChild(jinbi,6,GOLD_NUM_INSERT_JINBI);
+
+    Sprite *symbol;
+    if( gold>0 ) {
+        symbol = plus;
+    } else if( gold<0 ) {
+        symbol = minus;
+    } else {// is the upper procedures necessary when gold==0 ???
+        return ;
+    }
+
+	jinbi->runAction(Sequence::create(
+        DelayTime::create(0),
+        Spawn::create(FadeIn::create(1.5),
+        MoveTo::create(1.5,_layout->DestOfGold(dir,xoffset)),NULL),
+        ScaleTo::create(0,0),NULL));
+    
+	number->runAction(Sequence::create(
+        DelayTime::create(0),
+        Spawn::create(FadeIn::create(1.5),
+        MoveTo::create(1.5,_layout->DestOfNumber(dir)),NULL),
+        ScaleTo::create(0,0),NULL));
+
+    symbol->runAction(Sequence::create(
+        DelayTime::create(0),
+        Spawn::create(FadeIn::create(1.5),
+        MoveTo::create(1.5,_layout->DestOfSign(dir,xoffset)),NULL),
+        ScaleTo::create(0,0),NULL));
+}
+
+void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
+{
+    CalculateGoldNum(GoldAccountImmediate,GoldWinner,Gold_kind,who_give);
+    UpdateGoldAccounts(GoldAccountImmediate);
+
+	for(int id=0;id<3;id++) {
+        int score;
+        _roundManager->_players[id]->get_property(score);
+        GuiUpdateScore(id,score);
+        GuiJinBiShow((PlayerDir_t)id,GoldAccountImmediate[id]);        
+	}
+}
+
+
+/***********************************************************
+        gold show
+***********************************************************/
+Label *NetRaceLayer::_CreateName(const char *name) {
+    auto NickName=Label::create(name,"Arial",28);
+    NickName->setAnchorPoint(Vec2(0.5,0.5));
+    NickName->setPosition(Vec2(70,60));
+    return NickName;
+}
+
+Sprite *NetRaceLayer::_CreateHeadImage(const char *file) {
+    auto headPhoto=Sprite::createWithSpriteFrameName(file);//ͷ��4
+    headPhoto->setScaleX(100/headPhoto->getTextureRect().size.width);
+    headPhoto->setScaleY(100/headPhoto->getTextureRect().size.height);
+    headPhoto->setAnchorPoint(Vec2(0,0));
+    headPhoto->setPosition(Vec2(20,80));
+    return headPhoto;
+}
+
+Sprite *NetRaceLayer::_CreateGoldImage() {
+    auto gold = Sprite::createWithSpriteFrameName("result_money.png");//���1
+    gold->setAnchorPoint(Vec2(0,0.5));
+    gold->setPosition(Vec2(15,22));
+    return gold;
+}
+
+LabelAtlas *NetRaceLayer::_CreatePropertyNumber(int number,Sprite *gold) {
+    std::string strNumber = _NumToString(number);
+    auto label = LabelAtlas::create(strNumber,"fonts/result_money_number.png",17,23,'.');
+    label->setAnchorPoint(Vec2(0,0.5));
+    label->setPosition(Vec2(gold->getPosition().x+gold->getTextureRect().size.width+5, 22));
+    return label;
+}
+
+Sprite *NetRaceLayer::_CreatePropertyUnit(int number,LabelAtlas *label) {
+    Sprite* unit = NULL;
+    if(number>=100000&&number<100000000) {
+        unit=Sprite::createWithSpriteFrameName("wan-hand.png");
+        unit->setAnchorPoint(Vec2(0,0.5));
+        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
+    }
+    else if(number>=100000000) {
+        unit=Sprite::createWithSpriteFrameName("yi-hand.png");
+        unit->setAnchorPoint(Vec2(0,0.5));
+        unit->setPosition(Vec2(label->getPosition().x+label->getContentSize().width+5,22));
+    }
+    return unit;
+}
+
+Sprite *NetRaceLayer::_CreateHu() {
+    auto Win=Sprite::createWithSpriteFrameName("jiesuanhu.png");//��5
+    Win->setAnchorPoint(Vec2(0.5,0.5));
+    Win->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+    Win->setVisible(false);
+    return Win;
+}
+
+Sprite *NetRaceLayer::_CreateZiMo() {
+    auto selfDrawn=Sprite::createWithSpriteFrameName("jiesuanzimo.png");//����6
+    selfDrawn->setAnchorPoint(Vec2(0.5,0.5));
+    selfDrawn->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+    selfDrawn->setVisible(false);
+    return selfDrawn;
+}
+
+Sprite *NetRaceLayer::_CreateFangPao() {
+    auto PointGun1=Sprite::createWithSpriteFrameName("jiesuanfangpao.png");//����7
+    PointGun1->setAnchorPoint(Vec2(0.5,0.5));
+    PointGun1->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+    PointGun1->setVisible(false);
+    return PointGun1;
+}
+
+Sprite *NetRaceLayer::_CreateBaozhuang() {
+	auto BaoZhuang=Sprite::createWithSpriteFrameName("jiesuanbaozhuang.png");//包庄
+	BaoZhuang->setAnchorPoint(Vec2(0.5,0.5));
+	BaoZhuang->setPosition(Vec2(origin.x+visibleSize.width*0.9,origin.y+visibleSize.height*0.15363));
+	BaoZhuang->setVisible(false);
+    return BaoZhuang;
+}
+
+void NetRaceLayer::_CreateAccountPanel(const UserProfile_t &profile, Node *parent) {
+    parent->addChild(_CreateName(profile.name),2,ACCOUNT_NIKENAME);
+    parent->addChild(_CreateHeadImage(profile.photo),2,ACCOUNT_IMAGE);
+    auto gold = _CreateGoldImage();
+    parent->addChild(gold,2,ACCOUNT_JINBI);
+    auto label = _CreatePropertyNumber(profile.property,gold);
+    parent->addChild(label,2,ACCOUNT_PROPRETY);
+    auto unit = _CreatePropertyUnit(profile.property,label);
+    if(unit!=NULL) {
+        parent->addChild(unit,ACCOUNT_PROPRETY_UNIT);
+    }
+    parent->addChild(_CreateHu(),2,ACCOUNT_HU_FONT);
+    parent->addChild(_CreateZiMo(),2,ACCOUNT_ZIMO_FONT);
+    parent->addChild(_CreateFangPao(),2,ACCOUNT_DIANPAO_FONT);
+    parent->addChild(_CreateBaozhuang(),2,ACCOUNT_BAOZHUANG_FONT);
+}
+
+Sprite *NetRaceLayer::_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent) {
+    Sprite *sign = NULL;
+    
+    if(gold>0) {
+        sign = Sprite::createWithSpriteFrameName("fen_add.png");
+    } else {
+        sign = Sprite::createWithSpriteFrameName("fen_sub.png");
+    }
+    sign->setAnchorPoint(Vec2(0,0.5));
+    
+    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+        sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,parent->getContentSize().height/2));
+    else
+        sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
+
+    if(gold!=0) {
+        sign->setVisible(true);
+    } else {
+        sign->setVisible(false);
+    }
+
+    return sign;
+}
+
+LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerColor *parent) {
+    char char_AccoutnGold[80];
+    std::string str_AccountGold;
+    sprintf(char_AccoutnGold,"%d",abs(gold));
+    str_AccountGold = char_AccoutnGold;
+    LabelAtlas* propertyOfIncrease = NULL;
+
+    if(gold>0) {
+        propertyOfIncrease = LabelAtlas::create(str_AccountGold,"fonts/Score_add_number.png",26,32,'0');//加
+    } else {
+        propertyOfIncrease = LabelAtlas::create(str_AccountGold,"fonts/Score_sub_number.png",26,32,'0');//减
+    }
+
+    propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
+    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
+        propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,parent->getContentSize().height/2));
+    else
+        propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
+
+    if(gold!=0) {
+        propertyOfIncrease->setVisible(true);
+    } else {
+        propertyOfIncrease->setVisible(false);
+    }
+
+    return propertyOfIncrease;
+}
+
+void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent) {
+	auto posOfCards = Vec2(162,180);//牌0，1
+	float x = posOfCards.x;
+	float y = posOfCards.y - _object->RectSize(PENG_CARD).height/2;
+    
+	Sprite *show_card_list[MAX_HANDIN_NUM];
+	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
+    
+	for(int i=0;i<list->len;i++)
+	{
+		show_card_list[i]=_object->Create(PENG_CARD);
+		show_card_list[i]->setAnchorPoint(Vec2(0,0.5));
+		show_card_list[i]->setPosition(Vec2(x,y));
+		parent->addChild(show_card_list[i],2);
+		auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+		s_card->setAnchorPoint(Vec2(0.5,0.5));
+		s_card->setPosition(Vec2(show_card_list[i]->getTextureRect().size.width/2,show_card_list[i]->getTextureRect().size.height*0.6));
+		show_card_list[i]->addChild(s_card,1);
+
+        
+		if(list->data[i].status==c_PENG||list->data[i].status==c_MING_KOU)
+		{
+			if(list->data[i].kind!=list->data[i+1].kind)
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*1.1;
+			}
+			else if(list->data[i].kind==list->data[i+1].kind && list->data[i+1].status==c_FREE)
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*1.1;
+			}
+			else
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*0.95;
+			}
+		}
+		else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
+		{
+			if(list->data[i].kind!=list->data[i+1].kind)
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*1.1;
+			}
+			else
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*0.95;
+			}
+		}
+		else if(list->data[i].status==c_FREE)
+		{
+			if( win.kind==SINGLE_WIN && win.player==dir && win.player==_roundManager->_curPlayer && i==(list->len-2) )
+				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
+			else
+				x+=show_card_list[i]->getTextureRect().size.width*0.95;
+		}
+	}
+
+    if((win.kind==SINGLE_WIN && win.player==dir) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=dir))
+    {
+        if(_roundManager->_isCardFromOthers)
+        {
+            auto winCard=_object->Create(PENG_CARD);
+            winCard->setAnchorPoint(Vec2(0,0.5));
+            winCard->setPosition(Vec2(x+30,y));
+            auto s_card=_object->CreateKind((Card_t)list->data[list->len].kind,MIDDLE_SIZE);
+            s_card->setAnchorPoint(Vec2(0.5,0.5));
+            s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
+            winCard->addChild(s_card,1);
+
+            parent->addChild(winCard,2);
+        }
+    }
+}
+
+void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
+	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
+
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+
+	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
+        auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        BarOfPlayer->addChild(sign,2,ACCOUNT_DIANPAO_FONT);
+
+        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
+	}
+
+    _ShowCards((PlayerDir_t)no,win,BarOfPlayer);
+    
+	int tagNum=BarOfPlayer->getTag();
+	if(_roundManager->IsTing(tagNum)&&
+        ((win.kind==SINGLE_WIN && ((win.player==_roundManager->_curPlayer&&tagNum!=win.player)||(win.player!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
+        (win.kind==DOUBLE_WIN && tagNum==_roundManager->_curPlayer)))
+	{
+        float Extra_x=162;
+        float Extra_y=origin.y+visibleSize.height*0.1256-10;
+
+		auto mingFlag=Sprite::createWithSpriteFrameName("result_mpbh.png");
+		mingFlag->setAnchorPoint(Vec2(0,0.5));
+		mingFlag->setPosition(Vec2(Extra_x,Extra_y));
+		BarOfPlayer->addChild(mingFlag);
+	}
+}
+void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	//float x=origin.x+visibleSize.width*0.17;
+	float x=162;
+	float y=origin.y+visibleSize.height*0.1256-10;
+	int tagNum=BarOfPlayer->getTag();
+	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
+	auto curScore=_roundManager->_players[tagNum]->get_parter()->get_card_score();
+
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+    
+	if((win.kind==SINGLE_WIN&&(win.player==_roundManager->_curPlayer&&curScore==2)||(win.player!=_roundManager->_curPlayer&&tagNum==win.player&&curScore==1))
+        ||(win.kind==DOUBLE_WIN&&tagNum!=_roundManager->_curPlayer&&curScore==1))
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("ph-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("1","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_MING)
+	{
+		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.player)||(win.kind==DOUBLE_WIN&&(tagNum!=_roundManager->_curPlayer))))
+		{
+			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+			kindOfHuBkg->setPosition(Vec2(x,y));
+			BarOfPlayer->addChild(kindOfHuBkg);
+			auto kindOfHu = Sprite::createWithSpriteFrameName("m-js.png");//番型种类图片
+			kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+			kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+			kindOfHuBkg->addChild(kindOfHu);
+			auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+			timesOfHu->setAnchorPoint(Vec2(0,0.5));
+			timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+			kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+			auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+			fanFont->setAnchorPoint(Point(0.0f,0.5f));
+			fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+			kindOfHuBkg->addChild(fanFont);
+			x+=kindOfHuBkg->getTextureRect().size.width+22;
+			if(x>=900)
+			{
+				x=origin.x+visibleSize.width*0.17;
+				y=origin.y+visibleSize.height*0.1256-10-56;
+			}
+		}
+	}
+	if((num&RH_HAIDILAO)&&win.kind==SINGLE_WIN)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("hdl-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_QINYISE)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("qys-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_SIPENG)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("pph-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_QIANGGANG)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("qgh-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_GANGHUA)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("gskh-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_GANGPAO) // undefinded
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("gsp-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_SHOUYIZHUA)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("szy-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_DASANYUAN)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("dsy-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_XIAOSANYUAN)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("xsy-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_MINGSIGUI)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("msg-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("2","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_ANSIGUI)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("asg-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_QIDUI)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("qd-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_SANYUANQIDUI)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("syqd-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("32","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_KAWUXIN)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("kwx-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("4","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_HAOHUAQIDUI)//双龙七对
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("hhqd-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("8","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_CHAOHAOHUAQIDUI)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("slqd-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("32","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+	if(num&RH_CHAOCHAOHAOHUAQIDUI)
+	{
+		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHuBkg->setPosition(Vec2(x,y));
+		BarOfPlayer->addChild(kindOfHuBkg);
+		auto kindOfHu = Sprite::createWithSpriteFrameName("cjhhqd-js.png");//番型种类图片
+		kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+		kindOfHu->setPosition(Vec2(17,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(kindOfHu);
+		auto timesOfHu=LabelAtlas::create("128","fonts/result_fan_number.png",22, 30, '0');//番数
+		timesOfHu->setAnchorPoint(Vec2(0,0.5));
+		timesOfHu->setPosition(Vec2(160,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(timesOfHu);//result_fx_text
+		auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+		fanFont->setAnchorPoint(Point(0.0f,0.5f));
+		fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkg->getTextureRect().size.height/2));
+		kindOfHuBkg->addChild(fanFont);
+		x+=kindOfHuBkg->getTextureRect().size.width+22;
+		if(x>=900)
+		{
+			x=origin.x+visibleSize.width*0.17;
+			y=origin.y+visibleSize.height*0.1256-10-56;
+		}
+	}
+}
+void NetRaceLayer::raceAccount(float delta)
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
+	show_card_indicator->setVisible(false);
+	while(this->getChildByTag(GAME_BACK_BAR))
+		this->removeChildByTag(GAME_BACK_BAR);
+	if(this->getChildByTag(ROBOT_TUO_GUAN))
+		this->removeChildByTag(ROBOT_TUO_GUAN,true);	
+	if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
+		this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ResultImage.plist");
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("erqs_resultbox_btn_res.plist");
+	auto raceAccoutLayer=Layer::create();//account::create();
+	//
+	//myframe->addChild(raceAccoutLayer,30,RACE_ACCOUT_TAG_ID);
+	this->addChild(raceAccoutLayer,11,RACE_ACCOUT_TAG_ID);
+	//raceAccoutLayer->runAction(FadeIn::create(0.3));
+	auto BackGround=Sprite::create("racetable.png");//结算背景
+	BackGround->setScale(1.189);
+	BackGround->setAnchorPoint(Vec2(0.5,0.5));
+	BackGround->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2 ));
+	raceAccoutLayer->addChild(BackGround,0);
+
+	auto Striae1=Sprite::create("tiaotu4.png");//下条纹
+	Striae1->setAnchorPoint(Vec2(0.5,0));
+	Striae1->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+0));
+	raceAccoutLayer->addChild(Striae1,1);
+
+	auto Striae2=Sprite::create("tiaotu3.png");//上条纹
+	Striae2->setAnchorPoint(Vec2(0.5,1));
+	int i=Striae2->getTextureRect().size.height;
+	Striae2->setScaleY(201.6/Striae2->getTextureRect().size.height);
+	Striae2->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*0.718435));
+	raceAccoutLayer->addChild(Striae2,1);
+
+	auto zhuangPic=Sprite::create("tileImage/zhuang.png");//119  23
+	zhuangPic->setAnchorPoint(Vec2(0.5,0.5));
+	zhuangPic->setScale(0.8);
+	//zhuangPic->setPosition(Vec2(origin.x+visibleSize.width*156/1218,origin.y+visibleSize.height*575/716));
+	zhuangPic->setPosition(Vec2(119,origin.y+visibleSize.height-25));
+	raceAccoutLayer->addChild(zhuangPic,3);
+
+	auto BarOfPlayer0=LayerColor::create();
+	BarOfPlayer0->setContentSize(Size(visibleSize.width,visibleSize.height*196.5/716));
+	raceAccoutLayer->addChild(BarOfPlayer0,2,ACCOUNTBAR_PLAYERZERO);
+
+	auto BarOfPlayer1=LayerColor::create();
+	BarOfPlayer1->setContentSize(Size(visibleSize.width,visibleSize.height*196.5/716));
+	raceAccoutLayer->addChild(BarOfPlayer1,2,ACCOUNTBAR_PLAYERONE);
+
+	auto BarOfPlayer2=LayerColor::create();
+	BarOfPlayer2->setContentSize(Size(visibleSize.width,visibleSize.height*196.5/716));
+	raceAccoutLayer->addChild(BarOfPlayer2,2,ACCOUNTBAR_PLAYERTWO);	
+
+	Vec2 AccountPlace[3];
+	AccountPlace[0]=Vec2(origin.x,origin.y+visibleSize.height*519.5/716);
+	AccountPlace[1]=Vec2(origin.x,origin.y+visibleSize.height*315.25/716);
+	AccountPlace[2]=Vec2(origin.x,origin.y+visibleSize.height*111/716);
+
+    int lastWinner = _roundManager->GetLastWinner();
+	raceAccoutLayer->getChildByTag(lastWinner)->setPosition(AccountPlace[0]);
+	raceAccoutLayer->getChildByTag((lastWinner+1)%3)->setPosition(AccountPlace[1]);
+	raceAccoutLayer->getChildByTag((lastWinner+2)%3)->setPosition(AccountPlace[2]);
+
+	unsigned int num;
+	unsigned int numDoubule;
+    
+    WinInfo_t win;
+    _roundManager->GetWin(win);
+
+    auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.player); 
+    auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.player+1)%3);
+    auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.player+2)%3);
+
+    switch(win.kind) {
+        case SINGLE_WIN:
+            _roundManager->_players[win.player]->get_parter()->get_Hu_Flag(&num);
+            AccountShows(WinBar,win.player);
+            AccountShows(WinBarPlus,(win.player+1)%3);
+            AccountShows(WinBarMinus,(win.player+2)%3);
+            if(win.player==_roundManager->_curPlayer)
+                WinBar->getChildByTag(ACCOUNT_ZIMO_FONT)->setVisible(true);
+            else
+            {
+                WinBar->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
+                raceAccoutLayer->getChildByTag(_roundManager->_curPlayer)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
+            }
+            AccountHuKind(WinBar,num);
+            break;
+        case DOUBLE_WIN:
+            _roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_Hu_Flag(&num);
+            _roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
+            AccountShows(WinBar,_roundManager->_curPlayer);
+            AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
+            AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
+            
+            WinBar->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
+            WinBarPlus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
+            WinBarMinus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
+            AccountHuKind(WinBarPlus,num);
+            AccountHuKind(WinBarMinus,numDoubule);
+            break;
+        case NONE_WIN:
+            if(_roundManager->_firstMingNo!=-1)
+            {
+                AccountShows(WinBar,_roundManager->_firstMingNo);
+                AccountShows(WinBarPlus,(_roundManager->_firstMingNo+1)%3);
+                AccountShows(WinBarMinus,(_roundManager->_firstMingNo+2)%3);
+            
+                WinBar->getChildByTag(ACCOUNT_BAOZHUANG_FONT)->setVisible(true);
+            
+                //float BHx=origin.x+visibleSize.width*0.17;
+                float BHx=162;
+                float BHy=origin.y+visibleSize.height*0.1256-10;
+            
+                auto kindOfHuBkgPlus = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+                kindOfHuBkgPlus->setAnchorPoint(Point(0.0f,0.5f));
+                kindOfHuBkgPlus->setPosition(Vec2(BHx,BHy));
+                WinBarPlus->addChild(kindOfHuBkgPlus);
+                auto kindOfHuPlus= Sprite::createWithSpriteFrameName("bh-js.png");//番型种类图片
+                kindOfHuPlus->setAnchorPoint(Point(0.0f,0.5f));
+                kindOfHuPlus->setPosition(Vec2(17,kindOfHuBkgPlus->getTextureRect().size.height/2));
+                kindOfHuBkgPlus->addChild(kindOfHuPlus);
+                auto timesOfHuPlus=LabelAtlas::create("1","fonts/result_fan_number.png",22, 30, '0');//番数
+                timesOfHuPlus->setAnchorPoint(Vec2(0,0.5));
+                timesOfHuPlus->setPosition(Vec2(160,kindOfHuBkgPlus->getTextureRect().size.height/2));
+                kindOfHuBkgPlus->addChild(timesOfHuPlus);//result_fx_text
+                auto fanFontPlus= Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+                fanFontPlus->setAnchorPoint(Point(0.0f,0.5f));
+                fanFontPlus->setPosition(Vec2(timesOfHuPlus->getPosition().x+timesOfHuPlus->getContentSize().width+6,kindOfHuBkgPlus->getTextureRect().size.height/2));
+                kindOfHuBkgPlus->addChild(fanFontPlus);
+            
+                auto kindOfHuBkgMinus= Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
+                kindOfHuBkgMinus->setAnchorPoint(Point(0.0f,0.5f));
+                kindOfHuBkgMinus->setPosition(Vec2(BHx,BHy));
+                WinBarMinus->addChild(kindOfHuBkgMinus);
+                auto kindOfHu = Sprite::createWithSpriteFrameName("bh-js.png");//番型种类图片
+                kindOfHu->setAnchorPoint(Point(0.0f,0.5f));
+                kindOfHu->setPosition(Vec2(17,kindOfHuBkgMinus->getTextureRect().size.height/2));
+                kindOfHuBkgMinus->addChild(kindOfHu);
+                auto timesOfHu=LabelAtlas::create("1","fonts/result_fan_number.png",22, 30, '0');//番数
+                timesOfHu->setAnchorPoint(Vec2(0,0.5));
+                timesOfHu->setPosition(Vec2(160,kindOfHuBkgMinus->getTextureRect().size.height/2));
+                kindOfHuBkgMinus->addChild(timesOfHu);//result_fx_text
+                auto fanFont = Sprite::createWithSpriteFrameName("result_fx_text.png");//番字
+                fanFont->setAnchorPoint(Point(0.0f,0.5f));
+                fanFont->setPosition(Vec2(timesOfHu->getPosition().x+timesOfHu->getContentSize().width+6,kindOfHuBkgMinus->getTextureRect().size.height/2));
+                kindOfHuBkgMinus->addChild(fanFont);
+            }
+            else
+            {
+                AccountShows(WinBar,_roundManager->_curPlayer);
+                AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
+                AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
+            }
+            break;
+    }
+
+	_eventDispatcher->removeCustomEventListeners(DISTRIBUTE_DONE_EVENT_TYPE);
+	_eventDispatcher->removeCustomEventListeners(NOONE_WIN_EVENT_TYPE);
+	auto ShowoutOnce=Button::create("xuanyaoyixia1.png","xuanyaoyixia2.png","xuanyaoyixia2.png",UI_TEX_TYPE_PLIST);//炫耀一下
+	ShowoutOnce->addTouchEventListener(CC_CALLBACK_1(NetRaceLayer::display_callback,this));
+	ShowoutOnce->setAnchorPoint(Vec2(0.5,0.5));
+	ShowoutOnce->setPosition(Vec2(origin.x+visibleSize.width*0.2996716,origin.y+visibleSize.height*0.075419));
+	this->addChild(ShowoutOnce,11,SHINE_TAG_ID);
+
+	auto PlayOnceAgin=Button::create("zailaiyiju1.png","zailaiyiju2.png","zailaiyiju2.png",UI_TEX_TYPE_PLIST);
+	PlayOnceAgin->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnRestartHandler,this));
+	PlayOnceAgin->setAnchorPoint(Vec2(0.5,0.5));
+	PlayOnceAgin->setPosition(Vec2(origin.x+visibleSize.width*0.6247948,origin.y+visibleSize.height*0.075419));
+	this->addChild(PlayOnceAgin,11,RACE_RESTART_TAG_ID);
+}
+
+void  NetRaceLayer::showall()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+    HideClock();
+	
+	float x,y;
+	Sprite *p_list[MAX_HANDIN_NUM];
+
+    int winner = _roundManager->GetLastWinner();
+	for(int a=0;a<3;a++)
+	{
+		int no = (winner+a)%3;
+        
+		CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
+		for(int ik=0;ik<MAX_HANDIN_NUM;ik++)
+		{
+			if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik))
+				myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+no*20+ik,true);
+		}
+		x=_layout->_playerPosi[no].basePoint.x+10; 
+		y=_layout->_playerPosi[no].basePoint.y+10;
+		for(int i=0;i<list->len;i++)
+		{
+			if(list->data[i].kind!=ck_NOT_DEFINED )
+			{
+				if(no==0)
+				{
+					if(list->data[i].status==c_AN_GANG)
+					{
+						if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)
+						{
+							p_list[i]=_object->Create(LR_OUT_CARD);
+							p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
+							p_list[i]->setPosition(Vec2(x-10,y-8));
+							auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+							s_card->setRotation(90);
+							s_card->setScale(0.9);
+							p_list[i]->addChild(s_card);
+						}
+						else
+						{
+							p_list[i]=_object->Create(LR_AN_GANG_CARD);
+							p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
+							p_list[i]->setPosition(Vec2(x-10,y-8));
+						}
+					}
+					else
+					{
+						p_list[i]=_object->Create(LR_OUT_CARD);
+						p_list[i]->setAnchorPoint(Vec2(0.3f,1.0f));
+						p_list[i]->setPosition(Vec2(x-10,y-8));
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+						s_card->setRotation(90);
+						s_card->setScale(0.9);
+						p_list[i]->addChild(s_card);
+					}
+					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
+						y-=((p_list[i]->getTextureRect().size.height)*0.65);
+					else if(list->data[i].status==c_PENG)
+					{
+						if((list->data[i+1].kind!=list->data[i].kind)||((list->data[i+1].kind==list->data[i].kind)&&(list->data[i+1].status!=list->data[i].status)))
+							y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						else
+							y-=((p_list[i]->getTextureRect().size.height)*0.65);
+					}
+					else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
+					{
+						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+							y-=((p_list[i]->getTextureRect().size.height)*0.65);
+						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+							y+=13;
+						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+							y-=(((p_list[i]->getTextureRect().size.height)*0.65)+13);
+						else if(list->data[i].kind!=list->data[i+1].kind)//4
+						{
+							if(list->data[i+1].kind!=list->data[i].kind)
+								y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
+							else
+								y-=((p_list[i]->getTextureRect().size.height)*0.65);
+						}
+					}
+				}
+				else if(no==1)
+				{
+					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
+						p_list[i]=_object->Create(MING_CARD);
+					else if(list->data[i].status==c_PENG||list->data[i].status==c_MING_GANG)
+						p_list[i]=_object->Create(PENG_CARD);
+					else if(list->data[i].status==c_AN_GANG)
+					{
+						if(list->data[i].kind==list->data[i+1].kind && list->data[i].kind!=list->data[i+2].kind)
+							p_list[i]=_object->Create(PENG_CARD);
+						else
+							p_list[i]=_object->Create(AN_GANG_CARD);
+					}
+					p_list[i]->setAnchorPoint(Vec2(0,0));
+					p_list[i]->setPosition(Vec2(x,y));
+					if(list->data[i].status==c_FREE)
+					{
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
+						s_card->setAnchorPoint(Vec2(0.5,0.5));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+						p_list[i]->addChild(s_card,1);
+						x+=p_list[i]->getTextureRect().size.width*1.0;
+					}
+					else if(list->data[i].status==c_MING_KOU)
+					{
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,NORMAL);
+						s_card->setAnchorPoint(Vec2(0.5,0.5));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+						p_list[i]->addChild(s_card,1);
+						x += p_list[i]->getTextureRect().size.width*1;
+					}
+					else if(list->data[i].status==c_PENG)
+					{
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+						s_card->setAnchorPoint(Vec2(0.5,0.5));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+						p_list[i]->addChild(s_card,1);
+						if(list->data[i+1].status==c_FREE)
+							x += p_list[i]->getTextureRect().size.width*2;
+						else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
+							x += p_list[i]->getTextureRect().size.width*1.5;
+						else
+							x += p_list[i]->getTextureRect().size.width*1.0;
+					}
+					else if(list->data[i].status==c_MING_GANG)
+					{
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+						s_card->setAnchorPoint(Vec2(0.5,0.5));
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+						p_list[i]->addChild(s_card,1);
+						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+							x+=p_list[i]->getTextureRect().size.width*1.0;
+						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+							y+=17;
+						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+						{
+							x+=p_list[i]->getTextureRect().size.width*1.0;
+							y-=17;
+						}
+						else if(list->data[i].kind!=list->data[i+1].kind)//4
+						{
+							if(list->data[i+1].status==c_FREE)
+								x += p_list[i]->getTextureRect().size.width*2;
+							else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
+								x += p_list[i]->getTextureRect().size.width*1.5;
+							else
+								x += p_list[i]->getTextureRect().size.width*1.0;
+						}
+					}
+					else if(list->data[i].status==c_AN_GANG)
+					{
+						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+							x+=p_list[i]->getTextureRect().size.width*1.0;
+						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+							y+=17;
+						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+						{
+							auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+							s_card->setAnchorPoint(Vec2(0.5,0.5));
+							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
+							p_list[i]->addChild(s_card,1);
+							x+=p_list[i]->getTextureRect().size.width*1.0;
+							y-=17;
+						}
+						else if(list->data[i].kind!=list->data[i+1].kind)//4
+						{
+							if(list->data[i+1].status==c_FREE)
+								x += p_list[i]->getTextureRect().size.width*2;
+							else if(list->data[i].kind!=list->data[i+1].kind &&(list->data[i+1].status!=c_FREE))
+								x += p_list[i]->getTextureRect().size.width*1.5;
+							else
+								x += p_list[i]->getTextureRect().size.width*1.0;
+						}
+					}
+				}
+				else if(no==2)
+				{
+					if(list->data[i].status==c_AN_GANG)
+					{
+						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+						{
+							p_list[i]=_object->Create(LR_OUT_CARD);
+							p_list[i]->setAnchorPoint(Vec2(0.3,0));
+							p_list[i]->setPosition(Vec2(x-10,y-8));
+							auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+							s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+							s_card->setRotation(-90);
+							s_card->setScale(0.9);
+							p_list[i]->addChild(s_card);
+						}
+						else
+						{
+							p_list[i]=_object->Create(LR_AN_GANG_CARD);
+							p_list[i]->setAnchorPoint(Vec2(0.3,0));
+							p_list[i]->setPosition(Vec2(x-10,y-8));
+						}
+					}
+					else
+					{
+						p_list[i]=_object->Create(LR_OUT_CARD);
+						p_list[i]->setAnchorPoint(Vec2(0.3,0));
+						p_list[i]->setPosition(Vec2(x-10,y-8));
+						auto s_card=_object->CreateKind((Card_t)list->data[i].kind,SMALL);
+						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.65));
+						s_card->setRotation(-90);
+						s_card->setScale(0.9);
+						p_list[i]->addChild(s_card);
+					}
+					if(list->data[i].status==c_FREE||list->data[i].status==c_MING_KOU)
+						y+=((p_list[i]->getTextureRect().size.height)*0.65);
+					else if(list->data[i].status==c_PENG)
+					{
+						if((list->data[i+1].kind!=list->data[i].kind)||((list->data[i+1].kind==list->data[i].kind)&&(list->data[i+1].status!=list->data[i].status)))
+							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+						else
+							y+=((p_list[i]->getTextureRect().size.height)*0.65);
+					}
+					else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
+					{
+						if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind==list->data[i+3].kind)&&(list->data[i].kind!=list->data[i+4].kind))//1
+							y+=(p_list[i]->getTextureRect().size.height*0.65+13);
+						else if((list->data[i].kind==list->data[i+1].kind)&&(list->data[i].kind==list->data[i+2].kind)&&(list->data[i].kind!=list->data[i+3].kind))//2
+							y-=13;
+						else if(list->data[i].kind==list->data[i+1].kind&&list->data[i].kind!=list->data[i+2].kind)//3
+							y+=((p_list[i]->getTextureRect().size.height)*0.65);
+						else if(list->data[i].kind!=list->data[i+1].kind)//4
+						{
+							if(list->data[i+1].kind!=list->data[i].kind)
+								y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
+							else
+								y+=((p_list[i]->getTextureRect().size.height)*0.65);
+						}
+					}
+				}
+				if(no!=2)
+					myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+no*20+i);
+				else if(no==2)
+					myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+no*20+i);
+				p_list[i]->_ID=1;
+			}
+		}
+	}
+}
+
+/***********************************************************
+        button accessosaries
+***********************************************************/
+void NetRaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+
+			auto startIcon = _object->CreateStartGame();
+			this->addChild(startIcon,2,START_GAME_TAG_ID+1);
+
+			this->runAction(
+                Sequence::create(
+                    Spawn::create(
+                        TargetedAction::create(curButton,Sequence::create(
+                            DelayTime::create(0.1),
+                            FadeOut::create(0.2),NULL)),
+                        TargetedAction::create(startIcon,Spawn::create(
+                            ScaleTo::create(0.3,1.3),
+                            FadeOut::create(0.3),NULL)),
+                        _voice->Speak("anniu.ogg"),NULL),
+                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::StartGame)),NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	auto curButton=(Button*)pSender;
+
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		{
+			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON))->setTouchEnabled(true);
+			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
+            
+            _InitResidueCards();
+			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			curButton->setTouchEnabled(false);
+            
+			auto restartBtn = _object->CreateRestartGame();
+			this->addChild(restartBtn,2,RACE_RESTART_TAG_ID+1);
+
+			this->runAction(
+                Sequence::create(
+                    Spawn::create(TargetedAction::create(
+                        restartBtn,Spawn::create(
+                            ScaleTo::create(0.3,1.3),
+                            FadeOut::create(0.3),NULL)),
+                        _voice->Speak("anniu.ogg"),NULL),
+                    DelayTime::create(0.2),CallFunc::create(this,callfunc_selector(
+                    NetRaceLayer::StartGame)),NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            LOGGER_WRITE("%s",__FUNCTION__);
+            
+			if(this->getChildByTag(ROBOT_TUO_GUAN))
+				this->removeChildByTag(ROBOT_TUO_GUAN,true);//TUOGUAN_CANCEL_BUTTON
+			
+			auto TuoGuanButton=(Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON);
+			TuoGuanButton->setTouchEnabled(true);
+			TuoGuanButton->setHighlighted(false);
+			curButton->setTouchEnabled(false);
+			curButton->setScale(0);
+			_roundManager->_isTuoGuan=false;
+			auto StartSelfGame=CallFunc::create([=](){
+				if( !_roundManager->IsTing(1) )
+					ListenToCardTouch();
+				else
+					ListenToTingButton();
+			});
+			myframe->runAction(Sequence::create(CallFunc::create([=](){this->removeChildByTag(TUOGUAN_CANCEL_BUTTON,true);}),StartSelfGame,NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
+{
+    auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			_eventDispatcher->removeEventListenersForTarget(myframe,true);//???????
+
+			_roundManager->_isTuoGuan=true;
+			curButton->setTouchEnabled(false);
+			curButton->setHighlighted(true);
+
+			auto TuoGuanCancel=Button::create("quxiaotuoguan2.png","quxiaotuoguan1.png","quxiaotuoguan2.png",UI_TEX_TYPE_PLIST);
+			TuoGuanCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnTuoGuanCancelHandler,this));
+			TuoGuanCancel->setAnchorPoint(Vec2(0.5,0.5));
+			TuoGuanCancel->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*60/716));
+			this->addChild(TuoGuanCancel,19,TUOGUAN_CANCEL_BUTTON);
+
+			auto layer_color=LayerColor::create();
+			layer_color->setColor(Color3B(0,0,0));
+			layer_color->ignoreAnchorPointForPosition(false);
+			layer_color->setAnchorPoint(Vec2(0,0));
+			layer_color->setPosition(Vec2(origin.x,origin.y));
+			layer_color->setContentSize(Size(visibleSize.width,visibleSize.height*120/716));
+			layer_color->setOpacity(150);
+			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
+            
+			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision)
+			{
+				_DeleteActionTip();
+				_roundManager->_isWaitDecision=false;
+				_roundManager->_tempActionToDo=a_JUMP;
+                
+				if(_roundManager->_isCardFromOthers)
+				{
+					if(_roundManager->_isQiangGangAsking)
+					{
+						_roundManager->_isQiangGangAsking=false;
+                        
+						auto GoldAccount=CallFunc::create([=](){
+							GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
+							_roundManager->_qiangGangTargetNo=-1;
+						});
+						auto curSeq=Sequence::create(
+                            GoldAccount,CallFunc::create([=](){
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL);
+						myframe->runAction(curSeq);
+					}
+					else if(_roundManager->_isDoubleHuAsking)
+					{
+						_roundManager->_isDoubleHuAsking = false;
+						auto huFunc=CallFunc::create([=](){_HuEffect(_roundManager->_otherOneForDouble);});
+						myframe->runAction(huFunc);
+					}
+					else
+					{
+						_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
+						myframe->runAction(CallFunc::create([=](){
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}));
+					}
+				}
+				else {
+					_roundManager->WaitForMyChoose();
+                }
+			}
+			else
+			{
+				if(_roundManager->_isMyShowTime)
+				{
+					_roundManager->_isMyShowTime=false;
+					_roundManager->_actionToDo=a_JUMP;
+					if(_roundManager->_lastAction==a_JUMP)
+						_roundManager->_continue_gang_times=0;
+					_roundManager->_lastAction=a_JUMP;
+
+					_roundManager->WaitForMyChoose();
+				}
+			}
+			//else if(ifMyTime)
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+			auto scene = Scene::create();
+			auto startLayer=HelloWorld::create();
+			scene->addChild(startLayer,1);
+			Director::sharedDirector()->replaceScene(scene);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::BtnBackCancelHandler(Ref* pSender,ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			
+			auto backBUtton=(Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON);
+			backBUtton->setTouchEnabled(true);
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+			(this->getChildByTag(GAME_BACK_BAR))->runAction(ScaleTo::create(0,0));
+
+			auto StartSelfGame=CallFunc::create([=](){
+				if(_roundManager->_isGameStart)
+				{
+					if(!_roundManager->IsTing(1))
+						ListenToCardTouch();
+					else
+						ListenToTingButton();
+				}
+			});
+			if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
+				((Button*)this->getChildByTag(TUOGUAN_CANCEL_BUTTON))->setTouchEnabled(true);
+			this->runAction(Sequence::create(
+                CallFunc::create([=](){this->removeChildByTag(GAME_BACK_BAR,true);}),
+                StartSelfGame,NULL));
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::BtnBackHandler(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+	auto VoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");});
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			curButton->setTouchEnabled(false);
+			Back();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
+void NetRaceLayer::Back()
+{
+    LOGGER_WRITE("%s",__FUNCTION__);
+
+	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("GlobalUI.plist");
+
+	if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
+		((Button*)this->getChildByTag(TUOGUAN_CANCEL_BUTTON))->setTouchEnabled(false);
+	while(this->getChildByTag(GAME_BACK_BAR))
+		this->removeChildByTag(GAME_BACK_BAR);
+
+	auto backChooseBkg=LayerColor::create();
+	backChooseBkg->setContentSize(Size(visibleSize.width,visibleSize.height));
+	backChooseBkg->setColor(Color3B(28,120,135));
+	//backChooseBkg->setColor(Color3B(114,83,52));
+	backChooseBkg->setOpacity(50);
+	backChooseBkg->setPosition(Vec2::ZERO);
+	this->addChild(backChooseBkg,20,GAME_BACK_BAR);
+
+	EventListenerTouchOneByOne* backChooseListener=EventListenerTouchOneByOne::create();
+	backChooseListener->setSwallowTouches(true);
+	backChooseListener->onTouchBegan=[=](Touch* touch, Event* event){return true;};
+	backChooseListener->onTouchMoved=[=](Touch* touch, Event* event){};
+	backChooseListener->onTouchEnded=[=](Touch* touch, Event* event){};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(backChooseListener,backChooseBkg);
+
+	auto backChooseBar=Sprite::createWithSpriteFrameName("gameprompt.png");
+	backChooseBar->ignoreAnchorPointForPosition(false);
+	backChooseBar->setAnchorPoint(Vec2(0.5,0.5));
+	backChooseBar->setPosition(Vec2(backChooseBkg->getContentSize().width/2,backChooseBkg->getContentSize().height/2));
+	backChooseBkg->addChild(backChooseBar,0);
+
+	auto strings = CCDictionary::createWithContentsOfFile("fonts/NewString.xml");
+	auto nameofTishi = ((CCString*)strings->objectForKey("GameBackString"))->getCString();
+	auto kindOfHu = LabelTTF::create(nameofTishi, "Arial", 40);
+	kindOfHu->setColor(Color3B(114,83,52));
+	kindOfHu->setAnchorPoint(Vec2(0.5,0.5));
+	kindOfHu->ignoreAnchorPointForPosition(false);
+	kindOfHu->setPosition(Vec2(backChooseBar->getContentSize().width/2,backChooseBar->getContentSize().height*0.6+20));
+	backChooseBar->addChild(kindOfHu,2);
+
+	auto ensureBut=Button::create("tuichu2.png","tuichu.png","tuichu.png",UI_TEX_TYPE_PLIST);//退出
+	ensureBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackConfirmHandler,this));
+	ensureBut->setAnchorPoint(Vec2(0.5,0.5));
+	ensureBut->setPosition(Vec2(backChooseBar->getContentSize().width*0.75-15,backChooseBar->getContentSize().height*0.3));
+	backChooseBar->addChild(ensureBut);
+
+	auto BackBut=Button::create("jixuyouxi2.png","jixuyouxi.png","jixuyouxi.png",UI_TEX_TYPE_PLIST);//继续游戏
+	BackBut->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnBackCancelHandler,this));
+	BackBut->setAnchorPoint(Vec2(0.5,0.5));
+	BackBut->setPosition(Vec2(backChooseBar->getContentSize().width*0.25+15,backChooseBar->getContentSize().height*0.3));
+	backChooseBar->addChild(BackBut);
+}
 
 /***********************************************
         general support
