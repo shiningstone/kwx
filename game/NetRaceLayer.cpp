@@ -124,7 +124,7 @@ void NetRaceLayer::CreateRace()
 
     _eventDispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(
         DISTRIBUTE_CALL_EVENT_TYPE, [this](EventCustom * event){
-        _DispatchDistributeCardEvents();}), 
+        _DispatchDistributeCardEvents(event->getUserData());}), 
         2);
 }
 
@@ -643,18 +643,22 @@ void NetRaceLayer::DistributeTo(PlayerDir_t dir,int lenOfInHand) {
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
 
-void NetRaceLayer::Call_DistributeCard(PlayerDir_t dir) {
-    PlayerDir_t receiver = dir;
-	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,&receiver);
+void NetRaceLayer::Call_DistributeCard(PlayerDir_t dir,Card_t card,int num) {
+    DistributeInfo_t distInfo;
+    
+    distInfo.target = dir;
+    distInfo.card   = card;
+    distInfo.distNum = num;
+
+	_DistributeEvent(DISTRIBUTE_CALL_EVENT_TYPE,&distInfo);
 }
 
-void NetRaceLayer::_DispatchDistributeCardEvents()
+void NetRaceLayer::_DispatchDistributeCardEvents(void *data)
 {
-	if(_roundManager->_distributedNum<TOTAL_CARD_NUM) {
-        DCI scard;
-		scard.card = CARD_KIND(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4);
-		scard.num = _roundManager->_distributedNum;
-		_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&scard);
+    DistributeInfo_t *distInfo = static_cast<DistributeInfo_t *>(data);
+    
+	if(distInfo->distNum<TOTAL_CARD_NUM) {
+		_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,distInfo);
 	}
 	else {
 		_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
@@ -665,14 +669,15 @@ void NetRaceLayer::ListenToDistributeCard() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
-		auto userData = static_cast<DCI*>(event->getUserData());
+		auto userData = static_cast<DistributeInfo_t *>(event->getUserData());
         
-		_roundManager->_lastHandedOutCard = userData->card;
-		_roundManager->_distributedNum    = userData->num;
-        _roundManager->_isCardFromOthers = false;
+		_roundManager->_lastHandedOutCard = (CARD_KIND)userData->card;
+        _roundManager->_isCardFromOthers  = false;
 
-        auto cards = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
-		DistributeTo((PlayerDir_t)_roundManager->_curPlayer,cards->len-1);
+        auto target = userData->target;
+        
+        auto cards = _roundManager->_players[target]->get_parter()->get_card_list();
+		DistributeTo(target,cards->len-1);
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 

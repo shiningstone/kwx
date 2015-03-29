@@ -1158,7 +1158,9 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 }
 
 void RoundManager::DistributeTo(PlayerDir_t dir) {
-    _uiManager->Call_DistributeCard(dir);
+    Card_t card = (Card_t)(_unDistributedCards[_distributedNum++]/4);
+    
+    _uiManager->Call_DistributeCard(dir,card,_distributedNum);
 }
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {
