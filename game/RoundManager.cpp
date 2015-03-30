@@ -576,8 +576,8 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 
 	if((action1&a_HU)&&(action2&a_HU)) {
         WinInfo_t win;
-        win.kind = DOUBLE_WIN;
-        win.winner = (PlayerDir_t)_curPlayer;
+        win.kind  = DOUBLE_WIN;
+        win.loser = (PlayerDir_t)_curPlayer;
         
         if(no1==1) {
             _actionToDo=action1;
@@ -595,6 +595,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         WinInfo_t win;
         win.kind = SINGLE_WIN;
         win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
+        win.loser = _curPlayer;
 
         if(no1==1)
             _actionToDo=action1;
