@@ -11,7 +11,8 @@
 RoundManager::RoundManager(NetRaceLayer *uiManager) {
     _uiManager = uiManager;
 
-    _lastWin.player = INVALID_DIR;
+    _lastWin.winner = INVALID_DIR;
+    _lastWin.loser  = INVALID_DIR;
 
     _river = NULL;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
@@ -42,7 +43,7 @@ RoundManager::~RoundManager() {
 PlayerDir_t RoundManager::GetLastWinner() {
     if( _lastWin.winner==INVALID_DIR ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-        _lastWin.player = MIDDLE;
+        _lastWin.winner = MIDDLE;
     }
     return _lastWin.winner;
 }
@@ -66,8 +67,8 @@ void RoundManager::GetWin(WinInfo_t &info) {
 
 bool RoundManager::IsWinner(int no) {
 	if((_lastWin.kind==SINGLE_WIN&&
-                ((_lastWin.player==_curPlayer && _lastWin.player!=no)
-                ||(_lastWin.player!=_curPlayer && no!=_lastWin.player && no!=_curPlayer)))
+                ((_lastWin.winner==_curPlayer && _lastWin.winner!=no)
+                ||(_lastWin.winner!=_curPlayer && no!=_lastWin.winner && no!=_curPlayer)))
         ||(_lastWin.kind==NONE_WIN && _firstMingNo!=INVALID && no!=_firstMingNo)) {
         return true;
     } else {
@@ -611,7 +612,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         WinInfo_t win;
         win.kind = SINGLE_WIN;
         win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
-        win.loser = _curPlayer;
+        win.loser = (PlayerDir_t)_curPlayer;
 
         if(no1==1)
             _actionToDo=action1;
