@@ -743,8 +743,7 @@ void RoundManager::WaitForMyAction() {
 void RoundManager::WaitForMyChoose() {
 	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
-                (IsTing(_curPlayer) 
-                && !_isGangAsking) ) {
+                (IsTing(_curPlayer) && !_isGangAsking) ) {
             auto cards = _players[MIDDLE]->get_parter()->get_card_list();
             Vec2 location = _uiManager->GetCardPositionInHand(cards->len-1);
             RecvHandout(cards->len-1,location,2);
@@ -956,6 +955,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         }
     }else{
         int no=((PlayerDir_t)dir+1)%3;
+        
         unsigned char action1 = 
             _players[no]->get_parter()->hand_in(
                 _lastHandedOutCard,

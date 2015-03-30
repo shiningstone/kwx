@@ -186,10 +186,6 @@ void NetRaceLayer::WaitForFirstAction(PlayerDir_t zhuang)
     _roundManager->WaitForFirstAction(zhuang);
 }
 
-Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
-    return _GetCardInHand(MIDDLE,idx)->getPosition();
-}
-
 void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
     myframe->_ID = dir;
     
@@ -2656,7 +2652,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                 DelayTime::create(0.1),
                 ScaleTo::create(0,0),NULL)),NULL);
 		
-	if(dir!=1) {
+	if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
                                 _voice->SpeakAction(PENG,_roundManager->_cardHolders[dir]->GetSex()),
@@ -3003,7 +2999,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
 	delete gang;
 
-    if(no!=1) {
+    if(no!=MIDDLE) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
                 _voice->SpeakAction(GANG,
@@ -6371,7 +6367,10 @@ void NetRaceLayer::Back()
 /***********************************************
         general support
 ***********************************************/
-    
+Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
+    return _GetCardInHand(MIDDLE,idx)->getPosition();
+}
+
 Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 {
     auto bgOfGang=Sprite::createWithSpriteFrameName("mojixx.png");
