@@ -103,14 +103,14 @@ private:
     void _CalcDoubleWinGold(int goldOfPlayer[3], int giver);
     void _CalcNoneWinGold(int goldOfPlayer[3], int giver);
     void _CalcHuGold(int goldOfPlayer[3]);
-    void CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give);
+    void CalculateGoldNum(int goldOfPlayer[3],PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t who_give);
 
     void DispatchAction(Node *psender,ARRAY_ACTION action);
     Sprite *_CreateEffectCard(int i,CARD_KIND value );
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
     void GuiJinBiShow(PlayerDir_t dir, int gold);
-    void GoldNumInsert(int GoldWinner,int Gold_kind,int who_give);
+    void GoldNumInsert(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
     void _GuiUpdateScore(LayerColor *layer,int score);
 
     void _ClockAddTime( Sprite *clock, int time );

@@ -268,7 +268,7 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
 
 void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
-        GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
+        GoldNumInsert((PlayerDir_t)winner,MING_GANG,(PlayerDir_t)whoGive);}),CallFunc::create([=](){
         _roundManager->DistributeTo((PlayerDir_t)winner);}),NULL));
 }
 
@@ -658,7 +658,7 @@ void NetRaceLayer::ListenToDistributeCard() {
             Sequence::create(
                 DelayTime::create(0.5),CallFunc::create([=](){
     			if(_roundManager->_firstMingNo!=-1)
-    				GoldNumInsert(4,3,_roundManager->_firstMingNo);}),
+    				GoldNumInsert(INVALID_DIR,HU_WIN,(PlayerDir_t)_roundManager->_firstMingNo);}),
     			DelayTime::create(1),
     			Spawn::create(CallFunc::create([=](){
         			this->addChild(_object->CreateHuangZhuangBkg(),10,HUANG_ZHUANG_LAYER);
@@ -1098,7 +1098,7 @@ void NetRaceLayer::ListenToDoubleHu() {
                 NetRaceLayer::showall)),
                 simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+1)%3)),"dahu.png"),
                 simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+2)%3)),"dahu.png"),NULL),CallFunc::create([=](){
-            GoldNumInsert(3,3,_roundManager->_curPlayer);}),NULL));
+            GoldNumInsert(INVALID_DIR,HU_WIN,(PlayerDir_t)_roundManager->_curPlayer);}),NULL));
     });
     
     _eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
@@ -1805,7 +1805,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,boo
                 ScaleTo::create(0,0),NULL)),NULL);
 
         goldEffect = CallFunc::create([=](){
-            GoldNumInsert(dir,2,prevDir);});
+            GoldNumInsert(dir,MING_GANG,prevDir);});
     }
     
     myframe->runAction(Sequence::create(
@@ -2986,7 +2986,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             Spawn::create(
                 _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
-			GoldNumInsert(dir,1,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
+			GoldNumInsert(dir,AN_GANG,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
             _roundManager->UpdateCards(dir,a_AN_GANG);}), CCCallFunc::create([=]() {
             _CardInHandUpdateEffect(dir);}),
@@ -3278,7 +3278,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),
             DelayTime::create(0.48), CallFunc::create([=](){
-			GoldNumInsert(dir,1,dir);}),CallFunc::create([=](){
+			GoldNumInsert(dir,AN_GANG,dir);}),CallFunc::create([=](){
             _roundManager->DistributeTo(dir);}),NULL));
 	}
 }
@@ -3707,7 +3707,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
             _roundManager->UpdateCards(dir,a_MING_GANG);}),
             DelayTime::create(0.48),CallFunc::create([=](){
 			if(_roundManager->_isCardFromOthers)
-				GoldNumInsert(dir,2,prevDir);}),CallFunc::create([=](){
+				GoldNumInsert(dir,MING_GANG,prevDir);}),CallFunc::create([=](){
             _roundManager->ActionAfterGang(dir);}),NULL));
 	}
 }
@@ -3733,7 +3733,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
                 Spawn::create(
                     _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex()),
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),NULL),CallFunc::create([=](){
-				GoldNumInsert(winner,3,giver);}),CallFunc::create(this,callfunc_selector(
+				GoldNumInsert(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
                 NetRaceLayer::showall)),NULL));
 		} else {
             Sequence *backgroundEffect = _roundManager->IsTing(MIDDLE) 
@@ -3746,7 +3746,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 			myframe->runAction(Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
                     _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex()),CallFunc::create([=](){
-    				GoldNumInsert(winner,3,giver);}),
+    				GoldNumInsert(winner,HU_WIN,giver);}),
                     backgroundEffect,NULL));
 		}
 	} else {
@@ -3787,7 +3787,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 
 				myframe->runAction(Sequence::create(
                     hideQiReminder,Spawn::create(CallFunc::create([=](){
-    					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
+    					GoldNumInsert((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
     					_roundManager->_qiangGangTargetNo = INVALID;/*!!! could this be called before runAction */}),CallFunc::create([=](){
                         _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
 			} else if(_roundManager->_isDoubleHuAsking) {
@@ -4567,18 +4567,19 @@ void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
     }
 }
 
-void NetRaceLayer::CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give) {
+void NetRaceLayer::CalculateGoldNum(int goldOfPlayer[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
 	goldOfPlayer[0]=0;
 	goldOfPlayer[1]=0;
 	goldOfPlayer[2]=0;
 
-	if(Gold_kind==AN_GANG) {
-		_CalcAnGangGold(GoldWinner,goldOfPlayer);
-	} else if(Gold_kind==MING_GANG) {
-        _CalcMingGangGold(GoldWinner,who_give,goldOfPlayer);
-	} else if(Gold_kind==HU_WIN) {
-    	_CalcHuGold(goldOfPlayer);
-	}
+    switch(goldKind) {
+        case AN_GANG:
+            return _CalcAnGangGold(GoldWinner,goldOfPlayer);
+        case MING_GANG:
+            return _CalcMingGangGold(GoldWinner,whoGive,goldOfPlayer);
+        case HU_WIN:
+            return _CalcHuGold(goldOfPlayer);
+    }
 }
 
 void NetRaceLayer::_UpdateGouldAccount(int id,int gold) {
@@ -4660,9 +4661,10 @@ void NetRaceLayer::GuiJinBiShow(PlayerDir_t dir, int gold) {
         ScaleTo::create(0,0),NULL));
 }
 
-void NetRaceLayer::GoldNumInsert(int GoldWinner,int Gold_kind,int who_give)
+/* GoldWinner is useless when goldKind equals HU_WIN */
+void NetRaceLayer::GoldNumInsert(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive)
 {
-    CalculateGoldNum(GoldAccountImmediate,GoldWinner,Gold_kind,who_give);
+    CalculateGoldNum(GoldAccountImmediate,GoldWinner,Gold_kind,whoGive);
     UpdateGoldAccounts(GoldAccountImmediate);
 
 	for(int id=0;id<3;id++) {
@@ -6032,7 +6034,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 						_roundManager->_isQiangGangAsking=false;
                         
 						myframe->runAction(Sequence::create(CallFunc::create([=](){
-							GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
+							GoldNumInsert((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
 							_roundManager->_qiangGangTargetNo=INVALID;}),CallFunc::create([=](){
                             _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
 					} else if(_roundManager->_isDoubleHuAsking) {
