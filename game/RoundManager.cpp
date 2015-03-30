@@ -49,12 +49,19 @@ PlayerDir_t RoundManager::GetLastWinner() {
 
 void RoundManager::SetWin(WinKind_t kind,int player) {
     _lastWin.kind       = kind;
-    _lastWin.player     = (PlayerDir_t)player;
+
+    if(kind==DOUBLE_WIN) {
+        _lastWin.loser = (PlayerDir_t)player;
+    } else {
+        _lastWin.winner = (PlayerDir_t)player;
+        _lastWin.loser  = (PlayerDir_t)_curPlayer;
+    }
 }
 
 void RoundManager::GetWin(WinInfo_t &info) {
     info.kind   = _lastWin.kind;
-    info.player = _lastWin.player;
+    info.winner = _lastWin.winner;
+    info.loser  = _lastWin.loser;
 }
 
 bool RoundManager::IsWinner(int no, int curPlayer, int FirstMingPlayer) {
@@ -762,7 +769,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     auto list=_players[dir]->get_parter()->get_card_list();
 
     if(_actionToDo&a_HU) {
-        _uiManager->_HuEffect(dir);
+        RecvHu(dir);
     } else if(_actionToDo&a_AN_GANG||_actionToDo&a_SHOU_GANG) {
         _continue_gang_times++;
         _lastActionSource = dir;
@@ -944,10 +951,9 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                     _actionToDo=a_JUMP;
         }
         
-        if((PlayerDir_t)dir==MIDDLE)
-        {
-            if(_players[MIDDLE]->get_parter()->get_ting_status()==1&&(_actionToDo&a_HU)){
-                _uiManager->_HuEffect(MIDDLE);
+        if((PlayerDir_t)dir==MIDDLE) {
+            if(IsTing(MIDDLE)&&(_actionToDo&a_HU)){
+                RecvHu(MIDDLE);
             }else{
                 if(_isTuoGuan)
                     _actionToDo=a_JUMP;
@@ -970,9 +976,8 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _isGangHua
             );
         
-        if(no==1&&_isTuoGuan)
-        {
-            if(_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
+        if(no==MIDDLE&&_isTuoGuan) {
+            if(IsTing(MIDDLE)&&(action1&a_HU))
                 action1=a_HU;
             else
                 action1=a_JUMP;
@@ -1070,21 +1075,23 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         if((action1&a_HU)&&(action2&a_HU))
         {
             _uiManager->HideClock();
+            
             if((no!=1&&no1!=1)||(no==1||no1==1&&_players[1]->get_parter()->get_ting_status()==1))
             {
-                _uiManager->_HuEffect(3);
+                WinInfo_t win;
+                win.kind  = DOUBLE_WIN;
+                win.loser = (PlayerDir_t)_curPlayer;
+                
+                _uiManager->_HuEffect(win);
                 _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
             }
             else if((no==1||no1==1)&&_players[1]->get_parter()->get_ting_status()==0)
             {
                 _isDoubleHuAsking = true;
-                if(no==1)
-                {
+                if(no==1) {
                     _otherOneForDouble = no1;
                     _actionToDo=action1;
-                }
-                else
-                {
+                } else {
                     _otherOneForDouble = no;
                     _actionToDo=action2;
                 }                   
@@ -1095,14 +1102,11 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         else if(action1&a_HU||action2&a_HU)//点炮
         {
             _uiManager->HideClock();
-            if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU)))
-            {
-                if(_players[1]->get_parter()->get_ting_status()==1)//&&_actionToDo&a_HU)
-                {
-                    _uiManager->_HuEffect(1);
-                }
-                else
-                {
+            
+            if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU))) {
+                if(_players[1]->get_parter()->get_ting_status()==1) {
+                    RecvHu(MIDDLE);
+                } else {
                     if(no==1)
                         _actionToDo=action1;
                     else
@@ -1111,10 +1115,12 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                     return;
                 }
             }
-            else if(no!=1&&(action1&a_HU))
-                _uiManager->_HuEffect(no);
-            else if(no1!=1&&(action2&a_HU))
-                _uiManager->_HuEffect(no1);
+            else if(no!=1&&(action1&a_HU)) {
+                RecvHu((PlayerDir_t)no);
+            }
+            else if(no1!=1&&(action2&a_HU)) {
+                RecvHu((PlayerDir_t)no1);
+            }
         }
         else if(action1!=a_JUMP)//下家
         {
