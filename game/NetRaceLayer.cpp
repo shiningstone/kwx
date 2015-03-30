@@ -3728,138 +3728,26 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
     PlayerDir_t giver  = win.giver;
 
 	if(win.kind!=DOUBLE_WIN) {
-		auto callfunc = simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png");
-        CallFunc*HuVoice = _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex());
-
         if(winner!=MIDDLE) {
 			myframe->runAction(Sequence::create(
                 Spawn::create(
-                    HuVoice,
-                    callfunc,NULL),CallFunc::create([=](){
+                    _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex()),
+                    simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),NULL),CallFunc::create([=](){
 				GoldNumInsert(winner,3,giver);}),CallFunc::create(this,callfunc_selector(
                 NetRaceLayer::showall)),NULL));
 		} else {
-			Sequence* g_seq1;
-			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1) {
-			    g_seq1 = _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5);
-			}
-
-			auto centerExplode=Sprite::createWithSpriteFrameName("101.png");
-			centerExplode->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(centerExplode,30,IMG_101_EFFECT_TAG_ID);
-			centerExplode->setOpacity(200);
-			centerExplode->setScale(0);
-			auto animation = Animation::create();
-			animation->addSpriteFrameWithFile("101.png");
-			animation->addSpriteFrameWithFile("103.png");
-			animation->addSpriteFrameWithFile("105.png");
-			animation->addSpriteFrameWithFile("106.png");
-			animation->setDelayPerUnit(0.05f);
-			animation->setRestoreOriginalFrame(true);
-			auto action = Animate::create(animation);
-			auto action1=Repeat::create(action,3);
-			auto l_seq1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(callfunc,action1,NULL),FadeOut::create(0.1),NULL);
-			//auto l_seq1=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),action1,FadeOut::create(0.1),NULL);
-			auto ll_action1=TargetedAction::create(centerExplode,l_seq1);
-
-			auto lightCircle=Sprite::createWithSpriteFrameName("4.png");
-			lightCircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(lightCircle,29,IMG_4_EFFECT_TAG_ID);
-			lightCircle->setRotation(90);
-			lightCircle->setScaleX(0);
-			lightCircle->setScaleY(0);
-			lightCircle->setOpacity(150);
-			BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
-			lightCircle->setBlendFunc(tmp_oBlendFunc);
-			auto l_seq2=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.2,0.6),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,0.4,4.0)),EaseSineIn::create(FadeOut::create(0.5)),NULL),NULL);
-			auto ll_action2=TargetedAction::create(lightCircle,l_seq2);
-
-			auto lightCircle2=Sprite::createWithSpriteFrameName("Q13.png");
-			lightCircle2->setAnchorPoint(Vec2(0.5,0));
-			lightCircle2->setOpacity(180);
-			lightCircle2->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
-			myframe->addChild(lightCircle2,30,IMG_Q13_EFFECT_TAG_ID);
-			lightCircle2->setScale(0);
-			auto l_seq3=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.5)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action3=TargetedAction::create(lightCircle2,l_seq3);
-
-			auto lightCircle3=Sprite::createWithSpriteFrameName("Q13.png");
-			lightCircle3->setAnchorPoint(Vec2(0.5,0));
-			lightCircle2->setOpacity(180);
-			lightCircle3->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
-			myframe->addChild(lightCircle3,30,IMG_Q13_2_EFFECT_TAG_ID);
-			lightCircle3->setScale(0);
-			auto l_seq4=Sequence::create(DelayTime::create(0.5),ScaleTo::create(0,0.26),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.5)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action4=TargetedAction::create(lightCircle3,l_seq4);
-			
-			auto lightCircle4=Sprite::createWithSpriteFrameName("888.png");
-			lightCircle4->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			lightCircle4->setScale(0);
-			myframe->addChild(lightCircle4,29,IMG_888_EFFECT_TAG_ID);
-			lightCircle4->setBlendFunc(tmp_oBlendFunc);
-			auto l_seq5=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,1),Spawn::create(EaseSineOut::create(ScaleTo::create(0.3,5.5)),FadeOut::create(0.3),NULL),NULL);
-			auto ll_action5=TargetedAction::create(lightCircle4,l_seq5);
-
-			auto star=Sprite::createWithSpriteFrameName("104.png");
-			star->setAnchorPoint(Vec2(0.5,0));
-			star->setScale(0);
-			star->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(star,29,IMG_104_EFFECT_TAG_ID);
-			auto l_seq6=Sequence::create(DelayTime::create(0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,0.7)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action6=TargetedAction::create(star,l_seq6);
-			
-			auto flame=Sprite::createWithSpriteFrameName("444.png");
-			flame->setAnchorPoint(Vec2(0,0.5));
-			flame->setRotation(-90);
-			flame->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			myframe->addChild(flame,29,IMG_444_EFFECT_TAG_ID);
-			flame->setBlendFunc(tmp_oBlendFunc);
-			flame->setScale(0);
-			auto l_seq7=Sequence::create(DelayTime::create(0.3),Spawn::create(EaseSineOut::create(ScaleTo::create(0.5,1.0)),FadeOut::create(0.5),NULL),NULL);
-			auto ll_action7=TargetedAction::create(flame,l_seq7);
-
-			auto firecircle=Sprite::createWithSpriteFrameName("666.png");
-			firecircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
-			firecircle->setTag(4);
-			firecircle->setScale(0);
-			firecircle->setOpacity(200);
-			myframe->addChild(firecircle,29,IMG_666_EFFECT_TAG_ID);
-			auto actionScale=ScaleTo::create(0.5,1.0);
-			auto c_fadeOut=FadeOut::create(0.5);
-			auto c_seq1=Spawn::create(EaseSineOut::create(actionScale),c_fadeOut,NULL);
-			firecircle->setOpacity(100);
-			firecircle->setBlendFunc(tmp_oBlendFunc);
-			auto l_seq8=Sequence::create(DelayTime::create(0.3),ScaleTo::create(0,0.1),c_seq1,NULL);
-			auto ll_action8=TargetedAction::create(firecircle,l_seq8);
-			
-			auto ll_action9=Sequence::create(DelayTime::create(0.3),CCCallFunc::create([=]()
-			{
-				_StartParticleSystem(0.3);	
-			}),NULL);
-
-			auto sorPos=this->getPosition();
-			auto pShake1 = MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y+10));
-			auto pShake2 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto pShake3 = MoveTo::create(0.1,Vec2(sorPos.x-10,sorPos.y-10));
-			auto pShake4 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto pShake5 = MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y));
-			auto pShake6 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto pShake7 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y+10));
-			auto pShake8 = MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y));
-			auto l_seq10=Sequence::create(DelayTime::create(0.3),pShake1,pShake2,pShake3,pShake4,pShake5,pShake6,pShake7,pShake8,NULL);
-			auto ll_action10=TargetedAction::create(this,l_seq10);
-			auto l_spa=Spawn::create(ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
-			
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png");
-			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(winner,3,giver);	
-			});
-			Spawn* hu_seq;
-			if(_roundManager->_players[MIDDLE]->get_parter()->get_ting_status()!=1)
-				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,Sequence::create(g_seq1,l_spa,NULL),NULL);
-			else
-				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,l_spa,NULL);
-			myframe->runAction(hu_seq);
+            Sequence *backgroundEffect = _roundManager->IsTing(MIDDLE) 
+                ? Sequence::create(
+                        _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5),
+                        _CreateHuBackgroundEffect(winner),NULL)
+                : Sequence::create(
+                        _CreateHuBackgroundEffect(winner),NULL);
+            
+			myframe->runAction(Spawn::create(
+                    simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
+                    _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex()),CallFunc::create([=](){
+    				GoldNumInsert(winner,3,giver);}),
+                    backgroundEffect,NULL));
 		}
 	} else {
 		ListenToDoubleHu();
@@ -6451,6 +6339,158 @@ bool NetRaceLayer::_IsClickedOn(Node* button,Touch* touch) {
     } else {
         return false;
     }
+}
+
+Spawn *NetRaceLayer::_CreateHuBackgroundEffect(PlayerDir_t winner) {
+    auto centerImage = Sprite::createWithSpriteFrameName("101.png");
+    centerImage->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+    myframe->addChild(centerImage,30,IMG_101_EFFECT_TAG_ID);
+    centerImage->setOpacity(200);
+    centerImage->setScale(0);
+    auto animation = Animation::create();
+    animation->addSpriteFrameWithFile("101.png");
+    animation->addSpriteFrameWithFile("103.png");
+    animation->addSpriteFrameWithFile("105.png");
+    animation->addSpriteFrameWithFile("106.png");
+    animation->setDelayPerUnit(0.05f);
+    animation->setRestoreOriginalFrame(true);
+    auto ll_action1 = TargetedAction::create(centerImage,Sequence::create(
+        DelayTime::create(0.3),
+        ScaleTo::create(0,1),
+        Spawn::create(
+            simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
+            Repeat::create(Animate::create(
+                animation),3),NULL),
+        FadeOut::create(0.1),NULL));
+    
+    auto lightCircle=Sprite::createWithSpriteFrameName("4.png");
+    lightCircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+    myframe->addChild(lightCircle,29,IMG_4_EFFECT_TAG_ID);
+    lightCircle->setRotation(90);
+    lightCircle->setScaleX(0);
+    lightCircle->setScaleY(0);
+    lightCircle->setOpacity(150);
+    BlendFunc tmp_oBlendFunc ={GL_SRC_ALPHA, GL_ONE};
+    lightCircle->setBlendFunc(tmp_oBlendFunc);
+    auto ll_action2 = TargetedAction::create(
+        lightCircle,Sequence::create(
+            DelayTime::create(0.3),
+            ScaleTo::create(0,0.2,0.6),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.5,0.4,4.0)),
+                EaseSineIn::create(
+                    FadeOut::create(0.5)),NULL),NULL));
+    
+    auto lightCircle2=Sprite::createWithSpriteFrameName("Q13.png");
+    lightCircle2->setAnchorPoint(Vec2(0.5,0));
+    lightCircle2->setOpacity(180);
+    lightCircle2->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
+    myframe->addChild(lightCircle2,30,IMG_Q13_EFFECT_TAG_ID);
+    lightCircle2->setScale(0);
+    auto ll_action3=TargetedAction::create(
+        lightCircle2,Sequence::create(
+            DelayTime::create(0.3),
+            ScaleTo::create(0,0.3),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.5,1.5)),
+                FadeOut::create(0.5),NULL),NULL));
+    
+    auto lightCircle3=Sprite::createWithSpriteFrameName("Q13.png");
+    lightCircle3->setAnchorPoint(Vec2(0.5,0));
+    lightCircle2->setOpacity(180);
+    lightCircle3->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3-20));
+    myframe->addChild(lightCircle3,30,IMG_Q13_2_EFFECT_TAG_ID);
+    lightCircle3->setScale(0);
+    auto ll_action4=TargetedAction::create(
+        lightCircle3,Sequence::create(
+            DelayTime::create(0.5),
+            ScaleTo::create(0,0.26),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.5,1.5)),
+                FadeOut::create(0.5),NULL),NULL));
+    
+    auto lightCircle4=Sprite::createWithSpriteFrameName("888.png");
+    lightCircle4->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+    lightCircle4->setScale(0);
+    myframe->addChild(lightCircle4,29,IMG_888_EFFECT_TAG_ID);
+    lightCircle4->setBlendFunc(tmp_oBlendFunc);
+    auto ll_action5=TargetedAction::create(
+        lightCircle4,Sequence::create(
+            DelayTime::create(0.3),
+            ScaleTo::create(0,1),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.3,5.5)),
+                FadeOut::create(0.3),NULL),NULL));
+    
+    auto star=Sprite::createWithSpriteFrameName("104.png");
+    star->setAnchorPoint(Vec2(0.5,0));
+    star->setScale(0);
+    star->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+    myframe->addChild(star,29,IMG_104_EFFECT_TAG_ID);
+    auto ll_action6=TargetedAction::create(
+        star,Sequence::create(
+            DelayTime::create(0.3),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.5,0.7)),
+                FadeOut::create(0.5),NULL),NULL));
+    
+    auto flame=Sprite::createWithSpriteFrameName("444.png");
+    flame->setAnchorPoint(Vec2(0,0.5));
+    flame->setRotation(-90);
+    flame->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+    myframe->addChild(flame,29,IMG_444_EFFECT_TAG_ID);
+    flame->setBlendFunc(tmp_oBlendFunc);
+    flame->setScale(0);
+    auto ll_action7=TargetedAction::create(
+        flame,Sequence::create(
+            DelayTime::create(0.3),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.5,1.0)),
+                FadeOut::create(0.5),NULL),NULL));
+    
+    auto firecircle=Sprite::createWithSpriteFrameName("666.png");
+    firecircle->setPosition(Vec2(visibleSize.width/2,visibleSize.height/3));
+    firecircle->setTag(4);
+    firecircle->setScale(0);
+    firecircle->setOpacity(200);
+    myframe->addChild(firecircle,29,IMG_666_EFFECT_TAG_ID);
+    firecircle->setOpacity(100);
+    firecircle->setBlendFunc(tmp_oBlendFunc);
+    auto ll_action8=TargetedAction::create(
+        firecircle,Sequence::create(
+            DelayTime::create(0.3),
+            ScaleTo::create(0,0.1),
+            Spawn::create(
+                EaseSineOut::create(
+                    ScaleTo::create(0.5,1.0)),
+                FadeOut::create(0.5),NULL),NULL));
+    
+    auto ll_action9=Sequence::create(DelayTime::create(0.3),CCCallFunc::create([=](){
+        _StartParticleSystem(0.3);  
+    }),NULL);
+    
+    auto sorPos=this->getPosition();
+    auto ll_action10=TargetedAction::create(
+        this,Sequence::create(
+            DelayTime::create(0.3),
+            MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y+10)),
+            MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y)),
+            MoveTo::create(0.1,Vec2(sorPos.x-10,sorPos.y-10)),
+            MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y)),
+            MoveTo::create(0.1,Vec2(sorPos.x+10,sorPos.y)),
+            MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y)),
+            MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y+10)),
+            MoveTo::create(0.1,Vec2(sorPos.x,sorPos.y)),NULL));
+    
+    return Spawn::create(
+        ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,
+        ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
 }
 
 
