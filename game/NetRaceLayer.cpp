@@ -1811,6 +1811,8 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
         ActionAfterGang=CallFunc::create([=](){
                             _roundManager->DistributeTo(dir);});
     } else {
+        _roundManager->_qiangGangTargetNo = _roundManager->_curPlayer;
+
         ActionAfterGang=CallFunc::create([=](){
                             _roundManager->QiangGangHuJudge();});
     }
@@ -2636,9 +2638,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 	myframe->_ID = dir;
     
 	const int riverLast =_roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
-	if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast)) {
-		myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast);
-	}
+    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast);
 
 	auto outCard = myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID);
     auto hideOutcard = Spawn::create(CCCallFunc::create([=](){
@@ -2985,23 +2985,23 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 	}
 }
 
-void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
+void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 {
 	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
 	delete gang;
 
-    if(no!=MIDDLE) {
+    if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
                 _voice->SpeakAction(GANG,
-                    _roundManager->_cardHolders[no]->GetSex()),
-                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)no),"gang.png"),NULL), CallFunc::create([=](){
-			GoldNumInsert(no,1,no);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                    _roundManager->_cardHolders[dir]->GetSex()),
+                simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
+			GoldNumInsert(dir,1,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
-            _roundManager->UpdateCards((PlayerDir_t)no,a_AN_GANG);}), CCCallFunc::create([=]() {
-            _CardInHandUpdateEffect((PlayerDir_t)no);}),
+            _roundManager->UpdateCards(dir,a_AN_GANG);}), CCCallFunc::create([=]() {
+            _CardInHandUpdateEffect(dir);}),
             _voice->Speak("down"),CallFunc::create([=](){
-            _roundManager->DistributeTo((PlayerDir_t)no);}),NULL),NULL));
+            _roundManager->DistributeTo(dir);}),NULL),NULL));
 	}
 	else {
 		for(int NodeNum=0;NodeNum<3;NodeNum++) {
@@ -3012,7 +3012,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 				ifUpdateDuringEffect=false;
                 _roundManager->CancelEffectCard();
 				_DeleteActionEffect();
-				_CardInHandUpdateEffect((PlayerDir_t)no);
+				_CardInHandUpdateEffect(dir);
 			}
 		}
 
@@ -3026,7 +3026,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
         /**********************
             logical
         **********************/
-		auto list = _roundManager->_players[no]->get_parter()->get_card_list();
+		auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
         Card outCard;
 
 		int ifZeroPointTwo=0;
@@ -3088,12 +3088,12 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
             int i;
             for(i=actionStartPlace;i<list->len-1;i++)
 			{
-                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                auto curPos = _GetCardInHand(dir,i)->getPosition();
                 TargetedAction *motion;
                 
 				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE))
 				{
-					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion=TargetedAction::create( _GetCardInHand(dir,i),
                         Sequence::create(
                             DelayTime::create(0.18),
                             MoveTo::create(0.3,Vec2(
@@ -3102,13 +3102,13 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 				}
 				else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2])
 				{
-					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             ScaleTo::create(0,0),NULL));
 				}
 				else if(i>GangCardsPlace[2])
 				{
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             DelayTime::create(0.18),
                             MoveTo::create(0.3,Vec2(
@@ -3119,7 +3119,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
                 gang_list_seq.insert(i-actionStartPlace,motion);
 			}
             
-			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+list->len-1),
+			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+list->len-1),
                 Sequence::create(
                     DelayTime::create(0.18),
                     ScaleTo::create(0,0),NULL));
@@ -3128,28 +3128,28 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 		} else {
 			for(int i=actionStartPlace;i<=list->len-1;i++)
 			{
-                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
                 TargetedAction *motion;
                 
 				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE)) {
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             DelayTime::create(0.18),
                             MoveTo::create(0.3,Vec2(
                                 curPos.x + GangCardSize.width*(3.5+GAP),
                                 curPos.y)),NULL));
 				} else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2]) {
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             ScaleTo::create(0,0),NULL));
 				} else if(i==GangCardsPlace[3]) {
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             ScaleTo::create(0,0),NULL));
                 } else if(i>GangCardsPlace[3]) {
                     MoveTo* actionMove;
                     if( (i==list->len-1) && (card!=list->data[list->len-1].kind)) {
-						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i-1)->getPosition();
+						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i-1)->getPosition();
 						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
                         
 						actionMove = MoveTo::create(0.3,Vec2(
@@ -3161,7 +3161,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 						    curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2)),
 						    curPos.y));
                     
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             DelayTime::create(0.18),
                             actionMove,NULL));
@@ -3232,7 +3232,7 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
 					_roundManager->CancelEffectCard();
-					_CardInHandUpdateEffect((PlayerDir_t)no);
+					_CardInHandUpdateEffect(dir);
 				} else {
 					int sameCardNum=0;
 					for(int a=list->atcvie_place-1;a>=0;a--)
@@ -3260,9 +3260,9 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
     		Sequence::create(
                 hideReminder,
                 Spawn::create(
-                    simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
+                    simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
                     _voice->SpeakAction(GANG,
-                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
+                        _roundManager->_cardHolders[dir]->GetSex()),
                     moveFreeCards,
                     Spawn::create(
             		    moveAngangCards,
@@ -3288,31 +3288,23 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),
             DelayTime::create(0.48), CallFunc::create([=](){
-			GoldNumInsert(no,1,_roundManager->_curPlayer);}), CCCallFunc::create([=]() {
-			_roundManager->_curPlayer = no;}),CallFunc::create([=](){
-            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+			GoldNumInsert(dir,1,dir);}),CallFunc::create([=](){
+            _roundManager->DistributeTo(dir);}),NULL));
 	}
 }
 
-void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int gang[])
+void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card,int gang[])
 {
-    myframe->_ID = no;
+    myframe->_ID = dir;
 
-	auto list = _roundManager->_players[no]->get_parter()->get_card_list();
+	auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
 
-	int riverLast = _roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
 	if(_roundManager->_isCardFromOthers) {
-        if(myframe->getChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25 + riverLast))
-        {
-            myframe->removeChildByTag(HAND_OUT_CARDS_TAG_ID+prevDir*25 + riverLast);
-        }
+        int riverLast = _roundManager->_players[prevDir]->get_parter()->getOutCardList()->length;
+        _Remove(myframe,HAND_OUT_CARDS_TAG_ID+prevDir*25+riverLast);
 	}
     
-    if(no!=MIDDLE){
-        if(!_roundManager->_isCardFromOthers) {
-            _roundManager->_qiangGangTargetNo = _roundManager->_curPlayer;
-        }
-        
+    if(dir!=MIDDLE) {
         _OthersMingGangEffect((PlayerDir_t)_roundManager->_curPlayer,_roundManager->_isCardFromOthers);
 	} else {
 		for(int node=0;node<3;node++) {
@@ -3324,7 +3316,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
                 
                 _roundManager->CancelEffectCard();
 				_DeleteActionEffect();
-				_CardInHandUpdateEffect((PlayerDir_t)no);
+				_CardInHandUpdateEffect((PlayerDir_t)dir);
 			}
 		}
 
@@ -3346,7 +3338,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 		Sequence *hideOutcard;
 
 		if( !_roundManager->_isCardFromOthers ) {
-			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20 + list->len-1);//gang1
+			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20 + list->len-1);//gang1
 			lastInHand->runAction(ScaleTo::create(0,0));
 			
 			s_curOutCard=_object->Create(FREE_CARD);
@@ -3548,9 +3540,9 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
         
 		if(!_roundManager->_isCardFromOthers) {
 			for(int i=actionStartPlace; i<=gang[0]; i++) {/* right shift */
-				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
 
-				auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),
+				auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                     Sequence::create(
                     DelayTime::create(delayTime),
                     MoveTo::create(0.3,Vec2(
@@ -3560,7 +3552,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
              }
 			for(int i=gang[0]; i<=gang[2]; i++) {/*hide gang cards*/
 				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         ScaleTo::create(0,0),NULL)));
 			}
 		}
@@ -3568,10 +3560,10 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
             const float GAP = (list->atcvie_place==0)?0.5:0.0;
             
 			for(int i=actionStartPlace;i<gang[0];i++) {/* right shift */
-                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+                auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
 
                 gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         DelayTime::create(delayTime),
                         MoveTo::create(0.3,Vec2(
                             curPos.x+cardPengSize.width*(3.5+GAP),
@@ -3579,14 +3571,14 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 			}
             for(int i=gang[0];i<=gang[2];i++) {/* hide */
 				gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         ScaleTo::create(0,0),NULL)));
 			} 
             for(int i=gang[2]+1;i<list->len;i++) {/* right shift */
-				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i)->getPosition();
+				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
                 
                 gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
-                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+i),Sequence::create(
+                    myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         DelayTime::create(delayTime),
                         MoveTo::create(0.3,Vec2(
                             curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
@@ -3667,7 +3659,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 				{
 					ifUpdateDuringEffect=false;
                     _roundManager->CancelEffectCard();
-					_CardInHandUpdateEffect((PlayerDir_t)no);
+					_CardInHandUpdateEffect((PlayerDir_t)dir);
 				}
 				else 
 				{
@@ -3724,7 +3716,7 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
 
         CallFunc* dis_action;
         if(!_roundManager->_isCardFromOthers) {
-            _roundManager->_qiangGangTargetNo=no;
+            _roundManager->_qiangGangTargetNo=dir;
             dis_action=CallFunc::create([=](){
                             _roundManager->QiangGangHuJudge();});
         } else
@@ -3732,10 +3724,10 @@ void NetRaceLayer::_MingGangEffect(int no,PlayerDir_t prevDir, Card_t card,int g
                             _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);});
         
 		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
-            _roundManager->UpdateCards((PlayerDir_t)no,a_MING_GANG);}),
+            _roundManager->UpdateCards((PlayerDir_t)dir,a_MING_GANG);}),
             DelayTime::create(0.48),CallFunc::create([=](){
 			if(_roundManager->_isCardFromOthers)
-				GoldNumInsert(no,2,_roundManager->_curPlayer);}),dis_action,NULL));
+				GoldNumInsert(dir,2,_roundManager->_curPlayer);}),dis_action,NULL));
 	}
 }
 
