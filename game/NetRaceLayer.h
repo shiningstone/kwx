@@ -206,7 +206,7 @@ private:
     void _CreateAccountPanel(const UserProfile_t &profile, Node *parent);
     Sprite *_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent);
     LabelAtlas *_CreatePropertyChange(PlayerDir_t dir,int gold,LayerColor *parent);
-    void _ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent);
+    void _ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent);
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);

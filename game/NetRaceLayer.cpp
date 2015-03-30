@@ -4937,7 +4937,7 @@ LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerCo
     return propertyOfIncrease;
 }
 
-void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent) {
+void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *parent) {
 	auto posOfCards = Vec2(162,180);//牌0，1
 	float x = posOfCards.x;
 	float y = posOfCards.y - _object->RectSize(PENG_CARD).height/2;
@@ -4985,14 +4985,14 @@ void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *p
 		}
 		else if(list->data[i].status==c_FREE)
 		{
-			if( win.kind==SINGLE_WIN && win.winner==dir && win.winner==_roundManager->_curPlayer && i==(list->len-2) )
+			if( win.kind==SINGLE_WIN && win.winner==dir && win.loser==dir && i==(list->len-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
 
-    if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=dir))
+    if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN && win.loser!=dir))
     {
         if(_roundManager->_isCardFromOthers)
         {
@@ -5023,13 +5023,14 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
         BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
 	}
 
-    _ShowCards((PlayerDir_t)no,win,BarOfPlayer);
+    _ExposeCards((PlayerDir_t)no,win,BarOfPlayer);
     
-	int tagNum=BarOfPlayer->getTag();
+	int tagNum = BarOfPlayer->getTag();
 	if(_roundManager->IsTing(tagNum)&&
-        ((win.kind==SINGLE_WIN && ((win.winner==_roundManager->_curPlayer&&tagNum!=win.winner)||(win.winner!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
-        (win.kind==DOUBLE_WIN && tagNum==_roundManager->_curPlayer)))
-	{
+            ((win.kind==SINGLE_WIN && 
+                ((win.winner==win.loser && tagNum!=win.winner)  /* others zimo */
+                ||(win.winner!=win.loser && tagNum==win.loser)))/* tagNum dianpao */
+            || (win.kind==DOUBLE_WIN && tagNum==win.loser))) {
         float Extra_x=162;
         float Extra_y=origin.y+visibleSize.height*0.1256-10;
 
@@ -5039,13 +5040,15 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 		BarOfPlayer->addChild(mingFlag);
 	}
 }
+
 void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	//float x=origin.x+visibleSize.width*0.17;
-	float x=162;
-	float y=origin.y+visibleSize.height*0.1256-10;
+	float x = 162;
+	float y = origin.y+visibleSize.height*0.1256-10;
+
 	int tagNum=BarOfPlayer->getTag();
 	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
 	auto curScore=_roundManager->_players[tagNum]->get_parter()->get_card_score();
@@ -5053,8 +5056,10 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
     WinInfo_t win;
     _roundManager->GetWin(win);
     
-	if((win.kind==SINGLE_WIN&&(win.winner==_roundManager->_curPlayer&&curScore==2)||(win.winner!=_roundManager->_curPlayer&&tagNum==win.winner&&curScore==1))
-        ||(win.kind==DOUBLE_WIN&&tagNum!=_roundManager->_curPlayer&&curScore==1))
+	if((win.kind==SINGLE_WIN
+            &&(win.winner==win.loser && curScore==2)
+            ||(win.winner!=win.loser && tagNum==win.winner && curScore==1))
+        ||(win.kind==DOUBLE_WIN && tagNum!=win.loser && curScore==1))
 	{
 		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -5081,8 +5086,9 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	}
 	if(num&RH_MING)
 	{
-		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.winner)||(win.kind==DOUBLE_WIN&&(tagNum!=_roundManager->_curPlayer))))
-		{
+		if(tingStatus==1 &&
+                ((win.kind==SINGLE_WIN && tagNum==win.winner)
+                ||(win.kind==DOUBLE_WIN && (tagNum!=win.loser)))) {
 			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
 			kindOfHuBkg->setPosition(Vec2(x,y));
@@ -5605,44 +5611,56 @@ void NetRaceLayer::raceAccount(float delta)
     WinInfo_t win;
     _roundManager->GetWin(win);
 
-    auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.winner); 
-    auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+1)%3);
-    auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+2)%3);
-
     switch(win.kind) {
         case SINGLE_WIN:
+            auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.winner); 
+            auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+1)%3);
+            auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+2)%3);
+            
             _roundManager->_players[win.winner]->get_parter()->get_Hu_Flag(&num);
             AccountShows(WinBar,win.winner);
             AccountShows(WinBarPlus,(win.winner+1)%3);
             AccountShows(WinBarMinus,(win.winner+2)%3);
-            if(win.winner==_roundManager->_curPlayer)
+            
+            if(win.winner==win.loser) {
                 WinBar->getChildByTag(ACCOUNT_ZIMO_FONT)->setVisible(true);
-            else
-            {
+            } else {
                 WinBar->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
-                raceAccoutLayer->getChildByTag(_roundManager->_curPlayer)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
+                raceAccoutLayer->getChildByTag(win.loser)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
             }
+            
             AccountHuKind(WinBar,num);
             break;
         case DOUBLE_WIN:
-            _roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_Hu_Flag(&num);
-            _roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
-            AccountShows(WinBar,_roundManager->_curPlayer);
-            AccountShows(WinBarPlus,(_roundManager->_curPlayer+1)%3);
-            AccountShows(WinBarMinus,(_roundManager->_curPlayer+2)%3);
+            auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.loser); 
+            auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.loser+1)%3);
+            auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.loser+2)%3);
+            
+            _roundManager->_players[(win.loser+1)%3]->get_parter()->get_Hu_Flag(&num);
+            _roundManager->_players[(win.loser+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
+            
+            AccountShows(WinBar,win.loser);
+            AccountShows(WinBarPlus,(win.loser+1)%3);
+            AccountShows(WinBarMinus,(win.loser+2)%3);
             
             WinBar->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
             WinBarPlus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
             WinBarMinus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
+            
             AccountHuKind(WinBarPlus,num);
             AccountHuKind(WinBarMinus,numDoubule);
             break;
         case NONE_WIN:
-            if(_roundManager->_firstMingNo!=-1)
-            {
-                AccountShows(WinBar,_roundManager->_firstMingNo);
-                AccountShows(WinBarPlus,(_roundManager->_firstMingNo+1)%3);
-                AccountShows(WinBarMinus,(_roundManager->_firstMingNo+2)%3);
+            if(_roundManager->_firstMingNo!=INVALID) {
+                int fakeWinner = _roundManager->_firstMingNo;
+                
+                auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(fakeWinner); 
+                auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((fakeWinner+1)%3);
+                auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((fakeWinner+2)%3);
+                
+                AccountShows(WinBar,fakeWinner);
+                AccountShows(WinBarPlus,(fakeWinner+1)%3);
+                AccountShows(WinBarMinus,(fakeWinner+2)%3);
             
                 WinBar->getChildByTag(ACCOUNT_BAOZHUANG_FONT)->setVisible(true);
             
