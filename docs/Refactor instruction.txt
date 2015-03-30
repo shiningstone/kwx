@@ -1,5 +1,5 @@
 2015.03.28
-效果与逻辑大块逻辑已经分割完成，但是还有一些逻辑行散落在NetRaceLayer里面。
+特效与逻辑大块逻辑已经分割完成，但是还有一些逻辑行散落在NetRaceLayer里面。
 	有些逻辑行执行的结果会被网络版执行覆盖，所以不会有任何影响；
 	其他逻辑行则比较危险，可能需要特殊处理。（目前尚不明确）
 
@@ -15,6 +15,7 @@ RoundManager
 	StartGame
 		说明：由NetRaceLayer::StartGame调用
 		实现：玩家手牌初始化
+			  显示玩家ready状态
 		      调用NetRaceLayer::FirstRoundDistributeEffect
 		网络版：只需执行玩家初始化
 
@@ -54,6 +55,16 @@ RoundManager
 		网络版：增加参数接收牌类型，
 		        由于其他特效会调到这个函数，增加阻塞或者直接退出
 	
+	ActionAfterGang
+		说明：杠牌特效执行完成之后的动作
+		实现：
+		网络版：直接退出
+		
+	UpdateCards
+		说明：更新手牌
+		实现：
+		网络版：***其他玩家在碰、杠后需要更新。
+		
 NetRaceLayer
 	CreateRace
 		说明：完成界面，等待“开始游戏”按钮事件
@@ -66,7 +77,14 @@ NetRaceLayer
 			  设置MIDDLE玩家ready状态
 			  调用RoundManager::StartGame
 		网络版：是否需要增加ready按钮？强制ready
-		
+	
+	OthersHandoutEffect	
+		说明：其他玩家出牌特效
+		实现：特效
+		      更新手牌
+			  调用RoundManager::WaitForResponse
+		网络版：
+
 	FirstRoundDistributeEffect 参数 zhuang(庄)
 		说明：首轮发牌特效，由RoundManager::StartGame调用
 		实现：发牌特效
@@ -75,12 +93,17 @@ NetRaceLayer
 			  根据zhuang选择调用RoundManager::WaitForMyAction或者RoundManager::WaitForOthersAction
 		网络版：改由服务器触发调用
 		
+	QiEffect
+		说明：
+		实现：
+		网络版：不需要修改
+		
 	PengEffect
 		说明：
 		实现：
 		网络版：不需要最后一个runAction？
 		
-		
+	
 		说明：
 		实现：
 		网络版：
