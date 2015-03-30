@@ -3738,9 +3738,9 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 		} else {
             Sequence *backgroundEffect = _roundManager->IsTing(MIDDLE) 
                 ? Sequence::create(
-                        _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5),
                         _CreateHuBackgroundEffect(winner),NULL)
                 : Sequence::create(
+                        _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5),
                         _CreateHuBackgroundEffect(winner),NULL);
             
 			myframe->runAction(Spawn::create(
