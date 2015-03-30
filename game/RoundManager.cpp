@@ -1171,6 +1171,14 @@ void RoundManager::DistributeTo(PlayerDir_t dir) {
     }
 }
 
+void RoundManager::ActionAfterGang(PlayerDir_t dir) {
+    if(!_isCardFromOthers) {
+        QiangGangHuJudge(dir);
+    } else {
+        DistributeTo(dir);
+    }
+}
+
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {
     if(action==a_PENG) {
         _isCardFromOthers = true;

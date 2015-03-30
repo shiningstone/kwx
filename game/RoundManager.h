@@ -47,6 +47,7 @@ public:
     void WaitForOthersChoose();
     void WaitForResponse(PlayerDir_t dir);
     void DistributeTo(PlayerDir_t dir);
+    void ActionAfterGang(PlayerDir_t dir);
 
     void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action);
 

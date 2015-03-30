@@ -1791,12 +1791,11 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
     return TargetedAction::create(cardOut,result);
 }
 
-void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) {
+void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isCardFromOthers) {
     Sequence *gang_seq;
     
     auto hideOutCard = Sequence::create(NULL);
     auto goldEffect  = CallFunc::create([=](){NULL;});
-    CallFunc* ActionAfterGang;
 
     if(isCardFromOthers) {
         hideOutCard = Sequence::create(CCCallFunc::create([=](){
@@ -1806,13 +1805,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
                 ScaleTo::create(0,0),NULL)),NULL);
 
         goldEffect = CallFunc::create([=](){
-            GoldNumInsert(dir,2,dir);});
-            
-        ActionAfterGang=CallFunc::create([=](){
-                            _roundManager->DistributeTo(dir);});
-    } else {
-        ActionAfterGang=CallFunc::create([=](){
-                            _roundManager->QiangGangHuJudge(dir);});
+            GoldNumInsert(dir,2,prevDir);});
     }
     
     myframe->runAction(Sequence::create(
@@ -1824,8 +1817,8 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)),CCCallFunc::create([=]() {
             _roundManager->UpdateCards(dir,a_MING_GANG);}),CCCallFunc::create([=]() {
-            _CardInHandUpdateEffect(dir);}),
-            ActionAfterGang,NULL),NULL));
+            _CardInHandUpdateEffect(dir);}),CallFunc::create([=](){
+            _roundManager->ActionAfterGang(dir);}),NULL),NULL));
 }
 
 void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToMing)
@@ -3303,7 +3296,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 	}
     
     if(dir!=MIDDLE) {
-        _OthersMingGangEffect((PlayerDir_t)_roundManager->_curPlayer,_roundManager->_isCardFromOthers);
+        _OthersMingGangEffect(dir,prevDir,_roundManager->_isCardFromOthers);
 	} else {
 		for(int node=0;node<3;node++) {
 		    _Remove(myframe,PENG_EFFECT_NODE_ID+node);
@@ -3682,14 +3675,13 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		auto MingGangEffectNode = Node::create();
 		myframe->addChild(MingGangEffectNode,1,MING_GANG_EFFECT_NODE);
 
-		MingGangEffectNode->_ID=1;
+		MingGangEffectNode->_ID = dir;
 		MingGangEffectNode->runAction(
             Sequence::create(
                 hideReminder,
             Spawn::create(
-                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),
-                _voice->SpeakAction(GANG,
-                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
+                simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
+                _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),
                 hideOutcard,
                 moveFreeCards,
                 Spawn::create(
@@ -3712,19 +3704,12 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                 callFunc_update_list,CallFunc::create([=](){
                 _Remove(myframe,MING_GANG_EFFECT_NODE);}),NULL),NULL));
 
-        CallFunc* dis_action;
-        if(!_roundManager->_isCardFromOthers) {
-            dis_action=CallFunc::create([=](){
-                            _roundManager->QiangGangHuJudge(dir);});
-        } else
-            dis_action=CallFunc::create([=](){
-                            _roundManager->DistributeTo(dir);});
-        
 		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
-            _roundManager->UpdateCards((PlayerDir_t)dir,a_MING_GANG);}),
+            _roundManager->UpdateCards(dir,a_MING_GANG);}),
             DelayTime::create(0.48),CallFunc::create([=](){
 			if(_roundManager->_isCardFromOthers)
-				GoldNumInsert(dir,2,_roundManager->_curPlayer);}),dis_action,NULL));
+				GoldNumInsert(dir,2,prevDir);}),CallFunc::create([=](){
+            _roundManager->ActionAfterGang(dir);}),NULL));
 	}
 }
 
