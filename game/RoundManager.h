@@ -50,7 +50,7 @@ public:
 
     void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action);
 
-    void QiangGangHuJudge();
+    void QiangGangHuJudge(PlayerDir_t dir);
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
     TingInfo_t GetTingInfo(PlayerDir_t dir,int outCarIdx);
     

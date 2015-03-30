@@ -1811,10 +1811,8 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
         ActionAfterGang=CallFunc::create([=](){
                             _roundManager->DistributeTo(dir);});
     } else {
-        _roundManager->_qiangGangTargetNo = _roundManager->_curPlayer;
-
         ActionAfterGang=CallFunc::create([=](){
-                            _roundManager->QiangGangHuJudge();});
+                            _roundManager->QiangGangHuJudge(dir);});
     }
     
     myframe->runAction(Sequence::create(
@@ -3716,12 +3714,11 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 
         CallFunc* dis_action;
         if(!_roundManager->_isCardFromOthers) {
-            _roundManager->_qiangGangTargetNo=dir;
             dis_action=CallFunc::create([=](){
-                            _roundManager->QiangGangHuJudge();});
+                            _roundManager->QiangGangHuJudge(dir);});
         } else
             dis_action=CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);});
+                            _roundManager->DistributeTo(dir);});
         
 		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
             _roundManager->UpdateCards((PlayerDir_t)dir,a_MING_GANG);}),

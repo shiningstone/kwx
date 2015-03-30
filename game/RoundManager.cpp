@@ -537,8 +537,10 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _uiManager->MyHandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
 }
 
-void RoundManager::QiangGangHuJudge() {
+void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
     LOGGER_WRITE("%s",__FUNCTION__);
+
+    _qiangGangTargetNo = dir;
 
 	_isCardFromOthers=true;
 	unsigned char curTingStatus=_players[_curPlayer]->get_parter()->get_ting_status();
