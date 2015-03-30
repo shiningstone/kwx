@@ -3715,7 +3715,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 /* why use different mechanism for single hu and double hu ??? */
 void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 {
-    LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
+    LOGGER_WRITE("%s(%d-%d)",__FUNCTION__,win.winner,win.giver);
 
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
 

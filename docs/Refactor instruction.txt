@@ -90,26 +90,35 @@ NetRaceLayer
 		实现：发牌特效
 		      residue特效
 			  玩家手牌特效
-			  根据zhuang选择调用RoundManager::WaitForMyAction或者RoundManager::WaitForOthersAction
+			  出口RoundManager::WaitForMyAction或者RoundManager::WaitForOthersAction
 		网络版：改由服务器触发调用
 		
-	QiEffect
-		说明：
-		实现：
+	_QiEffect
+		说明：  
+		实现：  出口RoundManager::RecvHandout/RoundManager::DistributeTo/RoundManager::_HuEffect
+				为什么弃之后还有后续操作？
 		网络版：不需要修改
 		
-	PengEffect
+	_PengEffect
 		说明：
-		实现：
+		实现：  出口RoundManager::WaitForMyAction/RoundManager::WaitForOthersAction
 		网络版：不需要最后一个runAction？
 		
-	
+	_AnGangEffect
 		说明：
-		实现：
+		实现：  出口RoundManager::DistributeTo
 		网络版：
 		
-
-
+	_MingGangEffect
+		说明：
+		实现：  出口RoundManager::DistributeTo/RoundManager::QiangGangHuJudge
+		网络版：
+		
+	_HuEffect
+		说明：
+		实现：  出口RoundManager::DistributeTo/RoundManager::QiangGangHuJudge
+				为什么要用两种机制？
+		网络版：
 
 
 
