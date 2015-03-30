@@ -269,7 +269,7 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
 void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
         GoldNumInsert(winner,2,whoGive);}),CallFunc::create([=](){
-        _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+        _roundManager->DistributeTo(winner);}),NULL));
 }
 
 void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
@@ -652,14 +652,6 @@ void NetRaceLayer::ListenToDistributeCard() {
 		
         _roundManager->SetWin(NONE_WIN,_roundManager->_curPlayer);
 
-		auto Nowinner=CallFunc::create([=](){
-			this->addChild(_object->CreateHuangZhuangBkg(),10,HUANG_ZHUANG_LAYER);
-			auto HuangZhuang=_object->CreateHuangZhuang();;
-			this->addChild(HuangZhuang,10,HUANG_ZHUANG_FONT);
-            
-			auto FontAction=TargetedAction::create(HuangZhuang,FadeIn::create(0.5));
-		});
-
 		scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
 
 		this->runAction(
@@ -668,8 +660,11 @@ void NetRaceLayer::ListenToDistributeCard() {
     			if(_roundManager->_firstMingNo!=-1)
     				GoldNumInsert(4,3,_roundManager->_firstMingNo);}),
     			DelayTime::create(1),
-    			Spawn::create(
-    			    Nowinner,CallFunc::create(this,callfunc_selector(
+    			Spawn::create(CallFunc::create([=](){
+        			this->addChild(_object->CreateHuangZhuangBkg(),10,HUANG_ZHUANG_LAYER);
+        			auto HuangZhuang=_object->CreateHuangZhuang();;
+        			this->addChild(HuangZhuang,10,HUANG_ZHUANG_FONT);
+        			auto FontAction=TargetedAction::create(HuangZhuang,FadeIn::create(0.5));}),CallFunc::create(this,callfunc_selector(
     			    NetRaceLayer::showall)),NULL),NULL));
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_noonewinListener,3);
@@ -1596,12 +1591,12 @@ void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards) {
     
     const auto SIZE      = _GetCardInHand(MIDDLE,0)->getTextureRect().size;
     /* maybe need to be put into the circulation */
-    const auto LAST_CARD = _GetCardInHand((PlayerDir_t)_roundManager->_curPlayer,LAST);
+    const auto LAST_CARD = _GetCardInHand(MIDDLE,LAST);
     const auto LAST_POS  = LAST_CARD->getPosition();
     
     /* need to be optimized !!! */
     for(int i=cards->atcvie_place; i<LAST; i++) {
-        auto card = _GetCardInHand((PlayerDir_t)_roundManager->_curPlayer,i);
+        auto card = _GetCardInHand(MIDDLE,i);
         auto curPos   = card->getPosition();
         
         auto RightMove = MoveTo::create(0.3,Vec2(curPos.x+SIZE.width,curPos.y));
@@ -1814,7 +1809,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,bool isCardFromOthers) 
             GoldNumInsert(dir,2,dir);});
             
         ActionAfterGang=CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);});
+                            _roundManager->DistributeTo(dir);});
     } else {
         ActionAfterGang=CallFunc::create([=](){
                             _roundManager->QiangGangHuJudge();});
@@ -1851,17 +1846,17 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
     
 	if(time==1) {
 		cardOut->setPosition(touch);
-		bizerMotion = BizerMove1(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
+		bizerMotion = BizerMove1(_roundManager->_players[MIDDLE]->get_parter()->getOutCardList(),
 		                touch);
     }
 	else {
 		cardOut->setPosition(touch.x,100);
-		bizerMotion = BizerMove2(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->getOutCardList(),
+		bizerMotion = BizerMove2(_roundManager->_players[MIDDLE]->get_parter()->getOutCardList(),
 		                touch,time);
     }
     myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
 
-	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
+	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_cardHolders[MIDDLE]->GetSex());
 
     Spawn* mingEffect = turnToMing?
                 (Spawn::create(
@@ -2662,7 +2657,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                                 NetRaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
                                 _roundManager->UpdateCards(dir,a_PENG);}),    CCCallFunc::create([=]() {
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
-                    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+                    			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
 		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
@@ -2929,12 +2924,8 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
             fireEffect,NULL);
 
 
-
-        
-		Spawn *simple_seq = simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"peng.png" );
-        
 		auto PengEffectNode = Node::create();
-		PengEffectNode->_ID=1;
+		PengEffectNode->_ID = dir;
 		myframe->addChild(PengEffectNode,1,PENG_EFFECT_NODE_ID);
         
 		auto callFunc_update_list = CCCallFunc::create([=](){
@@ -2966,9 +2957,9 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 
 		PengEffectNode->runAction(Sequence::create(
             hideReminder,Spawn::create(
-                simple_seq,
+                simple_tip_effect(_layout->PositionOfActSign(dir),"peng.png" ),
                 _voice->SpeakAction(PENG,
-                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),Spawn::create(
+                    _roundManager->_cardHolders[dir]->GetSex()),Spawn::create(
                 hide2CardsInhand),Spawn::create(
                 moveRightCardInHand,
                 moveLeftCardInHand,NULL),Sequence::create(
@@ -2988,7 +2979,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         ***************************************/
 		myframe->runAction( Sequence::create(CallFunc::create([=](){
                 _roundManager->UpdateCards(dir,a_PENG);}),CCCallFunc::create([=](){
-    			_roundManager->_actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+    			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
     			_roundManager->WaitForMyAction();}),CallFunc::create([=](){
                 _roundManager->_isMyShowTime=true;}),NULL));
 	}
@@ -3003,15 +2994,14 @@ void NetRaceLayer::_AnGangEffect(int no,Card_t card,int gang[])
 		myframe->runAction(Sequence::create(
             Spawn::create(
                 _voice->SpeakAction(GANG,
-                    _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex()),
-                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"gang.png"),NULL), CallFunc::create([=](){
-			GoldNumInsert(no,1,_roundManager->_curPlayer);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                    _roundManager->_cardHolders[no]->GetSex()),
+                simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)no),"gang.png"),NULL), CallFunc::create([=](){
+			GoldNumInsert(no,1,no);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
             _roundManager->UpdateCards((PlayerDir_t)no,a_AN_GANG);}), CCCallFunc::create([=]() {
             _CardInHandUpdateEffect((PlayerDir_t)no);}),
-            _voice->Speak("down"), CCCallFunc::create([=](){
-			_roundManager->_curPlayer=no;}),CallFunc::create([=](){
-            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
+            _voice->Speak("down"),CallFunc::create([=](){
+            _roundManager->DistributeTo((PlayerDir_t)no);}),NULL),NULL));
 	}
 	else {
 		for(int NodeNum=0;NodeNum<3;NodeNum++) {
