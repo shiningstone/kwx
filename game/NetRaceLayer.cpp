@@ -217,14 +217,14 @@ void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
     
     if(qiangGang) {
         _DeleteActionTip();
-        _HuEffect(win.player);
+        _HuEffect((PlayerDir_t)win.player);
     } else if(win.kind==DOUBLE_WIN) {
         _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
         _DeleteActionTip();
-        _HuEffect(3);   /*why use event rather than call*/
+        _HuEffect(DOUBLE_PLAYER);   /*why use event rather than call*/
         _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
     } else {
-        _HuEffect(win.player);
+        _HuEffect((PlayerDir_t)win.player);
     }
 }
 
@@ -243,7 +243,7 @@ void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
 
     if(win.player!=MIDDLE) {
         if(_roundManager->IsTing(1)) {
-            _HuEffect(3);
+            _HuEffect(DOUBLE_PLAYER);
             _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
         } else {
             _roundManager->WaitForMyAction();
@@ -256,13 +256,13 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
 
     if(win.player==MIDDLE) {
         if(_roundManager->IsTing(MIDDLE)) {
-            _HuEffect(win.player);
+            _HuEffect((PlayerDir_t)win.player);
         } else {
             _roundManager->WaitForMyAction();
         }
 
     } else {
-        _HuEffect(win.player);
+        _HuEffect((PlayerDir_t)win.player);
     }
 }
 
@@ -3714,7 +3714,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 }
 
 /* why use different mechanism for single hu and double hu ??? */
-void NetRaceLayer::_HuEffect(int no)
+void NetRaceLayer::_HuEffect(PlayerDir_t dir)
 {
     LOGGER_WRITE("%s(%d)",__FUNCTION__,0);
 
@@ -3725,22 +3725,19 @@ void NetRaceLayer::_HuEffect(int no)
     
 	scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
 
-	if(no<3) {
-        _roundManager->SetWin(SINGLE_WIN,no);
+	if(dir<DOUBLE_PLAYER) {
+        _roundManager->SetWin(SINGLE_WIN,dir);
         
-		auto callfunc=CallFunc::create(this,callfunc_selector(NetRaceLayer::showall));
+		auto callfunc = simple_tip_effect(_layout->PositionOfActSign(dir),"dahu.png");
+        CallFunc*HuVoice = _voice->SpeakAction(HU,_roundManager->_cardHolders[dir]->GetSex());
 
-        CallFunc*HuVoice = _voice->SpeakAction(HU,
-                        _roundManager->_cardHolders[_roundManager->_curPlayer]->GetSex());
-
-        if(no!=1)
-		{
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
-			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(no,3,_roundManager->_curPlayer);	
-			});
-			auto hu_seq=Sequence::create(Spawn::create(HuVoice,simple_seq,NULL),GoldAccount,callfunc,NULL);
-			myframe->runAction(hu_seq);
+        if(dir!=MIDDLE) {
+			myframe->runAction(Sequence::create(
+                Spawn::create(
+                    HuVoice,
+                    callfunc,NULL),CallFunc::create([=](){
+				GoldNumInsert(dir,3,_roundManager->_curPlayer);}),CallFunc::create(this,callfunc_selector(
+                NetRaceLayer::showall)),NULL));
 		}
 		else
 		{
@@ -3857,7 +3854,7 @@ void NetRaceLayer::_HuEffect(int no)
 			
 			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(no,3,_roundManager->_curPlayer);	
+				GoldNumInsert(dir,3,_roundManager->_curPlayer);	
 			});
 			Spawn* hu_seq;
 			if(_roundManager->_players[1]->get_parter()->get_ting_status()!=1)
@@ -3867,7 +3864,7 @@ void NetRaceLayer::_HuEffect(int no)
 			myframe->runAction(hu_seq);
 		}
 	}
-	else if(no==3) {//两个对家双响
+	else if(dir==3) {//两个对家双响
         _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
 		ListenToDoubleHu();
 	}
@@ -3925,7 +3922,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
 				_roundManager->_isDoubleHuAsking=false;
 				myframe->runAction(Sequence::create(
                     shadeFunc,CallFunc::create([=](){
-                    _HuEffect(_roundManager->_otherOneForDouble);}),NULL));
+                    _HuEffect((PlayerDir_t)_roundManager->_otherOneForDouble);}),NULL));
 			} else {
 				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 				myframe->runAction(Sequence::create(
@@ -6149,7 +6146,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 					else if(_roundManager->_isDoubleHuAsking)
 					{
 						_roundManager->_isDoubleHuAsking = false;
-						auto huFunc=CallFunc::create([=](){_HuEffect(_roundManager->_otherOneForDouble);});
+						auto huFunc=CallFunc::create([=](){_HuEffect((PlayerDir_t)_roundManager->_otherOneForDouble);});
 						myframe->runAction(huFunc);
 					}
 					else

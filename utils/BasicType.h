@@ -15,6 +15,7 @@ typedef enum {
     MIDDLE,
     RIGHT,
     INVALID_DIR,
+    DOUBLE_PLAYER = 3,
 }PlayerDir_t;
 
 typedef enum {
