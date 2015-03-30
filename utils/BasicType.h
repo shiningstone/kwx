@@ -66,7 +66,8 @@ typedef enum {
 
 typedef struct {
     WinKind_t    kind;
-    PlayerDir_t  player;
+    PlayerDir_t  winner;
+    PlayerDir_t  loser;
 }WinInfo_t;
 
 typedef enum {

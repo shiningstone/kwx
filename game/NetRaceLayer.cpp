@@ -217,14 +217,14 @@ void NetRaceLayer::HuEffect(const WinInfo_t &win,bool qiangGang) {
     
     if(qiangGang) {
         _DeleteActionTip();
-        _HuEffect((PlayerDir_t)win.player);
+        _HuEffect((PlayerDir_t)win.winner);
     } else if(win.kind==DOUBLE_WIN) {
         _effect->Shade(myframe->getChildByTag(HU_REMIND_ACT_TAG_ID));
         _DeleteActionTip();
         _HuEffect(DOUBLE_PLAYER);   /*why use event rather than call*/
         _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
     } else {
-        _HuEffect((PlayerDir_t)win.player);
+        _HuEffect((PlayerDir_t)win.winner);
     }
 }
 
@@ -241,7 +241,7 @@ void NetRaceLayer::GangEffect(PlayerDir_t winner,Card_t card, int gangCardIdx[],
 void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
     HideClock();
 
-    if(win.player!=MIDDLE) {
+    if(win.winner!=MIDDLE) {
         if(_roundManager->IsTing(1)) {
             _HuEffect(DOUBLE_PLAYER);
             _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
@@ -254,15 +254,15 @@ void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
 void NetRaceLayer::SingleWin(const WinInfo_t &win) {
     HideClock();
 
-    if(win.player==MIDDLE) {
+    if(win.winner==MIDDLE) {
         if(_roundManager->IsTing(MIDDLE)) {
-            _HuEffect((PlayerDir_t)win.player);
+            _HuEffect((PlayerDir_t)win.winner);
         } else {
             _roundManager->WaitForMyAction();
         }
 
     } else {
-        _HuEffect((PlayerDir_t)win.player);
+        _HuEffect((PlayerDir_t)win.winner);
     }
 }
 
@@ -4682,13 +4682,13 @@ void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
     
     switch(win.kind) {
         case SINGLE_WIN:
-            _CalcSingleWinGold(goldOfPlayer,win.player);
+            _CalcSingleWinGold(goldOfPlayer,win.winner);
             break;
         case DOUBLE_WIN:
-            _CalcDoubleWinGold(goldOfPlayer,win.player);
+            _CalcDoubleWinGold(goldOfPlayer,win.loser);
             break;
         case NONE_WIN:
-            _CalcNoneWinGold(goldOfPlayer,win.player);
+            _CalcNoneWinGold(goldOfPlayer,win.winner);
             break;
     }
 }
@@ -4998,14 +4998,14 @@ void NetRaceLayer::_ShowCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *p
 		}
 		else if(list->data[i].status==c_FREE)
 		{
-			if( win.kind==SINGLE_WIN && win.player==dir && win.player==_roundManager->_curPlayer && i==(list->len-2) )
+			if( win.kind==SINGLE_WIN && win.winner==dir && win.winner==_roundManager->_curPlayer && i==(list->len-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
 
-    if((win.kind==SINGLE_WIN && win.player==dir) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=dir))
+    if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN &&_roundManager->_curPlayer!=dir))
     {
         if(_roundManager->_isCardFromOthers)
         {
@@ -5040,7 +5040,7 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
     
 	int tagNum=BarOfPlayer->getTag();
 	if(_roundManager->IsTing(tagNum)&&
-        ((win.kind==SINGLE_WIN && ((win.player==_roundManager->_curPlayer&&tagNum!=win.player)||(win.player!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
+        ((win.kind==SINGLE_WIN && ((win.winner==_roundManager->_curPlayer&&tagNum!=win.winner)||(win.winner!=_roundManager->_curPlayer&&tagNum==_roundManager->_curPlayer)))||
         (win.kind==DOUBLE_WIN && tagNum==_roundManager->_curPlayer)))
 	{
         float Extra_x=162;
@@ -5066,7 +5066,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
     WinInfo_t win;
     _roundManager->GetWin(win);
     
-	if((win.kind==SINGLE_WIN&&(win.player==_roundManager->_curPlayer&&curScore==2)||(win.player!=_roundManager->_curPlayer&&tagNum==win.player&&curScore==1))
+	if((win.kind==SINGLE_WIN&&(win.winner==_roundManager->_curPlayer&&curScore==2)||(win.winner!=_roundManager->_curPlayer&&tagNum==win.winner&&curScore==1))
         ||(win.kind==DOUBLE_WIN&&tagNum!=_roundManager->_curPlayer&&curScore==1))
 	{
 		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
@@ -5094,7 +5094,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	}
 	if(num&RH_MING)
 	{
-		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.player)||(win.kind==DOUBLE_WIN&&(tagNum!=_roundManager->_curPlayer))))
+		if(tingStatus==1&&((win.kind==SINGLE_WIN&&tagNum==win.winner)||(win.kind==DOUBLE_WIN&&(tagNum!=_roundManager->_curPlayer))))
 		{
 			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -5618,17 +5618,17 @@ void NetRaceLayer::raceAccount(float delta)
     WinInfo_t win;
     _roundManager->GetWin(win);
 
-    auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.player); 
-    auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.player+1)%3);
-    auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.player+2)%3);
+    auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.winner); 
+    auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+1)%3);
+    auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+2)%3);
 
     switch(win.kind) {
         case SINGLE_WIN:
-            _roundManager->_players[win.player]->get_parter()->get_Hu_Flag(&num);
-            AccountShows(WinBar,win.player);
-            AccountShows(WinBarPlus,(win.player+1)%3);
-            AccountShows(WinBarMinus,(win.player+2)%3);
-            if(win.player==_roundManager->_curPlayer)
+            _roundManager->_players[win.winner]->get_parter()->get_Hu_Flag(&num);
+            AccountShows(WinBar,win.winner);
+            AccountShows(WinBarPlus,(win.winner+1)%3);
+            AccountShows(WinBarMinus,(win.winner+2)%3);
+            if(win.winner==_roundManager->_curPlayer)
                 WinBar->getChildByTag(ACCOUNT_ZIMO_FONT)->setVisible(true);
             else
             {

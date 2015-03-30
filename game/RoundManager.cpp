@@ -423,7 +423,8 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 
     /*!!!just for compile reason for now, the value should be set before play effect*/
     WinInfo_t win;
-    win.player = (PlayerDir_t)dir;
+    win.winner = dir;
+    win.loser  = _curPlayer;
     if(_isDoubleHuAsking) {
         win.kind = DOUBLE_WIN;
     }
@@ -570,7 +571,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	if((action1&a_HU)&&(action2&a_HU)) {
         WinInfo_t win;
         win.kind = DOUBLE_WIN;
-        win.player = (PlayerDir_t)_curPlayer;
+        win.winner = (PlayerDir_t)_curPlayer;
         
         if(no1==1) {
             _actionToDo=action1;
@@ -587,7 +588,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	} else if(action1&a_HU||action2&a_HU) {
         WinInfo_t win;
         win.kind = SINGLE_WIN;
-        win.player = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
+        win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
 
         if(no1==1)
             _actionToDo=action1;
