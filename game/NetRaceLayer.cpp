@@ -6127,29 +6127,20 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 			layer_color->setOpacity(150);
 			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
             
-			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision)
-			{
+			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision) {
 				_DeleteActionTip();
 				_roundManager->_isWaitDecision=false;
 				_roundManager->_tempActionToDo=a_JUMP;
                 
-				if(_roundManager->_isCardFromOthers)
-				{
-					if(_roundManager->_isQiangGangAsking)
-					{
+				if(_roundManager->_isCardFromOthers) {
+					if(_roundManager->_isQiangGangAsking) {
 						_roundManager->_isQiangGangAsking=false;
                         
-						auto GoldAccount=CallFunc::create([=](){
+						myframe->runAction(Sequence::create(CallFunc::create([=](){
 							GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
-							_roundManager->_qiangGangTargetNo=-1;
-						});
-						auto curSeq=Sequence::create(
-                            GoldAccount,CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL);
-						myframe->runAction(curSeq);
-					}
-					else if(_roundManager->_isDoubleHuAsking)
-					{
+							_roundManager->_qiangGangTargetNo=INVALID;}),CallFunc::create([=](){
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+					} else if(_roundManager->_isDoubleHuAsking) {
 						_roundManager->_isDoubleHuAsking = false;
 
 						myframe->runAction(CallFunc::create([=](){
@@ -6159,26 +6150,21 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
                             WinInfo_t win;
                             _roundManager->GetWin(win);
                             _HuEffect(win);}));
-					}
-					else
-					{
-						_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
+					} else {
 						myframe->runAction(CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}));
+                            _roundManager->DistributeTo(_roundManager->TurnToNext());}));
 					}
-				}
-				else {
+				} else {
 					_roundManager->WaitForMyChoose();
                 }
-			}
-			else
-			{
-				if(_roundManager->_isMyShowTime)
-				{
+			} else {
+				if(_roundManager->_isMyShowTime) {
 					_roundManager->_isMyShowTime=false;
 					_roundManager->_actionToDo=a_JUMP;
+
 					if(_roundManager->_lastAction==a_JUMP)
 						_roundManager->_continue_gang_times=0;
+
 					_roundManager->_lastAction=a_JUMP;
 
 					_roundManager->WaitForMyChoose();
