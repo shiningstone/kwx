@@ -117,6 +117,7 @@ void NetRaceLayer::CreateRace()
     StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnStartHandler,this));
     this->addChild(StartButton,2,START_GAME_TAG_ID);
 
+    /* is this neccessary??? */
     _eventDispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(
         WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
         _roundManager->Shuffle();}), 
@@ -167,11 +168,10 @@ void NetRaceLayer::StartGame()
     
 	_RaceBeginPrepare();                  //牌局开始效果
 
-	GuiShowReady(1);
     _roundManager->StartGame();
 }
 
-void NetRaceLayer::_FirstResponse(int no)
+void NetRaceLayer::WaitForFirstAction(PlayerDir_t zhuang)
 {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
@@ -180,17 +180,10 @@ void NetRaceLayer::_FirstResponse(int no)
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
 
-    _roundManager->_isGameStart=true;
-    _roundManager->_actionToDo=_roundManager->_players[no]->get_parter()->ActiontodoCheckAgain();/*why???*/
-
     ListenToCardTouch();
     ((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 
-    if(no==1) {
-        _roundManager->WaitForMyAction();
-    } else {
-        _roundManager->WaitForOthersAction((PlayerDir_t)no);
-    }
+    _roundManager->WaitForFirstAction(zhuang);
 }
 
 Vec2 NetRaceLayer::GetCardPositionInHand(int idx) {
@@ -741,7 +734,7 @@ void NetRaceLayer::_RightBatchDistribute(int batchIdx, float delayRef, int cardL
     }
 }
 
-void NetRaceLayer::FirstRoundDistributeEffect(int zhuang) {
+void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
     LOGGER_WRITE("%s",__FUNCTION__);
 	auto VoiceEffect=_voice->Speak("sort.ogg");	
 
@@ -1041,7 +1034,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(int zhuang) {
 		_CardInHandUpdateEffect(RIGHT);}),NULL),CallFunc::create([=](){
 		UpdateClock(0,zhuang);}),CallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteStartDealCards)),CCCallFunc::create([=](){
-		_FirstResponse(zhuang);
+		WaitForFirstAction(zhuang);
 	}),NULL));
 }
 

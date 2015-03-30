@@ -40,6 +40,7 @@ public:
     void RecvMingCancel();
 	void RecvMing();
 
+    void WaitForFirstAction(PlayerDir_t zhuang);
     void WaitForMyAction();
     void WaitForMyChoose();
     void WaitForOthersAction(PlayerDir_t dir);

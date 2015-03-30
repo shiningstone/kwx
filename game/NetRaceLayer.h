@@ -235,7 +235,7 @@ private:
 	BezierTo* OthersBizerMove(int no,outCardList* outCard);
     Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
 	void ListenToDistributeCard();
-	void _FirstResponse(int no);
+	void WaitForFirstAction(PlayerDir_t zhuang);
 	void _MyHandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
 	void _DistributeEvent(const std::string event_type,void* val);
@@ -256,7 +256,7 @@ public:
 	void _UpdateResidueCards(int no);//更新剩余牌数
     void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
     void _LeftBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
-	void FirstRoundDistributeEffect(int zhuang);//发牌效果
+	void FirstRoundDistributeEffect(PlayerDir_t zhuang);//发牌效果
     Sequence *_FisrtRoundResidueUpdate();
 	/***********callback function***********************/
     void QiEffect();

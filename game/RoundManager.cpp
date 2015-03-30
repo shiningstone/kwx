@@ -367,7 +367,9 @@ void RoundManager::CreateRace(Scene *scene) {
 
 void RoundManager::StartGame() {
 	_isGameStart=false;
+    
     _cardHolders[MIDDLE]->_isReady = true;
+	_uiManager->GuiShowReady(MIDDLE);
     WaitUntilAllReady();
 
     RenewOutCard();
@@ -377,7 +379,7 @@ void RoundManager::StartGame() {
 	if(_actionToDo!=a_TIMEOUT) {
 		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
 		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		_uiManager->FirstRoundDistributeEffect(lastWinner);//牌局开始发牌效果�?
+		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
 	}
 }
 
@@ -699,6 +701,17 @@ void RoundManager::RecvMing() {
         }
     } else {
         WaitForOthersChoose();
+    }
+}
+
+void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
+    _isGameStart = true;
+    _actionToDo = _players[zhuang]->get_parter()->ActiontodoCheckAgain();/*why???*/
+
+    if(zhuang==MIDDLE) {
+        WaitForMyAction();
+    } else {
+        WaitForOthersAction((PlayerDir_t)zhuang);
     }
 }
 
