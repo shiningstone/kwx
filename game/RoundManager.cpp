@@ -40,11 +40,11 @@ RoundManager::~RoundManager() {
         winner information
 ***********************************************/
 PlayerDir_t RoundManager::GetLastWinner() {
-    if( _lastWin.player==INVALID_DIR ) {
+    if( _lastWin.winner==INVALID_DIR ) {
         LOGGER_WRITE("NETWORK: Request(last winner) not defined");
         _lastWin.player = MIDDLE;
     }
-    return _lastWin.player;
+    return _lastWin.winner;
 }
 
 void RoundManager::SetWin(WinKind_t kind,int player) {
@@ -429,14 +429,13 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
     }
 
     /*!!!just for compile reason for now, the value should be set before play effect*/
-    WinInfo_t win;
-    win.winner = dir;
-    win.loser  = _curPlayer;
     if(_isDoubleHuAsking) {
-        win.kind = DOUBLE_WIN;
+        SetWin(DOUBLE_WIN,_curPlayer);
+    } else {
+        SetWin(SINGLE_WIN,dir);
     }
 
-    _uiManager->HuEffect(win, _isQiangGangAsking);
+    _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
 void RoundManager::RecvGang(PlayerDir_t dir) {
