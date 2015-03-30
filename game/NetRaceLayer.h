@@ -43,7 +43,6 @@ public:
 	void QueryMingOutCard();
     
     void ShowActionButtons();
-    PlayerDir_t _NextPlayer(PlayerDir_t dir);
     Vec2 GetCardPositionInHand(int idx);
     void OthersHandoutEffect(PlayerDir_t dir,bool canKou);
 protected:
@@ -99,7 +98,7 @@ private:
     std::string _NumToString( int number );
     void _CalcAnGangGold(int winner,int goldOfPlayer[3]);
     void _CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]);
-    void _CalcSingleWinGold(int goldOfPlayer[3], int winner);
+    void _CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive);
     void _CalcDoubleWinGold(int goldOfPlayer[3], int loser);
     void _CalcNoneWinGold(int goldOfPlayer[3], int loser);
     void _CalcHuGold(int goldOfPlayer[3]);

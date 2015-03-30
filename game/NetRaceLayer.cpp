@@ -3867,34 +3867,22 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 	}
 }
 
-void NetRaceLayer::_QiEffect(PlayerDir_t dir)
-{
+void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 	myframe->_ID = MIDDLE;
-
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-	if(_roundManager->_lastAction==a_JUMP)
-		_roundManager->_continue_gang_times=0;
-	_roundManager->_lastAction=a_JUMP;
-	_roundManager->_actionToDo=a_JUMP;
-	if(_roundManager->_isWaitDecision) {
-		_roundManager->_isWaitDecision=false;
-		_roundManager->_tempActionToDo=a_JUMP;
-	}
 
     /********************************
         hide reminder
     ********************************/
-	auto shadeFunc =_HideQiReminder();
+	auto hideQiReminder =_HideQiReminder();
     
     /********************************
         
     ********************************/
-	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && dir==MIDDLE) {
+	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && dir==MIDDLE) {/*??? is this judgement neccessary */
 		if(!_roundManager->_isCardFromOthers) {
 			if(_roundManager->_isGangAsking) {
 				myframe->runAction(Sequence::create(
-                    shadeFunc,CallFunc::create([=](){
+                    hideQiReminder,CallFunc::create([=](){
     					_roundManager->_isGangAsking = false;
                         
                         CardsInfo_t cards;
@@ -3902,23 +3890,24 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
                         
                         Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
 
-                        _roundManager->RecvHandout(cards.last,location,2);
+                        _roundManager->RecvHandout(cards.last,location,2);/*bug??? forced to handout last card*/
                     }),NULL));
 			} else
-				myframe->runAction(shadeFunc);
+				myframe->runAction(hideQiReminder);
 		} else {
 			if(_roundManager->_isQiangGangAsking) {
 				_roundManager->_isQiangGangAsking=false;
 
 				myframe->runAction(Sequence::create(
-                    shadeFunc,Spawn::create(CallFunc::create([=](){
+                    hideQiReminder,Spawn::create(CallFunc::create([=](){
     					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
     					_roundManager->_qiangGangTargetNo = INVALID;/*!!! could this be called before runAction */}),CallFunc::create([=](){
                         _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
 			} else if(_roundManager->_isDoubleHuAsking) {
 				_roundManager->_isDoubleHuAsking=false;
+                
 				myframe->runAction(Sequence::create(
-                    shadeFunc,CallFunc::create([=](){
+                    hideQiReminder,CallFunc::create([=](){
                     PlayerDir_t loser = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
                     _roundManager->SetWin(DOUBLE_WIN,loser);
                     
@@ -3926,10 +3915,9 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
                     _roundManager->GetWin(win);
                     _HuEffect(win);}),NULL));
 			} else {
-				_roundManager->_curPlayer=(_roundManager->_curPlayer+1)%3;
 				myframe->runAction(Sequence::create(
-                    shadeFunc,CallFunc::create([=](){
-                    _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+                    hideQiReminder,CallFunc::create([=](){
+                    _roundManager->DistributeTo(_roundManager->TurnToNext());}),NULL));
 			}
 		}
 	}
@@ -4116,12 +4104,12 @@ void NetRaceLayer::KouConfirmEffect() {
 void NetRaceLayer::MingCancelEffect() {
     auto button = myframe->getChildByTag(MING_CANCEL);
     
-    myframe->_ID = _roundManager->_curPlayer;
+    myframe->_ID = MIDDLE;
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->_actionToDo=_roundManager->_players[1]->get_parter()->ActiontodoCheckAgain();
+        _roundManager->_actionToDo=_roundManager->_players[MIDDLE]->get_parter()->ActiontodoCheckAgain();
         _roundManager->WaitForMyAction();}),NULL));
 }
 
@@ -4341,9 +4329,6 @@ void NetRaceLayer::QueryKouCards() {
 }
 
 void NetRaceLayer::QueryMingOutCard() {
-    _roundManager->_isMingTime=true;
-    _roundManager->UpdateCards((PlayerDir_t)_roundManager->_curPlayer,a_MING);
-    
     _Remove(myframe,MING_KOU_ENSURE);
     _Remove(myframe,MING_KOU_SIGN);
     _Remove(myframe,MING_KOU_CANCEL);
@@ -4645,15 +4630,15 @@ void NetRaceLayer::_CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]) {
     }
 }
 
-void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner) {
+void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive) {
     auto score = _roundManager->_players[winner]->get_parter()->get_card_score();
     goldOfPlayer[winner] = score*PREMIUM_LEAST;
     
-    if(_roundManager->_curPlayer==winner) {
+    if(whoGive==winner) {
         goldOfPlayer[(winner+1)%3] = -(goldOfPlayer[winner]/2);
         goldOfPlayer[(winner+2)%3] = -(goldOfPlayer[winner]/2);
     } else {
-        goldOfPlayer[_roundManager->_curPlayer] = -goldOfPlayer[winner];
+        goldOfPlayer[whoGive] = -goldOfPlayer[winner];
     }
     
     goldOfPlayer[(winner+1)%3] = goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+1)%3]*_roundManager->IsTing((winner+1)%3);
@@ -4684,7 +4669,7 @@ void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
     
     switch(win.kind) {
         case SINGLE_WIN:
-            _CalcSingleWinGold(goldOfPlayer,win.winner);
+            _CalcSingleWinGold(goldOfPlayer,win.winner,win.loser);
             break;
         case DOUBLE_WIN:
             _CalcDoubleWinGold(goldOfPlayer,win.loser);
@@ -4910,7 +4895,7 @@ Sprite *NetRaceLayer::_CreateSymbol(PlayerDir_t dir,int gold,LayerColor *parent)
     }
     sign->setAnchorPoint(Vec2(0,0.5));
     
-    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo) )
+    if( _roundManager->IsWinner(dir) )
         sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,parent->getContentSize().height/2));
     else
         sign->setPosition(Vec2(origin.x+visibleSize.width*0.816+20,origin.y+30));
@@ -4938,7 +4923,7 @@ LabelAtlas *NetRaceLayer::_CreatePropertyChange(PlayerDir_t dir,int gold,LayerCo
     }
 
     propertyOfIncrease->setAnchorPoint(Vec2(0,0.5));
-    if( _roundManager->IsWinner(dir, _roundManager->_curPlayer, _roundManager->_firstMingNo)  )
+    if( _roundManager->IsWinner(dir)  )
         propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,parent->getContentSize().height/2));
     else
         propertyOfIncrease->setPosition(Vec2(origin.x+visibleSize.width*0.816+50+20,origin.y+30));
@@ -6400,10 +6385,6 @@ Spawn* NetRaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 void NetRaceLayer::_DistributeEvent(const std::string event_type,void* val) {
     LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
 	_eventDispatcher->dispatchCustomEvent(event_type,val);
-}
-
-PlayerDir_t NetRaceLayer::_NextPlayer(PlayerDir_t dir) {
-    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
 }
 
 void NetRaceLayer::_DeleteStartDealCards() {

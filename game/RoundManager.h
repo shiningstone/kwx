@@ -16,8 +16,6 @@ using namespace ui;
 
 class NetRole;
 
-#define PLAYER_NUMBER 3
-
 class RoundManager {
     friend class NetRaceLayer;
     friend class Ai;
@@ -62,7 +60,9 @@ public:
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     void GetWin(WinInfo_t &info);
-    bool IsWinner(int no, int curPlayer, int FirstMingPlayer);
+    bool IsWinner(int no);
+
+    PlayerDir_t TurnToNext();
 
     void RecordOutCard( Card card );
     void RenewOutCard();
@@ -118,11 +118,11 @@ private:
     static RoundManager *_instance;
     Logger *_logger;
 
-	int         aim[PLAYER_NUMBER];
+	int         aim[PLAYER_NUM];
 
     WinInfo_t   _lastWin;
-    NetRole     *_players[PLAYER_NUMBER];
-    CardHolder  *_cardHolders[PLAYER_NUMBER];
+    NetRole     *_players[PLAYER_NUM];
+    CardHolder  *_cardHolders[PLAYER_NUM];
 
     outCardList *_river;
     int         _unDistributedCards[TOTAL_CARD_NUM];

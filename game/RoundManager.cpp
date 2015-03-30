@@ -19,7 +19,7 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
 	}
     _distributedNum = 0;
 
-    for(int i=0;i<PLAYER_NUMBER;i++) {
+    for(int i=0;i<PLAYER_NUM;i++) {
         _players[i] = NULL;
     }
 
@@ -29,7 +29,7 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
 
 RoundManager::~RoundManager() {
     delete _river;
-    for(int i=0;i<PLAYER_NUMBER;i++) {
+    for(int i=0;i<PLAYER_NUM;i++) {
         delete _players[i];
     }
     
@@ -64,17 +64,21 @@ void RoundManager::GetWin(WinInfo_t &info) {
     info.loser  = _lastWin.loser;
 }
 
-bool RoundManager::IsWinner(int no, int curPlayer, int FirstMingPlayer) {
+bool RoundManager::IsWinner(int no) {
 	if((_lastWin.kind==SINGLE_WIN&&
-                ((_lastWin.player==curPlayer && _lastWin.player!=no)
-                ||(_lastWin.player!=curPlayer && no!=_lastWin.player && no!=curPlayer)))
-        ||(_lastWin.kind==NONE_WIN && FirstMingPlayer!=-1 && no!=FirstMingPlayer)) {
+                ((_lastWin.player==_curPlayer && _lastWin.player!=no)
+                ||(_lastWin.player!=_curPlayer && no!=_lastWin.player && no!=_curPlayer)))
+        ||(_lastWin.kind==NONE_WIN && _firstMingNo!=INVALID && no!=_firstMingNo)) {
         return true;
     } else {
         return false;
     }
 }
 
+PlayerDir_t RoundManager::TurnToNext() {
+    _curPlayer = (_curPlayer+1)%PLAYER_NUM;
+    return (PlayerDir_t)_curPlayer;
+}
 /***********************************************
         river information
 ***********************************************/
@@ -507,6 +511,18 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvQi() {
+	if(_lastAction==a_JUMP) {
+		_continue_gang_times=0;
+    }
+
+	_lastAction=a_JUMP;
+	_actionToDo=a_JUMP;
+
+	if(_isWaitDecision) {
+		_isWaitDecision=false;
+		_tempActionToDo=a_JUMP;
+	}
+
     _uiManager->QiEffect();
 }
 
@@ -707,6 +723,9 @@ void RoundManager::RecvMing() {
         if(_ai->KouCardGroupNum()>0) {
             _uiManager->QueryKouCards();
         } else {
+            _isMingTime=true;
+            UpdateCards(MIDDLE,a_MING);
+            
             _uiManager->QueryMingOutCard();
         }
     } else {
