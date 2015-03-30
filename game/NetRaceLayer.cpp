@@ -241,7 +241,7 @@ void NetRaceLayer::GangEffect(PlayerDir_t winner,Card_t card, int gangCardIdx[],
 void NetRaceLayer::DoubleWin(const WinInfo_t &win) {
     HideClock();
 
-    if(win.winner!=MIDDLE) {
+    if(win.giver!=MIDDLE) {
         if(_roundManager->IsTing(MIDDLE)) {
             _HuEffect(win);
             _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);

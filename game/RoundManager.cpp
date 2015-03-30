@@ -52,7 +52,8 @@ void RoundManager::SetWin(WinKind_t kind,int player) {
     _lastWin.kind       = kind;
 
     if(kind==DOUBLE_WIN) {
-        _lastWin.giver = (PlayerDir_t)player;
+        _lastWin.winner = INVALID_DIR;
+        _lastWin.giver  = (PlayerDir_t)player;
     } else {
         _lastWin.winner = (PlayerDir_t)player;
         _lastWin.giver  = (PlayerDir_t)_curPlayer;
@@ -1001,10 +1002,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 action1=a_HU;
             else
                 action1=a_JUMP;
-        }
-        
-        if(_players[no]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
-        {
+        } else if(_players[no]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT) {
             if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
                 if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
@@ -1018,10 +1016,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             else if(_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
                 if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
                     action1=a_JUMP;
-        }
-        
-        if(_players[no]->get_parter()->get_role_type()==INTERNET_PLAYER)
-        {
+        } else if(_players[no]->get_parter()->get_role_type()==INTERNET_PLAYER) {
             LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
             if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
@@ -1096,17 +1091,11 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         {
             _uiManager->HideClock();
             
-            if((no!=1&&no1!=1)||(no==1||no1==1&&_players[1]->get_parter()->get_ting_status()==1))
-            {
-                WinInfo_t win;
-                win.kind  = DOUBLE_WIN;
-                win.giver = (PlayerDir_t)_curPlayer;
-                
-                _uiManager->_HuEffect(win);
+            if((no!=MIDDLE&&no1!=MIDDLE) || (no==MIDDLE||no1==MIDDLE&&IsTing(MIDDLE))){ 
+                SetWin(DOUBLE_WIN,(PlayerDir_t)_curPlayer);
+                _uiManager->_HuEffect(_lastWin);
                 _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
-            }
-            else if((no==1||no1==1)&&_players[1]->get_parter()->get_ting_status()==0)
-            {
+            } else if((no==MIDDLE||no1==MIDDLE) && !IsTing(MIDDLE)) {
                 _isDoubleHuAsking = true;
                 if(no==1) {
                     _otherOneForDouble = no1;
@@ -1118,8 +1107,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 WaitForMyAction();
                 return;
             }
-        }
-        else if(action1&a_HU||action2&a_HU)//点炮
+        } else if(action1&a_HU||action2&a_HU)//点炮
         {
             _uiManager->HideClock();
             
