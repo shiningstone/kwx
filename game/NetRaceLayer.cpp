@@ -3729,8 +3729,6 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
     PlayerDir_t loser  = win.loser;
 
 	if(win.kind!=DOUBLE_WIN) {
-        _roundManager->SetWin(SINGLE_WIN,winner);
-        
 		auto callfunc = simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png");
         CallFunc*HuVoice = _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex());
 
@@ -3853,7 +3851,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 			auto ll_action10=TargetedAction::create(this,l_seq10);
 			auto l_spa=Spawn::create(ll_action1,ll_action2,ll_action3,ll_action4,ll_action5,ll_action6,ll_action7,ll_action8,ll_action9,ll_action10,NULL);
 			
-			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign((PlayerDir_t)_roundManager->_curPlayer),"dahu.png");
+			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
 				GoldNumInsert(winner,3,loser);	
 			});
@@ -3865,7 +3863,6 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 			myframe->runAction(hu_seq);
 		}
 	} else {//两个对家双响
-        _roundManager->SetWin(DOUBLE_WIN,_roundManager->_curPlayer);
 		ListenToDoubleHu();
 	}
 }
@@ -3916,7 +3913,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir)
 				myframe->runAction(Sequence::create(
                     shadeFunc,Spawn::create(CallFunc::create([=](){
     					GoldNumInsert(_roundManager->_qiangGangTargetNo,2,_roundManager->_curPlayer);
-    					_roundManager->_qiangGangTargetNo=-1;/*!!! could this be called before runAction */}),CallFunc::create([=](){
+    					_roundManager->_qiangGangTargetNo = INVALID;/*!!! could this be called before runAction */}),CallFunc::create([=](){
                         _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
 			} else if(_roundManager->_isDoubleHuAsking) {
 				_roundManager->_isDoubleHuAsking=false;
