@@ -97,10 +97,10 @@ private:
     void _InitResidueCards();
     std::string _NumToString( int number );
     void _CalcAnGangGold(int winner,int goldOfPlayer[3]);
-    void _CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]);
+    void _CalcMingGangGold(int winner,int giver,int goldOfPlayer[3]);
     void _CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive);
-    void _CalcDoubleWinGold(int goldOfPlayer[3], int loser);
-    void _CalcNoneWinGold(int goldOfPlayer[3], int loser);
+    void _CalcDoubleWinGold(int goldOfPlayer[3], int giver);
+    void _CalcNoneWinGold(int goldOfPlayer[3], int giver);
     void _CalcHuGold(int goldOfPlayer[3]);
     void CalculateGoldNum(int goldOfPlayer[3],int GoldWinner,int Gold_kind,int who_give);
 

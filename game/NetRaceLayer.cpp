@@ -2984,8 +2984,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
     if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
-                _voice->SpeakAction(GANG,
-                    _roundManager->_cardHolders[dir]->GetSex()),
+                _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(dir,1,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
@@ -3726,7 +3725,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 	scheduleOnce(schedule_selector(NetRaceLayer::raceAccount),3);
 
     PlayerDir_t winner = win.winner;
-    PlayerDir_t loser  = win.loser;
+    PlayerDir_t giver  = win.giver;
 
 	if(win.kind!=DOUBLE_WIN) {
 		auto callfunc = simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png");
@@ -3737,7 +3736,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
                 Spawn::create(
                     HuVoice,
                     callfunc,NULL),CallFunc::create([=](){
-				GoldNumInsert(winner,3,loser);}),CallFunc::create(this,callfunc_selector(
+				GoldNumInsert(winner,3,giver);}),CallFunc::create(this,callfunc_selector(
                 NetRaceLayer::showall)),NULL));
 		} else {
 			Sequence* g_seq1;
@@ -3853,7 +3852,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 			
 			Spawn *simple_seq=simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png");
 			auto GoldAccount=CallFunc::create([=](){
-				GoldNumInsert(winner,3,loser);	
+				GoldNumInsert(winner,3,giver);	
 			});
 			Spawn* hu_seq;
 			if(_roundManager->_players[MIDDLE]->get_parter()->get_ting_status()!=1)
@@ -3862,7 +3861,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
 				hu_seq=Spawn::create(simple_seq,HuVoice,GoldAccount,l_spa,NULL);
 			myframe->runAction(hu_seq);
 		}
-	} else {//两个对家双响
+	} else {
 		ListenToDoubleHu();
 	}
 }
@@ -3908,8 +3907,8 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
                 
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
-                    PlayerDir_t loser = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
-                    _roundManager->SetWin(DOUBLE_WIN,loser);
+                    PlayerDir_t giver = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
+                    _roundManager->SetWin(DOUBLE_WIN,giver);
                     
                     WinInfo_t win;
                     _roundManager->GetWin(win);
@@ -4619,14 +4618,14 @@ void NetRaceLayer::_CalcAnGangGold(int winner,int goldOfPlayer[3]) {
     goldOfPlayer[(winner+2)%3] = -2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
 }
 
-void NetRaceLayer::_CalcMingGangGold(int winner,int loser,int goldOfPlayer[3]) {
-    if (winner==loser) {
+void NetRaceLayer::_CalcMingGangGold(int winner,int giver,int goldOfPlayer[3]) {
+    if (winner==giver) {
         goldOfPlayer[winner]       = 2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
         goldOfPlayer[(winner+1)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
         goldOfPlayer[(winner+2)%3] = -1*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
     } else {
         goldOfPlayer[winner]       =2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
-        goldOfPlayer[loser]        =-2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
+        goldOfPlayer[giver]        =-2*PREMIUM_LEAST*(_roundManager->_continue_gang_times);
     }
 }
 
@@ -4646,21 +4645,21 @@ void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGiv
     goldOfPlayer[winner] = - (goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+2)%3]);
 }
 
-void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int loser) {
+void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int giver) {
     for(int i=1;i<3;i++) {
-        auto score = _roundManager->_players[(loser+i)%3]->get_parter()->get_card_score();
-        int  ting  = _roundManager->IsTing((loser+i)%3);
+        auto score = _roundManager->_players[(giver+i)%3]->get_parter()->get_card_score();
+        int  ting  = _roundManager->IsTing((giver+i)%3);
 
-        goldOfPlayer[(loser+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
+        goldOfPlayer[(giver+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
     }
 
-    goldOfPlayer[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
+    goldOfPlayer[giver] = - ((goldOfPlayer[(giver+1)%3] + goldOfPlayer[(giver+2)%3]));
 }
 
-void NetRaceLayer::_CalcNoneWinGold(int goldOfPlayer[3], int loser) {
-    GoldAccountImmediate[(loser+1)%3] = PREMIUM_LEAST;
-    GoldAccountImmediate[(loser+2)%3] = PREMIUM_LEAST;
-    GoldAccountImmediate[loser] = - ((goldOfPlayer[(loser+1)%3] + goldOfPlayer[(loser+2)%3]));
+void NetRaceLayer::_CalcNoneWinGold(int goldOfPlayer[3], int giver) {
+    GoldAccountImmediate[(giver+1)%3] = PREMIUM_LEAST;
+    GoldAccountImmediate[(giver+2)%3] = PREMIUM_LEAST;
+    GoldAccountImmediate[giver] = - ((goldOfPlayer[(giver+1)%3] + goldOfPlayer[(giver+2)%3]));
 }
 
 void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
@@ -4669,10 +4668,10 @@ void NetRaceLayer::_CalcHuGold(int goldOfPlayer[3]) {
     
     switch(win.kind) {
         case SINGLE_WIN:
-            _CalcSingleWinGold(goldOfPlayer,win.winner,win.loser);
+            _CalcSingleWinGold(goldOfPlayer,win.winner,win.giver);
             break;
         case DOUBLE_WIN:
-            _CalcDoubleWinGold(goldOfPlayer,win.loser);
+            _CalcDoubleWinGold(goldOfPlayer,win.giver);
             break;
         case NONE_WIN:
             _CalcNoneWinGold(goldOfPlayer,win.winner);
@@ -4985,14 +4984,14 @@ void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor 
 		}
 		else if(list->data[i].status==c_FREE)
 		{
-			if( win.kind==SINGLE_WIN && win.winner==dir && win.loser==dir && i==(list->len-2) )
+			if( win.kind==SINGLE_WIN && win.winner==dir && win.giver==dir && i==(list->len-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
 
-    if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN && win.loser!=dir))
+    if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN && win.giver!=dir))
     {
         if(_roundManager->_isCardFromOthers)
         {
@@ -5028,9 +5027,9 @@ void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 	int tagNum = BarOfPlayer->getTag();
 	if(_roundManager->IsTing(tagNum)&&
             ((win.kind==SINGLE_WIN && 
-                ((win.winner==win.loser && tagNum!=win.winner)  /* others zimo */
-                ||(win.winner!=win.loser && tagNum==win.loser)))/* tagNum dianpao */
-            || (win.kind==DOUBLE_WIN && tagNum==win.loser))) {
+                ((win.winner==win.giver && tagNum!=win.winner)  /* others zimo */
+                ||(win.winner!=win.giver && tagNum==win.giver)))/* tagNum dianpao */
+            || (win.kind==DOUBLE_WIN && tagNum==win.giver))) {
         float Extra_x=162;
         float Extra_y=origin.y+visibleSize.height*0.1256-10;
 
@@ -5057,9 +5056,9 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
     _roundManager->GetWin(win);
     
 	if((win.kind==SINGLE_WIN
-            &&(win.winner==win.loser && curScore==2)
-            ||(win.winner!=win.loser && tagNum==win.winner && curScore==1))
-        ||(win.kind==DOUBLE_WIN && tagNum!=win.loser && curScore==1))
+            &&(win.winner==win.giver && curScore==2)
+            ||(win.winner!=win.giver && tagNum==win.winner && curScore==1))
+        ||(win.kind==DOUBLE_WIN && tagNum!=win.giver && curScore==1))
 	{
 		auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 		kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
@@ -5088,7 +5087,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	{
 		if(tingStatus==1 &&
                 ((win.kind==SINGLE_WIN && tagNum==win.winner)
-                ||(win.kind==DOUBLE_WIN && (tagNum!=win.loser)))) {
+                ||(win.kind==DOUBLE_WIN && (tagNum!=win.giver)))) {
 			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景
 			kindOfHuBkg->setAnchorPoint(Point(0.0f,0.5f));
 			kindOfHuBkg->setPosition(Vec2(x,y));
@@ -5623,11 +5622,11 @@ void NetRaceLayer::raceAccount(float delta)
                 AccountShows(WinBarPlus,(win.winner+1)%3);
                 AccountShows(WinBarMinus,(win.winner+2)%3);
             
-                if(win.winner==win.loser) {
+                if(win.winner==win.giver) {
                     WinBar->getChildByTag(ACCOUNT_ZIMO_FONT)->setVisible(true);
                 } else {
                     WinBar->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
-                    raceAccoutLayer->getChildByTag(win.loser)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
+                    raceAccoutLayer->getChildByTag(win.giver)->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
                 }
             
                 AccountHuKind(WinBar,num);
@@ -5635,16 +5634,16 @@ void NetRaceLayer::raceAccount(float delta)
             }
         case DOUBLE_WIN:
             {
-                auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.loser); 
-                auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.loser+1)%3);
-                auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.loser+2)%3);
+                auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(win.giver); 
+                auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+1)%3);
+                auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+2)%3);
             
-                _roundManager->_players[(win.loser+1)%3]->get_parter()->get_Hu_Flag(&num);
-                _roundManager->_players[(win.loser+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
+                _roundManager->_players[(win.giver+1)%3]->get_parter()->get_Hu_Flag(&num);
+                _roundManager->_players[(win.giver+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
             
-                AccountShows(WinBar,win.loser);
-                AccountShows(WinBarPlus,(win.loser+1)%3);
-                AccountShows(WinBarMinus,(win.loser+2)%3);
+                AccountShows(WinBar,win.giver);
+                AccountShows(WinBarPlus,(win.giver+1)%3);
+                AccountShows(WinBarMinus,(win.giver+2)%3);
             
                 WinBar->getChildByTag(ACCOUNT_DIANPAO_FONT)->setVisible(true);
                 WinBarPlus->getChildByTag(ACCOUNT_HU_FONT)->setVisible(true);
@@ -6152,8 +6151,8 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 						_roundManager->_isDoubleHuAsking = false;
 
 						myframe->runAction(CallFunc::create([=](){
-                            PlayerDir_t loser = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
-                            _roundManager->SetWin(DOUBLE_WIN,loser);
+                            PlayerDir_t giver = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
+                            _roundManager->SetWin(DOUBLE_WIN,giver);
                             
                             WinInfo_t win;
                             _roundManager->GetWin(win);

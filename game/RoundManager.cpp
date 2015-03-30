@@ -12,7 +12,7 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
     _uiManager = uiManager;
 
     _lastWin.winner = INVALID_DIR;
-    _lastWin.loser  = INVALID_DIR;
+    _lastWin.giver  = INVALID_DIR;
 
     _river = NULL;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
@@ -52,17 +52,17 @@ void RoundManager::SetWin(WinKind_t kind,int player) {
     _lastWin.kind       = kind;
 
     if(kind==DOUBLE_WIN) {
-        _lastWin.loser = (PlayerDir_t)player;
+        _lastWin.giver = (PlayerDir_t)player;
     } else {
         _lastWin.winner = (PlayerDir_t)player;
-        _lastWin.loser  = (PlayerDir_t)_curPlayer;
+        _lastWin.giver  = (PlayerDir_t)_curPlayer;
     }
 }
 
 void RoundManager::GetWin(WinInfo_t &info) {
     info.kind   = _lastWin.kind;
     info.winner = _lastWin.winner;
-    info.loser  = _lastWin.loser;
+    info.giver  = _lastWin.giver;
 }
 
 bool RoundManager::IsWinner(int no) {
@@ -594,7 +594,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	if((action1&a_HU)&&(action2&a_HU)) {
         WinInfo_t win;
         win.kind  = DOUBLE_WIN;
-        win.loser = (PlayerDir_t)_curPlayer;
+        win.giver = (PlayerDir_t)_curPlayer;
         
         if(no1==1) {
             _actionToDo=action1;
@@ -612,7 +612,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         WinInfo_t win;
         win.kind = SINGLE_WIN;
         win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
-        win.loser = (PlayerDir_t)_curPlayer;
+        win.giver = (PlayerDir_t)_curPlayer;
 
         if(no1==1)
             _actionToDo=action1;
@@ -1100,7 +1100,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             {
                 WinInfo_t win;
                 win.kind  = DOUBLE_WIN;
-                win.loser = (PlayerDir_t)_curPlayer;
+                win.giver = (PlayerDir_t)_curPlayer;
                 
                 _uiManager->_HuEffect(win);
                 _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
