@@ -1,5 +1,6 @@
 
 #include "KwxMessenger.h"
+#include "MsgFormats.h"
 #include "KwxMsg.h"
 
 #ifndef NULL
@@ -13,6 +14,8 @@ Logger       *KwxMessenger::_logger = 0;
 
 KwxMessenger::KwxMessenger() {
     _messenger = NetMessenger::getInstance();
+    _messenger->Start();
+
     _logger = LOGGER_REGISTER("KwxMessenger");
 }
 
@@ -75,28 +78,37 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 }
 
 /************************************************************
-	Upstream
+	Request (Upstream)
 ************************************************************/
 int KwxMessenger::SetAction(ActionId_t code) {
-
+    return 0;
 }
 
 int KwxMessenger::SetShowCard(CardType_t code) {
-
+    return 0;
 }
 
 int KwxMessenger::SetReaction(ActionId_t code,CardType_t kind) {
+    INT8U buf[MSG_MAX_LEN] = {0};
+    int   len = 0;
+    
+    KwxMsg aMsg(UP_STREAM);
+    len = aMsg.SetReaction(buf,code,kind);
+    
+    _messenger->Send(buf,len);
 
+    return 0;
 }
 
 int KwxMessenger::SetReaction(ActionId_t code,int num,Card_t *kind) {
-
+    return 0;
 }
 
 int KwxMessenger::SetRequestDistribute() {
-
+    return 0;
 }
 
 int KwxMessenger::SetUpdateCardList(CARD *cards,int num) {
-
+    return 0;
 }
+

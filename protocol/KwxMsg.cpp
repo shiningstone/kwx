@@ -62,8 +62,6 @@ int KwxMsg::Serialize(INT8U *outMsg) {
     len += _body->Serialize(outMsg+len);
 	_set_size(outMsg,len);
 
-    _messenger->Send(outMsg,len);
-
     return len;
 }
 

@@ -5,6 +5,7 @@
 
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/KwxMsg.h"
+#include "./../../protocol/KwxMessenger.h"
 
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"
@@ -63,8 +64,6 @@ class TestKwxAutoRecv : public CTestMessenger {
 };
 
 INT8U TestKwxAutoRecv::RecvBuf[256] = {0};
-
-
 class TestKwxAutoHandleMsg : public CTestMessenger {
 	INT8U MESSAGE[MSG_MAX_LEN];
 	int   MESSAGE_LEN;
@@ -104,8 +103,65 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
     }
 };
 
+/**************************************************
+        requests
+**************************************************/
+class TestSetRaction : public CTestMessenger {
+	virtual void Start() {
+		CTestMessenger::Start();
+	}
 
-void testKwxMsgUsingSocket() {
+	virtual void ServerActions() {
+        INT8U MESSAGE[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,49,               //request code(发送玩家反应)
+            0x00,56,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+        
+            6,
+            131,4,0,1,2,3,         //roomPath:0x00010203
+            132,4,4,5,6,7,         //roomId:  0x04050607
+            133,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                  //site:    1
+            66,2,                  //act:     2 
+            135,1,3                //card kind: 3
+        };
+        INT8U msgInNetwork[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+		SERVER.Start();
+
+		SERVER.Recv((char *)msgInNetwork,&len);
+
+        assert(len==sizeof(MESSAGE));
+        assert(!memcmp(msgInNetwork,MESSAGE,len));
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+        KwxMessenger aMessenger;
+        aMessenger.SetReaction(aGANG,TIAO_4);
+    }
+};
+
+static void testRequests() {
+	CTestCase *aCase;
+
+	aCase = new TestSetRaction();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+}
+
+static void testAutoRecv() {
 	CTestCase *aCase;
 
 	aCase = new TestKwxAutoRecv();
@@ -117,6 +173,10 @@ void testKwxMsgUsingSocket() {
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
+}
 
+void testKwxMsgUsingSocket() {
+    testRequests();
+    testAutoRecv();
     while(1);
 }
