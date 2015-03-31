@@ -1,133 +1,140 @@
+********************************************************************
 2015.03.28
 特效与逻辑大块逻辑已经分割完成，但是还有一些逻辑行散落在NetRaceLayer里面。
 	有些逻辑行执行的结果会被网络版执行覆盖，所以不会有任何影响；
 	其他逻辑行则比较危险，可能需要特殊处理。（目前尚不明确）
 
 主要接口及其内部主要实现介绍
+	RoundManager
+		CreateRace
+			说明：游戏总入口，由HelloWorldScene::enterRoomStandAlone调用
+			实现：Player创建
+				  调用NetRaceLayer::CreateRace
+			网络版：增加参数GameMode_t，指定创建单机版或者网络版。
+		
+		StartGame
+			说明：由NetRaceLayer::StartGame调用
+			实现：玩家手牌初始化
+				  显示玩家ready状态
+				  调用NetRaceLayer::FirstRoundDistributeEffect
+			网络版：只需执行玩家初始化
 
-RoundManager
-	CreateRace
-		说明：游戏总入口，由HelloWorldScene::enterRoomStandAlone调用
-		实现：Player创建
-			  调用NetRaceLayer::CreateRace
-		网络版：增加参数GameMode_t，指定创建单机版或者网络版。
-	
-	StartGame
-		说明：由NetRaceLayer::StartGame调用
-		实现：玩家手牌初始化
-			  显示玩家ready状态
-		      调用NetRaceLayer::FirstRoundDistributeEffect
-		网络版：只需执行玩家初始化
+		WaitForMyAction
+			说明：
+			实现：根据可执行动作显示动作按钮
+				  状态更新
+				  调用WaitForMyChoose
+			网络版：不需修改？
+		
+		WaitForMyChoose
+			说明：
+			实现：如果托管或明，直接出牌
+				  否则设置_isMyShowTime（等待MIDDLE选牌）
+			网络版：
+					
+		***WaitForOthersAction***
+			说明：
+			实现：
+			网络版：只更新出牌指示箭头（尚无效果接口）
+					需确认有单机版的后续操作的入口
+		
+		RecvPeng、RecvHu、RecvGang、RecvQi、RecvHandout
+			说明：由按钮点击触发调用
+			实现：状态更新
+				  提供参数调用对应的特效接口NetRaceLayer::XxxxEffect
+			网络版：上报服务器，接收到反馈后调用特效接口（阻塞？）
+			
+		RecvMing
+			说明：根据手牌状况，提供“扣"或者直接选牌出牌
+			实现：
+			网络版：不需要，但是”明“状态需要记录，并且在出牌的时候上报服务器
+			
+		DistributeTo
+			说明：发牌
+			实现：
+			网络版：增加参数接收牌类型，
+					由于其他特效会调到这个函数，增加阻塞或者直接退出
+		
+		ActionAfterGang
+			说明：杠牌特效执行完成之后的动作
+			实现：
+			网络版：直接退出
+			
+		UpdateCards
+			说明：更新手牌
+			实现：
+			网络版：***其他玩家在碰、杠后需要更新。
+			
+	NetRaceLayer
+		CreateRace
+			说明：完成界面，等待“开始游戏”按钮事件
+			实现：略
+			网络版：不需修改
 
-	WaitForMyAction
-		说明：
-		实现：根据可执行动作显示动作按钮
-		      状态更新
-		      调用WaitForMyChoose
-		网络版：不需修改？
-	
-	WaitForMyChoose
-		说明：
-		实现：如果托管或明，直接出牌
-		      否则设置_isMyShowTime（等待MIDDLE选牌）
-		网络版：
-				
-	***WaitForOthersAction***
-		说明：
-		实现：
-		网络版：只更新出牌指示箭头（尚无效果接口）
-				需确认有单机版的后续操作的入口
-	
-	RecvPeng、RecvHu、RecvGang、RecvQi、RecvHandout
-		说明：由按钮点击触发调用
-		实现：状态更新
-		      提供参数调用对应的特效接口NetRaceLayer::XxxxEffect
-		网络版：上报服务器，接收到反馈后调用特效接口（阻塞？）
+		StartGame
+			说明：由“开始游戏”按钮事件触发调用
+			实现：资源初始化
+				  设置MIDDLE玩家ready状态
+				  调用RoundManager::StartGame
+			网络版：是否需要增加ready按钮？强制ready
 		
-	RecvMing
-		说明：根据手牌状况，提供“扣"或者直接选牌出牌
-		实现：
-		网络版：不需要，但是”明“状态需要记录，并且在出牌的时候上报服务器
-		
-	DistributeTo
-		说明：发牌
-		实现：
-		网络版：增加参数接收牌类型，
-		        由于其他特效会调到这个函数，增加阻塞或者直接退出
-	
-	ActionAfterGang
-		说明：杠牌特效执行完成之后的动作
-		实现：
-		网络版：直接退出
-		
-	UpdateCards
-		说明：更新手牌
-		实现：
-		网络版：***其他玩家在碰、杠后需要更新。
-		
-NetRaceLayer
-	CreateRace
-		说明：完成界面，等待“开始游戏”按钮事件
-		实现：略
-		网络版：不需修改
+		OthersHandoutEffect	
+			说明：其他玩家出牌特效
+			实现：特效
+				  更新手牌
+				  调用RoundManager::WaitForResponse
+			网络版：
 
-	StartGame
-		说明：由“开始游戏”按钮事件触发调用
-		实现：资源初始化
-			  设置MIDDLE玩家ready状态
-			  调用RoundManager::StartGame
-		网络版：是否需要增加ready按钮？强制ready
-	
-	OthersHandoutEffect	
-		说明：其他玩家出牌特效
-		实现：特效
-		      更新手牌
-			  调用RoundManager::WaitForResponse
-		网络版：
+		FirstRoundDistributeEffect 参数 zhuang(庄)
+			说明：首轮发牌特效，由RoundManager::StartGame调用
+			实现：发牌特效
+				  residue特效
+				  玩家手牌特效
+				  出口RoundManager::WaitForMyAction或者RoundManager::WaitForOthersAction
+			网络版：改由服务器触发调用
+			
+		_QiEffect
+			说明：  
+			实现：  出口RoundManager::RecvHandout/RoundManager::DistributeTo/RoundManager::_HuEffect
+					为什么弃之后还有后续操作？
+			网络版：不需要修改
+			
+		_PengEffect
+			说明：
+			实现：  出口RoundManager::WaitForMyAction/RoundManager::WaitForOthersAction
+			网络版：不需要最后一个runAction？
+			
+		_AnGangEffect
+			说明：
+			实现：  出口RoundManager::DistributeTo
+			网络版：
+			
+		_MingGangEffect
+			说明：
+			实现：  出口RoundManager::DistributeTo/RoundManager::QiangGangHuJudge
+			网络版：
+			
+		_HuEffect
+			说明：
+			实现：  出口RoundManager::DistributeTo/RoundManager::QiangGangHuJudge
+					为什么要用两种机制？
+			网络版：
 
-	FirstRoundDistributeEffect 参数 zhuang(庄)
-		说明：首轮发牌特效，由RoundManager::StartGame调用
-		实现：发牌特效
-		      residue特效
-			  玩家手牌特效
-			  出口RoundManager::WaitForMyAction或者RoundManager::WaitForOthersAction
-		网络版：改由服务器触发调用
-		
-	_QiEffect
-		说明：  
-		实现：  出口RoundManager::RecvHandout/RoundManager::DistributeTo/RoundManager::_HuEffect
-				为什么弃之后还有后续操作？
-		网络版：不需要修改
-		
-	_PengEffect
-		说明：
-		实现：  出口RoundManager::WaitForMyAction/RoundManager::WaitForOthersAction
-		网络版：不需要最后一个runAction？
-		
-	_AnGangEffect
-		说明：
-		实现：  出口RoundManager::DistributeTo
-		网络版：
-		
-	_MingGangEffect
-		说明：
-		实现：  出口RoundManager::DistributeTo/RoundManager::QiangGangHuJudge
-		网络版：
-		
-	_HuEffect
-		说明：
-		实现：  出口RoundManager::DistributeTo/RoundManager::QiangGangHuJudge
-				为什么要用两种机制？
-		网络版：
+网络版实现思路
+	报文接收
+		报文接收有专门的进程，但是报文处理还需要另外起一个线程，或者发送消息给主线程进行处理，前期可以
+	采用直接调用的方式；
+		报文处理入口为KwxMsg.c内的静态函数_HANDLE_DS_PACKAGES；
+		报文接收出口为RoundManager下的RecvXxxx函数（目前采用重载方式与单机版保持兼容）
 
-
-
+	报文处理
+		
+********************************************************************
 2015.03.19
 效果是统一放在RoundManager还是Player也可以执行我还没有想好，暂时统一由RoundManager执行。
 CardList也是我希望能够产生的一个类，这个类负责对手上的牌排序，碰杠胡判断等，不过是否实现要看时间是否允许
 下面的接口说明仅介绍了接口之间的调用关系，一些内部的逻辑处理没有涉及
 
-********************************************************************
 RoundManager
 	负责牌局总体进度控制
 	负责界面更新请求
