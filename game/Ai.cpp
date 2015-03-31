@@ -214,7 +214,7 @@ void Ai::MingKouChoose(PlayerDir_t dir) {
 /*************************************
         card process
 *************************************/
-Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_ACTION gangType,bool isTing,bool isCardFromOthers) {
+Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers) {
     if( gangType & a_AN_GANG || gangType & a_SHOU_GANG ) {
         if(!isTing) {
             /*BUG here : only the first group can be found*/
@@ -228,7 +228,7 @@ Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_AC
                         cardIdx[matchCardNum] = j;
                         
                         if(matchCardNum==3) {
-                            return cards->data[i].kind;
+                            return (Card_t)cards->data[i].kind;
                         }
                     }
                 }
@@ -241,7 +241,7 @@ Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_AC
                 if(cards->data[i].kind==cards->data[cardIdx[3]].kind) {
                     cardIdx[p++]=i;
                     if(p==3) {
-                        return cards->data[i].kind;
+                        return (Card_t)cards->data[i].kind;
                     }
                 }
             }
