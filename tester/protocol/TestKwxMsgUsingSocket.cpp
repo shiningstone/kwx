@@ -53,13 +53,12 @@ class TestKwxAutoRecv : public CTestMessenger {
 	virtual void ClientActions() {
         memset(RecvBuf,0,256);
 
-        KwxMsg aMsg(DOWN_STREAM);
-        aMsg.StartReceiving((MsgHandler_t)&TestKwxAutoRecv::MsgHandler);
+        KwxMessenger::StartReceiving((MsgHandler_t)&TestKwxAutoRecv::MsgHandler);
         Sleep(DELAY);
 
         assert( !memcmp(RecvBuf,MESSAGE,MESSAGE_LEN) );
 
-        aMsg.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        KwxMessenger::StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 };
 
@@ -97,9 +96,9 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
 	}
 
 	virtual void ClientActions() {
-        KwxMsg::StartReceiving();
+        KwxMessenger::StartReceiving();
         Sleep(DELAY);
-        KwxMsg::StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        KwxMessenger::StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 };
 

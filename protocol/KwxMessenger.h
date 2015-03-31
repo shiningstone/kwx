@@ -20,7 +20,7 @@ public:
     /* auto receive */
     static void StartReceiving();
     static void StopReceiving();
-    void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
+    static void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
 
     /* upstream */
     int SetAction(ActionId_t code);

@@ -30,11 +30,6 @@ public:
     KwxMsg(int dir);
     ~KwxMsg();
     
-    /* auto receive */
-    static void StartReceiving();
-    static void StopReceiving();
-    void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
-
     /* upstream */
     int SetAction(INT8U *buf,ActionId_t code);
     int SetShowCard(INT8U *buf,CardType_t code);
@@ -59,7 +54,6 @@ protected:
 
     Header          *_header;
     MsgBody         *_body;
-    static NetMessenger    *_messenger;
 protected:
 	const int   _dir;
 

@@ -8,9 +8,6 @@
 #include "KwxMsg.h"
 
 
-static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
-
-NetMessenger *KwxMsg::_messenger = 0;
 Logger *KwxMsg::_logger = 0;
 
 KwxMsg::KwxMsg(int dir)
@@ -21,37 +18,12 @@ KwxMsg::KwxMsg(int dir)
         _header = new DnHeader();
     }
     _body = new MsgBody();
-    _messenger = NetMessenger::getInstance();
-
     _logger = LOGGER_REGISTER("KwxMsg");
 }
 
 KwxMsg::~KwxMsg() {
     delete _header;
     delete _body;
-    LOGGER_DEREGISTER(_logger);
-}
-
-void KwxMsg::StartReceiving(MsgHandler_t handle) {
-    _messenger->SetHandler(handle);
-    _messenger->Start();
-}
-
-void KwxMsg::StartReceiving() {
-    if(_messenger==0) {
-        _messenger = NetMessenger::getInstance();
-    }
-
-    if (_logger==0) {
-        _logger = LOGGER_REGISTER("KwxMsg");
-    }
-
-    _messenger->SetHandler(_HANDLE_DS_PACKAGES);
-    _messenger->Start();
-}
-
-void KwxMsg::StopReceiving() {
-    _messenger->SetHandler(0);
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -287,33 +259,5 @@ int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
     cardInfo.cardKind = (CardType_t)_body->_items[1]->_value;/*id==67*/
 
     return 0;
-}
-
-int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    KwxMsg aMsg(DOWN_STREAM);
-    Logger *_logger = LOGGER_REGISTER("KwxMsg");
-
-    aMsg.Deserialize(pkg);
-
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,aMsg.GetRequestCode());
-
-    switch(aMsg.GetRequestCode()) {
-        case REQ_GAME_SEND_DIST:
-            return 0;
-
-        case REQ_GAME_RECV_ACTION:
-            return 0;
-
-        case REQ_GAME_RECV_SHOWCARD:
-            return 0;
-
-        case REQ_GAME_RECV_RESPONSE:
-            return 0;
-
-        default:
-            return KWX_INVALID_PCHC;
-    }
-
-    LOGGER_DEREGISTER(_logger);
 }
 
