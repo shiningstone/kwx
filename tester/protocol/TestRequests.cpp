@@ -12,6 +12,8 @@
 #include "./../../RaceType.h"
 #include "./CTestProtocol.h"
 
+#if 0
+
 class TestGameSendReactionGang : public CTestCase {
 public:
     virtual int Execute() {
@@ -169,8 +171,6 @@ public:
         return 0;
     }
 };
-
-#if 0
 class TestGameSendAction : public CTestCase {
 public:
     virtual int Execute() {
@@ -441,46 +441,49 @@ public:
 
 #endif
 
+class TestSendAction_peng3tiao : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,49,               //request code(发送玩家反应 REQ_GAME_SEND_ACTION)
+            0x00,60,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            6,
+            131,4,0,1,2,3,         //roomPath:0x00010203
+            132,4,4,5,6,7,         //roomId:  0x04050607
+            133,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                  //site:    1
+            134,4,0,0,0,1,         //act:     1(碰)                 
+            135,1,2                //card:    3tiao
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
+        KwxMsg aMsg(UP_STREAM);
+        len = aMsg.SendAction(buf,aPENG,TIAO_3);
+
+        assert(len==sizeof(msgInNetwork));
+        assert(!memcmp(buf,msgInNetwork,len));
+
+        return 0;
+    }
+};
+
 void testRequests() {
-    CTestCase *aCase = new TestGameSendReactionGang();
+	CTestCase *aCase;
+    
+    aCase = new TestSendAction_peng3tiao();
     aCase->Execute();
-
-    aCase = new TestGameSendReactionMing1Card();
-    aCase->Execute();
-
-    aCase = new TestGameSendReactionMing2Cards();
-    aCase->Execute();
-
-    aCase = new TestGameRecvOthersReaction();
-    aCase->Execute();
-
-
-#if 0
-    CTestCase *aCase = new TestGameSendAction();
-    aCase->Execute();
-
-    aCase = new TestGameSendShowCard();
-    aCase->Execute();
-
-    aCase = new TestGameSendDistributeRequest();
-    aCase->Execute();
-
-    aCase = new TestGameRecvDistributeResponse();
-    aCase->Execute();
-
-    aCase = new TestGameSendUpdateList();
-    aCase->Execute();
-
-    aCase = new TestGameRecvOthersAction();
-    aCase->Execute();
-
-    aCase = new TestGameRecvOthersShowCard();
-    aCase->Execute();
-
-    aCase = new TestGameRecvUpdateList();/*REQ_GAME_RECV_UPDATELIST(56)*/
-    aCase = new TestGameRecvCalScore();/*REQ_GAME_SEND_CALSCORE（51）*/
-    aCase = new TestGameRecvCounter();/*REQ_GAME_SEND_DAOJISHI（55）*/
-    aCase = new TestGameRecvConfirmRaction();/*REQ_GAME_SEND_OK（54）*/
-    /*REQ_GAME_SEND_DAOJISHI（57）*/
-    #endif
 }

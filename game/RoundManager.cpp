@@ -243,7 +243,7 @@ int RoundManager::Shuffle() {
     _isGangHua = false;
     _isMyShowTime = false;
     _isTuoGuan = false;
-    _otherHandedOut = CARD_UNKNONW;
+    _otherHandedOut = CARD_UNKNOWN;
     
     CancelEffectCard();
     _isMingTime = false;
@@ -416,7 +416,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        card = _ai->FindGangCards(gangCardIdx,list,CARD_UNKNONW,_actionToDo,IsTing(dir),_isCardFromOthers);
+        card = _ai->FindGangCards(gangCardIdx,list,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -747,7 +747,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        Card_t card = _ai->FindGangCards(gangIdx,list,CARD_UNKNONW,_actionToDo,IsTing(dir),_isCardFromOthers);
+        Card_t card = _ai->FindGangCards(gangIdx,list,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
 
         if( !IsTing(dir) ) {
             SetEffectCard(card,c_AN_GANG);

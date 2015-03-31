@@ -261,7 +261,7 @@ Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,int gang
 		}
     }
 
-    return CARD_UNKNONW;
+    return CARD_UNKNOWN;
 }
 
 int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isCardFromOthers,int gang4) {
@@ -300,7 +300,7 @@ Card_t Ai::FindPengCards(int cardIdx[2],CARD_ARRAY *cards,Card_t target) {
         }
     }
 
-    return CARD_UNKNONW;
+    return CARD_UNKNOWN;
 }
 
 int Ai::ReChooseAfterPeng(int chosen,int pengIdx[2]) {

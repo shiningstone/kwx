@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "./../utils/UtilBasic.h"
+#include "./../utils/BasicType.h"
 #include "./../network/NetMessenger.h"
 
 #include "MsgFormats.h"

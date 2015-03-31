@@ -49,7 +49,7 @@ typedef enum {
     FA,
     BAI,        
     CARD_MAX,
-    CARD_UNKNONW = CARD_MAX,
+    CARD_UNKNOWN = 0xff,
 }Card_t;
 
 typedef enum {
