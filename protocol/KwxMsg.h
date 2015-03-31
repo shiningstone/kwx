@@ -31,7 +31,7 @@ public:
     ~KwxMsg();
     
     /* upstream */
-    int SetAction(INT8U *buf,ActionId_t code);
+    int SendAction(INT8U *buf,ActionId_t code,Card_t card);
     int SetShowCard(INT8U *buf,CardType_t code);
     int SetReaction(INT8U *buf,ActionId_t code,CardType_t kind);
     int SetReaction(INT8U *buf,ActionId_t code,int num,Card_t *kind);
@@ -67,6 +67,8 @@ protected:
     int AddTableId(TableId_t code);
     int AddSeatId(INT8U code);
     int AddAction(ActionId_t code);
+    int AddCard(Card_t card);
+    
     int AddShowCard(CardType_t card);
     int AddCards(CARD *cards,int num);
     int AddCardKind(CardType_t code);

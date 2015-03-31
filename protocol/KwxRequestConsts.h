@@ -21,7 +21,6 @@ typedef enum {
     REQ_GAME_ENTER_ROOM = 44,
     REQ_GAME_SEND_SEAT_ACTION = 45,
     REQ_GAME_SEND_MSG = 46,
-    REQ_GAME_SEND_ACTION = 47,
     REQ_GAME_SEND_SHOW_CARD = 48,      /*  THIS HAS NOT BEEN UNDETERMINED YET*/
     REQ_GAME_SEND_RESPONSE = 49,      /*  THIS HAS NOT BEEN UNDETERMINED YET*/
 
@@ -44,16 +43,20 @@ typedef enum {
     REQ_GAME_USE_GIFT = 63,
     REQ_GET_COUNTDOWN_HONUS = 64,
 
-
+    /* KWX-外部通信协议4.0 */
+    REQ_GAME_SEND_ACTION = 49,
 }RequestId_t;
 
 typedef enum {
-    aPENG = 1,
-    aGANG,
-    aGUO,
-    aHU,
-    aQIANG_GANG,
-    aMING,
+    aQi        = 0,
+    aPENG      = 0x1,
+    aMING_GANG = 0x2,
+    aAN_GANG   = 0x4,
+    aMING      = 0x8,
+    aHU        = 0x10,
+    aSHOU_GANG = 0x20,
+    aKOU       = 0x40,
+    aKOU_CANCEL= 0x80,
 }ActionId_t;/*ARRAY_ACTION???*/
 
 typedef enum {
@@ -61,10 +64,10 @@ typedef enum {
     CardKindOfReaction = 61,
     CardKind = 65,
     ActionIdOfReaction = 66,
-	ActionId = 67,
 	RoomPath = 131,
 	RoomId   = 132,
 	TableId  = 133,
+    ActionId = 134,
     CardList = 135,
 }Item_t;
 

@@ -306,6 +306,9 @@ bool RoundManager::IsCurEffectCard(Card card) {
     }
 }
 
+/****************************************
+       main interface
+****************************************/
 void RoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
     scene->addChild(_uiManager);

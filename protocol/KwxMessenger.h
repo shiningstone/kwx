@@ -23,12 +23,7 @@ public:
     static void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
 
     /* upstream */
-    int SetAction(ActionId_t code);
-    int SetShowCard(CardType_t code);
-    int SetReaction(ActionId_t code,CardType_t kind);
-    int SetReaction(ActionId_t code,int num,Card_t *kind);
-    int SetRequestDistribute();
-    int SetUpdateCardList(CARD *cards,int cardNum);
+    int SendAction(ActionId_t code,Card_t card);
 
 private:
 	static NetMessenger *_messenger;

@@ -46,7 +46,7 @@ NetRaceLayer::NetRaceLayer()
     
     KwxMsg aMsg(UP_STREAM);
     aMsg.StartReceiving();
-    len = aMsg.SetAction(buf,(ActionId_t)PENG);
+    len = aMsg.SendAction(buf,(ActionId_t)PENG);
 	/**************************/
 }
 

@@ -201,7 +201,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         KwxMsg aMsg(UP_STREAM);
-        len = aMsg.SetAction(buf,PENG);
+        len = aMsg.SendAction(buf,PENG);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));

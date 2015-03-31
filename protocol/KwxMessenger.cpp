@@ -80,35 +80,15 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 /************************************************************
 	Request (Upstream)
 ************************************************************/
-int KwxMessenger::SetAction(ActionId_t code) {
-    return 0;
-}
-
-int KwxMessenger::SetShowCard(CardType_t code) {
-    return 0;
-}
-
-int KwxMessenger::SetReaction(ActionId_t code,CardType_t kind) {
+int KwxMessenger::SendAction(ActionId_t code,Card_t card) {
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
     KwxMsg aMsg(UP_STREAM);
-    len = aMsg.SetReaction(buf,code,kind);
+    len = aMsg.SendAction(buf,code,card);
     
     _messenger->Send(buf,len);
 
-    return 0;
-}
-
-int KwxMessenger::SetReaction(ActionId_t code,int num,Card_t *kind) {
-    return 0;
-}
-
-int KwxMessenger::SetRequestDistribute() {
-    return 0;
-}
-
-int KwxMessenger::SetUpdateCardList(CARD *cards,int num) {
     return 0;
 }
 

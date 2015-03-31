@@ -91,11 +91,13 @@ int KwxMsg::AddSeatId(INT8U code) {
 }
 
 int KwxMsg::AddAction(ActionId_t code) {
-    if(GetRequestCode()==REQ_GAME_SEND_RESPONSE) {
-    	return _add_item( new Item(ActionIdOfReaction,code) );
-    } else {
-    	return _add_item( new Item(ActionId,code) );
-    }
+	INT32U value = _htonl(code);
+	return _add_item( new Item(ActionId,4,(INT8U *)&value) );
+}
+
+int KwxMsg::AddCard(Card_t card) {
+    INT8U code = card;
+	return _add_item( new Item(CardList,1,(INT8U *)&code) );
 }
 
 int KwxMsg::AddShowCard(CardType_t card) {
@@ -133,15 +135,17 @@ int KwxMsg::AddCardKind(int num,Card_t *card) {
 ***********************************************************/
 #include "EnvVariables.h"
 
-int KwxMsg::SetAction(INT8U *buf,ActionId_t code) {
+int KwxMsg::SendAction(INT8U *buf,ActionId_t code,Card_t card) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_ACTION);
+    
     AddRoomPath(seat->_roomPath);
     AddRoomId(seat->_roomId);
     AddTableId(seat->_tableId);
     AddSeatId(seat->_seatId);
     AddAction(code);
+    AddCard(card);
 
     LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
 
