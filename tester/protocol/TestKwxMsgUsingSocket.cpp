@@ -106,11 +106,32 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
 /**************************************************
         requests
 **************************************************/
-class TestSetRaction : public CTestMessenger {
-	virtual void Start() {
-		CTestMessenger::Start();
-	}
+class TestRequest : public CTestMessenger {
+protected:
+    void SetExpValue(INT8U *buf,int len) {
+        memcpy(ExpMessage,buf,len);
+        ExpLen = len;
+    }
 
+    INT8U ExpMessage[MSG_MAX_LEN];
+    int   ExpLen;
+
+	virtual void ServerActions() {
+        INT8U msgInNetwork[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+		SERVER.Start();
+
+		SERVER.Recv((char *)msgInNetwork,&len);
+
+        assert(len==ExpLen);
+        assert(!memcmp(msgInNetwork,ExpMessage,len));
+
+		SERVER.Stop();
+	}
+};
+
+class TestSetRaction : public TestRequest {
 	virtual void ServerActions() {
         INT8U MESSAGE[] = {
             'K','W','X',           //KWX
@@ -133,17 +154,9 @@ class TestSetRaction : public CTestMessenger {
             66,2,                  //act:     2 
             135,1,3                //card kind: 3
         };
-        INT8U msgInNetwork[MSG_MAX_LEN] = {0};
-        int   len = 0;
 
-		SERVER.Start();
-
-		SERVER.Recv((char *)msgInNetwork,&len);
-
-        assert(len==sizeof(MESSAGE));
-        assert(!memcmp(msgInNetwork,MESSAGE,len));
-
-		SERVER.Stop();
+        SetExpValue(MESSAGE,sizeof(MESSAGE));
+        TestRequest::ServerActions();
 	}
 
 	virtual void ClientActions() {
