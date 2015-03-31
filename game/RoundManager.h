@@ -105,10 +105,9 @@ public:
     Card_t _otherHandedOut;
     
     int  Shuffle();
-    bool GetReadyStatus(int tableId);
+    bool GetReadyStatus(PlayerDir_t dir);
     bool WaitUntilAllReady();
 
-    int FindGangCards(int dir,int cards[4],Card_t target=CARD_UNKNONW);
 	void set_aims_sequence(const int p_aim[]);
 
     /* main process */

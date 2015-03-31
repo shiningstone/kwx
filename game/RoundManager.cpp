@@ -77,10 +77,18 @@ bool RoundManager::IsWinner(int no) {
     }
 }
 
+/***********************************************
+        general operations
+***********************************************/
+bool RoundManager::IsTing(int id) {
+    return _players[id]->get_parter()->get_ting_status();
+}
+
 PlayerDir_t RoundManager::TurnToNext() {
     _curPlayer = (_curPlayer+1)%PLAYER_NUM;
     return (PlayerDir_t)_curPlayer;
 }
+
 /***********************************************
         river information
 ***********************************************/
@@ -158,10 +166,6 @@ void RoundManager::LoadPlayerInfo() {
         database->GetUserProfile(ids[dir],profile);
         _cardHolders[dir]->Set(&profile);
 	}
-}
-
-bool RoundManager::IsTing(int id) {
-    return _players[id]->get_parter()->get_ting_status();
 }
 
 int RoundManager::Shuffle() {
@@ -257,23 +261,25 @@ int RoundManager::Shuffle() {
     return 0;
 }
 
-bool RoundManager::GetReadyStatus(int seatId) {
-    LOGGER_WRITE("NETWORK : %s %d",__FUNCTION__,seatId);
+
+/****************************************
+        before start
+****************************************/
+bool RoundManager::GetReadyStatus(PlayerDir_t dir) {
+    LOGGER_WRITE("NETWORK : %s %d",__FUNCTION__,dir);
     return true;
 }
 
 bool RoundManager::WaitUntilAllReady() {
     LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
-    while( !GetReadyStatus(0) || !GetReadyStatus(2) ) {
+    while( !GetReadyStatus(LEFT) || !GetReadyStatus(RIGHT) ) {
         //delay
     }
 
     return true;
 }
 
-
-void RoundManager::set_aims_sequence(const int p_aim[])
-{
+void RoundManager::set_aims_sequence(const int p_aim[]) {
     LOGGER_WRITE("%s",__FUNCTION__);
 	for(int i=0;i<3;i++)
 		aim[i]=p_aim[i];
@@ -299,71 +305,6 @@ bool RoundManager::IsCurEffectCard(Card card) {
         return false;
     }
 }
-/****************************************
-        card handler
-****************************************/
-int RoundManager::FindGangCards(int dir,int cards[4],Card_t target) {
-    auto list = _players[dir]->get_parter()->get_card_list();
-
-    if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
-        if(!IsTing(dir)) {
-            int matchCardNum = 0;
-            int firstMatchCard = 0;
-            
-            for(int i=list->atcvie_place; i<list->len; i++) {
-                for(int j=i+1; j<list->len; j++) {
-                    if(list->data[i].kind==list->data[j].kind) {
-                        matchCardNum++;
-                        if(matchCardNum==3) {
-                            firstMatchCard = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            
-            int idx = 0;
-            for(int i=firstMatchCard; i<list->len; i++) {
-                if(list->data[firstMatchCard].kind==list->data[i].kind) {
-                    cards[idx++] = i;
-                }
-            }
-        } else {
-            cards[3] = list->len-1;
-        
-            int p = 0;
-            for(int i=0; i<list->atcvie_place; i++){
-                if(list->data[i].kind==list->data[cards[3]].kind) {
-                    cards[p++]=i;
-                    if(p==3) {
-                        break;
-                    }
-                }
-            }
-        }
-    } else {
-		int l_len = _isCardFromOthers ? (list->len) : (list->len-1);
-        
-		for(int i=0;i<l_len;i++) {
-			if(target==list->data[i].kind) {
-				if(i==0) {
-					cards[0]=i;
-				} else if(i>0 && target!=list->data[i-1].kind) {
-					cards[0]=i;
-				} else if(i==1 && target==list->data[i-1].kind) {
-					cards[1]=i;
-				} else if(i>1 && target==list->data[i-1].kind && target!=list->data[i-2].kind) {
-					cards[1]=i;
-				} else if(i>1 && target==list->data[i-1].kind && target==list->data[i-2].kind) {
-					cards[2]=i;
-				}
-			}
-		}
-    }
-
-    return 0;
-}
-
 
 void RoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
@@ -473,8 +414,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        FindGangCards(dir,gangCardIdx);
-        card =(Card_t)list->data[gangCardIdx[0]].kind;
+        card = _ai->FindGangCards(gangCardIdx,list,CARD_UNKNONW,_actionToDo,IsTing(dir),_isCardFromOthers);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -506,8 +446,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(GangCard);
 		}
 
-        FindGangCards(dir,gangCardIdx,(Card_t)GangCard.kind);
-
+        card = _ai->FindGangCards(gangCardIdx,list,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
         _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
 	}
 }
@@ -805,17 +744,14 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
             _lastActionWithGold=a_SHOU_GANG;
         }
 
-        Card_t card;
-        int* Angang=new int[4];
+        int* gangIdx=new int[4];
+        Card_t card = _ai->FindGangCards(gangIdx,list,CARD_UNKNONW,_actionToDo,IsTing(dir),_isCardFromOthers);
 
-        FindGangCards(dir,Angang);
-        card =(Card_t)list->data[Angang[0]].kind;
-
-        if( !IsTing(dir) ) {/* is dir equals dir ??? */
+        if( !IsTing(dir) ) {
             SetEffectCard(card,c_AN_GANG);
         }
 
-        _uiManager->_AnGangEffect(dir,card,Angang);
+        _uiManager->_AnGangEffect(dir,card,gangIdx);
     } else if(_actionToDo&a_MING_GANG) {
         _lastActionSource=dir;
         _actionToDo=a_MING_GANG;
@@ -838,30 +774,9 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
             RecordOutCard(GangCard);
         }
 
-        int l_len;
-        if(!_isCardFromOthers)
-            l_len=list->len-1;
-        else
-            l_len=list->len;
-
-        int* Angang=new int[4];
-        for(int i=0;i<l_len;i++) {/* is this logic neccessary ??? --- gang[1]=gang[0]+1;gang[2]=gang[1]+1*/
-            if(GangCard.kind==list->data[i].kind) {
-                if(i==0) {
-                    Angang[0]=i;
-                } else if(i>0 && GangCard.kind!=list->data[i-1].kind) {
-                    Angang[0]=i;
-                } else if(i==1 && GangCard.kind==list->data[i-1].kind) {
-                    Angang[1]=i;
-                } else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind!=list->data[i-2].kind) {
-                    Angang[1]=i;
-                } else if(i>1 && GangCard.kind==list->data[i-1].kind && GangCard.kind==list->data[i-2].kind) {
-                    Angang[2]=i;
-                }
-            }
-        }
-
-        _uiManager->_MingGangEffect(dir,prevPlayer,(Card_t)GangCard.kind,Angang);
+        int* gangIdx=new int[4];
+        Card_t card = _ai->FindGangCards(gangIdx,list,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _uiManager->_MingGangEffect(dir,prevPlayer,card,gangIdx);
     }
     else if(_actionToDo&a_MING) {
         RecvMing();

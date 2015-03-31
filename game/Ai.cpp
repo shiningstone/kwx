@@ -210,6 +210,60 @@ void Ai::MingKouChoose(PlayerDir_t dir) {
 		}
 	}
 }
+
+/*************************************
+        card process
+*************************************/
+Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_ACTION gangType,bool isTing,bool isCardFromOthers) {
+    if( gangType & a_AN_GANG || gangType & a_SHOU_GANG ) {
+        if(!isTing) {
+            /*BUG here : only the first group can be found*/
+            for(int i=cards->atcvie_place; i<cards->len; i++) {
+                int matchCardNum = 0;
+                cardIdx[0]       = i;
+                
+                for(int j=i+1; j<cards->len; j++) {
+                    if(cards->data[i].kind==cards->data[j].kind) {
+                        matchCardNum++;
+                        cardIdx[matchCardNum] = j;
+                        
+                        if(matchCardNum==3) {
+                            return cards->data[i].kind;
+                        }
+                    }
+                }
+            }
+        } else {
+            cardIdx[3] = cards->len-1;
+        
+            int p = 0;
+            for(int i=0; i<cards->atcvie_place; i++){
+                if(cards->data[i].kind==cards->data[cardIdx[3]].kind) {
+                    cardIdx[p++]=i;
+                    if(p==3) {
+                        return cards->data[i].kind;
+                    }
+                }
+            }
+        }
+    } else {
+		int last = isCardFromOthers ? (cards->len) : (cards->len-1);
+
+        int matchCardNum = 0;
+		for(int i=0;i<last;i++) {
+			if(target==cards->data[i].kind) {
+                cardIdx[matchCardNum++] = i;
+                
+                if(matchCardNum==3) {
+                    return target;
+                }
+			}
+		}
+    }
+
+    return CARD_UNKNONW;
+}
+
 /*************************************
         singleton
 *************************************/
