@@ -2730,36 +2730,21 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
             move 2 peng cards in hand
         ****************/
 		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
+
+        int pengCard[2] = {0};
+        _ai->FindPengCards(pengCard,list,card);
+
+		int isChosenCanceled=0;
         
-		int firstMatch = 0;
-		int secondMatch = 0;
-		for(int i=list->atcvie_place;i<list->len;i++) {
-			if(card==list->data[i].kind) {
-				if(i==0) {
-					firstMatch = 0;
-				} else if(card!=list->data[i-1].kind) {
-					firstMatch = i;
-				} else if(card==list->data[i-1].kind) {
-					secondMatch = i;
-					break;
-				}
-			}
-		}
-
-		int ifZeroPointTwo=0;
-		if(_myChosenCard!=-1) {
-			if(_myChosenCard > secondMatch) {
-				_myChosenCard += 1;
+		if(_myChosenCard!=INVALID) {
+            _myChosenCard = _ai->ReChooseAfterPeng(_myChosenCard,pengCard);
+            
+            if(_myChosenCard==INVALID) {
+                isChosenCanceled = 1;
             }
-			else if(_myChosenCard== secondMatch || _myChosenCard==firstMatch) {
-				ifZeroPointTwo = 1;
-				_myChosenCard = -1;
-			}
-			else if(_myChosenCard<firstMatch)
-				_myChosenCard += 3;
 		}
 
-		auto LeftPengCard = _CreateEffectCard(firstMatch, (CARD_KIND)card);
+		auto LeftPengCard = _CreateEffectCard(pengCard[0], (CARD_KIND)card);
 		myframe->addChild(LeftPengCard,20,EFFET_NEWCATD1_TAG);
 		auto moveLeftCardInHand = TargetedAction::create(LeftPengCard,Sequence::create(
             DelayTime::create(0.18),
@@ -2770,7 +2755,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 			DelayTime::create(0.12),
 			ScaleTo::create(0,0),NULL));
 
-		auto RightPengCard = _CreateEffectCard(secondMatch, (CARD_KIND)card);
+		auto RightPengCard = _CreateEffectCard(pengCard[1], (CARD_KIND)card);
 		myframe->addChild(RightPengCard,20,EFFET_NEWCATD2_TAG);
 
         /* in case these values are changed during being moved */
@@ -2803,14 +2788,14 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
             Sequence *seq;
 
-            if(i==firstMatch||i==secondMatch) {
+            if(i==pengCard[0]||i==pengCard[1]) {
 				seq = Sequence::create(
                     ScaleTo::create(0,0),NULL);
             } else {
 				auto curPos   = s_card->getPosition();
 				auto cardSize = s_card->getTextureRect().size;
 
-                if (i<firstMatch) {
+                if (i<pengCard[0]) {
                     seq = Sequence::create(
                         DelayTime::create(0.18),
                         MoveTo::create(0.3,Vec2(
@@ -2820,7 +2805,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                     seq = Sequence::create(
                         DelayTime::create(0.18),
                         MoveTo::create(0.3,Vec2(
-                            curPos.x + (cardPengSize.width*(3.5+GAP)) - cardSize.width*(2 + ifZeroPointTwo*0.2),
+                            curPos.x + (cardPengSize.width*(3.5+GAP)) - cardSize.width*(2 + isChosenCanceled*0.2),
                             curPos.y)),NULL);
                 }
             }
@@ -2839,13 +2824,13 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
             
 			auto curCard = (Sprite*)myframe->getChildByTag(curTag);
             
-			if(a>secondMatch)
+			if(a>pengCard[1])
 				curCard->setTag(curTag+1);
-			else if(a==secondMatch)
+			else if(a==pengCard[1])
 				curCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-			else if(a==firstMatch)
+			else if(a==pengCard[0])
 				curCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-			else if(a<firstMatch && a>list->atcvie_place)
+			else if(a<pengCard[0] && a>list->atcvie_place)
 				curCard->setTag(curTag+3);
             else if(a==list->atcvie_place) {
 				curCard->setTag(curTag+3);
@@ -3021,23 +3006,19 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 		auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
         Card outCard;
 
-		int ifZeroPointTwo=0;
+		int isChosenCanceled=0;
 		int ifLeft=0;
-		if(_myChosenCard!=-1) {
+        
+		if(_myChosenCard!=INVALID) {
 			if(_myChosenCard<list->len-5)
 				ifLeft=1;
-			if(_myChosenCard==GangCardsPlace[3]
-                ||_myChosenCard==GangCardsPlace[2]
-                ||_myChosenCard==GangCardsPlace[1]
-                ||_myChosenCard==GangCardsPlace[0]) {
-				if(_myChosenCard!=(list->len-1))
-					ifZeroPointTwo=1;
-				_myChosenCard=-1;
-			} else if(_myChosenCard<GangCardsPlace[3]
-			            &&_myChosenCard>GangCardsPlace[2])
-				_myChosenCard+=1;
-			else if(_myChosenCard<GangCardsPlace[0])
-				_myChosenCard+=4;
+
+            int oldChosen = _myChosenCard;
+            _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
+
+            if(_myChosenCard==INVALID && oldChosen!=list->len-1) {
+                isChosenCanceled=1;
+            }
 		}
 
         /**********************
@@ -3104,7 +3085,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                         Sequence::create(
                             DelayTime::create(0.18),
                             MoveTo::create(0.3,Vec2(
-                                curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2)),
+                                curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(3+isChosenCanceled*0.2)),
                                 curPos.y)),NULL));
 				}
 
@@ -3145,12 +3126,12 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
                         
 						actionMove = MoveTo::create(0.3,Vec2(
-                            curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2))-instanceBetween,
+                            curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+isChosenCanceled*0.2))-instanceBetween,
                             curPos.y));
 					}
 					else
 						actionMove = MoveTo::create(0.3,Vec2(
-						    curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+ifZeroPointTwo*0.2)),
+						    curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+isChosenCanceled*0.2)),
 						    curPos.y));
                     
 					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
@@ -3365,22 +3346,20 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
         /**********************
             
         **********************/
-        int ifZeroPointTwo=0;
+        int isChosenCanceled = 0;
         int ifLeft=0;
         
         if(_myChosenCard!=INVALID) {
-            if(_myChosenCard<list->len-4) {
+            if(_myChosenCard < list->len-4) {
                 ifLeft=1;
             }
 
-            _myChosenCard = _ai->ReChoose(_myChosenCard,gang,_roundManager->_isCardFromOthers);
+            _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,gang,_roundManager->_isCardFromOthers);
             if(_myChosenCard==INVALID) {
-                ifZeroPointTwo=1;
+                isChosenCanceled=1;
             }
         }
-            
-		auto Pengsize = _object->RectSize(PENG_CARD);
-        
+
 		Sprite* baseCard;
 		Vec2    basePos;
         
@@ -3389,21 +3368,23 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 			basePos  = baseCard->getPosition();
             
 			distributeCardPos=Vec2(
-                basePos.x + baseCard->getBoundingBox().size.width + 30 - FreeCardSize.width*ifZeroPointTwo*0.2,
+                basePos.x + baseCard->getBoundingBox().size.width + 30 - FreeCardSize.width*isChosenCanceled*0.2,
                 basePos.y);
 		} else {
+            auto Pengsize = _object->RectSize(PENG_CARD);
+            
 			baseCard = _GetCardInHand(MIDDLE,list->len-4);
 			basePos  = baseCard->getPosition();
 
             if( list->atcvie_place>0 )
 				distributeCardPos = Vec2(
 				    basePos.x + Pengsize.width*3.5 + 30 
-				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
+				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
 				    basePos.y);
 			else
 				distributeCardPos = Vec2(
 				    basePos.x + Pengsize.width*4 + 30 
-				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*ifZeroPointTwo*0.2*ifLeft,
+				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
 				    basePos.y);
 		}
 
@@ -3566,7 +3547,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                     myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         DelayTime::create(delayTime),
                         MoveTo::create(0.3,Vec2(
-                            curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+ifZeroPointTwo*0.2),
+                            curPos.x+cardPengSize.width*(3.5+GAP)-FreeCardSize.width*(3+isChosenCanceled*0.2),
                             curPos.y)),NULL)));
 			}
 		}

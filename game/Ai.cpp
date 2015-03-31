@@ -264,7 +264,7 @@ Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_AC
     return CARD_UNKNONW;
 }
 
-int Ai::ReChoose(int chosen,int gangIdx[3],int isCardFromOthers) {
+int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isCardFromOthers,int gang4) {
     int newChosen = 0;
 
     if(!isCardFromOthers) {
@@ -274,9 +274,11 @@ int Ai::ReChoose(int chosen,int gangIdx[3],int isCardFromOthers) {
             newChosen = chosen;
         }
     } else {
-        if(chosen<gangIdx[0])
+        if(chosen<gangIdx[0]) {
             newChosen = chosen + 4;
-        else if(chosen==gangIdx[0]||chosen==gangIdx[1]||chosen==gangIdx[2]) {
+        } else if(chosen==gangIdx[0]||chosen==gangIdx[1]||chosen==gangIdx[2]) {
+            newChosen = INVALID;
+        } else if(gang4!=INVALID && chosen==gang4) {
             newChosen = INVALID;
         } else {
             newChosen = chosen + 1;
@@ -285,6 +287,36 @@ int Ai::ReChoose(int chosen,int gangIdx[3],int isCardFromOthers) {
 
     return newChosen;
 }
+
+Card_t Ai::FindPengCards(int cardIdx[2],CARD_ARRAY *cards,Card_t target) {
+    int matchNum = 0;
+    
+    for(int i=cards->atcvie_place;i<cards->len;i++) {
+        if(target==(Card_t)cards->data[i].kind) {
+            cardIdx[matchNum++] = i;
+            if(matchNum==2) {
+                return target;
+            }
+        }
+    }
+
+    return CARD_UNKNONW;
+}
+
+int Ai::ReChooseAfterPeng(int chosen,int pengIdx[2]) {
+    int newChosen = 0;
+
+    if(chosen > pengIdx[1]) {
+        newChosen = chosen + 1;
+    } else if(chosen== pengIdx[1] || chosen==pengIdx[0]) {
+        newChosen = INVALID;
+    } else if(chosen<pengIdx[0]) {
+        newChosen = chosen + 3;
+    }
+
+    return newChosen;
+}
+
 /*************************************
         singleton
 *************************************/
