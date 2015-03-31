@@ -264,6 +264,27 @@ Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_AC
     return CARD_UNKNONW;
 }
 
+int Ai::ReChoose(int chosen,int gangIdx[3],int isCardFromOthers) {
+    int newChosen = 0;
+
+    if(!isCardFromOthers) {
+        if(chosen>gangIdx[2]) {
+            newChosen = chosen + 1;
+        } else {
+            newChosen = chosen;
+        }
+    } else {
+        if(chosen<gangIdx[0])
+            newChosen = chosen + 4;
+        else if(chosen==gangIdx[0]||chosen==gangIdx[1]||chosen==gangIdx[2]) {
+            newChosen = INVALID;
+        } else {
+            newChosen = chosen + 1;
+        }
+    }
+
+    return newChosen;
+}
 /*************************************
         singleton
 *************************************/

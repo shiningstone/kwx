@@ -10,7 +10,7 @@ public:
     void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);
     int  ChooseWorstCard(bool &kouRequest);
     Card_t FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,ARRAY_ACTION gangType,bool isTing,bool isCardFromOthers);
-    
+    int  ReChoose(int chosen);
 private:
     RoundManager *_roundManager;
     

@@ -375,7 +375,6 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
         _lastActionWithGold = a_QIANG_GANG;
     }
 
-    /*!!!just for compile reason for now, the value should be set before play effect*/
     if(_isDoubleHuAsking) {
         SetWin(DOUBLE_WIN,_curPlayer);
     } else {

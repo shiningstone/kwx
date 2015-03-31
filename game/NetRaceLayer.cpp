@@ -573,7 +573,9 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     switch(dir) {
         case MIDDLE:
             if( _roundManager->_lastActionSource==MIDDLE
-                && (_roundManager->_lastAction==a_AN_GANG||_roundManager->_lastAction==a_SHOU_GANG||_roundManager->_lastAction==a_MING_GANG) ) {
+                && (_roundManager->_lastAction==a_AN_GANG
+                    ||_roundManager->_lastAction==a_SHOU_GANG
+                    ||_roundManager->_lastAction==a_MING_GANG) ) {
                 x = distributeCardPos.x;
             } else {
                 x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
@@ -3365,22 +3367,15 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
         **********************/
         int ifZeroPointTwo=0;
         int ifLeft=0;
-        if(_myChosenCard!=-1) {
-            if(_myChosenCard<list->len-4)
+        
+        if(_myChosenCard!=INVALID) {
+            if(_myChosenCard<list->len-4) {
                 ifLeft=1;
-            
-            if(!_roundManager->_isCardFromOthers) {
-                if(_myChosenCard>gang[2])
-                    _myChosenCard+=1;
-            } else {
-                if(_myChosenCard>gang[2])
-                    _myChosenCard+=1;
-                else if(_myChosenCard==gang[0]||_myChosenCard==gang[1]||_myChosenCard==gang[2]) {
-                    ifZeroPointTwo=1;
-                    _myChosenCard=-1;
-                }
-                else if(_myChosenCard<gang[0])
-                    _myChosenCard+=4;
+            }
+
+            _myChosenCard = _ai->ReChoose(_myChosenCard,gang,_roundManager->_isCardFromOthers);
+            if(_myChosenCard==INVALID) {
+                ifZeroPointTwo=1;
             }
         }
             
