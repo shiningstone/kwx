@@ -44,6 +44,7 @@ public:
     int         Construct(DistributeResponse_t &response);
     int         Construct(OthersAction_t &actionInfo);
     int         Construct(OthersShowCard_t &cardInfo);
+    int         Construct(ActionResponse_t &waitInfo);
 
 /* the following items should be only referenced by test */
 /*

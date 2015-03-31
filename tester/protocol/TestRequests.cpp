@@ -481,9 +481,45 @@ public:
     }
 };
 
+class TestRecvActionResponse_waitRight : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,49,               //request code(下发其他玩家出牌)
+            7,                     //package level
+            0x00,25,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,1,                  //seatId
+            63,2,                  //wait 2
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxMsg aMsg(DOWN_STREAM);
+        ActionResponse_t waitInfo = {0};
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(waitInfo);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_SEND_ACTION );
+        assert( aMsg.GetLevel()==7 );
+        assert( waitInfo.seat==1 );
+        assert( waitInfo.waitSeat==2 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
     
     aCase = new TestSendAction_peng3tiao();
+    aCase->Execute();
+
+    aCase = new TestRecvActionResponse_waitRight();
     aCase->Execute();
 }

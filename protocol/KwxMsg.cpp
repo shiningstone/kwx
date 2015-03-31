@@ -266,3 +266,10 @@ int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
     return 0;
 }
 
+int KwxMsg::Construct(ActionResponse_t &waitInfo) {
+    waitInfo.seat     = _body->_items[0]->_value;
+    waitInfo.waitSeat = _body->_items[1]->_value;
+
+    return 0;
+}
+

@@ -33,4 +33,9 @@ typedef struct _OthersShowCard {
     CardType_t    cardKind;
 }OthersShowCard_t;
 
+typedef struct _ActionResponse {
+    INT8U         seat;
+    INT8U         waitSeat;
+}ActionResponse_t;
+
 #endif
