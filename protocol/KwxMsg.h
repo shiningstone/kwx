@@ -32,18 +32,10 @@ public:
     
     /* upstream */
     int SendAction(INT8U *buf,ActionId_t code,Card_t card);
-    int SetShowCard(INT8U *buf,CardType_t code);
-    int SetReaction(INT8U *buf,ActionId_t code,CardType_t kind);
-    int SetReaction(INT8U *buf,ActionId_t code,int num,Card_t *kind);
-    int SetRequestDistribute(INT8U *buf);
-    int SetUpdateCardList(INT8U *buf,CARD *cards,int cardNum);
     
     /* downstream*/
     RequestId_t GetRequestCode();
     int         GetLevel();
-    int         Construct(DistributeResponse_t &response);
-    int         Construct(OthersAction_t &actionInfo);
-    int         Construct(OthersShowCard_t &cardInfo);
     int         Construct(ActionResponse_t &waitInfo);
 
 /* the following items should be only referenced by test */
@@ -69,11 +61,6 @@ protected:
     int AddSeatId(INT8U code);
     int AddAction(ActionId_t code);
     int AddCard(Card_t card);
-    
-    int AddShowCard(CardType_t card);
-    int AddCards(CARD *cards,int num);
-    int AddCardKind(CardType_t code);
-    int AddCardKind(int num,Card_t *card);
 
     static Logger       *_logger;
 };

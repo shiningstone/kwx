@@ -101,36 +101,6 @@ int KwxMsg::AddCard(Card_t card) {
 	return _add_item( new Item(CardList,1,(INT8U *)&code) );
 }
 
-int KwxMsg::AddShowCard(CardType_t card) {
-    return _add_item( new Item(CardKind,card) );
-}
-
-int KwxMsg::AddCards(CARD *cards,int num) {
-    INT8U buf[MAX_HANDIN_NUM*4] = {0};
-
-    for(int i=0;i<num;i++) {
-        buf[i*4+1] = cards[i].kind;
-        buf[i*4+2] = cards[i].status;
-        buf[i*4+3] = cards[i].can_play;
-    }
-
-    return _add_item( new Item(CardList,num*4,buf) );
-}
-
-int KwxMsg::AddCardKind(CardType_t code) {
-    return _add_item( new Item(CardList,1,&code) );
-}
-
-int KwxMsg::AddCardKind(int num,Card_t *card) {
-    INT8U buf[MAX_HANDIN_NUM+1] = {0};
-
-    buf[0] = 0xff;
-    for(int i=1;i<num+1;i++) {
-        buf[i] = card[i-1];
-    }
-
-    return _add_item( new Item(CardList,num+1,buf) );
-}
 /**********************************************************
 	Interfaces
 ***********************************************************/
@@ -153,81 +123,6 @@ int KwxMsg::SendAction(INT8U *buf,ActionId_t code,Card_t card) {
     return Serialize(buf);
 }
 
-int KwxMsg::SetShowCard(INT8U *buf,CardType_t code) {
-    SeatInfo *seat = SeatInfo::getInstance();
-
-    SetRequestCode(REQ_GAME_SEND_SHOW_CARD);
-    AddRoomPath(seat->_roomPath);
-    AddRoomId(seat->_roomId);
-    AddTableId(seat->_tableId);
-    AddSeatId(seat->_seatId);
-    AddShowCard(code);
-
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
-
-    return Serialize(buf);
-}
-
-int KwxMsg::SetReaction(INT8U *buf,ActionId_t code,CardType_t kind) {
-    SeatInfo *seat = SeatInfo::getInstance();
-
-    SetRequestCode(REQ_GAME_SEND_RESPONSE);
-    AddRoomPath(seat->_roomPath);
-    AddRoomId(seat->_roomId);
-    AddTableId(seat->_tableId);
-    AddSeatId(seat->_seatId);
-    AddAction(code);
-    AddCardKind(kind);
-
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
-
-    return Serialize(buf);
-}
-
-int KwxMsg::SetReaction(INT8U *buf,ActionId_t code,int num,Card_t *kind) {
-    SeatInfo *seat = SeatInfo::getInstance();
-
-    SetRequestCode(REQ_GAME_SEND_RESPONSE);
-    AddRoomPath(seat->_roomPath);
-    AddRoomId(seat->_roomId);
-    AddTableId(seat->_tableId);
-    AddSeatId(seat->_seatId);
-    AddAction(code);
-    AddCardKind(num,kind);
-
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
-
-    return Serialize(buf);
-}
-
-int KwxMsg::SetRequestDistribute(INT8U *buf) {
-    SeatInfo *seat = SeatInfo::getInstance();
-
-    SetRequestCode(REQ_GAME_SEND_DIST);
-    AddRoomPath(seat->_roomPath);
-    AddRoomId(seat->_roomId);
-    AddTableId(seat->_tableId);
-    AddSeatId(seat->_seatId);
-
-    LOGGER_WRITE("%s\n",__FUNCTION__);
-
-    return Serialize(buf);
-}
-
-int KwxMsg::SetUpdateCardList(INT8U *buf,CARD *cards,int num) {
-    SeatInfo *seat = SeatInfo::getInstance();
-
-    SetRequestCode(REQ_GAME_SEND_UPDATELIST);
-    AddRoomPath(seat->_roomPath);
-    AddRoomId(seat->_roomId);
-    AddTableId(seat->_tableId);
-    AddSeatId(seat->_seatId);
-
-    LOGGER_WRITE("%s\n",__FUNCTION__);
-
-    return Serialize(buf);
-}
-
 RequestId_t KwxMsg::GetRequestCode() {
     return (RequestId_t)_header->_requestCode;
 }
@@ -235,35 +130,6 @@ RequestId_t KwxMsg::GetRequestCode() {
 int KwxMsg::GetLevel() {
     DnHeader *header = static_cast<DnHeader *>(_header);
     return header->_level;
-}
-
-int KwxMsg::Construct(DistributeResponse_t &response) {
-    response.seat = _body->_items[0]->_value;                          /*id==60*/
-    response.cardKind = _body->_items[1]->_value;                      /*id==61*/
-    response.counter = _body->_items[2]->_value;                       /*id==62*/
-    response.reminder = _ntohl(*((INT32U *)_body->_items[3]->_buf));   /*id==130*/
-
-    return 0;
-}
-
-int KwxMsg::Construct(OthersAction_t &actionInfo) {
-    if(GetRequestCode()==REQ_GAME_RECV_RESPONSE) {
-        actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
-        actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
-        actionInfo.cardKind = (CardType_t)_body->_items[2]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
-    } else {
-        actionInfo.seat   = _body->_items[0]->_value;            /*id==60*/
-        actionInfo.action = (ActionId_t)_body->_items[1]->_value;/*id==67 (others' action) || id==66 (others' reaction)*/
-    }
-
-    return 0;
-}
-
-int KwxMsg::Construct(OthersShowCard_t &cardInfo) {
-    cardInfo.seat     = _body->_items[0]->_value;            /*id==60*/
-    cardInfo.cardKind = (CardType_t)_body->_items[1]->_value;/*id==67*/
-
-    return 0;
 }
 
 int KwxMsg::Construct(ActionResponse_t &waitInfo) {
