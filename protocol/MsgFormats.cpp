@@ -79,7 +79,7 @@ Item::Item(Item_t itemId, INT8U value) {
 	_value    = value;
 }
 
-Item::Item(Item_t itemId, INT8U bufLen,INT8U *buf) {
+Item::Item(Item_t itemId, INT16U bufLen,INT8U *buf) {
 	_id       = itemId;
 	_bufLen   = bufLen;
 	memcpy(_buf,buf,bufLen);
@@ -105,9 +105,12 @@ int Item::Serialize(INT8U *outMsg) {
             outMsg[1] = _value;
             return 2;
         case ID_WITH_BUF:
-            outMsg[1] = _bufLen;
-            memcpy(outMsg+2, _buf, _bufLen);
-            return 2+_bufLen;
+            {
+                INT16U value = _htons(_bufLen);
+                memcpy(outMsg+1,(INT8U *)&value,2);
+                memcpy(outMsg+1+2, _buf, _bufLen);
+                return 1+2+_bufLen;
+            }
 		default:
 			return -1;
     }
@@ -123,9 +126,9 @@ int Item::Deserialize(const INT8U *inMsg) {
             _value = inMsg[1];
             return 2;
         case ID_WITH_BUF:
-            _bufLen = inMsg[1];
-            memcpy(_buf, inMsg+2, _bufLen);
-            return 2+_bufLen;
+            _bufLen = _ntohs( *(INT16U *)(inMsg+1) );
+            memcpy(_buf, inMsg+1+2, _bufLen);
+            return 1+2+_bufLen;
 		default:
 			return -1;
     }

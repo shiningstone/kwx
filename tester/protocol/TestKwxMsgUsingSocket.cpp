@@ -142,16 +142,16 @@ class TestSendAction : public TestRequest {
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,49,               //request code(发送玩家反应 REQ_GAME_SEND_ACTION)
-            0x00,60,               //package size
+            0x00,65,               //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
 
             6,
-            131,4,0,1,2,3,         //roomPath:0x00010203
-            132,4,4,5,6,7,         //roomId:  0x04050607
-            133,4,8,9,10,11,       //tableId: 0x08090a0b
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
             60,1,                  //site:    1
-            134,4,0,0,0,1,         //act:     1(碰)                 
-            135,1,2                //card:    3tiao
+            134,0,4,0,0,0,1,         //act:     1(碰)                 
+            135,0,1,2                //card:    3tiao
         };
 
         SetExpValue(MESSAGE,sizeof(MESSAGE));

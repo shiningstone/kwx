@@ -159,7 +159,7 @@ class TestItemOneIdPlusBuf : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
-            128,1,0
+            128,0,1,0
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -168,10 +168,10 @@ public:
         Item aItem;
 
 		len = aItem.Deserialize(msgInNetwork);
-        assert(len==3);
+        assert(len==4);
 		assert(aItem._id==128);
         assert(aItem._bufLen==1);
-        assert(!memcmp(aItem._buf,msgInNetwork+2,aItem._bufLen));
+        assert(!memcmp(aItem._buf,msgInNetwork+3,aItem._bufLen));
 
 		//组包测试
         Item bItem;
@@ -181,7 +181,7 @@ public:
 
         len = bItem.Serialize(buf);
 
-        assert(len==3);
+        assert(len==4);
         assert(!memcmp(msgInNetwork,buf,len));
 
 		return OK;
@@ -192,7 +192,7 @@ class TestItemOneIdPlusLongBuf : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
-            128,2,0,1
+            128,0,2,0,1
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -201,10 +201,10 @@ public:
         Item aItem;
 
 		len = aItem.Deserialize(msgInNetwork);
-        assert(len==4);
+        assert(len==5);
 		assert(aItem._id==128);
         assert(aItem._bufLen==2);
-        assert(!memcmp(aItem._buf,msgInNetwork+2,aItem._bufLen));
+        assert(!memcmp(aItem._buf,msgInNetwork+3,aItem._bufLen));
 
 		//组包测试
         Item bItem;
@@ -215,7 +215,7 @@ public:
 
         len = bItem.Serialize(buf);
 
-        assert(len==4);
+        assert(len==5);
         assert(!memcmp(msgInNetwork,buf,len));
 
 		return OK;
@@ -342,7 +342,7 @@ public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
             3,
-            128,4,0,1,2,3,
+            128,0,4,0,1,2,3,
             50,4,
             0
         };
@@ -357,7 +357,7 @@ public:
         assert(aBody._itemNum==3);
 		    assert(aBody._items[0]->_id==128);
 		    assert(aBody._items[0]->_bufLen==4);
-		    assert( !memcmp(aBody._items[0]->_buf,msgInNetwork+3,4) );
+		    assert( !memcmp(aBody._items[0]->_buf,msgInNetwork+4,4) );
 		    
             assert(aBody._items[1]->_id==50);
 		    assert(aBody._items[1]->_value==4);
@@ -404,10 +404,10 @@ public:
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x0c,0x0d,             //request code
-            0x00,0x28,             //package size
+            0x00,0x29,             //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
             3,
-            128,4,0,1,2,3,
+            128,0,4,0,1,2,3,
             50,4,
             0
         };
@@ -465,7 +465,7 @@ public:
             0x04,0x05,             //package size
             0,0,0,0,0,0,0,0,0,0,0,0,//reserved
             3,
-            128,4,0,1,2,3,
+            128,0,4,0,1,2,3,
             50,4,
             0
         };
@@ -483,7 +483,7 @@ public:
         assert(aBody->_itemNum==3);
 		    assert(aBody->_items[0]->_id==128);
 		    assert(aBody->_items[0]->_bufLen==4);
-		    assert( !memcmp(aBody->_items[0]->_buf,msgInNetwork+23,4) );
+		    assert( !memcmp(aBody->_items[0]->_buf,msgInNetwork+24,4) );
 		    
             assert(aBody->_items[1]->_id==50);
 		    assert(aBody->_items[1]->_value==4);

@@ -83,14 +83,14 @@ class Item : public MsgIntf {
 public:
 	Item();
 	Item(Item_t itemId, INT8U value);
-	Item(Item_t itemId, INT8U bufLen,INT8U *buf);
+	Item(Item_t itemId, INT16U bufLen,INT8U *buf);
 
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
     Item_t   _id;
     INT8U    _value;
-    INT8U    _bufLen;
+    INT16U   _bufLen;
     INT8U    _buf[ITEM_BUF_LEN];
 protected:
     const static int PURE_ID = 0;
