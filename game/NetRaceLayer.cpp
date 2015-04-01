@@ -9,14 +9,6 @@
 using namespace cocos2d::ui;
 USING_NS_CC;
 
-/**************************/
-/* this is for test network communication*/
-#include "./../utils/UtilBasic.h"
-#include "./../protocol/MsgFormats.h"
-#include "./../protocol/KwxMsg.h"
-#include "./../protocol/EnvVariables.h"
-/**************************/
-
 /************************************************
                 init 
 ************************************************/
@@ -35,19 +27,6 @@ NetRaceLayer::NetRaceLayer()
     _effect = GraphicEffect::getInstance();
     
     _logger = LOGGER_REGISTER("NetRaceLayer");
-
-	/**************************/
-	/* this is just for test */
-    INT8U buf[MSG_MAX_LEN] = {0};
-    int   len = 0;
-    
-    SeatInfo *seat = SeatInfo::getInstance();
-    seat->Set(0x00010203,0x04050607,0x08090a0b,1);
-    
-    KwxMsg aMsg(UP_STREAM);
-    aMsg.StartReceiving();
-    len = aMsg.SendAction(buf,(ActionId_t)PENG);
-	/**************************/
 }
 
 void NetRaceLayer::Set(RoundManager *rm) {
