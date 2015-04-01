@@ -18,42 +18,40 @@
 class Header;
 class MsgBody;
 class Item;
-class NetMessenger;
-/**********************************************************************
-关于下行包接收：
-    用户可以自行创建一个线程，将接收到的报文交给Deserialize/Construct依次处理；
-    或者
-    使用StartReceiving()启动自动接收处理模式，处理函数为_HANDLE_DS_PACKAGES。
-**********************************************************************/
-class KwxMsg : public MsgIntf {
+
+class KwxMsg {
 public:
     KwxMsg(int dir);
     ~KwxMsg();
+
+    const int _dir;    
+    Header  *_header;
+    MsgBody *_body;
+
+    static Logger       *_logger;
+};
+
+class KwxDsMsg : public KwxMsg, public DsMsgIntf {
+public:
+    KwxDsMsg();
     
-    /* upstream */
-    int SendAction(INT8U *buf,ActionId_t code,Card_t card);
-    
-    /* downstream*/
     RequestId_t GetRequestCode();
     int         GetLevel();
     int         Construct(ActionResponse_t &waitInfo);
 
-/* the following items should be only referenced by test */
-/*
-protected:
-*/
-    virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
+};
 
-    Header          *_header;
-    MsgBody         *_body;
-protected:
-	const int   _dir;
+class KwxUsMsg : public KwxMsg, public UsMsgIntf {
+public:
+    KwxUsMsg();
+    
+    int SendAction(INT8U *buf,ActionId_t code,Card_t card);
 
+    virtual int Serialize(INT8U *outMsg);
 	void _set_size(INT8U *buf,INT16U len);
 	int  _add_item(Item *item);
 
-    /* upstream */
     int SetRequestCode(RequestId_t code);
     int AddRoomPath(RoomPath_t code);
     int AddRoomId(RoomId_t code);
@@ -61,8 +59,6 @@ protected:
     int AddSeatId(INT8U code);
     int AddAction(ActionId_t code);
     int AddCard(Card_t card);
-
-    static Logger       *_logger;
 };
 
 #define KWX_INVALID_PCHC          -1

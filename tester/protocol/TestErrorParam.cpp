@@ -15,7 +15,7 @@ public:
         INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
             0,                     //reserved
         };
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg;
 
 		int len = aMsg.Deserialize(msgInNetwork);
         assert(len==KWX_INVALID_PCHC);

@@ -50,7 +50,7 @@ void KwxMessenger::StopReceiving() {
 }
 
 int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    KwxMsg aMsg(DOWN_STREAM);
+    KwxDsMsg aMsg;
     Logger *_logger = LOGGER_REGISTER("KwxMessenger");
 
     aMsg.Deserialize(pkg);
@@ -84,7 +84,7 @@ int KwxMessenger::SendAction(ActionId_t code,Card_t card) {
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
-    KwxMsg aMsg(UP_STREAM);
+    KwxUsMsg aMsg;
     len = aMsg.SendAction(buf,code,card);
     
     _messenger->Send(buf,len);

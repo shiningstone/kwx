@@ -44,7 +44,7 @@ public:
         SeatInfo *seat = SeatInfo::getInstance();
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SetReaction(buf,aGANG,TIAO_4);
 
         assert(len==sizeof(msgInNetwork));
@@ -85,7 +85,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         Card_t mingCard[] = {TIAO_4};
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SetReaction(buf,aMING,1,mingCard);
 
         assert(len==sizeof(msgInNetwork));
@@ -126,7 +126,7 @@ public:
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         Card_t mingCard[] = {TIAO_4,TIAO_5};
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SetReaction(buf,aMING,2,mingCard);
 
         assert(len==sizeof(msgInNetwork));
@@ -155,7 +155,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg();
         OthersAction_t actionInfo = {0};
 
         len = aMsg.Deserialize(msgInNetwork);
@@ -200,7 +200,7 @@ public:
         SeatInfo *seat = SeatInfo::getInstance();
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SendAction(buf,PENG);
 
         assert(len==sizeof(msgInNetwork));
@@ -239,7 +239,7 @@ public:
         SeatInfo *seat = SeatInfo::getInstance();
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SetShowCard(buf,0);
 
         assert(len==sizeof(msgInNetwork));
@@ -277,7 +277,7 @@ public:
         SeatInfo *seat = SeatInfo::getInstance();
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SetRequestDistribute(buf);
 
         assert(len==sizeof(msgInNetwork));
@@ -324,7 +324,7 @@ public:
             cards[1].status    = c_MING_KOU;
             cards[1].can_play  = cps_NO;
 
-        KwxMsg aMsg(UP_STREAM);
+        KwxDsMsg aMsg(UP_STREAM);
         len = aMsg.SetUpdateCardList(buf,cards,sizeof(cards)/sizeof(CARD));
 
         assert(len==sizeof(msgInNetwork));
@@ -353,7 +353,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg();
         DistributeResponse_t response = {0};
 
         len = aMsg.Deserialize(msgInNetwork);
@@ -389,7 +389,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg();
         OthersAction_t actionInfo = {0};
 
         len = aMsg.Deserialize(msgInNetwork);
@@ -423,7 +423,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg();
         OthersShowCard_t cardInfo = {0};
 
         len = aMsg.Deserialize(msgInNetwork);
@@ -471,7 +471,7 @@ public:
         SeatInfo *seat = SeatInfo::getInstance();
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
-        KwxMsg aMsg(UP_STREAM);
+        KwxUsMsg aMsg;
         len = aMsg.SendAction(buf,aPENG,TIAO_3);
 
         assert(len==sizeof(msgInNetwork));
@@ -498,7 +498,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg;
         ActionResponse_t waitInfo = {0};
 
         len = aMsg.Deserialize(msgInNetwork);

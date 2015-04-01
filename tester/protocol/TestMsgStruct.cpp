@@ -414,33 +414,8 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        //解包测试
-        KwxMsg aMsg(UP_STREAM);
-
-		len = aMsg.Deserialize(msgInNetwork);
-        assert(len==sizeof(msgInNetwork));
-
-        UpHeader *aHeader = static_cast <UpHeader *>(aMsg._header);
-		assert(aHeader->_protocol==0x10);
-		assert(aHeader->_userId==0x01020304);
-		assert(aHeader->_customerId==0x0809);
-		assert(aHeader->_productId==0x0a0b);
-		assert(aHeader->_requestCode==0x0c0d);
-        assert(aHeader->_size==40);
-
-        MsgBody *aBody = aMsg._body;
-        assert(aBody->_itemNum==3);
-		    assert(aBody->_items[0]->_id==128);
-		    assert(aBody->_items[0]->_bufLen==4);
-		    assert( !memcmp(aBody->_items[0]->_buf,msgInNetwork+33,4) );
-		    
-            assert(aBody->_items[1]->_id==50);
-		    assert(aBody->_items[1]->_value==4);
-
-            assert(aBody->_items[2]->_id==0);
-            
 		//组包测试
-        KwxMsg bMsg(UP_STREAM);
+        KwxUsMsg bMsg;
 
         UpHeader *bHeader = static_cast <UpHeader *>(bMsg._header);
 		bHeader->_protocol=16;
@@ -494,7 +469,7 @@ public:
             50,4,
             0
         };
-        KwxMsg aMsg(DOWN_STREAM);
+        KwxDsMsg aMsg;
 
 		int len = aMsg.Deserialize(msgInNetwork);
         assert(len==sizeof(msgInNetwork));
@@ -514,37 +489,6 @@ public:
 		    assert(aBody->_items[1]->_value==4);
 
             assert(aBody->_items[2]->_id==0);
-
-		//组包测试
-        INT8U buf[MSG_MAX_LEN] = {0};
-
-        KwxMsg bMsg(DOWN_STREAM);
-        DnHeader *bHeader = static_cast <DnHeader *>(bMsg._header);
-		bHeader->_requestCode=0x0102;
-        bHeader->_level=0x03;
-        bHeader->_size=0x0405;
-
-        MsgBody *bBody = bMsg._body;
-        bBody->_itemNum=3;
-            bBody->_items[0] = new Item();
-		    bBody->_items[0]->_id=(Item_t)128;
-            bBody->_items[0]->_bufLen=4;
-            bBody->_items[0]->_buf[0]=0;
-            bBody->_items[0]->_buf[1]=1;
-            bBody->_items[0]->_buf[2]=2;
-            bBody->_items[0]->_buf[3]=3;
-
-            bBody->_items[1] = new Item();
-		    bBody->_items[1]->_id=(Item_t)50;
-		    bBody->_items[1]->_value=4;
-
-            bBody->_items[2] = new Item();
-		    bBody->_items[2]->_id=(Item_t)0;
-
-        len = bMsg.Serialize(buf);
-
-        assert(len==sizeof(msgInNetwork));
-        assert(!memcmp(msgInNetwork,buf,len));
 
 		return OK;
     }
