@@ -58,18 +58,6 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
     LOGGER_WRITE("%s : %d\n",__FUNCTION__,aMsg.GetRequestCode());
 
     switch(aMsg.GetRequestCode()) {
-        case REQ_GAME_SEND_DIST:
-            return 0;
-
-        case REQ_GAME_RECV_ACTION:
-            return 0;
-
-        case REQ_GAME_RECV_SHOWCARD:
-            return 0;
-
-        case REQ_GAME_RECV_RESPONSE:
-            return 0;
-
         default:
             return KWX_INVALID_PCHC;
     }
