@@ -80,13 +80,11 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 /************************************************************
 	Request (Upstream)
 ************************************************************/
-int KwxMessenger::SendAction(ActionId_t code,Card_t card) {
+int KwxMessenger::Send(KwxUsMsg &aMsg) {
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
-    KwxUsMsg aMsg;
-    len = aMsg.SendAction(buf,code,card);
-    
+    len = aMsg.Serialize(buf);
     _messenger->Send(buf,len);
 
     return 0;

@@ -59,16 +59,6 @@ typedef enum {
     aKOU_CANCEL= 0x80,
 }ActionId_t;/*ARRAY_ACTION???*/
 
-typedef enum {
-	SeatId   = 60,
-    CardKindOfReaction = 61,
-    CardKind = 65,
-    ActionIdOfReaction = 66,
-	RoomPath = 131,
-	RoomId   = 132,
-	TableId  = 133,
-    ActionId = 134,
-    CardList = 135,
-}Item_t;
+typedef INT8U Item_t;
 
 #endif

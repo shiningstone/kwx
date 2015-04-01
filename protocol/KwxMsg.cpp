@@ -82,10 +82,8 @@ int KwxUsMsg::Serialize(INT8U *outMsg) {
 }
 
 void KwxUsMsg::_set_size(INT8U *buf,INT16U len) {
-	if (_dir==UP_STREAM) {
-		INT8U offset = UpHeader::SIZE;
-		*((INT16U *)(buf+offset)) = _htons(len);
-	}
+	INT8U offset = UpHeader::SIZE;
+	*((INT16U *)(buf+offset)) = _htons(len);
 }
 
 int KwxUsMsg::SetRequestCode(RequestId_t code) {
@@ -99,54 +97,29 @@ int KwxUsMsg::_add_item(Item *item) {
 	return 0;
 }
 
-int KwxUsMsg::AddRoomPath(RoomPath_t code) {
-	INT32U value = _htonl(code);
-	return _add_item( new Item(RoomPath,4,(INT8U *)&value) );
-}
-
-int KwxUsMsg::AddRoomId(RoomId_t code) {
-	INT32U value = _htonl(code);
-	return _add_item( new Item(RoomId,4,(INT8U *)&value) );
-}
-
-int KwxUsMsg::AddTableId(TableId_t code) {
-	INT32U value = _htonl(code);
-	return _add_item( new Item(TableId,4,(INT8U *)&value) );
-}
-
-int KwxUsMsg::AddSeatId(INT8U code) {
-	return _add_item( new Item(SeatId,code) );
-}
-
-int KwxUsMsg::AddAction(ActionId_t code) {
-	INT32U value = _htonl(code);
-	return _add_item( new Item(ActionId,4,(INT8U *)&value) );
-}
-
-int KwxUsMsg::AddCard(Card_t card) {
-    INT8U code = card;
-	return _add_item( new Item(CardList,1,(INT8U *)&code) );
-}
-
 /**********************************************************
 	Interfaces
 ***********************************************************/
 #include "EnvVariables.h"
 
-int KwxUsMsg::SendAction(INT8U *buf,ActionId_t code,Card_t card) {
+int RequestSendAction::Set(ActionId_t action,Card_t card) {
     SeatInfo *seat = SeatInfo::getInstance();
 
     SetRequestCode(REQ_GAME_SEND_ACTION);
-    
-    AddRoomPath(seat->_roomPath);
-    AddRoomId(seat->_roomId);
-    AddTableId(seat->_tableId);
-    AddSeatId(seat->_seatId);
-    AddAction(code);
-    AddCard(card);
 
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,code);
+    INT32U roomPath = _htonl(seat->_roomPath);
+    INT32U roomId   = _htonl(seat->_roomId);
+    INT32U tableId  = _htonl(seat->_tableId);
+    INT32U actionId = _htonl(action);
+    INT8U  cardKind = card;
 
-    return Serialize(buf);
+    _add_item( new Item(131,4,(INT8U *)&roomPath) );
+    _add_item( new Item(132,4,(INT8U *)&roomId) );
+    _add_item( new Item(133,4,(INT8U *)&tableId) );
+    _add_item( new Item(60,   seat->_seatId) );
+    _add_item( new Item(134,4,(INT8U *)&actionId) );
+    _add_item( new Item(135,1,(INT8U *)&cardKind) );
+
+    return 0;
 }
 

@@ -12,6 +12,7 @@
 #include "KwxRequestConsts.h"
 #include "KwxRequestTypes.h"
 
+class KwxUsMsg;
 class KwxMessenger {
 public:
     KwxMessenger();
@@ -22,8 +23,7 @@ public:
     static void StopReceiving();
     static void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
 
-    /* upstream */
-    int SendAction(ActionId_t code,Card_t card);
+    int Send(KwxUsMsg &aMsg);/* why cannot declare as const KwxUsMsg??? */
 
 private:
 	static NetMessenger *_messenger;

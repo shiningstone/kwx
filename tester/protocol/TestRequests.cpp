@@ -471,8 +471,9 @@ public:
         SeatInfo *seat = SeatInfo::getInstance();
         seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
-        KwxUsMsg aMsg;
-        len = aMsg.SendAction(buf,aPENG,TIAO_3);
+        RequestSendAction aMsg;
+        aMsg.Set(aPENG,TIAO_3);
+        len = aMsg.Serialize(buf);
 
         assert(len==sizeof(msgInNetwork));
         assert(!memcmp(buf,msgInNetwork,len));

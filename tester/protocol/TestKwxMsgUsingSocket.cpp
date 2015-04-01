@@ -160,7 +160,9 @@ class TestSendAction : public TestRequest {
 
 	virtual void ClientActions() {
         KwxMessenger aMessenger;
-        aMessenger.SendAction(aPENG,TIAO_3);
+        RequestSendAction aMsg;
+        aMsg.Set(aPENG,TIAO_3);
+        aMessenger.Send(aMsg);
     }
 };
 
