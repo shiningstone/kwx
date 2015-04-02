@@ -515,6 +515,45 @@ public:
     }
 };
 
+class TestRecvActionNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,76,               //request code
+            7,                     //package level
+            0x00,38,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            5,
+            60,1,                  //seatId
+            61,0,                  //who show card: 0 server
+            62,2,                  //next player
+            131,0,4,0,0,0,1,       //action : peng
+            132,0,1,2,             //card :   3 tiao
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        ActionNotif_t action = {0};
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(action);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_ACTION );
+        assert( aMsg.GetLevel()==7 );
+        assert( action.seat==1 );
+        assert( action.isFromServer==true );
+        assert( action.next==2 );
+        assert( action.action==a_PENG );
+        assert( action.card[0]==TIAO_3 );
+
+        return 0;
+    }
+};
+
 class TestSendGameStart : public CTestCase {
 public:
     virtual int Execute() {
@@ -752,5 +791,7 @@ void testRequests() {
     aCase = new TestSendAction_peng3tiao();
     aCase->Execute();
     aCase = new TestRecvActionResponse_waitRight();
+    aCase->Execute();
+    aCase = new TestRecvActionNotif();
     aCase->Execute();
 }

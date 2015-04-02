@@ -18,10 +18,19 @@ typedef enum {
     FAIL,
 }Status_t;
 
-typedef struct _ActionResponse {
+typedef struct _ActionResponse_t {
     INT8U         seat;
     INT8U         waitSeat;
 }ActionResponse_t;
+
+typedef struct _ActionNotif_t {
+    INT8U         seat;
+    bool          isFromServer;
+    INT8U         next;
+    ActionId_t    action;
+    int           cardNum;
+    Card_t        card[18];
+}ActionNotif_t;
 
 typedef struct _GameStartResponse_t {
     INT32U        score;

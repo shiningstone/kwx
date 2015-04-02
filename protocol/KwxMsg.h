@@ -46,6 +46,7 @@ public:
     int Construct(GameStartNotif_t &startInfo);
     int Construct(HandoutResponse_t &handoutResponse);
     int Construct(HandoutNotif_t &handoutInfo);
+    int Construct(ActionNotif_t &action);
     
 private:
     int KwxDsMsg::_load(_MsgTingInfo_t &info,const Item *item);

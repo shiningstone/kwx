@@ -125,6 +125,16 @@ int KwxDsMsg::Construct(HandoutNotif_t &handoutInfo) {
     return 0;
 }
 
+int KwxDsMsg::Construct(ActionNotif_t &action) {
+    action.seat    = GetItemValue(0);
+    action.isFromServer = (GetItemValue(1)==0)?true:false;
+    action.next    = GetItemValue(2);
+    action.action  = (ActionId_t)GetItemValue(3);
+    action.cardNum = _body->_items[4]->_bufLen;
+    memcpy(action.card,_body->_items[4]->_buf,action.cardNum);
+    return 0;
+}
+
 /**********************************************************
 	UpStream
 ***********************************************************/
