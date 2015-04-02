@@ -48,7 +48,7 @@ public:
     int Construct(HandoutNotif_t &handoutInfo);
     
 private:
-    int KwxDsMsg::_load(_MsgTingInfo_t *info,INT8U *inMsg,INT16U num);
+    int KwxDsMsg::_load(_MsgTingInfo_t &info,const Item *item);
 };
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {

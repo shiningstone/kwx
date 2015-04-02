@@ -33,23 +33,26 @@ typedef struct _GameStartNotif_t {
 }GameStartNotif_t;
 
 /*there is another TingInfo_t, maybe could combine them*/
-typedef struct __MsgTingInfo_t {
-    Card_t        card;        /* 可以胡的花色 */
+typedef struct _TingItem_t {
+    Card_t        kind;        /* 可以胡的花色 */
     int           remain;      /* 剩余数目     */
     int           fan;         /* 番数         */
+}TingItem_t;
+
+typedef struct __MsgTingInfo_t {
+    int              num;
+    TingItem_t       card[9];
 }_MsgTingInfo_t;
 
 typedef struct _HandoutResponse_t {
     Status_t         status;
-    int              tingNum;
-    _MsgTingInfo_t   tingInfo[9];
+    _MsgTingInfo_t   ting;
 }HandoutResponse_t;
 
 typedef struct _HandoutNotif_t {
     INT8U            seat;
     Card_t           handout;
-    int              tingNum;
-    _MsgTingInfo_t   tingInfo[9];
+    _MsgTingInfo_t   ting;
 }HandoutNotif_t;
 
 #endif

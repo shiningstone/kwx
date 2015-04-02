@@ -685,9 +685,9 @@ public:
         assert( aMsg.GetRequestCode()==REQ_GAME_SEND_START );
         assert( aMsg.GetLevel()==7 );
         assert( handoutInfo.status==SUCCESS );
-        assert( handoutInfo.tingInfo[0].card==TIAO_2);
-        assert( handoutInfo.tingInfo[0].remain==2 );
-        assert( handoutInfo.tingInfo[0].fan==3 );
+        assert( handoutInfo.ting.card[0].kind==TIAO_2);
+        assert( handoutInfo.ting.card[0].remain==2 );
+        assert( handoutInfo.ting.card[0].fan==3 );
 
         return 0;
     }
@@ -722,9 +722,9 @@ public:
         assert( aMsg.GetLevel()==7 );
         assert( handoutInfo.seat==2 );
         assert( handoutInfo.handout==TIAO_1);
-        assert( handoutInfo.tingInfo[0].card==TONG_1);
-        assert( handoutInfo.tingInfo[0].remain==2 );
-        assert( handoutInfo.tingInfo[0].fan==3 );
+        assert( handoutInfo.ting.card[0].kind==TONG_1);
+        assert( handoutInfo.ting.card[0].remain==2 );
+        assert( handoutInfo.ting.card[0].fan==3 );
 
         return 0;
     }
