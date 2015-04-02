@@ -99,19 +99,6 @@ int KwxDsMsg::Construct(GameStartNotif_t &startInfo) {
     return 0;
 }
 
-int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
-    const INT8U *p = inMsg;
-
-    ting.cards = new TingItem_t[ting.cardNum];
-    for(int i=0;i<ting.cardNum;i++) {
-        ting.cards[i].kind   = (Card_t)p[0+4*i];
-        ting.cards[i].remain = p[1+4*i];
-        ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
-    }
-
-	return 0;
-}
-
 int KwxDsMsg::Construct(HandoutResponse_t &handoutResponse) {
     handoutResponse.status = (Status_t)GetItemValue(0);
     handoutResponse.ting.cardNum = _body->_items[1]->_bufLen;
@@ -138,42 +125,6 @@ int KwxDsMsg::Construct(ActionNotif_t &action) {
     return 0;
 }
 
-int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
-    num = (INT8U)item->_bufLen;
-    
-    for(int i=0;i<num;i++) {
-        cards[i] = (Card_t)item->_buf[i];
-    }
-
-    return 0;
-}
-
-int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
-    if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
-        ming.choiceNum = 0;
-    }
-#if 0
-    const int len = item->_bufLen;
-    const INT8U *p = item->_buf;
-
-    int idx = 0;
-    int i   = 0;
-    while(i<len) {
-        i += 2;
-        
-        ming.choice[idx].kind = (Card_t)*(p+i);
-        ming.choice[idx].tingKindNum = *(p+i+1);
-        i += 2;
-
-        int j = 0;
-        while(j<ming.choice[idx].tingKindNum) {
-            _load(ming.choice[idx].ting[j].kind,p+i);
-        }
-    }
-#endif
-	return 0;
-}
-
 int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     dist.seat      = GetItemValue(0);
     dist.timer     = GetItemValue(1);
@@ -186,6 +137,61 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     _load(dist.ming,_body->_items[7]);
     
     return 0;
+}
+
+int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
+    num = (INT8U)item->_bufLen;
+    
+    for(int i=0;i<num;i++) {
+        cards[i] = (Card_t)item->_buf[i];
+    }
+
+    return 0;
+}
+
+int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
+    const INT8U *p = inMsg;
+
+    ting.cards = new TingItem_t[ting.cardNum];
+    for(int i=0;i<ting.cardNum;i++) {
+        ting.cards[i].kind   = (Card_t)p[0+4*i];
+        ting.cards[i].remain = p[1+4*i];
+        ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
+    }
+
+	return 0;
+}
+
+int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
+    if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
+        ming.choiceNum = 0;
+        return 0;
+    }
+
+    const int   len = item->_bufLen;
+    const INT8U *p = item->_buf;
+    _MingChoice_t choices[13];
+
+    int idx = 0;
+    int i   = 0;
+    while(i<len) {
+        i += 2;
+
+        choices[idx].kind = (Card_t)(*(p+i));
+        choices[idx].ting.cardNum = *(p+i+1);
+        i += 2;
+
+        _load(choices[idx].ting,p+i);
+        i += choices[idx].ting.cardNum*4;
+
+        idx++;
+    }
+
+    ming.choiceNum = idx;
+    ming.handouts  = new _MingChoice_t[idx];
+    memcpy(ming.handouts,choices,sizeof(_MingChoice_t)*idx);
+
+	return 0;
 }
 
 /**********************************************************

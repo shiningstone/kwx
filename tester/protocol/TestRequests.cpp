@@ -862,9 +862,9 @@ public:
         assert( dist.ming.handouts[0].ting.cards[0].kind==TIAO_6 );
         assert( dist.ming.handouts[0].ting.cards[0].remain==1 );
         assert( dist.ming.handouts[0].ting.cards[0].fan==2 );
-        assert( dist.ming.handouts[0].ting.cards[1].kind==TIAO_6 );
-        assert( dist.ming.handouts[0].ting.cards[1].remain==1 );
-        assert( dist.ming.handouts[0].ting.cards[1].fan==2 );
+        assert( dist.ming.handouts[0].ting.cards[1].kind==TIAO_7 );
+        assert( dist.ming.handouts[0].ting.cards[1].remain==2 );
+        assert( dist.ming.handouts[0].ting.cards[1].fan==4 );
 
         return 0;
     }
