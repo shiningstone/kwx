@@ -153,13 +153,18 @@ int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
     ting.cards = new TingItem_t[ting.cardNum];
-    for(int i=0;i<ting.cardNum;i++) {
+    int i = 0;
+    int num = 0;
+    while(num<ting.cardNum) {
         ting.cards[i].kind   = (Card_t)p[0+4*i];
         ting.cards[i].remain = p[1+4*i];
         ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
+
+        i++;
+        num += ting.cards[i].remain;
     }
 
-	return 0;
+	return i*4;
 }
 
 int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
@@ -181,8 +186,7 @@ int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
         choices[idx].ting.cardNum = *(p+i+1);
         i += 2;
 
-        _load(choices[idx].ting,p+i);
-        i += choices[idx].ting.cardNum*4;
+        i += _load(choices[idx].ting,p+i);
 
         idx++;
     }

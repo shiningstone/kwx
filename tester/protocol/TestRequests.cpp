@@ -461,9 +461,9 @@ public:
             131,0,4,0,1,2,3,         //roomPath:0x00010203
             132,0,4,4,5,6,7,         //roomId:  0x04050607
             133,0,4,8,9,10,11,       //tableId: 0x08090a0b
-            60,1,                  //site:    1
+            60,1,                    //site:    1
             134,0,4,0,0,0,1,         //act:     1(碰)                 
-            135,0,1,2                //card:    3tiao
+            135,0,1,2                //card:    3条
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -529,8 +529,8 @@ public:
             60,1,                  //seatId
             61,0,                  //who show card: 0 server
             62,2,                  //next player
-            131,0,4,0,0,0,1,       //action : peng
-            132,0,1,2,             //card :   3 tiao
+            131,0,4,0,0,0,1,       //action : 碰
+            132,0,1,2,             //card :   3条
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -678,7 +678,7 @@ public:
             132,0,4,4,5,6,7,         //roomId:  0x04050607
             133,0,4,8,9,10,11,       //tableId: 0x08090a0b
             60,1,                    //site:    1
-            65,2,                    //show card : 3tiao
+            65,2,                    //show card : 3条
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -814,7 +814,7 @@ public:
     }
 };
 
-class TestRecvDistCard_Ming : public CTestCase {
+class TestRecvDistCard_MingOut1Ting2 : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
@@ -833,7 +833,7 @@ public:
             130,0,1,0xff,          //gang remind:        不可杠
             131,0,1,0xff,          //kou remind:         不可扣
             132,0,12,
-                0,0,4,2,           //ming remind:        出5条可胡2张
+                0,0,4,3,           //ming remind:        出5条可胡3张
                 5,1,0,2,           //                    胡6条，剩1张，赢2番
                 6,2,0,4,           //                    胡7条，剩2张，赢4番
         };
@@ -899,6 +899,6 @@ void testRequests() {
     
     aCase = new TestRecvDistCard_MingGang4tiao();
     aCase->Execute();
-    aCase = new TestRecvDistCard_Ming();
+    aCase = new TestRecvDistCard_MingOut1Ting2();
     aCase->Execute();
 }

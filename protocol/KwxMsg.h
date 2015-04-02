@@ -48,7 +48,14 @@ public:
     int Construct(HandoutNotif_t &handoutInfo);
     int Construct(ActionNotif_t &action);
     int Construct(DistCardInfo_t &dist);
-    
+
+    /***************************************************************************
+    NOTE :
+        there are some dynamically allocated memory in several kinds of struct
+    ***************************************************************************/
+    static void Release(DistCardInfo_t &info);
+    static void Release(HandoutNotif_t &info);
+    static void Release(HandoutResponse_t &info);
 private:
     int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item);
     int KwxDsMsg::_load(_MsgTingInfo_t &info,const INT8U *inMsg);
