@@ -28,7 +28,7 @@ typedef struct _ActionNotif_t {
     bool          isFromServer;
     INT8U         next;
     ActionId_t    action;
-    int           cardNum;
+    INT8U         cardNum;
     Card_t        card[18];
 }ActionNotif_t;
 

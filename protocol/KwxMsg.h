@@ -50,6 +50,7 @@ public:
     int Construct(DistCardInfo_t &dist);
     
 private:
+    int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item);
     int KwxDsMsg::_load(_MsgTingInfo_t &info,const Item *item);
     int KwxDsMsg::_load(_MingInfo_t &info,const Item *item);
 };

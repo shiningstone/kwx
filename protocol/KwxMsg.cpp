@@ -131,9 +131,16 @@ int KwxDsMsg::Construct(ActionNotif_t &action) {
     action.next    = GetItemValue(2);
     action.action  = (ActionId_t)GetItemValue(3);
     
-    action.cardNum = _body->_items[4]->_bufLen;
-    for(int i=0;i<action.cardNum;i++) {
-        action.card[i] = (Card_t)_body->_items[4]->_buf[i];
+    _load(action.card, action.cardNum, _body->_items[4]);
+
+    return 0;
+}
+
+int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
+    num = (INT8U)item->_bufLen;
+    
+    for(int i=0;i<num;i++) {
+        cards[i] = (Card_t)item->_buf[i];
     }
 
     return 0;
@@ -154,16 +161,8 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     dist.kind      = (Card_t)GetItemValue(3);
     dist.remind    = (ActionId_t)GetItemValue(4);
 
-    dist.gangKindNum = (INT8U)_body->_items[5]->_bufLen;
-    for(int i=0;i<dist.gangKindNum;i++) {
-        dist.gangCard[i] = (Card_t)_body->_items[5]->_buf[i];
-    }
-    
-    dist.kouKindNum = (INT8U)_body->_items[6]->_bufLen;
-    for(int i=0;i<dist.kouKindNum;i++) {
-        dist.kouCard[i] = (Card_t)_body->_items[6]->_buf[i];
-    }
-    
+    _load(dist.gangCard, dist.gangKindNum, _body->_items[5]);
+    _load(dist.kouCard, dist.kouKindNum, _body->_items[6]);
     _load(dist.ming,_body->_items[7]);
     
     return 0;
