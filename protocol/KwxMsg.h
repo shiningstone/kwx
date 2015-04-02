@@ -59,10 +59,13 @@ public:
     static void Release(DistCardInfo_t &info);
     static void Release(HandoutNotif_t &info);
     static void Release(HandoutResponse_t &info);
+    static void Release(RemindInfo_t &info);
+    
 private:
-    int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item);
-    int KwxDsMsg::_load(_MsgTingInfo_t &info,const INT8U *inMsg);
-    int KwxDsMsg::_load(_MingInfo_t &info,const Item *item);
+    int _load(Card_t *cards,INT8U &num,const Item *item);
+    int _load(_MsgTingInfo_t &info,const INT8U *inMsg);
+    int _load(_MingInfo_t &info,const Item *item);
+    int _load(_Reminds_t &remind,int itemIdx);
 };
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {

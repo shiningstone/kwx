@@ -130,11 +130,19 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     dist.timer     = GetItemValue(1);
     dist.remain    = GetItemValue(2);
     dist.kind      = (Card_t)GetItemValue(3);
-    dist.remind    = (ActionId_t)GetItemValue(4);
 
-    _load(dist.gangCard, dist.gangKindNum, _body->_items[5]);
-    _load(dist.kouCard, dist.kouKindNum, _body->_items[6]);
-    _load(dist.ming,_body->_items[7]);
+    _load(dist.remind,4);
+    
+    return 0;
+}
+
+int KwxDsMsg::Construct(RemindInfo_t &remind) {
+    remind.seat   = GetItemValue(0);
+    remind.timer  = GetItemValue(1);
+
+    _load(remind.remind,2);
+
+    remind.wait = GetItemValue(6);
     
     return 0;
 }
@@ -156,20 +164,6 @@ int KwxDsMsg::Construct(ScoreNotif_t &score) {
     score.val[0] = _ntohl( *((INT32U *)(_body->_items[1]->_buf)) );
     score.val[1] = _ntohl( *((INT32U *)(_body->_items[1]->_buf+4)) );
     score.val[2] = _ntohl( *((INT32U *)(_body->_items[1]->_buf+8)) );
-    
-    return 0;
-}
-
-int KwxDsMsg::Construct(RemindInfo_t &remind) {
-    remind.seat   = GetItemValue(0);
-    remind.timer  = GetItemValue(1);
-    remind.action = (ActionId_t)GetItemValue(2);
-
-    _load(remind.gangCard, remind.gangKindNum, _body->_items[3]);
-    _load(remind.kouCard, remind.kouKindNum, _body->_items[4]);
-    _load(remind.ming,_body->_items[5]);
-
-    remind.wait = GetItemValue(6);
     
     return 0;
 }
@@ -234,6 +228,15 @@ int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
 	return 0;
 }
 
+int KwxDsMsg::_load(_Reminds_t &remind,int itemIdx) {
+    remind.actions = (ActionId_t)GetItemValue(itemIdx);
+
+    _load(remind.gangCard, remind.gangKindNum, _body->_items[itemIdx+1]);
+    _load(remind.kouCard, remind.kouKindNum, _body->_items[itemIdx+2]);
+    _load(remind.ming,_body->_items[itemIdx+3]);
+
+    return 0;
+}
 /**********************************************************
 	UpStream
 ***********************************************************/

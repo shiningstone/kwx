@@ -74,18 +74,29 @@ typedef struct __MingInfo_t {
     _MingChoice_t    *handouts;    
 }_MingInfo_t;
 
-typedef struct _DistCardInfo_t {
-    INT8U            seat;
-    INT8U            timer;
-    INT8U            remain;
-    Card_t           kind;
-    ActionId_t       remind;
+typedef struct __Reminds_t {
+    ActionId_t       actions;
     INT8U            gangKindNum;
     Card_t           gangCard[4];
     INT8U            kouKindNum;
     Card_t           kouCard[4];
     _MingInfo_t      ming;
+}_Reminds_t;
+
+typedef struct _DistCardInfo_t {
+    INT8U            seat;
+    INT8U            timer;
+    INT8U            remain;
+    Card_t           kind;
+    _Reminds_t       remind;
 }DistCardInfo_t;
+
+typedef struct _RemindInfo_t {
+    INT8U            seat;
+    INT8U            timer;
+    _Reminds_t       remind;
+    INT8U            wait;
+}RemindInfo_t;
 
 typedef struct _DistCardNotif_t {
     INT8U            seat;
@@ -98,17 +109,5 @@ typedef struct _ScoreNotif_t {
     INT8U            seat[3];
     INT32U           val[3];
 }ScoreNotif_t;
-
-typedef struct _RemindInfo_t {
-    INT8U            seat;
-    INT8U            timer;
-    ActionId_t       action;
-    INT8U            gangKindNum;
-    Card_t           gangCard[4];
-    INT8U            kouKindNum;
-    Card_t           kouCard[4];
-    _MingInfo_t      ming;
-    INT8U            wait;
-}RemindInfo_t;
 
 #endif

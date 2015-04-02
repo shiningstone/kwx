@@ -805,10 +805,10 @@ public:
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
-        assert( dist.remind==a_MING_GANG );
-        assert( dist.gangCard[0]==TIAO_4 );
-        assert( dist.kouCard[0]==CARD_UNKNOWN);
-        assert( dist.ming.choiceNum==0 );
+        assert( dist.remind.actions==a_MING_GANG );
+        assert( dist.remind.gangCard[0]==TIAO_4 );
+        assert( dist.remind.kouCard[0]==CARD_UNKNOWN);
+        assert( dist.remind.ming.choiceNum==0 );
 
         return 0;
     }
@@ -853,18 +853,18 @@ public:
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
-        assert( dist.remind==a_MING );
-        assert( dist.gangCard[0]==CARD_UNKNOWN );
-        assert( dist.kouCard[0]==CARD_UNKNOWN );
+        assert( dist.remind.actions==a_MING );
+        assert( dist.remind.gangCard[0]==CARD_UNKNOWN );
+        assert( dist.remind.kouCard[0]==CARD_UNKNOWN );
         
-        assert( dist.ming.choiceNum==1 );
-        assert( dist.ming.handouts[0].kind==TIAO_5 );
-        assert( dist.ming.handouts[0].ting.cards[0].kind==TIAO_6 );
-        assert( dist.ming.handouts[0].ting.cards[0].remain==1 );
-        assert( dist.ming.handouts[0].ting.cards[0].fan==2 );
-        assert( dist.ming.handouts[0].ting.cards[1].kind==TIAO_7 );
-        assert( dist.ming.handouts[0].ting.cards[1].remain==2 );
-        assert( dist.ming.handouts[0].ting.cards[1].fan==4 );
+        assert( dist.remind.ming.choiceNum==1 );
+        assert( dist.remind.ming.handouts[0].kind==TIAO_5 );
+        assert( dist.remind.ming.handouts[0].ting.cards[0].kind==TIAO_6 );
+        assert( dist.remind.ming.handouts[0].ting.cards[0].remain==1 );
+        assert( dist.remind.ming.handouts[0].ting.cards[0].fan==2 );
+        assert( dist.remind.ming.handouts[0].ting.cards[1].kind==TIAO_7 );
+        assert( dist.remind.ming.handouts[0].ting.cards[1].remain==2 );
+        assert( dist.remind.ming.handouts[0].ting.cards[1].fan==4 );
 
         return 0;
     }
@@ -911,22 +911,22 @@ public:
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
-        assert( dist.remind==a_MING );
-        assert( dist.gangCard[0]==CARD_UNKNOWN );
-        assert( dist.kouCard[0]==CARD_UNKNOWN );
+        assert( dist.remind.actions==a_MING );
+        assert( dist.remind.gangCard[0]==CARD_UNKNOWN );
+        assert( dist.remind.kouCard[0]==CARD_UNKNOWN );
         
-        assert( dist.ming.choiceNum==2 );
-        assert( dist.ming.handouts[0].kind==TIAO_5 );
-        assert( dist.ming.handouts[0].ting.cards[0].kind==TIAO_6 );
-        assert( dist.ming.handouts[0].ting.cards[0].remain==1 );
-        assert( dist.ming.handouts[0].ting.cards[0].fan==2 );
-        assert( dist.ming.handouts[0].ting.cards[1].kind==TIAO_7 );
-        assert( dist.ming.handouts[0].ting.cards[1].remain==2 );
-        assert( dist.ming.handouts[0].ting.cards[1].fan==4 );
-        assert( dist.ming.handouts[1].kind==TIAO_8 );
-        assert( dist.ming.handouts[1].ting.cards[0].kind==TIAO_9 );
-        assert( dist.ming.handouts[1].ting.cards[0].remain==1 );
-        assert( dist.ming.handouts[1].ting.cards[0].fan==9 );
+        assert( dist.remind.ming.choiceNum==2 );
+        assert( dist.remind.ming.handouts[0].kind==TIAO_5 );
+        assert( dist.remind.ming.handouts[0].ting.cards[0].kind==TIAO_6 );
+        assert( dist.remind.ming.handouts[0].ting.cards[0].remain==1 );
+        assert( dist.remind.ming.handouts[0].ting.cards[0].fan==2 );
+        assert( dist.remind.ming.handouts[0].ting.cards[1].kind==TIAO_7 );
+        assert( dist.remind.ming.handouts[0].ting.cards[1].remain==2 );
+        assert( dist.remind.ming.handouts[0].ting.cards[1].fan==4 );
+        assert( dist.remind.ming.handouts[1].kind==TIAO_8 );
+        assert( dist.remind.ming.handouts[1].ting.cards[0].kind==TIAO_9 );
+        assert( dist.remind.ming.handouts[1].ting.cards[0].remain==1 );
+        assert( dist.remind.ming.handouts[1].ting.cards[0].fan==9 );
 
         return 0;
     }
@@ -1039,10 +1039,10 @@ public:
         assert( aMsg.GetLevel()==7 );
         assert( remind.seat==1 );
         assert( remind.timer==2 );
-        assert( remind.action==a_PENG );
-        assert( remind.gangCard[0]==CARD_UNKNOWN );
-        assert( remind.kouCard[0]==CARD_UNKNOWN );
-        assert( remind.ming.choiceNum==0 );
+        assert( remind.remind.actions==a_PENG );
+        assert( remind.remind.gangCard[0]==CARD_UNKNOWN );
+        assert( remind.remind.kouCard[0]==CARD_UNKNOWN );
+        assert( remind.remind.ming.choiceNum==0 );
         assert( remind.wait==0 );
 
         return 0;
