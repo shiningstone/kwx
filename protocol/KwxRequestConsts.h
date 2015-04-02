@@ -3,15 +3,28 @@
 #define __KWX_REQUEST_CONSTS__
 
 typedef enum {
-    /* KWX-外部通信协议4.0 */
+    /* Upstream & Downstream : request and its response */
     REQ_GAME_SEND_START      = 43,
     REQ_GAME_SEND_SHOWCARD   = 48,
     REQ_GAME_SEND_ACTION     = 49,
 
-    /* other's request notifications */
+    /* Downstream : other's request notifications */
     REQ_GAME_RECV_SHOWCARD   = 75,
     REQ_GAME_RECV_ACTION     = 76,
     REQ_GAME_RECV_START      = 77,
+
+    /* todo */
+    #if 0
+    REQ_GAME_DIST_CARD（51）                
+    REQ_GAME_DIST_CARD_TOOTHER(52)              
+    REQ_GAME_DIST_REMIND（55）              
+    REQ_GAME_DIST_BEGINCARDS（56）--下行发给庄家                
+    REQ_GAME_DIST_BEGINCARDS_OTHER（57）--下行发给其他两个玩家              
+    REQ_GAME_DIST_DECISION（59）                
+    
+    REQ_GAME_GET_TINGINFO（50）             
+    REQ_GAME_SEND_CALSCORE（53）                
+    #endif
 }RequestId_t;
 
 typedef enum {

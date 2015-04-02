@@ -24,7 +24,7 @@ KwxMessenger::~KwxMessenger() {
 }
 
 /************************************************************
-	auto receiving 
+	auto receiving (Downstream)
 ************************************************************/
 void KwxMessenger::StartReceiving(MsgHandler_t handle) {
     _messenger->SetHandler(handle);
