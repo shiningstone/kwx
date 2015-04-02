@@ -870,6 +870,68 @@ public:
     }
 };
 
+class TestRecvDistCard_MingOut2Ting3 : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,51,               //request code/*发牌(下行) REQ_GAME_DIST_CARD*/
+            7,                     //package level
+            0x00,62,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            8,
+            60,0,                  //seat
+            61,1,                  //timer
+            62,2,                  //reserved card num
+            63,3,                  //card:               发4条
+            64,0x40,               //remind:             明
+            130,0,1,0xff,          //gang remind:        不可杠
+            131,0,1,0xff,          //kou remind:         不可扣
+            132,0,20,
+                0,0,4,3,           //ming remind:        出5条可胡3张
+                5,1,0,2,           //                    胡6条，剩1张，赢2番
+                6,2,0,4,           //                    胡7条，剩2张，赢4番
+                0,0,7,1,           //ming remind:        出8条可胡1张
+                8,1,0,9,           //                    胡9条，剩1张，赢9番
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        DistCardInfo_t dist;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(dist);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_CARD );
+        assert( aMsg.GetLevel()==7 );
+        assert( dist.seat==0 );
+        assert( dist.timer==1 );
+        assert( dist.remain==2 );
+        assert( dist.kind==TIAO_4 );
+        assert( dist.remind==a_MING );
+        assert( dist.gangCard[0]==CARD_UNKNOWN );
+        assert( dist.kouCard[0]==CARD_UNKNOWN );
+        
+        assert( dist.ming.choiceNum==2 );
+        assert( dist.ming.handouts[0].kind==TIAO_5 );
+        assert( dist.ming.handouts[0].ting.cards[0].kind==TIAO_6 );
+        assert( dist.ming.handouts[0].ting.cards[0].remain==1 );
+        assert( dist.ming.handouts[0].ting.cards[0].fan==2 );
+        assert( dist.ming.handouts[0].ting.cards[1].kind==TIAO_7 );
+        assert( dist.ming.handouts[0].ting.cards[1].remain==2 );
+        assert( dist.ming.handouts[0].ting.cards[1].fan==4 );
+        assert( dist.ming.handouts[1].kind==TIAO_8 );
+        assert( dist.ming.handouts[1].ting.cards[0].kind==TIAO_9 );
+        assert( dist.ming.handouts[1].ting.cards[0].remain==1 );
+        assert( dist.ming.handouts[1].ting.cards[0].fan==9 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -883,9 +945,9 @@ void testRequests() {
 
     aCase = new TestSendShowCard();
     aCase->Execute();
-    aCase = new TestRecvShowCardResponse();/*是否必须以0xffffffff结尾*/
+    aCase = new TestRecvShowCardResponse();
     aCase->Execute();
-    aCase = new TestRecvOthersShowCard();/*是否必须以0xffffffff结尾*/
+    aCase = new TestRecvOthersShowCard();
     aCase->Execute();
 
 
@@ -897,6 +959,8 @@ void testRequests() {
     aCase->Execute();
 
     
+    aCase = new TestRecvDistCard_MingOut2Ting3();
+    aCase->Execute();
     aCase = new TestRecvDistCard_MingGang4tiao();
     aCase->Execute();
     aCase = new TestRecvDistCard_MingOut1Ting2();

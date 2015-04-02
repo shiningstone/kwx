@@ -153,6 +153,7 @@ int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
     ting.cards = new TingItem_t[ting.cardNum];
+    
     int i = 0;
     int num = 0;
     while(num<ting.cardNum) {
@@ -160,8 +161,8 @@ int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
         ting.cards[i].remain = p[1+4*i];
         ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
 
-        i++;
         num += ting.cards[i].remain;
+        i++;
     }
 
 	return i*4;
