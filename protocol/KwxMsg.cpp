@@ -130,8 +130,40 @@ int KwxDsMsg::Construct(ActionNotif_t &action) {
     action.isFromServer = (GetItemValue(1)==0)?true:false;
     action.next    = GetItemValue(2);
     action.action  = (ActionId_t)GetItemValue(3);
+    
     action.cardNum = _body->_items[4]->_bufLen;
     memcpy(action.card,_body->_items[4]->_buf,action.cardNum);
+
+    return 0;
+}
+
+int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
+    if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
+        ming.mingKindNum = 0;
+    }
+
+	return 0;
+}
+
+int KwxDsMsg::Construct(DistCardInfo_t &dist) {
+    dist.seat      = GetItemValue(0);
+    dist.timer     = GetItemValue(1);
+    dist.remain    = GetItemValue(2);
+    dist.kind      = (Card_t)GetItemValue(3);
+    dist.remind    = (ActionId_t)GetItemValue(4);
+
+    dist.gangKindNum = _body->_items[5]->_bufLen;
+    for(int i=0;i<dist.gangKindNum;i++) {
+        dist.gangCard[i] = (Card_t)_body->_items[5]->_buf[i];
+    }
+    
+    dist.kouKindNum = _body->_items[6]->_bufLen;
+    for(int i=0;i<dist.kouKindNum;i++) {
+        dist.kouCard[i] = (Card_t)_body->_items[6]->_buf[i];
+    }
+    
+    _load(dist.ming,_body->_items[7]);
+    
     return 0;
 }
 

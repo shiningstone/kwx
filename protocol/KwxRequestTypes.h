@@ -64,4 +64,24 @@ typedef struct _HandoutNotif_t {
     _MsgTingInfo_t   ting;
 }HandoutNotif_t;
 
+typedef struct __MingInfo_t {
+    INT8U            mingKindNum;/*可以出的花色数目*/
+    Card_t           card[9];    /*可以出的花色*/
+    _MsgTingInfo_t   ting[9];    /*出牌后的停信息*/
+}_MingInfo_t;
+
+typedef struct _DistCardInfo_t {
+    INT8U            seat;
+    INT8U            timer;
+    INT8U            remain;
+    Card_t           kind;
+    ActionId_t       remind;
+    INT8U            gangKindNum;
+    Card_t           gangCard[4];
+    INT8U            kouKindNum;
+    Card_t           kouCard[4];
+    _MingInfo_t      ming;
+}DistCardInfo_t;
+
+
 #endif

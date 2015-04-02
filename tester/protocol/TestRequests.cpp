@@ -769,6 +769,51 @@ public:
     }
 };
 
+class TestRecvDistCard_MingGang4tiao : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,51,               //request code/*发牌(下行) REQ_GAME_DIST_CARD*/
+            7,                     //package level
+            0x00,46,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            8,
+            60,0,                  //seat
+            61,1,                  //timer
+            62,2,                  //reserved card num
+            63,3,                  //card:               发4条
+            64,2,                  //remind:             明杠
+            130,0,1,3,             //gang remind:        可杠4条
+            131,0,1,0xff,          //kou remind:         不可扣
+            132,0,4,0xff,0xff,0xff,0xff,  //ming remind: 不可明
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        DistCardInfo_t dist;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(dist);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_CARD );
+        assert( aMsg.GetLevel()==7 );
+        assert( dist.seat==0 );
+        assert( dist.timer==1 );
+        assert( dist.remain==2 );
+        assert( dist.kind==TIAO_4 );
+        assert( dist.remind==a_MING_GANG );
+        assert( dist.gangCard[0]==TIAO_4 );
+        assert( dist.kouCard[0]==CARD_UNKNOWN);
+        assert( dist.ming.mingKindNum==0 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -793,5 +838,9 @@ void testRequests() {
     aCase = new TestRecvActionResponse_waitRight();
     aCase->Execute();
     aCase = new TestRecvActionNotif();
+    aCase->Execute();
+
+    
+    aCase = new TestRecvDistCard_MingGang4tiao();
     aCase->Execute();
 }

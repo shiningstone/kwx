@@ -47,9 +47,11 @@ public:
     int Construct(HandoutResponse_t &handoutResponse);
     int Construct(HandoutNotif_t &handoutInfo);
     int Construct(ActionNotif_t &action);
+    int Construct(DistCardInfo_t &dist);
     
 private:
     int KwxDsMsg::_load(_MsgTingInfo_t &info,const Item *item);
+    int KwxDsMsg::_load(_MingInfo_t &info,const Item *item);
 };
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {

@@ -7,6 +7,9 @@ typedef enum {
     REQ_GAME_SEND_START      = 43,
     REQ_GAME_SEND_SHOWCARD   = 48,
     REQ_GAME_SEND_ACTION     = 49,
+    
+    /* Downstream : start by server */
+    REQ_GAME_DIST_CARD       = 51,
 
     /* Downstream : other's request notifications */
     REQ_GAME_RECV_SHOWCARD   = 75,
@@ -15,7 +18,6 @@ typedef enum {
 
     /* todo */
     #if 0
-    REQ_GAME_DIST_CARD（51）                
     REQ_GAME_DIST_CARD_TOOTHER(52)              
     REQ_GAME_DIST_REMIND（55）              
     REQ_GAME_DIST_BEGINCARDS（56）--下行发给庄家                
