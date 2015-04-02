@@ -50,6 +50,7 @@ public:
     int Construct(DistCardInfo_t &dist);
     int Construct(DistCardNotif_t &dist);
     int Construct(ScoreNotif_t &score);
+    int Construct(RemindInfo_t &remind);
 
     /***************************************************************************
     NOTE :

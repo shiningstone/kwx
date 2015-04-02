@@ -1006,6 +1006,49 @@ public:
     }
 };
 
+class TestRecvRemindNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,55,               //request code/*下发提醒(下行) REQ_GAME_DIST_REMIND*/
+            7,                     //package level
+            0x00,42,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            7,
+            60,1,                        //seat
+            61,2,                        //timer
+            129,0,4,0,0,0,1,             //remind :      碰
+            130,0,1,0xff,                //gang remind : 不可杠
+            131,0,1,0xff,                //kou remind :  不可扣
+            132,0,4,0xff,0xff,0xff,0xff, //ming remind : 不可明
+            63,0,                        //wait :        不等
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        RemindInfo_t remind;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(remind);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_REMIND );
+        assert( aMsg.GetLevel()==7 );
+        assert( remind.seat==1 );
+        assert( remind.timer==2 );
+        assert( remind.action==a_PENG );
+        assert( remind.gangCard[0]==CARD_UNKNOWN );
+        assert( remind.kouCard[0]==CARD_UNKNOWN );
+        assert( remind.ming.choiceNum==0 );
+        assert( remind.wait==0 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -1043,5 +1086,8 @@ void testRequests() {
     aCase->Execute();
 
     aCase = new TestRecvScoreNotif();
+    aCase->Execute();
+
+    aCase = new TestRecvRemindNotif();
     aCase->Execute();
 }

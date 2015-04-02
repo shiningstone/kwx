@@ -99,5 +99,16 @@ typedef struct _ScoreNotif_t {
     INT32U           val[3];
 }ScoreNotif_t;
 
+typedef struct _RemindInfo_t {
+    INT8U            seat;
+    INT8U            timer;
+    ActionId_t       action;
+    INT8U            gangKindNum;
+    Card_t           gangCard[4];
+    INT8U            kouKindNum;
+    Card_t           kouCard[4];
+    _MingInfo_t      ming;
+    INT8U            wait;
+}RemindInfo_t;
 
 #endif

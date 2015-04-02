@@ -160,6 +160,20 @@ int KwxDsMsg::Construct(ScoreNotif_t &score) {
     return 0;
 }
 
+int KwxDsMsg::Construct(RemindInfo_t &remind) {
+    remind.seat   = GetItemValue(0);
+    remind.timer  = GetItemValue(1);
+    remind.action = (ActionId_t)GetItemValue(2);
+
+    _load(remind.gangCard, remind.gangKindNum, _body->_items[3]);
+    _load(remind.kouCard, remind.kouKindNum, _body->_items[4]);
+    _load(remind.ming,_body->_items[5]);
+
+    remind.wait = GetItemValue(6);
+    
+    return 0;
+}
+
 int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
     num = (INT8U)item->_bufLen;
     
