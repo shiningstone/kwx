@@ -48,6 +48,8 @@ public:
     int Construct(HandoutNotif_t &handoutInfo);
     int Construct(ActionNotif_t &action);
     int Construct(DistCardInfo_t &dist);
+    int Construct(DistCardNotif_t &dist);
+    int Construct(ScoreNotif_t &score);
 
     /***************************************************************************
     NOTE :

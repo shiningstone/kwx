@@ -12,6 +12,8 @@ typedef enum {
     REQ_GAME_DIST_CARD       = 51,
 
     /* Downstream : other's request notifications */
+    REQ_GAME_DIST_CARD_TOOTHER = 52,
+    REQ_GAME_SEND_CALSCORE   = 53,                
     REQ_GAME_RECV_SHOWCARD   = 75,
     REQ_GAME_RECV_ACTION     = 76,
     REQ_GAME_RECV_START      = 77,
@@ -25,7 +27,6 @@ typedef enum {
     REQ_GAME_DIST_DECISION£¨59£©                
     
     REQ_GAME_GET_TINGINFO£¨50£©             
-    REQ_GAME_SEND_CALSCORE£¨53£©                
     #endif
 }RequestId_t;
 

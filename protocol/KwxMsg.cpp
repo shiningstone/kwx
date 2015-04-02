@@ -139,6 +139,27 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     return 0;
 }
 
+int KwxDsMsg::Construct(DistCardNotif_t &dist) {
+    dist.seat      = GetItemValue(0);
+    dist.remain    = GetItemValue(1);
+    dist.timer     = GetItemValue(2);
+    dist.kind      = (Card_t)GetItemValue(3);
+    
+    return 0;
+}
+
+int KwxDsMsg::Construct(ScoreNotif_t &score) {
+    score.seat[0] = _body->_items[0]->_buf[0];
+    score.seat[1] = _body->_items[0]->_buf[1];
+    score.seat[2] = _body->_items[0]->_buf[2];
+
+    score.val[0] = _ntohl( *((INT32U *)(_body->_items[1]->_buf)) );
+    score.val[1] = _ntohl( *((INT32U *)(_body->_items[1]->_buf+4)) );
+    score.val[2] = _ntohl( *((INT32U *)(_body->_items[1]->_buf+8)) );
+    
+    return 0;
+}
+
 int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
     num = (INT8U)item->_bufLen;
     

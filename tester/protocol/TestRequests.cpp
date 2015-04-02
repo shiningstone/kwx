@@ -932,6 +932,80 @@ public:
     }
 };
 
+class TestRecvDistCardNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,52,               //request code/*发牌(下行) REQ_GAME_DIST_CARD_TOOTHER*/
+            7,                     //package level
+            0x00,39,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            4,
+            60,0,                  //seat
+            61,1,                  //reserved card num
+            62,2,                  //timer
+            63,3,                  //card:               发4条
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        DistCardNotif_t dist;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(dist);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_CARD_TOOTHER );
+        assert( aMsg.GetLevel()==7 );
+        assert( dist.seat==0 );
+        assert( dist.remain==1 );
+        assert( dist.timer==2 );
+        assert( dist.kind==TIAO_4 );
+
+        return 0;
+    }
+};
+
+class TestRecvScoreNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,53,               //request code/*下发计分结算(下行) REQ_GAME_SEND_CALSCORE*/
+            7,                     //package level
+            0x00,42,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            131,0,3,1,2,3,                     //seat[]
+            135,0,12,0,0,0,1,0,0,0,2,0,0,0,3   //score[]
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        ScoreNotif_t score;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(score);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_SEND_CALSCORE );
+        assert( aMsg.GetLevel()==7 );
+        assert( score.seat[0]==1 );
+        assert( score.seat[1]==2 );
+        assert( score.seat[2]==3 );
+        assert( score.val[0]==1 );
+        assert( score.val[1]==2 );
+        assert( score.val[2]==3 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -959,10 +1033,15 @@ void testRequests() {
     aCase->Execute();
 
     
+    aCase = new TestRecvDistCardNotif();
+    aCase->Execute();
     aCase = new TestRecvDistCard_MingOut2Ting3();
     aCase->Execute();
     aCase = new TestRecvDistCard_MingGang4tiao();
     aCase->Execute();
     aCase = new TestRecvDistCard_MingOut1Ting2();
+    aCase->Execute();
+
+    aCase = new TestRecvScoreNotif();
     aCase->Execute();
 }

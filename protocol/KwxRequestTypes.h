@@ -87,5 +87,17 @@ typedef struct _DistCardInfo_t {
     _MingInfo_t      ming;
 }DistCardInfo_t;
 
+typedef struct _DistCardNotif_t {
+    INT8U            seat;
+    INT8U            remain;
+    INT8U            timer;
+    Card_t           kind;
+}DistCardNotif_t;
+
+typedef struct _ScoreNotif_t {
+    INT8U            seat[3];
+    INT32U           val[3];
+}ScoreNotif_t;
+
 
 #endif
