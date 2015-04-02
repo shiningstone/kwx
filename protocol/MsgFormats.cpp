@@ -96,7 +96,7 @@ Item_t Item::_IdType(INT8U id) {
 }
 
 Item_t Item::GetIdType() {
-    return _id;
+    return _IdType(_id);
 }
 
 int Item::Serialize(INT8U *outMsg) {

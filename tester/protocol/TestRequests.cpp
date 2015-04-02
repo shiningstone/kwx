@@ -585,6 +585,39 @@ public:
     }
 };
 
+class TestRecvOthersGameStart : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,77,               //request code
+            7,                     //package level
+            0x00,30,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,2,                  //other's seat
+            131,0,4,0,0,0,1,       //score
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        GameStartNotif_t startInfo = {0};
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(startInfo);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_START );
+        assert( aMsg.GetLevel()==7 );
+        assert( startInfo.seat==2 );
+        assert( startInfo.score==1 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -592,6 +625,9 @@ void testRequests() {
     aCase->Execute();
 
     aCase = new TestRecvGameStartResponse();
+    aCase->Execute();
+
+    aCase = new TestRecvOthersGameStart();
     aCase->Execute();
 
     aCase = new TestSendAction_peng3tiao();

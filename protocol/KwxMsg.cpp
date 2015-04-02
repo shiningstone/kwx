@@ -83,13 +83,19 @@ INT32U KwxDsMsg::GetItemValue(int idx) {
 }
 
 int KwxDsMsg::Construct(ActionResponse_t &waitInfo) {
-    waitInfo.seat     = _body->_items[0]->_value;
-    waitInfo.waitSeat = _body->_items[1]->_value;
+    waitInfo.seat     = GetItemValue(0);
+    waitInfo.waitSeat = GetItemValue(1);
     return 0;
 }
 
 int KwxDsMsg::Construct(GameStartResponse_t &startInfo) {
-    startInfo.score = _ntohl( *(INT32U *)(_body->_items[0]->_buf) );
+    startInfo.score = GetItemValue(0);
+    return 0;
+}
+
+int KwxDsMsg::Construct(GameStartNotif_t &startInfo) {
+    startInfo.seat = GetItemValue(0);
+    startInfo.score = GetItemValue(1);
     return 0;
 }
 

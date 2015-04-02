@@ -43,6 +43,7 @@ public:
     
     int         Construct(ActionResponse_t &waitInfo);
     int         Construct(GameStartResponse_t &startInfo);
+    int         Construct(GameStartNotif_t &startInfo);
 };
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {

@@ -20,4 +20,10 @@ typedef struct _GameStartResponse_t {
     INT32U        score;
 }GameStartResponse_t;
 
+typedef struct _GameStartNotif_t {
+    INT8U         seat;
+    INT32U        score;
+}GameStartNotif_t;
+
+
 #endif
