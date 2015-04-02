@@ -45,14 +45,20 @@ public:
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {
 public:
-    KwxUsMsg();
-    
     virtual int Serialize(INT8U *outMsg);
+    
+protected:
+    KwxUsMsg();
     
 	void _set_size(INT8U *buf,INT16U len);
 	int  _add_item(Item *item);
 
     int SetRequestCode(RequestId_t code);
+    int SetSeatInfo();
+    
+/* this is for test use */
+public:
+    friend class TestFullUpMsg;
 };
 
 class RequestSendAction : public KwxUsMsg {

@@ -97,26 +97,32 @@ int KwxUsMsg::_add_item(Item *item) {
 	return 0;
 }
 
-/**********************************************************
-	Interfaces
-***********************************************************/
 #include "EnvVariables.h"
-
-int RequestSendAction::Set(ActionId_t action,Card_t card) {
+int KwxUsMsg::SetSeatInfo() {
     SeatInfo *seat = SeatInfo::getInstance();
-
-    SetRequestCode(REQ_GAME_SEND_ACTION);
 
     INT32U roomPath = _htonl(seat->_roomPath);
     INT32U roomId   = _htonl(seat->_roomId);
     INT32U tableId  = _htonl(seat->_tableId);
-    INT32U actionId = _htonl(action);
-    INT8U  cardKind = card;
 
     _add_item( new Item(131,4,(INT8U *)&roomPath) );
     _add_item( new Item(132,4,(INT8U *)&roomId) );
     _add_item( new Item(133,4,(INT8U *)&tableId) );
     _add_item( new Item(60,   seat->_seatId) );
+
+    return 0;
+}
+
+/**********************************************************
+	Interfaces
+***********************************************************/
+int RequestSendAction::Set(ActionId_t action,Card_t card) {
+    SetRequestCode(REQ_GAME_SEND_ACTION);
+    
+    INT32U actionId = _htonl(action);
+    INT8U  cardKind = card;
+
+    SetSeatInfo();
     _add_item( new Item(134,4,(INT8U *)&actionId) );
     _add_item( new Item(135,1,(INT8U *)&cardKind) );
 
@@ -124,18 +130,10 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
 }
 
 int RequestGameStart::Set() {
-    SeatInfo *seat = SeatInfo::getInstance();
-
     SetRequestCode(REQ_GAME_SEND_START);
-
-    INT32U roomPath = _htonl(seat->_roomPath);
-    INT32U roomId   = _htonl(seat->_roomId);
-    INT32U tableId  = _htonl(seat->_tableId);
-
-    _add_item( new Item(131,4,(INT8U *)&roomPath) );
-    _add_item( new Item(132,4,(INT8U *)&roomId) );
-    _add_item( new Item(133,4,(INT8U *)&tableId) );
-    _add_item( new Item(60,   seat->_seatId) );
+    SetSeatInfo();
 
     return 0;
 }
+
+
