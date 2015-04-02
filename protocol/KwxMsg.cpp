@@ -99,14 +99,14 @@ int KwxDsMsg::Construct(GameStartNotif_t &startInfo) {
     return 0;
 }
 
-int KwxDsMsg::_load(_MsgTingInfo_t &ting,const Item *item) {
-    ting.num = (item->_bufLen)/4;
+int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
+    const INT8U *p = inMsg;
 
-    const INT8U *p = item->_buf;
-    for(int i=0;i<ting.num;i++) {
-        ting.card[i].kind   = (Card_t)p[0+4*i];
-        ting.card[i].remain = p[1+4*i];
-        ting.card[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
+    ting.cards = new TingItem_t[ting.cardNum];
+    for(int i=0;i<ting.cardNum;i++) {
+        ting.cards[i].kind   = (Card_t)p[0+4*i];
+        ting.cards[i].remain = p[1+4*i];
+        ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
     }
 
 	return 0;
@@ -114,14 +114,16 @@ int KwxDsMsg::_load(_MsgTingInfo_t &ting,const Item *item) {
 
 int KwxDsMsg::Construct(HandoutResponse_t &handoutResponse) {
     handoutResponse.status = (Status_t)GetItemValue(0);
-    _load(handoutResponse.ting,_body->_items[1]);
+    handoutResponse.ting.cardNum = _body->_items[1]->_bufLen;
+    _load(handoutResponse.ting,_body->_items[1]->_buf);
     return 0;
 }
 
 int KwxDsMsg::Construct(HandoutNotif_t &handoutInfo) {
     handoutInfo.seat    = (Status_t)GetItemValue(0);
-    handoutInfo.handout = (Card_t)GetItemValue(1);
-    _load(handoutInfo.ting,_body->_items[2]);
+    handoutInfo.kind = (Card_t)GetItemValue(1);
+    handoutInfo.ting.cardNum = _body->_items[2]->_bufLen;
+    _load(handoutInfo.ting,_body->_items[2]->_buf);
     return 0;
 }
 
@@ -148,9 +150,27 @@ int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
 
 int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
     if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
-        ming.mingKindNum = 0;
+        ming.choiceNum = 0;
     }
+#if 0
+    const int len = item->_bufLen;
+    const INT8U *p = item->_buf;
 
+    int idx = 0;
+    int i   = 0;
+    while(i<len) {
+        i += 2;
+        
+        ming.choice[idx].kind = (Card_t)*(p+i);
+        ming.choice[idx].tingKindNum = *(p+i+1);
+        i += 2;
+
+        int j = 0;
+        while(j<ming.choice[idx].tingKindNum) {
+            _load(ming.choice[idx].ting[j].kind,p+i);
+        }
+    }
+#endif
 	return 0;
 }
 

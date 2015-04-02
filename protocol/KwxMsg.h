@@ -51,7 +51,7 @@ public:
     
 private:
     int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item);
-    int KwxDsMsg::_load(_MsgTingInfo_t &info,const Item *item);
+    int KwxDsMsg::_load(_MsgTingInfo_t &info,const INT8U *inMsg);
     int KwxDsMsg::_load(_MingInfo_t &info,const Item *item);
 };
 

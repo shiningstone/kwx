@@ -44,13 +44,13 @@ typedef struct _GameStartNotif_t {
 /*there is another TingInfo_t, maybe could combine them*/
 typedef struct _TingItem_t {
     Card_t        kind;        /* 可以胡的花色 */
-    int           remain;      /* 剩余数目     */
+    int           remain;      /* 剩余张数     */
     int           fan;         /* 番数         */
 }TingItem_t;
 
 typedef struct __MsgTingInfo_t {
-    int              num;
-    TingItem_t       card[9];
+    int              cardNum;      /* 可以胡的花色数目 */
+    TingItem_t       *cards;
 }_MsgTingInfo_t;
 
 typedef struct _HandoutResponse_t {
@@ -60,14 +60,18 @@ typedef struct _HandoutResponse_t {
 
 typedef struct _HandoutNotif_t {
     INT8U            seat;
-    Card_t           handout;
+    Card_t           kind;
     _MsgTingInfo_t   ting;
 }HandoutNotif_t;
 
+typedef struct __MingChoice_t {
+    Card_t           kind;       /*可以出的花色*/
+    _MsgTingInfo_t   ting;
+}_MingChoice_t;
+
 typedef struct __MingInfo_t {
-    INT8U            mingKindNum;/*可以出的花色数目*/
-    Card_t           card[9];    /*可以出的花色*/
-    _MsgTingInfo_t   ting[9];    /*出牌后的停信息*/
+    INT8U            choiceNum;     /*可以出的花色数目*/
+    _MingChoice_t    *handouts;    
 }_MingInfo_t;
 
 typedef struct _DistCardInfo_t {
