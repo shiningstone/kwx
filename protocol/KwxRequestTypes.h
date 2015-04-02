@@ -91,6 +91,22 @@ typedef struct _DistCardInfo_t {
     _Reminds_t       remind;
 }DistCardInfo_t;
 
+typedef struct _FirstDistZhuang_t {
+    INT8U            seat;
+    INT8U            timer;
+    INT8U            remain;
+    Card_t           cards[14];
+    _Reminds_t       remind;
+}FirstDistZhuang_t;
+
+typedef struct _FirstDistNonZhuang_t {
+    INT8U            seat;
+    INT8U            remain;
+    Card_t           cards[13];
+    INT8U            zhuang;
+    INT8U            timer;
+}FirstDistNonZhuang_t;
+
 typedef struct _RemindInfo_t {
     INT8U            seat;
     INT8U            timer;

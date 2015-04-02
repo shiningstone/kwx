@@ -48,6 +48,8 @@ public:
     int Construct(HandoutNotif_t &handoutInfo);
     int Construct(ActionNotif_t &action);
     int Construct(DistCardInfo_t &dist);
+    int Construct(FirstDistZhuang_t &dist);
+    int Construct(FirstDistNonZhuang_t &dist);
     int Construct(DistCardNotif_t &dist);
     int Construct(ScoreNotif_t &score);
     int Construct(RemindInfo_t &remind);
@@ -60,6 +62,7 @@ public:
     static void Release(HandoutNotif_t &info);
     static void Release(HandoutResponse_t &info);
     static void Release(RemindInfo_t &info);
+    static void Release(FirstDistZhuang_t &info);
     
 private:
     int _load(Card_t *cards,INT8U &num,const Item *item);

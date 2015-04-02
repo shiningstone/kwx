@@ -1049,6 +1049,94 @@ public:
     }
 };
 
+class TestRecvFirstDistNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,56,               //request code/*开局发牌(下行) REQ_GAME_DIST_BEGINCARDS*/
+            7,                     //package level
+            0x00,66,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            8,
+            60,0,                  //seat
+            61,1,                  //reserved card num
+            62,2,                  //timer
+            128,0,14,              //cards
+                10,10,10,10,0,   
+                1,2,3,4,5, 
+                6,7,8,9,
+            129,0,4,0,0,0,4,       //remind:             暗杠
+            130,0,1,10,             //gang remind:       可杠2筒
+            131,0,1,0xff,          //kou remind:         不可扣
+            132,0,4,0xff,0xff,0xff,0xff,  //ming remind: 不可明
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        FirstDistZhuang_t dist;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(dist);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_BEGINCARDS );
+        assert( aMsg.GetLevel()==7 );
+        assert( dist.seat==0 );
+        assert( dist.remain==1 );
+        assert( dist.timer==2 );
+        assert( dist.remind.actions==a_AN_GANG );
+        assert( dist.remind.gangCard[0]==TONG_2 );
+        assert( dist.remind.kouCard[0]==CARD_UNKNOWN);
+        assert( dist.remind.ming.choiceNum==0 );
+
+        return 0;
+    }
+};
+
+class TestRecvFirstDistNonZhuangNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,57,               //request code/*非庄家开局发牌(下行) REQ_GAME_DIST_BEGINCARDS_OTHER*/
+            7,                     //package level
+            0x00,45,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            5,
+            60,0,                  //seat
+            61,1,                  //reserved card num
+            128,0,13,              //cards
+                10,10,10,10,0,   
+                1,2,3,4,5, 
+                6,7,8,
+            62,2,                  //zhuang
+            63,3,                  //timer
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        FirstDistNonZhuang_t dist;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(dist);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_BEGINCARDS_OTHER );
+        assert( aMsg.GetLevel()==7 );
+        assert( dist.seat==0 );
+        assert( dist.remain==1 );
+        assert( dist.zhuang==2 );
+        assert( dist.timer==3 );
+ 
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -1089,5 +1177,11 @@ void testRequests() {
     aCase->Execute();
 
     aCase = new TestRecvRemindNotif();
+    aCase->Execute();
+    
+    aCase = new TestRecvFirstDistNotif();
+    aCase->Execute();
+
+    aCase = new TestRecvFirstDistNonZhuangNotif();
     aCase->Execute();
 }

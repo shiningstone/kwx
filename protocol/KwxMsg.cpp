@@ -136,6 +136,27 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     return 0;
 }
 
+int KwxDsMsg::Construct(FirstDistZhuang_t &dist) {
+    dist.seat      = GetItemValue(0);
+    dist.remain    = GetItemValue(1);
+    dist.timer     = GetItemValue(2);
+    memcpy(dist.cards, _body->_items[3]->_buf, 14);
+
+    _load(dist.remind,4);
+    
+    return 0;
+}
+
+int KwxDsMsg::Construct(FirstDistNonZhuang_t &dist) {
+    dist.seat      = GetItemValue(0);
+    dist.remain    = GetItemValue(1);
+    memcpy(dist.cards, _body->_items[2]->_buf, 13);
+    dist.zhuang    = GetItemValue(3);
+    dist.timer     = GetItemValue(4);
+    
+    return 0;
+}
+
 int KwxDsMsg::Construct(RemindInfo_t &remind) {
     remind.seat   = GetItemValue(0);
     remind.timer  = GetItemValue(1);
