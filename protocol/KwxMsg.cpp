@@ -99,6 +99,31 @@ int KwxDsMsg::Construct(GameStartNotif_t &startInfo) {
     return 0;
 }
 
+int KwxDsMsg::_load(_MsgTingInfo_t *info,INT8U *inMsg,INT16U num) {
+    for(int i=0;i<num;i++) {
+        (info+i)->card   = (Card_t)inMsg[0+4*i];
+        (info+i)->remain = inMsg[1+4*i];
+        (info+i)->fan    = _ntohs( *((INT16U *)(inMsg+2+4*i)) );
+    }
+
+	return 0;
+}
+
+int KwxDsMsg::Construct(HandoutResponse_t &handoutResponse) {
+    handoutResponse.status = (Status_t)GetItemValue(0);
+    handoutResponse.tingNum = (_body->_items[1]->_bufLen)/4;
+    _load(handoutResponse.tingInfo,_body->_items[1]->_buf,handoutResponse.tingNum);
+    return 0;
+}
+
+int KwxDsMsg::Construct(HandoutNotif_t &handoutInfo) {
+    handoutInfo.seat    = (Status_t)GetItemValue(0);
+    handoutInfo.handout = (Card_t)GetItemValue(1);
+    handoutInfo.tingNum = (_body->_items[2]->_bufLen)/4;
+    _load(handoutInfo.tingInfo,_body->_items[2]->_buf,handoutInfo.tingNum);
+    return 0;
+}
+
 /**********************************************************
 	UpStream
 ***********************************************************/

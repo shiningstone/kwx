@@ -41,9 +41,14 @@ public:
     int         GetLevel();
     INT32U      GetItemValue(int idx);
     
-    int         Construct(ActionResponse_t &waitInfo);
-    int         Construct(GameStartResponse_t &startInfo);
-    int         Construct(GameStartNotif_t &startInfo);
+    int Construct(ActionResponse_t &waitInfo);
+    int Construct(GameStartResponse_t &startInfo);
+    int Construct(GameStartNotif_t &startInfo);
+    int Construct(HandoutResponse_t &handoutResponse);
+    int Construct(HandoutNotif_t &handoutInfo);
+    
+private:
+    int KwxDsMsg::_load(_MsgTingInfo_t *info,INT8U *inMsg,INT16U num);
 };
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {

@@ -9,6 +9,7 @@ typedef enum {
     REQ_GAME_SEND_ACTION     = 49,
 
     /* other's request notification */
+    REQ_GAME_RECV_SHOWCARD   = 75,
     REQ_GAME_RECV_START      = 77,
 }RequestId_t;
 

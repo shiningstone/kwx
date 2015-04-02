@@ -4,11 +4,6 @@
 
 #include "./../CTestCase.h"
 
-typedef enum {
-    OK,
-    FAIL
-};
-
 class CTestProtocol : public CTestCase {
 public:
 	virtual void Start();

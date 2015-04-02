@@ -8,6 +8,8 @@
 #include <assert.h>
 #include "./CTestProtocol.h"
 
+#define OK 0
+
 class TestUpHeader : public CTestCase {
 public:
     virtual int Execute() {

@@ -658,24 +658,99 @@ public:
     }
 };
 
+class TestRecvShowCardResponse : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,43,               //request code
+            7,                     //package level
+            0x00,30,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,0,                   //status
+            131,0,4,1,2,0,3,       //ting info : 胡2条，剩2张，赢3番
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        HandoutResponse_t handoutInfo;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(handoutInfo);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_SEND_START );
+        assert( aMsg.GetLevel()==7 );
+        assert( handoutInfo.status==SUCCESS );
+        assert( handoutInfo.tingInfo[0].card==TIAO_2);
+        assert( handoutInfo.tingInfo[0].remain==2 );
+        assert( handoutInfo.tingInfo[0].fan==3 );
+
+        return 0;
+    }
+};
+
+class TestRecvOthersShowCard : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,75,               //request code
+            7,                     //package level
+            0x00,32,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            3,
+            60,2,                  //seatId
+            65,0,                  //show card:  1条
+            131,0,4,9,2,0,3,       //ting info : 胡2条，剩2张，赢3番
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        HandoutNotif_t handoutInfo;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(handoutInfo);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_RECV_SHOWCARD );
+        assert( aMsg.GetLevel()==7 );
+        assert( handoutInfo.seat==2 );
+        assert( handoutInfo.handout==TIAO_1);
+        assert( handoutInfo.tingInfo[0].card==TONG_1);
+        assert( handoutInfo.tingInfo[0].remain==2 );
+        assert( handoutInfo.tingInfo[0].fan==3 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
     aCase = new TestSendGameStart();
     aCase->Execute();
-
     aCase = new TestRecvGameStartResponse();
     aCase->Execute();
-
     aCase = new TestRecvOthersGameStart();
     aCase->Execute();
 
+
     aCase = new TestSendShowCard();
     aCase->Execute();
+    aCase = new TestRecvShowCardResponse();/*是否必须以0xffffffff结尾*/
+    aCase->Execute();
+    aCase = new TestRecvOthersShowCard();/*是否必须以0xffffffff结尾*/
+    aCase->Execute();
+
 
     aCase = new TestSendAction_peng3tiao();
     aCase->Execute();
-
     aCase = new TestRecvActionResponse_waitRight();
     aCase->Execute();
 }
