@@ -74,6 +74,11 @@ public:
     int Set();
 };
 
+class RequestHandout : public KwxUsMsg {
+public:
+    int Set(Card_t card);
+};
+
 #define KWX_INVALID_PCHC          -1
 #define KWX_UNSUPPORTED_PARAM     -2
 #define KWX_DISMATCH_LENGTH       -3

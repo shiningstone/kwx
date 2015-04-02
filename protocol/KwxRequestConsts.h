@@ -4,11 +4,12 @@
 
 typedef enum {
     /* KWX-外部通信协议4.0 */
-    REQ_GAME_SEND_START = 43,
-    REQ_GAME_SEND_ACTION = 49,
+    REQ_GAME_SEND_START      = 43,
+    REQ_GAME_SEND_SHOWCARD   = 48,
+    REQ_GAME_SEND_ACTION     = 49,
 
     /* other's request notification */
-    REQ_GAME_RECV_START = 77,
+    REQ_GAME_RECV_START      = 77,
 }RequestId_t;
 
 typedef enum {
