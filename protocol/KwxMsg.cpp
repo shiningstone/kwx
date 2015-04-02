@@ -123,3 +123,19 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
     return 0;
 }
 
+int RequestGameStart::Set() {
+    SeatInfo *seat = SeatInfo::getInstance();
+
+    SetRequestCode(REQ_GAME_SEND_START);
+
+    INT32U roomPath = _htonl(seat->_roomPath);
+    INT32U roomId   = _htonl(seat->_roomId);
+    INT32U tableId  = _htonl(seat->_tableId);
+
+    _add_item( new Item(131,4,(INT8U *)&roomPath) );
+    _add_item( new Item(132,4,(INT8U *)&roomId) );
+    _add_item( new Item(133,4,(INT8U *)&tableId) );
+    _add_item( new Item(60,   seat->_seatId) );
+
+    return 0;
+}

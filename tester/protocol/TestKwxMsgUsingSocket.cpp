@@ -193,5 +193,5 @@ static void testAutoRecv() {
 void testKwxMsgUsingSocket() {
     testRequests();
     testAutoRecv();
-    while(1);
+    //while(1);
 }

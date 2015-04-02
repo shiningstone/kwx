@@ -60,6 +60,11 @@ public:
     int Set(ActionId_t code,Card_t card);
 };
 
+class RequestGameStart : public KwxUsMsg {
+public:
+    int Set();
+};
+
 #define KWX_INVALID_PCHC          -1
 #define KWX_UNSUPPORTED_PARAM     -2
 #define KWX_DISMATCH_LENGTH       -3

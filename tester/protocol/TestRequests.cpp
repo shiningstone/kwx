@@ -515,8 +515,50 @@ public:
     }
 };
 
+class TestSendGameStart : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,43,               //request code(ÇëÇó¿ªÊ¼ REQ_GAME_SEND_START)
+            0x00,54,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            4,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                    //site:    1
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
+        RequestGameStart aMsg;
+        aMsg.Set();
+        len = aMsg.Serialize(buf);
+
+        assert(len==sizeof(msgInNetwork));
+        assert(!memcmp(buf,msgInNetwork,len));
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
+
+    aCase = new TestSendGameStart();
+    aCase->Execute();
 
     aCase = new TestSendAction_peng3tiao();
     aCase->Execute();
