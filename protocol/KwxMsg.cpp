@@ -132,7 +132,9 @@ int KwxDsMsg::Construct(ActionNotif_t &action) {
     action.action  = (ActionId_t)GetItemValue(3);
     
     action.cardNum = _body->_items[4]->_bufLen;
-    memcpy(action.card,_body->_items[4]->_buf,action.cardNum);
+    for(int i=0;i<action.cardNum;i++) {
+        action.card[i] = (Card_t)_body->_items[4]->_buf[i];
+    }
 
     return 0;
 }
@@ -152,12 +154,12 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     dist.kind      = (Card_t)GetItemValue(3);
     dist.remind    = (ActionId_t)GetItemValue(4);
 
-    dist.gangKindNum = _body->_items[5]->_bufLen;
+    dist.gangKindNum = (INT8U)_body->_items[5]->_bufLen;
     for(int i=0;i<dist.gangKindNum;i++) {
         dist.gangCard[i] = (Card_t)_body->_items[5]->_buf[i];
     }
     
-    dist.kouKindNum = _body->_items[6]->_bufLen;
+    dist.kouKindNum = (INT8U)_body->_items[6]->_bufLen;
     for(int i=0;i<dist.kouKindNum;i++) {
         dist.kouCard[i] = (Card_t)_body->_items[6]->_buf[i];
     }
