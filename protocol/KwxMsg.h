@@ -39,8 +39,10 @@ public:
     
     RequestId_t GetRequestCode();
     int         GetLevel();
+    INT32U      GetItemValue(int idx);
     
     int         Construct(ActionResponse_t &waitInfo);
+    int         Construct(GameStartResponse_t &startInfo);
 };
 
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {

@@ -20,6 +20,10 @@ typedef enum {
     aKOU_CANCEL= 0x80,
 }ActionId_t;/*ARRAY_ACTION???*/
 
-typedef INT8U Item_t;
+typedef enum {
+    PURE_ID,
+    ID_WITH_INT,
+    ID_WITH_BUF,
+}Item_t;
 
 #endif

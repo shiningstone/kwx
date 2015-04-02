@@ -85,14 +85,18 @@ Item::Item(Item_t itemId, INT16U bufLen,INT8U *buf) {
 	memcpy(_buf,buf,bufLen);
 }
 
-int Item::_IdType(INT8U id) {
-    if( _id<50 ) {
+Item_t Item::_IdType(INT8U id) {
+    if( id<50 ) {
         return PURE_ID ;
-    } else if( _id>=50 && _id<128 ) {
+    } else if( id>=50 && id<128 ) {
         return ID_WITH_INT ;
     } else {
         return ID_WITH_BUF ;
     }
+}
+
+Item_t Item::GetIdType() {
+    return _id;
 }
 
 int Item::Serialize(INT8U *outMsg) {

@@ -88,16 +88,14 @@ public:
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
+    Item_t  GetIdType();
+
     Item_t   _id;
     INT8U    _value;
     INT16U   _bufLen;
     INT8U    _buf[ITEM_BUF_LEN];
 protected:
-    const static int PURE_ID = 0;
-    const static int ID_WITH_INT = 1;
-    const static int ID_WITH_BUF = 2;
-
-    int _IdType(INT8U id);
+    static Item_t _IdType(INT8U id);
 };
 
 class MsgBody : public MsgIntf {
