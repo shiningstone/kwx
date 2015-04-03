@@ -46,12 +46,6 @@ public:
     INT32U      GetItemValue(int idx) const;
     INT16U      GetItemBufLen(int idx) const;
 
-    int _load(Card_t *cards,INT8U &num,int itemIdx) const;
-    int _load(ActionId_t *actions,INT8U &num,int itemIdx) const;
-    int _load(MsgTingInfo_t &info,const INT8U *inMsg) const;
-    int _load(MingInfo_t &info,const Item *item) const;
-    int _load(Reminds_t &remind,int itemIdx) const;
-
 private:
 	static KwxDsMsg *_instance;
     KwxDsMsg();

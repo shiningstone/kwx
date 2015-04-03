@@ -1,0 +1,96 @@
+
+#include <string.h>
+
+#include "MsgFormats.h"
+#include "KwxMsg.h"
+#include "DsMsgParser.h"
+
+int DsMsgParser::_load(Card_t *cards,INT8U &num,const KwxDsMsg &msg,int itemIdx) {
+    num = (INT8U)msg.GetItemBufLen(itemIdx);
+    
+    for(int i=0;i<num;i++) {
+        cards[i] = (Card_t)msg._body->_items[itemIdx]->_buf[i];
+    }
+
+    return 0;
+}
+
+int DsMsgParser::_load(ActionId_t *actions,INT8U &num,const KwxDsMsg &msg,int itemIdx) {
+	int i = 0;
+	int actIdx = 0;
+
+    for(i=MAX_AVAIL_ACTIONS-1;i>=0;i--) {
+        if((ActionId_t)msg._body->_items[itemIdx]->_buf[i]==aQi) {
+			break;
+		} else {
+            actions[actIdx++] = (ActionId_t)msg._body->_items[itemIdx]->_buf[i];
+		}
+    }
+
+    actions[actIdx++] = aQi;
+
+    num = actIdx;
+
+    return 0;
+}
+
+int DsMsgParser::_load(MsgTingInfo_t &ting,const INT8U *inMsg) {
+    const INT8U *p = inMsg;
+
+    ting.cards = new TingItem_t[ting.cardNum];
+    
+    int i = 0;
+    int num = 0;
+    while(num<ting.cardNum) {
+        ting.cards[i].kind   = (Card_t)p[0+4*i];
+        ting.cards[i].remain = p[1+4*i];
+        ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
+
+        num += ting.cards[i].remain;
+        i++;
+    }
+
+	return i*4;
+}
+
+int DsMsgParser::_load(MingInfo_t &ming,const KwxDsMsg &msg,int itemIdx) {
+    Item *item = msg._body->_items[itemIdx];
+
+    if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
+        ming.choiceNum = 0;
+        return 0;
+    }
+
+    int   len = item->_bufLen;
+    INT8U *p = item->_buf;
+    MingChoice_t choices[13];
+
+    int idx = 0;
+    int i   = 0;
+    while(i<len) {
+        i += 2;
+
+        choices[idx].kind = (Card_t)(*(p+i));
+        choices[idx].ting.cardNum = *(p+i+1);
+        i += 2;
+
+        i += _load(choices[idx].ting,p+i);
+
+        idx++;
+    }
+
+    ming.choiceNum = idx;
+    ming.handouts  = new MingChoice_t[idx];
+    memcpy(ming.handouts,choices,sizeof(MingChoice_t)*idx);
+
+	return 0;
+}
+
+int DsMsgParser::_load(Reminds_t &remind,const KwxDsMsg &msg,int itemIdx) {
+    _load(remind.actions, remind.actionNum,msg, itemIdx);
+    _load(remind.gangCard, remind.gangKindNum, msg, itemIdx+1);
+    _load(remind.kouCard, remind.kouKindNum, msg, itemIdx+2);
+    _load(remind.ming,msg, itemIdx+3);
+
+    return 0;
+}

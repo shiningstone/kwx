@@ -3,6 +3,7 @@
 
 #include "MsgFormats.h"
 #include "KwxDsMsg.h"
+#include "DsMsgParser.h"
 
 #ifndef __UNIT_TEST__
 #include "./../game/RoundManager.h"
@@ -38,7 +39,7 @@ HandoutResponse::~HandoutResponse() {
 int HandoutResponse::Construct(const KwxDsMsg &msg) {
     status = (Status_t)msg.GetItemValue(0);
     ting.cardNum = msg._body->_items[1]->_bufLen;
-    msg._load(ting,msg._body->_items[1]->_buf);
+    DsMsgParser::_load(ting,msg._body->_items[1]->_buf);
     return 0;
 }
 
@@ -54,7 +55,7 @@ int HandoutNotif::Construct(const KwxDsMsg &msg) {
     seat         = (Status_t)msg.GetItemValue(0);
     kind         = (Card_t)msg.GetItemValue(1);
     ting.cardNum = msg._body->_items[2]->_bufLen;
-    msg._load(ting,msg._body->_items[2]->_buf);
+    DsMsgParser::_load(ting,msg._body->_items[2]->_buf);
     return 0;
 }
 
@@ -77,8 +78,8 @@ int ActionNotif::Construct(const KwxDsMsg &msg) {
     isFromServer = (msg.GetItemValue(1)==0)?true:false;
     next    = msg.GetItemValue(2);
 
-    msg._load(actions, actionNum, 3);
-    msg._load(card, cardNum, 4);
+    DsMsgParser::_load(actions, actionNum, msg, 3);
+    DsMsgParser::_load(card, cardNum, msg, 4);
     return 0;
 }
 
@@ -100,9 +101,9 @@ int DistCardInfo::Construct(const KwxDsMsg &msg) {
     remind.actionNum = 1;
     remind.actions[0] = (ActionId_t)msg.GetItemValue(4);
     
-    msg._load(remind.gangCard, remind.gangKindNum, 5);
-    msg._load(remind.kouCard, remind.kouKindNum, 6);
-    msg._load(remind.ming,msg._body->_items[7]);
+    DsMsgParser::_load(remind.gangCard, remind.gangKindNum, msg, 5);
+    DsMsgParser::_load(remind.kouCard, remind.kouKindNum, msg, 6);
+    DsMsgParser::_load(remind.ming, msg, 7);
     return 0;
 }
 
@@ -120,7 +121,7 @@ int FirstDistZhuang::Construct(const KwxDsMsg &msg) {
     timer     = msg.GetItemValue(2);
     memcpy(cards, msg._body->_items[3]->_buf, 14);
 
-    msg._load(remind,4);
+    DsMsgParser::_load(remind, msg, 4);
     return 0;
 }
 
@@ -149,7 +150,7 @@ RemindInfo::~RemindInfo() {
 int RemindInfo::Construct(const KwxDsMsg &msg) {
     seat   = msg.GetItemValue(0);
     timer  = msg.GetItemValue(1);
-    msg._load(remind,2);
+    DsMsgParser::_load(remind, msg, 2);
     wait = msg.GetItemValue(6);
     
     return 0;
@@ -190,7 +191,7 @@ int DecisionNotif::Construct(const KwxDsMsg &msg) {
     seat      = msg.GetItemValue(0);
     whoGive   = msg.GetItemValue(1);
     next      = msg.GetItemValue(2);
-    msg._load(actions, actionNum, 3);
+    DsMsgParser::_load(actions, actionNum, msg, 3);
     card      = (Card_t)msg.GetItemValue(4);
     return 0;
 }
@@ -201,7 +202,7 @@ int DecisionNotif::Dispatch() {
 
 int TingInfoResponse::Construct(const KwxDsMsg &msg) {
     info.cardNum = msg._body->_items[0]->_bufLen/4;
-    msg._load(info,msg._body->_items[0]->_buf);
+    DsMsgParser::_load(info,msg._body->_items[0]->_buf);
     return 0;
 }
 
