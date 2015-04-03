@@ -130,49 +130,64 @@ int HandoutResponse::Dispatch() {
     return 0;
 }
 
-
-
-int KwxDsMsg::Construct(HandoutNotif_t &handoutInfo) {
-    handoutInfo.seat    = (Status_t)GetItemValue(0);
-    handoutInfo.kind = (Card_t)GetItemValue(1);
-    handoutInfo.ting.cardNum = _body->_items[2]->_bufLen;
-    _load(handoutInfo.ting,_body->_items[2]->_buf);
+int HandoutNotif::Construct(const KwxDsMsg &msg) {
+    seat         = (Status_t)msg.GetItemValue(0);
+    kind         = (Card_t)msg.GetItemValue(1);
+    ting.cardNum = msg._body->_items[2]->_bufLen;
+    msg._load(ting,msg._body->_items[2]->_buf);
     return 0;
 }
 
-int KwxDsMsg::Construct(ActionResponse_t &waitInfo) {
-    waitInfo.seat     = GetItemValue(0);
-    waitInfo.waitSeat = GetItemValue(1);
+int HandoutNotif::Dispatch() {
     return 0;
 }
 
-int KwxDsMsg::Construct(ActionNotif_t &action) {
-    action.seat    = GetItemValue(0);
-    action.isFromServer = (GetItemValue(1)==0)?true:false;
-    action.next    = GetItemValue(2);
-
-    _load(action.actions, action.actionNum, 3);
-    _load(action.card, action.cardNum, 4);
-
+int ActionResponse::Construct(const KwxDsMsg &msg) {
+    seat     = msg.GetItemValue(0);
+    waitSeat = msg.GetItemValue(1);
     return 0;
 }
 
-int KwxDsMsg::Construct(DistCardInfo_t &dist) {
-    dist.seat      = GetItemValue(0);
-    dist.timer     = GetItemValue(1);
-    dist.remain    = GetItemValue(2);
-    dist.kind      = (Card_t)GetItemValue(3);
+int ActionResponse::Dispatch() {
+    return 0;
+}
+
+int ActionNotif::Construct(const KwxDsMsg &msg) {
+    seat    = msg.GetItemValue(0);
+    isFromServer = (msg.GetItemValue(1)==0)?true:false;
+    next    = msg.GetItemValue(2);
+
+    msg._load(actions, actionNum, 3);
+    msg._load(card, cardNum, 4);
+    return 0;
+}
+
+int ActionNotif::Dispatch() {
+    return 0;
+}
+
+int DistCardInfo::Construct(const KwxDsMsg &msg) {
+    seat      = msg.GetItemValue(0);
+    timer     = msg.GetItemValue(1);
+    remain    = msg.GetItemValue(2);
+    kind      = (Card_t)msg.GetItemValue(3);
 
     /* !!!this action defined differently from others */
-    dist.remind.actionNum = 1;
-    dist.remind.actions[0] = (ActionId_t)GetItemValue(4);
+    remind.actionNum = 1;
+    remind.actions[0] = (ActionId_t)msg.GetItemValue(4);
     
-    _load(dist.remind.gangCard, dist.remind.gangKindNum, 5);
-    _load(dist.remind.kouCard, dist.remind.kouKindNum, 6);
-    _load(dist.remind.ming,_body->_items[7]);
-    
+    msg._load(remind.gangCard, remind.gangKindNum, 5);
+    msg._load(remind.kouCard, remind.kouKindNum, 6);
+    msg._load(remind.ming,msg._body->_items[7]);
     return 0;
 }
+
+int DistCardInfo::Dispatch() {
+    return 0;
+}
+
+
+
 
 int KwxDsMsg::Construct(FirstDistZhuang_t &dist) {
     dist.seat      = GetItemValue(0);

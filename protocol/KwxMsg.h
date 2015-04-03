@@ -53,10 +53,6 @@ public:
     int _load(_Reminds_t &remind,int itemIdx) const;
 
     /* these functions are only for test purpose */
-    int Construct(HandoutNotif_t &handoutInfo);
-    int Construct(ActionResponse_t &waitInfo);
-    int Construct(ActionNotif_t &action);
-    int Construct(DistCardInfo_t &dist);
     int Construct(FirstDistZhuang_t &dist);
     int Construct(FirstDistNonZhuang_t &dist);
     int Construct(DistCardNotif_t &dist);
@@ -115,6 +111,53 @@ public:
     Status_t        status;
     MsgTingInfo_t   ting;
 };
+
+class HandoutNotif : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+    
+    INT8U            seat;
+    Card_t           kind;
+    MsgTingInfo_t    ting;
+};
+
+class ActionResponse : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+    
+    INT8U         seat;
+    INT8U         waitSeat;
+};
+
+class ActionNotif : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+    
+    INT8U         seat;
+    bool          isFromServer;
+    INT8U         next;
+    INT8U         actionNum;
+    ActionId_t    actions[MAX_AVAIL_ACTIONS];
+    INT8U         cardNum;
+    Card_t        card[18];
+};
+
+class DistCardInfo : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+    
+    INT8U            seat;
+    INT8U            timer;
+    INT8U            remain;
+    Card_t           kind;
+    _Reminds_t       remind;
+};
+
+
 /****************************************************
     UPSTREAM
 ****************************************************/

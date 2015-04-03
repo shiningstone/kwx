@@ -20,20 +20,6 @@ typedef enum {
     FAIL,
 }Status_t;
 
-typedef struct _ActionResponse_t {
-    INT8U         seat;
-    INT8U         waitSeat;
-}ActionResponse_t;
-
-typedef struct _ActionNotif_t {
-    INT8U         seat;
-    bool          isFromServer;
-    INT8U         next;
-    INT8U         actionNum;
-    ActionId_t    actions[MAX_AVAIL_ACTIONS];
-    INT8U         cardNum;
-    Card_t        card[18];
-}ActionNotif_t;
 
 /*there is another TingInfo_t, maybe could combine them*/
 typedef struct _TingItem_t {
@@ -46,12 +32,6 @@ typedef struct _MsgTingInfo_t {
     int              cardNum;      /* 可以胡的花色数目 */
     TingItem_t       *cards;
 }MsgTingInfo_t;
-
-typedef struct _HandoutNotif_t {
-    INT8U            seat;
-    Card_t           kind;
-    MsgTingInfo_t   ting;
-}HandoutNotif_t;
 
 typedef struct __MingChoice_t {
     Card_t           kind;       /*可以出的花色*/
@@ -72,14 +52,6 @@ typedef struct __Reminds_t {
     Card_t           kouCard[4];
     _MingInfo_t      ming;
 }_Reminds_t;
-
-typedef struct _DistCardInfo_t {
-    INT8U            seat;
-    INT8U            timer;
-    INT8U            remain;
-    Card_t           kind;
-    _Reminds_t       remind;
-}DistCardInfo_t;
 
 typedef struct _FirstDistZhuang_t {
     INT8U            seat;

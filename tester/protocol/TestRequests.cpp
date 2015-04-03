@@ -71,10 +71,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        ActionResponse_t waitInfo = {0};
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(waitInfo);
+
+        ActionResponse waitInfo;
+        waitInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ACTION );
@@ -107,10 +107,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        ActionNotif_t action = {0};
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(action);
+
+        ActionNotif action;
+        action.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_RECV_ACTION );
@@ -322,10 +322,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        HandoutNotif_t handoutInfo;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(handoutInfo);
+
+        HandoutNotif handoutInfo;
+        handoutInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_RECV_SHOWCARD );
@@ -364,10 +364,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        DistCardInfo_t dist;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(dist);
+
+        DistCardInfo dist;
+        dist.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD );
@@ -412,10 +412,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        DistCardInfo_t dist;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(dist);
+
+        DistCardInfo dist;
+        dist.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD );
@@ -470,10 +470,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        DistCardInfo_t dist;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(dist);
+
+        DistCardInfo dist;
+        dist.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD );
