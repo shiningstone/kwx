@@ -48,25 +48,25 @@ typedef struct _TingItem_t {
     int           fan;         /* 番数         */
 }TingItem_t;
 
-typedef struct __MsgTingInfo_t {
+typedef struct _MsgTingInfo_t {
     int              cardNum;      /* 可以胡的花色数目 */
     TingItem_t       *cards;
-}_MsgTingInfo_t;
+}MsgTingInfo_t;
 
 typedef struct _HandoutResponse_t {
     Status_t         status;
-    _MsgTingInfo_t   ting;
+    MsgTingInfo_t   ting;
 }HandoutResponse_t;
 
 typedef struct _HandoutNotif_t {
     INT8U            seat;
     Card_t           kind;
-    _MsgTingInfo_t   ting;
+    MsgTingInfo_t   ting;
 }HandoutNotif_t;
 
 typedef struct __MingChoice_t {
     Card_t           kind;       /*可以出的花色*/
-    _MsgTingInfo_t   ting;
+    MsgTingInfo_t   ting;
 }_MingChoice_t;
 
 typedef struct __MingInfo_t {
@@ -125,5 +125,13 @@ typedef struct _ScoreNotif_t {
     INT8U            seat[3];
     INT32U           val[3];
 }ScoreNotif_t;
+
+typedef struct _DecisionNotif_t {
+    INT8U            seat;
+    INT8U            whoGive;
+    INT8U            next;
+    ActionId_t       actions;
+    Card_t           card;
+}DecisionNotif_t;
 
 #endif

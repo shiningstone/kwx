@@ -1049,7 +1049,7 @@ public:
     }
 };
 
-class TestRecvFirstDistNotif : public CTestCase {
+class TestRecvFirstDistZhuangNotif : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
@@ -1137,6 +1137,117 @@ public:
     }
 };
 
+class TestRecvActionDecisionNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,59,               //request code/*下发最终动作(下行) REQ_GAME_DIST_DECISION*/
+            7,                     //package level
+            0x00,45,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            5,
+            60,0,                  //seat
+            61,1,                  //whoGive
+            62,2,                  //next
+            131,0,4,0,0,0,1,       //action:  碰   
+            132,0,1,0              //card:    1条
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        DecisionNotif_t decision;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(decision);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_DIST_DECISION );
+        assert( aMsg.GetLevel()==7 );
+        assert( decision.seat==0 );
+        assert( decision.whoGive==1 );
+        assert( decision.next==2 );
+        assert( decision.actions==a_PENG );
+		assert( decision.card==TIAO_1);
+ 
+        return 0;
+    }
+};
+
+class TestSendGetTingInfo : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,50,               //request code(获取停牌信息 REQ_GAME_GET_TINGINFO)
+            0x00,54,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            4,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                    //site:    1
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        SeatInfo *seat = SeatInfo::getInstance();
+        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+
+        RequestTingInfo aMsg;
+        aMsg.Set();
+        len = aMsg.Serialize(buf);
+
+        assert(len==sizeof(msgInNetwork));
+        assert(!memcmp(buf,msgInNetwork,len));
+
+        return 0;
+    }
+};
+
+class TestRecvTingInfoResponse : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code
+            7,                     //package level
+            0x00,28,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            1,
+            131,0,4,1,2,0,3,        //ting info : 胡2条，剩2张，赢3番
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        KwxDsMsg aMsg;
+        MsgTingInfo_t ting;
+
+        len = aMsg.Deserialize(msgInNetwork);
+        aMsg.Construct(ting);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg.GetRequestCode()==REQ_GAME_GET_TINGINFO );
+        assert( aMsg.GetLevel()==7 );
+        assert( ting.cards[0].kind==TIAO_2);
+        assert( ting.cards[0].remain==2 );
+        assert( ting.cards[0].fan==3 );
+
+        return 0;
+    }
+};
+
 void testRequests() {
 	CTestCase *aCase;
 
@@ -1179,9 +1290,18 @@ void testRequests() {
     aCase = new TestRecvRemindNotif();
     aCase->Execute();
     
-    aCase = new TestRecvFirstDistNotif();
+    aCase = new TestRecvFirstDistZhuangNotif();
     aCase->Execute();
 
     aCase = new TestRecvFirstDistNonZhuangNotif();
+    aCase->Execute();
+
+    aCase = new TestRecvActionDecisionNotif();
+    aCase->Execute();
+
+    aCase = new TestSendGetTingInfo();
+    aCase->Execute();
+    
+    aCase = new TestRecvTingInfoResponse();
     aCase->Execute();
 }

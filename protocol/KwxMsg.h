@@ -53,6 +53,8 @@ public:
     int Construct(DistCardNotif_t &dist);
     int Construct(ScoreNotif_t &score);
     int Construct(RemindInfo_t &remind);
+    int Construct(DecisionNotif_t &decision);
+    int Construct(MsgTingInfo_t &info);
 
     /***************************************************************************
     NOTE :
@@ -66,7 +68,7 @@ public:
     
 private:
     int _load(Card_t *cards,INT8U &num,const Item *item);
-    int _load(_MsgTingInfo_t &info,const INT8U *inMsg);
+    int _load(MsgTingInfo_t &info,const INT8U *inMsg);
     int _load(_MingInfo_t &info,const Item *item);
     int _load(_Reminds_t &remind,int itemIdx);
 };
@@ -102,6 +104,11 @@ public:
 class RequestHandout : public KwxUsMsg {
 public:
     int Set(Card_t card);
+};
+
+class RequestTingInfo : public KwxUsMsg {
+public:
+    int Set();
 };
 
 #define KWX_INVALID_PCHC          -1

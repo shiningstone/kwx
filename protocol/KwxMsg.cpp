@@ -189,6 +189,23 @@ int KwxDsMsg::Construct(ScoreNotif_t &score) {
     return 0;
 }
 
+int KwxDsMsg::Construct(DecisionNotif_t &decision) {
+    decision.seat      = GetItemValue(0);
+    decision.whoGive   = GetItemValue(1);
+    decision.next      = GetItemValue(2);
+    decision.actions   = (ActionId_t)GetItemValue(3);
+    decision.card      = (Card_t)GetItemValue(4);
+    
+    return 0;
+}
+
+int KwxDsMsg::Construct(MsgTingInfo_t &info) {
+    info.cardNum = _body->_items[0]->_bufLen/4;
+    _load(info,_body->_items[0]->_buf);
+    
+    return 0;
+}
+
 int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
     num = (INT8U)item->_bufLen;
     
@@ -199,7 +216,7 @@ int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
     return 0;
 }
 
-int KwxDsMsg::_load(_MsgTingInfo_t &ting,const INT8U *inMsg) {
+int KwxDsMsg::_load(MsgTingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
     ting.cards = new TingItem_t[ting.cardNum];
@@ -338,4 +355,10 @@ int RequestHandout::Set(Card_t card) {
     return 0;
 }
 
+int RequestTingInfo::Set() {
+    SetRequestCode(REQ_GAME_GET_TINGINFO);
+    SetSeatInfo();
+
+    return 0;
+}
 
