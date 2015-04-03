@@ -2,6 +2,8 @@
 #ifndef _DS_INSTRUCTION_
 #define _DS_INSTRUCTION_
 
+#include "./../utils/LogManager.h"
+
 #include "RequestStructs.h"
 #include "CommonMsg.h"
 
@@ -17,9 +19,11 @@ public:
 protected:
     DsInstruction();
     static SeatInfo     *_seatInfo;
+    
 #ifndef __UNIT_TEST__
     RoundManager *_roundManager;
 #endif
+    static Logger   *_logger;
 };
 
 class GameStartResponse : public DsInstruction {

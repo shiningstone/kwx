@@ -21,15 +21,14 @@ class TestKwxAutoRecv : public CTestMessenger {
 
         INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x00,50,               //request code(发送发牌请求)
+            0x00,49,               //request code
             7,                     //package level
-            0x00,27,               //package size
+            0x00,25,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            3,
-            60,1,                  //roomId
-            61,2,                  //seat
-            70,0,                  //card kind
+            2,
+            60,1,                  //seatId
+            63,2,                  //wait 2
         };
 
 		MESSAGE_LEN = sizeof(msgInNetwork);
@@ -72,15 +71,13 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
 
         INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x00,50,               //request code(发送发牌请求)
+            0x00,43,               //request code
             7,                     //package level
-            0x00,27,               //package size
+            0x00,28,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            3,
-            60,1,                  //roomId
-            61,2,                  //seat
-            70,0,                  //card kind
+            1,
+            131,0,4,0,0,0,1,       //score
         };
 
 		MESSAGE_LEN = sizeof(msgInNetwork);
@@ -193,5 +190,5 @@ static void testAutoRecv() {
 void testKwxMsgUsingSocket() {
     testRequests();
     testAutoRecv();
-    //while(1);
+    while(1);
 }

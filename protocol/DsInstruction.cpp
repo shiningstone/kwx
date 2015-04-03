@@ -11,6 +11,7 @@
 #endif
 
 SeatInfo *DsInstruction::_seatInfo = 0;
+Logger *DsInstruction::_logger = 0;
 
 DsInstruction::DsInstruction() {
     _seatInfo = SeatInfo::getInstance();
@@ -18,6 +19,7 @@ DsInstruction::DsInstruction() {
     #ifndef __UNIT_TEST__
     _roundManager = RoundManager::getInstance();
     #endif
+    _logger = LOGGER_REGISTER("DsInstruction");
 }
 
 int GameStartResponse::Construct(const DsMsg &msg) {
@@ -26,6 +28,7 @@ int GameStartResponse::Construct(const DsMsg &msg) {
 }
 
 int GameStartResponse::Dispatch() {
+    LOGGER_WRITE("%s\n",__FUNCTION__);
     return 0;
 }
 
