@@ -5,6 +5,7 @@
 #include "RequestStructs.h"
 #include "CommonMsg.h"
 
+class SeatInfo;
 class RoundManager;
 /****************************************************
     DOWNSTREAM : Instruction structure
@@ -14,8 +15,9 @@ public:
     virtual int Construct(const DsMsg &msg) = 0;
     virtual int Dispatch() = 0;
 protected:
-#ifndef __UNIT_TEST__
     DsInstruction();
+    static SeatInfo     *_seatInfo;
+#ifndef __UNIT_TEST__
     RoundManager *_roundManager;
 #endif
 };

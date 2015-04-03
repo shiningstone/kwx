@@ -4,14 +4,21 @@
 #include "MsgFormats.h"
 #include "DsInstruction.h"
 #include "DsMsgParser.h"
+#include "KwxMsgEnv.h"
 
 #ifndef __UNIT_TEST__
 #include "./../game/RoundManager.h"
+#endif
+
+SeatInfo *DsInstruction::_seatInfo = 0;
 
 DsInstruction::DsInstruction() {
+    _seatInfo = SeatInfo::getInstance();
+    
+    #ifndef __UNIT_TEST__
     _roundManager = RoundManager::getInstance();
+    #endif
 }
-#endif
 
 int GameStartResponse::Construct(const DsMsg &msg) {
     score = msg.GetItemValue(0);
@@ -29,6 +36,7 @@ int GameStartNotif::Construct(const DsMsg &msg) {
 }
 
 int GameStartNotif::Dispatch() {
+    PlayerDir_t dir = _seatInfo->GetPlayer(seat);
     return 0;
 }
 
