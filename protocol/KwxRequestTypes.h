@@ -35,15 +35,6 @@ typedef struct _ActionNotif_t {
     Card_t        card[18];
 }ActionNotif_t;
 
-typedef struct _GameStartResponse_t {
-    INT32U        score;
-}GameStartResponse_t;
-
-typedef struct _GameStartNotif_t {
-    INT8U         seat;
-    INT32U        score;
-}GameStartNotif_t;
-
 /*there is another TingInfo_t, maybe could combine them*/
 typedef struct _TingItem_t {
     Card_t        kind;        /* 可以胡的花色 */
@@ -55,11 +46,6 @@ typedef struct _MsgTingInfo_t {
     int              cardNum;      /* 可以胡的花色数目 */
     TingItem_t       *cards;
 }MsgTingInfo_t;
-
-typedef struct _HandoutResponse_t {
-    Status_t         status;
-    MsgTingInfo_t   ting;
-}HandoutResponse_t;
 
 typedef struct _HandoutNotif_t {
     INT8U            seat;

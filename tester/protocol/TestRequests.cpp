@@ -181,11 +181,11 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        GameStartResponse_t startInfo = {0};
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(startInfo);
 
+        GameStartResponse startInfo;
+		startInfo.Construct(*aMsg);
+        
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_START );
         assert( aMsg->GetLevel()==7 );
@@ -213,10 +213,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        GameStartNotif_t startInfo = {0};
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(startInfo);
+        
+        GameStartNotif startInfo;
+		startInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_RECV_START );
@@ -286,10 +286,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        HandoutResponse_t handoutInfo;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(handoutInfo);
+
+        HandoutResponse handoutInfo;
+        handoutInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_START );

@@ -471,7 +471,7 @@ public:
             50,4,
             0
         };
-        KwxDsMsg *aMsg=KwxDsMsg::getInstance();
+        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
 
 		int len = aMsg->Deserialize(msgInNetwork);
         assert(len==sizeof(msgInNetwork));

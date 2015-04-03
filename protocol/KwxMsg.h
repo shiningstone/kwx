@@ -32,23 +32,27 @@ public:
 };
 
 /****************************************************
-    DOWNSTREAM
+    DOWNSTREAM : Basic Message structure
 ****************************************************/
-
 class KwxDsMsg : public KwxMsg, public DsMsgIntf {
 public:
 	static KwxDsMsg *getInstance();
-	static void          destroyInstance();
+	static void      destroyInstance();
 
     virtual int Deserialize(const INT8U *inMsg);
     
     RequestId_t GetRequestCode();
     int         GetLevel();
 
+    INT32U      GetItemValue(int idx) const;
+
+    int _load(Card_t *cards,INT8U &num,int itemIdx) const;
+    int _load(ActionId_t *actions,INT8U &num,int itemIdx) const;
+    int _load(MsgTingInfo_t &info,const INT8U *inMsg) const;
+    int _load(_MingInfo_t &info,const Item *item) const;
+    int _load(_Reminds_t &remind,int itemIdx) const;
+
     /* these functions are only for test purpose */
-    int Construct(GameStartResponse_t &startInfo);
-    int Construct(GameStartNotif_t &startInfo);
-    int Construct(HandoutResponse_t &handoutResponse);
     int Construct(HandoutNotif_t &handoutInfo);
     int Construct(ActionResponse_t &waitInfo);
     int Construct(ActionNotif_t &action);
@@ -61,6 +65,7 @@ public:
     int Construct(DecisionNotif_t &decision);
     int Construct(MsgTingInfo_t &info);
 
+#if 0
     /***************************************************************************
     NOTE :
         there are some dynamically allocated memory in several kinds of struct
@@ -70,20 +75,46 @@ public:
     static void Release(HandoutResponse_t &info);
     static void Release(RemindInfo_t &info);
     static void Release(FirstDistZhuang_t &info);
-    
+#endif    
 private:
 	static KwxDsMsg *_instance;
     KwxDsMsg();
-
-    INT32U  _GetItemValue(int idx);
-
-    int _load(Card_t *cards,INT8U &num,int itemIdx);
-    int _load(ActionId_t *actions,INT8U &num,int itemIdx);
-    int _load(MsgTingInfo_t &info,const INT8U *inMsg);
-    int _load(_MingInfo_t &info,const Item *item);
-    int _load(_Reminds_t &remind,int itemIdx);
 };
 
+/****************************************************
+    DOWNSTREAM : Instruction structure
+****************************************************/
+class KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg) = 0;
+    virtual int Dispatch() = 0;
+};
+
+class GameStartResponse : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+
+    INT32U        score;
+};
+
+class GameStartNotif : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+    
+    INT8U         seat;
+    INT32U        score;
+};
+
+class HandoutResponse : public KwxDsInstruction {
+public:
+    virtual int Construct(const KwxDsMsg &msg);
+    virtual int Dispatch();
+    
+    Status_t        status;
+    MsgTingInfo_t   ting;
+};
 /****************************************************
     UPSTREAM
 ****************************************************/

@@ -15,7 +15,7 @@ public:
         INT8U msgInNetwork[DnHeader::DN_HEADER_LEN] = {
             0,                     //reserved
         };
-        KwxDsMsg *aMsg=KwxDsMsg::getInstance();
+        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
 
 		int len = aMsg->Deserialize(msgInNetwork);
         assert(len==KWX_INVALID_PCHC);
