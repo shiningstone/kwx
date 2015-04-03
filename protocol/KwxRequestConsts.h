@@ -26,18 +26,6 @@ typedef enum {
 }RequestId_t;
 
 typedef enum {
-    aQi        = 0,
-    aPENG      = 0x1,
-    aMING_GANG = 0x2,
-    aAN_GANG   = 0x4,
-    aMING      = 0x8,
-    aHU        = 0x10,
-    aSHOU_GANG = 0x20,
-    aKOU       = 0x40,
-    aKOU_CANCEL= 0x80,
-}ActionId_t;/*ARRAY_ACTION???*/
-
-typedef enum {
     PURE_ID,
     ID_WITH_INT,
     ID_WITH_BUF,

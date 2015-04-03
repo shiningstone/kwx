@@ -1,4 +1,6 @@
 
+#include "./../network/NetMessenger.h"
+
 #include "KwxMessenger.h"
 #include "MsgFormats.h"
 #include "KwxMsg.h"

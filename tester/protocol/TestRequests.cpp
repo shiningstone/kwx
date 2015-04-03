@@ -3,6 +3,7 @@
 
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/KwxMsg.h"
+#include "./../../protocol/KwxDsMsg.h"
 #include "./../../protocol/EnvVariables.h"
 
 /********************************************************************

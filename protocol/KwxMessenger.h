@@ -2,16 +2,11 @@
 #ifndef _KWX_MESSENGER_
 #define _KWX_MESSENGER_
 
-#include "./../RaceType.h"
-
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"
-#include "./../network/NetMessenger.h"
 #include "./../utils/LogManager.h"
 
-#include "KwxRequestConsts.h"
-#include "KwxRequestTypes.h"
-
+class NetMessenger;
 class KwxUsMsg;
 class KwxMessenger {
 public:

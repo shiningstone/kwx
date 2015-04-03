@@ -1,6 +1,6 @@
 
-#ifndef __KXW_REQUEST_TYPES__
-#define __KXW_REQUEST_TYPES__
+#ifndef _KXW_REQUEST_TYPES_
+#define _KXW_REQUEST_TYPES_
 
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"
@@ -20,6 +20,18 @@ typedef enum {
     FAIL,
 }Status_t;
 
+typedef enum {
+    aQi        = 0,
+    aPENG      = 0x1,
+    aMING_GANG = 0x2,
+    aAN_GANG   = 0x4,
+    aMING      = 0x8,
+    aHU        = 0x10,
+    aSHOU_GANG = 0x20,
+    aKOU       = 0x40,
+    aKOU_CANCEL= 0x80,
+}ActionId_t;/*ARRAY_ACTION???*/
+
 /*there is another TingInfo_t, maybe could combine them*/
 typedef struct _TingItem_t {
     Card_t        kind;        /* 可以胡的花色 */
@@ -33,7 +45,7 @@ typedef struct _MsgTingInfo_t {
 }MsgTingInfo_t;
 
 typedef struct __MingChoice_t {
-    Card_t           kind;       /*可以出的花色*/
+    Card_t          kind;       /*可以出的花色*/
     MsgTingInfo_t   ting;
 }_MingChoice_t;
 

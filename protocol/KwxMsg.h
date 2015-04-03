@@ -1,15 +1,11 @@
 
-#ifndef __KWX_MSG__
-#define __KWX_MSG__
-
-
-#include "./../RaceType.h"
+#ifndef _KWX_MSG_
+#define _KWX_MSG_
 
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
-#include "KwxRequestConsts.h"
 #include "KwxRequestTypes.h"
 
 #define UP_STREAM     0
@@ -25,25 +21,28 @@ public:
     ~KwxMsg();
 
     const int _dir;    
+    
     Header  *_header;
     MsgBody *_body;
 
-    static Logger       *_logger;
+    static Logger  *_logger;
 };
 
 /****************************************************
     DOWNSTREAM : Basic Message structure
 ****************************************************/
+class KwxDsInstruction;
 class KwxDsMsg : public KwxMsg, public DsMsgIntf {
 public:
 	static KwxDsMsg *getInstance();
 	static void      destroyInstance();
 
+    int Dispatch(const INT8U *inMsg);
     virtual int Deserialize(const INT8U *inMsg);
-    
+    KwxDsInstruction *_GenerateInstruction();    
+
     RequestId_t GetRequestCode();
     int         GetLevel();
-
     INT32U      GetItemValue(int idx) const;
 
     int _load(Card_t *cards,INT8U &num,int itemIdx) const;
@@ -96,172 +95,6 @@ public:
 class RequestTingInfo : public KwxUsMsg {
 public:
     int Set();
-};
-
-/****************************************************
-    DOWNSTREAM : Instruction structure
-****************************************************/
-class KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg) = 0;
-    virtual int Dispatch() = 0;
-};
-
-class GameStartResponse : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-
-    INT32U        score;
-};
-
-class GameStartNotif : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U         seat;
-    INT32U        score;
-};
-
-class HandoutResponse : public KwxDsInstruction {
-public:
-    ~HandoutResponse();
-    
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    Status_t        status;
-    MsgTingInfo_t   ting;
-};
-
-class HandoutNotif : public KwxDsInstruction {
-public:
-    ~HandoutNotif();
-    
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    Card_t           kind;
-    MsgTingInfo_t    ting;
-};
-
-class ActionResponse : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U         seat;
-    INT8U         waitSeat;
-};
-
-class ActionNotif : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U         seat;
-    bool          isFromServer;
-    INT8U         next;
-    INT8U         actionNum;
-    ActionId_t    actions[MAX_AVAIL_ACTIONS];
-    INT8U         cardNum;
-    Card_t        card[18];
-};
-
-class DistCardInfo : public KwxDsInstruction {
-public:
-    ~DistCardInfo();
-    
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    INT8U            timer;
-    INT8U            remain;
-    Card_t           kind;
-    _Reminds_t       remind;
-};
-
-class FirstDistZhuang : public KwxDsInstruction {
-public:
-    ~FirstDistZhuang();
-    
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    INT8U            timer;
-    INT8U            remain;
-    Card_t           cards[14];
-    _Reminds_t       remind;
-};
-
-class FirstDistNonZhuang : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    INT8U            remain;
-    Card_t           cards[13];
-    INT8U            zhuang;
-    INT8U            timer;
-};
-
-class RemindInfo : public KwxDsInstruction {
-public:
-    ~RemindInfo();
-    
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    INT8U            timer;
-    _Reminds_t       remind;
-    INT8U            wait;
-};
-
-class DistCardNotif : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    INT8U            remain;
-    INT8U            timer;
-    Card_t           kind;
-};
-
-class ScoreNotif : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat[3];
-    INT32U           val[3];
-};
-
-class DecisionNotif : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    INT8U            seat;
-    INT8U            whoGive;
-    INT8U            next;
-    INT8U            actionNum;
-    ActionId_t       actions[MAX_AVAIL_ACTIONS];
-    Card_t           card;
-};
-
-class TingInfoResponse : public KwxDsInstruction {
-public:
-    virtual int Construct(const KwxDsMsg &msg);
-    virtual int Dispatch();
-    
-    MsgTingInfo_t    info;
 };
 
 #define KWX_INVALID_PCHC          -1

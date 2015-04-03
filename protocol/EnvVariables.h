@@ -1,8 +1,10 @@
 
-#ifndef _ENV_VARIABLES__
-#define _ENV_VARIABLES__
+#ifndef _ENV_VARIABLES_
+#define _ENV_VARIABLES_
 
 #include "./../utils/UtilBasic.h"
+
+#include "KwxRequestTypes.h"
 
 /*******************************************************************************
 	NOTE:
@@ -31,9 +33,6 @@ private:
         if a player is allowed to join more than one table in the meantime,
         getInstance should be called with the param "threadInfo"
 ********************************************************************************/
-#include "KwxRequestConsts.h"
-#include "KwxRequestTypes.h"
-
 class SeatInfo {
 public:
     static SeatInfo *getInstance(int threadInfo=0);

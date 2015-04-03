@@ -1,7 +1,6 @@
 
 #include "EnvVariables.h"
 
-
 EnvVariable *EnvVariable::_instance = 0;
 
 EnvVariable *EnvVariable::getInstance() {
