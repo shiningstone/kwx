@@ -471,17 +471,17 @@ public:
             50,4,
             0
         };
-        KwxDsMsg aMsg;
+        KwxDsMsg *aMsg=KwxDsMsg::getInstance();
 
-		int len = aMsg.Deserialize(msgInNetwork);
+		int len = aMsg->Deserialize(msgInNetwork);
         assert(len==sizeof(msgInNetwork));
 
-        DnHeader *aHeader = static_cast <DnHeader *>(aMsg._header);
+        DnHeader *aHeader = static_cast <DnHeader *>(aMsg->_header);
 		assert(aHeader->_requestCode==0x0102);
 		assert(aHeader->_level==0x03);
 		assert(aHeader->_size==0x0405);
 		
-        MsgBody *aBody = aMsg._body;
+        MsgBody *aBody = aMsg->_body;
         assert(aBody->_itemNum==3);
 		    assert(aBody->_items[0]->_id==128);
 		    assert(aBody->_items[0]->_bufLen==4);

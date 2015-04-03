@@ -31,6 +31,24 @@ KwxMsg::~KwxMsg() {
 /**********************************************************
 	Downstream
 ***********************************************************/
+/*******************************************************
+        µ¥ÀýÄ£Ê½ 
+*******************************************************/
+KwxDsMsg * KwxDsMsg::_instance   = 0;
+
+KwxDsMsg * KwxDsMsg::getInstance() {
+    if(_instance==0) {
+        _instance = new KwxDsMsg();
+    }
+
+    return _instance;
+}
+
+void KwxDsMsg::destroyInstance() {
+    delete _instance;
+    _instance = 0;
+}
+
 KwxDsMsg::KwxDsMsg()
 :KwxMsg(DOWN_STREAM){
 }
@@ -57,7 +75,7 @@ int KwxDsMsg::GetLevel() {
     return header->_level;
 }
 
-INT32U KwxDsMsg::GetItemValue(int idx) {
+INT32U KwxDsMsg::_GetItemValue(int idx) {
     switch(_body->_items[idx]->GetIdType()) {
         case PURE_ID:
             return INVALID;
@@ -82,42 +100,42 @@ INT32U KwxDsMsg::GetItemValue(int idx) {
     }
 }
 
-int KwxDsMsg::Construct(ActionResponse_t &waitInfo) {
-    waitInfo.seat     = GetItemValue(0);
-    waitInfo.waitSeat = GetItemValue(1);
-    return 0;
-}
-
 int KwxDsMsg::Construct(GameStartResponse_t &startInfo) {
-    startInfo.score = GetItemValue(0);
+    startInfo.score = _GetItemValue(0);
     return 0;
 }
 
 int KwxDsMsg::Construct(GameStartNotif_t &startInfo) {
-    startInfo.seat = GetItemValue(0);
-    startInfo.score = GetItemValue(1);
+    startInfo.seat = _GetItemValue(0);
+    startInfo.score = _GetItemValue(1);
     return 0;
 }
 
 int KwxDsMsg::Construct(HandoutResponse_t &handoutResponse) {
-    handoutResponse.status = (Status_t)GetItemValue(0);
+    handoutResponse.status = (Status_t)_GetItemValue(0);
     handoutResponse.ting.cardNum = _body->_items[1]->_bufLen;
     _load(handoutResponse.ting,_body->_items[1]->_buf);
     return 0;
 }
 
 int KwxDsMsg::Construct(HandoutNotif_t &handoutInfo) {
-    handoutInfo.seat    = (Status_t)GetItemValue(0);
-    handoutInfo.kind = (Card_t)GetItemValue(1);
+    handoutInfo.seat    = (Status_t)_GetItemValue(0);
+    handoutInfo.kind = (Card_t)_GetItemValue(1);
     handoutInfo.ting.cardNum = _body->_items[2]->_bufLen;
     _load(handoutInfo.ting,_body->_items[2]->_buf);
     return 0;
 }
 
+int KwxDsMsg::Construct(ActionResponse_t &waitInfo) {
+    waitInfo.seat     = _GetItemValue(0);
+    waitInfo.waitSeat = _GetItemValue(1);
+    return 0;
+}
+
 int KwxDsMsg::Construct(ActionNotif_t &action) {
-    action.seat    = GetItemValue(0);
-    action.isFromServer = (GetItemValue(1)==0)?true:false;
-    action.next    = GetItemValue(2);
+    action.seat    = _GetItemValue(0);
+    action.isFromServer = (_GetItemValue(1)==0)?true:false;
+    action.next    = _GetItemValue(2);
 
     _load(action.actions, action.actionNum, 3);
     _load(action.card, action.cardNum, 4);
@@ -126,14 +144,14 @@ int KwxDsMsg::Construct(ActionNotif_t &action) {
 }
 
 int KwxDsMsg::Construct(DistCardInfo_t &dist) {
-    dist.seat      = GetItemValue(0);
-    dist.timer     = GetItemValue(1);
-    dist.remain    = GetItemValue(2);
-    dist.kind      = (Card_t)GetItemValue(3);
+    dist.seat      = _GetItemValue(0);
+    dist.timer     = _GetItemValue(1);
+    dist.remain    = _GetItemValue(2);
+    dist.kind      = (Card_t)_GetItemValue(3);
 
     /* !!!this action defined differently from others */
     dist.remind.actionNum = 1;
-    dist.remind.actions[0] = (ActionId_t)GetItemValue(4);
+    dist.remind.actions[0] = (ActionId_t)_GetItemValue(4);
     
     _load(dist.remind.gangCard, dist.remind.gangKindNum, 5);
     _load(dist.remind.kouCard, dist.remind.kouKindNum, 6);
@@ -143,9 +161,9 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
 }
 
 int KwxDsMsg::Construct(FirstDistZhuang_t &dist) {
-    dist.seat      = GetItemValue(0);
-    dist.remain    = GetItemValue(1);
-    dist.timer     = GetItemValue(2);
+    dist.seat      = _GetItemValue(0);
+    dist.remain    = _GetItemValue(1);
+    dist.timer     = _GetItemValue(2);
     memcpy(dist.cards, _body->_items[3]->_buf, 14);
 
     _load(dist.remind,4);
@@ -154,31 +172,31 @@ int KwxDsMsg::Construct(FirstDistZhuang_t &dist) {
 }
 
 int KwxDsMsg::Construct(FirstDistNonZhuang_t &dist) {
-    dist.seat      = GetItemValue(0);
-    dist.remain    = GetItemValue(1);
+    dist.seat      = _GetItemValue(0);
+    dist.remain    = _GetItemValue(1);
     memcpy(dist.cards, _body->_items[2]->_buf, 13);
-    dist.zhuang    = GetItemValue(3);
-    dist.timer     = GetItemValue(4);
+    dist.zhuang    = _GetItemValue(3);
+    dist.timer     = _GetItemValue(4);
     
     return 0;
 }
 
 int KwxDsMsg::Construct(RemindInfo_t &remind) {
-    remind.seat   = GetItemValue(0);
-    remind.timer  = GetItemValue(1);
+    remind.seat   = _GetItemValue(0);
+    remind.timer  = _GetItemValue(1);
 
     _load(remind.remind,2);
 
-    remind.wait = GetItemValue(6);
+    remind.wait = _GetItemValue(6);
     
     return 0;
 }
 
 int KwxDsMsg::Construct(DistCardNotif_t &dist) {
-    dist.seat      = GetItemValue(0);
-    dist.remain    = GetItemValue(1);
-    dist.timer     = GetItemValue(2);
-    dist.kind      = (Card_t)GetItemValue(3);
+    dist.seat      = _GetItemValue(0);
+    dist.remain    = _GetItemValue(1);
+    dist.timer     = _GetItemValue(2);
+    dist.kind      = (Card_t)_GetItemValue(3);
     
     return 0;
 }
@@ -196,11 +214,11 @@ int KwxDsMsg::Construct(ScoreNotif_t &score) {
 }
 
 int KwxDsMsg::Construct(DecisionNotif_t &decision) {
-    decision.seat      = GetItemValue(0);
-    decision.whoGive   = GetItemValue(1);
-    decision.next      = GetItemValue(2);
+    decision.seat      = _GetItemValue(0);
+    decision.whoGive   = _GetItemValue(1);
+    decision.next      = _GetItemValue(2);
     _load(decision.actions, decision.actionNum, 3);
-    decision.card      = (Card_t)GetItemValue(4);
+    decision.card      = (Card_t)_GetItemValue(4);
     
     return 0;
 }

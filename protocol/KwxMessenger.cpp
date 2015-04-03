@@ -50,14 +50,14 @@ void KwxMessenger::StopReceiving() {
 }
 
 int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    KwxDsMsg aMsg;
     Logger *_logger = LOGGER_REGISTER("KwxMessenger");
 
-    aMsg.Deserialize(pkg);
+    KwxDsMsg *aMsg=KwxDsMsg::getInstance();
+    aMsg->Deserialize(pkg);
 
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,aMsg.GetRequestCode());
+    LOGGER_WRITE("%s : %d\n",__FUNCTION__,aMsg->GetRequestCode());
 
-    switch(aMsg.GetRequestCode()) {
+    switch(aMsg->GetRequestCode()) {
         default:
             return KWX_INVALID_PCHC;
     }

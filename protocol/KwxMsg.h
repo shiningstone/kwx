@@ -31,21 +31,26 @@ public:
     static Logger       *_logger;
 };
 
+/****************************************************
+    DOWNSTREAM
+****************************************************/
+
 class KwxDsMsg : public KwxMsg, public DsMsgIntf {
 public:
-    KwxDsMsg();
+	static KwxDsMsg *getInstance();
+	static void          destroyInstance();
 
     virtual int Deserialize(const INT8U *inMsg);
     
     RequestId_t GetRequestCode();
     int         GetLevel();
-    INT32U      GetItemValue(int idx);
-    
-    int Construct(ActionResponse_t &waitInfo);
+
+    /* these functions are only for test purpose */
     int Construct(GameStartResponse_t &startInfo);
     int Construct(GameStartNotif_t &startInfo);
     int Construct(HandoutResponse_t &handoutResponse);
     int Construct(HandoutNotif_t &handoutInfo);
+    int Construct(ActionResponse_t &waitInfo);
     int Construct(ActionNotif_t &action);
     int Construct(DistCardInfo_t &dist);
     int Construct(FirstDistZhuang_t &dist);
@@ -67,6 +72,11 @@ public:
     static void Release(FirstDistZhuang_t &info);
     
 private:
+	static KwxDsMsg *_instance;
+    KwxDsMsg();
+
+    INT32U  _GetItemValue(int idx);
+
     int _load(Card_t *cards,INT8U &num,int itemIdx);
     int _load(ActionId_t *actions,INT8U &num,int itemIdx);
     int _load(MsgTingInfo_t &info,const INT8U *inMsg);
@@ -74,6 +84,9 @@ private:
     int _load(_Reminds_t &remind,int itemIdx);
 };
 
+/****************************************************
+    UPSTREAM
+****************************************************/
 class KwxUsMsg : public KwxMsg, public UsMsgIntf {
 public:
     virtual int Serialize(INT8U *outMsg);
