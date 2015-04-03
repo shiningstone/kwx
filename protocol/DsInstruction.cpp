@@ -8,12 +8,12 @@
 #ifndef __UNIT_TEST__
 #include "./../game/RoundManager.h"
 
-KwxDsInstruction::KwxDsInstruction() {
+DsInstruction::DsInstruction() {
     _roundManager = RoundManager::getInstance();
 }
 #endif
 
-int GameStartResponse::Construct(const KwxDsMsg &msg) {
+int GameStartResponse::Construct(const DsMsg &msg) {
     score = msg.GetItemValue(0);
     return 0;
 }
@@ -22,7 +22,7 @@ int GameStartResponse::Dispatch() {
     return 0;
 }
 
-int GameStartNotif::Construct(const KwxDsMsg &msg) {
+int GameStartNotif::Construct(const DsMsg &msg) {
     seat  = msg.GetItemValue(0);
     score = msg.GetItemValue(1);
     return 0;
@@ -36,7 +36,7 @@ HandoutResponse::~HandoutResponse() {
 
 }
 
-int HandoutResponse::Construct(const KwxDsMsg &msg) {
+int HandoutResponse::Construct(const DsMsg &msg) {
     status = (Status_t)msg.GetItemValue(0);
     ting.cardNum = msg._body->_items[1]->_bufLen;
     DsMsgParser::_load(ting,msg._body->_items[1]->_buf);
@@ -51,7 +51,7 @@ HandoutNotif::~HandoutNotif() {
 
 }
 
-int HandoutNotif::Construct(const KwxDsMsg &msg) {
+int HandoutNotif::Construct(const DsMsg &msg) {
     seat         = (Status_t)msg.GetItemValue(0);
     kind         = (Card_t)msg.GetItemValue(1);
     ting.cardNum = msg._body->_items[2]->_bufLen;
@@ -63,7 +63,7 @@ int HandoutNotif::Dispatch() {
     return 0;
 }
 
-int ActionResponse::Construct(const KwxDsMsg &msg) {
+int ActionResponse::Construct(const DsMsg &msg) {
     seat     = msg.GetItemValue(0);
     waitSeat = msg.GetItemValue(1);
     return 0;
@@ -73,7 +73,7 @@ int ActionResponse::Dispatch() {
     return 0;
 }
 
-int ActionNotif::Construct(const KwxDsMsg &msg) {
+int ActionNotif::Construct(const DsMsg &msg) {
     seat    = msg.GetItemValue(0);
     isFromServer = (msg.GetItemValue(1)==0)?true:false;
     next    = msg.GetItemValue(2);
@@ -91,7 +91,7 @@ DistCardInfo::~DistCardInfo() {
 
 }
 
-int DistCardInfo::Construct(const KwxDsMsg &msg) {
+int DistCardInfo::Construct(const DsMsg &msg) {
     seat      = msg.GetItemValue(0);
     timer     = msg.GetItemValue(1);
     remain    = msg.GetItemValue(2);
@@ -115,7 +115,7 @@ FirstDistZhuang::~FirstDistZhuang() {
 
 }
 
-int FirstDistZhuang::Construct(const KwxDsMsg &msg) {
+int FirstDistZhuang::Construct(const DsMsg &msg) {
     seat      = msg.GetItemValue(0);
     remain    = msg.GetItemValue(1);
     timer     = msg.GetItemValue(2);
@@ -129,7 +129,7 @@ int FirstDistZhuang::Dispatch() {
     return 0;
 }
 
-int FirstDistNonZhuang::Construct(const KwxDsMsg &msg) {
+int FirstDistNonZhuang::Construct(const DsMsg &msg) {
     seat      = msg.GetItemValue(0);
     remain    = msg.GetItemValue(1);
     memcpy(cards, msg._body->_items[2]->_buf, 13);
@@ -147,7 +147,7 @@ RemindInfo::~RemindInfo() {
 
 }
 
-int RemindInfo::Construct(const KwxDsMsg &msg) {
+int RemindInfo::Construct(const DsMsg &msg) {
     seat   = msg.GetItemValue(0);
     timer  = msg.GetItemValue(1);
     DsMsgParser::_load(remind, msg, 2);
@@ -160,7 +160,7 @@ int RemindInfo::Dispatch() {
     return 0;
 }
 
-int DistCardNotif::Construct(const KwxDsMsg &msg) {
+int DistCardNotif::Construct(const DsMsg &msg) {
     seat      = msg.GetItemValue(0);
     remain    = msg.GetItemValue(1);
     timer     = msg.GetItemValue(2);
@@ -172,7 +172,7 @@ int DistCardNotif::Dispatch() {
     return 0;
 }
 
-int ScoreNotif::Construct(const KwxDsMsg &msg) {
+int ScoreNotif::Construct(const DsMsg &msg) {
     seat[0] = msg._body->_items[0]->_buf[0];
     seat[1] = msg._body->_items[0]->_buf[1];
     seat[2] = msg._body->_items[0]->_buf[2];
@@ -187,7 +187,7 @@ int ScoreNotif::Dispatch() {
     return 0;
 }
 
-int DecisionNotif::Construct(const KwxDsMsg &msg) {
+int DecisionNotif::Construct(const DsMsg &msg) {
     seat      = msg.GetItemValue(0);
     whoGive   = msg.GetItemValue(1);
     next      = msg.GetItemValue(2);
@@ -200,7 +200,7 @@ int DecisionNotif::Dispatch() {
     return 0;
 }
 
-int TingInfoResponse::Construct(const KwxDsMsg &msg) {
+int TingInfoResponse::Construct(const DsMsg &msg) {
     info.cardNum = msg._body->_items[0]->_bufLen/4;
     DsMsgParser::_load(info,msg._body->_items[0]->_buf);
     return 0;

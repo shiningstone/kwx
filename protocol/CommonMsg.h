@@ -8,36 +8,38 @@
 
 #include "KwxMsgBasic.h"
 #include "MsgIntf.h"
+#include "KwxMsgEnv.h"
 
 class Header;
 class MsgBody;
 class Item;
 
-class KwxMsg {
+class CommonMsg {
 public:
-    KwxMsg(int dir);
-    ~KwxMsg();
+    CommonMsg(int dir);
+    ~CommonMsg();
 
     const int _dir;    
     
     Header  *_header;
     MsgBody *_body;
 
-    static Logger  *_logger;
+    static SeatInfo *_seatInfo;
+    static Logger   *_logger;
 };
 
 /****************************************************
     DOWNSTREAM : Basic Message structure
 ****************************************************/
-class KwxDsInstruction;
-class KwxDsMsg : public KwxMsg, public DsMsgIntf {
+class DsInstruction;
+class DsMsg : public CommonMsg, public DsMsgIntf {
 public:
-	static KwxDsMsg *getInstance();
+	static DsMsg *getInstance();
 	static void      destroyInstance();
 
     int Dispatch(const INT8U *inMsg,int inLen);
     virtual int Deserialize(const INT8U *inMsg);
-    KwxDsInstruction *_GenerateInstruction();    
+    DsInstruction *_GenerateInstruction();    
 
     RequestId_t GetRequestCode() const;
     int         GetLevel() const;
@@ -45,25 +47,25 @@ public:
     INT16U      GetItemBufLen(int idx) const;
 
 private:
-	static KwxDsMsg *_instance;
-    KwxDsMsg();
+	static DsMsg *_instance;
+    DsMsg();
 };
 
 /****************************************************
     UPSTREAM
 ****************************************************/
-class KwxUsMsg : public KwxMsg, public UsMsgIntf {
+class UsMsg : public CommonMsg, public UsMsgIntf {
 public:
     virtual int Serialize(INT8U *outMsg);
     
 protected:
-    KwxUsMsg();
+    UsMsg();
     
 	void _set_size(INT8U *buf,INT16U len);
 	int  _add_item(Item *item);
 
     int SetRequestCode(RequestId_t code);
-    int SetSeatInfo();
+    int AddSeatInfo();
     
 /* this is for test use */
 public:

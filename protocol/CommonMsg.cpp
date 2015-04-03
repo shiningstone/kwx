@@ -9,9 +9,10 @@
 #include "CommonMsg.h"
 #include "DsInstruction.h"
 
-Logger *KwxMsg::_logger = 0;
+Logger *CommonMsg::_logger = 0;
+SeatInfo *CommonMsg::_seatInfo = 0;
 
-KwxMsg::KwxMsg(int dir)
+CommonMsg::CommonMsg(int dir)
 :_dir(dir) {
 	if (_dir==UP_STREAM) {
         _header = new UpHeader();
@@ -19,10 +20,12 @@ KwxMsg::KwxMsg(int dir)
         _header = new DnHeader();
     }
     _body = new MsgBody();
-    _logger = LOGGER_REGISTER("KwxMsg");
+
+    _seatInfo = SeatInfo::getInstance();
+    _logger = LOGGER_REGISTER("CommonMsg");
 }
 
-KwxMsg::~KwxMsg() {
+CommonMsg::~CommonMsg() {
     delete _header;
     delete _body;
     LOGGER_DEREGISTER(_logger);
@@ -34,29 +37,29 @@ KwxMsg::~KwxMsg() {
 /*******************************************************
         µ¥ÀýÄ£Ê½ 
 *******************************************************/
-KwxDsMsg * KwxDsMsg::_instance   = 0;
+DsMsg * DsMsg::_instance   = 0;
 
-KwxDsMsg * KwxDsMsg::getInstance() {
+DsMsg * DsMsg::getInstance() {
     if(_instance==0) {
-        _instance = new KwxDsMsg();
+        _instance = new DsMsg();
     }
 
     return _instance;
 }
 
-void KwxDsMsg::destroyInstance() {
+void DsMsg::destroyInstance() {
     delete _instance;
     _instance = 0;
 }
 
-KwxDsMsg::KwxDsMsg()
-:KwxMsg(DOWN_STREAM){
+DsMsg::DsMsg()
+:CommonMsg(DOWN_STREAM){
 }
 
-int KwxDsMsg::Dispatch(const INT8U *inMsg,int inLen) {
+int DsMsg::Dispatch(const INT8U *inMsg,int inLen) {
     Deserialize(inMsg);
 
-    KwxDsInstruction *instruction = _GenerateInstruction();
+    DsInstruction *instruction = _GenerateInstruction();
     if((int)instruction!=KWX_INVALID_PCHC) {
         instruction->Dispatch();
         delete instruction;
@@ -69,7 +72,7 @@ int KwxDsMsg::Dispatch(const INT8U *inMsg,int inLen) {
 	return 0;
 }
 
-int KwxDsMsg::Deserialize(const INT8U *inMsg) {
+int DsMsg::Deserialize(const INT8U *inMsg) {
     int len = 0;
 
     if (memcmp(inMsg,Header::PCHC,3)) {
@@ -82,7 +85,7 @@ int KwxDsMsg::Deserialize(const INT8U *inMsg) {
     return len;
 }
 
-KwxDsInstruction *KwxDsMsg::_GenerateInstruction() {
+DsInstruction *DsMsg::_GenerateInstruction() {
     switch(GetRequestCode()) {
         case REQ_GAME_SEND_START:
             return new GameStartResponse();
@@ -127,20 +130,20 @@ KwxDsInstruction *KwxDsMsg::_GenerateInstruction() {
             return new TingInfoResponse();
 
         default:
-            return (KwxDsInstruction *)KWX_INVALID_PCHC;
+            return (DsInstruction *)KWX_INVALID_PCHC;
     }
 }
 
-RequestId_t KwxDsMsg::GetRequestCode() const {
+RequestId_t DsMsg::GetRequestCode() const {
     return (RequestId_t)_header->_requestCode;
 }
 
-int KwxDsMsg::GetLevel() const {
+int DsMsg::GetLevel() const {
     DnHeader *header = static_cast<DnHeader *>(_header);
     return header->_level;
 }
 
-INT32U KwxDsMsg::GetItemValue(int idx) const {
+INT32U DsMsg::GetItemValue(int idx) const {
     switch(_body->_items[idx]->GetIdType()) {
         case PURE_ID:
             return INVALID;
@@ -165,7 +168,7 @@ INT32U KwxDsMsg::GetItemValue(int idx) const {
     }
 }
 
-INT16U KwxDsMsg::GetItemBufLen(int idx) const {
+INT16U DsMsg::GetItemBufLen(int idx) const {
     if(_body->_items[idx]->GetIdType()==ID_WITH_BUF) {
         return _body->_items[idx]->_bufLen;
     } else {
@@ -176,11 +179,11 @@ INT16U KwxDsMsg::GetItemBufLen(int idx) const {
 /**********************************************************
 	UpStream
 ***********************************************************/
-KwxUsMsg::KwxUsMsg()
-:KwxMsg(UP_STREAM) {
+UsMsg::UsMsg()
+:CommonMsg(UP_STREAM) {
 }
 
-int KwxUsMsg::Serialize(INT8U *outMsg) {
+int UsMsg::Serialize(INT8U *outMsg) {
     int len = 0;
 
     len += _header->Serialize(outMsg);
@@ -190,34 +193,32 @@ int KwxUsMsg::Serialize(INT8U *outMsg) {
     return len;
 }
 
-void KwxUsMsg::_set_size(INT8U *buf,INT16U len) {
+void UsMsg::_set_size(INT8U *buf,INT16U len) {
 	INT8U offset = UpHeader::SIZE;
 	*((INT16U *)(buf+offset)) = _htons(len);
 }
 
-int KwxUsMsg::SetRequestCode(RequestId_t code) {
+int UsMsg::SetRequestCode(RequestId_t code) {
 	_header->_requestCode = (INT16U)code;
     return 0;
 }
 
-int KwxUsMsg::_add_item(Item *item) {
+int UsMsg::_add_item(Item *item) {
 	_body->_items[_body->_itemNum] = item;
 	_body->_itemNum++;
 	return 0;
 }
 
 #include "KwxMsgEnv.h"
-int KwxUsMsg::SetSeatInfo() {
-    SeatInfo *seat = SeatInfo::getInstance();
-
-    INT32U roomPath = _htonl(seat->_roomPath);
-    INT32U roomId   = _htonl(seat->_roomId);
-    INT32U tableId  = _htonl(seat->_tableId);
+int UsMsg::AddSeatInfo() {
+    INT32U roomPath = _htonl(_seatInfo->_roomPath);
+    INT32U roomId   = _htonl(_seatInfo->_roomId);
+    INT32U tableId  = _htonl(_seatInfo->_tableId);
 
     _add_item( new Item((Item_t)131,4,(INT8U *)&roomPath) );
     _add_item( new Item((Item_t)132,4,(INT8U *)&roomId) );
     _add_item( new Item((Item_t)133,4,(INT8U *)&tableId) );
-    _add_item( new Item((Item_t)60,   seat->_seatId) );
+    _add_item( new Item((Item_t)60,   _seatInfo->_seatId) );
 
     return 0;
 }

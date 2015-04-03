@@ -52,7 +52,7 @@ void KwxMessenger::StopReceiving() {
 }
 
 int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+    DsMsg *aMsg = DsMsg::getInstance();
     aMsg->Dispatch(pkg,len);
 	return 0;
 }
@@ -60,7 +60,7 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 /************************************************************
 	Request (Upstream)
 ************************************************************/
-int KwxMessenger::Send(KwxUsMsg &aMsg) {
+int KwxMessenger::Send(UsMsg &aMsg) {
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
@@ -79,7 +79,7 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
     INT32U actionId = _htonl(action);
     INT8U  cardKind = card;
 
-    SetSeatInfo();
+    AddSeatInfo();
     _add_item( new Item((Item_t)134,4,(INT8U *)&actionId) );
     _add_item( new Item((Item_t)135,1,(INT8U *)&cardKind) );
 
@@ -88,14 +88,14 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
 
 int RequestGameStart::Set() {
     SetRequestCode(REQ_GAME_SEND_START);
-    SetSeatInfo();
+    AddSeatInfo();
 
     return 0;
 }
 
 int RequestHandout::Set(Card_t card) {
     SetRequestCode(REQ_GAME_SEND_SHOWCARD);
-    SetSeatInfo();
+    AddSeatInfo();
     _add_item( new Item((Item_t)65,card) );
 
     return 0;
@@ -103,7 +103,7 @@ int RequestHandout::Set(Card_t card) {
 
 int RequestTingInfo::Set() {
     SetRequestCode(REQ_GAME_GET_TINGINFO);
-    SetSeatInfo();
+    AddSeatInfo();
 
     return 0;
 }

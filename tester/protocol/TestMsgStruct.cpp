@@ -417,7 +417,7 @@ public:
         int   len = 0;
 
 		//×é°ü²âÊÔ
-        KwxUsMsg bMsg;
+        UsMsg bMsg;
 
         UpHeader *bHeader = static_cast <UpHeader *>(bMsg._header);
 		bHeader->_protocol=16;
@@ -471,7 +471,7 @@ public:
             50,4,
             0
         };
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
 
 		int len = aMsg->Deserialize(msgInNetwork);
         assert(len==sizeof(msgInNetwork));

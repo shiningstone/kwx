@@ -9,7 +9,7 @@
 class NetMessenger;
 
 #include "KwxMsgBasic.h"
-class KwxUsMsg;
+class UsMsg;
 
 class KwxMessenger {
 public:
@@ -20,7 +20,7 @@ public:
     static void StartReceiving();
     static void StopReceiving();
 
-    int Send(KwxUsMsg &aMsg);/* why cannot declare as const KwxUsMsg??? */
+    int Send(UsMsg &aMsg);/* why cannot declare as const UsMsg??? */
 
 private:
     friend class TestKwxAutoRecv;
@@ -30,22 +30,22 @@ private:
     static Logger       *_logger;
 };
 
-class RequestSendAction : public KwxUsMsg {
+class RequestSendAction : public UsMsg {
 public:
     int Set(ActionId_t code,Card_t card);
 };
 
-class RequestGameStart : public KwxUsMsg {
+class RequestGameStart : public UsMsg {
 public:
     int Set();
 };
 
-class RequestHandout : public KwxUsMsg {
+class RequestHandout : public UsMsg {
 public:
     int Set(Card_t card);
 };
 
-class RequestTingInfo : public KwxUsMsg {
+class RequestTingInfo : public UsMsg {
 public:
     int Set();
 };

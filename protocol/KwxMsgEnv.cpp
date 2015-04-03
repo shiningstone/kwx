@@ -63,3 +63,12 @@ int SeatInfo::Set(RoomPath_t path,RoomId_t room,TableId_t table,SeatId_t seat) {
 
     return 0;
 }
+
+PlayerDir_t SeatInfo::GetPlayer(SeatId_t seat)const {
+    return (PlayerDir_t) ((MIDDLE + seat + PLAYER_NUM - _seatId) % PLAYER_NUM);
+}
+
+SeatId_t SeatInfo::GetSeatId(PlayerDir_t dir)const {
+    return (_seatId + dir + PLAYER_NUM - MIDDLE) % PLAYER_NUM;
+}
+

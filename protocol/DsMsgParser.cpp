@@ -5,7 +5,7 @@
 #include "CommonMsg.h"
 #include "DsMsgParser.h"
 
-int DsMsgParser::_load(Card_t *cards,INT8U &num,const KwxDsMsg &msg,int itemIdx) {
+int DsMsgParser::_load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx) {
     num = (INT8U)msg.GetItemBufLen(itemIdx);
     
     for(int i=0;i<num;i++) {
@@ -15,7 +15,7 @@ int DsMsgParser::_load(Card_t *cards,INT8U &num,const KwxDsMsg &msg,int itemIdx)
     return 0;
 }
 
-int DsMsgParser::_load(ActionId_t *actions,INT8U &num,const KwxDsMsg &msg,int itemIdx) {
+int DsMsgParser::_load(ActionId_t *actions,INT8U &num,const DsMsg &msg,int itemIdx) {
 	int i = 0;
 	int actIdx = 0;
 
@@ -53,7 +53,7 @@ int DsMsgParser::_load(MsgTingInfo_t &ting,const INT8U *inMsg) {
 	return i*4;
 }
 
-int DsMsgParser::_load(MingInfo_t &ming,const KwxDsMsg &msg,int itemIdx) {
+int DsMsgParser::_load(MingInfo_t &ming,const DsMsg &msg,int itemIdx) {
     Item *item = msg._body->_items[itemIdx];
 
     if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
@@ -86,7 +86,7 @@ int DsMsgParser::_load(MingInfo_t &ming,const KwxDsMsg &msg,int itemIdx) {
 	return 0;
 }
 
-int DsMsgParser::_load(Reminds_t &remind,const KwxDsMsg &msg,int itemIdx) {
+int DsMsgParser::_load(Reminds_t &remind,const DsMsg &msg,int itemIdx) {
     _load(remind.actions, remind.actionNum,msg, itemIdx);
     _load(remind.gangCard, remind.gangKindNum, msg, itemIdx+1);
     _load(remind.kouCard, remind.kouKindNum, msg, itemIdx+2);

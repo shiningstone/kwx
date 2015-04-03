@@ -72,7 +72,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         ActionResponse waitInfo;
@@ -108,7 +108,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         ActionNotif action;
@@ -182,7 +182,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         GameStartResponse startInfo;
@@ -214,7 +214,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
         
         GameStartNotif startInfo;
@@ -287,7 +287,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         HandoutResponse handoutInfo;
@@ -323,7 +323,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         HandoutNotif handoutInfo;
@@ -365,7 +365,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         DistCardInfo dist;
@@ -413,7 +413,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         DistCardInfo dist;
@@ -471,7 +471,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
         DistCardInfo dist;
@@ -524,7 +524,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
 		DistCardNotif dist;
@@ -559,7 +559,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
 		ScoreNotif score;
@@ -601,7 +601,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
 		RemindInfo remind;
@@ -648,7 +648,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         FirstDistZhuang dist;
 
         len = aMsg->Deserialize(msgInNetwork);
@@ -692,7 +692,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         FirstDistNonZhuang dist;
 
         len = aMsg->Deserialize(msgInNetwork);
@@ -730,7 +730,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         DecisionNotif decision;
 
         len = aMsg->Deserialize(msgInNetwork);
@@ -804,7 +804,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        KwxDsMsg *aMsg = KwxDsMsg::getInstance();
+        DsMsg *aMsg = DsMsg::getInstance();
         TingInfoResponse ting;
 
         len = aMsg->Deserialize(msgInNetwork);
