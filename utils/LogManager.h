@@ -37,7 +37,7 @@ public :
     Logger(const char *name);
     
     int  Write(const char * format, ...);
-    int  WriteArray(char *buf,int len);
+    int  WriteArray(const char *buf,int len);
     void Set(bool enable);
     bool IsEnabled();
 

@@ -3,6 +3,8 @@
 #define __KWX_DS_MSG__
 
 #include "KwxMsg.h"
+
+class RoundManager;
 /****************************************************
     DOWNSTREAM : Instruction structure
 ****************************************************/
@@ -10,6 +12,11 @@ class KwxDsInstruction {
 public:
     virtual int Construct(const KwxDsMsg &msg) = 0;
     virtual int Dispatch() = 0;
+protected:
+#ifndef __UNIT_TEST__
+    KwxDsInstruction();
+    RoundManager *_roundManager;
+#endif
 };
 
 class GameStartResponse : public KwxDsInstruction {
@@ -17,7 +24,7 @@ public:
     virtual int Construct(const KwxDsMsg &msg);
     virtual int Dispatch();
 
-    INT32U        score;
+    INT32U           score;
 };
 
 class GameStartNotif : public KwxDsInstruction {
@@ -25,8 +32,8 @@ public:
     virtual int Construct(const KwxDsMsg &msg);
     virtual int Dispatch();
     
-    INT8U         seat;
-    INT32U        score;
+    INT8U            seat;
+    INT32U           score;
 };
 
 class HandoutResponse : public KwxDsInstruction {
@@ -57,8 +64,8 @@ public:
     virtual int Construct(const KwxDsMsg &msg);
     virtual int Dispatch();
     
-    INT8U         seat;
-    INT8U         waitSeat;
+    INT8U            seat;
+    INT8U            waitSeat;
 };
 
 class ActionNotif : public KwxDsInstruction {
@@ -66,13 +73,13 @@ public:
     virtual int Construct(const KwxDsMsg &msg);
     virtual int Dispatch();
     
-    INT8U         seat;
-    bool          isFromServer;
-    INT8U         next;
-    INT8U         actionNum;
-    ActionId_t    actions[MAX_AVAIL_ACTIONS];
-    INT8U         cardNum;
-    Card_t        card[18];
+    INT8U            seat;
+    bool             isFromServer;
+    INT8U            next;
+    INT8U            actionNum;
+    ActionId_t       actions[MAX_AVAIL_ACTIONS];
+    INT8U            cardNum;
+    Card_t           card[18];
 };
 
 class DistCardInfo : public KwxDsInstruction {
@@ -86,7 +93,7 @@ public:
     INT8U            timer;
     INT8U            remain;
     Card_t           kind;
-    _Reminds_t       remind;
+    Reminds_t        remind;
 };
 
 class FirstDistZhuang : public KwxDsInstruction {
@@ -100,7 +107,7 @@ public:
     INT8U            timer;
     INT8U            remain;
     Card_t           cards[14];
-    _Reminds_t       remind;
+    Reminds_t        remind;
 };
 
 class FirstDistNonZhuang : public KwxDsInstruction {
@@ -124,7 +131,7 @@ public:
     
     INT8U            seat;
     INT8U            timer;
-    _Reminds_t       remind;
+    Reminds_t        remind;
     INT8U            wait;
 };
 

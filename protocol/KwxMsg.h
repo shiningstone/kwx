@@ -37,7 +37,7 @@ public:
 	static KwxDsMsg *getInstance();
 	static void      destroyInstance();
 
-    int Dispatch(const INT8U *inMsg);
+    int Dispatch(const INT8U *inMsg,int inLen);
     virtual int Deserialize(const INT8U *inMsg);
     KwxDsInstruction *_GenerateInstruction();    
 
@@ -48,8 +48,8 @@ public:
     int _load(Card_t *cards,INT8U &num,int itemIdx) const;
     int _load(ActionId_t *actions,INT8U &num,int itemIdx) const;
     int _load(MsgTingInfo_t &info,const INT8U *inMsg) const;
-    int _load(_MingInfo_t &info,const Item *item) const;
-    int _load(_Reminds_t &remind,int itemIdx) const;
+    int _load(MingInfo_t &info,const Item *item) const;
+    int _load(Reminds_t &remind,int itemIdx) const;
 
 private:
 	static KwxDsMsg *_instance;

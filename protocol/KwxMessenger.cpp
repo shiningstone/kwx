@@ -52,19 +52,9 @@ void KwxMessenger::StopReceiving() {
 }
 
 int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    Logger *_logger = LOGGER_REGISTER("KwxMessenger");
-
     KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-    aMsg->Deserialize(pkg);
-
-    LOGGER_WRITE("%s : %d\n",__FUNCTION__,aMsg->GetRequestCode());
-
-    switch(aMsg->GetRequestCode()) {
-        default:
-            return KWX_INVALID_PCHC;
-    }
-
-    LOGGER_DEREGISTER(_logger);
+    aMsg->Dispatch(pkg,len);
+	return 0;
 }
 
 /************************************************************

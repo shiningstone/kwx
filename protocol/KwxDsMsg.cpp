@@ -4,6 +4,14 @@
 #include "MsgFormats.h"
 #include "KwxDsMsg.h"
 
+#ifndef __UNIT_TEST__
+#include "./../game/RoundManager.h"
+
+KwxDsInstruction::KwxDsInstruction() {
+    _roundManager = RoundManager::getInstance();
+}
+#endif
+
 int GameStartResponse::Construct(const KwxDsMsg &msg) {
     score = msg.GetItemValue(0);
     return 0;

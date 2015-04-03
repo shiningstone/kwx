@@ -62,7 +62,7 @@ int Logger::Write(const char * format, ...) {
 }
 
 #include <ctype.h>
-int Logger::WriteArray(char *pkg,int len) {
+int Logger::WriteArray(const char *pkg,int len) {
     char buf[1024] = {0};
     int usedBytes  = 0;
 

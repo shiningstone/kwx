@@ -54,6 +54,35 @@ KwxDsMsg::KwxDsMsg()
 :KwxMsg(DOWN_STREAM){
 }
 
+int KwxDsMsg::Dispatch(const INT8U *inMsg,int inLen) {
+    Deserialize(inMsg);
+
+    KwxDsInstruction *instruction = _GenerateInstruction();
+    if((int)instruction!=KWX_INVALID_PCHC) {
+        instruction->Dispatch();
+        delete instruction;
+    } else {
+        LOGGER_WRITE("unknown instruction\n");
+        LOGGER_WRITE_ARRAY((char *)inMsg,inLen);
+        return INVALID;
+    }
+
+	return 0;
+}
+
+int KwxDsMsg::Deserialize(const INT8U *inMsg) {
+    int len = 0;
+
+    if (memcmp(inMsg,Header::PCHC,3)) {
+        return KWX_INVALID_PCHC;
+    }
+
+    len += _header->Deserialize(inMsg);
+    len += _body->Deserialize(inMsg+len);
+
+    return len;
+}
+
 KwxDsInstruction *KwxDsMsg::_GenerateInstruction() {
     switch(GetRequestCode()) {
         case REQ_GAME_SEND_START:
@@ -101,29 +130,6 @@ KwxDsInstruction *KwxDsMsg::_GenerateInstruction() {
         default:
             return (KwxDsInstruction *)KWX_INVALID_PCHC;
     }
-}
-
-int KwxDsMsg::Dispatch(const INT8U *inMsg) {
-    Deserialize(inMsg);
-
-    KwxDsInstruction *instruction = _GenerateInstruction();
-    instruction->Dispatch();
-    delete instruction;
-
-	return 0;
-}
-
-int KwxDsMsg::Deserialize(const INT8U *inMsg) {
-    int len = 0;
-
-    if (memcmp(inMsg,Header::PCHC,3)) {
-        return KWX_INVALID_PCHC;
-    }
-
-    len += _header->Deserialize(inMsg);
-    len += _body->Deserialize(inMsg+len);
-
-    return len;
 }
 
 RequestId_t KwxDsMsg::GetRequestCode() {
@@ -208,7 +214,7 @@ int KwxDsMsg::_load(MsgTingInfo_t &ting,const INT8U *inMsg) const {
 	return i*4;
 }
 
-int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) const {
+int KwxDsMsg::_load(MingInfo_t &ming,const Item *item) const {
     if(_ntohl(*(INT32U *)(item->_buf))==0xffffffff) {
         ming.choiceNum = 0;
         return 0;
@@ -216,7 +222,7 @@ int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) const {
 
     const int   len = item->_bufLen;
     const INT8U *p = item->_buf;
-    _MingChoice_t choices[13];
+    MingChoice_t choices[13];
 
     int idx = 0;
     int i   = 0;
@@ -233,13 +239,13 @@ int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) const {
     }
 
     ming.choiceNum = idx;
-    ming.handouts  = new _MingChoice_t[idx];
-    memcpy(ming.handouts,choices,sizeof(_MingChoice_t)*idx);
+    ming.handouts  = new MingChoice_t[idx];
+    memcpy(ming.handouts,choices,sizeof(MingChoice_t)*idx);
 
 	return 0;
 }
 
-int KwxDsMsg::_load(_Reminds_t &remind,int itemIdx) const {
+int KwxDsMsg::_load(Reminds_t &remind,int itemIdx) const {
     _load(remind.actions, remind.actionNum,itemIdx);
     _load(remind.gangCard, remind.gangKindNum, itemIdx+1);
     _load(remind.kouCard, remind.kouKindNum, itemIdx+2);

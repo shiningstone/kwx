@@ -44,24 +44,24 @@ typedef struct _MsgTingInfo_t {
     TingItem_t       *cards;
 }MsgTingInfo_t;
 
-typedef struct __MingChoice_t {
+typedef struct _MingChoice_t {
     Card_t          kind;       /*可以出的花色*/
     MsgTingInfo_t   ting;
-}_MingChoice_t;
+}MingChoice_t;
 
-typedef struct __MingInfo_t {
+typedef struct _MingInfo_t {
     INT8U            choiceNum;     /*可以出的花色数目*/
-    _MingChoice_t    *handouts;    
-}_MingInfo_t;
+    MingChoice_t    *handouts;    
+}MingInfo_t;
 
-typedef struct __Reminds_t {
+typedef struct _Reminds_t {
     INT8U            actionNum;
     ActionId_t       actions[MAX_AVAIL_ACTIONS];
     INT8U            gangKindNum;
     Card_t           gangCard[4];
     INT8U            kouKindNum;
     Card_t           kouCard[4];
-    _MingInfo_t      ming;
-}_Reminds_t;
+    MingInfo_t      ming;
+}Reminds_t;
 
 #endif
