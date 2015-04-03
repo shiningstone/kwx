@@ -523,10 +523,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        DistCardNotif_t dist;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(dist);
+
+		DistCardNotif dist;
+        dist.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD_TOOTHER );
@@ -558,10 +558,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        ScoreNotif_t score;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(score);
+
+		ScoreNotif score;
+        score.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_CALSCORE );
@@ -600,10 +600,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        RemindInfo_t remind;
-
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(remind);
+
+		RemindInfo remind;
+        remind.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_REMIND );
@@ -647,10 +647,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        FirstDistZhuang_t dist;
+        FirstDistZhuang dist;
 
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(dist);
+        dist.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_BEGINCARDS );
@@ -691,10 +691,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        FirstDistNonZhuang_t dist;
+        FirstDistNonZhuang dist;
 
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(dist);
+        dist.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_BEGINCARDS_OTHER );
@@ -729,10 +729,10 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        DecisionNotif_t decision;
+        DecisionNotif decision;
 
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(decision);
+        decision.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_DECISION );
@@ -803,17 +803,17 @@ public:
         int   len = 0;
 
         KwxDsMsg *aMsg = KwxDsMsg::getInstance();
-        MsgTingInfo_t ting;
+        TingInfoResponse ting;
 
         len = aMsg->Deserialize(msgInNetwork);
-        aMsg->Construct(ting);
+        ting.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_GET_TINGINFO );
         assert( aMsg->GetLevel()==7 );
-        assert( ting.cards[0].kind==TIAO_2);
-        assert( ting.cards[0].remain==2 );
-        assert( ting.cards[0].fan==3 );
+        assert( ting.info.cards[0].kind==TIAO_2);
+        assert( ting.info.cards[0].remain==2 );
+        assert( ting.info.cards[0].fan==3 );
 
         return 0;
     }
