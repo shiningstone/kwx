@@ -1,6 +1,6 @@
 
-#ifndef _KWX_MESSENGER_
-#define _KWX_MESSENGER_
+#ifndef __KWX_MESSENGER_H__
+#define __KWX_MESSENGER_H__
 
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"
@@ -24,4 +24,25 @@ private:
 	static NetMessenger *_messenger;
     static Logger       *_logger;
 };
+
+class RequestSendAction : public KwxUsMsg {
+public:
+    int Set(ActionId_t code,Card_t card);
+};
+
+class RequestGameStart : public KwxUsMsg {
+public:
+    int Set();
+};
+
+class RequestHandout : public KwxUsMsg {
+public:
+    int Set(Card_t card);
+};
+
+class RequestTingInfo : public KwxUsMsg {
+public:
+    int Set();
+};
+
 #endif

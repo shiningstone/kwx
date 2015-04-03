@@ -132,11 +132,11 @@ KwxDsInstruction *KwxDsMsg::_GenerateInstruction() {
     }
 }
 
-RequestId_t KwxDsMsg::GetRequestCode() {
+RequestId_t KwxDsMsg::GetRequestCode() const {
     return (RequestId_t)_header->_requestCode;
 }
 
-int KwxDsMsg::GetLevel() {
+int KwxDsMsg::GetLevel() const {
     DnHeader *header = static_cast<DnHeader *>(_header);
     return header->_level;
 }
@@ -163,6 +163,14 @@ INT32U KwxDsMsg::GetItemValue(int idx) const {
             }
         default:
             return INVALID;
+    }
+}
+
+INT16U KwxDsMsg::GetItemBufLen(int idx) const {
+    if(_body->_items[idx]->GetIdType()==ID_WITH_BUF) {
+        return _body->_items[idx]->_bufLen;
+    } else {
+        return INVALID;
     }
 }
 
@@ -299,44 +307,6 @@ int KwxUsMsg::SetSeatInfo() {
     _add_item( new Item((Item_t)132,4,(INT8U *)&roomId) );
     _add_item( new Item((Item_t)133,4,(INT8U *)&tableId) );
     _add_item( new Item((Item_t)60,   seat->_seatId) );
-
-    return 0;
-}
-
-/**********************************************************
-	Interfaces
-***********************************************************/
-int RequestSendAction::Set(ActionId_t action,Card_t card) {
-    SetRequestCode(REQ_GAME_SEND_ACTION);
-    
-    INT32U actionId = _htonl(action);
-    INT8U  cardKind = card;
-
-    SetSeatInfo();
-    _add_item( new Item((Item_t)134,4,(INT8U *)&actionId) );
-    _add_item( new Item((Item_t)135,1,(INT8U *)&cardKind) );
-
-    return 0;
-}
-
-int RequestGameStart::Set() {
-    SetRequestCode(REQ_GAME_SEND_START);
-    SetSeatInfo();
-
-    return 0;
-}
-
-int RequestHandout::Set(Card_t card) {
-    SetRequestCode(REQ_GAME_SEND_SHOWCARD);
-    SetSeatInfo();
-    _add_item( new Item((Item_t)65,card) );
-
-    return 0;
-}
-
-int RequestTingInfo::Set() {
-    SetRequestCode(REQ_GAME_GET_TINGINFO);
-    SetSeatInfo();
 
     return 0;
 }

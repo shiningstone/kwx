@@ -1,9 +1,9 @@
 
 #include "./../network/NetMessenger.h"
 
-#include "KwxMessenger.h"
 #include "MsgFormats.h"
 #include "KwxMsg.h"
+#include "KwxMessenger.h"
 
 #ifndef NULL
 #define NULL 0
@@ -66,6 +66,44 @@ int KwxMessenger::Send(KwxUsMsg &aMsg) {
     
     len = aMsg.Serialize(buf);
     _messenger->Send(buf,len);
+
+    return 0;
+}
+
+/**********************************************************
+	Interfaces
+***********************************************************/
+int RequestSendAction::Set(ActionId_t action,Card_t card) {
+    SetRequestCode(REQ_GAME_SEND_ACTION);
+    
+    INT32U actionId = _htonl(action);
+    INT8U  cardKind = card;
+
+    SetSeatInfo();
+    _add_item( new Item((Item_t)134,4,(INT8U *)&actionId) );
+    _add_item( new Item((Item_t)135,1,(INT8U *)&cardKind) );
+
+    return 0;
+}
+
+int RequestGameStart::Set() {
+    SetRequestCode(REQ_GAME_SEND_START);
+    SetSeatInfo();
+
+    return 0;
+}
+
+int RequestHandout::Set(Card_t card) {
+    SetRequestCode(REQ_GAME_SEND_SHOWCARD);
+    SetSeatInfo();
+    _add_item( new Item((Item_t)65,card) );
+
+    return 0;
+}
+
+int RequestTingInfo::Set() {
+    SetRequestCode(REQ_GAME_GET_TINGINFO);
+    SetSeatInfo();
 
     return 0;
 }

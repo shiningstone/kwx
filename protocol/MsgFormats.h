@@ -88,7 +88,7 @@ public:
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
-    Item_t  GetIdType();
+    Item_t  GetIdType() const ;
 
     Item_t   _id;
     INT8U    _value;

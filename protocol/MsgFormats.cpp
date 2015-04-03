@@ -95,7 +95,7 @@ Item_t Item::_IdType(INT8U id) {
     }
 }
 
-Item_t Item::GetIdType() {
+Item_t Item::GetIdType() const {
     return _IdType(_id);
 }
 
