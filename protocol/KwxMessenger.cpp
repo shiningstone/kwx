@@ -2,7 +2,7 @@
 #include "./../network/NetMessenger.h"
 
 #include "MsgFormats.h"
-#include "KwxMsg.h"
+#include "CommonMsg.h"
 #include "KwxMessenger.h"
 
 #ifndef NULL

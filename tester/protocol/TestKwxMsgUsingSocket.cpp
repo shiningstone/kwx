@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #include "./../../protocol/MsgFormats.h"
-#include "./../../protocol/KwxMsg.h"
+#include "./../../protocol/CommonMsg.h"
 #include "./../../protocol/KwxMessenger.h"
 
 #include "./../../network/CSockets.h"

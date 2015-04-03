@@ -1,15 +1,13 @@
 
-#ifndef _KWX_MSG_
-#define _KWX_MSG_
+#ifndef _COMMON_MSG_
+#define _COMMON_MSG_
 
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
-#include "KwxRequestTypes.h"
-
-#define UP_STREAM     0
-#define DOWN_STREAM   1
+#include "KwxMsgBasic.h"
+#include "MsgIntf.h"
 
 class Header;
 class MsgBody;

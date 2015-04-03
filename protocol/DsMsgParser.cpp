@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "MsgFormats.h"
-#include "KwxMsg.h"
+#include "CommonMsg.h"
 #include "DsMsgParser.h"
 
 int DsMsgParser::_load(Card_t *cards,INT8U &num,const KwxDsMsg &msg,int itemIdx) {

@@ -5,10 +5,9 @@
 #include "./../utils/BasicType.h"
 #include "./../network/NetMessenger.h"
 
-#include "KwxRequestConsts.h"
 #include "MsgFormats.h"
-#include "KwxMsg.h"
-#include "KwxDsMsg.h"
+#include "CommonMsg.h"
+#include "DsInstruction.h"
 
 Logger *KwxMsg::_logger = 0;
 
@@ -207,7 +206,7 @@ int KwxUsMsg::_add_item(Item *item) {
 	return 0;
 }
 
-#include "EnvVariables.h"
+#include "KwxMsgEnv.h"
 int KwxUsMsg::SetSeatInfo() {
     SeatInfo *seat = SeatInfo::getInstance();
 

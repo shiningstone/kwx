@@ -1,6 +1,6 @@
 
-#ifndef _KXW_REQUEST_TYPES_
-#define _KXW_REQUEST_TYPES_
+#ifndef _REQUEST_STRUCTS_
+#define _REQUEST_STRUCTS_
 
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"

@@ -6,7 +6,7 @@
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
-#include "KwxRequestTypes.h"
+#include "RequestStructs.h"
 
 class KwxDsMsg;
 class DsMsgParser {

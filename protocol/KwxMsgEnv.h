@@ -1,11 +1,10 @@
 
-#ifndef _ENV_VARIABLES_
-#define _ENV_VARIABLES_
+#ifndef __KWX_ENV_VARIABLES_H__
+#define __KWX_ENV_VARIABLES_H__
 
 #include "./../utils/UtilBasic.h"
 
-#include "KwxRequestTypes.h"
-
+#include "KwxMsgBasic.h"
 /*******************************************************************************
 	NOTE:
 		the value of environment variables should either 

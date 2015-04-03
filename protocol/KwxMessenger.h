@@ -7,7 +7,10 @@
 #include "./../utils/LogManager.h"
 
 class NetMessenger;
+
+#include "KwxMsgBasic.h"
 class KwxUsMsg;
+
 class KwxMessenger {
 public:
     KwxMessenger();

@@ -1,7 +1,7 @@
 
 #include <string.h>
 #include "MsgFormats.h"
-#include "EnvVariables.h"
+#include "KwxMsgEnv.h"
 
 const INT8U Header::PCHC[3] = {'K','W','X'};
 

@@ -1,29 +1,19 @@
 
-#ifndef __MSG_FORMATS__
-#define __MSG_FORMATS__
+#ifndef _MSG_FORMATS_
+#define _MSG_FORMATS_
 
 #include "./../utils/UtilBasic.h"
-#include "KwxRequestConsts.h"
 
-#define MSG_MAX_LEN    1024
+#include "MsgIntf.h"
+
 #define ITEM_BUF_LEN   128
 #define ITEM_MAX_NUM   128
 
-class UsMsgIntf {
-public:
-    virtual int Serialize(INT8U *outMsg) = 0;
-};
-
-class DsMsgIntf {
-public:
-    virtual int Deserialize(const INT8U *inMsg) = 0;
-};
-
-class MsgIntf : public UsMsgIntf, public DsMsgIntf {
-public:
-    virtual int Serialize(INT8U *outMsg) = 0;
-    virtual int Deserialize(const INT8U *inMsg) = 0;
-};
+typedef enum {
+    PURE_ID,
+    ID_WITH_INT,
+    ID_WITH_BUF,
+}Item_t;
 
 class Header : public MsgIntf {
 public:

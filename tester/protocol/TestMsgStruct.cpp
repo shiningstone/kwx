@@ -1,6 +1,6 @@
-
+#include "./../../protocol/RequestStructs.h"
 #include "./../../protocol/MsgFormats.h"
-#include "./../../protocol/KwxMsg.h"
+#include "./../../protocol/CommonMsg.h"
 
 /********************************************************************
 	TestCases

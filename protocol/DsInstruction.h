@@ -1,8 +1,9 @@
 
-#ifndef __KWX_DS_MSG__
-#define __KWX_DS_MSG__
+#ifndef _DS_INSTRUCTION_
+#define _DS_INSTRUCTION_
 
-#include "KwxMsg.h"
+#include "RequestStructs.h"
+#include "CommonMsg.h"
 
 class RoundManager;
 /****************************************************

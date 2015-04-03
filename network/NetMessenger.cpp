@@ -143,6 +143,7 @@ void NetMessenger::destroyInstance() {
 /*******************************************************
         报文格式处理 
 *******************************************************/
+#include "./../protocol/KwxMsgBasic.h"
 #include "./../protocol/MsgFormats.h"
 
 int NetMessenger::_get_available_pkg_len() {

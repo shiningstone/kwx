@@ -1,10 +1,10 @@
 
 #include "./../../utils/BasicType.h"
 
-#include "./../../protocol/MsgFormats.h"
-#include "./../../protocol/KwxMsg.h"
-#include "./../../protocol/KwxDsMsg.h"
-#include "./../../protocol/EnvVariables.h"
+#include "./../../protocol/RequestStructs.h"
+#include "./../../protocol/CommonMsg.h"
+#include "./../../protocol/DsInstruction.h"
+#include "./../../protocol/KwxMsgEnv.h"
 #include "./../../protocol/KwxMessenger.h"
 
 /********************************************************************

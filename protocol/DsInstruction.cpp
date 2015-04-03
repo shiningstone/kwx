@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "MsgFormats.h"
-#include "KwxDsMsg.h"
+#include "DsInstruction.h"
 #include "DsMsgParser.h"
 
 #ifndef __UNIT_TEST__
