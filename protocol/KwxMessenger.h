@@ -19,11 +19,13 @@ public:
     /* auto receive */
     static void StartReceiving();
     static void StopReceiving();
-    static void StartReceiving(MsgHandler_t handle);               //this method should only be referenced by test cases.
 
     int Send(KwxUsMsg &aMsg);/* why cannot declare as const KwxUsMsg??? */
 
 private:
+    friend class TestKwxAutoRecv;
+    static void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
+
 	static NetMessenger *_messenger;
     static Logger       *_logger;
 };
