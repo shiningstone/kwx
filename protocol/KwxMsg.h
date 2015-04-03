@@ -67,7 +67,8 @@ public:
     static void Release(FirstDistZhuang_t &info);
     
 private:
-    int _load(Card_t *cards,INT8U &num,const Item *item);
+    int _load(Card_t *cards,INT8U &num,int itemIdx);
+    int _load(ActionId_t *actions,INT8U &num,int itemIdx);
     int _load(MsgTingInfo_t &info,const INT8U *inMsg);
     int _load(_MingInfo_t &info,const Item *item);
     int _load(_Reminds_t &remind,int itemIdx);

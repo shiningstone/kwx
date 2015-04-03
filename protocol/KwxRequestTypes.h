@@ -5,6 +5,8 @@
 #include "./../utils/UtilBasic.h"
 #include "./../utils/BasicType.h"
 
+#define MAX_AVAIL_ACTIONS 4
+
 typedef INT32U RoomPath_t;
 typedef INT32U RoomId_t;
 typedef INT32U TableId_t;
@@ -27,7 +29,8 @@ typedef struct _ActionNotif_t {
     INT8U         seat;
     bool          isFromServer;
     INT8U         next;
-    ActionId_t    action;
+    INT8U         actionNum;
+    ActionId_t    actions[MAX_AVAIL_ACTIONS];
     INT8U         cardNum;
     Card_t        card[18];
 }ActionNotif_t;
@@ -75,7 +78,8 @@ typedef struct __MingInfo_t {
 }_MingInfo_t;
 
 typedef struct __Reminds_t {
-    ActionId_t       actions;
+    INT8U            actionNum;
+    ActionId_t       actions[MAX_AVAIL_ACTIONS];
     INT8U            gangKindNum;
     Card_t           gangCard[4];
     INT8U            kouKindNum;
@@ -130,7 +134,8 @@ typedef struct _DecisionNotif_t {
     INT8U            seat;
     INT8U            whoGive;
     INT8U            next;
-    ActionId_t       actions;
+    INT8U            actionNum;
+    ActionId_t       actions[MAX_AVAIL_ACTIONS];
     Card_t           card;
 }DecisionNotif_t;
 

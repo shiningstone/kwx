@@ -118,9 +118,9 @@ int KwxDsMsg::Construct(ActionNotif_t &action) {
     action.seat    = GetItemValue(0);
     action.isFromServer = (GetItemValue(1)==0)?true:false;
     action.next    = GetItemValue(2);
-    action.action  = (ActionId_t)GetItemValue(3);
-    
-    _load(action.card, action.cardNum, _body->_items[4]);
+
+    _load(action.actions, action.actionNum, 3);
+    _load(action.card, action.cardNum, 4);
 
     return 0;
 }
@@ -131,7 +131,13 @@ int KwxDsMsg::Construct(DistCardInfo_t &dist) {
     dist.remain    = GetItemValue(2);
     dist.kind      = (Card_t)GetItemValue(3);
 
-    _load(dist.remind,4);
+    /* !!!this action defined differently from others */
+    dist.remind.actionNum = 1;
+    dist.remind.actions[0] = (ActionId_t)GetItemValue(4);
+    
+    _load(dist.remind.gangCard, dist.remind.gangKindNum, 5);
+    _load(dist.remind.kouCard, dist.remind.kouKindNum, 6);
+    _load(dist.remind.ming,_body->_items[7]);
     
     return 0;
 }
@@ -193,7 +199,7 @@ int KwxDsMsg::Construct(DecisionNotif_t &decision) {
     decision.seat      = GetItemValue(0);
     decision.whoGive   = GetItemValue(1);
     decision.next      = GetItemValue(2);
-    decision.actions   = (ActionId_t)GetItemValue(3);
+    _load(decision.actions, decision.actionNum, 3);
     decision.card      = (Card_t)GetItemValue(4);
     
     return 0;
@@ -206,12 +212,31 @@ int KwxDsMsg::Construct(MsgTingInfo_t &info) {
     return 0;
 }
 
-int KwxDsMsg::_load(Card_t *cards,INT8U &num,const Item *item) {
-    num = (INT8U)item->_bufLen;
+int KwxDsMsg::_load(Card_t *cards,INT8U &num,int itemIdx) {
+    num = (INT8U)_body->_items[itemIdx]->_bufLen;
     
     for(int i=0;i<num;i++) {
-        cards[i] = (Card_t)item->_buf[i];
+        cards[i] = (Card_t)_body->_items[itemIdx]->_buf[i];
     }
+
+    return 0;
+}
+
+int KwxDsMsg::_load(ActionId_t *actions,INT8U &num,int itemIdx) {
+	int i = 0;
+	int actIdx = 0;
+
+    for(i=MAX_AVAIL_ACTIONS-1;i>=0;i--) {
+        if((ActionId_t)_body->_items[itemIdx]->_buf[i]==aQi) {
+			break;
+		} else {
+            actions[actIdx++] = (ActionId_t)_body->_items[itemIdx]->_buf[i];
+		}
+    }
+
+    actions[actIdx++] = aQi;
+
+    num = actIdx;
 
     return 0;
 }
@@ -267,10 +292,9 @@ int KwxDsMsg::_load(_MingInfo_t &ming,const Item *item) {
 }
 
 int KwxDsMsg::_load(_Reminds_t &remind,int itemIdx) {
-    remind.actions = (ActionId_t)GetItemValue(itemIdx);
-
-    _load(remind.gangCard, remind.gangKindNum, _body->_items[itemIdx+1]);
-    _load(remind.kouCard, remind.kouKindNum, _body->_items[itemIdx+2]);
+    _load(remind.actions, remind.actionNum,itemIdx);
+    _load(remind.gangCard, remind.gangKindNum, itemIdx+1);
+    _load(remind.kouCard, remind.kouKindNum, itemIdx+2);
     _load(remind.ming,_body->_items[itemIdx+3]);
 
     return 0;
