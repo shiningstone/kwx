@@ -225,11 +225,54 @@ void test_game_server() {
 	SERVER.Stop();
 }
 
+#include "./../../protocol/KwxMsgBasic.h"
+void test_smart_game_server() {
+    FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
+    assert(fmonitor!=NULL);
+
+    ServerSocket SERVER;
+    bool start = false;
+    int  choice = STRING;
+
+    while(1) {
+        if(start) {
+            char sendBuf[512] = {0};
+            int  sendLen = 0;
+            char recvBuf[512] = {0};
+            int  recvLen = 0;
+
+        	SERVER.Recv(recvBuf,&recvLen);
+
+            if(recvBuf[16]==REQ_GAME_SEND_START) {
+                sendLen = GetSendData(sendBuf,1);
+                SERVER.Send(sendBuf,sendLen);
+
+                sendLen = GetSendData(sendBuf,2);
+                SERVER.Send(sendBuf,sendLen);
+                
+                sendLen = GetSendData(sendBuf,3);
+                SERVER.Send(sendBuf,sendLen);
+            }
+        } else {
+        	SERVER.Start();
+            printf("server started\n");
+            start = true;
+        }
+    }
+
+	SERVER.Stop();
+}
+
 void test_server_console() {
 #if 0
     test_basic();
     test_read_send_data();
 #endif
-    test_game_server();
+
+    #if 0
+    test_game_server()();
+    #else
+    test_smart_game_server();
+    #endif
 }
 
