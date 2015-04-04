@@ -6,7 +6,7 @@
 	TestCases
 *********************************************************************/
 #include <assert.h>
-#include "./CTestProtocol.h"
+#include "./../CTestCase.h"
 
 class TestNonKwxMsg : public CTestCase {
 public:

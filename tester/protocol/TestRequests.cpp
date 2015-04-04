@@ -12,7 +12,7 @@
 *********************************************************************/
 #include <assert.h>
 #include "./../../RaceType.h"
-#include "./CTestProtocol.h"
+#include "./../CTestCase.h"
 
 class TestSendGameStart : public CTestCase {
 public:

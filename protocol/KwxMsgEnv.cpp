@@ -55,20 +55,44 @@ SeatInfo::SeatInfo() {
 #endif
 }
 
+
 int SeatInfo::Set(RoomPath_t path,RoomId_t room,TableId_t table,SeatId_t seat) {
     _roomPath = path;
     _roomId   = room;
     _tableId  = table;
     _seatId   = seat;
+    
+    _SetSeatDirMap();
 
     return 0;
 }
 
+void SeatInfo::_SetSeatDirMap() {
+    const int SeatToDir[3][3] = {
+        /*1     2       3*/
+        {MIDDLE,RIGHT,  LEFT},  /*_seatId==1*/
+        {LEFT,  MIDDLE, RIGHT}, /*_seatId==2*/
+        {RIGHT, LEFT,   MIDDLE},/*_seatId==3*/
+    };
+    
+    const int DirToSeat[3][3] = {
+        /*LEFT MIDDLE RIGHT*/
+        {3,     1,      2},/*_seatId==1*/
+        {1,     2,      3},/*_seatId==2*/
+        {2,     3,      1},/*_seatId==3*/
+    };
+    
+    for(int i=0;i<PLAYER_NUM;i++) {
+        _seatToDir[i] = (PlayerDir_t) SeatToDir[_seatId][i];
+        _dirToSeat[i] = DirToSeat[_seatId][i];
+    }
+}
+
 PlayerDir_t SeatInfo::GetPlayer(SeatId_t seat)const {
-    return (PlayerDir_t) ((MIDDLE + seat + PLAYER_NUM - _seatId) % PLAYER_NUM);
+    return _seatToDir[seat-1];
 }
 
 SeatId_t SeatInfo::GetSeatId(PlayerDir_t dir)const {
-    return (_seatId + dir + PLAYER_NUM - MIDDLE) % PLAYER_NUM;
+    return _dirToSeat[dir];
 }
 

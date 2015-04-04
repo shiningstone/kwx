@@ -35,17 +35,23 @@ private:
 #include "./../utils/BasicType.h"
 class SeatInfo {
 public:
+    friend class UsMsg;
+
     static SeatInfo *getInstance(int threadInfo=0);
     int Set(RoomPath_t path,RoomId_t room,TableId_t table,SeatId_t seat);
 
     PlayerDir_t GetPlayer(SeatId_t seat) const;
     SeatId_t    GetSeatId(PlayerDir_t dir) const;
-
+private:
     RoomPath_t _roomPath;
     RoomId_t   _roomId;
     TableId_t  _tableId;
     SeatId_t   _seatId;
-private:
+
+    void _SetSeatDirMap();
+    PlayerDir_t _seatToDir[PLAYER_NUM];
+    SeatId_t    _dirToSeat[PLAYER_NUM];
+
     static const int MAX_JOINABLE_TABLE = 1;
 
     SeatInfo();
