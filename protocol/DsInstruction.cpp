@@ -108,10 +108,7 @@ int DistCardInfo::Construct(const DsMsg &msg) {
     remain    = msg.GetItemValue(2);
     kind      = (Card_t)msg.GetItemValue(3);
 
-    /* !!!this action defined differently from others */
-    remind.actionNum = 1;
-    remind.actions[0] = (ActionId_t)msg.GetItemValue(4);
-    
+    DsMsgParser::_load(remind.actions, remind.actionNum, msg, 4);
     DsMsgParser::_load(remind.gangCard, remind.gangKindNum, msg, 5);
     DsMsgParser::_load(remind.kouCard, remind.kouKindNum, msg, 6);
     DsMsgParser::_load(remind.ming, msg, 7);

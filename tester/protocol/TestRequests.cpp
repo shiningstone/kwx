@@ -349,7 +349,7 @@ public:
             'K','W','X',           //KWX
             0x00,51,               //request code/*发牌(下行) REQ_GAME_DIST_CARD*/
             7,                     //package level
-            0x00,46,               //package size
+            0x00,51,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
@@ -357,7 +357,7 @@ public:
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
-            64,2,                  //remind:             明杠
+            129,0,4,0,0,0,2,       //remind:             明杠
             130,0,1,3,             //gang remind:        可杠4条
             131,0,1,0xff,          //kou remind:         不可扣
             132,0,4,0xff,0xff,0xff,0xff,  //ming remind: 不可明
@@ -394,7 +394,7 @@ public:
             'K','W','X',           //KWX
             0x00,51,               //request code/*发牌(下行) REQ_GAME_DIST_CARD*/
             7,                     //package level
-            0x00,54,               //package size
+            0x00,59,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
@@ -402,7 +402,7 @@ public:
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
-            64,0x40,               //remind:             明
+            129,0,4,0,0,0,0x40,    //remind:             明
             130,0,1,0xff,          //gang remind:        不可杠
             131,0,1,0xff,          //kou remind:         不可扣
             132,0,12,
@@ -450,7 +450,7 @@ public:
             'K','W','X',           //KWX
             0x00,51,               //request code/*发牌(下行) REQ_GAME_DIST_CARD*/
             7,                     //package level
-            0x00,62,               //package size
+            0x00,67,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
@@ -458,7 +458,7 @@ public:
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
-            64,0x40,               //remind:             明
+            129,0,4,0,0,0,0x40,    //remind:             明
             130,0,1,0xff,          //gang remind:        不可杠
             131,0,1,0xff,          //kou remind:         不可扣
             132,0,20,
