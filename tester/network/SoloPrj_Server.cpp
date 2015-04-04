@@ -117,12 +117,13 @@ void test_basic() {
     
 ****************************************************/
 #define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
+#define SEND_DATA    "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\send.txt"
 
 #include <stdio.h>
 
 void show(char *buf,int len) {
     for (int i=0;i<len;i++) {
-        printf("0x%02x ",buf[i]);
+        printf("0x%02x ",(unsigned char)buf[i]);
         if((i+1)%8==0) {
             printf("\n");
         }
@@ -131,33 +132,60 @@ void show(char *buf,int len) {
     printf("\n");
 }
 
-/* the string format should be 4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00 */
-int GetSendData(char *buf) {
-    FILE * fsend = fopen(WORKING_PATH"send.txt","r");
+/* the string format should be 
+    lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00 */
+int GetLine(char *buf,int line=1) {
+    FILE * fsend = fopen(SEND_DATA,"r");
     assert(fsend!=NULL);
 
-    fgets(buf,512,fsend);
-    return StringToHex(buf);
-}
-
-int PressAnyKeyToSend(char *sendBuf) {
-    char c;
-    printf("\nSEND:");
-    scanf("%c",&c);
-    if(c=='q') {
-        return -1;
+    int i = 1;
+    while(i<=line) {
+        memset(buf,0,512);
+        if(fgets(buf,512,fsend)==NULL) {
+            return -1;
+        } else {
+            i++;
+        }
     }
-        
-    int  len = GetSendData(sendBuf);
-    show(sendBuf,len);
 
     return 0;
 }
 
-void test_server_console() {
-#if 0
-    test_basic();
-#endif
+int ExtractHeader(char *buf) {
+    char *p = strrchr(buf,':');
+    int remain = strlen(buf)-(p+1-buf);
+    memcpy(buf,p+1,remain);
+    buf[remain] = 0;
+
+    return remain;
+}
+
+int GetSendData(char *buf,int line=1) {
+    FILE * fsend = fopen(SEND_DATA,"r");
+    assert(fsend!=NULL);
+
+    if(GetLine(buf,line)==-1) {
+        printf("read line %d from %s fail\n",line,SEND_DATA);
+        return -1;
+    } else {
+        ExtractHeader(buf);
+        return StringToHex(buf);
+    }
+}
+
+void test_read_send_data() {
+    while(1) {
+        int choice = 0;
+        printf("choose a package:");
+        scanf("%d",&choice);
+
+        char sendBuf[512] = {0};
+        int  len = GetSendData(sendBuf,choice);
+        show(sendBuf,len);
+    }
+}
+
+void test_game_server() {
     FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
     assert(fmonitor!=NULL);
 
@@ -174,7 +202,11 @@ void test_server_console() {
 
         	SERVER.Recv(recvBuf,&recvLen);
 
-            sendLen = GetSendData(sendBuf);
+            int line = 0;
+            printf("choose a package:");
+            scanf("%d",&line);
+
+            sendLen = GetSendData(sendBuf,line);
             show(sendBuf,sendLen);
             SERVER.Send(sendBuf,sendLen);
         } else {
@@ -185,5 +217,13 @@ void test_server_console() {
     }
 
 	SERVER.Stop();
+}
+
+void test_server_console() {
+#if 0
+    test_basic();
+#endif
+    test_read_send_data();
+    test_game_server();
 }
 
