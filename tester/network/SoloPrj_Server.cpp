@@ -178,6 +178,10 @@ void test_read_send_data() {
         int choice = 0;
         printf("choose a package:");
         scanf("%d",&choice);
+        if(choice==0) {
+            break;
+        }
+
 
         char sendBuf[512] = {0};
         int  len = GetSendData(sendBuf,choice);
@@ -205,6 +209,9 @@ void test_game_server() {
             int line = 0;
             printf("choose a package:");
             scanf("%d",&line);
+            if(line==0) {
+                break;
+            }
 
             sendLen = GetSendData(sendBuf,line);
             show(sendBuf,sendLen);
@@ -222,8 +229,8 @@ void test_game_server() {
 void test_server_console() {
 #if 0
     test_basic();
-#endif
     test_read_send_data();
+#endif
     test_game_server();
 }
 

@@ -2,6 +2,8 @@
 #ifndef __KWX_MSG_BASIC_H__
 #define __KWX_MSG_BASIC_H__
 
+#include "./../utils/UtilBasic.h"
+
 #define MSG_MAX_LEN    1024
 
 #define UP_STREAM     0

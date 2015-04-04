@@ -1,6 +1,9 @@
 
 #include <stdlib.h>
 
+#include "./../protocol/CommonMsg.h"
+#include "./../protocol/KwxMessenger.h"
+
 #include "RaceType.h"
 #include "Raction.h"
 
@@ -27,6 +30,7 @@ NetRoundManager::NetRoundManager(NetRaceLayer *uiManager)
     }
 
     _ai = Ai::getInstance(this);
+    _messenger = new KwxMessenger();
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
 
@@ -35,7 +39,8 @@ NetRoundManager::~NetRoundManager() {
     for(int i=0;i<PLAYER_NUM;i++) {
         delete _players[i];
     }
-    
+
+    delete _messenger;
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -112,14 +117,21 @@ void NetRoundManager::CreateRace(Scene *scene) {
     LoadPlayerInfo();
 	_isGameStart=false;
     
+    _messenger->StartReceiving();
     _uiManager->CreateRace();
 }
 
+#include "./../network/CSockets.h"
 void NetRoundManager::StartGame() {
 	_isGameStart=false;
     
     _cardHolders[MIDDLE]->_isReady = true;
+    
+    RequestGameStart aReq;
+    aReq.Set();
+    _messenger->Send(aReq);
 	_uiManager->GuiShowReady(MIDDLE);
+    
     if(!WaitUntilAllReady()) {
         return ;
     }

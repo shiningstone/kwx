@@ -41,7 +41,7 @@ void CSocket::Stop() {
 }
 
 int CSocket::Send(char *buf,int len) {
-    int actLen = send(_connection, buf, len, 0 );;
+    int actLen = send(_connection, buf, len, 0 );
     _log(SEND,buf,actLen);
     return actLen;
 }

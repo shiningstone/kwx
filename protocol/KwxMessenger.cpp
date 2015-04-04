@@ -16,8 +16,12 @@ Logger       *KwxMessenger::_logger = 0;
 
 KwxMessenger::KwxMessenger() {
     _messenger = NetMessenger::getInstance();
+    
+    /*如果要用StartReceiving，不能调用Start*/
+    #if 0
     _messenger->Start();
-
+    #endif
+    
     _logger = LOGGER_REGISTER("KwxMessenger");
 }
 

@@ -16,6 +16,7 @@ using namespace ui;
 
 class NetRole;
 class RoundManager;
+class KwxMessenger;
 
 class NetRoundManager : public RoundManager {
     friend class NetRaceLayer;
@@ -24,6 +25,7 @@ public:
     static NetRoundManager *getInstance();
     static void  destroyInstance();
     Ai             *_ai;
+    KwxMessenger   *_messenger;
 
     NetRoundManager(NetRaceLayer *uiManager);
     ~NetRoundManager();
