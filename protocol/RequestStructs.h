@@ -38,7 +38,7 @@ typedef struct _Reminds_t {
     Card_t           gangCard[4];
     INT8U            kouKindNum;
     Card_t           kouCard[4];
-    MingInfo_t      ming;
+    MingInfo_t       ming;
 }Reminds_t;
 
 #endif

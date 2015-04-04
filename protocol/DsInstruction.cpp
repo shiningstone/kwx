@@ -44,7 +44,7 @@ int GameStartNotif::Dispatch() {
 }
 
 HandoutResponse::~HandoutResponse() {
-
+    DsMsgParser::_unload(ting);
 }
 
 int HandoutResponse::Construct(const DsMsg &msg) {
@@ -59,7 +59,7 @@ int HandoutResponse::Dispatch() {
 }
 
 HandoutNotif::~HandoutNotif() {
-
+    DsMsgParser::_unload(ting);
 }
 
 int HandoutNotif::Construct(const DsMsg &msg) {
@@ -99,7 +99,7 @@ int ActionNotif::Dispatch() {
 }
 
 DistCardInfo::~DistCardInfo() {
-
+    DsMsgParser::_unload(remind);
 }
 
 int DistCardInfo::Construct(const DsMsg &msg) {
@@ -120,7 +120,7 @@ int DistCardInfo::Dispatch() {
 }
 
 FirstDistZhuang::~FirstDistZhuang() {
-
+    DsMsgParser::_unload(remind);
 }
 
 int FirstDistZhuang::Construct(const DsMsg &msg) {
@@ -152,7 +152,7 @@ int FirstDistNonZhuang::Dispatch() {
 }
 
 RemindInfo::~RemindInfo() {
-
+    DsMsgParser::_unload(remind);
 }
 
 int RemindInfo::Construct(const DsMsg &msg) {

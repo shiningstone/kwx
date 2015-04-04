@@ -3,6 +3,7 @@
 #pragma comment(lib,"ws2_32.lib")
 #include <assert.h>
 
+#include "./../../protocol/KwxMsgBasic.h"
 #include "./../../protocol/MsgFormats.h"
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"

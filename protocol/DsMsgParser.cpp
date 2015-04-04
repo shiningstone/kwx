@@ -53,6 +53,17 @@ int DsMsgParser::_load(MsgTingInfo_t &ting,const INT8U *inMsg) {
 	return i*4;
 }
 
+int DsMsgParser::_unload(MsgTingInfo_t &ting) {
+    if(ting.cardNum>0) {
+        delete []ting.cards;
+
+        ting.cards = NULL;
+        ting.cardNum = 0;
+    }
+
+    return 0;
+}
+
 int DsMsgParser::_load(MingInfo_t &ming,const DsMsg &msg,int itemIdx) {
     Item *item = msg._body->_items[itemIdx];
 
@@ -86,6 +97,22 @@ int DsMsgParser::_load(MingInfo_t &ming,const DsMsg &msg,int itemIdx) {
 	return 0;
 }
 
+int DsMsgParser::_unload(MingInfo_t &ming) {
+    for(int i=0;i<ming.choiceNum;i++) {
+        MingChoice_t choice = ming.handouts[i];
+        _unload(choice.ting);
+    }
+
+    if(ming.choiceNum>0) {
+        delete []ming.handouts;
+
+        ming.handouts = NULL;
+        ming.choiceNum = 0;
+    }
+    
+    return 0;
+}
+
 int DsMsgParser::_load(Reminds_t &remind,const DsMsg &msg,int itemIdx) {
     _load(remind.actions, remind.actionNum,msg, itemIdx);
     _load(remind.gangCard, remind.gangKindNum, msg, itemIdx+1);
@@ -94,3 +121,9 @@ int DsMsgParser::_load(Reminds_t &remind,const DsMsg &msg,int itemIdx) {
 
     return 0;
 }
+
+int DsMsgParser::_unload(Reminds_t &remind) {
+    _unload(remind.ming);
+    return 0;
+}
+

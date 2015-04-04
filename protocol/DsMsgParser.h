@@ -16,6 +16,10 @@ public:
     static int _load(MsgTingInfo_t &info,const INT8U *inMsg);
     static int _load(MingInfo_t &info,const DsMsg &msg,int itemIdx);
     static int _load(Reminds_t &remind,const DsMsg &msg,int itemIdx);
+
+    static int _unload(MsgTingInfo_t &ting);
+    static int _unload(MingInfo_t &ming);
+    static int _unload(Reminds_t &remind);
 };
 
 #endif
