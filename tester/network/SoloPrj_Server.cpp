@@ -13,14 +13,16 @@ typedef enum {
 int ctoi(char c) {
     if( c>='0' && c <= '9' ) {
         return c-'0';
-    } else if( (c>='a' && c<='f') || (c>='A' &&c<='F' ) ) {
+    } else if( c>='a' && c<='f' ) {
         return 10+c-'a';
+    } else if( c>='A' &&c<='F' ) {
+        return 10+c-'A';
     } else {
         return -1;
     }
 }
 
-void StringToHex(char *buf) {
+int StringToHex(char *buf) {
     char Hex[128] = {0};
 
     int i=0;
@@ -30,6 +32,8 @@ void StringToHex(char *buf) {
 
     memset(buf,0,128);
     memcpy(buf,Hex,i);
+
+    return i;
 }
 
 void test_basic_recv_and_send() {
@@ -104,10 +108,82 @@ void test_peng_effect() {
 	SERVER.Stop();
 }
 
+void test_basic() {
+    test_basic_recv_and_send();
+    test_peng_effect();
+}
+
+/****************************************************
+    
+****************************************************/
+#define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
+
+#include <stdio.h>
+
+void show(char *buf,int len) {
+    for (int i=0;i<len;i++) {
+        printf("0x%02x ",buf[i]);
+        if((i+1)%8==0) {
+            printf("\n");
+        }
+    }
+    
+    printf("\n");
+}
+
+/* the string format should be 4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00 */
+int GetSendData(char *buf) {
+    FILE * fsend = fopen(WORKING_PATH"send.txt","r");
+    assert(fsend!=NULL);
+
+    fgets(buf,512,fsend);
+    return StringToHex(buf);
+}
+
+int PressAnyKeyToSend(char *sendBuf) {
+    char c;
+    printf("\nSEND:");
+    scanf("%c",&c);
+    if(c=='q') {
+        return -1;
+    }
+        
+    int  len = GetSendData(sendBuf);
+    show(sendBuf,len);
+
+    return 0;
+}
+
 void test_server_console() {
 #if 0
-    test_basic_recv_and_send();
+    test_basic();
 #endif
-    test_peng_effect();
+    FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
+    assert(fmonitor!=NULL);
+
+    ServerSocket SERVER;
+    bool start = false;
+    int  choice = STRING;
+
+    while(1) {
+        if(start) {
+            char sendBuf[512] = {0};
+            int  sendLen = 0;
+            char recvBuf[512] = {0};
+            int  recvLen = 0;
+
+        	SERVER.Recv(recvBuf,&recvLen);
+
+            sendLen = GetSendData(sendBuf);
+            show(sendBuf,sendLen);
+            SERVER.Send(sendBuf,sendLen);
+        } else {
+        	SERVER.Start();
+            printf("server started\n");
+            start = true;
+        }
+    }
+
+	SERVER.Stop();
 }
 
