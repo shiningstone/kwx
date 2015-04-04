@@ -1,6 +1,9 @@
 
 #include <stdlib.h>
 
+#include "cocos2d.h"
+USING_NS_CC;
+
 #include "./../protocol/CommonMsg.h"
 #include "./../protocol/KwxMessenger.h"
 
@@ -105,8 +108,30 @@ bool NetRoundManager::WaitUntilAllReady() {
 }
 
 /****************************************
+       networks
+****************************************/
+void NetRoundManager::DsInstructionHandler(EventCustom * event) {
+    auto userData = static_cast<int *>(event->getUserData());
+    LOGGER_WRITE("got a ds instruction:score %d\n",*userData);
+}
+
+void NetRoundManager::ListenToMessenger() {
+    auto eventDispatcher = Director::getInstance()->getEventDispatcher();
+    auto _DsInstructionHandler = EventListenerCustom::create(DS_INSTRUCTION_EVENT_TYPE, [this](EventCustom * event){
+        DsInstructionHandler(event);
+    });
+    eventDispatcher->addEventListenerWithFixedPriority(_DsInstructionHandler,2);
+}
+
+void NetRoundManager::Dispatch(void* val) {
+    auto eventDispatcher = Director::getInstance()->getEventDispatcher();
+    eventDispatcher->dispatchCustomEvent(DS_INSTRUCTION_EVENT_TYPE,val);
+}
+
+/****************************************
        main interface
 ****************************************/
+
 void NetRoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
     scene->addChild(_uiManager);
@@ -116,12 +141,13 @@ void NetRoundManager::CreateRace(Scene *scene) {
     InitPlayers();
     LoadPlayerInfo();
 	_isGameStart=false;
-    
+
+    ListenToMessenger();
     _messenger->StartReceiving();
+    
     _uiManager->CreateRace();
 }
 
-#include "./../network/CSockets.h"
 void NetRoundManager::StartGame() {
 	_isGameStart=false;
     
@@ -131,7 +157,7 @@ void NetRoundManager::StartGame() {
     aReq.Set();
     _messenger->Send(aReq);
 	_uiManager->GuiShowReady(MIDDLE);
-    
+#if 0    
     if(!WaitUntilAllReady()) {
         return ;
     }
@@ -146,6 +172,7 @@ void NetRoundManager::StartGame() {
 		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
 		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
 	}
+#endif
 }
 
 void NetRoundManager::RecvPeng(PlayerDir_t dir) {

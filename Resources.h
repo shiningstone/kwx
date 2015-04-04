@@ -29,6 +29,7 @@
 #define DISTRIBUTE_DONE_EVENT_TYPE      "distribute_card_done"
 #define ALL_PALYER_HU_DONE_EVENT_TYPE	"hu_done"
 #define DOUBLE_HU_WITH_ME				"double_hu"
+#define DS_INSTRUCTION_EVENT_TYPE       "ds_instruction"
 
 /*clock reserved time children*/
 #define ALARM_CLOCK_CHILD_NUM_TAG_ID		1

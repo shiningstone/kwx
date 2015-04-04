@@ -25,7 +25,15 @@ public:
     static NetRoundManager *getInstance();
     static void  destroyInstance();
     Ai             *_ai;
+
+/******************/
+/* networks start */
     KwxMessenger   *_messenger;
+    void DsInstructionHandler(EventCustom * event);
+    void ListenToMessenger();
+    void Dispatch(void* val);
+/* networks end   */
+/******************/
 
     NetRoundManager(NetRaceLayer *uiManager);
     ~NetRoundManager();

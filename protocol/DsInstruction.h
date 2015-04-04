@@ -8,7 +8,7 @@
 #include "CommonMsg.h"
 
 class SeatInfo;
-class RoundManager;
+class NetRoundManager;
 /****************************************************
     DOWNSTREAM : Instruction structure
 ****************************************************/
@@ -21,7 +21,7 @@ protected:
     static SeatInfo     *_seatInfo;
     
 #ifndef __UNIT_TEST__
-    RoundManager *_roundManager;
+    NetRoundManager   *_roundManager;
 #endif
     static Logger   *_logger;
 };

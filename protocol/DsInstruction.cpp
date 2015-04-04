@@ -8,6 +8,7 @@
 
 #ifndef __UNIT_TEST__
 #include "./../game/RoundManager.h"
+#include "./../game/NetRoundManager.h"
 #endif
 
 SeatInfo *DsInstruction::_seatInfo = 0;
@@ -17,7 +18,7 @@ DsInstruction::DsInstruction() {
     _seatInfo = SeatInfo::getInstance();
     
     #ifndef __UNIT_TEST__
-    _roundManager = RoundManager::getInstance();
+    _roundManager = NetRoundManager::getInstance();
     #endif
     _logger = LOGGER_REGISTER("DsInstruction");
 }
@@ -29,6 +30,9 @@ int GameStartResponse::Construct(const DsMsg &msg) {
 
 int GameStartResponse::Dispatch() {
     LOGGER_WRITE("%s\n",__FUNCTION__);
+    #ifndef __UNIT_TEST__
+    _roundManager->Dispatch(&score);
+    #endif
     return 0;
 }
 
