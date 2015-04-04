@@ -95,12 +95,6 @@ void NetRaceLayer::CreateRace()
     auto StartButton = _object->CreateButton(BTN_START);
     StartButton->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnStartHandler,this));
     this->addChild(StartButton,2,START_GAME_TAG_ID);
-
-    /* is this neccessary??? */
-    _eventDispatcher->addEventListenerWithFixedPriority(EventListenerCustom::create(
-        WAIT_START_CALLBACK_EVENT_TYPE, [this](EventCustom * event){
-        _roundManager->Shuffle();}), 
-        3);
 }
 
 void NetRaceLayer::StartGame()
@@ -132,8 +126,6 @@ void NetRaceLayer::StartGame()
 			this->removeChildByTag(GOLD_NUM_INSERT_JINBI+i,true);
 	}
     
-    _DistributeEvent(WAIT_START_CALLBACK_EVENT_TYPE,NULL);
-
 	myframe = LayerColor::create(Color4B(0,0,0,0),visibleSize.width,visibleSize.height);
 	myframe->setPosition(Vec2(origin.x, origin.y));
 	this->addChild(myframe,3,GAME_BKG_TAG_ID);

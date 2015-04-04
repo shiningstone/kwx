@@ -7,8 +7,10 @@
 #include "NetRole.h"
 #include "NetRaceLayer.h"
 #include "RoundManager.h"
+#include "NetRoundManager.h"
 
-RoundManager::RoundManager(NetRaceLayer *uiManager) {
+NetRoundManager::NetRoundManager(NetRaceLayer *uiManager)
+:RoundManager(uiManager) {
     _uiManager = uiManager;
 
     _lastWin.winner = INVALID_DIR;
@@ -25,10 +27,10 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
     }
 
     _ai = Ai::getInstance(this);
-    _logger = LOGGER_REGISTER("RoundManager");
+    _logger = LOGGER_REGISTER("NetRoundManager");
 }
 
-RoundManager::~RoundManager() {
+NetRoundManager::~NetRoundManager() {
     delete _river;
     for(int i=0;i<PLAYER_NUM;i++) {
         delete _players[i];
@@ -38,96 +40,17 @@ RoundManager::~RoundManager() {
 }
 
 /***********************************************
-        winner information
-***********************************************/
-PlayerDir_t RoundManager::GetLastWinner() {
-    if( _lastWin.winner==INVALID_DIR ) {
-        LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-        _lastWin.winner = MIDDLE;
-    }
-    return _lastWin.winner;
-}
-
-void RoundManager::SetWin(WinKind_t kind,int player) {
-    _lastWin.kind       = kind;
-
-    if(kind==DOUBLE_WIN) {
-        _lastWin.winner = INVALID_DIR;
-        _lastWin.giver  = (PlayerDir_t)player;
-    } else {
-        _lastWin.winner = (PlayerDir_t)player;
-        _lastWin.giver  = (PlayerDir_t)_curPlayer;
-    }
-}
-
-void RoundManager::GetWin(WinInfo_t &info) {
-    info.kind   = _lastWin.kind;
-    info.winner = _lastWin.winner;
-    info.giver  = _lastWin.giver;
-}
-
-bool RoundManager::IsWinner(int no) {
-	if((_lastWin.kind==SINGLE_WIN&&
-                ((_lastWin.winner==_curPlayer && _lastWin.winner!=no)
-                ||(_lastWin.winner!=_curPlayer && no!=_lastWin.winner && no!=_curPlayer)))
-        ||(_lastWin.kind==NONE_WIN && _firstMingNo!=INVALID && no!=_firstMingNo)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/***********************************************
-        general operations
-***********************************************/
-bool RoundManager::IsTing(int id) {
-    return _players[id]->get_parter()->get_ting_status();
-}
-
-PlayerDir_t RoundManager::TurnToNext() {
-    _curPlayer = (_curPlayer+1)%PLAYER_NUM;
-    return (PlayerDir_t)_curPlayer;
-}
-
-/***********************************************
-        river information
-***********************************************/
-void RoundManager::RecordHandOut(int cardIdx) {
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[cardIdx]);
-    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(cardIdx);
-}
-
-void RoundManager::RecordOutCard( Card card ) {
-    _river->insertItem(card);
-
-    LOGGER_WRITE("RIVER : ");
-    char cards[84] = {0};
-    int  i = 0;
-    outCardNode *p = _river->head;
-    while(p->pNext) {
-        cards[i++] = p->pNext->data.kind;
-        p = p->pNext;
-    }
-    LOGGER_WRITE_ARRAY(cards,i);
-}
-
-void RoundManager::RenewOutCard() {
-    delete _river;
-	_river = new outCardList;
-}
-
-/***********************************************
         player information
 ***********************************************/
 #include "NetMe.h"
 #include "NetPlayer.h"
 #include "NetRaceRound.h"
 
-void RoundManager::Init() {
+void NetRoundManager::Init() {
     InitPlayers();
 }
 
-void RoundManager::InitPlayers() {
+void NetRoundManager::InitPlayers() {
     _cardHolders[0] = new CardHolder();
     _cardHolders[1] = new CardHolder();
     _cardHolders[2] = new CardHolder();
@@ -145,16 +68,7 @@ void RoundManager::InitPlayers() {
 	_players[2]->get_parter()->set_role_type( INTERNET_PLAYER );
 }
 
-void RoundManager::_GenerateIds(int ids[]) {
-    ids[0]=rand()%16;
-    ids[1]=17;
-    
-    do {
-        ids[2]=rand()%16;
-    } while( ids[2]==ids[0] );
-}
-
-void RoundManager::LoadPlayerInfo() {
+void NetRoundManager::LoadPlayerInfo() {
     Database *database = Database::getInstance();
     
     int  ids[3] = {0};
@@ -168,148 +82,27 @@ void RoundManager::LoadPlayerInfo() {
 	}
 }
 
-int RoundManager::Shuffle() {
-	for(int j=0;j<2;j++) {//伪随机数列生成
-		for(int i=0;i<TOTAL_CARD_NUM;i++) {
-			int tmp = _unDistributedCards[i];
-			int cur = rand()%TOTAL_CARD_NUM;
-			_unDistributedCards[i] = _unDistributedCards[cur];
-			_unDistributedCards[cur] = tmp;
-		}
-	}
-	////////////////////测试/////////////////////////
-	//[0,3]一条 [4,7]二条 [8,11]三条 [12,15]四条 [16,19]五条 [20,23]六条 [24,27]七条 [28,31]八条 [32,35]九条 
-	//[36,39]一筒 [40,43]二筒 [44,47]三筒 [48,51]四筒 [52,55]五筒 [56,59]六筒 [60,63]七筒 [64,67]八筒 [68,71]九筒
-	//[72,75]红中 [76,79]发财 [80,83]白板
-	int oneSeq[14]={0,0,0,8,9,10,12,16,20,24,28,32,36,39};
-	int twoSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
-	int threeSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
-	_unDistributedCards[40]=0;
-	_unDistributedCards[41]=4;
-	_unDistributedCards[42]=8;
-	_unDistributedCards[43]=12;
-	_unDistributedCards[44]=16;
-	_unDistributedCards[45]=20;
-	_unDistributedCards[46]=24;
-	_unDistributedCards[47]=80;
-	_unDistributedCards[48]=80;
-	_unDistributedCards[49]=80;
-	_unDistributedCards[50]=80;
-	_unDistributedCards[51]=80;
-	int c=0;
-	for(int a=0;a<14;a++)
-	{
-		if(oneSeq[a]<0||oneSeq[a]>83)
-		{
-			CCLOG("ERROR CARDS");
-			return 0;
-		}
-		_unDistributedCards[c++]=oneSeq[a];
-	}
-	for(int a=0;a<13;a++)
-	{
-		if(twoSeq[a]<0||twoSeq[a]>83)
-		{
-			CCLOG("ERROR CARDS");
-			return 0;
-		}
-		_unDistributedCards[c++]=twoSeq[a];
-	}
-	for(int a=0;a<13;a++)
-	{
-		if(threeSeq[a]<0||threeSeq[a]>83)
-		{
-			CCLOG("ERROR CARDS");
-			return 0;
-		}
-		_unDistributedCards[c++]=threeSeq[a];
-	}
-
-
-    char p[TOTAL_CARD_NUM] = {0};
-    for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        p[i] = (_unDistributedCards[i])/4;
-    }
-    LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
-
-    _isGangAsking = false;
-    _isQiangGangAsking = false;
-    _isDoubleHuAsking = false;
-    _isCardFromOthers = false;
-    _firstMingNo = INVALID;
-    _qiangGangTargetNo = INVALID;
-    _otherOneForDouble = INVALID;
-    _isWaitDecision = false;
-    _isGangHua = false;
-    _isMyShowTime = false;
-    _isTuoGuan = false;
-    _otherHandedOut = CARD_UNKNOWN;
-    
-    CancelEffectCard();
-    _isMingTime = false;
-
-	_actionToDo=a_JUMP;
-	_continue_gang_times=0;
-    _lastAction = INVALID;
-    _lastActionWithGold = INVALID;
-    _lastActionSource = INVALID;
-
-    _curPlayer = GetLastWinner();
-
-    _distributedNum = 40;
-
-    return 0;
-}
-
-
 /****************************************
         before start
 ****************************************/
-bool RoundManager::GetReadyStatus(PlayerDir_t dir) {
+bool NetRoundManager::GetReadyStatus(PlayerDir_t dir) {
     LOGGER_WRITE("NETWORK : %s %d",__FUNCTION__,dir);
-    return true;
+    return false;
 }
 
-bool RoundManager::WaitUntilAllReady() {
+bool NetRoundManager::WaitUntilAllReady() {
     LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
     while( !GetReadyStatus(LEFT) || !GetReadyStatus(RIGHT) ) {
-        //delay
+        return false;
     }
 
     return true;
-}
-
-void RoundManager::set_aims_sequence(const int p_aim[]) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-	for(int i=0;i<3;i++)
-		aim[i]=p_aim[i];
-}
-
-/****************************************
-        effect card
-****************************************/
-void RoundManager::CancelEffectCard() {
-    _curEffectCard.kind = ck_NOT_DEFINED;
-    _curEffectCard.status = c_NOT_DEFINDED;
-}
-
-void RoundManager::SetEffectCard(int kind,int status) {
-    _curEffectCard.kind = (CARD_KIND)kind;
-    _curEffectCard.status = (CARD_STATUS)status;
-}
-
-bool RoundManager::IsCurEffectCard(Card card) {
-    if(card.kind==_curEffectCard.kind && card.status==_curEffectCard.status) {
-        return true;
-    } else {
-        return false;
-    }
 }
 
 /****************************************
        main interface
 ****************************************/
-void RoundManager::CreateRace(Scene *scene) {
+void NetRoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
     scene->addChild(_uiManager);
 
@@ -322,12 +115,14 @@ void RoundManager::CreateRace(Scene *scene) {
     _uiManager->CreateRace();
 }
 
-void RoundManager::StartGame() {
+void NetRoundManager::StartGame() {
 	_isGameStart=false;
     
     _cardHolders[MIDDLE]->_isReady = true;
 	_uiManager->GuiShowReady(MIDDLE);
-    WaitUntilAllReady();
+    if(!WaitUntilAllReady()) {
+        return ;
+    }
 
     RenewOutCard();
     Shuffle();
@@ -341,7 +136,7 @@ void RoundManager::StartGame() {
 	}
 }
 
-void RoundManager::RecvPeng(PlayerDir_t dir) {
+void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     Card        card;
     PlayerDir_t prevPlayer;
     
@@ -368,7 +163,7 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
 }
 
-void RoundManager::RecvHu(PlayerDir_t dir) {
+void NetRoundManager::RecvHu(PlayerDir_t dir) {
     if(_isWaitDecision) {
         _isWaitDecision = false;
         _actionToDo = _tempActionToDo;
@@ -388,7 +183,7 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
-void RoundManager::RecvGang(PlayerDir_t dir) {
+void NetRoundManager::RecvGang(PlayerDir_t dir) {
     if(_isGangAsking)//is this judgement neccessary?
         _isGangAsking = false;
     
@@ -454,7 +249,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 	}
 }
 
-void RoundManager::RecvQi() {
+void NetRoundManager::RecvQi() {
 	if(_lastAction==a_JUMP) {
 		_continue_gang_times=0;
     }
@@ -470,7 +265,7 @@ void RoundManager::RecvQi() {
     _uiManager->QiEffect();
 }
 
-void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
+void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
 
     if(_isGangAsking) {
@@ -504,119 +299,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _uiManager->MyHandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
 }
 
-void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
-    _qiangGangTargetNo = dir;
-
-	_isCardFromOthers=true;
-	unsigned char curTingStatus=_players[_curPlayer]->get_parter()->get_ting_status();
-    
-	int no1=(_curPlayer+1)%3;
-    unsigned char action1=_players[no1]->get_parter()->hand_in(
-        _lastHandedOutCard,
-        _isCardFromOthers,
-        curTingStatus,
-        false,
-        a_QIANG_GANG,
-        _continue_gang_times,
-        _isGangHua
-    );
-
-	int no2=(_curPlayer+2)%3;
-	unsigned char action2=_players[no2]->get_parter()->hand_in(
-        _lastHandedOutCard,
-        _isCardFromOthers,
-        curTingStatus,
-        false,
-        a_QIANG_GANG,
-        _continue_gang_times,
-        _isGangHua
-    );
-
-	if((action1&a_HU)&&(action2&a_HU)) {
-        WinInfo_t win;
-        win.kind  = DOUBLE_WIN;
-        win.giver = (PlayerDir_t)_curPlayer;
-        
-        if(no1==1) {
-            _actionToDo=action1;
-            _otherOneForDouble = no2;
-        } else {
-            _actionToDo=action2;
-            _otherOneForDouble = no1;
-        }
-
-        _isDoubleHuAsking = true;
-        _lastActionWithGold=a_QIANG_GANG;
-
-        _uiManager->DoubleWin(win);
-	} else if(action1&a_HU||action2&a_HU) {
-        WinInfo_t win;
-        win.kind = SINGLE_WIN;
-        win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
-        win.giver = (PlayerDir_t)_curPlayer;
-
-        if(no1==1)
-            _actionToDo=action1;
-        else
-            _actionToDo=action2;
-
-        _isQiangGangAsking=true;
-        _lastActionWithGold=a_QIANG_GANG;
-        
-        _uiManager->SingleWin(win);
-	} else {
-		_isCardFromOthers=false;
-
-        _uiManager->GangGoldEffect(_qiangGangTargetNo,_curPlayer);
-	}
-}
-
-int RoundManager::_GroupIdx(int idx,CARD_ARRAY *cards) {
-    if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind==cards->data[idx+3].kind)&&(cards->data[idx].kind!=cards->data[idx+4].kind))
-        return 1;
-    else if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind!=cards->data[idx+3].kind))
-        return 2;
-    else if(cards->data[idx].kind==cards->data[idx+1].kind&&cards->data[idx].kind!=cards->data[idx+2].kind)
-        return 3;
-    else if(cards->data[idx].kind!=cards->data[idx+1].kind)
-        return 4;
-}
-
-CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
-	CARD_ARRAY *cards = _players[dir]->get_parter()->get_card_list();
-    CARD_STATUS status = cards->data[idx].status;
-
-    bool isTing       = IsTing(dir);
-    bool isMiddleTing = IsTing(MIDDLE);
-    
-    if(status==c_FREE) {
-        if(isTing) {
-            return LAYDOWN_SHOW ;
-        } else if (isMiddleTing) {
-            return LAYDOWN_HIDE ;
-        }
-    } else if(status==c_PENG || status==c_MING_GANG) {
-        return LAYDOWN_SHOW ;
-    } else if(status==c_AN_GANG) {
-        int groupIdx = _GroupIdx(idx,cards);
-        
-        if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
-            if(!isTing && isMiddleTing) {/* here must be a bug */
-                if(isTing) {
-                    return LAYDOWN_SHOW;
-                } else if(!isTing&&isMiddleTing) {
-                    return LAYDOWN_HIDE;
-                }
-            }
-        }
-    }
-
-    return NORMAL_APPERANCE;
-}
-
-void RoundManager::RecvKouCancel() {
+void NetRoundManager::RecvKouCancel() {
     auto cards = _players[MIDDLE]->get_parter()->get_card_list();
     for(int i=cards->atcvie_place;i<cards->len;i++) {
         cards->data[i].status=c_FREE;
@@ -625,7 +308,7 @@ void RoundManager::RecvKouCancel() {
     _uiManager->KouCancelEffect(cards);
 }
 
-void RoundManager::RecvKouConfirm() {
+void NetRoundManager::RecvKouConfirm() {
     auto cards = _players[MIDDLE]->get_parter()->get_card_list();
     for(int i=cards->atcvie_place;i<cards->len;i++) {
         if(cards->data[i].status==c_KOU_ENABLE)
@@ -640,7 +323,7 @@ void RoundManager::RecvKouConfirm() {
     _uiManager->KouConfirmEffect();
 }
 
-void RoundManager::RecvMingCancel() {
+void NetRoundManager::RecvMingCancel() {
     _isMingTime=false;
     
     UpdateCards(MIDDLE,a_KOU_CANCEL);
@@ -653,7 +336,7 @@ void RoundManager::RecvMingCancel() {
     _uiManager->MingCancelEffect();
 }
 
-void RoundManager::RecvMing() {
+void NetRoundManager::RecvMing() {
 	_actionToDo=a_MING;
 
     _ai->KouCardCheck((PlayerDir_t)_curPlayer);
@@ -672,7 +355,7 @@ void RoundManager::RecvMing() {
     }
 }
 
-void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
+void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
     _actionToDo = _players[zhuang]->get_parter()->ActiontodoCheckAgain();/*why???*/
 
@@ -683,7 +366,7 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     }
 }
 
-void RoundManager::WaitForMyAction() {
+void NetRoundManager::WaitForMyAction() {
     _uiManager->ShowActionButtons();
 
 	if(_actionToDo!=a_JUMP) {
@@ -708,7 +391,7 @@ void RoundManager::WaitForMyAction() {
 	}
 }
 
-void RoundManager::WaitForMyChoose() {
+void NetRoundManager::WaitForMyChoose() {
 	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
                 (IsTing(_curPlayer) && !_isGangAsking) ) {
@@ -722,7 +405,7 @@ void RoundManager::WaitForMyChoose() {
 	}
 }
 
-void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
+void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
     auto list=_players[dir]->get_parter()->get_card_list();
 
@@ -790,7 +473,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     }
 }
 
-void RoundManager::WaitForOthersChoose() {
+void NetRoundManager::WaitForOthersChoose() {
     if ( _curPlayer==1 ) {/* this should never happen */
         return;
     }
@@ -828,7 +511,7 @@ void RoundManager::WaitForOthersChoose() {
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
 
-void RoundManager::WaitForResponse(PlayerDir_t dir) {
+void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
     unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
     
     if(!_isCardFromOthers)
@@ -1085,7 +768,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
     }
 }
 
-void RoundManager::DistributeTo(PlayerDir_t dir) {
+void NetRoundManager::DistributeTo(PlayerDir_t dir) {
     if(_distributedNum<TOTAL_CARD_NUM) {
         DistributeInfo_t distInfo;
         
@@ -1099,7 +782,7 @@ void RoundManager::DistributeTo(PlayerDir_t dir) {
     }
 }
 
-void RoundManager::ActionAfterGang(PlayerDir_t dir) {
+void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
     if(!_isCardFromOthers) {
         QiangGangHuJudge(dir);
     } else {
@@ -1107,34 +790,20 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     }
 }
 
-void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {
-    if(action==a_PENG) {
-        _isCardFromOthers = true;
-    }
-
-    if(_actionToDo&a_AN_GANG) {
-        _players[dir]->get_parter()->action(_isCardFromOthers,a_AN_GANG);
-    } else if(_actionToDo&a_SHOU_GANG) {
-        _players[dir]->get_parter()->action(_isCardFromOthers,a_SHOU_GANG);
-    } else {
-        _players[dir]->get_parter()->action(_isCardFromOthers,action);
-    }
-}
-
 /*************************************
         singleton
 *************************************/
-RoundManager* RoundManager::_instance = NULL;
+NetRoundManager* NetRoundManager::_instance = NULL;
 
-RoundManager *RoundManager::getInstance() {
+NetRoundManager *NetRoundManager::getInstance() {
     if (_instance==NULL) {
-        _instance = new RoundManager(NULL);
+        _instance = new NetRoundManager(NULL);
     }
 
     return _instance;
 }
 
-void RoundManager::destroyInstance() {
+void NetRoundManager::destroyInstance() {
     delete _instance;
     _instance = NULL;
 }

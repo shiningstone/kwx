@@ -51,12 +51,9 @@ public:
 
     void QiangGangHuJudge(PlayerDir_t dir);
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
-    TingInfo_t GetTingInfo(PlayerDir_t dir,int outCarIdx);
     
     int _GroupIdx(int idx,CARD_ARRAY *cards);
 
-    NetRaceLayer *_uiManager;
-    
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     void GetWin(WinInfo_t &info);
@@ -73,6 +70,30 @@ public:
     void LoadPlayerInfo();
     bool IsTing(int player);
 
+    
+    int  Shuffle();
+    bool GetReadyStatus(PlayerDir_t dir);
+    bool WaitUntilAllReady();
+
+	void set_aims_sequence(const int p_aim[]);
+
+    /* main process */
+    virtual void CreateRace(Scene *scene);
+    virtual void StartGame();
+protected:
+    NetRaceLayer *_uiManager;
+    
+	int         aim[PLAYER_NUM];
+
+    WinInfo_t   _lastWin;
+    NetRole     *_players[PLAYER_NUM];
+    CardHolder  *_cardHolders[PLAYER_NUM];
+
+    outCardList *_river;
+    int         _unDistributedCards[TOTAL_CARD_NUM];
+    int         _distributedNum;
+
+    void        _GenerateIds(int ids[]);
     bool _isGameStart;
     bool _isGangAsking;
     bool _isQiangGangAsking;
@@ -104,30 +125,9 @@ public:
     bool _isTuoGuan;
     Card_t _otherHandedOut;
     
-    int  Shuffle();
-    bool GetReadyStatus(PlayerDir_t dir);
-    bool WaitUntilAllReady();
-
-	void set_aims_sequence(const int p_aim[]);
-
-    /* main process */
-    void CreateRace(Scene *scene);
-    void StartGame();
+    Logger *_logger;
 private:
     static RoundManager *_instance;
-    Logger *_logger;
-
-	int         aim[PLAYER_NUM];
-
-    WinInfo_t   _lastWin;
-    NetRole     *_players[PLAYER_NUM];
-    CardHolder  *_cardHolders[PLAYER_NUM];
-
-    outCardList *_river;
-    int         _unDistributedCards[TOTAL_CARD_NUM];
-    int         _distributedNum;
-
-    void _GenerateIds(int ids[]);
 };
 
 #endif
