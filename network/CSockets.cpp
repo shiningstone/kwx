@@ -181,7 +181,7 @@ void CSocket::_log(int dir,char *buf,int len) {
     sprintf(temp, "%s (%03d): ", (dir==0)?"SEND":"RECV", len);
     usedBytes = strlen(" (): ")+4+3;
 
-    if( isalpha(buf[0]) && strcmp(buf,"KWX") ) {
+    if( isalpha(buf[0]) && strncmp(buf,"KWX", 3) ) {
         sprintf(temp+usedBytes,"%s\n",buf);
         LOGGER_WRITE( temp );
     } else {

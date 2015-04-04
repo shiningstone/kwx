@@ -214,7 +214,6 @@ void test_game_server() {
             }
 
             sendLen = GetSendData(sendBuf,line);
-            show(sendBuf,sendLen);
             SERVER.Send(sendBuf,sendLen);
         } else {
         	SERVER.Start();
