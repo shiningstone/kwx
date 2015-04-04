@@ -3,6 +3,7 @@
 #define _DS_INSTRUCTION_
 
 #include "./../utils/LogManager.h"
+#include "./../game/DsInstructionStructs.h"
 
 #include "RequestStructs.h"
 #include "CommonMsg.h"
@@ -18,7 +19,10 @@ public:
     virtual int Dispatch() = 0;
 protected:
     DsInstruction();
-    static SeatInfo     *_seatInfo;
+    static SeatInfo *_seatInfo;
+    RequestId_t      request;
+
+    int _sendToManager(EventMsg_t *msg);
     
 #ifndef __UNIT_TEST__
     NetRoundManager   *_roundManager;

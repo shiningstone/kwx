@@ -110,10 +110,7 @@ bool NetRoundManager::WaitUntilAllReady() {
 /****************************************
        networks
 ****************************************/
-void NetRoundManager::DsInstructionHandler(EventCustom * event) {
-    auto userData = static_cast<int *>(event->getUserData());
-    LOGGER_WRITE("got a ds instruction:score %d\n",*userData);
-}
+#include "DsInstructionStructs.h"
 
 void NetRoundManager::ListenToMessenger() {
     auto eventDispatcher = Director::getInstance()->getEventDispatcher();
@@ -123,9 +120,21 @@ void NetRoundManager::ListenToMessenger() {
     eventDispatcher->addEventListenerWithFixedPriority(_DsInstructionHandler,2);
 }
 
-void NetRoundManager::Dispatch(void* val) {
+void NetRoundManager::RecvDsInstruction(void* val) {
     auto eventDispatcher = Director::getInstance()->getEventDispatcher();
     eventDispatcher->dispatchCustomEvent(DS_INSTRUCTION_EVENT_TYPE,val);
+}
+
+void NetRoundManager::DsInstructionHandler(EventCustom * event) {
+    auto msg = static_cast<EventMsg_t *>(event->getUserData());
+
+    LOGGER_WRITE("get msg %d\n",msg->request);
+    switch(msg->request) {
+        case REQ_GAME_SEND_START:
+            DiScoreInfo_t *info = (DiScoreInfo_t *)msg->data;
+            LOGGER_WRITE("Player%d's score should set to %d\n",info->dir,info->score);
+            break;
+    }
 }
 
 /****************************************

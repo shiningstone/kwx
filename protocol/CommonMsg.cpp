@@ -61,6 +61,7 @@ int DsMsg::Dispatch(const INT8U *inMsg,int inLen) {
 
     DsInstruction *instruction = _GenerateInstruction();
     if((int)instruction!=KWX_INVALID_PCHC) {
+        instruction->Construct(*this);
         instruction->Dispatch();
         delete instruction;
     } else {

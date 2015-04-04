@@ -23,16 +23,30 @@ DsInstruction::DsInstruction() {
     _logger = LOGGER_REGISTER("DsInstruction");
 }
 
+int DsInstruction::_sendToManager(EventMsg_t * msg) {
+    #ifndef __UNIT_TEST__
+    _roundManager->RecvDsInstruction(msg);
+    #endif
+    return 0;
+}
+
 int GameStartResponse::Construct(const DsMsg &msg) {
-    score = msg.GetItemValue(0);
+    request = msg.GetRequestCode();
+    score   = msg.GetItemValue(0);
     return 0;
 }
 
 int GameStartResponse::Dispatch() {
-    LOGGER_WRITE("%s\n",__FUNCTION__);
-    #ifndef __UNIT_TEST__
-    _roundManager->Dispatch(&score);
-    #endif
+    DiScoreInfo_t *info = new DiScoreInfo_t;
+    info->dir   = MIDDLE;
+    info->score = score;
+
+    EventMsg_t *msg = new EventMsg_t;
+    msg->request = request;
+    msg->data    = info;
+
+    _sendToManager(msg);
+    
     return 0;
 }
 

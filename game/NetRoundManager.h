@@ -31,7 +31,7 @@ public:
     KwxMessenger   *_messenger;
     void DsInstructionHandler(EventCustom * event);
     void ListenToMessenger();
-    void Dispatch(void* val);
+    void RecvDsInstruction(void* val);
 /* networks end   */
 /******************/
 
