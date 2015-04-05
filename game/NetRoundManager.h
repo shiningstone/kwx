@@ -12,6 +12,7 @@ using namespace ui;
 #include "OutCardList.h"
 
 #include "CardHolder.h"
+#include "DiStructs.h"
 #include "./../utils/LogManager.h"
 
 class NetRole;
@@ -32,6 +33,8 @@ public:
     void DsInstructionHandler(EventCustom * event);
     void ListenToMessenger();
     void RecvDsInstruction(void* val);
+
+    void _Recv(DiScoreInfo_t *info);
 /* networks end   */
 /******************/
 

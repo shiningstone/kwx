@@ -110,7 +110,7 @@ bool NetRoundManager::WaitUntilAllReady() {
 /****************************************
        networks
 ****************************************/
-#include "DsInstructionStructs.h"
+#include "DiStructs.h"
 
 void NetRoundManager::ListenToMessenger() {
     auto eventDispatcher = Director::getInstance()->getEventDispatcher();
@@ -131,12 +131,18 @@ void NetRoundManager::DsInstructionHandler(EventCustom * event) {
     LOGGER_WRITE("get msg %d\n",msg->request);
     switch(msg->request) {
         case REQ_GAME_SEND_START:
-            DiScoreInfo_t *info = (DiScoreInfo_t *)msg->data;
-            LOGGER_WRITE("Player%d's score should set to %d\n",info->dir,info->score);
+            _Recv((DiScoreInfo_t *)msg->data);
             break;
     }
 }
 
+void NetRoundManager::_Recv(DiScoreInfo_t *info) {
+    _cardHolders[info->dir]->_isReady = true;
+	_uiManager->GuiShowReady(info->dir);
+
+    LOGGER_WRITE("Player%d's score should set to %d\n",info->dir,info->score);
+
+}
 /****************************************
        main interface
 ****************************************/
@@ -160,28 +166,9 @@ void NetRoundManager::CreateRace(Scene *scene) {
 void NetRoundManager::StartGame() {
 	_isGameStart=false;
     
-    _cardHolders[MIDDLE]->_isReady = true;
-    
     RequestGameStart aReq;
     aReq.Set();
     _messenger->Send(aReq);
-	_uiManager->GuiShowReady(MIDDLE);
-#if 0    
-    if(!WaitUntilAllReady()) {
-        return ;
-    }
-
-    RenewOutCard();
-    Shuffle();
-
-    int lastWinner = GetLastWinner();
-    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
-	if(_actionToDo!=a_TIMEOUT) {
-		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
-	}
-#endif
 }
 
 void NetRoundManager::RecvPeng(PlayerDir_t dir) {

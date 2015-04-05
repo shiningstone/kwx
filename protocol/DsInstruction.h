@@ -3,7 +3,7 @@
 #define _DS_INSTRUCTION_
 
 #include "./../utils/LogManager.h"
-#include "./../game/DsInstructionStructs.h"
+#include "./../game/DiStructs.h"
 
 #include "RequestStructs.h"
 #include "CommonMsg.h"

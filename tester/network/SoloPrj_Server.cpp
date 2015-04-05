@@ -231,6 +231,7 @@ void test_game_server() {
     接收到一个指定类型的request后，自动发送预设的消息
 *************************************************************/
 #include "./../../protocol/KwxMsgBasic.h"
+void handle_requests(ServerSocket SERVER,char *recvBuf,int len);
 void test_smart_game_server() {
     FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
     assert(fmonitor!=NULL);
@@ -241,23 +242,11 @@ void test_smart_game_server() {
 
     while(1) {
         if(start) {
-            char sendBuf[512] = {0};
-            int  sendLen = 0;
             char recvBuf[512] = {0};
             int  recvLen = 0;
 
         	SERVER.Recv(recvBuf,&recvLen);
-
-            if(recvBuf[16]==REQ_GAME_SEND_START) {
-                sendLen = GetSendData(sendBuf,1);
-                SERVER.Send(sendBuf,sendLen);
-
-                sendLen = GetSendData(sendBuf,2);
-                SERVER.Send(sendBuf,sendLen);
-                
-                sendLen = GetSendData(sendBuf,3);
-                SERVER.Send(sendBuf,sendLen);
-            }
+            handle_requests(SERVER,recvBuf,recvLen);
         } else {
         	SERVER.Start();
             printf("server started\n");
@@ -266,6 +255,22 @@ void test_smart_game_server() {
     }
 
 	SERVER.Stop();
+}
+
+void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[512] = {0};
+    int  sendLen = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_START) {
+        sendLen = GetSendData(sendBuf,1);
+        SERVER.Send(sendBuf,sendLen);
+    
+        sendLen = GetSendData(sendBuf,2);
+        SERVER.Send(sendBuf,sendLen);
+        
+        sendLen = GetSendData(sendBuf,3);
+        SERVER.Send(sendBuf,sendLen);
+    }
 }
 
 void test_server_console() {
