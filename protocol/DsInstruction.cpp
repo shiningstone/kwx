@@ -1,6 +1,4 @@
 
-#include <string.h>
-
 #include "MsgFormats.h"
 #include "DsInstruction.h"
 #include "DsMsgParser.h"
@@ -64,17 +62,32 @@ int GameStartNotif::Construct(const DsMsg &msg) {
 int FirstDistZhuang::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
+    INT8U num = 0;
+    
     seat      = _GetPlayer(msg.GetItemValue(0));
     remain    = msg.GetItemValue(1);
     timer     = msg.GetItemValue(2);
-    memcpy(cards, msg._body->_items[3]->_buf, 14);
-
+    DsMsgParser::_load(cards, num, msg, 3);
     DsMsgParser::_load(remind, msg, 4);
     return 0;
 }
 
 FirstDistZhuang::~FirstDistZhuang() {
     DsMsgParser::_unload(remind);
+}
+
+int FirstDistNonZhuang::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    INT8U num = 0;
+        
+    seat      = _GetPlayer(msg.GetItemValue(0));
+    remain    = msg.GetItemValue(1);
+    DsMsgParser::_load(cards, num, msg, 2);
+    zhuang    = _GetPlayer(msg.GetItemValue(3));
+    timer     = msg.GetItemValue(4);
+    
+    return 0;
 }
 
 int HandoutResponse::Construct(const DsMsg &msg) {
@@ -140,18 +153,6 @@ int DistCardInfo::Construct(const DsMsg &msg) {
     DsMsgParser::_load(remind.gangCard, remind.gangKindNum, msg, 5);
     DsMsgParser::_load(remind.kouCard, remind.kouKindNum, msg, 6);
     DsMsgParser::_load(remind.ming, msg, 7);
-    return 0;
-}
-
-int FirstDistNonZhuang::Construct(const DsMsg &msg) {
-    DsInstruction::Construct(msg);
-        
-    seat      = _GetPlayer(msg.GetItemValue(0));
-    remain    = msg.GetItemValue(1);
-    memcpy(cards, msg._body->_items[2]->_buf, 13);
-    zhuang    = _GetPlayer(msg.GetItemValue(3));
-    timer     = msg.GetItemValue(4);
-    
     return 0;
 }
 

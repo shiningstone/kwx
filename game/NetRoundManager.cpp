@@ -136,17 +136,22 @@ void NetRoundManager::_DiRecv(GameStartNotif *info) {
 
 void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _uiManager->GuiHideReady();
+
+    int cards[14];
+    for(int i=0;i<14;i++) {
+        cards[i] = info->cards[i]*4;
+    }
+    delete info;
     
     RenewOutCard();
     Shuffle();
 
-    int lastWinner = GetLastWinner();
-    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
-	if(_actionToDo!=a_TIMEOUT) {
-		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
-	}
+    _curPlayer = MIDDLE;
+    _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
+    _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
+    _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
+
+	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
 }
 
 /****************************************
