@@ -63,7 +63,6 @@ int DsMsg::Dispatch(const INT8U *inMsg,int inLen) {
     if((int)instruction!=KWX_INVALID_PCHC) {
         instruction->Construct(*this);
         instruction->Dispatch();
-        delete instruction;
     } else {
         LOGGER_WRITE("unknown instruction\n");
         LOGGER_WRITE_ARRAY((char *)inMsg,inLen);

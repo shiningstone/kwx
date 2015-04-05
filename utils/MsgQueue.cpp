@@ -28,7 +28,6 @@ void MsgQueue::update(float fDelta){
             
             _listener->HandleMsg(msg);
         }
-        CCLog("public events");
     }
 
     _clearMutex();

@@ -8,13 +8,14 @@ USING_NS_CC;
 USING_NS_CC;
 using namespace ui;
 
+#include "./../utils/LogManager.h"
+#include "./../utils/MsgQueue.h"
+#include "./../protocol/DsInstruction.h"
+
 #include "RaceType.h"
 #include "OutCardList.h"
 
 #include "CardHolder.h"
-#include "DiStructs.h"
-#include "./../utils/LogManager.h"
-#include "./../utils/MsgQueue.h"
 
 class NetRole;
 class RoundManager;
@@ -37,8 +38,8 @@ public:
     void ListenToMessenger();
     void RecvMsg(void* val);
 
-    void _DiRecv(DiScoreInfo_t *info);
-    void _DiRecv(DiZhuangDist_t *info);
+    void _DiRecv(GameStartResponse *info);
+    void _DiRecv(GameStartNotif *info);
 /* networks end   */
 /******************/
 

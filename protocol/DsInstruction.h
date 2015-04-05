@@ -3,7 +3,6 @@
 #define _DS_INSTRUCTION_
 
 #include "./../utils/LogManager.h"
-#include "./../game/DiStructs.h"
 
 #include "RequestStructs.h"
 #include "CommonMsg.h"
@@ -16,14 +15,14 @@ class NetRoundManager;
 class DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch() = 0;
+    virtual int Dispatch();
+
+    RequestId_t      request;
 protected:
     DsInstruction();
     static SeatInfo *_seatInfo;
-    RequestId_t      request;
 
     PlayerDir_t      _GetPlayer(INT8U seat);
-    int _sendToManager(void *info);
     
 #ifndef __UNIT_TEST__
     NetRoundManager   *_roundManager;
@@ -34,7 +33,6 @@ protected:
 class GameStartResponse : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
 
     INT32U           score;
 };
@@ -42,7 +40,6 @@ public:
 class GameStartNotif : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT32U           score;

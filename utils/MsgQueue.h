@@ -27,11 +27,11 @@ private:
     /***************************************
             singleton
     ***************************************/
-    protected:
-        MsgQueue(NetRoundManager *employer);
-        ~MsgQueue();
-    
-        static MsgQueue *_instance;
+protected:
+    MsgQueue(NetRoundManager *employer);
+    ~MsgQueue();
+
+    static MsgQueue *_instance;
 };
 
 #endif

@@ -109,9 +109,6 @@ bool NetRoundManager::WaitUntilAllReady() {
 /****************************************
        networks
 ****************************************/
-#include "DiStructs.h"
-#include "./../utils/MsgQueue.h"
-
 void NetRoundManager::ListenToMessenger() {
     _msgQueue = MsgQueue::getInstance(this);
 }
@@ -121,47 +118,44 @@ void NetRoundManager::RecvMsg(void* val) {
 }
 
 void NetRoundManager::HandleMsg(void * aMsg) {
-    auto msg = static_cast<EventMsg_t *>(aMsg);
+    auto di = static_cast<DsInstruction *>(aMsg);
+    LOGGER_WRITE("get ds instruction %d\n",di->request);
 
-    switch(msg->request) {
+    switch(di->request) {
         case REQ_GAME_SEND_START:
-            _DiRecv((DiScoreInfo_t *)msg->data);
+            _DiRecv((GameStartResponse *)di);
             break;
         case REQ_GAME_RECV_START:
-            _DiRecv((DiScoreInfo_t *)msg->data);
-            break;
-        case REQ_GAME_DIST_BEGINCARDS:
-            _DiRecv((DiZhuangDist_t *)msg->data);
+            _DiRecv((GameStartNotif *)di);
             break;
         default:
-            LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,msg->request);
+            LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
     }
 }
 
-void NetRoundManager::_DiRecv(DiScoreInfo_t *info) {
-    _cardHolders[info->dir]->_isReady = true;
-
-    _uiManager->GuiShowReady(info->dir);
-    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->dir,info->score);
+void NetRoundManager::_DiRecv(GameStartResponse *info) {
+    _cardHolders[MIDDLE]->_isReady = true;
+    _uiManager->GuiShowReady(MIDDLE);
+    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",MIDDLE,info->score);
+    delete info;
 
     if(!WaitUntilAllReady()) {
         return ;
     }
 }
 
-void NetRoundManager::_DiRecv(DiZhuangDist_t *info) {
-    RenewOutCard();
-    Shuffle();
+void NetRoundManager::_DiRecv(GameStartNotif *info) {
+    _cardHolders[info->seat]->_isReady = true;
+    _uiManager->GuiShowReady(info->seat);
+    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",MIDDLE,info->score);
+    delete info;
 
-    int lastWinner = GetLastWinner();
-    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
-	if(_actionToDo!=a_TIMEOUT) {
-		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
-	}
+    if(!WaitUntilAllReady()) {
+        return ;
+    }
 }
+
 /****************************************
        main interface
 ****************************************/
