@@ -30,7 +30,7 @@ public:
 /******************/
 /* networks start */
     KwxMessenger   *_messenger;
-    void DsInstructionHandler(EventCustom * event);
+    void RecvMsg(void * aMsg);
     void ListenToMessenger();
     void RecvDsInstruction(void* val);
 

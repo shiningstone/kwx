@@ -110,22 +110,20 @@ bool NetRoundManager::WaitUntilAllReady() {
        networks
 ****************************************/
 #include "DiStructs.h"
+#include "./../utils/MsgQueue.h"
 
 void NetRoundManager::ListenToMessenger() {
-    auto eventDispatcher = Director::getInstance()->getEventDispatcher();
-    auto _DsInstructionHandler = EventListenerCustom::create(DS_INSTRUCTION_EVENT_TYPE, [this](EventCustom * event){
-        DsInstructionHandler(event);
-    });
-    eventDispatcher->addEventListenerWithFixedPriority(_DsInstructionHandler,2);
+    MsgQueue *queue = MsgQueue::getInstance();
+    queue->setListener(this);
 }
 
 void NetRoundManager::RecvDsInstruction(void* val) {
-    auto eventDispatcher = Director::getInstance()->getEventDispatcher();
-    eventDispatcher->dispatchCustomEvent(DS_INSTRUCTION_EVENT_TYPE,val);
+    MsgQueue *queue = MsgQueue::getInstance();
+    queue->push(val);
 }
 
-void NetRoundManager::DsInstructionHandler(EventCustom * event) {
-    auto msg = static_cast<EventMsg_t *>(event->getUserData());
+void NetRoundManager::RecvMsg(void * aMsg) {
+    auto msg = static_cast<EventMsg_t *>(aMsg);
 
     switch(msg->request) {
         case REQ_GAME_SEND_START:
@@ -143,7 +141,7 @@ void NetRoundManager::DsInstructionHandler(EventCustom * event) {
 void NetRoundManager::_DiRecv(DiScoreInfo_t *info) {
     _cardHolders[info->dir]->_isReady = true;
 
-	_uiManager->GuiShowReady(info->dir);
+    _uiManager->GuiShowReady(info->dir);
     LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->dir,info->score);
 
     if(!WaitUntilAllReady()) {
@@ -164,7 +162,6 @@ void NetRoundManager::_DiRecv(DiScoreInfo_t *info) {
 /****************************************
        main interface
 ****************************************/
-
 void NetRoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
     scene->addChild(_uiManager);
