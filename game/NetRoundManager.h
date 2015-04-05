@@ -34,7 +34,7 @@ public:
     void ListenToMessenger();
     void RecvDsInstruction(void* val);
 
-    void _Recv(DiScoreInfo_t *info);
+    void _DiRecv(DiScoreInfo_t *info);
 /* networks end   */
 /******************/
 

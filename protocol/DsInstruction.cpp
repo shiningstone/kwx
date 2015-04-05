@@ -23,15 +23,36 @@ DsInstruction::DsInstruction() {
     _logger = LOGGER_REGISTER("DsInstruction");
 }
 
-int DsInstruction::_sendToManager(EventMsg_t * msg) {
+int DsInstruction::_sendToManager(void *info) {
     #ifndef __UNIT_TEST__
+    EventMsg_t *msg = new EventMsg_t;
+    msg->request = request;
+    msg->data    = info;
+
     _roundManager->RecvDsInstruction(msg);
     #endif
     return 0;
 }
 
-int GameStartResponse::Construct(const DsMsg &msg) {
+int DsInstruction::Construct(const DsMsg &msg) {
     request = msg.GetRequestCode();
+    return 0;
+}
+
+PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
+    PlayerDir_t dir = _seatInfo->GetPlayer(seat);
+    if( dir<LEFT || dir>RIGHT ) {
+        return INVALID_DIR;
+    } else {
+        return _seatInfo->GetPlayer(seat);
+    }
+}
+/*****************************************************
+    Concrete classes
+*****************************************************/
+int GameStartResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
     score   = msg.GetItemValue(0);
     return 0;
 }
@@ -41,23 +62,26 @@ int GameStartResponse::Dispatch() {
     info->dir   = MIDDLE;
     info->score = score;
 
-    EventMsg_t *msg = new EventMsg_t;
-    msg->request = request;
-    msg->data    = info;
-
-    _sendToManager(msg);
+    _sendToManager(info);
     
     return 0;
 }
 
 int GameStartNotif::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
     seat  = msg.GetItemValue(0);
     score = msg.GetItemValue(1);
     return 0;
 }
 
 int GameStartNotif::Dispatch() {
-    PlayerDir_t dir = _seatInfo->GetPlayer(seat);
+    DiScoreInfo_t *info = new DiScoreInfo_t;
+    info->dir   = _GetPlayer(seat);
+    info->score = score;
+
+    _sendToManager(info);
+    
     return 0;
 }
 

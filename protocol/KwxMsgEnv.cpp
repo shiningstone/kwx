@@ -83,8 +83,8 @@ void SeatInfo::_SetSeatDirMap() {
     };
     
     for(int i=0;i<PLAYER_NUM;i++) {
-        _seatToDir[i] = (PlayerDir_t) SeatToDir[_seatId][i];
-        _dirToSeat[i] = DirToSeat[_seatId][i];
+        _seatToDir[i] = (PlayerDir_t) SeatToDir[_seatId-1][i];
+        _dirToSeat[i] = DirToSeat[_seatId-1][i];
     }
 }
 

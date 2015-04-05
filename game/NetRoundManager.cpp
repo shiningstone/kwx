@@ -94,13 +94,12 @@ void NetRoundManager::LoadPlayerInfo() {
         before start
 ****************************************/
 bool NetRoundManager::GetReadyStatus(PlayerDir_t dir) {
-    LOGGER_WRITE("NETWORK : %s %d",__FUNCTION__,dir);
-    return false;
+    return _cardHolders[dir]->_isReady;
 }
 
 bool NetRoundManager::WaitUntilAllReady() {
-    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
     while( !GetReadyStatus(LEFT) || !GetReadyStatus(RIGHT) ) {
+        LOGGER_WRITE("%s not all player ready",__FUNCTION__);
         return false;
     }
 
@@ -128,20 +127,39 @@ void NetRoundManager::RecvDsInstruction(void* val) {
 void NetRoundManager::DsInstructionHandler(EventCustom * event) {
     auto msg = static_cast<EventMsg_t *>(event->getUserData());
 
-    LOGGER_WRITE("get msg %d\n",msg->request);
     switch(msg->request) {
         case REQ_GAME_SEND_START:
-            _Recv((DiScoreInfo_t *)msg->data);
+            _DiRecv((DiScoreInfo_t *)msg->data);
+            break;
+        case REQ_GAME_RECV_START:
+            _DiRecv((DiScoreInfo_t *)msg->data);
+            break;
+        default:
+            LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,msg->request);
             break;
     }
 }
 
-void NetRoundManager::_Recv(DiScoreInfo_t *info) {
+void NetRoundManager::_DiRecv(DiScoreInfo_t *info) {
     _cardHolders[info->dir]->_isReady = true;
+
 	_uiManager->GuiShowReady(info->dir);
+    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->dir,info->score);
 
-    LOGGER_WRITE("Player%d's score should set to %d\n",info->dir,info->score);
+    if(!WaitUntilAllReady()) {
+        return ;
+    }
 
+    RenewOutCard();
+    Shuffle();
+
+    int lastWinner = GetLastWinner();
+    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
+	if(_actionToDo!=a_TIMEOUT) {
+		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
+		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
+	}
 }
 /****************************************
        main interface
@@ -156,6 +174,10 @@ void NetRoundManager::CreateRace(Scene *scene) {
     InitPlayers();
     LoadPlayerInfo();
 	_isGameStart=false;
+
+    LOGGER_WRITE("NOTE: SeatInfo should be set when get response from server rather than here\n");
+    SeatInfo *seat = SeatInfo::getInstance();
+    seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
     ListenToMessenger();
     _messenger->StartReceiving();

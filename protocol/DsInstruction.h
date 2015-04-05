@@ -15,14 +15,15 @@ class NetRoundManager;
 ****************************************************/
 class DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg) = 0;
+    virtual int Construct(const DsMsg &msg);
     virtual int Dispatch() = 0;
 protected:
     DsInstruction();
     static SeatInfo *_seatInfo;
     RequestId_t      request;
 
-    int _sendToManager(EventMsg_t *msg);
+    PlayerDir_t      _GetPlayer(INT8U seat);
+    int _sendToManager(void *info);
     
 #ifndef __UNIT_TEST__
     NetRoundManager   *_roundManager;
