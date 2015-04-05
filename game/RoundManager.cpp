@@ -9,6 +9,8 @@
 #include "RoundManager.h"
 
 RoundManager::RoundManager(NetRaceLayer *uiManager) {
+    _MODE = LOCAL_GAME;
+
     _uiManager = uiManager;
 
     _lastWin.winner = INVALID_DIR;
@@ -684,7 +686,7 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 }
 
 void RoundManager::WaitForMyAction() {
-    _uiManager->ShowActionButtons();
+    _uiManager->ShowActionButtons(_actionToDo);
 
 	if(_actionToDo!=a_JUMP) {
 		_isWaitDecision = true;

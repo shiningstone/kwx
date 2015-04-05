@@ -36,6 +36,10 @@ public:
     int  _FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
 
     void MingKouChoose(PlayerDir_t dir);
+/*************************************
+        round info
+*************************************/
+    
 /***************************************
         singleton
 ***************************************/

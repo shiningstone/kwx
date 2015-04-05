@@ -2161,35 +2161,33 @@ LabelAtlas * NetRaceLayer::_CreateNumberSign(int number) {
 /***********************************************
         action button show
 ***********************************************/
-void NetRaceLayer::ShowActionButtons() {
+void NetRaceLayer::ShowActionButtons(int actionsMask) {
     _Show(myframe,TING_SING_BAR,false);
 
 	float y=origin.y+visibleSize.height*0.25;
 	float x=origin.x+visibleSize.width*0.85;
 
-	if(_roundManager->_actionToDo!=a_JUMP) {
+	if(actionsMask!=a_JUMP) {
 	    float width = _AddBtnQi(Vec2(x,y));
 		x = x-width;
 	}
     
-	if(_roundManager->_actionToDo&a_HU) {	
+	if(actionsMask&a_HU) {	
         float width = _AddBtnHu(Vec2(x,y));
 		x = x-width;
 	}
     
-	if(_roundManager->_actionToDo&a_MING) {
+	if(actionsMask&a_MING) {
         float width = _AddBtnMing(Vec2(x,y));
 		x = x-width;
 	}
     
-	if(_roundManager->_actionToDo&a_AN_GANG 
-        || _roundManager->_actionToDo&a_MING_GANG
-        ||_roundManager->_actionToDo&a_SHOU_GANG) {
+	if(actionsMask&a_AN_GANG || actionsMask&a_MING_GANG ||actionsMask&a_SHOU_GANG) {
         float width = _AddBtnGang(Vec2(x,y));
 		x = x-width;
 	}
 
-	if(_roundManager->_actionToDo&a_PENG) {		
+	if(actionsMask&a_PENG) {		
         float width = _AddBtnPeng(Vec2(x,y));
 		x = x-width;
 	}

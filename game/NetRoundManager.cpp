@@ -17,6 +17,8 @@ USING_NS_CC;
 
 NetRoundManager::NetRoundManager(NetRaceLayer *uiManager)
 :RoundManager(uiManager) {
+    _MODE = NETWORK_GAME;
+
     _uiManager = uiManager;
 
     _lastWin.winner = INVALID_DIR;
@@ -137,15 +139,15 @@ void NetRoundManager::_DiRecv(GameStartNotif *info) {
 void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _uiManager->GuiHideReady();
 
+    RenewOutCard();
+    Shuffle();
+
     int cards[14];
     for(int i=0;i<14;i++) {
         cards[i] = info->cards[i]*4;
     }
     delete info;
     
-    RenewOutCard();
-    Shuffle();
-
     _curPlayer = MIDDLE;
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
@@ -406,7 +408,6 @@ void NetRoundManager::RecvMing() {
 
 void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
-    _actionToDo = _players[zhuang]->get_parter()->ActiontodoCheckAgain();/*why???*/
 
     if(zhuang==MIDDLE) {
         WaitForMyAction();
@@ -416,7 +417,7 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 }
 
 void NetRoundManager::WaitForMyAction() {
-    _uiManager->ShowActionButtons();
+    _uiManager->ShowActionButtons(_actionToDo);
 
 	if(_actionToDo!=a_JUMP) {
 		_isWaitDecision = true;

@@ -42,7 +42,7 @@ public:
 	void QueryKouCards();
 	void QueryMingOutCard();
     
-    void ShowActionButtons();
+    void ShowActionButtons(int mask);
     Vec2 GetCardPositionInHand(int idx);
     void OthersHandoutEffect(PlayerDir_t dir,bool canKou);
 protected:

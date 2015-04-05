@@ -81,8 +81,9 @@ public:
     virtual void CreateRace(Scene *scene);
     virtual void StartGame();
 protected:
-    NetRaceLayer *_uiManager;
+    GameMode_t _MODE;
     
+    NetRaceLayer *_uiManager;
 	int         aim[PLAYER_NUM];
 
     WinInfo_t   _lastWin;
