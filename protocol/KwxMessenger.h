@@ -26,7 +26,7 @@ private:
     friend class TestKwxAutoRecv;
     static void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
 
-	static NetMessenger *_messenger;
+	static NetMessenger *_messenger;/*it makes more sense to let KwxMessenger derived from NetMessenger*/
     static Logger       *_logger;
 };
 

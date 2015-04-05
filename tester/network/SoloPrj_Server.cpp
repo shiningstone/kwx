@@ -114,7 +114,8 @@ void test_basic() {
 }
 
 /****************************************************
-    
+    发送消息实现
+    消息格式 : lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00
 ****************************************************/
 #define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
 #define SEND_DATA    "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\send.txt"
@@ -132,8 +133,6 @@ void show(char *buf,int len) {
     printf("\n");
 }
 
-/* the string format should be 
-    lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00 */
 int GetLine(char *buf,int line=1) {
     FILE * fsend = fopen(SEND_DATA,"r");
     assert(fsend!=NULL);
@@ -189,6 +188,9 @@ void test_read_send_data() {
     }
 }
 
+/*************************************************************
+    接收到一个包后，可以选择发送一个send.txt中预设的消息
+*************************************************************/
 void test_game_server() {
     FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
     assert(fmonitor!=NULL);
@@ -225,6 +227,9 @@ void test_game_server() {
 	SERVER.Stop();
 }
 
+/*************************************************************
+    接收到一个指定类型的request后，自动发送预设的消息
+*************************************************************/
 #include "./../../protocol/KwxMsgBasic.h"
 void test_smart_game_server() {
     FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
