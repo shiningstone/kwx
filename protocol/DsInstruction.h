@@ -50,7 +50,6 @@ public:
     ~HandoutResponse();
     
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     Status_t        status;
     MsgTingInfo_t   ting;
@@ -61,7 +60,6 @@ public:
     ~HandoutNotif();
     
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     Card_t           kind;
@@ -71,7 +69,6 @@ public:
 class ActionResponse : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            waitSeat;
@@ -80,7 +77,6 @@ public:
 class ActionNotif : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     bool             isFromServer;
@@ -96,7 +92,6 @@ public:
     ~DistCardInfo();
     
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            timer;
@@ -110,7 +105,6 @@ public:
     ~FirstDistZhuang();
     
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            timer;
@@ -122,7 +116,6 @@ public:
 class FirstDistNonZhuang : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            remain;
@@ -136,7 +129,6 @@ public:
     ~RemindInfo();
     
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            timer;
@@ -147,7 +139,6 @@ public:
 class DistCardNotif : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            remain;
@@ -158,7 +149,6 @@ public:
 class ScoreNotif : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat[3];
     INT32U           val[3];
@@ -167,7 +157,6 @@ public:
 class DecisionNotif : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     INT8U            seat;
     INT8U            whoGive;
@@ -180,7 +169,6 @@ public:
 class TingInfoResponse : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
     
     MsgTingInfo_t    info;
 };

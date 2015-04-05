@@ -289,6 +289,7 @@ public:
 	void _CardInHandUpdateEffect(PlayerDir_t dir);
 	void _CardRiverUpdateEffect(PlayerDir_t dir);
 	void showall();
+    void GuiHideReady();
 	void GuiShowReady(int direction);
 	//int get_cur_player_no();
 	//void set_cur_player_no(int no);

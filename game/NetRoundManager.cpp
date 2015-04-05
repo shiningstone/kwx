@@ -91,22 +91,6 @@ void NetRoundManager::LoadPlayerInfo() {
 }
 
 /****************************************
-        before start
-****************************************/
-bool NetRoundManager::GetReadyStatus(PlayerDir_t dir) {
-    return _cardHolders[dir]->_isReady;
-}
-
-bool NetRoundManager::WaitUntilAllReady() {
-    while( !GetReadyStatus(LEFT) || !GetReadyStatus(RIGHT) ) {
-        LOGGER_WRITE("%s not all player ready",__FUNCTION__);
-        return false;
-    }
-
-    return true;
-}
-
-/****************************************
        networks
 ****************************************/
 void NetRoundManager::ListenToMessenger() {
@@ -128,6 +112,8 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_RECV_START:
             _DiRecv((GameStartNotif *)di);
             break;
+        case REQ_GAME_DIST_BEGINCARDS:
+            _DiRecv((FirstDistZhuang *)di);
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -139,21 +125,28 @@ void NetRoundManager::_DiRecv(GameStartResponse *info) {
     _uiManager->GuiShowReady(MIDDLE);
     LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",MIDDLE,info->score);
     delete info;
-
-    if(!WaitUntilAllReady()) {
-        return ;
-    }
 }
 
 void NetRoundManager::_DiRecv(GameStartNotif *info) {
     _cardHolders[info->seat]->_isReady = true;
     _uiManager->GuiShowReady(info->seat);
-    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",MIDDLE,info->score);
+    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->seat,info->score);
     delete info;
+}
 
-    if(!WaitUntilAllReady()) {
-        return ;
-    }
+void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
+    _uiManager->GuiHideReady();
+    
+    RenewOutCard();
+    Shuffle();
+
+    int lastWinner = GetLastWinner();
+    _actionToDo = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
+	if(_actionToDo!=a_TIMEOUT) {
+		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
+		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
+	}
 }
 
 /****************************************

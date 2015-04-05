@@ -40,6 +40,7 @@ public:
 
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);
+    void _DiRecv(FirstDistZhuang *info);
 /* networks end   */
 /******************/
 
@@ -69,9 +70,6 @@ public:
     void Init();
     void InitPlayers();
     void LoadPlayerInfo();
-
-    bool GetReadyStatus(PlayerDir_t dir);
-    bool WaitUntilAllReady();
 
     /* main process */
     virtual void CreateRace(Scene *scene);

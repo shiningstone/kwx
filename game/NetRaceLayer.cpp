@@ -1208,6 +1208,11 @@ void NetRaceLayer::_UpdateResidueCards(int no)
 	}
 }
 
+void NetRaceLayer::GuiHideReady() {
+    _Remove(this,READY_INDICATE_LEFT_TAG_ID);
+    _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
+}
+
 void NetRaceLayer::GuiShowReady(int dir)
 {
 	auto Ready = Sprite::createWithSpriteFrameName("zhunbei.png");

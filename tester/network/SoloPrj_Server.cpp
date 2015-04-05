@@ -270,6 +270,9 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         
         sendLen = GetSendData(sendBuf,3);
         SERVER.Send(sendBuf,sendLen);
+        
+        sendLen = GetSendData(sendBuf,4);
+        SERVER.Send(sendBuf,sendLen);
     }
 }
 
