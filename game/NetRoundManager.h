@@ -14,6 +14,7 @@ using namespace ui;
 #include "CardHolder.h"
 #include "DiStructs.h"
 #include "./../utils/LogManager.h"
+#include "./../utils/MsgQueue.h"
 
 class NetRole;
 class RoundManager;
@@ -30,11 +31,14 @@ public:
 /******************/
 /* networks start */
     KwxMessenger   *_messenger;
-    void RecvMsg(void * aMsg);
+    MsgQueue       *_msgQueue;
+
+    void HandleMsg(void * aMsg);
     void ListenToMessenger();
-    void RecvDsInstruction(void* val);
+    void RecvMsg(void* val);
 
     void _DiRecv(DiScoreInfo_t *info);
+    void _DiRecv(DiZhuangDist_t *info);
 /* networks end   */
 /******************/
 

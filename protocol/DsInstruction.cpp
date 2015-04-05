@@ -29,7 +29,7 @@ int DsInstruction::_sendToManager(void *info) {
     msg->request = request;
     msg->data    = info;
 
-    _roundManager->RecvDsInstruction(msg);
+    _roundManager->RecvMsg(msg);
     #endif
     return 0;
 }
@@ -72,6 +72,24 @@ int GameStartNotif::Construct(const DsMsg &msg) {
         
     seat  = msg.GetItemValue(0);
     score = msg.GetItemValue(1);
+    return 0;
+}
+
+int FirstDistZhuang::Construct(const DsMsg &msg) {
+    seat      = msg.GetItemValue(0);
+    remain    = msg.GetItemValue(1);
+    timer     = msg.GetItemValue(2);
+    memcpy(cards, msg._body->_items[3]->_buf, 14);
+
+    DsMsgParser::_load(remind, msg, 4);
+    return 0;
+}
+
+FirstDistZhuang::~FirstDistZhuang() {
+    DsMsgParser::_unload(remind);
+}
+
+int FirstDistZhuang::Dispatch() {
     return 0;
 }
 
@@ -158,24 +176,6 @@ int DistCardInfo::Construct(const DsMsg &msg) {
 }
 
 int DistCardInfo::Dispatch() {
-    return 0;
-}
-
-FirstDistZhuang::~FirstDistZhuang() {
-    DsMsgParser::_unload(remind);
-}
-
-int FirstDistZhuang::Construct(const DsMsg &msg) {
-    seat      = msg.GetItemValue(0);
-    remain    = msg.GetItemValue(1);
-    timer     = msg.GetItemValue(2);
-    memcpy(cards, msg._body->_items[3]->_buf, 14);
-
-    DsMsgParser::_load(remind, msg, 4);
-    return 0;
-}
-
-int FirstDistZhuang::Dispatch() {
     return 0;
 }
 

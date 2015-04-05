@@ -8,10 +8,9 @@ USING_NS_CC;
 class NetRoundManager;
 class MsgQueue:public cocos2d::CCNode {
 public:
-    static MsgQueue *getInstance();
+    static MsgQueue *getInstance(NetRoundManager *employer);
     static void  destroyInstance();
 
-    void setListener(NetRoundManager *listener);
     void pop();
     void push(void *netPackage);
     
@@ -29,7 +28,7 @@ private:
             singleton
     ***************************************/
     protected:
-        MsgQueue();
+        MsgQueue(NetRoundManager *employer);
         ~MsgQueue();
     
         static MsgQueue *_instance;

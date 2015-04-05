@@ -113,16 +113,14 @@ bool NetRoundManager::WaitUntilAllReady() {
 #include "./../utils/MsgQueue.h"
 
 void NetRoundManager::ListenToMessenger() {
-    MsgQueue *queue = MsgQueue::getInstance();
-    queue->setListener(this);
+    _msgQueue = MsgQueue::getInstance(this);
 }
 
-void NetRoundManager::RecvDsInstruction(void* val) {
-    MsgQueue *queue = MsgQueue::getInstance();
-    queue->push(val);
+void NetRoundManager::RecvMsg(void* val) {
+    _msgQueue->push(val);
 }
 
-void NetRoundManager::RecvMsg(void * aMsg) {
+void NetRoundManager::HandleMsg(void * aMsg) {
     auto msg = static_cast<EventMsg_t *>(aMsg);
 
     switch(msg->request) {
@@ -131,6 +129,9 @@ void NetRoundManager::RecvMsg(void * aMsg) {
             break;
         case REQ_GAME_RECV_START:
             _DiRecv((DiScoreInfo_t *)msg->data);
+            break;
+        case REQ_GAME_DIST_BEGINCARDS:
+            _DiRecv((DiZhuangDist_t *)msg->data);
             break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,msg->request);
@@ -147,7 +148,9 @@ void NetRoundManager::_DiRecv(DiScoreInfo_t *info) {
     if(!WaitUntilAllReady()) {
         return ;
     }
+}
 
+void NetRoundManager::_DiRecv(DiZhuangDist_t *info) {
     RenewOutCard();
     Shuffle();
 

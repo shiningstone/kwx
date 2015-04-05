@@ -18,5 +18,9 @@ typedef struct _DiScoreInfo_t {
     int          score;
 }DiScoreInfo_t;
 
+typedef struct _DiZhuangDist_t {
+    PlayerDir_t  dir;
+}DiZhuangDist_t;
+
 #endif
 

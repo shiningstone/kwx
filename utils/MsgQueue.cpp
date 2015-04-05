@@ -4,8 +4,9 @@
 
 #include "MsgQueue.h"
 
-MsgQueue::MsgQueue(){
-    _queue = new std::queue<void *>();
+MsgQueue::MsgQueue(NetRoundManager *employer){
+    _queue    = new std::queue<void *>();
+    _listener = employer;
 
     this->onEnter();
     this->onEnterTransitionDidFinish();
@@ -17,10 +18,6 @@ MsgQueue::~MsgQueue(){
     delete _queue;
 }
 
-void MsgQueue::setListener(NetRoundManager *listener) {
-    _listener = listener;
-}
-
 void MsgQueue::update(float fDelta){
     _waitMutex();
 
@@ -29,7 +26,7 @@ void MsgQueue::update(float fDelta){
             void *msg = _queue->front();
             _queue->pop();
             
-            _listener->RecvMsg(msg);
+            _listener->HandleMsg(msg);
         }
         CCLog("public events");
     }
@@ -60,9 +57,9 @@ void MsgQueue::push(void * netPackage){
 *************************************/
 MsgQueue* MsgQueue::_instance = NULL;
 
-MsgQueue *MsgQueue::getInstance() {
+MsgQueue *MsgQueue::getInstance(NetRoundManager *employer) {
     if (_instance==NULL) {
-        _instance = new MsgQueue();
+        _instance = new MsgQueue(employer);
     }
 
     return _instance;
