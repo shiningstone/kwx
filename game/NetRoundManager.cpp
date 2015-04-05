@@ -148,7 +148,6 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     }
     delete info;
     
-    _curPlayer = MIDDLE;
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
@@ -403,16 +402,6 @@ void NetRoundManager::RecvMing() {
         }
     } else {
         WaitForOthersChoose();
-    }
-}
-
-void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
-    _isGameStart = true;
-
-    if(zhuang==MIDDLE) {
-        WaitForMyAction();
-    } else {
-        WaitForOthersAction((PlayerDir_t)zhuang);
     }
 }
 

@@ -676,7 +676,9 @@ void RoundManager::RecvMing() {
 
 void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
-    _actionToDo = _players[zhuang]->get_parter()->ActiontodoCheckAgain();/*why???*/
+
+    _curPlayer = zhuang;
+    _ai->UpdateAtFirstRound(_actionToDo);
 
     if(zhuang==MIDDLE) {
         WaitForMyAction();

@@ -996,8 +996,8 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		_CardInHandUpdateEffect(LEFT);}),CallFunc::create([=](){
 		_CardInHandUpdateEffect(MIDDLE);}),CallFunc::create([=](){
 		_CardInHandUpdateEffect(RIGHT);}),NULL),CallFunc::create([=](){
-		UpdateClock(0,zhuang);}),CallFunc::create(this,callfunc_selector(
-        NetRaceLayer::_DeleteStartDealCards)),CCCallFunc::create([=](){
+		UpdateClock(0,zhuang);}),CallFunc::create([=](){
+        _DeleteStartDealCards();}),CCCallFunc::create([=](){
 		WaitForFirstAction(zhuang);
 	}),NULL));
 }

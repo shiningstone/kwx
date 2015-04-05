@@ -39,6 +39,7 @@ public:
 /*************************************
         round info
 *************************************/
+    void UpdateAtFirstRound(int &actionToDo);
     
 /***************************************
         singleton

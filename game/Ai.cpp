@@ -318,6 +318,15 @@ int Ai::ReChooseAfterPeng(int chosen,int pengIdx[2]) {
 }
 
 /*************************************
+        round info
+*************************************/
+void Ai::UpdateAtFirstRound(int &actionToDo) {
+    if(_roundManager->_MODE==LOCAL_GAME) {
+        actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+    }
+}
+
+/*************************************
         singleton
 *************************************/
 Ai* Ai::_instance = NULL;
