@@ -146,6 +146,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     for(int i=0;i<14;i++) {
         cards[i] = info->cards[i]*4;
     }
+    _actionToDo = info->GetAvailActions(info->remind);
     delete info;
     
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?

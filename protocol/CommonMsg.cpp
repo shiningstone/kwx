@@ -92,6 +92,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
             
         case REQ_GAME_RECV_START:
             return new GameStartNotif();
+            
+        case REQ_GAME_DIST_BEGINCARDS:
+            return new FirstDistZhuang();
 
         case REQ_GAME_SEND_SHOWCARD:
             return new HandoutResponse();
@@ -110,9 +113,6 @@ DsInstruction *DsMsg::_GenerateInstruction() {
 
         case REQ_GAME_DIST_CARD_TOOTHER:
             return new DistCardNotif();
-
-        case REQ_GAME_DIST_BEGINCARDS:
-            return new FirstDistZhuang();
 
         case REQ_GAME_DIST_BEGINCARDS_OTHER:
             return new FirstDistNonZhuang();

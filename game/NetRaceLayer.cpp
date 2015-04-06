@@ -984,10 +984,6 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 	/**********************************************************
         
     **********************************************************/
-	_roundManager->_isCardFromOthers=false;
-	_roundManager->_distributedNum=0;	
-	_roundManager->_actionToDo=a_JUMP;
-    
 	ListenToDistributeCard();
 
 	myframe->_ID = zhuang;

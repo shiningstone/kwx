@@ -33,6 +33,16 @@ int DsInstruction::Dispatch() {
     return 0;
 }
 
+int DsInstruction::GetAvailActions(const Reminds_t &remind) {
+    int actionToDo = 0;
+    
+    for (int i=0;i<remind.actionNum; i++) {
+        actionToDo |= remind.actions[i];
+    }
+
+    return actionToDo;
+}
+
 PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
     PlayerDir_t dir = _seatInfo->GetPlayer(seat);
     if( dir<LEFT || dir>RIGHT ) {

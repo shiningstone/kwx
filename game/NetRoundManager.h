@@ -47,28 +47,28 @@ public:
     NetRoundManager(NetRaceLayer *uiManager);
     ~NetRoundManager();
 
-    void RecvPeng(PlayerDir_t dir);
-    void RecvHu(PlayerDir_t dir);
-    void RecvGang(PlayerDir_t dir);
-    void RecvQi();
-    void RecvHandout(int idx,Vec2 touch,int mode);
+    virtual void RecvPeng(PlayerDir_t dir);
+    virtual void RecvHu(PlayerDir_t dir);
+    virtual void RecvGang(PlayerDir_t dir);
+    virtual void RecvQi();
+    virtual void RecvHandout(int idx,Vec2 touch,int mode);
     /*internal action*/
-    void RecvKouCancel();
-    void RecvKouConfirm();
-    void RecvMingCancel();
-	void RecvMing();
+    virtual void RecvKouCancel();
+    virtual void RecvKouConfirm();
+    virtual void RecvMingCancel();
+	virtual void RecvMing();
 
-    void WaitForMyAction();
-    void WaitForMyChoose();
-    void WaitForOthersAction(PlayerDir_t dir);
-    void WaitForOthersChoose();
-    void WaitForResponse(PlayerDir_t dir);
-    void DistributeTo(PlayerDir_t dir);
-    void ActionAfterGang(PlayerDir_t dir);
+    virtual void WaitForMyAction();
+    virtual void WaitForMyChoose();
+    virtual void WaitForOthersAction(PlayerDir_t dir);
+    virtual void WaitForOthersChoose();
+    virtual void WaitForResponse(PlayerDir_t dir);
+    virtual void DistributeTo(PlayerDir_t dir);
+    virtual void ActionAfterGang(PlayerDir_t dir);
 
-    void Init();
-    void InitPlayers();
-    void LoadPlayerInfo();
+    virtual void Init();
+    virtual void InitPlayers();
+    virtual void LoadPlayerInfo();
 
     /* main process */
     virtual void CreateRace(Scene *scene);

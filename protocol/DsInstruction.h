@@ -17,13 +17,14 @@ public:
     virtual int Construct(const DsMsg &msg);
     virtual int Dispatch();
 
+    static int GetAvailActions(const Reminds_t &remind);
     RequestId_t      request;
 protected:
     DsInstruction();
     static SeatInfo *_seatInfo;
 
     PlayerDir_t      _GetPlayer(INT8U seat);
-    
+
 #ifndef __UNIT_TEST__
     NetRoundManager   *_roundManager;
 #endif
