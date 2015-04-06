@@ -364,6 +364,10 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         Sleep(DELAY);
         sendLen = GetSendData(sendBuf,15);
         SERVER.Send(sendBuf,sendLen);
+    
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,16);
+        SERVER.Send(sendBuf,sendLen);
     }
 }
 

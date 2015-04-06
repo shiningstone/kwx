@@ -577,7 +577,7 @@ public:
             'K','W','X',           //KWX
             0x00,55,               //request code/*下发提醒(下行) REQ_GAME_DIST_REMIND*/
             7,                     //package level
-            0x00,42,               //package size
+            0x00,49,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             7,

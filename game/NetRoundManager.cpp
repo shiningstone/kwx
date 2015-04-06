@@ -129,6 +129,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_RECV_SHOWCARD:
             _DiRecv((ShowCardNotif *)di);
             break;
+        case REQ_GAME_DIST_REMIND:
+            _DiRecv((RemindInfo *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -232,6 +235,16 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
 	_isCardFromOthers = true;
 
     _uiManager->OthersHandoutEffect(dir,false);
+}
+
+void NetRoundManager::_DiRecv(RemindInfo *info) {
+    PlayerDir_t dir = (PlayerDir_t)info->seat;
+    INT8U timer     = info->timer;
+    _actionToDo     = info->GetAvailActions(info->remind);
+    delete info;
+
+    _isCardFromOthers = true;
+    WaitForMyAction();
 }
 
 /****************************************

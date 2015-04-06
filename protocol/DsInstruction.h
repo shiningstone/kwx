@@ -133,6 +133,7 @@ public:
     
     INT8U            seat;
     INT8U            timer;
+    Card_t           kind;
     Reminds_t        remind;
     INT8U            wait;
 };

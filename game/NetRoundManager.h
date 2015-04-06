@@ -45,6 +45,7 @@ public:
     void _DiRecv(DistCardInfo *info);
     void _DiRecv(ShowCardResponse *info);
     void _DiRecv(ShowCardNotif *info);
+    void _DiRecv(RemindInfo *info);
 /* networks end   */
 /******************/
 
