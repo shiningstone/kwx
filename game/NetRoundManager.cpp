@@ -338,6 +338,11 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
     RecordHandOut(idx);
 
+    Card_t card = (Card_t)_lastHandedOutCard;
+    RequestHandout aReq;
+    aReq.Set(card);
+    _messenger->Send(aReq);
+
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
         !IsTing(_curPlayer) ) {
