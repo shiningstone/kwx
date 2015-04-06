@@ -116,6 +116,10 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             break;
         case REQ_GAME_DIST_BEGINCARDS:
             _DiRecv((FirstDistZhuang *)di);
+            break;
+        case REQ_GAME_SEND_SHOWCARD:
+            _DiRecv((HandoutResponse *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -154,6 +158,11 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
 	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
+}
+
+void NetRoundManager::_DiRecv(HandoutResponse *info) {
+    LOGGER_WRITE("handout ret = %d",info->status);
+    delete info;
 }
 
 /****************************************

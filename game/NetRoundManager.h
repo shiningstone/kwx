@@ -41,6 +41,7 @@ public:
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);
     void _DiRecv(FirstDistZhuang *info);
+    void _DiRecv(HandoutResponse *info);
 /* networks end   */
 /******************/
 
