@@ -339,6 +339,27 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         Sleep(DELAY);
         sendLen = GetSendData(sendBuf,10);
         SERVER.Send(sendBuf,sendLen);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==1) {
+        handout++;
+    
+        sendLen = GetSendData(sendBuf,11);
+        SERVER.Send(sendBuf,sendLen);
+    
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,12);
+        SERVER.Send(sendBuf,sendLen);
+    
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,13);
+        SERVER.Send(sendBuf,sendLen);
+    
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,14);
+        SERVER.Send(sendBuf,sendLen);
+    
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,15);
+        SERVER.Send(sendBuf,sendLen);
     }
 }
 

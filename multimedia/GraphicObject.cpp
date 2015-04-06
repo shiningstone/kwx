@@ -148,15 +148,17 @@ void GObjectFactory::LayDownWithFace(Sprite *parent,Card_t kind, float height_x)
 
 
 Sprite *GObjectFactory::CreateKind(Card_t type,CardSize_t size) {
+    Card_t showType = (type==CARD_UNKNOWN)?BAI:type;
+    
     switch(size) {
         case SMALL:
-            return Sprite::createWithTexture(_kindSmall[type]->getTexture());
+            return Sprite::createWithTexture(_kindSmall[showType]->getTexture());
         case SMALL_BLACK:
-            return Sprite::createWithTexture(_kindSmallBlack[type]->getTexture());
+            return Sprite::createWithTexture(_kindSmallBlack[showType]->getTexture());
         case MIDDLE_SIZE:
-            return Sprite::createWithTexture(_kindMiddle[type]->getTexture());
+            return Sprite::createWithTexture(_kindMiddle[showType]->getTexture());
         case NORMAL:
-            return Sprite::createWithTexture(_kind[type]->getTexture());
+            return Sprite::createWithTexture(_kind[showType]->getTexture());
     }
 }
 
