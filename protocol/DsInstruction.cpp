@@ -116,7 +116,7 @@ ShowCardResponse::~ShowCardResponse() {
 int ShowCardNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
-    seat         = (Status_t)msg.GetItemValue(0);
+    seat         = _GetPlayer(msg.GetItemValue(0));
     kind         = (Card_t)msg.GetItemValue(1);
     ting.cardNum = msg._body->_items[2]->_bufLen;
     DsMsgParser::_load(ting,msg._body->_items[2]->_buf);
