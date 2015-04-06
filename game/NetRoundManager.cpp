@@ -153,7 +153,9 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     for(int i=0;i<14;i++) {
         cards[i] = info->cards[i]*4;
     }
-    _actionToDo = info->GetAvailActions(info->remind);
+    PlayerDir_t dir = (PlayerDir_t)info->seat;
+    INT8U timer     = info->timer;
+    _actionToDo     = info->GetAvailActions(info->remind);
     delete info;
     
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
@@ -161,6 +163,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
 	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
+    _uiManager->UpdateClock(timer,MIDDLE);
 }
 
 void NetRoundManager::_DiRecv(HandoutResponse *info) {
@@ -171,9 +174,11 @@ void NetRoundManager::_DiRecv(HandoutResponse *info) {
 void NetRoundManager::_DiRecv(DistCardNotif *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
+    INT8U timer        = info->timer;
     delete info;
 
     DistributeTo(target,card);
+    _uiManager->UpdateClock(timer,target);
 }
 
 /****************************************

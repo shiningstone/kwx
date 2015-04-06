@@ -150,6 +150,7 @@ void NetRaceLayer::WaitForFirstAction(PlayerDir_t zhuang)
     /*!!! maybe lagging ???*/
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
+    LOGGER_WRITE("%s load plist done\n",__FUNCTION__);
 
     ListenToCardTouch();
     ((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
@@ -1841,7 +1842,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
             ifInsertCardsTime=true;}),CallFunc::create([=](){
             _DeleteActionReminder();}),NULL);
 
-	myframe->_ID=1;
+	myframe->_ID = MIDDLE;
 	_roundManager->_isCardFromOthers = true;
     
 	myframe->runAction(Sequence::create(
@@ -1854,7 +1855,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
     		else {
-                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
+                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(MIDDLE));
     			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(MIDDLE);}),
