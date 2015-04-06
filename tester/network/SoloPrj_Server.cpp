@@ -271,8 +271,31 @@ void test_game_server() {
 *************************************************************/
 #include "./../../protocol/KwxMsgBasic.h"
 void handle_requests(ServerSocket SERVER,char *recvBuf,int len);
+FILE *fmonitor = NULL;
+
+static void SaveLog(FILE *fp,char *dir,const char *buf,int len) {
+    char str[512] = {0};
+    int strLen = 0;
+
+    strcat(str,dir);    strLen += strlen(dir);
+    strcat(str,":");    strLen += 1;
+    for(int i=0;i<len;i++) {
+        sprintf(str+strLen,"0x%02x ",(unsigned char)buf[i]);
+        strLen += 5;
+        
+        if((i+1)%16==0) {
+            sprintf(str+strLen,"\r     ",(unsigned char)buf[i]);
+            strLen += strlen("\r     ");
+        }
+    }
+    strcat(str+strLen,"\r\n");
+    strLen += 2;
+
+    fwrite(str,strLen,1,fp);
+}
+
 void test_smart_game_server() {
-    FILE * fmonitor = fopen(WORKING_PATH"monitor.txt","w+");
+    fmonitor = fopen(WORKING_PATH"monitor.txt","w");
     assert(fmonitor!=NULL);
 
     ServerSocket SERVER;
@@ -285,6 +308,7 @@ void test_smart_game_server() {
             int  recvLen = 0;
 
         	SERVER.Recv(recvBuf,&recvLen);
+            SaveLog(fmonitor,"RECV",recvBuf,recvLen);
             handle_requests(SERVER,recvBuf,recvLen);
         } else {
         	SERVER.Start();
@@ -293,12 +317,22 @@ void test_smart_game_server() {
         }
     }
 
+    fclose(fmonitor);
 	SERVER.Stop();
 }
 
 #ifndef DELAY
 #define DELAY 1000
 #endif
+static void SendLine(ServerSocket SERVER,int lineNo) {
+    char sendBuf[512] = {0};
+    int  sendLen = 0;
+    
+    Sleep(DELAY);
+    sendLen = GetSendData(sendBuf,lineNo);
+    SERVER.Send(sendBuf,sendLen);
+    SaveLog(fmonitor,"SEND",sendBuf,sendLen);
+}
 
 void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[512] = {0};
@@ -307,67 +341,28 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     static int handout = 0;
 
     if(recvBuf[16]==REQ_GAME_SEND_START) {
-        sendLen = GetSendData(sendBuf,1);
-        SERVER.Send(sendBuf,sendLen);
-    
-        sendLen = GetSendData(sendBuf,2);
-        SERVER.Send(sendBuf,sendLen);
-        
-        sendLen = GetSendData(sendBuf,3);
-        SERVER.Send(sendBuf,sendLen);
-        
-        sendLen = GetSendData(sendBuf,4);
-        SERVER.Send(sendBuf,sendLen);
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
     } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==0) {
         handout++;
     
-        sendLen = GetSendData(sendBuf,5);
-        SERVER.Send(sendBuf,sendLen);
-
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,6);
-        SERVER.Send(sendBuf,sendLen);
-
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,7);
-        SERVER.Send(sendBuf,sendLen);
-
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,8);
-        SERVER.Send(sendBuf,sendLen);
-
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,9);
-        SERVER.Send(sendBuf,sendLen);
-
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,10);
-        SERVER.Send(sendBuf,sendLen);
+        SendLine(SERVER,5);
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+        SendLine(SERVER,10);
     } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==1) {
         handout++;
     
-        sendLen = GetSendData(sendBuf,11);
-        SERVER.Send(sendBuf,sendLen);
-    
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,12);
-        SERVER.Send(sendBuf,sendLen);
-    
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,13);
-        SERVER.Send(sendBuf,sendLen);
-    
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,14);
-        SERVER.Send(sendBuf,sendLen);
-    
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,15);
-        SERVER.Send(sendBuf,sendLen);
-    
-        Sleep(DELAY);
-        sendLen = GetSendData(sendBuf,16);
-        SERVER.Send(sendBuf,sendLen);
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
+        SendLine(SERVER,13);
+        SendLine(SERVER,14);
+        SendLine(SERVER,15);
+        SendLine(SERVER,16);
     }
 }
 
