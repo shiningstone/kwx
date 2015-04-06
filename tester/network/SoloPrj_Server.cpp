@@ -46,6 +46,12 @@ void test_string_to_hex() {
     _bytes(buf,testcase5);
     assert(!memcmp(buf,expcase5,sizeof(expcase5)));
 
+    char testcase51[] = "5,1";
+    char expcase51[] = {5,1};
+
+    _bytes(buf,testcase51);
+    assert(!memcmp(buf,expcase51,sizeof(expcase51)));
+
     char testcase6[] = "131";
     char expcase6[] = {0x83};
 
@@ -56,8 +62,12 @@ void test_string_to_hex() {
     char expcase7[] = {
         0x00,0x2b,0x07,0x00,0x1c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x83,0x00,0x04,0x00,0x00,0x00,0x01};
 
-    _bytes(buf,testcase7);
-    assert(!memcmp(buf,expcase7,sizeof(expcase7)));
+    char testcase8[] = "0x4b,0x57,0x58,0x00,52,7,0x00,29,0,0,0,0,0,0,0,0,0,0,0,0,4,60,2,61,1,62,2,63,3";
+    char expcase8[] = {
+        0x4b,0x57,0x58,0x00,52,7,0x00,29,0,0,0,0,0,0,0,0,0,0,0,0,4,60,2,61,1,62,2,63,3};
+
+    _bytes(buf,testcase8);
+    assert(!memcmp(buf,expcase8,sizeof(expcase8)));
 }
 
 void test_basic_recv_and_send() {
@@ -307,17 +317,18 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+//#define NETWORK_TRANSFER_ONLY
 void test_server_console() {
-#if 0
     test_string_to_hex();
+
+#ifdef NETWORK_TRANSFER_ONLY
     test_basic();
     test_read_send_data();
-#endif
-
+#else
     #if 0
     test_game_server()();
-    #else
-    test_smart_game_server();
     #endif
+    test_smart_game_server();
+#endif
 }
 

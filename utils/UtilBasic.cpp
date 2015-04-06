@@ -54,7 +54,7 @@ int _getByteLen(const char *strByte) {
     if(coma!=NULL) {
         return strchr(strByte,',')-strByte;
     } else {
-        return strlen(strByte);
+        return strlen(strByte)-1*(strByte[strlen(strByte)-1]==0xa);
     }
 }
 
