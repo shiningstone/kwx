@@ -120,6 +120,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_SEND_SHOWCARD:
             _DiRecv((HandoutResponse *)di);
             break;
+        case REQ_GAME_DIST_CARD_TOOTHER:
+            _DiRecv((DistCardNotif *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -162,6 +165,11 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
 
 void NetRoundManager::_DiRecv(HandoutResponse *info) {
     LOGGER_WRITE("handout ret = %d",info->status);
+    delete info;
+}
+
+void NetRoundManager::_DiRecv(DistCardNotif *info) {
+    LOGGER_WRITE("dist to %d",info->seat);
     delete info;
 }
 

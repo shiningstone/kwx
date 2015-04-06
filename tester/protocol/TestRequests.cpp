@@ -503,7 +503,7 @@ public:
             'K','W','X',           //KWX
             0x00,52,               //request code/*·¢ÅÆ(ÏÂÐÐ) REQ_GAME_DIST_CARD_TOOTHER*/
             7,                     //package level
-            0x00,39,               //package size
+            0x00,29,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             4,

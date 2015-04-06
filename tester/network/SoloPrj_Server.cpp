@@ -301,6 +301,9 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD) {
         sendLen = GetSendData(sendBuf,5);
         SERVER.Send(sendBuf,sendLen);
+
+        sendLen = GetSendData(sendBuf,6);
+        SERVER.Send(sendBuf,sendLen);
     }
 }
 

@@ -1840,7 +1840,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
             ifInsertCardsTime=true;}),CallFunc::create([=](){
             _DeleteActionReminder();}),NULL);
 
-	myframe->_ID = MIDDLE;
+	myframe->_ID=1;
 	_roundManager->_isCardFromOthers = true;
     
 	myframe->runAction(Sequence::create(
@@ -1853,7 +1853,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
     		else {
-                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(MIDDLE));
+                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(1));
     			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
 		_roundManager->WaitForResponse(MIDDLE);}),
