@@ -186,7 +186,7 @@ public:
     }
 };
 
-class TestRecvOthersShowCard : public CTestCase {
+class TestRecvShowCardNotif : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
@@ -827,7 +827,7 @@ void testRequests() {
     aCase->Execute();
     aCase = new TestRecvShowCardResponse();
     aCase->Execute();
-    aCase = new TestRecvOthersShowCard();
+    aCase = new TestRecvShowCardNotif();
     aCase->Execute();
 
 

@@ -43,6 +43,7 @@ public:
     void _DiRecv(FirstDistZhuang *info);
     void _DiRecv(HandoutResponse *info);
     void _DiRecv(DistCardNotif *info);
+    void _DiRecv(HandoutNotif *info);
 /* networks end   */
 /******************/
 

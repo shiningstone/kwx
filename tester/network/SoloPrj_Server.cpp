@@ -292,6 +292,10 @@ void test_smart_game_server() {
 	SERVER.Stop();
 }
 
+#ifndef DELAY
+#define DELAY 1000
+#endif
+
 void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[512] = {0};
     int  sendLen = 0;
@@ -312,7 +316,16 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         sendLen = GetSendData(sendBuf,5);
         SERVER.Send(sendBuf,sendLen);
 
+        Sleep(DELAY);
         sendLen = GetSendData(sendBuf,6);
+        SERVER.Send(sendBuf,sendLen);
+
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,7);
+        SERVER.Send(sendBuf,sendLen);
+
+        Sleep(DELAY);
+        sendLen = GetSendData(sendBuf,8);
         SERVER.Send(sendBuf,sendLen);
     }
 }

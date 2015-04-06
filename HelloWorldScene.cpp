@@ -4,8 +4,13 @@
 #include "GameScene.h"
 #include "game/NetRaceLayer.h"
 #include "game/RoundManager.h"
+#include "game/NetRoundManager.h"
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
+
+
+/*DEBUG : USED TO CONTROL START A SINGLE GAME OR NETWORK GAME*/
+//#define SINGLE_GAME
 
 HelloWorld::HelloWorld()
 {
@@ -117,7 +122,11 @@ void HelloWorld::enterRoomStandAlone()
 	SpriteFrameCache::getInstance()->removeSpriteFrames();
     TextureCache::sharedTextureCache()->removeAllTextures();
 
+#ifdef SINGLE_GAME
     RoundManager *rm = RoundManager::getInstance();
+#else
+    RoundManager *rm = NetRoundManager::getInstance();
+#endif
     rm->CreateRace(scene);
     
     Director::getInstance()->replaceScene(scene);

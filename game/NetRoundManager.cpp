@@ -123,6 +123,8 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_CARD_TOOTHER:
             _DiRecv((DistCardNotif *)di);
             break;
+        case REQ_GAME_RECV_SHOWCARD:
+            _DiRecv((HandoutNotif *)di);
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -167,7 +169,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
 }
 
 void NetRoundManager::_DiRecv(HandoutResponse *info) {
-    LOGGER_WRITE("handout ret = %d",info->status);
+    LOGGER_WRITE("%s handout ret = %d",__FUNCTION__,info->status);
     delete info;
 }
 
@@ -179,6 +181,23 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
 
     DistributeTo(target,card);
     _uiManager->UpdateClock(timer,target);
+}
+
+void NetRoundManager::_DiRecv(HandoutNotif *info) {
+    PlayerDir_t dir    = (PlayerDir_t)info->seat;
+    Card_t card        = (Card_t)info->kind;
+    delete info;
+
+    Card fake;
+    fake.kind   = (CARD_KIND)card;
+    RecordOutCard(fake);
+	_lastHandedOutCard = (CARD_KIND)card;
+
+    _players[_curPlayer]->get_parter()->hand_out(0);
+        
+	_isCardFromOthers = true;
+
+    _uiManager->OthersHandoutEffect(dir,false);
 }
 
 /****************************************
