@@ -63,7 +63,6 @@ public:
 
     void RecordOutCard( Card card );
     void RenewOutCard();
-    void RecordHandOut(int cardIdx);
 
     virtual void Init();
     virtual void InitPlayers();

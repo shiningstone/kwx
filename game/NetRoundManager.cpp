@@ -192,8 +192,12 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     fake.kind   = (CARD_KIND)card;
     RecordOutCard(fake);
 	_lastHandedOutCard = (CARD_KIND)card;
+    
+    _curPlayer = dir;
 
-    _players[_curPlayer]->get_parter()->hand_out(0);
+    int riverLast = _players[dir]->get_parter()->getOutCardList()->length;
+    _players[dir]->get_parter()->getOutCardList()->insertItem(fake);
+    //_players[_curPlayer]->get_parter()->hand_out(0);
         
 	_isCardFromOthers = true;
 
@@ -380,7 +384,8 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordHandOut(idx);
+    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[idx]);
+    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
 
     Card_t card = (Card_t)_lastHandedOutCard;
     RequestShowCard aReq;

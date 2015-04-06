@@ -94,11 +94,6 @@ PlayerDir_t RoundManager::TurnToNext() {
 /***********************************************
         river information
 ***********************************************/
-void RoundManager::RecordHandOut(int cardIdx) {
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[cardIdx]);
-    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(cardIdx);
-}
-
 void RoundManager::RecordOutCard( Card card ) {
     _river->insertItem(card);
 
@@ -492,7 +487,8 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordHandOut(idx);
+    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[idx]);
+    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
