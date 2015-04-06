@@ -1083,17 +1083,17 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             _actionToDo=action1;
             _curPlayer=(_curPlayer+1)%3;
             _uiManager->UpdateClock(0,_curPlayer);
-            DistributeTo((PlayerDir_t)_curPlayer);
+            DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
         }
     }
 }
 
-void RoundManager::DistributeTo(PlayerDir_t dir) {
-    if(_distributedNum<TOTAL_CARD_NUM) {
+void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
+    if(_distributedNum<TOTAL_CARD_NUM+1) {
         DistributeInfo_t distInfo;
         
         distInfo.target = dir;
-        distInfo.card   = (Card_t)(_unDistributedCards[_distributedNum++]/4);
+        distInfo.card   = card;
         distInfo.distNum = _distributedNum;
         
         _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
@@ -1106,7 +1106,7 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     if(!_isCardFromOthers) {
         QiangGangHuJudge(dir);
     } else {
-        DistributeTo(dir);
+        DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]/4));
     }
 }
 

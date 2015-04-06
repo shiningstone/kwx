@@ -240,7 +240,8 @@ void NetRaceLayer::SingleWin(const WinInfo_t &win) {
 void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
         GoldNumInsert((PlayerDir_t)winner,MING_GANG,(PlayerDir_t)whoGive);}),CallFunc::create([=](){
-        _roundManager->DistributeTo((PlayerDir_t)winner);}),NULL));
+        _roundManager->DistributeTo((PlayerDir_t)winner
+            ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 }
 
 void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
@@ -2948,7 +2949,8 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             _roundManager->UpdateCards(dir,a_AN_GANG);}), CCCallFunc::create([=]() {
             _CardInHandUpdateEffect(dir);}),
             _voice->Speak("down"),CallFunc::create([=](){
-            _roundManager->DistributeTo(dir);}),NULL),NULL));
+            _roundManager->DistributeTo(dir
+                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL),NULL));
 	}
 	else {
 		for(int NodeNum=0;NodeNum<3;NodeNum++) {
@@ -3232,7 +3234,8 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}),CallFunc::create([=](){
-            _roundManager->DistributeTo(dir);}),NULL));
+            _roundManager->DistributeTo(dir
+                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 	}
 }
 
@@ -3735,7 +3738,8 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
                     hideQiReminder,Spawn::create(CallFunc::create([=](){
     					GoldNumInsert((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
     					_roundManager->_qiangGangTargetNo = INVALID;/*!!! could this be called before runAction */}),CallFunc::create([=](){
-                        _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL),NULL));
+                        _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer
+                            ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL),NULL));
 			} else if(_roundManager->_isDoubleHuAsking) {
 				_roundManager->_isDoubleHuAsking=false;
                 
@@ -3750,7 +3754,8 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 			} else {
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
-                    _roundManager->DistributeTo(_roundManager->TurnToNext());}),NULL));
+                    _roundManager->DistributeTo(_roundManager->TurnToNext()
+                        ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 			}
 		}
 	}
@@ -5982,7 +5987,8 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 						myframe->runAction(Sequence::create(CallFunc::create([=](){
 							GoldNumInsert((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
 							_roundManager->_qiangGangTargetNo=INVALID;}),CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer
+                                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 					} else if(_roundManager->_isDoubleHuAsking) {
 						_roundManager->_isDoubleHuAsking = false;
 
@@ -5995,7 +6001,8 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
                             _HuEffect(win);}));
 					} else {
 						myframe->runAction(CallFunc::create([=](){
-                            _roundManager->DistributeTo(_roundManager->TurnToNext());}));
+                            _roundManager->DistributeTo(_roundManager->TurnToNext()
+                                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}));
 					}
 				} else {
 					_roundManager->WaitForMyChoose();

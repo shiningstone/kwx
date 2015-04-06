@@ -169,8 +169,11 @@ void NetRoundManager::_DiRecv(HandoutResponse *info) {
 }
 
 void NetRoundManager::_DiRecv(DistCardNotif *info) {
-    LOGGER_WRITE("dist to %d",info->seat);
+    PlayerDir_t target = (PlayerDir_t)info->seat;
+    Card_t card        = (Card_t)info->kind;
     delete info;
+
+    DistributeTo(target,card);
 }
 
 /****************************************
@@ -577,12 +580,12 @@ void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
     LOGGER_WRITE("%s (%d)\n",__FUNCTION__,dir);
 }
 
-void NetRoundManager::DistributeTo(PlayerDir_t dir) {
-    if(_distributedNum<TOTAL_CARD_NUM) {
+void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
+    if(_distributedNum<TOTAL_CARD_NUM+1) {
         DistributeInfo_t distInfo;
         
         distInfo.target = dir;
-        distInfo.card   = (Card_t)(_unDistributedCards[_distributedNum++]/4);
+        distInfo.card   = card;
         distInfo.distNum = _distributedNum;
         
         _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
@@ -595,7 +598,7 @@ void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
     if(!_isCardFromOthers) {
         QiangGangHuJudge(dir);
     } else {
-        DistributeTo(dir);
+        DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]/4));
     }
 }
 
