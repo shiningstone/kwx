@@ -39,9 +39,6 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        SeatInfo *seat = SeatInfo::getInstance();
-        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
-
         RequestGameStart aMsg;
         aMsg.Set();
         len = aMsg.Serialize(buf);
@@ -143,9 +140,6 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        SeatInfo *seat = SeatInfo::getInstance();
-        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
-
         RequestHandout aMsg;
         aMsg.Set(TIAO_3);
         len = aMsg.Serialize(buf);
@@ -162,13 +156,13 @@ public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x00,43,               //request code
+            0x00,48,               //request code
             7,                     //package level
             0x00,30,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             2,
-            60,0,                   //status
+            60,0,                  //status
             131,0,4,1,2,0,3,       //ting info : 胡2条，剩2张，赢3番
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -181,7 +175,7 @@ public:
         handoutInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
-        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_START );
+        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_SHOWCARD );
         assert( aMsg->GetLevel()==7 );
         assert( handoutInfo.status==SUCCESS );
         assert( handoutInfo.ting.cards[0].kind==TIAO_2);
@@ -255,9 +249,6 @@ public:
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
-
-        SeatInfo *seat = SeatInfo::getInstance();
-        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         RequestSendAction aMsg;
         aMsg.Set(aPENG,TIAO_3);
@@ -353,7 +344,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
-            60,0,                  //seat
+            60,1,                  //seat/*1,2,3,0-invalid*/
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
@@ -374,7 +365,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD );
         assert( aMsg->GetLevel()==7 );
-        assert( dist.seat==0 );
+        assert( dist.seat==MIDDLE );
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
@@ -398,7 +389,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
-            60,0,                  //seat
+            60,1,                  //seat
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
@@ -422,7 +413,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD );
         assert( aMsg->GetLevel()==7 );
-        assert( dist.seat==0 );
+        assert( dist.seat==MIDDLE );
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
@@ -454,7 +445,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
-            60,0,                  //seat
+            60,1,                  //seat
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
@@ -480,7 +471,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD );
         assert( aMsg->GetLevel()==7 );
-        assert( dist.seat==0 );
+        assert( dist.seat==MIDDLE );
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
@@ -516,7 +507,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             4,
-            60,0,                  //seat
+            60,2,                  //seat
             61,1,                  //reserved card num
             62,2,                  //timer
             63,3,                  //card:               发4条
@@ -533,7 +524,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_CARD_TOOTHER );
         assert( aMsg->GetLevel()==7 );
-        assert( dist.seat==0 );
+        assert( dist.seat==RIGHT );
         assert( dist.remain==1 );
         assert( dist.timer==2 );
         assert( dist.kind==TIAO_4 );
@@ -568,9 +559,9 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_CALSCORE );
         assert( aMsg->GetLevel()==7 );
-        assert( score.seat[0]==1 );
-        assert( score.seat[1]==2 );
-        assert( score.seat[2]==3 );
+        assert( score.seat[0]==MIDDLE );
+        assert( score.seat[1]==RIGHT );
+        assert( score.seat[2]==LEFT );
         assert( score.val[0]==1 );
         assert( score.val[1]==2 );
         assert( score.val[2]==3 );
@@ -596,7 +587,7 @@ public:
             130,0,1,0xff,                //gang remind : 不可杠
             131,0,1,0xff,                //kou remind :  不可扣
             132,0,4,0xff,0xff,0xff,0xff, //ming remind : 不可明
-            63,0,                        //wait :        不等
+            63,2,                        //wait :        不等
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -616,7 +607,7 @@ public:
         assert( remind.remind.gangCard[0]==CARD_UNKNOWN );
         assert( remind.remind.kouCard[0]==CARD_UNKNOWN );
         assert( remind.remind.ming.choiceNum==0 );
-        assert( remind.wait==0 );
+        assert( remind.wait==RIGHT );
 
         return 0;
     }
@@ -633,7 +624,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
-            60,0,                  //seat
+            60,1,                  //seat
             61,1,                  //reserved card num
             62,2,                  //timer
             128,0,14,              //cards
@@ -657,7 +648,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_BEGINCARDS );
         assert( aMsg->GetLevel()==7 );
-        assert( dist.seat==0 );
+        assert( dist.seat==MIDDLE );
         assert( dist.remain==1 );
         assert( dist.timer==2 );
         assert( dist.remind.actions[0]==a_AN_GANG );
@@ -680,7 +671,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             5,
-            60,0,                  //seat
+            60,1,                  //seat
             61,1,                  //reserved card num
             128,0,13,              //cards
                 10,10,10,10,0,   
@@ -701,7 +692,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_BEGINCARDS_OTHER );
         assert( aMsg->GetLevel()==7 );
-        assert( dist.seat==0 );
+        assert( dist.seat==MIDDLE );
         assert( dist.remain==1 );
         assert( dist.zhuang==2 );
         assert( dist.timer==3 );
@@ -721,7 +712,7 @@ public:
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             5,
-            60,0,                  //seat
+            60,1,                  //seat
             61,1,                  //whoGive
             62,2,                  //next
             131,0,4,0,0,0,1,       //action:  碰   
@@ -739,7 +730,7 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_DECISION );
         assert( aMsg->GetLevel()==7 );
-        assert( decision.seat==0 );
+        assert( decision.seat==MIDDLE );
         assert( decision.whoGive==1 );
         assert( decision.next==2 );
         assert( decision.actions[0]==a_PENG );
@@ -773,9 +764,6 @@ public:
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
-
-        SeatInfo *seat = SeatInfo::getInstance();
-        seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
         RequestTingInfo aMsg;
         aMsg.Set();
@@ -823,6 +811,9 @@ public:
 
 void testRequests() {
 	CTestCase *aCase;
+    
+    SeatInfo *seat = SeatInfo::getInstance();
+    seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
     aCase = new TestSendGameStart();
     aCase->Execute();
