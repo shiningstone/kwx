@@ -557,7 +557,7 @@ void NetRoundManager::WaitForOthersChoose() {
 }
 
 void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
-    LOGGER_WRITE("%s (%d)\n",__FUNCTION__);
+    LOGGER_WRITE("%s (%d)\n",__FUNCTION__,dir);
 }
 
 void NetRoundManager::DistributeTo(PlayerDir_t dir) {

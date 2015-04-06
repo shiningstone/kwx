@@ -37,20 +37,25 @@ int DsMsgParser::_load(ActionId_t *actions,INT8U &num,const DsMsg &msg,int itemI
 int DsMsgParser::_load(MsgTingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
-    ting.cards = new TingItem_t[ting.cardNum];
-    
-    int i = 0;
-    int num = 0;
-    while(num<ting.cardNum) {
-        ting.cards[i].kind   = (Card_t)p[0+4*i];
-        ting.cards[i].remain = p[1+4*i];
-        ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
-
-        num += ting.cards[i].remain;
-        i++;
+    if(_ntohl(*(INT32U *)(inMsg))==0xffffffff) {
+        ting.cardNum = 0;
+        return 4;
+    } else {
+        ting.cards = new TingItem_t[ting.cardNum];
+        
+        int i = 0;
+        int num = 0;
+        while(num<ting.cardNum) {
+            ting.cards[i].kind   = (Card_t)p[0+4*i];
+            ting.cards[i].remain = p[1+4*i];
+            ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
+        
+            num += ting.cards[i].remain;
+            i++;
+        }
+        
+        return i*4;
     }
-
-	return i*4;
 }
 
 int DsMsgParser::_unload(MsgTingInfo_t &ting) {

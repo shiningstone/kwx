@@ -104,7 +104,7 @@ int HandoutResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
     status = (Status_t)msg.GetItemValue(0);
-    ting.cardNum = msg._body->_items[1]->_bufLen;
+    ting.cardNum = msg._body->_items[1]->_bufLen/4;
     DsMsgParser::_load(ting,msg._body->_items[1]->_buf);
     return 0;
 }
