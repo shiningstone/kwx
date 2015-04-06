@@ -188,11 +188,24 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     INT8U timer        = info->timer;
     delete info;
 
-    _curPlayer = MIDDLE;
+    _curPlayer        = MIDDLE;
+    _isCardFromOthers = false;
+    _actionToDo     = info->GetAvailActions(info->remind);
+
     DistributeTo(target,card);
+    _players[MIDDLE]->get_parter()->hand_in(
+        (CARD_KIND)card,
+        _isCardFromOthers,
+        IsTing(MIDDLE),
+        (_distributedNum==TOTAL_CARD_NUM),
+        _lastActionWithGold,
+        _continue_gang_times,
+        _isGangHua
+    );
+    WaitForMyChoose();
+
     _uiManager->UpdateClock(timer,target);
     _uiManager->ListenToCardTouch();
-    WaitForMyChoose();
 }
 
 void NetRoundManager::_DiRecv(ShowCardResponse *info) {
