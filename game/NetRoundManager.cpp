@@ -117,14 +117,18 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_BEGINCARDS:
             _DiRecv((FirstDistZhuang *)di);
             break;
-        case REQ_GAME_SEND_SHOWCARD:
-            _DiRecv((ShowCardResponse *)di);
-            break;
         case REQ_GAME_DIST_CARD_TOOTHER:
             _DiRecv((DistCardNotif *)di);
             break;
+        case REQ_GAME_DIST_CARD:
+            _DiRecv((DistCardInfo *)di);
+            break;
+        case REQ_GAME_SEND_SHOWCARD:
+            _DiRecv((ShowCardResponse *)di);
+            break;
         case REQ_GAME_RECV_SHOWCARD:
             _DiRecv((ShowCardNotif *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -168,11 +172,6 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _uiManager->UpdateClock(timer,MIDDLE);
 }
 
-void NetRoundManager::_DiRecv(ShowCardResponse *info) {
-    LOGGER_WRITE("%s handout ret = %d",__FUNCTION__,info->status);
-    delete info;
-}
-
 void NetRoundManager::_DiRecv(DistCardNotif *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
@@ -181,6 +180,24 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
 
     DistributeTo(target,card);
     _uiManager->UpdateClock(timer,target);
+}
+
+void NetRoundManager::_DiRecv(DistCardInfo *info) {
+    PlayerDir_t target = (PlayerDir_t)info->seat;
+    Card_t card        = (Card_t)info->kind;
+    INT8U timer        = info->timer;
+    delete info;
+
+    _curPlayer = MIDDLE;
+    DistributeTo(target,card);
+    _uiManager->UpdateClock(timer,target);
+    _uiManager->ListenToCardTouch();
+    WaitForMyChoose();
+}
+
+void NetRoundManager::_DiRecv(ShowCardResponse *info) {
+    LOGGER_WRITE("%s handout ret = %d",__FUNCTION__,info->status);
+    delete info;
 }
 
 void NetRoundManager::_DiRecv(ShowCardNotif *info) {
@@ -384,8 +401,8 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[idx]);
-    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
+    RecordOutCard(_players[MIDDLE]->get_parter()->get_card_list()->data[idx]);
+    _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(idx);
 
     Card_t card = (Card_t)_lastHandedOutCard;
     RequestShowCard aReq;
@@ -393,8 +410,7 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _messenger->Send(aReq);
 
     bool turnToMing = false;
-	if(_actionToDo==a_MING && 
-        !IsTing(_curPlayer) ) {
+	if(_actionToDo==a_MING && !IsTing(_curPlayer) ) {
 		_players[_curPlayer]->get_parter()->LockAllCards();
 		_players[_curPlayer]->get_parter()->set_ting_status(1);
 

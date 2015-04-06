@@ -130,7 +130,6 @@ private:
     bool _CardTouchBegan(Touch* touch, Event* event);
     void _CardTouchMove(Touch* touch, Event* event);
     void _CardTouchEnd(Touch* touch, Event* event);
-    void ListenToCardTouch();
     void _CollectResouce(HAH *res) ;
 
     void _CreateGangCardsMotion(TargetedAction *motions[4]);
@@ -148,6 +147,7 @@ private:
 public:
 	void UpdateClock(int time,int direction);
     void HideClock();
+    void ListenToCardTouch();
 
     
 private:
