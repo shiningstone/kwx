@@ -97,7 +97,7 @@ int RequestGameStart::Set() {
     return 0;
 }
 
-int RequestHandout::Set(Card_t card) {
+int RequestShowCard::Set(Card_t card) {
     SetRequestCode(REQ_GAME_SEND_SHOWCARD);
     AddSeatInfo();
     _add_item( new Item((Item_t)65,card) );

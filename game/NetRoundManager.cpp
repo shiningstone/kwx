@@ -118,13 +118,13 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             _DiRecv((FirstDistZhuang *)di);
             break;
         case REQ_GAME_SEND_SHOWCARD:
-            _DiRecv((HandoutResponse *)di);
+            _DiRecv((ShowCardResponse *)di);
             break;
         case REQ_GAME_DIST_CARD_TOOTHER:
             _DiRecv((DistCardNotif *)di);
             break;
         case REQ_GAME_RECV_SHOWCARD:
-            _DiRecv((HandoutNotif *)di);
+            _DiRecv((ShowCardNotif *)di);
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -168,7 +168,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _uiManager->UpdateClock(timer,MIDDLE);
 }
 
-void NetRoundManager::_DiRecv(HandoutResponse *info) {
+void NetRoundManager::_DiRecv(ShowCardResponse *info) {
     LOGGER_WRITE("%s handout ret = %d",__FUNCTION__,info->status);
     delete info;
 }
@@ -183,7 +183,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     _uiManager->UpdateClock(timer,target);
 }
 
-void NetRoundManager::_DiRecv(HandoutNotif *info) {
+void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     PlayerDir_t dir    = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
     delete info;
@@ -383,7 +383,7 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     RecordHandOut(idx);
 
     Card_t card = (Card_t)_lastHandedOutCard;
-    RequestHandout aReq;
+    RequestShowCard aReq;
     aReq.Set(card);
     _messenger->Send(aReq);
 

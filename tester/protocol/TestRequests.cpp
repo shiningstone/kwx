@@ -140,7 +140,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        RequestHandout aMsg;
+        RequestShowCard aMsg;
         aMsg.Set(TIAO_3);
         len = aMsg.Serialize(buf);
 
@@ -171,7 +171,7 @@ public:
         DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
-        HandoutResponse handoutInfo;
+        ShowCardResponse handoutInfo;
         handoutInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
@@ -207,7 +207,7 @@ public:
         DsMsg *aMsg = DsMsg::getInstance();
         len = aMsg->Deserialize(msgInNetwork);
 
-        HandoutNotif handoutInfo;
+        ShowCardNotif handoutInfo;
         handoutInfo.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));

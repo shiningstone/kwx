@@ -97,10 +97,10 @@ DsInstruction *DsMsg::_GenerateInstruction() {
             return new FirstDistZhuang();
 
         case REQ_GAME_SEND_SHOWCARD:
-            return new HandoutResponse();
+            return new ShowCardResponse();
 
         case REQ_GAME_RECV_SHOWCARD:
-            return new HandoutNotif();
+            return new ShowCardNotif();
 
         case REQ_GAME_SEND_ACTION:
             return new ActionResponse();

@@ -40,7 +40,7 @@ public:
     int Set();
 };
 
-class RequestHandout : public UsMsg {
+class RequestShowCard : public UsMsg {
 public:
     int Set(Card_t card);
 };

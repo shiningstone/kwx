@@ -46,9 +46,9 @@ public:
     INT32U           score;
 };
 
-class HandoutResponse : public DsInstruction {
+class ShowCardResponse : public DsInstruction {
 public:
-    ~HandoutResponse();
+    ~ShowCardResponse();
     
     virtual int Construct(const DsMsg &msg);
     
@@ -56,9 +56,9 @@ public:
     MsgTingInfo_t   ting;
 };
 
-class HandoutNotif : public DsInstruction {
+class ShowCardNotif : public DsInstruction {
 public:
-    ~HandoutNotif();
+    ~ShowCardNotif();
     
     virtual int Construct(const DsMsg &msg);
     

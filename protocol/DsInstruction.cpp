@@ -100,7 +100,7 @@ int FirstDistNonZhuang::Construct(const DsMsg &msg) {
     return 0;
 }
 
-int HandoutResponse::Construct(const DsMsg &msg) {
+int ShowCardResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
     status = (Status_t)msg.GetItemValue(0);
@@ -109,11 +109,11 @@ int HandoutResponse::Construct(const DsMsg &msg) {
     return 0;
 }
 
-HandoutResponse::~HandoutResponse() {
+ShowCardResponse::~ShowCardResponse() {
     DsMsgParser::_unload(ting);
 }
 
-int HandoutNotif::Construct(const DsMsg &msg) {
+int ShowCardNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
     seat         = (Status_t)msg.GetItemValue(0);
@@ -123,7 +123,7 @@ int HandoutNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
-HandoutNotif::~HandoutNotif() {
+ShowCardNotif::~ShowCardNotif() {
     DsMsgParser::_unload(ting);
 }
 
