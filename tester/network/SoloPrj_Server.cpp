@@ -177,7 +177,11 @@ int GetLine(char *buf,int line=1) {
         if(fgets(buf,512,fsend)==NULL) {
             return -1;
         } else {
-            i++;
+            if(!strncmp(buf,"//",2)) {
+                continue;
+            } else {
+                i++;
+            }
         }
     }
 
