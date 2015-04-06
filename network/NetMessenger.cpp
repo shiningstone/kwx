@@ -150,7 +150,7 @@ int NetMessenger::_get_available_pkg_len() {
     int usedLen = _usedLen();
     
 	if ( strstr((char *)_pkgBuf+_outStart,"KWX") && usedLen>DnHeader::DN_HEADER_LEN  ) {
-		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf+_outStart+DnHeader::SIZE)));
+		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf + (_outStart+DnHeader::SIZE)%BUFF_SIZE)));
 		if ( usedLen>=pkgLen ) {
 			return pkgLen;
 		}
