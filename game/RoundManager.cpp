@@ -835,8 +835,7 @@ void RoundManager::WaitForOthersChoose() {
 void RoundManager::WaitForResponse(PlayerDir_t dir) {
     unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
     
-    if(!_isCardFromOthers)
-    {
+    if(!_isCardFromOthers) {
         _isGangHua=false;
         if(_lastActionSource==dir&&_continue_gang_times!=0)
             _isGangHua=true;
