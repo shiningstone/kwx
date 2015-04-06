@@ -11,6 +11,13 @@ extern INT32U _htonl(INT32U n);
 extern INT16U _ntohs(INT16U n);
 extern INT16U _htons(INT16U n);
 
+/****************************************
+string tranfer to bytes
+    seperator should be ','
+    byte's string could be 0,00,0x0,0x00
+****************************************/
+extern int _bytes(char *buf,const char *str);
+
 typedef int (*MsgHandler_t )(const INT8U *msg,int &len);
 
 #endif

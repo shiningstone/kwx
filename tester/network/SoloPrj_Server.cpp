@@ -10,30 +10,54 @@ typedef enum {
     HEX,
 };
 
-int ctoi(char c) {
-    if( c>='0' && c <= '9' ) {
-        return c-'0';
-    } else if( c>='a' && c<='f' ) {
-        return 10+c-'a';
-    } else if( c>='A' &&c<='F' ) {
-        return 10+c-'A';
-    } else {
-        return -1;
-    }
-}
+#define BUF_LEN 512
 
-int StringToHex(char *buf) {
-    char Hex[128] = {0};
+void test_string_to_hex() {
+    char buf[BUF_LEN] = {0};
 
-    int i=0;
-    for(i=0;3*i<strlen(buf);i++) {
-        Hex[i] = ctoi(*(buf+3*i))*16 + ctoi(*(buf+3*i+1));
-    }
+    char testcase1[] = "0x4b,0x57,0x58,0x00,0x2b,0x07,0x00,0x1c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x83,0x00,0x04,0x00,0x00,0x00,0x01";
+    char expcase1[] = {
+        0x4b,0x57,0x58,0x00,0x2b,0x07,0x00,0x1c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x83,0x00,0x04,0x00,0x00,0x00,0x01};
 
-    memset(buf,0,128);
-    memcpy(buf,Hex,i);
+    _bytes(buf,testcase1);
+    assert(!memcmp(buf,expcase1,sizeof(expcase1)));
 
-    return i;
+    char testcase2[] = "0x4b";
+    char expcase2[] = {0x4b};
+
+    _bytes(buf,testcase2);
+    assert(!memcmp(buf,expcase2,sizeof(expcase2)));
+
+    char testcase3[] = "0xb";
+    char expcase3[] = {0xb};
+
+    _bytes(buf,testcase3);
+    assert(!memcmp(buf,expcase3,sizeof(expcase3)));
+
+    char testcase4[] = "10";
+    char expcase4[] = {0xa};
+
+    _bytes(buf,testcase4);
+    assert(!memcmp(buf,expcase4,sizeof(expcase4)));
+
+    char testcase5[] = "1";
+    char expcase5[] = {1};
+
+    _bytes(buf,testcase5);
+    assert(!memcmp(buf,expcase5,sizeof(expcase5)));
+
+    char testcase6[] = "131";
+    char expcase6[] = {0x83};
+
+    _bytes(buf,testcase6);
+    assert(!memcmp(buf,expcase6,sizeof(expcase6)));
+
+    char testcase7[] = "0x00,43,7,0x00,28,0,0,0,0,0,0,0,0,0,0,0,0,1,131,0,4,0,0,0,1";
+    char expcase7[] = {
+        0x00,0x2b,0x07,0x00,0x1c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x83,0x00,0x04,0x00,0x00,0x00,0x01};
+
+    _bytes(buf,testcase7);
+    assert(!memcmp(buf,expcase7,sizeof(expcase7)));
 }
 
 void test_basic_recv_and_send() {
@@ -43,8 +67,8 @@ void test_basic_recv_and_send() {
 
     while(1) {
         if(start) {
-            char buf[128] = {0};
-            char recvBuf[128] = {0};
+            char buf[BUF_LEN] = {0};
+            char recvBuf[BUF_LEN] = {0};
             int  recvLen = 0;
 
         	SERVER.Recv(recvBuf,&recvLen);
@@ -163,12 +187,13 @@ int GetSendData(char *buf,int line=1) {
     FILE * fsend = fopen(SEND_DATA,"r");
     assert(fsend!=NULL);
 
-    if(GetLine(buf,line)==-1) {
+    char str[512] = {0};
+    if(GetLine(str,line)==-1) {
         printf("read line %d from %s fail\n",line,SEND_DATA);
         return -1;
     } else {
-        ExtractHeader(buf);
-        return StringToHex(buf);
+        ExtractHeader(str);
+        return _bytes(buf,str);
     }
 }
 
@@ -278,6 +303,7 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
 
 void test_server_console() {
 #if 0
+    test_string_to_hex();
     test_basic();
     test_read_send_data();
 #endif
