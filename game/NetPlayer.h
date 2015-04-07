@@ -4,11 +4,10 @@
 
 /* This file is copied from Robot.h/Robot.cpp */
 
-#include "NetRaceRound.h"
-#include "Raction.h"
 #include "RaceType.h"
 
 #include "NetRole.h"
+#include "NetRaceRound.h"
 #include "DataBase.h"
 
 class Logger;

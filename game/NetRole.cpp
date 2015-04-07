@@ -63,11 +63,11 @@ bool NetRole::get_nick_name(std::string & name)
 	return true;
 }
 
-Raction* NetRole::get_parter()
+NetRRound* NetRole::get_parter()
 {
 	return parter;
 }
-void NetRole::set_parter(Raction* p_parter)
+void NetRole::set_parter(NetRRound* p_parter)
 {
 	parter=p_parter;
 }

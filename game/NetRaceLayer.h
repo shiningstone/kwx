@@ -251,7 +251,7 @@ public:
 	   everytime when enter game,first call init_role(player) 
 	   function,then CreateRace();
 	##############################*/
-	void init_role(Role *s_p[],Raction *p_parter[]);//玩家对象初始化
+	void init_role(Role *s_p[],NetRRound *p_parter[]);//玩家对象初始化
 	void CreateRace();//创建比赛场景
 	void _UpdateResidueCards(int no);//更新剩余牌数
     void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);

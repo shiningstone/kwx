@@ -8,7 +8,7 @@ USING_NS_CC;
 #include "./../protocol/KwxMessenger.h"
 
 #include "RaceType.h"
-#include "Raction.h"
+#include "NetRaceRound.h"
 
 #include "NetRole.h"
 #include "NetRaceLayer.h"

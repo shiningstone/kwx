@@ -3,7 +3,7 @@
 
 #include "./../OutCardList.h"
 #include "./../RaceType.h"
-#include "./../Raction.h"
+#include "./../NetRaceRound.h"
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
@@ -30,8 +30,8 @@ class NetRole {
 		virtual bool get_property(int & pro);
 		virtual void set_language(std::string language); 
 		virtual bool get_language(std::string & language);
-		virtual Raction* get_parter();
-		virtual void set_parter(Raction* p_parter);
+		virtual NetRRound* get_parter();
+		virtual void set_parter(NetRRound* p_parter);
         
     protected:
         Logger   *_logger;
@@ -45,7 +45,7 @@ class NetRole {
         std::string playerLanguage;
         int property;
         CARD_KIND dist_card;
-		Raction *parter;
+		NetRRound *parter;
 };
 
 #endif

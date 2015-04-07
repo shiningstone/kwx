@@ -3,12 +3,10 @@
 
 #include "OutCardList.h"
 #include "Role.h"
-#include "Raction.h"
-//#include "cocos2d.h"
 
 #include "./../utils/LogManager.h"
 
-class NetRRound : public Raction
+class NetRRound
 {
 public:
 	NetRRound();
@@ -20,10 +18,7 @@ private:
     unsigned int  rr_aim;
     unsigned char rr_ting_flag;
     unsigned int  archive_ming_indexes;
-	int idOfPlayer;
-	std::string nickName;
-	std::string photo;
-	int property;
+    
     long card_score;
     long total_score;
 	int InsertPlaceForMG;
@@ -72,14 +67,6 @@ public:
     void update_score(long score);
     CARD_ARRAY *get_card_list();
 	outCardList *getOutCardList();
-	//void set_player_id(int player_id);
-	//bool get_player_id(int & player_id);
-	//void set_nick_name(const std::string name);
-	//bool get_nick_name(std::string & name);
-	//void set_photo(const std::string photo);
-	//bool get_photo(std::string & photo) const;
-	//void set_property(int pro);
-	//bool get_property(int & pro);
 	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
 	bool get_ming_check_result(MRES *res);
