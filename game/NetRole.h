@@ -10,18 +10,21 @@
 
 class NetRole {
 public:
-	NetRole();
+	NetRole(PlayerType_t type);
     NetRole(int id);
 
 	virtual void set_robot_hu_target(ROBOT_TARGET par_target);
 	virtual ROBOT_TARGET get_robot_hu_target();
 
 	virtual unsigned char init(int card_array[],int len,int aim);
-	virtual NetRRound* get_parter();
-	virtual void set_parter(NetRRound* p_parter);
     
     bool          _isReady;
 
+    /**************************************************
+            user's action
+    **************************************************/
+    virtual NetRRound* get_parter();
+    NetRRound        * _act;
     /**************************************************
             user's profile
     **************************************************/
@@ -32,7 +35,6 @@ public:
     void Set(const UserProfile_t *profile);
 protected:
     Logger    *_logger;
-	NetRRound *parter;
 };
 
 #endif

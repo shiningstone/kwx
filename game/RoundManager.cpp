@@ -121,13 +121,9 @@ void RoundManager::RenewOutCard() {
 #include "NetRaceRound.h"
 
 void RoundManager::InitPlayers() {
-	_players[0] = new NetPlayer();
-	_players[1] = new NetRole();
-	_players[2] = new NetPlayer();
-
-	_players[0]->set_parter( new NetRRound(SINGLE_OTHERS) );
-	_players[1]->set_parter( new NetRRound(SINGLE_ME) );
-	_players[2]->set_parter( new NetRRound(SINGLE_OTHERS) );
+	_players[0] = new NetPlayer(SINGLE_OTHERS);
+	_players[1] = new NetRole(SINGLE_ME);
+	_players[2] = new NetPlayer(SINGLE_OTHERS);
 
     Database *database = Database::getInstance();
 

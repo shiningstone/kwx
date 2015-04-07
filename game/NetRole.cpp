@@ -1,16 +1,18 @@
 
 #include "NetRole.h"
 
-NetRole::NetRole() {
+NetRole::NetRole(PlayerType_t type) {
     _isReady = false;
     memset(&_profile,0,sizeof(UserProfile_t));
+    _act = new NetRRound(type);
 
     _logger = LOGGER_REGISTER("NetRole");
 }
 
-NetRole::NetRole(int id) {//this is for default settings ( robot ) 
+NetRole::NetRole(int id,PlayerType_t type) {//this is for default settings ( robot ) 
     _isReady = false;
     memset(&_profile,0,sizeof(UserProfile_t));
+    _act = new NetRRound(type);
 
     _logger = LOGGER_REGISTER("NetRole");
 }
@@ -28,19 +30,15 @@ ROBOT_TARGET NetRole::get_robot_hu_target()
 	return PI_HU_TARGET;
 }
 
-unsigned char NetRole::init(int card_array[],int len,int aim)
-{
-	return parter->init(card_array,len,aim);
+/**************************************************
+        user's action
+**************************************************/
+unsigned char NetRole::init(int card_array[],int len,int aim) {
+	return _act->init(card_array,len,aim);
 }
 
-NetRRound* NetRole::get_parter()
-{
-	return parter;
-}
-
-void NetRole::set_parter(NetRRound* p_parter)
-{
-	parter=p_parter;
+NetRRound* NetRole::get_parter() {
+	return _act;
 }
 
 /**************************************************
