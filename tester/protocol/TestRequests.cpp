@@ -577,17 +577,19 @@ public:
             'K','W','X',           //KWX
             0x00,55,               //request code/*下发提醒(下行) REQ_GAME_DIST_REMIND*/
             7,                     //package level
-            0x00,49,               //package size
+            0x00,53,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            7,
+            9,
             60,1,                        //seat
             61,2,                        //timer
+            62,3,                        //kind :        4条
+            63,3,                        //whogive
             129,0,4,0,0,0,1,             //remind :      碰
             130,0,1,0xff,                //gang remind : 不可杠
             131,0,1,0xff,                //kou remind :  不可扣
             132,0,4,0xff,0xff,0xff,0xff, //ming remind : 不可明
-            63,2,                        //wait :        不等
+            64,2,                        //wait
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -603,6 +605,8 @@ public:
         assert( aMsg->GetLevel()==7 );
         assert( remind.seat==1 );
         assert( remind.timer==2 );
+        assert( remind.kind==TIAO_4 );
+        assert( remind.whoGive==LEFT );
         assert( remind.remind.actions[0]==a_PENG );
         assert( remind.remind.gangCard[0]==CARD_UNKNOWN );
         assert( remind.remind.kouCard[0]==CARD_UNKNOWN );

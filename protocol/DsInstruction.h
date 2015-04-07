@@ -134,6 +134,7 @@ public:
     INT8U            seat;
     INT8U            timer;
     Card_t           kind;
+    INT8U            whoGive;
     Reminds_t        remind;
     INT8U            wait;
 };

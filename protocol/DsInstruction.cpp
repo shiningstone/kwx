@@ -175,8 +175,10 @@ int RemindInfo::Construct(const DsMsg &msg) {
         
     seat   = _GetPlayer(msg.GetItemValue(0));
     timer  = msg.GetItemValue(1);
-    DsMsgParser::_load(remind, msg, 2);
-    wait = _GetPlayer(msg.GetItemValue(6));
+    kind   = (Card_t)msg.GetItemValue(2);
+    whoGive = _GetPlayer(msg.GetItemValue(3));
+    DsMsgParser::_load(remind, msg, 4);
+    wait = _GetPlayer(msg.GetItemValue(8));
     
     return 0;
 }
