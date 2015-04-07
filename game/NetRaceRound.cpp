@@ -841,7 +841,6 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 
 	rr_aim = aim;
 	rr_ting_flag = 0;
-	total_score = 0;
 	card_score=0;
 	hu_len=0;
 	hu_places_num=0;
@@ -1303,10 +1302,6 @@ long NetRRound::get_card_score()
 	return card_score;
 }
 
-void NetRRound::update_score(long score)
-{
-	total_score += score;
-}
 CARD_ARRAY* NetRRound::get_card_list()
 {
 	return card_list;

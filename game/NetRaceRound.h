@@ -30,7 +30,6 @@ private:
     unsigned int  archive_ming_indexes;
     
     long card_score;
-    long total_score;
 	int InsertPlaceForMG;
 	unsigned int kind_hu;
     CARD_ARRAY *card_list;
@@ -75,7 +74,6 @@ public:
 	void set_ting_status(unsigned char flag);
 	unsigned char get_ting_status();
     long get_card_score();
-    void update_score(long score);
     CARD_ARRAY *get_card_list();
 	outCardList *getOutCardList();
 	void get_hu_cards(CARD_KIND c_list[],int *len);
