@@ -222,10 +222,21 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
 void NetRoundManager::_DiRecv(RemindInfo *info) {
     PlayerDir_t dir = (PlayerDir_t)info->seat;
     INT8U timer     = info->timer;
+    Card_t kind     = info->kind;
     _actionToDo     = info->GetAvailActions(info->remind);
     delete info;
 
     _isCardFromOthers = true;
+    _players[dir]->get_parter()->hand_in(
+        _lastHandedOutCard,
+        _isCardFromOthers,
+        false,
+        (_distributedNum==TOTAL_CARD_NUM),
+        _lastActionWithGold,
+        _continue_gang_times,
+        _isGangHua
+    );
+
     WaitForMyAction();
 }
 
