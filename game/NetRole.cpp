@@ -2,23 +2,21 @@
 #include "NetRole.h"
 
 NetRole::NetRole() {
+    _isReady = false;
+    memset(&_profile,0,sizeof(UserProfile_t));
+
     _logger = LOGGER_REGISTER("NetRole");
 }
 
 NetRole::NetRole(int id) {//this is for default settings ( robot ) 
-    _logger = LOGGER_REGISTER("NetRole_%d");
+    _isReady = false;
+    memset(&_profile,0,sizeof(UserProfile_t));
+
+    _logger = LOGGER_REGISTER("NetRole");
 }
 
 NetRole::~NetRole() {
     LOGGER_DEREGISTER(_logger);
-}
-
-void NetRole::set_sex(std::string sex) {
-    _sex = (sex=="Boy")? BOY : GIRL;
-}
-
-Sex_t NetRole::get_sex() {
-    return _sex;
 }
 
 void NetRole::set_robot_hu_target(ROBOT_TARGET par_target)
@@ -35,59 +33,33 @@ unsigned char NetRole::init(int card_array[],int len,int aim)
 	return parter->init(card_array,len,aim);
 }
 
-void NetRole::set_player_id(int player_id)
-{
-	idOfPlayer=player_id;
-}
-bool NetRole::get_player_id(int & player_id)
-{
-	player_id=idOfPlayer;
-	return true;
-}
-void NetRole::set_photo(const std::string pho)
-{
-	photo=pho;
-}
-bool NetRole::get_photo(std::string & pho)
-{
-	pho=photo;
-	return true;
-}
-void NetRole::set_nick_name(const std::string name)
-{
-	nickName=name;
-}
-bool NetRole::get_nick_name(std::string & name)
-{
-	name=nickName;
-	return true;
-}
-
 NetRRound* NetRole::get_parter()
 {
 	return parter;
 }
+
 void NetRole::set_parter(NetRRound* p_parter)
 {
 	parter=p_parter;
 }
-void NetRole::set_property(int pro)
-{
-	property=pro;
+
+/**************************************************
+        user's profile
+**************************************************/
+void NetRole::Set(const UserProfile_t *profile) {
+    memcpy(&_profile,profile,sizeof(UserProfile_t));
 }
 
-bool NetRole::get_property(int & pro)
-{
-	pro=property;
-	return true;
+Sex_t NetRole::GetSex() {
+    if( !strcmp(_profile.sex,"Boy") ) {
+        return BOY;
+    } else {
+        return GIRL;
+    }
 }
-void NetRole::set_language(std::string language)
-{
-	playerLanguage=language;
-}
-bool NetRole::get_language(std::string & language)
-{
-	language=playerLanguage;
-	return true;
+
+int NetRole::UpdateProperty(int change) {
+    _profile.property += change;
+    return _profile.property ;
 }
 

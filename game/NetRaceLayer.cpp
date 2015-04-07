@@ -82,9 +82,9 @@ void NetRaceLayer::CreateRace()
 	this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
     
 	for(int dir=0;dir<3;dir++) {
-		_UpdateHeadImage(dir,_roundManager->_cardHolders[dir]->_profile.photo);
-		_UpdateNickName(dir,_roundManager->_cardHolders[dir]->_profile.name);
-		GuiUpdateScore(dir,_roundManager->_cardHolders[dir]->_profile.property);
+		_UpdateHeadImage(dir,_roundManager->_players[dir]->_profile.photo);
+		_UpdateNickName(dir,_roundManager->_players[dir]->_profile.name);
+		GuiUpdateScore(dir,_roundManager->_players[dir]->_profile.property);
 	}
 
     for(int i=0;i<4;i++) {
@@ -1755,7 +1755,7 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
                     		showAndHideOutcardNotice,
                     		inHandMoveToOutHand,
                     		_voice->SpeakCard(outCard,
-                                _roundManager->_cardHolders[dir]->GetSex()),NULL),
+                                _roundManager->_players[dir]->GetSex()),NULL),
                 		_voice->Speak("give"),NULL);;	
 
 	if(canKou) {
@@ -1788,7 +1788,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,boo
         hideOutCard,
         Spawn::create(
             simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
-            _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),NULL),
+            _voice->SpeakAction(GANG,_roundManager->_players[dir]->GetSex()),NULL),
         goldEffect,
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)),CCCallFunc::create([=]() {
@@ -1825,7 +1825,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
     }
     myframe->addChild(cardOut,30,OUT_CARD_FRAME_TAG_ID);
 
-	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_cardHolders[MIDDLE]->GetSex());
+	CallFunc* speakCard  = _voice->SpeakCard(outCard,_roundManager->_players[MIDDLE]->GetSex());
 
     Spawn* mingEffect = turnToMing?
                 (Spawn::create(
@@ -2615,7 +2615,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 	if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
-                                _voice->SpeakAction(PENG,_roundManager->_cardHolders[dir]->GetSex()),
+                                _voice->SpeakAction(PENG,_roundManager->_players[dir]->GetSex()),
                                 simple_tip_effect( _layout->PositionOfActSign(dir),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
@@ -2909,7 +2909,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
             hideReminder,Spawn::create(
                 simple_tip_effect(_layout->PositionOfActSign(dir),"peng.png" ),
                 _voice->SpeakAction(PENG,
-                    _roundManager->_cardHolders[dir]->GetSex()),Spawn::create(
+                    _roundManager->_players[dir]->GetSex()),Spawn::create(
                 hide2CardsInhand),Spawn::create(
                 moveRightCardInHand,
                 moveLeftCardInHand,NULL),Sequence::create(
@@ -2943,7 +2943,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
     if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
-                _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),
+                _voice->SpeakAction(GANG,_roundManager->_players[dir]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
@@ -3208,7 +3208,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                 Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
                     _voice->SpeakAction(GANG,
-                        _roundManager->_cardHolders[dir]->GetSex()),
+                        _roundManager->_players[dir]->GetSex()),
                     moveFreeCards,
                     Spawn::create(
             		    moveAngangCards,
@@ -3630,7 +3630,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                 hideReminder,
             Spawn::create(
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
-                _voice->SpeakAction(GANG,_roundManager->_cardHolders[dir]->GetSex()),
+                _voice->SpeakAction(GANG,_roundManager->_players[dir]->GetSex()),
                 hideOutcard,
                 moveFreeCards,
                 Spawn::create(
@@ -3681,7 +3681,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
         if(winner!=MIDDLE) {
 			myframe->runAction(Sequence::create(
                 Spawn::create(
-                    _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex()),
+                    _voice->SpeakAction(HU,_roundManager->_players[winner]->GetSex()),
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),NULL),CallFunc::create([=](){
 				GoldNumInsert(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
                 NetRaceLayer::showall)),NULL));
@@ -3695,7 +3695,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
             
 			myframe->runAction(Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
-                    _voice->SpeakAction(HU,_roundManager->_cardHolders[winner]->GetSex()),CallFunc::create([=](){
+                    _voice->SpeakAction(HU,_roundManager->_players[winner]->GetSex()),CallFunc::create([=](){
     				GoldNumInsert(winner,HU_WIN,giver);}),
                     backgroundEffect,NULL));
 		}
@@ -4537,14 +4537,8 @@ void NetRaceLayer::CalculateGoldNum(int goldOfPlayer[3],PlayerDir_t GoldWinner,G
 void NetRaceLayer::_UpdateGouldAccount(int id,int gold) {
     Database *database = Database::getInstance();
 
-    int total;
-    _roundManager->_players[id]->get_property(total);
-    total += gold;
-    _roundManager->_players[id]->set_property(total);
-    
-    int globalId = 0;
-    _roundManager->_players[id]->get_player_id(globalId);
-    database->SetProperty(globalId,total);
+    int total = _roundManager->_players[id]->UpdateProperty(gold);
+    database->SetProperty(_roundManager->_players[id]->_profile.id, total);
 }
 
 void NetRaceLayer::UpdateGoldAccounts(int goldOfPlayer[3]) {
@@ -4851,7 +4845,7 @@ void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor 
 }
 
 void NetRaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
-	_CreateAccountPanel(_roundManager->_cardHolders[no]->_profile,BarOfPlayer);
+	_CreateAccountPanel(_roundManager->_players[no]->_profile,BarOfPlayer);
 
     WinInfo_t win;
     _roundManager->GetWin(win);

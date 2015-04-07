@@ -56,15 +56,7 @@ NetRoundManager::~NetRoundManager() {
 #include "NetPlayer.h"
 #include "NetRaceRound.h"
 
-void NetRoundManager::Init() {
-    InitPlayers();
-}
-
 void NetRoundManager::InitPlayers() {
-    _cardHolders[0] = new CardHolder();
-    _cardHolders[1] = new CardHolder();
-    _cardHolders[2] = new CardHolder();
-
 	_players[0] = new NetPlayer();
 	_players[1] = new NetRole();
 	_players[2] = new NetPlayer();
@@ -72,20 +64,18 @@ void NetRoundManager::InitPlayers() {
 	_players[0]->set_parter( new NetRRound(INTERNET_OTHERS) );
 	_players[1]->set_parter( new NetRRound(INTERNET_ME) );
 	_players[2]->set_parter( new NetRRound(INTERNET_OTHERS) );
-}
 
-void NetRoundManager::LoadPlayerInfo() {
     Database *database = Database::getInstance();
-    
+
     int  ids[3] = {0};
     _GenerateIds(ids);
-    
-	for(int dir=0;dir<3;dir++)
-	{	
+
+    for(int dir=0;dir<3;dir++)
+    {   
         UserProfile_t profile = {0};
         database->GetUserProfile(ids[dir],profile);
-        _cardHolders[dir]->Set(&profile);
-	}
+        _players[dir]->Set(&profile);
+    }
 }
 
 /****************************************
@@ -135,14 +125,14 @@ void NetRoundManager::HandleMsg(void * aMsg) {
 }
 
 void NetRoundManager::_DiRecv(GameStartResponse *info) {
-    _cardHolders[MIDDLE]->_isReady = true;
+    _players[MIDDLE]->_isReady = true;
     _uiManager->GuiShowReady(MIDDLE);
     LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",MIDDLE,info->score);
     delete info;
 }
 
 void NetRoundManager::_DiRecv(GameStartNotif *info) {
-    _cardHolders[info->seat]->_isReady = true;
+    _players[info->seat]->_isReady = true;
     _uiManager->GuiShowReady(info->seat);
     LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->seat,info->score);
     delete info;
@@ -253,7 +243,6 @@ void NetRoundManager::CreateRace(Scene *scene) {
     _uiManager->Set(this);
 
     InitPlayers();
-    LoadPlayerInfo();
 	_isGameStart=false;
 
     LOGGER_WRITE("NOTE: SeatInfo should be set when get response from server rather than here\n");

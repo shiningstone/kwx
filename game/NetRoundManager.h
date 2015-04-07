@@ -15,8 +15,6 @@ using namespace ui;
 #include "RaceType.h"
 #include "OutCardList.h"
 
-#include "CardHolder.h"
-
 class NetRole;
 class RoundManager;
 class KwxMessenger;
@@ -71,9 +69,7 @@ public:
     virtual void DistributeTo(PlayerDir_t dir,Card_t card);
     virtual void ActionAfterGang(PlayerDir_t dir);
 
-    virtual void Init();
     virtual void InitPlayers();
-    virtual void LoadPlayerInfo();
 
     /* main process */
     virtual void CreateRace(Scene *scene);

@@ -11,7 +11,6 @@ using namespace ui;
 #include "RaceType.h"
 #include "OutCardList.h"
 
-#include "CardHolder.h"
 #include "./../utils/LogManager.h"
 
 class NetRole;
@@ -64,9 +63,7 @@ public:
     void RecordOutCard( Card card );
     void RenewOutCard();
 
-    virtual void Init();
     virtual void InitPlayers();
-    virtual void LoadPlayerInfo();
     bool IsTing(int player);
 
     
@@ -87,7 +84,6 @@ protected:
 
     WinInfo_t   _lastWin;
     NetRole     *_players[PLAYER_NUM];
-    CardHolder  *_cardHolders[PLAYER_NUM];
 
     outCardList *_river;
     int         _unDistributedCards[TOTAL_CARD_NUM];
