@@ -576,15 +576,6 @@ int NetPlayer::Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KI
 	}
 	return chose_place;
 }
-Raction* NetPlayer::get_parter()
-{
-	return parter;
-}
-
-void NetPlayer::set_parter(Raction* p_parter)
-{
-	parter=p_parter;
-}
 int NetPlayer::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
@@ -732,60 +723,3 @@ void NetPlayer::init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2)
 		*target=PI_HU_TARGET;
 }
 
-void NetPlayer::set_player_id(int player_id)
-{
-	idOfPlayer=player_id;
-}
-
-bool NetPlayer::get_player_id(int & player_id)
-{
-	player_id=idOfPlayer;
-	return true;
-}
-
-void NetPlayer::set_photo(const std::string pho)
-{
-	photo=pho;
-}
-
-bool NetPlayer::get_photo(std::string & pho)
-{
-	pho=photo;
-	return true;
-}
-void NetPlayer::set_nick_name(const std::string name)
-{
-	nickName=name;
-}
-bool NetPlayer::get_nick_name(std::string & name)
-{
-	name=nickName;
-	return true;
-}
-
-unsigned char NetPlayer::init(int card_array[],int len,int aim)
-{
-    LOGGER_WRITE("NETWROK : %s just need zhuang's action(jump or hu)",__FUNCTION__);
-	return parter->init(card_array,len,aim);
-}
-
-void NetPlayer::set_property(int pro)
-{
-	property=pro;
-}
-
-bool NetPlayer::get_property(int & pro)
-{
-	pro=property;
-	return true;
-}
-
-void NetPlayer::set_language(std::string language)
-{
-	playerLanguage=language;
-}
-bool NetPlayer::get_language(std::string & language)
-{
-	language=playerLanguage;
-	return true;
-}

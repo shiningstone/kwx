@@ -52,7 +52,7 @@ NetRoundManager::~NetRoundManager() {
 /***********************************************
         player information
 ***********************************************/
-#include "NetMe.h"
+#include "NetRole.h"
 #include "NetPlayer.h"
 #include "NetRaceRound.h"
 
@@ -66,7 +66,7 @@ void NetRoundManager::InitPlayers() {
     _cardHolders[2] = new CardHolder();
 
 	_players[0] = new NetPlayer();
-	_players[1] = new NetMe();
+	_players[1] = new NetRole();
 	_players[2] = new NetPlayer();
 
 	_players[0]->set_parter( new NetRRound() );
