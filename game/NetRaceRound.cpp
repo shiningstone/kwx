@@ -1,8 +1,7 @@
 #include "NetRaceRound.h"
 USING_NS_CC;
 
-NetRRound::NetRRound()
-{
+NetRRound::NetRRound() {
 	out_card_list=NULL;
 	card_list=NULL;
 	hu_len=0;
@@ -1029,10 +1028,6 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 		card_list->len--;
 	}
 
-	if(role_type==INTERNET_ME)
-	{
-		;
-	}
 		return l_kind;
 }
 
@@ -1226,11 +1221,6 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 		}
 	}
 
-	if(role_type==INTERNET_ME)
-	{
-		;
-	}
-
 	return ar_DONE;
 }
 
@@ -1337,11 +1327,3 @@ bool NetRRound::get_ming_check_result(MRES *res)
 		return false;
 }
 
-PlayerType_t NetRRound::get_role_type()
-{
-    if(role_type==SINGLE_OTHERS||role_type==INTERNET_OTHERS) {
-        return OTHERS;
-    } else {
-        return ME;
-    }
-}

@@ -46,7 +46,7 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 
     kouRequest = false;
     
-	if(_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_role_type()==OTHERS) {
+	if(_roundManager->_curPlayer!=MIDDLE) {
 		collect_resources(s_res,list1,list2,&len1,&len2);
 		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
 	}

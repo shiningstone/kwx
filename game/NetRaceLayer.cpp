@@ -4614,9 +4614,7 @@ void NetRaceLayer::GoldNumInsert(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,Pla
     UpdateGoldAccounts(GoldAccountImmediate);
 
 	for(int id=0;id<3;id++) {
-        int score;
-        _roundManager->_players[id]->get_property(score);
-        GuiUpdateScore(id,score);
+        GuiUpdateScore(id,_roundManager->_players[id]->_profile.property);
         GuiJinBiShow((PlayerDir_t)id,GoldAccountImmediate[id]);        
 	}
 }

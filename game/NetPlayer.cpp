@@ -614,7 +614,7 @@ ROBOT_TARGET NetPlayer::get_robot_hu_target()
 int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	//unsigned char ting_flag;
-	CARD_ARRAY *list=parter->get_card_list();
+	CARD_ARRAY *list=_act->get_card_list();
 	
 	int show_place=-1;
 	int hu_num=-1;
@@ -622,17 +622,17 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 	
 	for(int i=0;i<MAX_HANDIN_NUM;i++)
 		memset(res->hu_cards[i],ck_NOT_DEFINED,sizeof(CARD_KIND)*9);
-	if( parter->get_ming_check_result(res) )
+	if( _act->get_ming_check_result(res) )
 	{
 		int s_k;
 		int s_num;
-		int ming_index=parter->get_ming_indexes();
+		int ming_index=_act->get_ming_indexes();
 		CARD_KIND s_kind;
 		for(int k=0;k<MAX_HANDIN_NUM;k++)
 		{
 			if(ming_index&(1<<k))
 			{
-				s_kind=parter->get_card_list()->data[k].kind;
+				s_kind=_act->get_card_list()->data[k].kind;
 				if(Robot_check_pickup_card(s_kind,list1,list2,len1,len2)!=0)
 				{
 					res->hu_cards_num[k]=0;
@@ -655,7 +655,7 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 		for(s_k=0;s_k<MAX_HANDIN_NUM;s_k++)
 			if(ming_index&(1<<s_k))
 			{
-				s_kind=parter->get_card_list()->data[s_k].kind;
+				s_kind=_act->get_card_list()->data[s_k].kind;
 				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card(s_kind,list1,list2,len1,len2)==0)
 					l_place=s_k;
 			}
@@ -674,7 +674,7 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 
 void NetPlayer::init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2)
 {
-	CARD_ARRAY *list=parter->get_card_list();
+	CARD_ARRAY *list=_act->get_card_list();
 	int couples=0;
 	int color;
 	int same_color_num=0;

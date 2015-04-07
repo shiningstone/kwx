@@ -57,9 +57,9 @@ NetRoundManager::~NetRoundManager() {
 #include "NetRaceRound.h"
 
 void NetRoundManager::InitPlayers() {
-	_players[0] = new NetPlayer(INTERNET_OTHERS);
-	_players[1] = new NetRole(INTERNET_ME);
-	_players[2] = new NetPlayer(INTERNET_OTHERS);
+	_players[0] = new NetPlayer();
+	_players[1] = new NetRole();
+	_players[2] = new NetPlayer();
 
     Database *database = Database::getInstance();
 

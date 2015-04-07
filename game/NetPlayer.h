@@ -19,7 +19,6 @@ class NetPlayer:public NetRole
 		virtual ~NetPlayer();
     private:
         Logger   *_logger;
-        //Profile_t _profile;
 
 		ROBOT_TARGET g_target;
 	private:
