@@ -133,13 +133,9 @@ void RoundManager::InitPlayers() {
 	_players[1] = new NetRole();
 	_players[2] = new NetPlayer();
 
-	_players[0]->set_parter( new NetRRound() );
-	_players[1]->set_parter( new NetRRound() );
-	_players[2]->set_parter( new NetRRound() );
-
-	_players[0]->get_parter()->set_role_type( INTERNET_PLAYER );
-	_players[1]->get_parter()->set_role_type( SINGLE_BOADR_ME );
-	_players[2]->get_parter()->set_role_type( INTERNET_PLAYER );
+	_players[0]->set_parter( new NetRRound(SINGLE_OTHERS) );
+	_players[1]->set_parter( new NetRRound(SINGLE_ME) );
+	_players[2]->set_parter( new NetRRound(SINGLE_OTHERS) );
 }
 
 void RoundManager::_GenerateIds(int ids[]) {
@@ -849,26 +845,8 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _isGangHua
             );
         
-        if(_players[dir]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
+        if(_players[dir]->get_parter()->get_role_type()==OTHERS)
         {
-            if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
-                    _actionToDo=a_JUMP;
-            }
-            else if(_players[dir]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
-                    _actionToDo=a_JUMP;
-            }
-            else if(_players[dir]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
-                    _actionToDo=a_JUMP;
-        }
-        
-        if(_players[dir]->get_parter()->get_role_type()==INTERNET_PLAYER)
-        {
-            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
             if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
                 if(_lastHandedOutCard/9!=0&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
@@ -914,22 +892,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 action1=a_HU;
             else
                 action1=a_JUMP;
-        } else if(_players[no]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT) {
-            if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1 = a_JUMP;
-            }
-            else if(_players[no]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1 = a_JUMP;
-            }
-            else if(_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1=a_JUMP;
-        } else if(_players[no]->get_parter()->get_role_type()==INTERNET_PLAYER) {
-            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
+        } else if(_players[no]->get_parter()->get_role_type()==OTHERS) {
             if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
                 if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
@@ -964,26 +927,8 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             else
                 action2=a_JUMP;
         }
-        if(_players[no1]->get_parter()->get_role_type()==SINGLE_BOARD_ROBOT)
+        if(_players[no1]->get_parter()->get_role_type()==OTHERS)
         {
-            if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
-                    action2 = a_JUMP;
-            }
-            else if(_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
-                    action2 = a_JUMP;
-            }
-            else if(_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
-                    action2=a_JUMP;
-        }
-        
-        if(_players[no1]->get_parter()->get_role_type()==INTERNET_PLAYER)
-        {
-            LOGGER_WRITE("NETWORK : NetPlayer action here, %s %d",__FILE__,__LINE__);
             if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
                 if(_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))

@@ -69,13 +69,9 @@ void NetRoundManager::InitPlayers() {
 	_players[1] = new NetRole();
 	_players[2] = new NetPlayer();
 
-	_players[0]->set_parter( new NetRRound() );
-	_players[1]->set_parter( new NetRRound() );
-	_players[2]->set_parter( new NetRRound() );
-
-	_players[0]->get_parter()->set_role_type( INTERNET_PLAYER );
-	_players[1]->get_parter()->set_role_type( SINGLE_BOADR_ME );
-	_players[2]->get_parter()->set_role_type( INTERNET_PLAYER );
+	_players[0]->set_parter( new NetRRound(INTERNET_OTHERS) );
+	_players[1]->set_parter( new NetRRound(INTERNET_ME) );
+	_players[2]->set_parter( new NetRRound(INTERNET_OTHERS) );
 }
 
 void NetRoundManager::LoadPlayerInfo() {

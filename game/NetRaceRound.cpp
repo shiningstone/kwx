@@ -1341,11 +1341,12 @@ bool NetRRound::get_ming_check_result(MRES *res)
 	else
 		return false;
 }
-void NetRRound::set_role_type(RT type)
+
+PlayerType_t NetRRound::get_role_type()
 {
-	role_type=type;
-}
-RT NetRRound::get_role_type()
-{
-	return role_type;
+    if(role_type==SINGLE_OTHERS||role_type==INTERNET_OTHERS) {
+        return OTHERS;
+    } else {
+        return ME;
+    }
 }

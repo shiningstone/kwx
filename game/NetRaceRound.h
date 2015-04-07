@@ -6,14 +6,24 @@
 
 #include "./../utils/LogManager.h"
 
+typedef enum {
+    SINGLE_ME,
+    SINGLE_OTHERS,
+    INTERNET_ME,
+    INTERNET_OTHERS,
+    OTHERS,
+    ME,
+}PlayerType_t;
+
 class NetRRound
 {
 public:
-	NetRRound();
+	NetRRound(PlayerType_t type);
     virtual ~NetRRound();
 
 private:
     Logger *_logger;
+	const PlayerType_t role_type;
 
     unsigned int  rr_aim;
     unsigned char rr_ting_flag;
@@ -29,7 +39,6 @@ private:
 	int hu_places_num;
 	CARD_KIND hucards[9];
 	int hu_len;
-	RT role_type;
 	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型
 	int hu_reserved_num[MAX_HANDIN_NUM];//总剩余牌数
 	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
@@ -50,6 +59,8 @@ private:
     void array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[]);
     unsigned int ming_check();
 public:
+	PlayerType_t get_role_type();
+
 	unsigned char init(int card_array[],int len,int aim);
     unsigned char hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     CARD_KIND hand_out(unsigned int place);
@@ -70,8 +81,6 @@ public:
 	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
 	bool get_ming_check_result(MRES *res);
-	void set_role_type(RT type);
-	RT get_role_type();
 	void get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM]);//张数
 	void get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9]);//剩余牌数
 	void get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9]);//番型
