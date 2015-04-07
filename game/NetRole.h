@@ -16,8 +16,8 @@ public:
     NetRole(int id);
     ~NetRole();
 
-    int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2){return 0;}
-    void init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2){}
+    virtual int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2){return 0;}
+    virtual void init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2){}
     virtual void set_robot_hu_target(ROBOT_TARGET par_target){}
     virtual ROBOT_TARGET get_robot_hu_target(){return SAME_TIAO_TARGET;}
 
