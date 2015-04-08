@@ -2930,8 +2930,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 		myframe->runAction( Sequence::create(CallFunc::create([=](){
                 _roundManager->UpdateCards(dir,a_PENG);}),CCCallFunc::create([=](){
     			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
-    			_roundManager->WaitForMyAction();}),CallFunc::create([=](){
-                _roundManager->_isMyShowTime=true;}),NULL));
+    			_roundManager->WaitForMyAction();}),NULL));
 	}
 }
 

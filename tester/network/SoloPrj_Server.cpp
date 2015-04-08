@@ -363,6 +363,10 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,14);
         SendLine(SERVER,15);
         SendLine(SERVER,16);
+    } else if(recvBuf[16]==REQ_GAME_SEND_ACTION && handout==2) {
+        handout++;
+    
+        SendLine(SERVER,17);
     }
 }
 

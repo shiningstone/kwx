@@ -114,6 +114,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_REMIND:
             _DiRecv((RemindInfo *)di);
             break;
+        case REQ_GAME_SEND_ACTION:
+            _DiRecv((ActionResponse *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -237,7 +240,16 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
         _isGangHua
     );
 
-    WaitForMyAction();
+    ServerWaitForMyAction();
+}
+
+void NetRoundManager::_DiRecv(ActionResponse *info) {
+    PlayerDir_t dir = (PlayerDir_t)info->seat;
+    PlayerDir_t wait = (PlayerDir_t)info->waitSeat;
+    delete info;
+
+    LOGGER_WRITE("NOTE: something should happen here\n");
+    //_uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
 }
 
 /****************************************
@@ -294,6 +306,11 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
 
+    RequestSendAction aReq;
+    aReq.Set(aPENG,(Card_t)card.kind);
+    _messenger->Send(aReq);
+
+    LOGGER_WRITE("NOTE: maybe this action should be taken later\n");
     _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
 }
 
@@ -494,7 +511,7 @@ void NetRoundManager::RecvMing() {
     }
 }
 
-void NetRoundManager::WaitForMyAction() {
+void NetRoundManager::ServerWaitForMyAction() {
     _uiManager->ShowActionButtons(_actionToDo);
 
 	if(_actionToDo!=a_JUMP) {
@@ -517,6 +534,10 @@ void NetRoundManager::WaitForMyAction() {
 		_lastAction=a_JUMP;
 		WaitForMyChoose();
 	}
+}
+
+void NetRoundManager::WaitForMyAction() {
+
 }
 
 void NetRoundManager::WaitForMyChoose() {
@@ -664,6 +685,20 @@ void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
         DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]/4));
     }
 }
+
+void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
+    _isGameStart = true;
+
+    _curPlayer = zhuang;
+    _ai->UpdateAtFirstRound(_actionToDo);
+
+    if(zhuang==MIDDLE) {
+        ServerWaitForMyAction();
+    } else {
+        WaitForOthersAction((PlayerDir_t)zhuang);
+    }
+}
+
 
 /*************************************
         singleton

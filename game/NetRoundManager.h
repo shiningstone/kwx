@@ -44,6 +44,9 @@ public:
     void _DiRecv(ShowCardResponse *info);
     void _DiRecv(ShowCardNotif *info);
     void _DiRecv(RemindInfo *info);
+    void _DiRecv(ActionResponse *info);
+
+    void ServerWaitForMyAction();
 /* networks end   */
 /******************/
 
@@ -61,6 +64,7 @@ public:
     virtual void RecvMingCancel();
 	virtual void RecvMing();
 
+    virtual void WaitForFirstAction(PlayerDir_t zhuang);
     virtual void WaitForMyAction();
     virtual void WaitForMyChoose();
     virtual void WaitForOthersAction(PlayerDir_t dir);
