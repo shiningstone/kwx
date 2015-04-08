@@ -292,6 +292,16 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                     RecordOutCard(GangCard);
                     
                     _curPlayer = dir;
+                    
+                    _players[dir]->get_parter()->hand_in(
+                        (CARD_KIND)card,
+                        _isCardFromOthers,
+                        false,
+                        (_distributedNum==TOTAL_CARD_NUM),
+                        _lastActionWithGold,
+                        _continue_gang_times,
+                        _isGangHua
+                    );
                 }else {
                     LOGGER_WRITE("NOTE: this is ming gang by himself");
                 }
