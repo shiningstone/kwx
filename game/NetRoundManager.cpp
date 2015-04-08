@@ -270,7 +270,36 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     delete info;
 
     _curPlayer = whoGive;
-    RecvPeng(dir);
+    switch(_actionToDo) {
+        case aPENG:
+            RecvPeng(dir);
+            break;
+        case aMING_GANG:
+            {
+                _lastActionSource=dir;
+                _actionToDo=a_MING_GANG;
+                _lastAction=a_MING_GANG;
+                _lastActionWithGold=a_MING_GANG;
+                
+                Card GangCard;
+                if(_isCardFromOthers) {
+                    int riverLast = _players[whoGive]->get_parter()->getOutCardList()->length;
+                    _players[whoGive]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
+                    _players[whoGive]->get_parter()->getOutCardList()->deleteItem();
+                
+                    RecordOutCard(GangCard);
+                    RecordOutCard(GangCard);
+                    RecordOutCard(GangCard);
+                    
+                    _curPlayer = dir;
+                }else {
+                    LOGGER_WRITE("NOTE: this is ming gang by himself");
+                }
+
+                _uiManager->_MingGangEffect(dir,whoGive,card,NULL);
+            }
+            break;
+    }
 }
 
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
@@ -596,6 +625,7 @@ void NetRoundManager::WaitForMyChoose() {
 }
 
 void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
+    #if 0
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
     auto list=_players[dir]->get_parter()->get_card_list();
 
@@ -661,6 +691,7 @@ void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
         
         WaitForOthersChoose();
     }
+    #endif
 }
 
 void NetRoundManager::WaitForOthersChoose() {
