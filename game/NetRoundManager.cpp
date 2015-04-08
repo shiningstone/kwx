@@ -224,12 +224,18 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
 
 void NetRoundManager::_DiRecv(RemindInfo *info) {
     PlayerDir_t dir = (PlayerDir_t)info->seat;
+    PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
     INT8U timer     = info->timer;
     Card_t kind     = info->kind;
     _actionToDo     = info->GetAvailActions(info->remind);
     delete info;
 
-    _isCardFromOthers = true;
+    if(dir!=whoGive) {
+        _isCardFromOthers = true;
+    } else {
+        _isCardFromOthers = false;
+    }
+    
     _players[dir]->get_parter()->hand_in(
         _lastHandedOutCard,
         _isCardFromOthers,
@@ -240,6 +246,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
         _isGangHua
     );
 
+    _isMyShowTime = true;
     ServerWaitForMyAction();
 }
 
