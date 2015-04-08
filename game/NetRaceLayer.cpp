@@ -2620,7 +2620,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
-                                _roundManager->UpdateCards(dir,a_PENG);}),    CCCallFunc::create([=]() {
+                                _roundManager->UpdateCards(dir,a_PENG,card);}),    CCCallFunc::create([=]() {
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));

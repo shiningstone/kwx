@@ -4,6 +4,7 @@
 #include "OutCardList.h"
 #include "Role.h"
 
+#include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
 class NetRRound
@@ -52,6 +53,7 @@ public:
     unsigned char hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     CARD_KIND hand_out(unsigned int place);
     ACT_RES action(unsigned char who_give,ARRAY_ACTION act);
+    ACT_RES net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kind);
 	void MingCancel();
 	void LockAllCards();
     unsigned int get_aim();

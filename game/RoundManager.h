@@ -47,7 +47,7 @@ public:
     virtual void DistributeTo(PlayerDir_t dir,Card_t card);
     virtual void ActionAfterGang(PlayerDir_t dir);
 
-    void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action);
+    virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
 
     void QiangGangHuJudge(PlayerDir_t dir);
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);

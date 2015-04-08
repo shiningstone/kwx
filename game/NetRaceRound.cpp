@@ -1,3 +1,4 @@
+
 #include "NetRaceRound.h"
 USING_NS_CC;
 
@@ -1048,6 +1049,36 @@ void NetRRound::MingCancel()
 			card_list->data[a].can_play=cps_YES;
 	}
 }
+
+ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kind)
+{
+    LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
+
+	CARD temp_data;
+	InsertPlaceForMG=-1;
+
+	temp_data.can_play=cps_YES;
+	temp_data.kind = (CARD_KIND)kind;
+
+	if(act==a_PENG) {
+        card_delete(0,2);
+
+		temp_data.status=c_PENG;
+		temp_data.can_play=cps_NO;
+		card_insert(temp_data,3);
+		card_list->atcvie_place += 3;
+	} else if(act==a_JUMP) {
+		if(who_give==0)
+		{
+			temp_data.status=c_FREE;
+			card_delete(card_list->len-1,1);
+			card_insert(temp_data,1);
+		}
+	}
+
+	return ar_DONE;
+}
+
 ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 {
     LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);

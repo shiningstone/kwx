@@ -273,6 +273,24 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     RecvPeng(dir);
 }
 
+void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
+    if(dir==MIDDLE) {
+        RoundManager::UpdateCards(dir,action);
+    } else {
+        if(action==a_PENG) {
+            _isCardFromOthers = true;
+        }
+        
+        if(_actionToDo&a_AN_GANG) {
+            _players[dir]->get_parter()->net_action(_isCardFromOthers,a_AN_GANG,actKind);
+        } else if(_actionToDo&a_SHOU_GANG) {
+            _players[dir]->get_parter()->net_action(_isCardFromOthers,a_SHOU_GANG,actKind);
+        } else {
+            _players[dir]->get_parter()->net_action(_isCardFromOthers,action,actKind);
+        }
+    }
+}
+
 /****************************************
        main interface
 ****************************************/

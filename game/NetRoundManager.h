@@ -48,6 +48,8 @@ public:
     void _DiRecv(ActionNotif *info);
 
     void ServerWaitForMyAction();
+    
+    virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
 /* networks end   */
 /******************/
 

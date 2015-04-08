@@ -1036,7 +1036,7 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     }
 }
 
-void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action) {
+void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(action==a_PENG) {
         _isCardFromOthers = true;
     }
