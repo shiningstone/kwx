@@ -33,6 +33,16 @@ int DsInstruction::Dispatch() {
     return 0;
 }
 
+int DsInstruction::GetAvailActions(int actNum,ActionId_t actions[]) {
+    int actionToDo = 0;
+    
+    for (int i=0;i<actNum; i++) {
+        actionToDo |= actions[i];
+    }
+
+    return actionToDo;
+}
+
 int DsInstruction::GetAvailActions(const Reminds_t &remind) {
     int actionToDo = 0;
     
@@ -139,7 +149,7 @@ int ActionNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
     seat    = _GetPlayer(msg.GetItemValue(0));
-    isFromServer = (msg.GetItemValue(1)==0)?true:false;
+    whoGive = _GetPlayer(msg.GetItemValue(1));
     next    = _GetPlayer(msg.GetItemValue(2));
 
     DsMsgParser::_load(actions, actionNum, msg, 3);

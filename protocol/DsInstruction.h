@@ -18,6 +18,7 @@ public:
     virtual int Dispatch();
 
     static int GetAvailActions(const Reminds_t &remind);
+    static int GetAvailActions(int actNum,ActionId_t actions[]);
     RequestId_t      request;
 protected:
     DsInstruction();
@@ -80,7 +81,7 @@ public:
     virtual int Construct(const DsMsg &msg);
     
     INT8U            seat;
-    bool             isFromServer;
+    INT8U            whoGive;
     INT8U            next;
     INT8U            actionNum;
     ActionId_t       actions[MAX_AVAIL_ACTIONS];

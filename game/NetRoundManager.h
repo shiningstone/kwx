@@ -45,6 +45,7 @@ public:
     void _DiRecv(ShowCardNotif *info);
     void _DiRecv(RemindInfo *info);
     void _DiRecv(ActionResponse *info);
+    void _DiRecv(ActionNotif *info);
 
     void ServerWaitForMyAction();
 /* networks end   */

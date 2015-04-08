@@ -117,6 +117,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_SEND_ACTION:
             _DiRecv((ActionResponse *)di);
             break;
+        case REQ_GAME_RECV_ACTION:
+            _DiRecv((ActionNotif *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -251,12 +254,23 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
 }
 
 void NetRoundManager::_DiRecv(ActionResponse *info) {
-    PlayerDir_t dir = (PlayerDir_t)info->seat;
+    PlayerDir_t dir  = (PlayerDir_t)info->seat;
     PlayerDir_t wait = (PlayerDir_t)info->waitSeat;
     delete info;
 
     LOGGER_WRITE("NOTE: something should happen here\n");
     //_uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
+}
+
+void NetRoundManager::_DiRecv(ActionNotif *info) {
+    PlayerDir_t dir     = (PlayerDir_t)info->seat;
+    PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
+    _actionToDo     = info->GetAvailActions(info->actionNum,info->actions);
+    Card_t card     = info->card[0];
+    delete info;
+
+    _curPlayer = whoGive;
+    RecvPeng(dir);
 }
 
 /****************************************
@@ -313,9 +327,11 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
 
-    RequestSendAction aReq;
-    aReq.Set(aPENG,(Card_t)card.kind);
-    _messenger->Send(aReq);
+    if(dir==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(aPENG,(Card_t)card.kind);
+        _messenger->Send(aReq);
+    }
 
     LOGGER_WRITE("NOTE: maybe this action should be taken later\n");
     _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);

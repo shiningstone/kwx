@@ -322,7 +322,7 @@ void test_smart_game_server() {
 }
 
 #ifndef DELAY
-#define DELAY 1000
+#define DELAY 500
 #endif
 static void SendLine(ServerSocket SERVER,int lineNo) {
     char sendBuf[512] = {0};
@@ -368,6 +368,11 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     
         SendLine(SERVER,17);
         SendLine(SERVER,18);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==3) {
+        handout++;
+    
+        SendLine(SERVER,19);
+        SendLine(SERVER,20);
     }
 }
 
