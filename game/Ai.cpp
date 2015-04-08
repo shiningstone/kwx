@@ -4,6 +4,56 @@
 #include "RoundManager.h"
 #include "Ai.h"
 
+void Ai::init_target(CARD_ARRAY *list,ROBOT_TARGET *target,int hu_len1,int hu_len2)
+{
+	int couples=0;
+	int color;
+	int same_color_num=0;
+	int color_num;
+
+	for(int i=0;i<3;i++)
+	{
+		color=i;
+		color_num=0;
+		for(int j=0;j<list->len;j++)
+			if(list->data[j].kind/9==color)
+				color_num++;
+		if(color_num>9)
+			break;
+	}
+	if(color_num>=9)
+	{
+		same_color_num=color_num;
+		for(int j=0;j<list->atcvie_place;j++)
+			if(list->data[j].kind/9!=color)
+			{
+				same_color_num=0;
+				break;
+			}
+	}
+	for(int i=list->atcvie_place;i<list->len;i++)
+	{
+		int nums=1;
+		for(int k=i+1;k<list->len;k++)
+			if(list->data[i].kind==list->data[k].kind &&
+			 list->data[i].status==c_FREE &&
+			 list->data[i].status == list->data[k].status)
+				nums++;
+		if(nums==2||nums==4)
+			couples++;
+	}
+	if(list->atcvie_place==0&&couples>=5)
+		*target=SEVEN_COUPLES_TARGET;
+	else if(same_color_num>=9&&color==0)
+		*target=SAME_TIAO_TARGET;
+	else if(same_color_num>=9&&color==1)
+		*target=SAME_TONG_TARGET;
+	else if(couples>3)
+		*target=FOUR_PENG_TARGET;
+	else
+		*target=PI_HU_TARGET;
+}
+
 void Ai::_CollectResouce(HAH *res) {
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
@@ -31,7 +81,8 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
 
 	/*init hu target*/
 	if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-		_roundManager->_players[_roundManager->_curPlayer]->init_target(&res->target,*len1,*len2);
+        auto list = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
+        init_target(list,&res->target,*len1,*len2);
     }
 }
 

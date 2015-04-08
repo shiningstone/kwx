@@ -16,24 +16,27 @@ public:
     NetRole(int id);
     ~NetRole();
 
+	virtual unsigned char init(int card_array[],int len,int aim);
     virtual int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2){return 0;}
-    virtual void init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2){}
     virtual void set_robot_hu_target(ROBOT_TARGET par_target){}
     virtual ROBOT_TARGET get_robot_hu_target(){return SAME_TIAO_TARGET;}
-
-	virtual unsigned char init(int card_array[],int len,int aim);
     
     bool          _isReady;
+    UserProfile_t _profile;    
+    NetRRound    *_act;
 
     /**************************************************
             user's action
     **************************************************/
     virtual NetRRound* get_parter();
-    NetRRound        * _act;
+
+    /**************************************************
+            user's card info
+    **************************************************/
+    
     /**************************************************
             user's profile
     **************************************************/
-    UserProfile_t _profile;    
     Sex_t GetSex();
     int   UpdateProperty(int change);
 

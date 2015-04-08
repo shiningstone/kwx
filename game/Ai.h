@@ -7,6 +7,7 @@
 class RoundManager;
 class Ai {
 public:
+    void init_target(CARD_ARRAY *list,ROBOT_TARGET *target,int hu_len1,int hu_len2);
     void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);
     int  ChooseWorstCard(bool &kouRequest);
     Card_t FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers);

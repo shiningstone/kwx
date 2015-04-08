@@ -181,7 +181,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
 
     _curPlayer        = MIDDLE;
     _isCardFromOthers = false;
-    _actionToDo     = info->GetAvailActions(info->remind);
+    _actionToDo       = info->GetAvailActions(info->remind);
 
     DistributeTo(target,card);
     _players[MIDDLE]->get_parter()->hand_in(
