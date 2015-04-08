@@ -367,6 +367,7 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         handout++;
     
         SendLine(SERVER,17);
+        SendLine(SERVER,18);
     }
 }
 
