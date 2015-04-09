@@ -29,6 +29,7 @@ public:
     CardList();
 	~CardList();
 
+    virtual void push_back(CardNode_t *node);
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
@@ -44,10 +45,14 @@ protected:
 class CardInHand : public CardList {
 public:
     void   init(Card_t *cards,int len);
+    void   delete_card(int from,int len);
+    void   insert_card(CardNode_t data,int times=1);
 
     int FreeStart;
     int Last;
     int Residue;
+private:
+    int _FindInsertPoint(CardNode_t data);
 };
 
 #endif

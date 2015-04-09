@@ -2,120 +2,26 @@
 #include "NetRaceRound.h"
 USING_NS_CC;
 
-NetRRound::NetRRound() {
-	card_list=NULL;
+NetRRound::NetRRound(CardList *cards) {
 	hu_len=0;
 	kind_hu=0;
 
+    _cardsInHand = cards;
     _logger = LOGGER_REGISTER("RaceRound");
 }
 
 NetRRound::~NetRRound()
 {
-	if(card_list)
-		delete card_list;
-
     LOGGER_DEREGISTER(_logger);
 }
 
-int NetRRound::card_delete(unsigned int from,unsigned int len)
-{
-	int i;
-
-	for(i=0;i<card_list->len-from-len;i++)
-	{
-		memcpy(&(card_list->data[i+from]),&(card_list->data[i+from+len]),sizeof(CARD));
-	}
-	for(i=0;i<len;i++)
-	{
-		card_list->data[card_list->len-1-i].kind=ck_NOT_DEFINED;
-		card_list->data[card_list->len-1-i].status=c_NOT_DEFINDED;
-		card_list->data[card_list->len-1-i].can_play=cps_NOT_DEFINDED;
-	}
-	card_list->len -= len;
-	return 0;
+int NetRRound::_DeleteCards(unsigned int from,unsigned int len) {
+    _cardsInHand->delete_card(from,len);
 }
 
-void NetRRound::card_insert(CARD data,int times)
+void NetRRound::_InsertCard(CardNode_t data,int times)
 {
-	int i;
-	if(data.status!=c_FREE)
-	{
-		int insertPlace;
-		if(InsertPlaceForMG!=-1)
-		{
-			insertPlace=InsertPlaceForMG;
-		}
-		else
-		{
-			for(i=card_list->atcvie_place;i>=0;i--)
-			{
-				if(i==0)
-				{
-					insertPlace=i;
-					break;
-				}
-				else
-				{
-					if(data.status==c_MING_KOU)
-					{
-						if((card_list->data[i-1].status==c_MING_KOU&&data.kind>=card_list->data[i-1].kind)||card_list->data[i-1].status!=c_MING_KOU)
-						{
-							insertPlace=i;
-							break;
-						}
-					}
-					else if(card_list->data[i-1].status!=c_MING_KOU)
-					{
-						insertPlace=i;
-						break;
-					}
-				}
-			}
-		}
-		for(i=card_list->len-1;i>=insertPlace;i--)
-		{
-			memcpy(&(card_list->data[i+times]),&(card_list->data[i]),sizeof(CARD));
-		}
-
-		for(i=insertPlace;i<(insertPlace+times);i++)
-		{
-			memcpy(&(card_list->data[i]),&data,sizeof(CARD));
-		}
-	}
-	else
-	{
-		int insert_place=0;
-		if( card_list->len==0 )
-		{
-			for(int j=0;j<times;j++)
-				memcpy(&card_list->data[j],&data,sizeof(CARD));
-		}
-		else
-		{
-			for(i=card_list->atcvie_place;i<card_list->len;i++)
-				if( card_list->data[i].kind>=data.kind )
-				{
-					insert_place=i;
-					break;
-				}
-			if(i==card_list->len)
-			{
-				for(int j=0;j<times;j++)
-					memcpy(&(card_list->data[i+j]),&data,sizeof(CARD));
-			}
-			else
-			{
-				for(i=card_list->len-1;i>=insert_place;i--)
-				{
-					memcpy(&(card_list->data[i+times]),&(card_list->data[i]),sizeof(CARD));
-				}
-				for(int j=0;j<times;j++)
-					memcpy(&(card_list->data[insert_place+j]),&data,sizeof(CARD));
-			}
-		}
-	}
-	card_list->len += times;
+    _cardsInHand->insert_card(data,times);
 }
 
 long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
@@ -863,11 +769,11 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 		if(i==13)
 		{
 			ac=hand_in((CARD_KIND)(card_array[i]/4),0,0,false,a_JUMP,0,false);
-			card_delete(13,1);
-			card_insert(temp,1);
+			_DeleteCards(13,1);
+			_InsertCard(temp,1);
 		}
 		else
-			card_insert(temp,1);
+			_InsertCard(temp,1);
 	}
 	return ac;
 }
@@ -1009,15 +915,15 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 
 	if( place==card_list->len-1 )
 	{
-		card_delete(place,1);
+		_DeleteCards(place,1);
 		return l_kind;
 	}
 
-	card_delete(place,1);
+	_DeleteCards(place,1);
 
 	if(rr_ting_flag==0)
 	{
-		card_insert(tail_card,1);
+		_InsertCard(tail_card,1);
 		card_list->len--;
 	}
 
@@ -1053,24 +959,24 @@ ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kin
 	temp_data.kind = (CARD_KIND)kind;
 
 	if(act==a_PENG) {
-        card_delete(0,2);
+        _DeleteCards(0,2);
 
 		temp_data.status=c_PENG;
 		temp_data.can_play=cps_NO;
-		card_insert(temp_data,3);
+		_InsertCard(temp_data,3);
 		card_list->atcvie_place += 3;
 	} else if(act==a_MING_GANG) {
-        card_delete(0,3);
+        _DeleteCards(0,3);
         
 		temp_data.status=c_MING_GANG;
 		temp_data.can_play=cps_NO;
-		card_insert(temp_data,4);
+		_InsertCard(temp_data,4);
 		card_list->atcvie_place += 4;
 	} else if(act==a_JUMP) {
 		if(who_give==0) {
 			temp_data.status=c_FREE;
-			card_delete(card_list->len-1,1);
-			card_insert(temp_data,1);
+			_DeleteCards(card_list->len-1,1);
+			_InsertCard(temp_data,1);
 		}
 	}
 
@@ -1098,10 +1004,10 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 		for(;i<card_list->len;i++)
 			if(card_list->data[i].kind==temp_data.kind)
 			{
-				card_delete(i,2);
+				_DeleteCards(i,2);
 				break;
 			}
-		card_insert(temp_data,3);
+		_InsertCard(temp_data,3);
 		card_list->atcvie_place += 3;
 	}
 	else if(act==a_KOU)
@@ -1113,8 +1019,8 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 			if(card_list->data[i].status==c_MING_KOU)
 			{
 				temp_data.kind=card_list->data[i].kind;
-				card_delete(i,1);
-				card_insert(temp_data,1);
+				_DeleteCards(i,1);
+				_InsertCard(temp_data,1);
 				i++;
 				card_list->atcvie_place+=1;
 			}
@@ -1128,9 +1034,9 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 			if(card_list->data[i].status==c_MING_KOU)
 			{
 				temp_data.kind=card_list->data[i].kind;
-				card_delete(i,1);
+				_DeleteCards(i,1);
 				card_list->atcvie_place-=1;
-				card_insert(temp_data,1);
+				_InsertCard(temp_data,1);
 			}
 	}
 	else if(act==a_MING_GANG)
@@ -1150,9 +1056,9 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 			else if(card_list->data[i].status==c_MING_KOU&& card_list->data[i].kind==temp_data.kind)
 				card_list->atcvie_place--;
 			if(card_list->data[i].kind==temp_data.kind)
-				card_delete(i,1);
+				_DeleteCards(i,1);
 		}
-		card_insert(temp_data,4);
+		_InsertCard(temp_data,4);
 		card_list->atcvie_place += 4;
 	}
 	else if(act==a_AN_GANG)
@@ -1164,12 +1070,12 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 			{				 
 				if(card_list->data[m].status==c_MING_KOU)
 					card_list->atcvie_place--;
-				card_delete(m,1);
+				_DeleteCards(m,1);
 			}
 		}
 		temp_data.status=c_AN_GANG;
 		temp_data.can_play=cps_NO;
-		card_insert(temp_data,4);
+		_InsertCard(temp_data,4);
 		//if(rr_ting_flag!=0)
 		//	card_list->atcvie_place++;
 		//else
@@ -1194,19 +1100,19 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 		for(int k=card_list->len-1;k>=card_list->atcvie_place;k--)
 		{
 			if(card_list->data[k].kind==card_list->data[i].kind)
-				card_delete(k,1);
+				_DeleteCards(k,1);
 		}
 		//temp_data.kind=card_list->data[i].kind;
 		temp_data.status=c_AN_GANG;
 		temp_data.can_play=cps_NO;
-		card_insert(temp_data,4);
+		_InsertCard(temp_data,4);
 		card_list->atcvie_place += 4;
 
 		temp_data.status=c_FREE;
 		temp_data.can_play=cps_YES;
 		temp_data.kind=card_list->data[card_list->len-1].kind;
-		card_delete(card_list->len-1,1);
-		card_insert(temp_data,1);
+		_DeleteCards(card_list->len-1,1);
+		_InsertCard(temp_data,1);
 	}
 	else if(act==a_MING)
 	{
@@ -1232,11 +1138,11 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 		temp_data.can_play=cps_NO;
         
 		if(who_give!=0)
-			card_insert(temp_data,1);
+			_InsertCard(temp_data,1);
 		else
 		{
-			card_delete(card_list->len-1,1);
-			card_insert(temp_data,1);
+			_DeleteCards(card_list->len-1,1);
+			_InsertCard(temp_data,1);
 		}
 	
 	}
@@ -1245,8 +1151,8 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 		if(who_give==0)
 		{
 			temp_data.status=c_FREE;
-			card_delete(card_list->len-1,1);
-			card_insert(temp_data,1);
+			_DeleteCards(card_list->len-1,1);
+			_InsertCard(temp_data,1);
 		}
 	}
 

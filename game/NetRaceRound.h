@@ -10,7 +10,7 @@
 class NetRRound
 {
 public:
-	NetRRound();
+	NetRRound(CardInHand *cards);
     virtual ~NetRRound();
 
 private:
@@ -20,10 +20,11 @@ private:
     unsigned char rr_ting_flag;
     unsigned int  archive_ming_indexes;
     
+    CardInHand *_cardsInHand;
+
     long card_score;
 	int InsertPlaceForMG;
 	unsigned int kind_hu;
-    CARD_ARRAY *card_list;
 	int hu_places;
 	int hu_places_num;
 	CARD_KIND hucards[9];
@@ -34,8 +35,8 @@ private:
 	int hu_cards_num[MAX_HANDIN_NUM];
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-    int card_delete(unsigned int from,unsigned int len);
-    void card_insert(CARD data,int times);
+    int _DeleteCards(unsigned int from,unsigned int len);
+    void _InsertCard(CARD data,int times);
     int pattern_match(CARD_KIND data[],int len);
     int cards_stable(CARD_KIND clist[],int len);
     long cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
