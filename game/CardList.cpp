@@ -1,7 +1,15 @@
 
 #include "CardList.h"
 
-CardList::CardList(Card_t *cards,int len) {
+CardList::CardList() {
+	_logger = LOGGER_REGISTER("CardList");
+}
+
+CardList::~CardList() {
+    LOGGER_DEREGISTER(_logger);
+}
+
+void CardList::init(Card_t *cards,int len) {
 	for(int i=0;i<len;i++) {
 		CardNode_t *card = new CardNode_t;
 		card->kind = cards[i];
@@ -10,12 +18,6 @@ CardList::CardList(Card_t *cards,int len) {
 
 		vector::push_back(card);
 	}
-
-	_logger = LOGGER_REGISTER("CardList");
-}
-
-CardList::~CardList() {
-    LOGGER_DEREGISTER(_logger);
 }
 
 Card_t CardList::get(unsigned int idx) const {

@@ -26,12 +26,13 @@ typedef struct _CardNode_t {
 
 class CardList : public vector<CardNode_t *> {
 public:
-    CardList(Card_t *cards,int len);
+    CardList();
 	~CardList();
 
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
-    
+
+    void   init(Card_t *cards,int len);
 	void   show();
 	Card_t get(unsigned int idx) const;
     

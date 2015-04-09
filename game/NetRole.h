@@ -7,9 +7,9 @@
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
-#include "DataBase.h"
 #include "CardList.h"
 #include "NetRaceRound.h"
+#include "DataBase.h"
 
 class NetRole {
 public:
