@@ -29,7 +29,10 @@ public:
     CardList(Card_t *cards,int len);
 	~CardList();
 
-	void show();
+	virtual void push_back(Card_t kind);
+	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
+    
+	void   show();
 	Card_t get(unsigned int idx) const;
     
 private:

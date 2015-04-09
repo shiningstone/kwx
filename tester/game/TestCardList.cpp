@@ -12,4 +12,7 @@ void test_card_list() {
 	for(it=list.begin();it!=list.end();it++) {
 		printf("%d ",(*it)->kind);
 	}
+	//test push_back
+	list.push_back(TIAO_2);
+	list.show();
 }

@@ -320,7 +320,6 @@ void RoundManager::StartGame() {
 }
 
 void RoundManager::RecvPeng(PlayerDir_t dir) {
-    Card        card;
     PlayerDir_t prevPlayer;
     
     if(_isWaitDecision) {
@@ -332,10 +331,11 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     _continue_gang_times = 0;
     _lastAction=a_PENG;
     
-    const int riverLast =_players[_curPlayer]->get_parter()->getOutCardList()->length;
+    Card         card;
+    CardNode_t * last = _players[_curPlayer]->_river->back();
+    card->kind = last->kind;
+    _players[_curPlayer]->_river->pop_back();
     
-    _players[_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
-    _players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
     
     RecordOutCard(card);
     RecordOutCard(card);
@@ -413,13 +413,14 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
 		if(_isCardFromOthers) {
-			int riverLast = _players[_curPlayer]->get_parter()->getOutCardList()->length;
-			_players[_curPlayer]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-			_players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
+            Card         gangCard;
+            CardNode_t * last = _players[_curPlayer]->_river->back();
+            gangCard.kind = last->kind;
+            _players[_curPlayer]->_river->pop_back();
+    
+			RecordOutCard(gangCard);
+			RecordOutCard(gangCard);
+			RecordOutCard(gangCard);
             
 			_curPlayer=dir;
 		}else {
@@ -470,6 +471,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
     RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[idx]);
     _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
+    _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
@@ -740,13 +742,15 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         Card GangCard;
         PlayerDir_t prevPlayer = (PlayerDir_t)dir;
         if(_isCardFromOthers) {
-            int riverLast = _players[dir]->get_parter()->getOutCardList()->length;
-            _players[dir]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-            _players[dir]->get_parter()->getOutCardList()->deleteItem();
+            Card         gangCard;
+            CardNode_t * last = _players[_curPlayer]->_river->back();
+            gangCard.kind = last->kind;
+            _players[_curPlayer]->_river->pop_back();
 
             RecordOutCard(GangCard);
             RecordOutCard(GangCard);
             RecordOutCard(GangCard);
+            
             _curPlayer=dir;
         }else {
             GangCard=list->data[list->len-1];
@@ -790,6 +794,7 @@ void RoundManager::WaitForOthersChoose() {
 
     RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[index]);
 	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
+    _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 
     if(canKou) {
         _uiManager->TingHintBarOfOthers(_curPlayer,index);

@@ -230,9 +230,9 @@ private:
 	void _UpdateHeadImage(int direction,std::string head_photo);//¸üÐÂÍ·Ïñ
     /*###################################*/
 	void _DeleteStartDealCards();
-	BezierTo* BizerMove1(outCardList* outCard,Vec2 location);
-	BezierTo* BizerMove2(outCardList* outCard,Vec2 location,int time);
-	BezierTo* OthersBizerMove(int no,outCardList* outCard);
+	BezierTo* BizerMove1(CardList* river,Vec2 location);
+	BezierTo* BizerMove2(CardList* river,Vec2 location,int time);
+	BezierTo* OthersBizerMove(int no,CardList* river);
     Vec2 _GetLastCardPosition(PlayerDir_t dir,int cardLen) ;
 	void ListenToDistributeCard();
 	void WaitForFirstAction(PlayerDir_t zhuang);

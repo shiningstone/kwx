@@ -3,7 +3,6 @@
 USING_NS_CC;
 
 NetRRound::NetRRound() {
-	out_card_list=NULL;
 	card_list=NULL;
 	hu_len=0;
 	kind_hu=0;
@@ -15,8 +14,6 @@ NetRRound::~NetRRound()
 {
 	if(card_list)
 		delete card_list;
-	if(out_card_list)
-		delete out_card_list;
 
     LOGGER_DEREGISTER(_logger);
 }
@@ -846,13 +843,11 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 	hu_places_num=0;
 	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
 	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
-	if(out_card_list)
-		delete out_card_list;
+
 	if(card_list)
 		delete card_list;
-	out_card_list=new outCardList;
 	card_list = new CARD_ARRAY;
-	if(!card_list||!out_card_list)
+	if(!card_list)
 		return a_TIMEOUT;
 	card_list->len=0;
 	card_list->atcvie_place =0;
@@ -1012,8 +1007,6 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 	}
 	l_kind=card_list->data[place].kind;
     LOGGER_WRITE("NETWORK : %x %s : %d",this,__FUNCTION__,l_kind);
-
-	out_card_list->insertItem(card_list->data[place]);
 
 	if( place==card_list->len-1 )
 	{
@@ -1326,11 +1319,6 @@ long NetRRound::get_card_score()
 CARD_ARRAY* NetRRound::get_card_list()
 {
 	return card_list;
-}
-
-outCardList* NetRRound::getOutCardList()
-{
-	return out_card_list;
 }
 
 bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)

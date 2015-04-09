@@ -8,6 +8,7 @@
 #include "./../utils/LogManager.h"
 
 #include "DataBase.h"
+#include "CardList.h"
 #include "NetRaceRound.h"
 
 class NetRole {
@@ -33,7 +34,7 @@ public:
     /**************************************************
             user's card info
     **************************************************/
-    
+    CardList *_river;
     /**************************************************
             user's profile
     **************************************************/

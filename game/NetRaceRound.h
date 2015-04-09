@@ -24,7 +24,6 @@ private:
 	int InsertPlaceForMG;
 	unsigned int kind_hu;
     CARD_ARRAY *card_list;
-	outCardList *out_card_list;
 	int hu_places;
 	int hu_places_num;
 	CARD_KIND hucards[9];
@@ -65,7 +64,6 @@ public:
 	unsigned char get_ting_status();
     long get_card_score();
     CARD_ARRAY *get_card_list();
-	outCardList *getOutCardList();
 	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
 	bool get_ming_check_result(MRES *res);

@@ -216,8 +216,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     
     _curPlayer = dir;
 
-    int riverLast = _players[dir]->get_parter()->getOutCardList()->length;
-    _players[dir]->get_parter()->getOutCardList()->insertItem(fake);
+    _players[dir]->_river->push_back(card);
     //_players[_curPlayer]->get_parter()->hand_out(0);
         
 	_isCardFromOthers = true;
@@ -322,7 +321,6 @@ void NetRoundManager::StartGame() {
 }
 
 void NetRoundManager::RecvPeng(PlayerDir_t dir) {
-    Card        card;
     PlayerDir_t prevPlayer;
     
     if(_isWaitDecision) {
@@ -333,11 +331,12 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     
     _continue_gang_times = 0;
     _lastAction=a_PENG;
-    
-    const int riverLast =_players[_curPlayer]->get_parter()->getOutCardList()->length;
-    
-    _players[_curPlayer]->get_parter()->getOutCardList()->getCard(card,riverLast);
-    _players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
+
+
+    Card         card;
+    CardNode_t * last = _players[_curPlayer]->_river->back();
+    card.kind = last->kind;
+    _players[_curPlayer]->_river->pop_back();
     
     RecordOutCard(card);
     RecordOutCard(card);
@@ -422,13 +421,14 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
 		if(_isCardFromOthers) {
-			int riverLast = _players[_curPlayer]->get_parter()->getOutCardList()->length;
-			_players[_curPlayer]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-			_players[_curPlayer]->get_parter()->getOutCardList()->deleteItem();
-
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
+            Card         gangCard;
+            CardNode_t * last = _players[_curPlayer]->_river->back();
+            gangCard.kind = last->kind;
+            _players[_curPlayer]->_river->pop_back();
+    
+			RecordOutCard(gangCard);
+			RecordOutCard(gangCard);
+			RecordOutCard(gangCard);
             
 			_curPlayer=dir;
 		}else {
@@ -479,6 +479,7 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
     RecordOutCard(_players[MIDDLE]->get_parter()->get_card_list()->data[idx]);
     _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(idx);
+    _players[MIDDLE]->_river->push_back((Card_t)_lastHandedOutCard);
 
     Card_t card = (Card_t)_lastHandedOutCard;
     RequestShowCard aReq;
@@ -632,13 +633,15 @@ void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
         Card GangCard;
         PlayerDir_t prevPlayer = (PlayerDir_t)dir;
         if(_isCardFromOthers) {
-            int riverLast = _players[dir]->get_parter()->getOutCardList()->length;
-            _players[dir]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-            _players[dir]->get_parter()->getOutCardList()->deleteItem();
-
-            RecordOutCard(GangCard);
-            RecordOutCard(GangCard);
-            RecordOutCard(GangCard);
+            Card         gangCard;
+            CardNode_t * last = _players[_curPlayer]->_river->back();
+            gangCard.kind = last->kind;
+            _players[_curPlayer]->_river->pop_back();
+    
+            RecordOutCard(gangCard);
+            RecordOutCard(gangCard);
+            RecordOutCard(gangCard);
+            
             _curPlayer=dir;
         }else {
             GangCard=list->data[list->len-1];
@@ -682,6 +685,7 @@ void NetRoundManager::WaitForOthersChoose() {
 
     RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[index]);
 	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
+    _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 
     if(canKou) {
         _uiManager->TingHintBarOfOthers(_curPlayer,index);

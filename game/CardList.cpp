@@ -8,7 +8,7 @@ CardList::CardList(Card_t *cards,int len) {
 		card->status = sFREE;
 		card->canPlay = true;
 
-		push_back(card);
+		vector::push_back(card);
 	}
 
 	_logger = LOGGER_REGISTER("CardList");
@@ -24,6 +24,22 @@ Card_t CardList::get(unsigned int idx) const {
 	} else {
 		return (at(idx))->kind;
 	}
+}
+
+void CardList::push_back(Card_t kind) {
+	CardNode_t *card = new CardNode_t;
+	card->kind    = kind;
+	card->status  = sFREE;
+	card->canPlay = true;
+
+	vector::push_back(card);
+}
+
+void CardList::pop_back() {
+    CardNode_t *last = back();
+    delete last;
+
+	vector::pop_back();
 }
 
 void CardList::show() {
