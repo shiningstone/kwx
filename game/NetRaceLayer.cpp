@@ -1761,7 +1761,7 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
     return TargetedAction::create(cardOut,result);
 }
 
-void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isCardFromOthers) {
+void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isCardFromOthers,Card_t card) {
     Sequence *gang_seq;
     
     auto hideOutCard = Sequence::create(NULL);
@@ -1786,7 +1786,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,boo
         goldEffect,
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)),CCCallFunc::create([=]() {
-            _roundManager->UpdateCards(dir,a_MING_GANG);}),CCCallFunc::create([=]() {
+            _roundManager->UpdateCards(dir,a_MING_GANG,card);}),CCCallFunc::create([=]() {
             _CardInHandUpdateEffect(dir);}),CallFunc::create([=](){
             _roundManager->ActionAfterGang(dir);}),NULL),NULL));
 }
@@ -3243,7 +3243,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 	}
     
     if(dir!=MIDDLE) {
-        _OthersMingGangEffect(dir,prevDir,_roundManager->_isCardFromOthers);
+        _OthersMingGangEffect(dir,prevDir,_roundManager->_isCardFromOthers,card);
 	} else {
 		for(int node=0;node<3;node++) {
 		    _Remove(myframe,PENG_EFFECT_NODE_ID+node);
