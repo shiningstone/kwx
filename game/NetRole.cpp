@@ -3,24 +3,31 @@
 
 NetRole::NetRole() {
     _isReady = false;
+
     memset(&_profile,0,sizeof(UserProfile_t));
-    _act   = new NetRRound();
-    _river = new CardList();
+
+    _act         = new NetRRound();
+    _cardsInHand = new CardInHand();
+    _river       = new CardList();
 
     _logger = LOGGER_REGISTER("NetRole");
 }
 
 NetRole::NetRole(int id) {//this is for default settings ( robot ) 
     _isReady = false;
+
     memset(&_profile,0,sizeof(UserProfile_t));
-    _act   = new NetRRound();
-    _river = new CardList();
+
+    _act         = new NetRRound();
+    _cardsInHand = new CardInHand();
+    _river       = new CardList();
 
     _logger = LOGGER_REGISTER("NetRole");
 }
 
 NetRole::~NetRole() {
     delete _act;
+    delete _cardsInHand;
     delete _river;
     
     LOGGER_DEREGISTER(_logger);

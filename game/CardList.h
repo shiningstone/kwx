@@ -32,12 +32,19 @@ public:
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
-    void   init(Card_t *cards,int len);
 	void   show();
 	Card_t get(unsigned int idx) const;
     
 private:
     Logger *_logger;
+};
+
+class CardInHand : public CardList {
+public:
+    void   init(Card_t *cards,int len);
+
+
+
 };
 
 #endif
