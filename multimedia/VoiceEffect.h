@@ -18,12 +18,13 @@ public:
     static void destroyInstance();
     
     CallFunc *SpeakCard(Card_t card,Sex_t sex = BOY);
-    CallFunc *SpeakAction(Action_t id,Sex_t sex = BOY);
+    CallFunc *SpeakAction(ActionId_t id,Sex_t sex = BOY);
     CallFunc *Speak(const char *file);
 private:
     VoiceEffect();
     static VoiceEffect *_instance;
 
+    static Action_t _actionIdx(ActionId_t action);
     static int _motionToFile(char *file,const char *motion);
 };
 

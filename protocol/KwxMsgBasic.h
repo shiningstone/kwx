@@ -23,18 +23,6 @@ typedef enum {
 }Status_t;
 
 typedef enum {
-    aQi        = 0,
-    aPENG      = 0x1,
-    aMING_GANG = 0x2,
-    aAN_GANG   = 0x4,
-    aMING      = 0x8,
-    aHU        = 0x10,
-    aSHOU_GANG = 0x20,
-    aKOU       = 0x40,
-    aKOU_CANCEL= 0x80,
-}ActionId_t;/*ARRAY_ACTION???*/
-
-typedef enum {
     /* Upstream & Downstream : request and its response */
     REQ_GAME_SEND_START         = 43,
     REQ_GAME_SEND_SHOWCARD      = 48,

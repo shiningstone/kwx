@@ -1788,7 +1788,7 @@ void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,boo
         hideOutCard,
         Spawn::create(
             simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
-            _voice->SpeakAction(GANG,_roundManager->_players[dir]->GetSex()),NULL),
+            _voice->SpeakAction(aMING_GANG,_roundManager->_players[dir]->GetSex()),NULL),
         goldEffect,
         Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)),CCCallFunc::create([=]() {
@@ -2615,7 +2615,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 	if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create( 
                             Spawn::create(
-                                _voice->SpeakAction(PENG,_roundManager->_players[dir]->GetSex()),
+                                _voice->SpeakAction(aPENG,_roundManager->_players[dir]->GetSex()),
                                 simple_tip_effect( _layout->PositionOfActSign(dir),"peng.png" ),NULL), 
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
@@ -2908,7 +2908,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 		PengEffectNode->runAction(Sequence::create(
             hideReminder,Spawn::create(
                 simple_tip_effect(_layout->PositionOfActSign(dir),"peng.png" ),
-                _voice->SpeakAction(PENG,
+                _voice->SpeakAction(aPENG,
                     _roundManager->_players[dir]->GetSex()),Spawn::create(
                 hide2CardsInhand),Spawn::create(
                 moveRightCardInHand,
@@ -2942,7 +2942,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
     if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
-                _voice->SpeakAction(GANG,_roundManager->_players[dir]->GetSex()),
+                _voice->SpeakAction(aAN_GANG,_roundManager->_players[dir]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             NetRaceLayer::_DeleteActionTip)), CallFunc::create([=](){
@@ -3206,7 +3206,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                 hideReminder,
                 Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
-                    _voice->SpeakAction(GANG,
+                    _voice->SpeakAction(aAN_GANG,
                         _roundManager->_players[dir]->GetSex()),
                     moveFreeCards,
                     Spawn::create(
@@ -3629,7 +3629,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                 hideReminder,
             Spawn::create(
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
-                _voice->SpeakAction(GANG,_roundManager->_players[dir]->GetSex()),
+                _voice->SpeakAction(aMING_GANG,_roundManager->_players[dir]->GetSex()),
                 hideOutcard,
                 moveFreeCards,
                 Spawn::create(
@@ -3680,7 +3680,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
         if(winner!=MIDDLE) {
 			myframe->runAction(Sequence::create(
                 Spawn::create(
-                    _voice->SpeakAction(HU,_roundManager->_players[winner]->GetSex()),
+                    _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),NULL),CallFunc::create([=](){
 				GoldNumInsert(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
                 NetRaceLayer::showall)),NULL));
@@ -3694,7 +3694,7 @@ void NetRaceLayer::_HuEffect(const WinInfo_t &win)
             
 			myframe->runAction(Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
-                    _voice->SpeakAction(HU,_roundManager->_players[winner]->GetSex()),CallFunc::create([=](){
+                    _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),CallFunc::create([=](){
     				GoldNumInsert(winner,HU_WIN,giver);}),
                     backgroundEffect,NULL));
 		}
