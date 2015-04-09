@@ -16,7 +16,7 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
     _lastWin.winner = INVALID_DIR;
     _lastWin.giver  = INVALID_DIR;
 
-    _river = NULL;
+	_gRiver = new CardList;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
 		_unDistributedCards[i]=i;
 	}
@@ -31,7 +31,7 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
 }
 
 RoundManager::~RoundManager() {
-    delete _river;
+    delete _gRiver;
     for(int i=0;i<PLAYER_NUM;i++) {
         delete _players[i];
     }
@@ -95,22 +95,13 @@ PlayerDir_t RoundManager::TurnToNext() {
         river information
 ***********************************************/
 void RoundManager::RecordOutCard( Card card ) {
-    _river->insertItem(card);
-
-    LOGGER_WRITE("RIVER : ");
-    char cards[84] = {0};
-    int  i = 0;
-    outCardNode *p = _river->head;
-    while(p->pNext) {
-        cards[i++] = p->pNext->data.kind;
-        p = p->pNext;
-    }
-    LOGGER_WRITE_ARRAY(cards,i);
+    _gRiver->push_back((Card_t)card.kind);
+    _gRiver->show();
 }
 
 void RoundManager::RenewOutCard() {
-    delete _river;
-	_river = new outCardList;
+    delete _gRiver;
+	_gRiver = new CardList;
 }
 
 /***********************************************

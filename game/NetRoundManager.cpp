@@ -24,7 +24,7 @@ NetRoundManager::NetRoundManager(NetRaceLayer *uiManager)
     _lastWin.winner = INVALID_DIR;
     _lastWin.giver  = INVALID_DIR;
 
-    _river = NULL;
+	_gRiver = new CardList;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
 		_unDistributedCards[i]=i;
 	}
@@ -40,7 +40,7 @@ NetRoundManager::NetRoundManager(NetRaceLayer *uiManager)
 }
 
 NetRoundManager::~NetRoundManager() {
-    delete _river;
+    delete _gRiver;
     for(int i=0;i<PLAYER_NUM;i++) {
         delete _players[i];
     }

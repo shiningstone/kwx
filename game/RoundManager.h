@@ -13,6 +13,7 @@ using namespace ui;
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
+#include "CardList.h"
 
 class NetRole;
 
@@ -86,7 +87,7 @@ protected:
     WinInfo_t   _lastWin;
     NetRole     *_players[PLAYER_NUM];
 
-    outCardList *_river;
+    CardList   *_gRiver;
     int         _unDistributedCards[TOTAL_CARD_NUM];
     int         _distributedNum;
 
