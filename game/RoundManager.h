@@ -62,7 +62,7 @@ public:
 
     PlayerDir_t TurnToNext();
 
-    void RecordOutCard( Card card );
+    void RecordOutCard( CardNode_t *card );
     void RenewOutCard();
 
     virtual void InitPlayers();
@@ -108,7 +108,7 @@ protected:
     Card _curEffectCard;
     void CancelEffectCard();
     void SetEffectCard(int kind,int status);
-    bool IsCurEffectCard(Card card);
+    bool IsCurEffectCard(const CardNode_t *card);
 
     bool _isMingTime;
     int  _tempActionToDo;

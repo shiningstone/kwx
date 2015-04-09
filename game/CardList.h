@@ -35,8 +35,9 @@ public:
 	void   show();
 	Card_t get_kind(unsigned int idx) const;
     CardStatus_t get_status(unsigned int idx) const;
-    void   set(unsigned int idx,CardStatus_t status);
-private:
+    bool   canPlay(unsigned int idx) const;
+    void   set_status(unsigned int idx,CardStatus_t status);
+protected:
     Logger *_logger;
 };
 
@@ -45,6 +46,8 @@ public:
     void   init(Card_t *cards,int len);
 
     int FreeStart;
+    int Last;
+    int Residue;
 };
 
 #endif

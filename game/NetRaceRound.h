@@ -1,12 +1,12 @@
 #ifndef  _NET_RACE_ROUND_H_
 #define  _NET_RACE_ROUND_H_
 
-#include "OutCardList.h"
 #include "Role.h"
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
+#include "CardList.h"
 class NetRRound
 {
 public:
@@ -57,13 +57,12 @@ public:
 	void LockAllCards();
     unsigned int get_aim();
 	unsigned int get_ming_indexes();
-	int *get_ming_reserved_cards_num(outCardList *list);
+	int *get_ming_reserved_cards_num(CardList *list);
 	void set_ming_indexes(unsigned int indexesFlag);
 	unsigned char ActiontodoCheckAgain();
 	void set_ting_status(unsigned char flag);
 	unsigned char get_ting_status();
     long get_card_score();
-    CARD_ARRAY *get_card_list();
 	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
 	bool get_ming_check_result(MRES *res);

@@ -36,7 +36,7 @@ public:
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void GangGoldEffect(int winner,int whoGive);
-    void KouCancelEffect(CARD_ARRAY *cards);
+    void KouCancelEffect(CardInHand *cards);
     void KouConfirmEffect();
     void MingCancelEffect();
 	void QueryKouCards();
@@ -63,7 +63,7 @@ private:
     const static int DIST_BATCH_CARDS = 4;   /*card number of distribute batch*/
 
     typedef struct {
-        CARD_ARRAY *list;
+        CardInHand  *list;
         int         start;
         int         last;
         int         residual;
@@ -74,7 +74,7 @@ private:
     LayerColor* myframe;
 
     Sprite *_GetCardInHand(PlayerDir_t dir,int idx);
-    void    _ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards);
+    void    _ReOrderCardsInHand(int droppedCard,CardInHand *cards);
     void    _GetCardsInfo(CardsInfo_t *info);
     int     _FindCard(int start,int end,Touch *touch);
     TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
@@ -123,7 +123,7 @@ private:
     int _FindChosenGroup(Touch *touch,Sprite *cardsInHand[]);
     void _KouTouchEnded(Touch* touch, Event* event);
     Node *_NonKouMask(Sprite *card);
-    void    _MaskNonKouCards(CARD_ARRAY *cards);
+    void    _MaskNonKouCards(CardInHand *cards);
     void    ListenToKou(int no);
     TargetedAction *_ShowBigMing(Node *myframe);
     
@@ -242,7 +242,7 @@ public:
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(const WinInfo_t &win);
 	void _DistributeCard(PlayerDir_t dir, int lenOfInHand);
-	void MyHandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
+	void MyHandoutEffect(int cardInList,CardInHand *list,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 
 	unsigned int VoiceId;

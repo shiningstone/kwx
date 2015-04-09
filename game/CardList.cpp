@@ -1,6 +1,8 @@
 
 #include "CardList.h"
 
+#define MAX_HANDIN_NUM 18
+
 CardList::CardList() {
 	_logger = LOGGER_REGISTER("CardList");
 }
@@ -21,9 +23,18 @@ Card_t CardList::get_kind(unsigned int idx) const {
 CardStatus_t CardList::get_status(unsigned int idx) const {
 	if(idx>=size()) {
         LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
-		return CARD_UNKNOWN;
+		return sUNDEFINDED;
 	} else {
 		return (at(idx))->status;
+	}
+}
+
+bool CardList::canPlay(unsigned int idx) const {
+	if(idx>=size()) {
+        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
+		return false;
+	} else {
+		return (at(idx))->canPlay;
 	}
 }
 

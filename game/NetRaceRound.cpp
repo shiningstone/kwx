@@ -995,7 +995,6 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 /*if ting place=card_list->len*/
 CARD_KIND NetRRound::hand_out(unsigned int place)
 {
-
 	CARD_KIND l_kind;
 	CARD tail_card;
 	tail_card.kind = card_list->data[card_list->len-1].kind;
@@ -1264,7 +1263,7 @@ unsigned int NetRRound::get_ming_indexes()
 	return archive_ming_indexes;
 }
 
-int *NetRRound::get_ming_reserved_cards_num(outCardList *list)
+int *NetRRound::get_ming_reserved_cards_num(CardList *list)
 {
 	int i;	
 	memset(hu_residueForEvery,0,sizeof(int)*MAX_HANDIN_NUM*9);
@@ -1279,11 +1278,13 @@ int *NetRRound::get_ming_reserved_cards_num(outCardList *list)
 				{
 					int k=1;
 					int default_reserved_cards=4;
-					while(list->getCard(card,k++)==true)
-					{
-						if(card.kind==hu_cards[i][j])
+
+                    for(int idx=0;idx<list->size();i++) {
+                        if(list->at(idx)->kind==hu_cards[i][j]) {
 							default_reserved_cards--;
-					}
+                        }
+                    }
+
 					hu_residueForEvery[i][m++]=default_reserved_cards;
 					hu_reserved_num[i] += default_reserved_cards;
 				}
@@ -1320,11 +1321,6 @@ unsigned char NetRRound::get_ting_status()
 long NetRRound::get_card_score()
 {
 	return card_score;
-}
-
-CARD_ARRAY* NetRRound::get_card_list()
-{
-	return card_list;
 }
 
 bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)

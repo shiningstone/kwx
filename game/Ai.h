@@ -11,8 +11,8 @@ public:
     void init_target(CardInHand *list,ROBOT_TARGET *target,int hu_len1,int hu_len2);
     void collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2);
     int  ChooseWorstCard(bool &kouRequest);
-    Card_t FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers);
-    Card_t FindPengCards(int cardIdx[2],CARD_ARRAY *cards,Card_t target);
+    Card_t FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers);
+    Card_t FindPengCards(int cardIdx[2],CardInHand *cards,Card_t target);
     int  ReChooseAfterGang(int chosen,int gangIdx[3],bool isCardFromOthers,int gang4=INVALID/* set to INVALID if MingGang*/);
     int  ReChooseAfterPeng(int chosen,int pengIdx[2]);
 private:
@@ -31,11 +31,11 @@ public:
     int  KouCardIndex(int group,int idx);
     CARD_STATUS  KouCardStatus(int gIdx);
     void SetKouCardStatus(int gIdx,CARD_STATUS status);
-    void SwitchGroupStatus(int group,CARD_ARRAY *cards);
-    void Refresh(CARD_ARRAY *cards);
+    void SwitchGroupStatus(int group,CardInHand *cards);
+    void Refresh(CardInHand *cards);
     Card_t KouCardKind(int gIdx);
     void KouCardCheck(PlayerDir_t dir);
-    int  _FindCards(int idx[],CardInHand *list,CARD_KIND kind);
+    int  _FindCards(int idx[],CardInHand *list,Card_t kind);
 
     void MingKouChoose(PlayerDir_t dir);
 /*************************************

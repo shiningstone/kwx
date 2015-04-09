@@ -21,14 +21,6 @@ const char * VoiceCards[SEX_MAX][CARD_MAX] = {
     },
 };
 
-typedef enum {
-    PENG,
-    GANG,
-    TING,
-    HU,
-    ACTION_MAX,
-}Action_t;
-
 Action_t VoiceEffect::_actionIdx(ActionId_t action) {
     if(action==aPENG) {
         return PENG;

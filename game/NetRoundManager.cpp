@@ -209,9 +209,9 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     Card_t card        = (Card_t)info->kind;
     delete info;
 
-    Card fake;
-    fake.kind   = (CARD_KIND)card;
-    RecordOutCard(fake);
+    CardNode_t fake;
+    fake.kind   = card;
+    RecordOutCard(&fake);
 	_lastHandedOutCard = (CARD_KIND)card;
     
     _curPlayer = dir;
@@ -282,14 +282,15 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 
                 Card GangCard;
                 if(_isCardFromOthers) {
-                    int riverLast = _players[whoGive]->get_parter()->getOutCardList()->length;
-                    _players[whoGive]->get_parter()->getOutCardList()->getCard(GangCard,riverLast);
-                    _players[whoGive]->get_parter()->getOutCardList()->deleteItem();
-                
-                    RecordOutCard(GangCard);
-                    RecordOutCard(GangCard);
-                    RecordOutCard(GangCard);
                     
+                    CardNode_t *last = _players[whoGive]->_river->back();
+
+                    RecordOutCard(last);
+                    RecordOutCard(last);
+                    RecordOutCard(last);
+
+                    _players[whoGive]->_river->pop_back();
+                
                     _curPlayer = dir;
                     
                     _players[dir]->get_parter()->hand_in(
@@ -372,25 +373,24 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     _lastAction=a_PENG;
 
 
-    Card         card;
     CardNode_t * last = _players[_curPlayer]->_river->back();
-    card.kind = last->kind;
-    _players[_curPlayer]->_river->pop_back();
-    
-    RecordOutCard(card);
-    RecordOutCard(card);
-
-    prevPlayer = (PlayerDir_t)_curPlayer;
-    _curPlayer = dir;
+    RecordOutCard(last);
+    RecordOutCard(last);
+    Card_t PengCard = last->kind;
 
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(aPENG,(Card_t)card.kind);
+        aReq.Set(aPENG,PengCard);
         _messenger->Send(aReq);
     }
 
+    _players[_curPlayer]->_river->pop_back();
+    
+    prevPlayer = (PlayerDir_t)_curPlayer;
+    _curPlayer = dir;
+
     LOGGER_WRITE("NOTE: maybe this action should be taken later\n");
-    _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
+    _uiManager->PengEffect(dir,prevPlayer,PengCard);
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
@@ -428,7 +428,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
     int* gangCardIdx=new int[4];
     Card_t card;
     
-	auto list=_players[dir]->get_parter()->get_card_list();
+	auto list=_players[dir]->_cardsInHand;
 	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
 		_lastActionSource = dir;
         
@@ -456,27 +456,28 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 		_lastAction=a_MING_GANG;
 		_lastActionWithGold=a_MING_GANG;
 
-		Card GangCard;
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
+        Card_t GangCard;
 		if(_isCardFromOthers) {
-            Card         gangCard;
             CardNode_t * last = _players[_curPlayer]->_river->back();
-            gangCard.kind = last->kind;
-            _players[_curPlayer]->_river->pop_back();
-    
-			RecordOutCard(gangCard);
-			RecordOutCard(gangCard);
-			RecordOutCard(gangCard);
             
-			_curPlayer=dir;
+			RecordOutCard(last);
+			RecordOutCard(last);
+			RecordOutCard(last);
+            GangCard = last->kind;
+            
+            _players[_curPlayer]->_river->pop_back();
+
+            _curPlayer=dir;
 		}else {
-			GangCard=list->data[list->len-1];
-			RecordOutCard(GangCard);
+            CardNode_t *last = _players[_curPlayer]->_river->back();
+            GangCard = last->kind;
+			RecordOutCard(last);
 		}
 
-        card = _ai->FindGangCards(gangCardIdx,list,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
-        _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
+        card = _ai->FindGangCards(gangCardIdx,list,GangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _uiManager->GangEffect(dir,GangCard,gangCardIdx,false,prevPlayer);
 	}
 }
 
@@ -497,7 +498,7 @@ void NetRoundManager::RecvQi() {
 }
 
 void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
-    auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
+    auto cardsInHand = _players[MIDDLE]->_cardsInHand;
 
     if(_isGangAsking) {
         _isGangAsking = false;
@@ -516,7 +517,7 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordOutCard(_players[MIDDLE]->get_parter()->get_card_list()->data[idx]);
+    RecordOutCard(_players[MIDDLE]->_cardsInHand->at(idx));
     _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(idx);
     _players[MIDDLE]->_river->push_back((Card_t)_lastHandedOutCard);
 
@@ -537,19 +538,19 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 }
 
 void NetRoundManager::RecvKouCancel() {
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        cards->data[i].status=c_FREE;
+    auto cards = _players[MIDDLE]->_cardsInHand;
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        cards->set_status(i,sFREE);
     }
 
     _uiManager->KouCancelEffect(cards);
 }
 
 void NetRoundManager::RecvKouConfirm() {
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        if(cards->data[i].status==c_KOU_ENABLE)
-            cards->data[i].status=c_FREE;
+    auto cards = _players[MIDDLE]->_cardsInHand;
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        if(cards->get_status(i)==sKOU_ENABLE)
+            cards->set_status(i,sFREE);
     }   
     
     UpdateCards(MIDDLE,a_KOU);
@@ -625,9 +626,9 @@ void NetRoundManager::WaitForMyChoose() {
 	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
                 (IsTing(_curPlayer) && !_isGangAsking) ) {
-            auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-            Vec2 location = _uiManager->GetCardPositionInHand(cards->len-1);
-            RecvHandout(cards->len-1,location,2);
+            auto cards = _players[MIDDLE]->_cardsInHand;
+            Vec2 location = _uiManager->GetCardPositionInHand(cards->size()-1);
+            RecvHandout(cards->size()-1,location,2);
             
 		} else {
 			_isMyShowTime = true;
@@ -716,7 +717,7 @@ void NetRoundManager::WaitForOthersChoose() {
 	int index = _ai->ChooseWorstCard(canKou);
     
     if ( canKou ) {
-        _otherHandedOut = (Card_t)_players[_curPlayer]->get_parter()->get_card_list()->data[index].kind;
+        _otherHandedOut = _players[_curPlayer]->_cardsInHand->get_kind(index);
         
         _ai->KouCardCheck((PlayerDir_t)_curPlayer);
         if(_ai->KouCardGroupNum()>0) {
@@ -724,7 +725,7 @@ void NetRoundManager::WaitForOthersChoose() {
         }
     }
 
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[index]);
+    RecordOutCard(_players[_curPlayer]->_cardsInHand->at(index));
 	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
     _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 

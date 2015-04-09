@@ -12,6 +12,14 @@ using namespace ui;
 
 #include "./../utils/BasicType.h"
 
+typedef enum {
+    PENG,
+    GANG,
+    TING,
+    HU,
+    ACTION_MAX,
+}Action_t;
+
 class VoiceEffect {
 public:
     static VoiceEffect *getInstance();

@@ -78,8 +78,8 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
     CardInHand *cards = _roundManager->_players[_roundManager->_curPlayer]->_cardsInHand;
     
     for(int i=cards->FreeStart; i<cards->size();i++) {
-		int time = res->list[cards.get_kind(i)].same_times++;
-		res->list[cards.get_kind(i)].place[time]=i;
+		int time = res->list[cards->get_kind(i)].same_times++;
+		res->list[cards->get_kind(i)].place[time]=i;
 	}
 
 	/*init hu target*/
@@ -170,35 +170,35 @@ void Ai::SetKouCardStatus(int gIdx,CARD_STATUS status) {
     _bufKouCards.group[gIdx].card.status = status;
 }
 
-void Ai::SwitchGroupStatus(int group,CARD_ARRAY *cards) {
+void Ai::SwitchGroupStatus(int group,CardInHand *cards) {
     if(KouCardStatus(group)==c_MING_KOU) {
         SetKouCardStatus(group,c_KOU_ENABLE);
-        cards->data[KouCardIndex(group,0)].status=c_KOU_ENABLE;
-        cards->data[KouCardIndex(group,1)].status=c_KOU_ENABLE;
-        cards->data[KouCardIndex(group,2)].status=c_KOU_ENABLE;
+        cards->set_status(KouCardIndex(group,0),sKOU_ENABLE);
+        cards->set_status(KouCardIndex(group,1),sKOU_ENABLE);
+        cards->set_status(KouCardIndex(group,2),sKOU_ENABLE);
     }
     else if(KouCardStatus(group)==c_KOU_ENABLE) {
         SetKouCardStatus(group,c_MING_KOU);
-        cards->data[KouCardIndex(group,0)].status=c_MING_KOU;
-        cards->data[KouCardIndex(group,1)].status=c_MING_KOU;
-        cards->data[KouCardIndex(group,2)].status=c_MING_KOU;
+        cards->set_status(KouCardIndex(group,0),sMING_KOU);
+        cards->set_status(KouCardIndex(group,1),sMING_KOU);
+        cards->set_status(KouCardIndex(group,2),sMING_KOU);
     }
 }
 
-void Ai::Refresh(CARD_ARRAY *cards) {
+void Ai::Refresh(CardInHand *cards) {
     for( int group=0; group<KouCardGroupNum(); group++ ) {
         if(KouCardStatus(group)!=c_MING_KOU) {
             if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
                 (CARD_KIND)KouCardKind(group), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
             {
-                cards->data[KouCardIndex(group,0)].status=c_KOU_ENABLE;
-                cards->data[KouCardIndex(group,1)].status=c_KOU_ENABLE;
-                cards->data[KouCardIndex(group,2)].status=c_KOU_ENABLE;
+                cards->set_status(KouCardIndex(group,0),sKOU_ENABLE);
+                cards->set_status(KouCardIndex(group,1),sKOU_ENABLE);
+                cards->set_status(KouCardIndex(group,2),sKOU_ENABLE);
                 SetKouCardStatus(group,c_KOU_ENABLE);
             } else {
-                cards->data[KouCardIndex(group,0)].status=c_FREE;
-                cards->data[KouCardIndex(group,1)].status=c_FREE;
-                cards->data[KouCardIndex(group,2)].status=c_FREE;
+                cards->set_status(KouCardIndex(group,0),sFREE);
+                cards->set_status(KouCardIndex(group,1),sFREE);
+                cards->set_status(KouCardIndex(group,2),sFREE);
                 SetKouCardStatus(group,c_FREE);
             }
         }
@@ -221,7 +221,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
             if(_FindCards(cardIdx, list, curKind)==3 
-                    &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(curKind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+                    &&_roundManager->_players[dir]->get_parter()->judge_kou_cards((CARD_KIND)curKind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
                 
                 AddKouCardGroup((Card_t)curKind,cardIdx);
 
@@ -233,7 +233,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
 	}
 }
 
-int Ai::_FindCards(int idx[],CardInHand *list,CARD_KIND kind) {
+int Ai::_FindCards(int idx[],CardInHand *list,Card_t kind) {
     int num = 0;
     
     for(int i=list->FreeStart; i<list->size(); i++) {   
@@ -264,44 +264,44 @@ void Ai::MingKouChoose(PlayerDir_t dir) {
 /*************************************
         card process
 *************************************/
-Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers) {
+Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers) {
     if( gangType & a_AN_GANG || gangType & a_SHOU_GANG ) {
         if(!isTing) {
             /*BUG here : only the first group can be found*/
-            for(int i=cards->atcvie_place; i<cards->len; i++) {
+            for(int i=cards->FreeStart; i<cards->size(); i++) {
                 int matchCardNum = 0;
                 cardIdx[0]       = i;
                 
-                for(int j=i+1; j<cards->len; j++) {
-                    if(cards->data[i].kind==cards->data[j].kind) {
+                for(int j=i+1; j<cards->size(); j++) {
+                    if(cards->get_kind(i)==cards->get_kind(j)) {
                         matchCardNum++;
                         cardIdx[matchCardNum] = j;
                         
                         if(matchCardNum==3) {
-                            return (Card_t)cards->data[i].kind;
+                            return cards->get_kind(i);
                         }
                     }
                 }
             }
         } else {
-            cardIdx[3] = cards->len-1;
+            cardIdx[3] = cards->size()-1;
         
             int p = 0;
-            for(int i=0; i<cards->atcvie_place; i++){
-                if(cards->data[i].kind==cards->data[cardIdx[3]].kind) {
+            for(int i=0; i<cards->FreeStart; i++){
+                if(cards->get_kind(i)==cards->get_kind(cardIdx[3])) {
                     cardIdx[p++]=i;
                     if(p==3) {
-                        return (Card_t)cards->data[i].kind;
+                        return cards->get_kind(i);
                     }
                 }
             }
         }
     } else {
-		int last = isCardFromOthers ? (cards->len) : (cards->len-1);
+		int last = isCardFromOthers ? (cards->size()) : (cards->size()-1);
 
         int matchCardNum = 0;
 		for(int i=0;i<last;i++) {
-			if(target==cards->data[i].kind) {
+			if(target==cards->get_kind(i)) {
                 cardIdx[matchCardNum++] = i;
                 
                 if(matchCardNum==3) {
@@ -338,11 +338,11 @@ int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isCardFromOthers,int ga
     return newChosen;
 }
 
-Card_t Ai::FindPengCards(int cardIdx[2],CARD_ARRAY *cards,Card_t target) {
+Card_t Ai::FindPengCards(int cardIdx[2],CardInHand *cards,Card_t target) {
     int matchNum = 0;
     
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        if(target==(Card_t)cards->data[i].kind) {
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        if(target==cards->get_kind(i)) {
             cardIdx[matchNum++] = i;
             if(matchNum==2) {
                 return target;
