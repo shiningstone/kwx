@@ -33,8 +33,9 @@ public:
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
 	void   show();
-	Card_t get(unsigned int idx) const;
-    
+	Card_t get_kind(unsigned int idx) const;
+    CardStatus_t get_status(unsigned int idx) const;
+    void   set(unsigned int idx,CardStatus_t status);
 private:
     Logger *_logger;
 };
@@ -43,8 +44,7 @@ class CardInHand : public CardList {
 public:
     void   init(Card_t *cards,int len);
 
-
-
+    int FreeStart;
 };
 
 #endif

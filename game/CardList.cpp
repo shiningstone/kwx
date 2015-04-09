@@ -9,11 +9,29 @@ CardList::~CardList() {
     LOGGER_DEREGISTER(_logger);
 }
 
-Card_t CardList::get(unsigned int idx) const {
+Card_t CardList::get_kind(unsigned int idx) const {
 	if(idx>=size()) {
+        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
 		return CARD_UNKNOWN;
 	} else {
 		return (at(idx))->kind;
+	}
+}
+
+CardStatus_t CardList::get_status(unsigned int idx) const {
+	if(idx>=size()) {
+        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
+		return CARD_UNKNOWN;
+	} else {
+		return (at(idx))->status;
+	}
+}
+
+void CardList::set_status(unsigned int idx,CardStatus_t status) {
+	if(idx>=size()) {
+        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
+	} else {
+		(at(idx))->status = status;
 	}
 }
 

@@ -4,7 +4,7 @@
 #include "RoundManager.h"
 #include "Ai.h"
 
-void Ai::init_target(CARD_ARRAY *list,ROBOT_TARGET *target,int hu_len1,int hu_len2)
+void Ai::init_target(CardInHand *list,ROBOT_TARGET *target,int hu_len1,int hu_len2)
 {
 	int couples=0;
 	int color;
@@ -15,34 +15,35 @@ void Ai::init_target(CARD_ARRAY *list,ROBOT_TARGET *target,int hu_len1,int hu_le
 	{
 		color=i;
 		color_num=0;
-		for(int j=0;j<list->len;j++)
-			if(list->data[j].kind/9==color)
+        
+		for(int j=0;j<list->size();j++)
+			if(list->get_kind(j)/9==color)
 				color_num++;
+            
 		if(color_num>9)
 			break;
 	}
 	if(color_num>=9)
 	{
 		same_color_num=color_num;
-		for(int j=0;j<list->atcvie_place;j++)
-			if(list->data[j].kind/9!=color)
+		for(int j=0;j<list->FreeStart;j++)
+			if(list->get_kind(j)/9!=color)
 			{
 				same_color_num=0;
 				break;
 			}
 	}
-	for(int i=list->atcvie_place;i<list->len;i++)
+	for(int i=list->FreeStart;i<list->size();i++)
 	{
 		int nums=1;
-		for(int k=i+1;k<list->len;k++)
-			if(list->data[i].kind==list->data[k].kind &&
-			 list->data[i].status==c_FREE &&
-			 list->data[i].status == list->data[k].status)
+		for(int k=i+1;k<list->size();k++)
+			if(list->get_kind(i)==list->get_kind(k) &&
+			 list->get_status(i)==sFREE && sFREE == list->get_status(k))
 				nums++;
 		if(nums==2||nums==4)
 			couples++;
 	}
-	if(list->atcvie_place==0&&couples>=5)
+	if(list->FreeStart==0&&couples>=5)
 		*target=SEVEN_COUPLES_TARGET;
 	else if(same_color_num>=9&&color==0)
 		*target=SAME_TIAO_TARGET;
@@ -63,7 +64,7 @@ void Ai::_CollectResouce(HAH *res) {
 	CARD s_card;
 
     for(int i=0;i<_roundManager->_gRiver->size();i++) {
-		res->card_in_river[res->river_len++] = (CARD_KIND)_roundManager->_gRiver->get(i);
+		res->card_in_river[res->river_len++] = (CARD_KIND)_roundManager->_gRiver->get_kind(i);
     }
 }
 
@@ -74,15 +75,16 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
 	_roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_hu_cards(target1,len1);
 	_roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_hu_cards(target2,len2);
 
-    for(int i=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->atcvie_place;
-        i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++) {
-		int time = res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].same_times++;
-		res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].place[time]=i;
+    CardInHand *cards = _roundManager->_players[_roundManager->_curPlayer]->_cardsInHand;
+    
+    for(int i=cards->FreeStart; i<cards->size();i++) {
+		int time = res->list[cards.get_kind(i)].same_times++;
+		res->list[cards.get_kind(i)].place[time]=i;
 	}
 
 	/*init hu target*/
 	if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-        auto list = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list();
+        auto list = _roundManager->_players[_roundManager->_curPlayer]->_cardsInHand;
         init_target(list,&res->target,*len1,*len2);
     }
 }
@@ -107,8 +109,9 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 		index = _roundManager->_players[_roundManager->_curPlayer]->chose_card(
             s_res,TOTAL_CARD_NUM - _roundManager->_distributedNum,list1,list2,len1,len2);
 
-		if( index==-1 || index>_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1 ) {
-			index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+		if( index==-1 
+                || index > _roundManager->_players[_roundManager->_curPlayer]->_cardsInHand->size()-1 ) {
+			index = _roundManager->_players[_roundManager->_curPlayer]->_cardsInHand->size()-1;
 		}
         
 		if(s_res->hu_nums>=6 
@@ -117,7 +120,7 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 			kouRequest = true;
 		}
 	} else {
-		index = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+		index = _roundManager->_players[_roundManager->_curPlayer]->_cardsInHand->size()-1;
     }
 
     return index;
@@ -207,34 +210,34 @@ Card_t Ai::KouCardKind(int gIdx) {
 }
 
 void Ai::KouCardCheck(PlayerDir_t dir) {
-	CARD_ARRAY *list = _roundManager->_players[dir]->get_parter()->get_card_list();
+	CardInHand *list = _roundManager->_players[dir]->_cardsInHand;
 
 	ClearKouCardInfo();
         
-	for(int i=list->atcvie_place; i<list->len; i++){
-	    auto curKind = list->data[i].kind;
+	for(int i=list->FreeStart; i<list->size(); i++){
+	    auto curKind = list->get_kind(i);
         
         if( !IsKouCardInclude((Card_t)curKind) ) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
             if(_FindCards(cardIdx, list, curKind)==3 
-                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(curKind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+                    &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(curKind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
                 
                 AddKouCardGroup((Card_t)curKind,cardIdx);
-                
-                list->data[cardIdx[0]].status=c_KOU_ENABLE;
-                list->data[cardIdx[1]].status=c_KOU_ENABLE;
-                list->data[cardIdx[2]].status=c_KOU_ENABLE;
+
+                list->set_status(cardIdx[0],sKOU_ENABLE);
+                list->set_status(cardIdx[1],sKOU_ENABLE);
+                list->set_status(cardIdx[2],sKOU_ENABLE);
             }
         }
 	}
 }
 
-int Ai::_FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind) {
+int Ai::_FindCards(int idx[],CardInHand *list,CARD_KIND kind) {
     int num = 0;
     
-    for(int i=list->atcvie_place; i<list->len; i++) {   
-        if(list->data[i].kind==kind) {
+    for(int i=list->FreeStart; i<list->size(); i++) {   
+        if(list->get_kind(i)==kind) {
             idx[num++] = i;
         }
     }
@@ -243,7 +246,7 @@ int Ai::_FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind) {
 }
 
 void Ai::MingKouChoose(PlayerDir_t dir) {
-	auto list=_roundManager->_players[dir]->get_parter()->get_card_list();
+	auto list = _roundManager->_players[dir]->_cardsInHand;
     
 	for(int i=0;i<KouCardGroupNum();i++)
 	{
@@ -252,7 +255,7 @@ void Ai::MingKouChoose(PlayerDir_t dir) {
 		{
 			for(int b=0;b<3;b++)
 			{
-				list->data[KouCardIndex(i,b)].status=c_MING_KOU;
+			    list->set_status(KouCardIndex(i,b),sMING_KOU);
 			}
 		}
 	}

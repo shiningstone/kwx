@@ -53,7 +53,7 @@ public:
     void QiangGangHuJudge(PlayerDir_t dir);
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
     
-    int _GroupIdx(int idx,CARD_ARRAY *cards);
+    int _GroupIdx(int idx,CardList *cards);
 
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);

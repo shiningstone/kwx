@@ -614,8 +614,6 @@ ROBOT_TARGET NetPlayer::get_robot_hu_target()
 int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	//unsigned char ting_flag;
-	CARD_ARRAY *list=_act->get_card_list();
-	
 	int show_place=-1;
 	int hu_num=-1;
 	MRES *res=new MRES;
@@ -632,7 +630,7 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 		{
 			if(ming_index&(1<<k))
 			{
-				s_kind=_act->get_card_list()->data[k].kind;
+				s_kind = (CARD_KIND)_cardsInHand->get_kind(k);
 				if(Robot_check_pickup_card(s_kind,list1,list2,len1,len2)!=0)
 				{
 					res->hu_cards_num[k]=0;
@@ -655,7 +653,7 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 		for(s_k=0;s_k<MAX_HANDIN_NUM;s_k++)
 			if(ming_index&(1<<s_k))
 			{
-				s_kind=_act->get_card_list()->data[s_k].kind;
+				s_kind = (CARD_KIND)_cardsInHand->get_kind(s_k);
 				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card(s_kind,list1,list2,len1,len2)==0)
 					l_place=s_k;
 			}

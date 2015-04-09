@@ -545,14 +545,14 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	}
 }
 
-int RoundManager::_GroupIdx(int idx,CARD_ARRAY *cards) {
-    if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind==cards->data[idx+3].kind)&&(cards->data[idx].kind!=cards->data[idx+4].kind))
+int RoundManager::_GroupIdx(int idx,CardList *cards) {
+    if((cards->get_kind(idx)==cards->get_kind(idx+1))&&(cards->get_kind(idx)==cards->get_kind(idx+2))&&(cards->get_kind(idx)==cards->get_kind(idx+3))&&(cards->get_kind(idx)!=cards->get_kind(idx+4)))
         return 1;
-    else if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind!=cards->data[idx+3].kind))
+    else if((cards->get_kind(idx)==cards->get_kind(idx+1))&&(cards->get_kind(idx)==cards->get_kind(idx+2))&&(cards->get_kind(idx)!=cards->get_kind(idx+3)))
         return 2;
-    else if(cards->data[idx].kind==cards->data[idx+1].kind&&cards->data[idx].kind!=cards->data[idx+2].kind)
+    else if(cards->get_kind(idx)==cards->get_kind(idx+1)&&cards->get_kind(idx)!=cards->get_kind(idx+2))
         return 3;
-    else if(cards->data[idx].kind!=cards->data[idx+1].kind)
+    else if(cards->get_kind(idx)!=cards->get_kind(idx+1))
         return 4;
 }
 
