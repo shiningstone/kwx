@@ -7,8 +7,9 @@
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 
-#include "DataBase.h"
+#include "CardCollection.h"
 #include "NetRaceRound.h"
+#include "DataBase.h"
 
 class NetRole {
 public:
@@ -24,16 +25,21 @@ public:
 	virtual unsigned char init(int card_array[],int len,int aim);
     
     bool          _isReady;
+    UserProfile_t _profile;    
+    NetRRound    *_act;
 
     /**************************************************
             user's action
     **************************************************/
     virtual NetRRound* get_parter();
-    NetRRound        * _act;
+
+    /**************************************************
+            user's card info
+    **************************************************/
+    CardList *_river;
     /**************************************************
             user's profile
     **************************************************/
-    UserProfile_t _profile;    
     Sex_t GetSex();
     int   UpdateProperty(int change);
 

@@ -1,9 +1,10 @@
 
 #include "NetRaceRound.h"
+#include "CardCollection.h"
+
 USING_NS_CC;
 
 NetRRound::NetRRound() {
-	out_card_list=NULL;
 	card_list=NULL;
 	hu_len=0;
 	kind_hu=0;
@@ -15,8 +16,6 @@ NetRRound::~NetRRound()
 {
 	if(card_list)
 		delete card_list;
-	if(out_card_list)
-		delete out_card_list;
 
     LOGGER_DEREGISTER(_logger);
 }
@@ -846,13 +845,11 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 	hu_places_num=0;
 	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
 	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
-	if(out_card_list)
-		delete out_card_list;
+
 	if(card_list)
 		delete card_list;
-	out_card_list=new outCardList;
 	card_list = new CARD_ARRAY;
-	if(!card_list||!out_card_list)
+	if(!card_list)
 		return a_TIMEOUT;
 	card_list->len=0;
 	card_list->atcvie_place =0;
@@ -1013,8 +1010,6 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 	l_kind=card_list->data[place].kind;
     LOGGER_WRITE("NETWORK : %x %s : %d",this,__FUNCTION__,l_kind);
 
-	out_card_list->insertItem(card_list->data[place]);
-
 	if( place==card_list->len-1 )
 	{
 		card_delete(place,1);
@@ -1069,13 +1064,14 @@ ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kin
 		card_list->atcvie_place += 3;
 	} else if(act==a_MING_GANG) {
         card_delete(0,3);
-        
+
 		temp_data.status=c_MING_GANG;
 		temp_data.can_play=cps_NO;
 		card_insert(temp_data,4);
 		card_list->atcvie_place += 4;
 	} else if(act==a_JUMP) {
-		if(who_give==0) {
+		if(who_give==0)
+		{
 			temp_data.status=c_FREE;
 			card_delete(card_list->len-1,1);
 			card_insert(temp_data,1);
@@ -1271,11 +1267,11 @@ unsigned int NetRRound::get_ming_indexes()
 	return archive_ming_indexes;
 }
 
-int *NetRRound::get_ming_reserved_cards_num(outCardList *list)
+int *NetRRound::get_ming_reserved_cards_num(CardList *river)
 {
 	int i;	
 	memset(hu_residueForEvery,0,sizeof(int)*MAX_HANDIN_NUM*9);
-	CARD card;
+
 	int m=0;
 	for(i=0;i<MAX_HANDIN_NUM;i++)
 		if(archive_ming_indexes&(1<<i))
@@ -1286,11 +1282,11 @@ int *NetRRound::get_ming_reserved_cards_num(outCardList *list)
 				{
 					int k=1;
 					int default_reserved_cards=4;
-					while(list->getCard(card,k++)==true)
-					{
-						if(card.kind==hu_cards[i][j])
+
+                    for(int idx=0;idx<river->size();idx++) {
+						if(river->get_kind(idx)==hu_cards[i][j])
 							default_reserved_cards--;
-					}
+                    }
 					hu_residueForEvery[i][m++]=default_reserved_cards;
 					hu_reserved_num[i] += default_reserved_cards;
 				}
@@ -1332,11 +1328,6 @@ long NetRRound::get_card_score()
 CARD_ARRAY* NetRRound::get_card_list()
 {
 	return card_list;
-}
-
-outCardList* NetRRound::getOutCardList()
-{
-	return out_card_list;
 }
 
 bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)

@@ -11,9 +11,10 @@ void Ai::_CollectResouce(HAH *res) {
     res->reserved_card_num = TOTAL_CARD_NUM - _roundManager->_distributedNum;
     
 	CARD s_card;
-	int i = 1;
-	while(_roundManager->_river->getCard(s_card,i++)==true)
-		res->card_in_river[res->river_len++]=s_card.kind;
+
+    for(int i=0;i<_roundManager->_gRiver->size();i++) {
+		res->card_in_river[res->river_len++] = (CARD_KIND)_roundManager->_gRiver->get_kind(i);
+    }
 }
 
 void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)

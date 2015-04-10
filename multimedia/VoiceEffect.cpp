@@ -21,6 +21,18 @@ const char * VoiceCards[SEX_MAX][CARD_MAX] = {
     },
 };
 
+Action_t VoiceEffect::_actionIdx(ActionId_t action) {
+    if(action==aPENG) {
+        return PENG;
+    } else if(action==aAN_GANG||action==aMING_GANG) {
+        return GANG;
+    } else if (action==aMING){
+        return TING;
+    } else {
+        return HU;
+    }
+}
+
 const char * VoiceActions[SEX_MAX][ACTION_MAX] = {
     {"Music/peng.ogg","Music/gang.ogg","Music/ting2.ogg","Music/hu.ogg"},
     {"Music/g_peng.ogg","Music/g_gang.ogg","Music/g_ting1.ogg","Music/g_hu.ogg"},
@@ -36,10 +48,10 @@ CallFunc* VoiceEffect::SpeakCard(Card_t card,Sex_t sex) {
             VoiceCards[sex][card]);});
 }
 
-CallFunc* VoiceEffect::SpeakAction(Action_t action,Sex_t sex) {
+CallFunc* VoiceEffect::SpeakAction(ActionId_t action,Sex_t sex) {
     return CallFunc::create([=](){
         SimpleAudioEngine::sharedEngine()->playEffect(
-            VoiceActions[sex][action]);});
+            VoiceActions[sex][_actionIdx(action)]);});
 }
 
 int VoiceEffect::_motionToFile(char *file, const char *motion) {
