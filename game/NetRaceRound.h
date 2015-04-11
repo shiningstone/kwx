@@ -22,10 +22,12 @@ private:
     unsigned char rr_ting_flag;
     unsigned int  archive_ming_indexes;
     
+    CARD_ARRAY *card_list;
+    CardInHand *_cardInHand;
+
     long card_score;
 	int InsertPlaceForMG;
 	unsigned int kind_hu;
-    CARD_ARRAY *card_list;
 	int hu_places;
 	int hu_places_num;
 	CARD_KIND hucards[9];
@@ -46,7 +48,8 @@ private:
     int hu_check(CARD_KIND data_kind); //0:not 1:hu
     unsigned int ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);
     void array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
-    void array_sort2(CARD clist[],int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[]);
+    void array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
+    void array_sort2(int idx,int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[]);
 public:
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     unsigned int ming_check();

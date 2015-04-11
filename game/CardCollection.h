@@ -29,16 +29,36 @@ public:
     CardList();
 	~CardList();
 
+    virtual void push_back(CardNode_t *node);
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
-    void   init(Card_t *cards,int len);
 	void   show();
 	Card_t get_kind(unsigned int idx) const;
+    CardStatus_t get_status(unsigned int idx) const;
+    bool   canPlay(unsigned int idx) const;
+    void   set_status(unsigned int idx,CardStatus_t status);
+
     int    generate_raw(Card_t *array);
-    
-private:
+
+protected:
     Logger *_logger;
+};
+
+class CardInHand : public CardList {
+public:
+    void   init(Card_t *cards,int len);
+    void   delete_card(int from,int len);
+    void   insert_card(CardNode_t data);
+    void   insert_card(CardNode_t data,int times=1);
+
+    int active_place;
+
+    int FreeStart;
+    int Last;
+    int Residue;
+private:
+    int _FindInsertPoint(CardNode_t data);
 };
 
 #endif
