@@ -253,6 +253,7 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,in
         }
     } else {
         _ReOrderCardsInHand(chosenCard,list);
+        _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
     }
     
 	_MyHandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
@@ -1555,7 +1556,7 @@ Sprite *NetRaceLayer::_GetCardInHand(PlayerDir_t dir,int idx) {
 
 void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards) {
     /*NOTE : this function is called after handout ,so the position is 1 bigger than length */
-    const int  LAST      = (cards->len-1)+1;
+    const int  LAST      = (cards->len-1);
 
     if(droppedCard==LAST) {
 		_GetCardInHand(MIDDLE,droppedCard)->setScale(0);

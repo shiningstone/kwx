@@ -806,8 +806,6 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 		if(i==13)
 		{
 			ac=hand_in((CARD_KIND)(card_array[i]/4),0,0,false,a_JUMP,0,false);
-			card_delete(13,1);
-			card_insert(temp,1);
 		}
 		else
 			card_insert(temp,1);
@@ -845,11 +843,11 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 	int num = 0;
 	unsigned char res = 0x0;
 
-    CardNode_t card;
-	card.kind     = (Card_t)kind;
-	card.status   = sFREE;
-	card.canPlay = true;
-    _cardInHand->insert_card(card,1);
+    CardNode_t *card = new CardNode_t;
+	card->kind     = (Card_t)kind;
+	card->status   = sFREE;
+	card->canPlay = true;
+    _cardInHand->push_back(card);
 
 	if(rr_ting_flag==0)
 	{
@@ -940,27 +938,26 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 /*if ting place=_cardInHand->size()*/
 CARD_KIND NetRRound::hand_out(unsigned int place)
 {
-	CARD_KIND l_kind;
-	l_kind=card_list->data[place].kind;
+	CARD_KIND l_kind = (CARD_KIND)_cardInHand->get_kind(place);
 
-	if( card_list->data[place].status != sFREE )
-	{
+	if( _cardInHand->get_status(place) != sFREE ){
 		return ck_NOT_DEFINED;
 	}
-    
+
 	card_delete(place,1);
 
-	if( rr_ting_flag==0 && place!=_cardInHand->size()-1 )
+    int last = _cardInHand->size()-1;
+    if( rr_ting_flag==0 && place!=last )
 	{
-        CARD tail_card;
-        tail_card.kind = card_list->data[_cardInHand->size()-1].kind;
-        tail_card.status = card_list->data[_cardInHand->size()-1].status;
-        tail_card.can_play=card_list->data[_cardInHand->size()-1].can_play;
-        
-		card_insert(tail_card,1);
+        CardNode_t *tail_card = new CardNode_t;
+        tail_card->kind = (Card_t)_cardInHand->get_kind(last);
+        tail_card->status = (CardStatus_t)_cardInHand->get_status(last);
+        tail_card->canPlay = _cardInHand->canPlay(last)==cps_YES?true:false;
+
+        _cardInHand->push_back(tail_card);
 	}
 
-	return l_kind;
+    return l_kind;
 }
 
 void NetRRound::LockAllCards()

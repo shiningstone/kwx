@@ -15,6 +15,7 @@ public:
 	NetRRound();
     virtual ~NetRRound();
 
+    CardInHand *_cardInHand;
 private:
     Logger *_logger;
 
@@ -23,7 +24,6 @@ private:
     unsigned int  archive_ming_indexes;
     
     CARD_ARRAY *card_list;
-    CardInHand *_cardInHand;
 
     long card_score;
 	int InsertPlaceForMG;

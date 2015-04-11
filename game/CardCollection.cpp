@@ -125,7 +125,7 @@ void CardInHand::delete_card(int from,int len) {
 
 int CardInHand::_FindInsertPoint(CardNode_t data) {
     if(data.status!=sFREE) {
-        for(int i=FreeStart;i>0;i--) {
+        for(int i=active_place;i>0;i--) {
             if(get_status(i-1)!=sMING_KOU) {
                 return i;
             } else if(data.kind>=get_kind(i-1)) {
@@ -135,7 +135,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) {
 
         return 0;
     } else {
-        for(int i=FreeStart;i<=size();i++) {
+        for(int i=active_place;i<=size();i++) {
             if(get_kind(i)>=data.kind) {
                 return i;
             }
