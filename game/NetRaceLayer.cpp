@@ -254,6 +254,9 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,in
     } else {
         _ReOrderCardsInHand(chosenCard,list);
         _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
+        CardNode_t *node = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->back();
+        _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
+        _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
     }
     
 	_MyHandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
