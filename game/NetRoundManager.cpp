@@ -237,7 +237,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     } else {
         _isCardFromOthers = false;
     }
-    
+    #if 0
     _players[dir]->get_parter()->hand_in(
         _lastHandedOutCard,
         _isCardFromOthers,
@@ -247,7 +247,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
         _continue_gang_times,
         _isGangHua
     );
-
+    #endif
     _isMyShowTime = true;
     ServerWaitForMyAction();
 }
@@ -382,6 +382,16 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
 
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
+
+    _players[dir]->get_parter()->hand_in(
+        _lastHandedOutCard,
+        _isCardFromOthers,
+        false,
+        (_distributedNum==TOTAL_CARD_NUM),
+        _lastActionWithGold,
+        _continue_gang_times,
+        _isGangHua
+    );
 
     if(dir==MIDDLE) {
         RequestSendAction aReq;
@@ -617,7 +627,7 @@ void NetRoundManager::ServerWaitForMyAction() {
 }
 
 void NetRoundManager::WaitForMyAction() {
-
+    LOGGER_WRITE("%s (%d) wait",__FUNCTION__,1);
 }
 
 void NetRoundManager::WaitForMyChoose() {
@@ -635,75 +645,7 @@ void NetRoundManager::WaitForMyChoose() {
 }
 
 void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
-    #if 0
-    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
-    auto list=_players[dir]->get_parter()->get_card_list();
-
-    if(_actionToDo&a_HU) {
-        RecvHu(dir);
-    } else if(_actionToDo&a_AN_GANG||_actionToDo&a_SHOU_GANG) {
-        _continue_gang_times++;
-        _lastActionSource = dir;
-        
-        if(_actionToDo&a_AN_GANG) {
-            _actionToDo=a_AN_GANG;
-            _lastAction=a_AN_GANG;
-            _lastActionWithGold=a_AN_GANG;
-        } else if(_actionToDo&a_SHOU_GANG) {
-            _actionToDo=a_SHOU_GANG;
-            _lastAction=a_SHOU_GANG;
-            _lastActionWithGold=a_SHOU_GANG;
-        }
-
-        int* gangIdx=new int[4];
-        Card_t card = _ai->FindGangCards(gangIdx,list,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
-
-        if( !IsTing(dir) ) {
-            SetEffectCard(card,c_AN_GANG);
-        }
-
-        _uiManager->_AnGangEffect(dir,card,gangIdx);
-    } else if(_actionToDo&a_MING_GANG) {
-        _lastActionSource=dir;
-        _actionToDo=a_MING_GANG;
-        _lastAction=a_MING_GANG;
-        _lastActionWithGold=a_MING_GANG;
-
-        Card GangCard;
-        PlayerDir_t prevPlayer = (PlayerDir_t)dir;
-        if(_isCardFromOthers) {
-            Card         gangCard;
-            CardNode_t * last = _players[_curPlayer]->_river->back();
-            gangCard.kind = last->kind;
-            _players[_curPlayer]->_river->pop_back();
-    
-            RecordOutCard(gangCard);
-            RecordOutCard(gangCard);
-            RecordOutCard(gangCard);
-            
-            _curPlayer=dir;
-        }else {
-            GangCard=list->data[list->len-1];
-            RecordOutCard(GangCard);
-        }
-
-        int* gangIdx=new int[4];
-        Card_t card = _ai->FindGangCards(gangIdx,list,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
-        _uiManager->_MingGangEffect(dir,prevPlayer,card,gangIdx);
-    }
-    else if(_actionToDo&a_MING) {
-        RecvMing();
-    } else if(_actionToDo&a_PENG) {
-        RecvPeng(dir);
-    } else if(_actionToDo==a_JUMP) {
-        if(_lastAction==a_JUMP) {
-            _continue_gang_times=0;
-        }
-        _lastAction=a_JUMP;
-        
-        WaitForOthersChoose();
-    }
-    #endif
+    LOGGER_WRITE("%s (%d) wait",__FUNCTION__,dir);
 }
 
 void NetRoundManager::WaitForOthersChoose() {
@@ -746,7 +688,7 @@ void NetRoundManager::WaitForOthersChoose() {
 }
 
 void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
-    LOGGER_WRITE("%s (%d)\n",__FUNCTION__,dir);
+    LOGGER_WRITE("%s (%d) waiting\n",__FUNCTION__,dir);
 }
 
 void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {

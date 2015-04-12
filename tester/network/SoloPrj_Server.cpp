@@ -367,14 +367,15 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         handout++;
     
         SendLine(SERVER,17);
+        //Sleep(5*DELAY);
         SendLine(SERVER,18);
     } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==3) {
-        handout++;
+        //handout++;
     
-        SendLine(SERVER,19);
-        SendLine(SERVER,20);
-        SendLine(SERVER,21);
-        SendLine(SERVER,22);
+        //SendLine(SERVER,19);
+        //SendLine(SERVER,20);
+        //SendLine(SERVER,21);
+        //SendLine(SERVER,22);
     }
 }
 

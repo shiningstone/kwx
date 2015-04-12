@@ -253,12 +253,13 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,in
         }
     } else {
         _ReOrderCardsInHand(chosenCard,list);
-        _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
-        CardNode_t *node = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->back();
-        _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
-        _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
     }
     
+    _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
+    CardNode_t *node = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->back();
+    _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
+    _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
+
 	_MyHandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
 }
 
@@ -2755,7 +2756,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         
 		Vector<FiniteTimeAction *> hide2CardsInhand;
 
-		for(int i=list->atcvie_place;i<list->len;i++) {
+		for(int i=list->atcvie_place;i<list->len-1;i++) {
 			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
             Sequence *seq;
 
@@ -2885,6 +2886,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
 					_roundManager->CancelEffectCard();
+                    _roundManager->UpdateCards(dir,a_PENG);
 					_CardInHandUpdateEffect(dir);
 				} else  {
                     int sameCardNum = 0;
@@ -2926,8 +2928,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         /***************************************
             it is unneccessary for net-game???
         ***************************************/
-		myframe->runAction( Sequence::create(CallFunc::create([=](){
-                _roundManager->UpdateCards(dir,a_PENG);}),CCCallFunc::create([=](){
+		myframe->runAction( Sequence::create(CCCallFunc::create([=](){
     			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
     			_roundManager->WaitForMyAction();}),NULL));
 	}
