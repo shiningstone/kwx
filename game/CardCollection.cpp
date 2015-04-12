@@ -163,4 +163,39 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     }
 }
 
+Card_t CardInHand::_FindGangCard(int cardIdx[]) {
+    for(int i=active_place; i<size(); i++) {
+        cardIdx[0] = i;
+        int matchCardNum = 1;
+            
+        for(int j=i+1; j<size(); j++) {
+            if(get_kind(i)==get_kind(j)) {
+                cardIdx[matchCardNum++] = j;
 
+                if(matchCardNum==4) {
+                    return get_kind(cardIdx[0]);
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    
+    return CARD_UNKNOWN;
+}
+
+void CardInHand::perform(ActionId_t act) {
+    if(act==aAN_GANG) {
+        int cardIdx[4] = {0};
+        Card_t kind = _FindGangCard(cardIdx);
+
+        CardNode_t gangCard;
+        gangCard.kind    = kind;
+        gangCard.status  = sAN_GANG;
+        gangCard.canPlay = false;
+
+        delete_card(cardIdx[0],4);
+        insert_card(gangCard,4);
+        active_place += 4;
+    }
+}

@@ -1099,20 +1099,7 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 	}
 	else if(act==a_AN_GANG)
 	{
-		int m=_cardInHand->size()-1;
-		for(;m>=0;m--)
-		{
-			if(_cardInHand->at(m)->kind==temp_data.kind)
-			{				 
-				if(_cardInHand->at(m)->status==sMING_KOU)
-					_cardInHand->active_place--;
-				card_delete(m,1);
-			}
-		}
-		temp_data.status=c_AN_GANG;
-		temp_data.can_play=cps_NO;
-		card_insert(temp_data,4);
-		_cardInHand->active_place+=4;		
+		_cardInHand->perform(aAN_GANG);
 	}
 	else if(act==a_SHOU_GANG)
 	{

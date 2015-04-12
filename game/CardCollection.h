@@ -52,12 +52,16 @@ public:
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
 
+    void   perform(ActionId_t act);
+    
     int active_place;
 
     int FreeStart;
     int Last;
     int Residue;
 private:
+    Card_t CardInHand::_FindGangCard(int cardIdx[]);
+
     int _FindInsertPoint(CardNode_t data);
 };
 

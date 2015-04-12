@@ -375,6 +375,8 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,20);
         SendLine(SERVER,21);
         SendLine(SERVER,22);
+        SendLine(SERVER,23);
+        SendLine(SERVER,24);
     }
 }
 
