@@ -170,6 +170,15 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     delete info;
 
     DistributeTo(target,card);
+    _players[target]->get_parter()->hand_in(
+        (CARD_KIND)card,
+        false,
+        IsTing(target),
+        (_distributedNum==TOTAL_CARD_NUM),
+        _lastActionWithGold,
+        _continue_gang_times,
+        _isGangHua
+    );
     _uiManager->UpdateClock(timer,target);
 }
 
@@ -186,7 +195,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     DistributeTo(target,card);
     _players[MIDDLE]->get_parter()->hand_in(
         (CARD_KIND)card,
-        _isCardFromOthers,
+        false,
         IsTing(MIDDLE),
         (_distributedNum==TOTAL_CARD_NUM),
         _lastActionWithGold,
@@ -216,8 +225,8 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     
     _curPlayer = dir;
 
+    _players[dir]->get_parter()->_cardInHand->pop_back();
     _players[dir]->_river->push_back(card);
-    //_players[_curPlayer]->get_parter()->hand_out(0);
         
 	_isCardFromOthers = true;
 
@@ -237,17 +246,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     } else {
         _isCardFromOthers = false;
     }
-    #if 0
-    _players[dir]->get_parter()->hand_in(
-        _lastHandedOutCard,
-        _isCardFromOthers,
-        false,
-        (_distributedNum==TOTAL_CARD_NUM),
-        _lastActionWithGold,
-        _continue_gang_times,
-        _isGangHua
-    );
-    #endif
+
     _isMyShowTime = true;
     ServerWaitForMyAction();
 }
@@ -649,42 +648,7 @@ void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
 }
 
 void NetRoundManager::WaitForOthersChoose() {
-    if ( _curPlayer==1 ) {/* this should never happen */
-        return;
-    }
-
-    bool canKou = false;
-	int index = _ai->ChooseWorstCard(canKou);
-    
-    if ( canKou ) {
-        _otherHandedOut = (Card_t)_players[_curPlayer]->get_parter()->get_card_list()->data[index].kind;
-        
-        _ai->KouCardCheck((PlayerDir_t)_curPlayer);
-        if(_ai->KouCardGroupNum()>0) {
-            _ai->MingKouChoose((PlayerDir_t)_curPlayer);
-        }
-    }
-
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[index]);
-	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
-    _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
-
-    if(canKou) {
-        _uiManager->TingHintBarOfOthers(_curPlayer,index);
-
-        /* it is dangerous to raise these lines to upper, since the following will change the card list*/
-        if(_ai->KouCardGroupNum()>0)
-            UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
-
-        UpdateCards((PlayerDir_t)_curPlayer,a_MING);
-
-        _players[_curPlayer]->get_parter()->LockAllCards();
-        _players[_curPlayer]->get_parter()->set_ting_status(1);
-    }
-
-	_isCardFromOthers=true;
-
-    _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
+    LOGGER_WRITE("%s (%d) waiting\n",__FUNCTION__,_curPlayer);
 }
 
 void NetRoundManager::WaitForResponse(PlayerDir_t dir) {

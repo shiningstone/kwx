@@ -989,7 +989,7 @@ ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kin
 	temp_data.kind = (CARD_KIND)kind;
 
 	if(act==a_PENG) {
-        card_delete(0,2);
+        card_delete(0,3);
 
         CardNode_t node;
         node.kind=kind;
@@ -998,7 +998,7 @@ ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kin
         _cardInHand->insert_card(node,3);
         _cardInHand->active_place += 3;
 	} else if(act==a_MING_GANG) {
-        card_delete(0,3);
+        card_delete(0,4);
 
         CardNode_t node;
         node.kind=kind;

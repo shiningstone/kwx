@@ -1732,7 +1732,7 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
 
     Vec2 curOutPos;/* here must be something I have not known */
     if(dir==RIGHT) {
-		auto curOutPosTemp = _GetCardInHand(dir,cardInHand->len-1)->getPosition();
+		auto curOutPosTemp = _GetCardInHand(dir,cardInHand->len-2)->getPosition();
 		curOutPos = Vec2(
             curOutPosTemp.x,
             curOutPosTemp.y + cardOut->getTextureRect().size.height*1.5);
@@ -2620,7 +2620,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                             hideOutcard, 
                             Sequence::create(CCCallFunc::create(this,callfunc_selector(
                                 NetRaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
-                                _roundManager->UpdateCards(dir,a_PENG,card);}),    CCCallFunc::create([=]() {
+                                _roundManager->UpdateCards(dir,a_PENG,card);
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
                     			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
@@ -6555,7 +6555,7 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,CardList* outCard)
     
 	if(no==2)
 	{
-		int lenForPlayerTwo=_roundManager->_players[2]->get_parter()->get_card_list()->len;
+		int lenForPlayerTwo=_roundManager->_players[2]->get_parter()->get_card_list()->len-1;
 		auto BizerPosForPlayerTwoTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+lenForPlayerTwo-1)->getPosition();
 		auto BizerPosForPlayerTwo=Vec2(BizerPosForPlayerTwoTemp.x,BizerPosForPlayerTwoTemp.y);
 		if((outCard->size()-1)<6)
