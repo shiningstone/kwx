@@ -486,6 +486,12 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
         card = _ai->FindGangCards(gangCardIdx,list,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
         _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
 	}
+    
+    if(dir==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(aAN_GANG,(Card_t)card);
+        _messenger->Send(aReq);
+    }
 }
 
 void NetRoundManager::RecvQi() {
