@@ -12,7 +12,7 @@ class CardList;
 class NetRRound
 {
 public:
-	NetRRound();
+	NetRRound(CardInHand *cardInHand);
     virtual ~NetRRound();
 
     CardInHand *_cardInHand;

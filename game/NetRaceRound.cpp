@@ -4,17 +4,16 @@
 
 USING_NS_CC;
 
-NetRRound::NetRRound() {
+NetRRound::NetRRound(CardInHand *cardInHand) {
 	hu_len=0;
 	kind_hu=0;
-    _cardInHand = new CardInHand;
+    _cardInHand = cardInHand;
     card_list = new CARD_ARRAY;
 
     _logger = LOGGER_REGISTER("RaceRound");
 }
 
 NetRRound::~NetRRound() {
-    delete _cardInHand;
     delete card_list;
     LOGGER_DEREGISTER(_logger);
 }

@@ -4,8 +4,9 @@
 NetRole::NetRole() {
     _isReady = false;
     memset(&_profile,0,sizeof(UserProfile_t));
-    _act   = new NetRRound();
+    _cards = new CardInHand();
     _river = new CardList();
+    _act   = new NetRRound(_cards);
 
     _logger = LOGGER_REGISTER("NetRole");
 }
@@ -13,8 +14,9 @@ NetRole::NetRole() {
 NetRole::NetRole(int id) {//this is for default settings ( robot ) 
     _isReady = false;
     memset(&_profile,0,sizeof(UserProfile_t));
-    _act   = new NetRRound();
+    _cards = new CardInHand();
     _river = new CardList();
+    _act   = new NetRRound(_cards);
 
     _logger = LOGGER_REGISTER("NetRole");
 }
