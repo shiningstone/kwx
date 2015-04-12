@@ -186,11 +186,11 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
     INT8U timer        = info->timer;
-    delete info;
 
     _curPlayer        = MIDDLE;
     _isCardFromOthers = false;
     _actionToDo       = info->GetAvailActions(info->remind);
+    delete info;
 
     DistributeTo(target,card);
     _players[MIDDLE]->get_parter()->hand_in(
@@ -202,7 +202,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
         _continue_gang_times,
         _isGangHua
     );
-    WaitForMyChoose();
+    ServerWaitForMyAction();
 
     _uiManager->UpdateClock(timer,target);
     _uiManager->ListenToCardTouch();
