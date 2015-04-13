@@ -47,9 +47,13 @@ private:
     void task_check(unsigned int flag);//ÐÞ¸Ä1//,unsigned char last_action
     int hu_check(CARD_KIND data_kind); //0:not 1:hu
     unsigned int ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);
+    void _CreateByDisplace(CARD_KIND newCards[],int newLen,int start,int substitutePos,CARD_KIND substituteKind);
+    void _CreateByDisplace(CARD_KIND newCards[],int newLen,CARD origCards[],int substitutePos,CARD_KIND substituteKind);
+    void _Sort(CARD_KIND list[],int len);
     void array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
     void array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
     void array_sort2(int idx,int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[]);
+    int _AssumingKou(CARD newCards[], CARD_KIND kouKind);
 public:
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     unsigned int ming_check();

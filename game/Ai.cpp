@@ -75,6 +75,25 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 /*************************************
         kou card info
 *************************************/
+void Ai::KouCardCheck(PlayerDir_t dir) {
+    CardInHand *cards = _roundManager->_players[dir]->_cardInHand;
+
+    cards->ClearKouCardInfo();
+        
+    for(int i=cards->active_place; i<cards->size(); i++){
+        auto kind = cards->get_kind(i);
+        
+        if( !cards->IsKouInclude(kind) ) {
+            int cardIdx[4] = {-1,-1,-1,-1};
+            
+            if(cards->_FindCards(cardIdx, kind)==3 
+                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(kind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+                cards->AddKouGroup(kind,cardIdx);
+            }
+        }
+    }
+}
+
 void Ai::Refresh() {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cardInHand;
     
@@ -89,25 +108,6 @@ void Ai::Refresh() {
             }
         }
     }
-}
-
-void Ai::KouCardCheck(PlayerDir_t dir) {
-    CardInHand *cards = _roundManager->_players[dir]->_cardInHand;
-
-	cards->ClearKouCardInfo();
-        
-	for(int i=cards->active_place; i<cards->size(); i++){
-	    auto kind = cards->get_kind(i);
-        
-        if( !cards->IsKouInclude(kind) ) {
-            int cardIdx[4] = {-1,-1,-1,-1};
-            
-            if(cards->_FindCards(cardIdx, kind)==3 
-                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(kind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
-                cards->AddKouGroup(kind,cardIdx);
-            }
-        }
-	}
 }
 
 void Ai::MingKouChoose(PlayerDir_t dir) {

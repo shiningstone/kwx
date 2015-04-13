@@ -542,88 +542,67 @@ int NetRRound::hu_check(CARD_KIND data_kind)
 	return res;
 }
 
-void NetRRound::array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rlist[])
-{
-    CardList::iterator it = _cardInHand->begin()+idx;
+void NetRRound::_CreateByDisplace(CARD_KIND newCards[],int newLen,int start,int substitutePos,CARD_KIND substituteKind) {
+    CardList::iterator it = _cardInHand->begin()+start;
     
-	int i,j;
-	CARD_KIND temp_kind;
-
-	for(i=0;i<len;i++)
-		if(	i != index )
-			rlist[i]=(CARD_KIND)((*(it+i))->kind);
+	for(int i=0;i<newLen;i++) {
+		if(	i != substitutePos )
+			newCards[i]=(CARD_KIND)((*(it+i))->kind);
 		else
-			rlist[index]=kind;
+			newCards[i] = substituteKind;
+    }
+}
+
+void NetRRound::_CreateByDisplace(CARD_KIND newCards[],int newLen,CARD origCards[],int substitutePos,CARD_KIND substituteKind) {
+	for(int i=0;i<newLen;i++) {
+		if(	i != substitutePos )
+			newCards[i] = origCards[i].kind;
+		else
+			newCards[i] = substituteKind;
+    }
+}
+
+void NetRRound::_Sort(CARD_KIND list[],int len) {
+	for(int i=0;i<len;i++) {
+		CARD_KIND kind = list[i];
         
-	for(i=0;i<len;i++)
-	{
-		temp_kind=rlist[i];
-		for(j=i+1;j<len;j++)
-		{
-			if(rlist[j]<temp_kind)
-			{
-				rlist[i]=rlist[j];
-				rlist[j]=temp_kind;
-				temp_kind=rlist[i];
+		for(int j=i+1;j<len;j++) {
+			if(list[j]<kind) {
+				list[i] = list[j];
+				list[j] = kind;
+				kind    = list[i];
 			}
 		}
 	}
 }
 
+void NetRRound::array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rlist[])
+{
+    _CreateByDisplace(rlist,len,idx,index,kind);
+    _Sort(rlist,len);
+}
+
 void NetRRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[])
 {
-	int i,j;
-	CARD_KIND temp_kind;
-
-	for(i=0;i<len;i++)
-		if(	i != index )
-			rlist[i]=clist[i].kind;
-		else
-			rlist[index]=kind;
-        
-	for(i=0;i<len;i++)
-	{
-		temp_kind=rlist[i];
-		for(j=i+1;j<len;j++)
-		{
-			if(rlist[j]<temp_kind)
-			{
-				rlist[i]=rlist[j];
-				rlist[j]=temp_kind;
-				temp_kind=rlist[i];
-			}
-		}
-	}
+    _CreateByDisplace(rlist,len,clist,index,kind);
+    _Sort(rlist,len);
 }
 
 void NetRRound::array_sort2(int idx,int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[])
 {
     CardList::iterator it = _cardInHand->begin()+idx;
     
-	int i,j;
-	CARD_KIND temp_kind;
-
-	for(i=0;i<len;i++)
+	for(int i=0;i<len;i++)
 		if(i==index1)
 			rlist[index1]=kind1;
 		else if(i==index2)
 			rlist[index2]=kind2;
 		else
 			rlist[i]=(CARD_KIND)((*(it+i))->kind);
-	for(i=0;i<len;i++)
-	{
-		temp_kind=rlist[i];
-		for(j=i+1;j<len;j++)
-		{
-			if(rlist[j]<temp_kind)
-			{
-				rlist[i]=rlist[j];
-				rlist[j]=temp_kind;
-				temp_kind=rlist[i];
-			}
-		}
-	}
+        
+    _Sort(rlist,len);
 }
+
 unsigned int NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
 {
 	int active=_cardInHand->active_place;
@@ -636,57 +615,59 @@ unsigned int NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KI
 	return 0;
 }
 
-int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
-{
-	CARD temp_list[MAX_HANDIN_NUM];
-	CARD_KIND temp_list2[MAX_HANDIN_NUM];
-	for(int m=0;m<MAX_HANDIN_NUM;m++)
-		temp_list[m].kind=ck_NOT_DEFINED;
-	memset(temp_list2,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
+int NetRRound::_AssumingKou(CARD newCards[], CARD_KIND kouKind) {
+	for(int i=0;i<MAX_HANDIN_NUM;i++)
+		newCards[i].kind=ck_NOT_DEFINED;
 
-	int j=0;
-	int same_no=0;
+	int remain = 0;
+	int match  = 0;
 	for(int i=_cardInHand->active_place;i<_cardInHand->size();i++)
 	{
-		if(_cardInHand->get_status(i)==sMING_KOU)
+		if(_cardInHand->get_status(i)==sMING_KOU) {
 			continue;
-		else if(_cardInHand->get_kind(i)==card&&same_no<3)
-		{
-			same_no++;
-			continue;
-		}
-		else
-			temp_list[j++].kind=(CARD_KIND)_cardInHand->get_kind(i);
+        } else if(_cardInHand->get_kind(i)==kouKind&&match<3) {
+			match++;
+ 		} else {
+			newCards[remain++].kind=(CARD_KIND)_cardInHand->get_kind(i);
+        }
 	}
+
+    return remain;
+}
+
+int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
+{
+	CARD newCards[MAX_HANDIN_NUM];
+    int  newLen = _AssumingKou(newCards,card);
     
+	CARD_KIND temp_list2[MAX_HANDIN_NUM];
+	memset(temp_list2,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
+
 	if(no==1)
 	{
-		for(int n=0;n<j;n++)
-			for(int k=ck_YI_TIAO;k<=BAI;k++)
-			{
-				array_sort(temp_list,n,j,CARD_KIND(k),temp_list2);
-				if(cards_stable(temp_list2,j)==1)
+		for(int i=0;i<newLen;i++) {
+			for(int k=ck_YI_TIAO;k<=BAI;k++) {
+				array_sort(newCards,i,newLen,CARD_KIND(k),temp_list2);
+				if(cards_stable(temp_list2,newLen)==1)
 					return 1;
 			}
-	}
-	else if(no!=1)
-	{
+        }
+	} else {
 		int index;
-		for(int a=0;a<j;a++)
-		{
-			if(temp_list[a].kind==otherHandedOut)
-			{
+		for(int a=0;a<newLen;a++) {
+			if(newCards[a].kind==otherHandedOut) {
 				index=a;
 				break;
 			}
 		}
-		for(int k=ck_YI_TIAO;k<=BAI;k++)
-		{
-			array_sort(temp_list,index,j,CARD_KIND(k),temp_list2);
-			if(cards_stable(temp_list2,j)==1)
+        
+		for(int k=ck_YI_TIAO;k<=BAI;k++) {
+			array_sort(newCards,index,newLen,CARD_KIND(k),temp_list2);
+			if(cards_stable(temp_list2,newLen)==1)
 				return 1;
 		}
 	}
+    
 	return 0;
 }
 
