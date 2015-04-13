@@ -547,15 +547,7 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
 
     switch(dir) {
         case MIDDLE:
-            if( _roundManager->_lastActionSource==MIDDLE
-                && (_roundManager->_lastAction==a_AN_GANG
-                    ||_roundManager->_lastAction==a_SHOU_GANG
-                    ||_roundManager->_lastAction==a_MING_GANG) ) {
-                x = distributeCardPos.x;
-            } else {
-                x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
-            }
-            
+            x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
             y += 60 + 13*(_roundManager->IsTing(dir));
             break;
         case LEFT:
