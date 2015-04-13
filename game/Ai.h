@@ -22,19 +22,8 @@ private:
         kou card info
 *************************************/
 public:
-    void ClearKouCardInfo();
-    void AddKouCardGroup(Card_t kind,int *idx);
-    bool IsKouCardInclude(Card_t kind);
-    int  KouCardGroupNum();
-    int  KouCardIndex(int group,int idx);
-    CARD_STATUS  KouCardStatus(int gIdx);
-    void SetKouCardStatus(int gIdx,CARD_STATUS status);
-    void SwitchGroupStatus(int group,CARD_ARRAY *cards);
-    void Refresh(CARD_ARRAY *cards);
-    Card_t KouCardKind(int gIdx);
+    void Refresh();
     void KouCardCheck(PlayerDir_t dir);
-    int  _FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind);
-
     void MingKouChoose(PlayerDir_t dir);
 /*************************************
         round info
@@ -52,21 +41,6 @@ protected:
     ~Ai();
 
     static Ai *_instance;
-/*************************************
-        kou card info
-*************************************/
-private:
-    typedef struct {
-        CARD card;
-        int  idxInHand[3];
-    }CardGroup_t;
-    
-    typedef struct {
-        int num;
-        CardGroup_t group[4];
-    }KouCardInfo_t;
-
-    KouCardInfo_t _bufKouCards;
 };
 
 #endif

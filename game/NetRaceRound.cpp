@@ -472,17 +472,21 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
 	int i=0;
 	if( len==2 && clist[0]==clist[1] )
 		return 1;
+    
 	while(i<len-1)
 	{
 		if(	clist[i]==clist[i+1] )
 		{
 			if(i!=0)
 				memcpy(temp_list2,clist,i*sizeof(CARD_KIND));
+            
 			if(i<len-2)
 				memcpy(&temp_list2[i],&clist[i+2],(len-i-2)*sizeof(CARD_KIND));
-			if(pattern_match(temp_list2,len-2)==1)
+
+            if(pattern_match(temp_list2,len-2)==1)
 				return 1;
-			i += 2;
+
+            i += 2;
 		}
 		else
 			i++;
@@ -550,6 +554,7 @@ void NetRRound::array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rl
 			rlist[i]=(CARD_KIND)((*(it+i))->kind);
 		else
 			rlist[index]=kind;
+        
 	for(i=0;i<len;i++)
 	{
 		temp_kind=rlist[i];
@@ -575,6 +580,7 @@ void NetRRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KI
 			rlist[i]=clist[i].kind;
 		else
 			rlist[index]=kind;
+        
 	for(i=0;i<len;i++)
 	{
 		temp_kind=rlist[i];
@@ -652,6 +658,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		else
 			temp_list[j++].kind=(CARD_KIND)_cardInHand->get_kind(i);
 	}
+    
 	if(no==1)
 	{
 		for(int n=0;n<j;n++)

@@ -593,7 +593,7 @@ void NetRoundManager::RecvMing() {
     _ai->KouCardCheck((PlayerDir_t)_curPlayer);
 
     if(_curPlayer==MIDDLE) {
-        if(_ai->KouCardGroupNum()>0) {
+        if(_players[MIDDLE]->get_parter()->_cardInHand->KouGroupNum()>0) {
             _uiManager->QueryKouCards();
         } else {
             _isMingTime=true;

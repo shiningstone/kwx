@@ -75,134 +75,49 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 /*************************************
         kou card info
 *************************************/
-void Ai::ClearKouCardInfo() {
-    memset(&_bufKouCards,0,sizeof(KouCardInfo_t));
-}
-
-void Ai::AddKouCardGroup(Card_t kind,int *idx) {
-    _bufKouCards.group[_bufKouCards.num].card.kind   = (CARD_KIND)kind;
-    _bufKouCards.group[_bufKouCards.num].card.status = c_KOU_ENABLE;
-
-    _bufKouCards.group[_bufKouCards.num].idxInHand[0] = idx[0];
-    _bufKouCards.group[_bufKouCards.num].idxInHand[1] = idx[1];
-    _bufKouCards.group[_bufKouCards.num].idxInHand[2] = idx[2];
-
-    _bufKouCards.num++;
-}
-
-bool Ai::IsKouCardInclude(Card_t kind) {
-    for(int i=0;i<_bufKouCards.num;i++) {
-        if(_bufKouCards.group[i].card.kind==kind) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-int  Ai::KouCardGroupNum() {
-    return _bufKouCards.num;
-}
-
-int  Ai::KouCardIndex(int gIdx,int cIdx) {
-    return _bufKouCards.group[gIdx].idxInHand[cIdx];
-}
-
-CARD_STATUS Ai::KouCardStatus(int gIdx) {
-    return _bufKouCards.group[gIdx].card.status;
-}
-
-void Ai::SetKouCardStatus(int gIdx,CARD_STATUS status) {
-    _bufKouCards.group[gIdx].card.status = status;
-}
-
-void Ai::SwitchGroupStatus(int group,CARD_ARRAY *cards) {
-    if(KouCardStatus(group)==c_MING_KOU) {
-        SetKouCardStatus(group,c_KOU_ENABLE);
-        cards->data[KouCardIndex(group,0)].status=c_KOU_ENABLE;
-        cards->data[KouCardIndex(group,1)].status=c_KOU_ENABLE;
-        cards->data[KouCardIndex(group,2)].status=c_KOU_ENABLE;
-    }
-    else if(KouCardStatus(group)==c_KOU_ENABLE) {
-        SetKouCardStatus(group,c_MING_KOU);
-        cards->data[KouCardIndex(group,0)].status=c_MING_KOU;
-        cards->data[KouCardIndex(group,1)].status=c_MING_KOU;
-        cards->data[KouCardIndex(group,2)].status=c_MING_KOU;
-    }
-}
-
-void Ai::Refresh(CARD_ARRAY *cards) {
-    for( int group=0; group<KouCardGroupNum(); group++ ) {
-        if(KouCardStatus(group)!=c_MING_KOU) {
+void Ai::Refresh() {
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cardInHand;
+    
+    for( int group=0; group<cards->KouGroupNum(); group++ ) {
+        if(cards->KouGroupStatus(group)!=sMING_KOU) {
             if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
-                (CARD_KIND)KouCardKind(group), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
+                (CARD_KIND)cards->KouGroupKind(group), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
             {
-                cards->data[KouCardIndex(group,0)].status=c_KOU_ENABLE;
-                cards->data[KouCardIndex(group,1)].status=c_KOU_ENABLE;
-                cards->data[KouCardIndex(group,2)].status=c_KOU_ENABLE;
-                SetKouCardStatus(group,c_KOU_ENABLE);
+                cards->SetGroupStatus(group,sKOU_ENABLE);
             } else {
-                cards->data[KouCardIndex(group,0)].status=c_FREE;
-                cards->data[KouCardIndex(group,1)].status=c_FREE;
-                cards->data[KouCardIndex(group,2)].status=c_FREE;
-                SetKouCardStatus(group,c_FREE);
+                cards->SetGroupStatus(group,sFREE);
             }
         }
     }
 }
 
-Card_t Ai::KouCardKind(int gIdx) {
-    return (Card_t)_bufKouCards.group[gIdx].card.kind;
-}
-
 void Ai::KouCardCheck(PlayerDir_t dir) {
-	CARD_ARRAY *list = _roundManager->_players[dir]->get_parter()->get_card_list();
+    CardInHand *cards = _roundManager->_players[dir]->_cardInHand;
 
-	ClearKouCardInfo();
+	cards->ClearKouCardInfo();
         
-	for(int i=list->atcvie_place; i<list->len; i++){
-	    auto curKind = list->data[i].kind;
+	for(int i=cards->active_place; i<cards->size(); i++){
+	    auto kind = cards->get_kind(i);
         
-        if( !IsKouCardInclude((Card_t)curKind) ) {
+        if( !cards->IsKouInclude(kind) ) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
-            if(_FindCards(cardIdx, list, curKind)==3 
-                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(curKind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
-                
-                AddKouCardGroup((Card_t)curKind,cardIdx);
-                
-                list->data[cardIdx[0]].status=c_KOU_ENABLE;
-                list->data[cardIdx[1]].status=c_KOU_ENABLE;
-                list->data[cardIdx[2]].status=c_KOU_ENABLE;
+            if(cards->_FindCards(cardIdx, kind)==3 
+                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards(kind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+                cards->AddKouGroup(kind,cardIdx);
             }
         }
 	}
 }
 
-int Ai::_FindCards(int idx[],CARD_ARRAY *list,CARD_KIND kind) {
-    int num = 0;
-    
-    for(int i=list->atcvie_place; i<list->len; i++) {   
-        if(list->data[i].kind==kind) {
-            idx[num++] = i;
-        }
-    }
-
-    return num;
-}
-
 void Ai::MingKouChoose(PlayerDir_t dir) {
-	auto list=_roundManager->_players[dir]->get_parter()->get_card_list();
+    CardInHand *cards = _roundManager->_players[dir]->_cardInHand;
     
-	for(int i=0;i<KouCardGroupNum();i++)
+	for(int i=0;i<cards->KouGroupNum();i++)
 	{
 		if(_roundManager->_players[dir]->get_parter()->judge_kou_cards(
-            (CARD_KIND)KouCardKind(i),dir,(CARD_KIND)_roundManager->_otherHandedOut))
-		{
-			for(int b=0;b<3;b++)
-			{
-				list->data[KouCardIndex(i,b)].status=c_MING_KOU;
-			}
+            (CARD_KIND)cards->KouGroupKind(i),dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+		    cards->SetGroupStatus(sMING_KOU);
 		}
 	}
 }

@@ -630,7 +630,7 @@ void RoundManager::RecvMing() {
     _ai->KouCardCheck((PlayerDir_t)_curPlayer);
 
     if(_curPlayer==MIDDLE) {
-        if(_ai->KouCardGroupNum()>0) {
+        if(_players[MIDDLE]->get_parter()->_cardInHand->KouGroupNum()>0) {
             _uiManager->QueryKouCards();
         } else {
             _isMingTime=true;
@@ -776,7 +776,7 @@ void RoundManager::WaitForOthersChoose() {
         _otherHandedOut = (Card_t)_players[_curPlayer]->get_parter()->get_card_list()->data[index].kind;
         
         _ai->KouCardCheck((PlayerDir_t)_curPlayer);
-        if(_ai->KouCardGroupNum()>0) {
+        if(_players[_curPlayer]->get_parter()->_cardInHand->KouGroupNum()>0) {
             _ai->MingKouChoose((PlayerDir_t)_curPlayer);
         }
     }
