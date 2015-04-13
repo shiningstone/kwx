@@ -222,6 +222,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     fake.kind   = (CARD_KIND)card;
     RecordOutCard(fake);
 	_lastHandedOutCard = (CARD_KIND)card;
+    _actionToDo = a_JUMP;
     
     _curPlayer = dir;
 
