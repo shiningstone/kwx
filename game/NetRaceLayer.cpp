@@ -4042,19 +4042,19 @@ void NetRaceLayer::_MaskNonKouCards(CARD_ARRAY *cards) {
 }
 
 bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
-    auto cards=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+    auto cards=_roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
 
     Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
     int groupChosen=-1;
     
-    for(int i=0;i<cards->len;i++) {
+    for(int i=0;i<cards->size()-1;i++) {
         cardsInHand[i]=_GetCardInHand(MIDDLE,i);
         cardsInHand[i]->_ID = MIDDLE;
     }
     
-    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
+    for(int group=0; group<cards->KouGroupNum(); group++) {
         for(int i=0; i<3; i++) {
-            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)], touch) ) {
+            if ( _IsClickedOn(cardsInHand[cards->KouCardIndex(group,i)], touch) ) {
                 groupChosen = group;
                 break;/* BUG : only 1 group can be chosen??? */
             }
@@ -4063,7 +4063,7 @@ bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
     
     if(groupChosen!=-1) {
         for(int i=0; i<3; i++) {
-            cardsInHand[_ai->KouCardIndex(groupChosen,i)]->_ID++;/*==2???*/
+            cardsInHand[cards->KouCardIndex(groupChosen,i)]->_ID++;/*==2???*/
         }
     }
     
@@ -4072,10 +4072,12 @@ bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
 
 /* !!! only one group one time */
 int NetRaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
-    for(int group=0; group<_ai->KouCardGroupNum(); group++) {
+    CardInHand *cards = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
+
+    for(int group=0; group<cards->KouGroupNum(); group++) {
         for(int i=0;i<3;i++) {
-            if ( _IsClickedOn(cardsInHand[_ai->KouCardIndex(group,i)],touch) ) {
-                int idx = _ai->KouCardIndex(group,i);
+            if ( _IsClickedOn(cardsInHand[cards->KouCardIndex(group,i)],touch) ) {
+                int idx = cards->KouCardIndex(group,i);
                 if(cardsInHand[idx]->_ID!=1) {
                     return group;
                 }
@@ -4087,7 +4089,7 @@ int NetRaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
 }
 
 void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
-    CardInHand *cards = _roundManager->_players[MIDDLE]->_cardInHand;
+    CardInHand *cards = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
     
     Sprite *cardsInHand[MAX_HANDIN_NUM];
     for(int i=0; i<cards->size(); i++) {
@@ -4110,12 +4112,12 @@ void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
             if(cards->KouGroupStatus(group)==sMING_KOU) {
                 auto MingKouMark=_object->Create(MING_KOU_CARD);
                 MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
-                MingKouMark->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(group,i)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(group,i)]->getTextureRect().size.height/2));
+                MingKouMark->setPosition(Vec2(cardsInHand[cards->KouCardIndex(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->KouCardIndex(group,i)]->getTextureRect().size.height/2));
                 cardsInHand[cards->KouCardIndex(group,i)]->addChild(MingKouMark,2,MING_KOU);
             } else if(cards->KouGroupStatus(group)!=sKOU_ENABLE) {
                 auto KouNo=_object->Create(MING_MASK_CARD);
                 KouNo->setAnchorPoint(Vec2(0.5,0.5));
-                KouNo->setPosition(Vec2(cardsInHand[_ai->KouCardIndex(group,i)]->getTextureRect().size.width/2,cardsInHand[_ai->KouCardIndex(group,i)]->getTextureRect().size.height/2));
+                KouNo->setPosition(Vec2(cardsInHand[cards->KouCardIndex(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->KouCardIndex(group,i)]->getTextureRect().size.height/2));
                 cardsInHand[cards->KouCardIndex(group,i)]->addChild(KouNo,2,MING_KOU_MASK);
             }
         }

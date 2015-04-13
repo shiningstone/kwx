@@ -789,7 +789,7 @@ void RoundManager::WaitForOthersChoose() {
         _uiManager->TingHintBarOfOthers(_curPlayer,index);
 
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
-        if(_ai->KouCardGroupNum()>0)
+        if(_players[_curPlayer]->get_parter()->_cardInHand->KouGroupNum()>0)
             UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
 
         UpdateCards((PlayerDir_t)_curPlayer,a_MING);
