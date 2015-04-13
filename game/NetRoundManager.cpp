@@ -535,6 +535,16 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(GangCard);
 			RecordOutCard(GangCard);
             
+            _players[dir]->get_parter()->hand_in(
+                _lastHandedOutCard,
+                true,
+                false,
+                (_distributedNum==TOTAL_CARD_NUM),
+                _lastActionWithGold,
+                _continue_gang_times,
+                _isGangHua
+            );
+            
 			_curPlayer=dir;
 		}else {
 			GangCard=list->data[list->len-1];

@@ -3506,7 +3506,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                     myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         ScaleTo::create(0,0),NULL)));
 			} 
-            for(int i=gang[2]+1;i<list->len;i++) {/* right shift */
+            for(int i=gang[2]+1;i<list->len-1;i++) {/* right shift */
 				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
                 
                 gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
