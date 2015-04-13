@@ -676,11 +676,6 @@ void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
 }
 
 void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
-    if(!_isCardFromOthers) {
-        QiangGangHuJudge(dir);
-    } else {
-        DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]/4));
-    }
 }
 
 void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {

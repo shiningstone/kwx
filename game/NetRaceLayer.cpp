@@ -1730,7 +1730,7 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
             curOutPosTemp.y + cardOut->getTextureRect().size.height*1.5);
 	}
 	else {
-		auto cardOut_Yposition = _GetCardInHand(dir,cardInHand->len-1)->getPosition().y;
+		auto cardOut_Yposition = _GetCardInHand(dir,cardInHand->len-2)->getPosition().y;
         curOutPos = Vec2(
             _layout->_playerPosi[dir].basePoint.x + 10,
             cardOut_Yposition - 20 - 35);
@@ -6574,7 +6574,7 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,CardList* outCard)
 	else if(no==0)
 	{
 		auto l_list_len=_roundManager->_players[no]->get_parter()->get_card_list()->len-1;
-		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+l_list_len);
+		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+l_list_len-1);
 		if((outCard->size()-1)<6)
 		{
 			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);
