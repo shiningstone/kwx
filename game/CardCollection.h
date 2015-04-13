@@ -59,10 +59,35 @@ public:
     int FreeStart;
     int Last;
     int Residue;
-private:
-    Card_t CardInHand::_FindGangCard(int cardIdx[]);
 
-    int _FindInsertPoint(CardNode_t data);
+    /***************************************************
+            kou cards info
+    ***************************************************/
+    int  KouGroupNum() const;
+    Card_t KouGroupKind(int gIdx) const;
+    CardStatus_t KouGroupStatus(int gIdx) const;
+    int  KouCardIndex(int gIdx,int cIdx) const;
+    bool IsKouInclude(Card_t kind) const;
+    void AddKouGroup(Card_t kind,int *idx);
+    void SwitchGroupStatus(int gIdx);
+    int  _FindCards(int cardIdx[],Card_t card) const;
+
+    void SetGroupStatus(int gIdx,CardStatus_t status);
+    void ClearKouCardInfo();
+private:
+    int    _FindInsertPoint(CardNode_t data) const;
+    Card_t _FindGangCard(int cardIdx[]) const;
+
+    typedef struct {
+        int    idx[3];
+    }KouGroup_t;
+
+    typedef struct {
+        int        num;
+        KouGroup_t group[4];
+    }KouCards_t;
+
+    KouCards_t _bufKouCards;
 };
 
 #endif

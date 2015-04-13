@@ -123,28 +123,6 @@ void CardInHand::delete_card(int from,int len) {
     }
 }
 
-int CardInHand::_FindInsertPoint(CardNode_t data) {
-    if(data.status!=sFREE) {
-        for(int i=active_place;i>0;i--) {
-            if(get_status(i-1)!=sMING_KOU) {
-                return i;
-            } else if(data.kind>=get_kind(i-1)) {
-                return i;
-            }
-        }
-
-        return 0;
-    } else {
-        for(int i=active_place;i<=size();i++) {
-            if(get_kind(i)>=data.kind) {
-                return i;
-            }
-        }
-
-        return size();
-    }
-}
-
 void CardInHand::insert_card(CardNode_t data,int times) {
     int insertPlace = _FindInsertPoint(data);
 
@@ -163,7 +141,45 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     }
 }
 
-Card_t CardInHand::_FindGangCard(int cardIdx[]) {
+void CardInHand::perform(ActionId_t act) {
+    if(act==aAN_GANG) {
+        int cardIdx[4] = {0};
+        Card_t kind = _FindGangCard(cardIdx);
+
+        CardNode_t gangCard;
+        gangCard.kind    = kind;
+        gangCard.status  = sAN_GANG;
+        gangCard.canPlay = false;
+
+        delete_card(cardIdx[0],4);
+        insert_card(gangCard,4);
+        active_place += 4;
+    }
+}
+
+int CardInHand::_FindInsertPoint(CardNode_t data) const {
+    if(data.status!=sFREE) {
+        for(int i=active_place;i>0;i--) {
+            if(get_status(i-1)!=sMING_KOU) {
+                return i;
+            } else if(data.kind>=get_kind(i-1)) {
+                return i;
+            }
+        }
+
+        return 0;
+    } else {
+        for(int i=active_place;i<size();i++) {
+            if(get_kind(i)>=data.kind) {
+                return i;
+            }
+        }
+
+        return size();
+    }
+}
+
+Card_t CardInHand::_FindGangCard(int cardIdx[]) const{
     for(int i=active_place; i<size(); i++) {
         cardIdx[0] = i;
         int matchCardNum = 1;
@@ -184,18 +200,72 @@ Card_t CardInHand::_FindGangCard(int cardIdx[]) {
     return CARD_UNKNOWN;
 }
 
-void CardInHand::perform(ActionId_t act) {
-    if(act==aAN_GANG) {
-        int cardIdx[4] = {0};
-        Card_t kind = _FindGangCard(cardIdx);
+int CardInHand::_FindCards(int idx[],Card_t kind) const {
+    int num = 0;
+    
+    for(int i=active_place; i<size(); i++) {   
+        if(get_kind(i)==kind) {
+            idx[num++] = i;
+        }
+    }
 
-        CardNode_t gangCard;
-        gangCard.kind    = kind;
-        gangCard.status  = sAN_GANG;
-        gangCard.canPlay = false;
+    return num;
+}
 
-        delete_card(cardIdx[0],4);
-        insert_card(gangCard,4);
-        active_place += 4;
+/***************************************************
+        kou cards info
+***************************************************/
+void CardInHand::ClearKouCardInfo() {
+    memset(&_bufKouCards,0,sizeof(KouCards_t));
+}
+
+int  CardInHand::KouGroupNum() const {
+    return _bufKouCards.num;
+}
+
+int  CardInHand::KouCardIndex(int gIdx,int cIdx) const {
+    return _bufKouCards.group[gIdx].idx[cIdx];
+}
+
+Card_t CardInHand::KouGroupKind(int gIdx) const {
+    return get_kind(KouCardIndex(gIdx,0));
+}
+
+CardStatus_t CardInHand::KouGroupStatus(int gIdx) const {
+    return get_status(KouCardIndex(gIdx,0));
+}
+
+void CardInHand::SetGroupStatus(int gIdx,CardStatus_t status) {
+    set_status(KouCardIndex(gIdx,0),status);
+    set_status(KouCardIndex(gIdx,1),status);
+    set_status(KouCardIndex(gIdx,2),status);
+}
+
+void CardInHand::AddKouGroup(Card_t kind,int *idx) {
+    _bufKouCards.group[_bufKouCards.num].idx[0] = idx[0];
+    _bufKouCards.group[_bufKouCards.num].idx[1] = idx[1];
+    _bufKouCards.group[_bufKouCards.num].idx[2] = idx[2];
+
+    SetGroupStatus(_bufKouCards.num,sKOU_ENABLE);
+
+    _bufKouCards.num++;
+}
+
+bool CardInHand::IsKouInclude(Card_t kind) const {
+    for(int i=0;i<_bufKouCards.num;i++) {
+        if(KouGroupKind(i)==kind) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void CardInHand::SwitchGroupStatus(int gIdx) {
+    if(get_status(KouCardIndex(gIdx,0))==sMING_KOU) {
+        SetGroupStatus(gIdx,sKOU_ENABLE);
+    } else {
+        SetGroupStatus(gIdx,sMING_KOU);
     }
 }
+
