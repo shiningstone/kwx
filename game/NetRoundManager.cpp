@@ -337,11 +337,11 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
         }
         
         if(_actionToDo&a_AN_GANG) {
-            _players[dir]->get_parter()->net_action(_isCardFromOthers,a_AN_GANG,actKind);
+            _players[dir]->get_parter()->others_action(_isCardFromOthers,a_AN_GANG,actKind);
         } else if(_actionToDo&a_SHOU_GANG) {
-            _players[dir]->get_parter()->net_action(_isCardFromOthers,a_SHOU_GANG,actKind);
+            _players[dir]->get_parter()->others_action(_isCardFromOthers,a_SHOU_GANG,actKind);
         } else {
-            _players[dir]->get_parter()->net_action(_isCardFromOthers,action,actKind);
+            _players[dir]->get_parter()->others_action(_isCardFromOthers,action,actKind);
         }
     }
 }

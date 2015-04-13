@@ -965,7 +965,7 @@ void NetRRound::MingCancel()
 	}
 }
 
-ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kind)
+ACT_RES NetRRound::others_action(unsigned char who_give,ARRAY_ACTION act,Card_t kind)
 {
     LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
 
@@ -985,11 +985,20 @@ ACT_RES NetRRound::net_action(unsigned char who_give,ARRAY_ACTION act,Card_t kin
         _cardInHand->insert_card(node,3);
         _cardInHand->active_place += 3;
 	} else if(act==a_MING_GANG) {
-        card_delete(0,4);
+        card_delete(_cardInHand->active_place,4);
 
         CardNode_t node;
         node.kind=kind;
         node.status=sMING_GANG;
+		node.canPlay=cps_NO;
+        _cardInHand->insert_card(node,4);
+		_cardInHand->active_place += 4;
+	} else if(act==a_AN_GANG) {
+        card_delete(_cardInHand->active_place,4);
+
+        CardNode_t node;
+        node.kind=CARD_UNKNOWN;
+        node.status=sAN_GANG;
 		node.canPlay=cps_NO;
         _cardInHand->insert_card(node,4);
 		_cardInHand->active_place += 4;

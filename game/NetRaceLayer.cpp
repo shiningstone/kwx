@@ -287,7 +287,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
     
     for(int i=0;i<list->len;i++)
 	{
-		if(list->data[i].kind!=ck_NOT_DEFINED )
+		//if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
 			if(dir==LEFT || dir==RIGHT) {
 				p_list[i] = _CreateCardInHand(dir,i,list,(ting_flag==1),Vec2(x,y));
