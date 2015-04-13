@@ -68,7 +68,7 @@ void CardList::pop_back() {
 
 void CardList::show() {
 	CardList::iterator it;
-	char   kinds[MAX_HANDIN_NUM];
+	char   kinds[84];
 	int    idx = 0;
 
 	for(it=begin();it!=end();it++) {
