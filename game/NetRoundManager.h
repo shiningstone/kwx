@@ -48,6 +48,7 @@ public:
     void _DiRecv(ActionNotif *info);
 
     void ServerWaitForMyAction();
+    void ServerDistributeTo(PlayerDir_t dir,Card_t card);
     
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
 /* networks end   */

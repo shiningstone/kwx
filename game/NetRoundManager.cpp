@@ -169,7 +169,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     INT8U timer        = info->timer;
     delete info;
 
-    DistributeTo(target,card);
+    ServerDistributeTo(target,card);
     _players[target]->get_parter()->hand_in(
         (CARD_KIND)card,
         false,
@@ -192,7 +192,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _actionToDo       = info->GetAvailActions(info->remind);
     delete info;
 
-    DistributeTo(target,card);
+    ServerDistributeTo(target,card);
     _players[MIDDLE]->get_parter()->hand_in(
         (CARD_KIND)card,
         false,
@@ -307,6 +307,24 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 _uiManager->_MingGangEffect(dir,whoGive,card,NULL);
             }
             break;
+        case aAN_GANG:
+            {
+                _lastActionSource = dir;
+                
+                if(_actionToDo&a_AN_GANG) {
+                    _actionToDo=a_AN_GANG;
+                    _lastAction=a_AN_GANG;
+                    _lastActionWithGold=a_AN_GANG;
+                } else if(_actionToDo&a_SHOU_GANG) {
+                    _actionToDo=a_SHOU_GANG;
+                    _lastAction=a_SHOU_GANG;
+                    _lastActionWithGold=a_SHOU_GANG;
+                }
+                
+                int *gangCardIdx = new int(4);
+                _uiManager->GangEffect(dir,CARD_UNKNOWN,gangCardIdx);
+            }
+            break;
     }
 }
 
@@ -325,6 +343,45 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
         } else {
             _players[dir]->get_parter()->net_action(_isCardFromOthers,action,actKind);
         }
+    }
+}
+
+void NetRoundManager::ServerWaitForMyAction() {
+    _uiManager->ShowActionButtons(_actionToDo);
+
+	if(_actionToDo!=a_JUMP) {
+		_isWaitDecision = true;
+		_tempActionToDo=_actionToDo;
+		_actionToDo=a_JUMP;
+	}
+
+	if(_actionToDo&a_AN_GANG 
+        || _actionToDo&a_MING_GANG
+        ||_actionToDo&a_SHOU_GANG) {
+        _isGangAsking = true;
+	}
+
+	if(!_isCardFromOthers) {
+		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
+			_continue_gang_times=0;
+        }
+
+		_lastAction=a_JUMP;
+		WaitForMyChoose();
+	}
+}
+
+void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
+    if(_distributedNum<TOTAL_CARD_NUM+1) {
+        DistributeInfo_t distInfo;
+        
+        distInfo.target = dir;
+        distInfo.card   = card;
+        distInfo.distNum = _distributedNum;
+        
+        _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
+    } else {
+		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
     }
 }
 
@@ -606,30 +663,6 @@ void NetRoundManager::RecvMing() {
     }
 }
 
-void NetRoundManager::ServerWaitForMyAction() {
-    _uiManager->ShowActionButtons(_actionToDo);
-
-	if(_actionToDo!=a_JUMP) {
-		_isWaitDecision = true;
-		_tempActionToDo=_actionToDo;
-		_actionToDo=a_JUMP;
-	}
-
-	if(_actionToDo&a_AN_GANG 
-        || _actionToDo&a_MING_GANG
-        ||_actionToDo&a_SHOU_GANG) {
-        _isGangAsking = true;
-	}
-
-	if(!_isCardFromOthers) {
-		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
-			_continue_gang_times=0;
-        }
-
-		_lastAction=a_JUMP;
-		WaitForMyChoose();
-	}
-}
 
 void NetRoundManager::WaitForMyAction() {
     LOGGER_WRITE("%s (%d) wait",__FUNCTION__,1);
@@ -662,17 +695,6 @@ void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
 }
 
 void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
-    if(_distributedNum<TOTAL_CARD_NUM+1) {
-        DistributeInfo_t distInfo;
-        
-        distInfo.target = dir;
-        distInfo.card   = card;
-        distInfo.distNum = _distributedNum;
-        
-        _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
-    } else {
-		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
-    }
 }
 
 void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
