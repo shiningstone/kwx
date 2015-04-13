@@ -153,7 +153,19 @@ void CardInHand::perform(ActionId_t act) {
 
         delete_card(cardIdx[0],4);
         insert_card(gangCard,4);
+        
         active_place += 4;
+
+        CardNode_t cardsAfterGangCard[18];
+        int cardsNum = 0;
+        for(int i=cardIdx[3]+1;i<size();i++) {
+            cardsAfterGangCard[cardsNum++] = *at(i);
+        }
+
+        for(int i=0;i<cardsNum;i++) {
+            delete_card(cardIdx[3]+1+i,1);
+            insert_card(cardsAfterGangCard[i],1);
+        }
     }
 }
 

@@ -3223,7 +3223,9 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         
 		myframe->_ID=MIDDLE;
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
-            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),
+            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {
+             auto cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+            _ReOrderCardsInHand(0,cards);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}),CallFunc::create([=](){
             _roundManager->DistributeTo(dir

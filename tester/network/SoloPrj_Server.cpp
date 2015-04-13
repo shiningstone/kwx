@@ -377,11 +377,18 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,22);
         SendLine(SERVER,23);
         SendLine(SERVER,24);
+        SendLine(SERVER,25);
     } else if(recvBuf[16]==REQ_GAME_SEND_ACTION && handout==4) {
         handout++;
     
-        SendLine(SERVER,25);
         SendLine(SERVER,26);
+        SendLine(SERVER,27);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==5) {
+        handout++;
+    
+        SendLine(SERVER,28);
+        SendLine(SERVER,29);
+        SendLine(SERVER,30);
     }
 }
 
