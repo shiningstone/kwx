@@ -397,6 +397,11 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     
         SendLine(SERVER,34);
         SendLine(SERVER,35);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==7) {
+        handout++;
+    
+        SendLine(SERVER,36);
+        SendLine(SERVER,37);
     }
 }
 
