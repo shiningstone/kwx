@@ -89,6 +89,11 @@ public:
     bool PatternMatch2(const SimpleList &cards) const;
 
     bool PatternMatch(const SimpleList &cards) const;
+    /***************************************************
+            effect
+    ***************************************************/
+    void add_effect_card();
+    void del_effect_card();
 private:
     int    _FindInsertPoint(CardNode_t data) const;
     Card_t _FindGangCard(int cardIdx[]) const;

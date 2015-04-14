@@ -578,7 +578,7 @@ void NetRoundManager::RecvQi() {
     _uiManager->QiEffect();
 }
 
-void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
+void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     if(_isGangAsking) {
         _isGangAsking = false;
@@ -597,8 +597,8 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordOutCard(_players[MIDDLE]->get_parter()->get_card_list()->data[idx]);
-    _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(idx);
+    RecordOutCard(_players[MIDDLE]->get_parter()->get_card_list()->data[chosen]);
+    _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(chosen);
     _players[MIDDLE]->_river->push_back((Card_t)_lastHandedOutCard);
 
     Card_t card = (Card_t)_lastHandedOutCard;
@@ -615,7 +615,7 @@ void NetRoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     }
 
     auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
-    _uiManager->MyHandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
+    _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
 }
 
 void NetRoundManager::RecvKouCancel() {

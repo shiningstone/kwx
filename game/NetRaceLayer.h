@@ -242,7 +242,7 @@ public:
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(const WinInfo_t &win);
 	void _DistributeCard(PlayerDir_t dir, int lenOfInHand);
-	void MyHandoutEffect(int cardInList,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing);
+	void MyHandoutEffect(int cardInList,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 
 	unsigned int VoiceId;

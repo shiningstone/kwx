@@ -440,8 +440,6 @@ void RoundManager::RecvQi() {
 }
 
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
-    auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
-
     if(_isGangAsking) {
         _isGangAsking = false;
     }
@@ -472,7 +470,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
         turnToMing = true;
     }
 
-    _uiManager->MyHandoutEffect(idx,cardsInHand,touch,mode,turnToMing);
+    _uiManager->MyHandoutEffect(idx,touch,mode,turnToMing);
 }
 
 void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {

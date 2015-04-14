@@ -946,17 +946,6 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 
 	card_delete(place,1);
 
-    int last = _cardInHand->size()-1;
-    if( rr_ting_flag==0 && place!=last )
-	{
-        CardNode_t *tail_card = new CardNode_t;
-        tail_card->kind = (Card_t)_cardInHand->get_kind(last);
-        tail_card->status = (CardStatus_t)_cardInHand->get_status(last);
-        tail_card->canPlay = _cardInHand->canPlay(last)==cps_YES?true:false;
-
-        _cardInHand->push_back(tail_card);
-	}
-
     return l_kind;
 }
 

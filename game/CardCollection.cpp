@@ -465,3 +465,15 @@ bool CardInHand::PatternMatch(const SimpleList &cards) const{
     }
 }
 
+/***************************************************
+        effect
+***************************************************/
+void CardInHand::add_effect_card() {
+    CardNode_t *effectCard = new CardNode_t(*back());
+    push_back(effectCard);
+}
+
+void CardInHand::del_effect_card() {
+    pop_back();
+}
+

@@ -245,17 +245,24 @@ void NetRaceLayer::GangGoldEffect(int winner,int whoGive) {
             ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 }
 
-void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,int time,bool turnToMing)
+void NetRaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMing)
 {
     if(time==2) {
         if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
             myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
         }
     } else {
-        _ReOrderCardsInHand(chosenCard,list);
-    }
+        int last = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->size()-1;
+        if( chosenCard!=last+1 )/* _cardInHand is 1 shorter than it was before handout */
+        {
+            _roundManager->_players[MIDDLE]->_cards->add_effect_card();
+        }
 
-    _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
+        auto list = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+        _ReOrderCardsInHand(chosenCard,list);
+
+        _roundManager->_players[MIDDLE]->_cards->del_effect_card();
+    }
     
     CardNode_t *node = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->back();
     _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
