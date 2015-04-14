@@ -5,3 +5,5 @@
 2015.3.31
 	逻辑基本分离到RoundManager，但是动作接口还没有完全统一
 	后续主要实现网络版的NetRoundManager
+2015.4.14
+	网络版NetRoundManager实现过半，由于逻辑分离不彻底，进展不顺利
