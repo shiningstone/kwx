@@ -3,6 +3,13 @@
 
 #define MAX_HANDIN_NUM 18
 
+//#define DEBUG
+#ifdef DEBUG
+#define DBG_SHOW() show()
+#else
+#define DBG_SHOW()
+#endif
+
 CardList::CardList() {
 	_logger = LOGGER_REGISTER("CardList");
 }
@@ -57,6 +64,7 @@ void CardList::push_back(Card_t kind) {
 
 void CardList::push_back(CardNode_t *node) {    
     vector::push_back(node);
+    DBG_SHOW();
 }
 
 void CardList::pop_back() {
@@ -64,6 +72,7 @@ void CardList::pop_back() {
     delete last;
 
 	vector::pop_back();
+    DBG_SHOW();
 }
 
 void CardList::show() {
@@ -121,6 +130,8 @@ void CardInHand::delete_card(int from,int len) {
         delete p[idx];
         idx++;
     }
+
+    DBG_SHOW();
 }
 
 void CardInHand::insert_card(CardNode_t data,int times) {
@@ -139,6 +150,8 @@ void CardInHand::insert_card(CardNode_t data,int times) {
             insert(begin()+insertPlace+i,card);
         }
     }
+
+    DBG_SHOW();
 }
 
 void CardInHand::perform(ActionId_t act) {
@@ -155,7 +168,8 @@ void CardInHand::perform(ActionId_t act) {
         insert_card(gangCard,4);
         
         active_place += 4;
-
+        
+        /* 在这里排序导致没有插牌效果 */
         CardNode_t cardsAfterGangCard[18];
         int cardsNum = 0;
         for(int i=cardIdx[3]+1;i<size();i++) {
@@ -167,6 +181,8 @@ void CardInHand::perform(ActionId_t act) {
             insert_card(cardsAfterGangCard[i],1);
         }
     }
+
+    DBG_SHOW();
 }
 
 int CardInHand::_FindInsertPoint(CardNode_t data) const {

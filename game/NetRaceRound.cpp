@@ -1027,9 +1027,9 @@ ACT_RES NetRRound::others_action(unsigned char who_give,ARRAY_ACTION act,Card_t 
 	return ar_DONE;
 }
 
-ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
+ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 {
-    LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
+    LOGGER_WRITE("%x %s : %d (isCardFromOther=%d)",this,__FUNCTION__,act,isCardFromOther);
 
 	CARD temp_data;
 	InsertPlaceForMG=-1;
@@ -1167,7 +1167,7 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 		temp_data.status=c_FREE;
 		temp_data.can_play=cps_NO;
         
-		if(who_give!=0)
+		if(isCardFromOther)
 			card_insert(temp_data,1);
 		else
 		{
@@ -1178,7 +1178,7 @@ ACT_RES NetRRound::action(unsigned char who_give,ARRAY_ACTION act)
 	}
 	else if(act==a_JUMP)
 	{
-		if(who_give==0)
+		if(!isCardFromOther)
 		{
 			temp_data.status=c_FREE;
 			card_delete(_cardInHand->size()-1,1);

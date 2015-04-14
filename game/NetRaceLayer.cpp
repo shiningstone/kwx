@@ -254,8 +254,9 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,CARD_ARRAY *list,Vec2 touch,in
     } else {
         _ReOrderCardsInHand(chosenCard,list);
     }
-    
+
     _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
+    
     CardNode_t *node = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->back();
     _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
     _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
@@ -1836,7 +1837,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
             _DeleteActionReminder();}),NULL);
 
 	myframe->_ID = MIDDLE;
-	_roundManager->_isCardFromOthers = true;
+	_roundManager->_isCardFromOthers = false;
     
 	myframe->runAction(Sequence::create(
         allEffect,
