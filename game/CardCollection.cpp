@@ -212,7 +212,7 @@ Card_t CardInHand::_FindGangCard(int cardIdx[]) const{
     return CARD_UNKNOWN;
 }
 
-int CardInHand::_FindCards(int idx[],Card_t kind) const {
+int CardInHand::FindCards(int idx[],Card_t kind) const {
     int num = 0;
     
     for(int i=active_place; i<size(); i++) {   
@@ -231,26 +231,26 @@ void CardInHand::ClearKouCardInfo() {
     memset(&_bufKouCards,0,sizeof(KouCards_t));
 }
 
-int  CardInHand::KouGroupNum() const {
+int  CardInHand::kou_group_num() const {
     return _bufKouCards.num;
 }
 
-int  CardInHand::KouCardIndex(int gIdx,int cIdx) const {
+int  CardInHand::kou_card_index(int gIdx,int cIdx) const {
     return _bufKouCards.group[gIdx].idx[cIdx];
 }
 
 Card_t CardInHand::KouGroupKind(int gIdx) const {
-    return get_kind(KouCardIndex(gIdx,0));
+    return get_kind(kou_card_index(gIdx,0));
 }
 
-CardStatus_t CardInHand::KouGroupStatus(int gIdx) const {
-    return get_status(KouCardIndex(gIdx,0));
+CardStatus_t CardInHand::kou_group_status(int gIdx) const {
+    return get_status(kou_card_index(gIdx,0));
 }
 
 void CardInHand::SetGroupStatus(int gIdx,CardStatus_t status) {
-    set_status(KouCardIndex(gIdx,0),status);
-    set_status(KouCardIndex(gIdx,1),status);
-    set_status(KouCardIndex(gIdx,2),status);
+    set_status(kou_card_index(gIdx,0),status);
+    set_status(kou_card_index(gIdx,1),status);
+    set_status(kou_card_index(gIdx,2),status);
 }
 
 void CardInHand::AddKouGroup(Card_t kind,int *idx) {
@@ -273,11 +273,179 @@ bool CardInHand::IsKouInclude(Card_t kind) const {
     return false;
 }
 
-void CardInHand::SwitchGroupStatus(int gIdx) {
-    if(get_status(KouCardIndex(gIdx,0))==sMING_KOU) {
+void CardInHand::switch_group_status(int gIdx) {
+    if(get_status(kou_card_index(gIdx,0))==sMING_KOU) {
         SetGroupStatus(gIdx,sKOU_ENABLE);
     } else {
         SetGroupStatus(gIdx,sMING_KOU);
+    }
+}
+
+/***************************************************
+        logic
+***************************************************/
+bool CardInHand::_Has3Same(const SimpleList &cards) const  {
+    if(cards.kind[0]==cards.kind[1]&&cards.kind[0]==cards.kind[2]) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool CardInHand::_Has3Sequence(const SimpleList &cards) const  {
+    for(int i=1;i<cards.len;i++) {
+        if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
+            for(int j=i+1;j<cards.len;j++) {
+                if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+void CardInHand::_Remove3Same(SimpleList &cards) const {
+    memcpy(cards.kind,&(cards.kind[3]),cards.len-3);
+    cards.len -= 3;
+}
+
+void CardInHand::_Remove3Sequence(SimpleList &cards) const {
+    for(int i=1;i<cards.len;i++) {
+        if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
+            for(int j=i+1;j<cards.len;j++) {
+                if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
+                    SimpleList newList;
+                    int idx = 0;
+
+                    newList.len = cards.len - 3;
+
+                    for(int k=0;k<cards.len;k++) {
+                        if(k==0 || k==i || k==j) {
+                            continue;
+                        } else {
+                            newList.kind[idx++] = cards.kind[k];
+                        }
+                    }
+
+                    memcpy(&cards,&newList,sizeof(SimpleList));
+                }
+            }
+        }
+    }
+}
+
+/*this method could be very time-consuming*/
+bool CardInHand::PatternMatch2(const SimpleList &cards) const {
+    SimpleList remainCards;
+    memcpy(&remainCards,&cards,sizeof(SimpleList));
+
+    while(remainCards.len>0) {
+        if(_Has3Same(remainCards)) {
+            SimpleList subList;
+            memcpy(&subList,&remainCards,sizeof(SimpleList));
+            
+            _Remove3Same(subList);
+
+            if( PatternMatch2(subList) ) {
+                return true;
+            }
+        }
+
+        if(_Has3Sequence(remainCards)) {
+            _Remove3Sequence(remainCards);
+            return PatternMatch2(remainCards);
+        } else {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool CardInHand::PatternMatch(const SimpleList &cards) const{
+	int zhong_num=0;
+	int fa_num=0;
+	int bai_num=0;
+    
+	for(int i=0;i<cards.len;i++) {
+		if(cards.kind[i]==ZHONG)
+			zhong_num++;
+		if(cards.kind[i]==FA)
+			fa_num++;
+		if(cards.kind[i]==BAI)
+			bai_num++;
+	}
+
+    if(zhong_num==1 ||fa_num==1 || bai_num == 1 ) {
+		return false;
+    } else if(fa_num==2 && bai_num==2 && zhong_num==2 && cards.len!=12) {
+        return false;
+    }
+    
+	int i=0;
+
+	while(i<cards.len)
+	{
+		if(cards.len-i>=3)
+		{
+			if( cards.kind[i+2]==cards.kind[i] && cards.kind[i+1]==cards.kind[i] ||
+			(cards.kind[i+2]==cards.kind[i]+2 && cards.kind[i+1]==cards.kind[i]+1)&&(cards.kind[i+2]/9==cards.kind[i]/9 && cards.kind[i+2]/9==cards.kind[i+1]/9) )
+				i += 3;
+			else if(cards.len-i>=6)
+			{
+				if( (cards.kind[i+1]/9==cards.kind[i]/9 && cards.kind[i+2]/9==cards.kind[i]/9 &&
+					cards.kind[i+3]/9==cards.kind[i]/9 && cards.kind[i+4]/9==cards.kind[i]/9 && cards.kind[i+5]/9==cards.kind[i]/9)
+				&&( ( cards.kind[i+1]==cards.kind[i]+1 && cards.kind[i+2]==cards.kind[i]+1 &&
+				cards.kind[i+3]==cards.kind[i]+2 && cards.kind[i+4]==cards.kind[i]+2 && cards.kind[i+5]==cards.kind[i]+3 ) ||
+					( cards.kind[i+1]==cards.kind[i]+1 && cards.kind[i+2]==cards.kind[i]+1 &&
+				cards.kind[i+3]==cards.kind[i]+1 && cards.kind[i+4]==cards.kind[i]+1 && cards.kind[i+5]==cards.kind[i]+2) ||
+					( cards.kind[i+1]==cards.kind[i] && cards.kind[i+2]==cards.kind[i]+1 &&
+				cards.kind[i+3]==cards.kind[i]+1 && cards.kind[i+4]==cards.kind[i]+2 && cards.kind[i+5]==cards.kind[i]+2) ) )
+					i += 6;
+				else if(cards.len-i>=9)
+				{
+					if( (cards.kind[i]/9==cards.kind[i+1]/9&&cards.kind[i]/9==cards.kind[i+2]/9&&cards.kind[i]/9==cards.kind[i+3]/9&&
+					cards.kind[i]/9==cards.kind[i+4]/9&&cards.kind[i]/9==cards.kind[i+5]/9&&cards.kind[i]/9==cards.kind[i+7]/9 && cards.kind[i]/9==cards.kind[i+8]/9)
+						&&( cards.kind[i+1]==cards.kind[i]+1 && cards.kind[i+2]==cards.kind[i]+1 && cards.kind[i+3]==cards.kind[i]+1 &&
+					cards.kind[i+4]==cards.kind[i]+2 && cards.kind[i+5]==cards.kind[i]+2 && cards.kind[i+6]==cards.kind[i]+2  &&
+					cards.kind[i+7]==cards.kind[i]+3 && cards.kind[i+8]==cards.kind[i]+3 || cards.kind[i+1]==cards.kind[i] &&
+					cards.kind[i+2]==cards.kind[i]+1 && cards.kind[i+3]==cards.kind[i]+1 && cards.kind[i+4]==cards.kind[i]+1 &&
+					cards.kind[i+5]==cards.kind[i]+2 && cards.kind[i+6]==cards.kind[i]+2 && cards.kind[i+7]==cards.kind[i]+2 && cards.kind[i+8]==cards.kind[i]+3) )
+						i += 9;
+					else if(cards.len-i==12)
+					{
+						if(  (cards.kind[i]/9==cards.kind[i+1]/9&&cards.kind[i]/9==cards.kind[i+2]/9&&cards.kind[i]/9==cards.kind[i+3]/9&&
+						cards.kind[i]/9==cards.kind[i+4]/9&&cards.kind[i]/9==cards.kind[i+5]/9&&cards.kind[i]/9==cards.kind[i+7]/9 && 
+						cards.kind[i]/9==cards.kind[i+8]/9&&cards.kind[i]/9==cards.kind[i+9]/9&&cards.kind[i]/9==cards.kind[i+10]/9&&cards.kind[i]/9==cards.kind[i+11]/9)
+							&&(cards.kind[i+1]==cards.kind[i] && cards.kind[i+2]==cards.kind[i]+1 && cards.kind[i+3]==cards.kind[i]+1 &&
+						cards.kind[i+4]==cards.kind[i]+1 && cards.kind[i+5]==cards.kind[i]+1 && cards.kind[i+6]==cards.kind[i]+2  &&
+						cards.kind[i+7]==cards.kind[i]+2 && cards.kind[i+8]==cards.kind[i]+2 && cards.kind[i+9]==cards.kind[i]+2  &&
+						cards.kind[i+10]==cards.kind[i]+3 && cards.kind[i+11]==cards.kind[i]+3) || (cards.kind[i+1]==cards.kind[i] &&
+						cards.kind[i+2]==cards.kind[i+3] && cards.kind[i+4]==cards.kind[i+5] && cards.kind[i+6]==cards.kind[i+7] &&
+						cards.kind[i+8]==cards.kind[i+9] && cards.kind[i+10]==cards.kind[i+11]) )
+							i +=12;
+						else
+							break;
+					}
+					else
+						break;
+				}
+				else
+					break;
+			}
+			else
+				break;
+		}
+		else
+			break;
+	}
+
+	if(i==cards.len) {
+		return true;
+    } else {
+        return false;
     }
 }
 

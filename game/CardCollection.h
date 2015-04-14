@@ -23,6 +23,11 @@ typedef struct _CardNode_t {
 	CardStatus_t status;
 	bool         canPlay;
 }CardNode_t;
+    
+typedef struct {
+    Card_t  kind[18];
+    int     len;
+}SimpleList;
 
 class CardList : public vector<CardNode_t *> {
 public:
@@ -63,17 +68,27 @@ public:
     /***************************************************
             kou cards info
     ***************************************************/
-    int  KouGroupNum() const;
-    Card_t KouGroupKind(int gIdx) const;
-    CardStatus_t KouGroupStatus(int gIdx) const;
-    int  KouCardIndex(int gIdx,int cIdx) const;
+    int          kou_group_num() const;
+    CardStatus_t kou_group_status(int gIdx) const;
+    int          kou_card_index(int gIdx,int cIdx) const;
+    void         switch_group_status(int gIdx);
+    Card_t       KouGroupKind(int gIdx) const;
+    
     bool IsKouInclude(Card_t kind) const;
     void AddKouGroup(Card_t kind,int *idx);
-    void SwitchGroupStatus(int gIdx);
-    int  _FindCards(int cardIdx[],Card_t card) const;
-
+    int  FindCards(int cardIdx[],Card_t card) const;
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
+    /***************************************************
+            logic
+    ***************************************************/
+    bool _Has3Same(const SimpleList &cards) const ;
+    bool _Has3Sequence(const SimpleList &cards) const ;
+    void _Remove3Same(SimpleList &cards)const ;
+    void _Remove3Sequence(SimpleList &cards)const ;
+    bool PatternMatch2(const SimpleList &cards) const;
+
+    bool PatternMatch(const SimpleList &cards) const;
 private:
     int    _FindInsertPoint(CardNode_t data) const;
     Card_t _FindGangCard(int cardIdx[]) const;

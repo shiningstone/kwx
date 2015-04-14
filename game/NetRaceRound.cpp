@@ -38,26 +38,28 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 	int i;
 	unsigned char color;
 	unsigned char l_four_flag=0;
-	unsigned char color_flag=1;
-	unsigned char si_peng_flag=0;
+	bool HuQingYiSe = true;
+	bool HuMingSiGui = false;
+	bool HuPengPengHu = false;
 	unsigned char free_num=0;
 	unsigned char couple_num=0;
+    
 	unsigned char zhong_num=0;
 	unsigned char fa_num=0;
 	unsigned char bai_num=0;
-	unsigned char four_num=0;
+
+    unsigned char four_num=0;
 	unsigned char last_card_same_num=0;
-	unsigned char si_gui_flag = 0;
 	unsigned int  hu_flag = 0;
 	long score = 1;
 	color=kind/9;
 
+    //this process could be moved to _cardInHand
 	for(i=0;i<_cardInHand->size();i++)
 	{
-		int l_cards=1;
 		if(	_cardInHand->get_kind(i)/9!=color )
 		{
-			color_flag = 0;
+			HuQingYiSe = false;
 		}
 		if(_cardInHand->get_status(i)==sFREE )
 		{
@@ -66,22 +68,24 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 		if( _cardInHand->get_kind(i)==(Card_t)kind )
 		{
 			if(_cardInHand->get_status(i)==sPENG)
-				si_gui_flag=1;
+				HuMingSiGui = true;
 			last_card_same_num++;
 		}
+        
+		int l_cards=1;
 		for(int k=i+1;k<_cardInHand->size();k++)
 			if(_cardInHand->get_kind(i)==_cardInHand->get_kind(k) &&
-			 _cardInHand->get_status(i)==sFREE &&
-			 _cardInHand->get_status(i) == _cardInHand->get_status(k))
+			 _cardInHand->get_status(i)==sFREE && _cardInHand->get_status(k)==sFREE)
 				l_cards++;
-		if(l_cards==2||l_cards==4)
+        if(l_cards==2||l_cards==4)
 			couple_num++;
-		l_four_flag=1;
-		for(int k=i+1;k<_cardInHand->size();k++)
+
+        l_four_flag=1;
+        for(int k=i+1;k<_cardInHand->size();k++)
 			if(_cardInHand->get_kind(i)==_cardInHand->get_kind(k) &&
 			_cardInHand->get_status(k)==sFREE)
 				l_four_flag++;
-		if(l_four_flag==4)
+        if(l_four_flag==4)
 			four_num++;
 
 		if(_cardInHand->get_kind(i)==ZHONG)
@@ -97,34 +101,39 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 			bai_num++;
 		}
 	}
+    
 	if(free_num!=2)
 	{
 		int len=_cardInHand->size()-_cardInHand->active_place;
-		int l_num;
 		int l_couple=0;
 		for(int k=_cardInHand->active_place;k<_cardInHand->size();k++)
 		{
-			l_num=1;
+			int l_num=1;
 			for(int t=k+1;t<_cardInHand->size();t++)
 				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(t))
 					l_num++;
+                
 			if(l_num==3)
 				len -= 3;
-			l_num=0;
-			for(int t=_cardInHand->active_place;t<_cardInHand->size();t++)
+
+            l_num=0;
+
+            for(int t=_cardInHand->active_place;t<_cardInHand->size();t++)
 				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(t))
 					l_num++;
-			if(l_num==2)
+
+            if(l_num==2)
 				l_couple++;
 		}
 		if(len==2&&l_couple==2)
-			si_peng_flag=1;
+			HuPengPengHu = true;
 	}
 	else
 	{
 		score *=4;
 		hu_flag|=RH_SHOUYIZHUA;//手抓一
 	}
+    
 	if(is_last_one)
 	{
 		score *= 2;
@@ -140,12 +149,12 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 		score *= 2;
 		hu_flag|=RH_ZIMO;//自摸
 	}
-	if(color_flag)
+	if(HuQingYiSe)
 	{
 		score *= 4;
 		hu_flag |=RH_QINYISE;//清一色
 	}
-	if(si_peng_flag==1)
+	if(HuPengPengHu)
 	{
 		score *= 2;
 		hu_flag |=RH_SIPENG;//碰碰胡
@@ -174,7 +183,7 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 	}
 	if(last_card_same_num==4)
 	{
-		if(si_gui_flag==1)
+		if(HuMingSiGui)
 		{
 			score *= 2;
 			hu_flag |= RH_MINGSIGUI;//明四归
@@ -238,9 +247,12 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 			}
 		}
 	}
+    
 	kind_hu=hu_flag;
+    
 	if(rr_aim!=RA_NOTASK)
 		task_check(hu_flag);
+    
 	return score;
 }
 
@@ -248,30 +260,31 @@ int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 {
 	int i;
 	unsigned char color;
-	unsigned char color_flag=1;
-	unsigned char si_peng_flag=0;
+	bool HuQingYiSe = true;
+	bool HuMingSiGui = false;
+	bool HuPengPengHu = false;
 	unsigned char couple_num=0;
 	unsigned char zhong_num=0;
 	unsigned char fa_num=0;
 	unsigned char bai_num=0;
 	unsigned char four_num=0;
 	unsigned char last_card_same_num=0;
-	unsigned char si_gui_flag = 0;
 	unsigned int  hu_flag = 0;
 	long score = 1;
 	color=kind/9;
 
 	for(i=0;i<len;i++)
 	{
-		int l_cards=1;
 		if(	data[i]/9 != color )
 		{
-			color_flag = 0;
+			HuQingYiSe = false;
 		}
 		if( data[i]==kind )
 		{
 			last_card_same_num++;
 		}
+
+		int l_cards=1;
 		for(int k=i+1;k<len;k++)
 			if(data[i]==data[k] )
 				l_cards++;
@@ -314,13 +327,13 @@ int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 				l_couple++;
 		}
 		if(l_len==2&&l_couple==2)
-			si_peng_flag=1;
+			HuPengPengHu = true;
 	}
 	else
 		score *= 4;
-	if(color_flag)
+	if(HuQingYiSe)
 		score *= 4;
-	if(si_peng_flag==1)
+	if(HuPengPengHu)
 		score *= 2;
 	if(zhong_num==3&&fa_num==3&&bai_num==3)
 		score *= 8;
