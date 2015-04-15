@@ -539,6 +539,106 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
 
     return false;
 }
+
+void CardInHand::get_statistic(Card_t huKind) const {
+	unsigned char color = huKind/9;;
+
+    unsigned char free_num = 0;
+	unsigned char couple_num = 0;
+    unsigned char four_num = 0;
+	unsigned char last_card_same_num = 0;
+
+    unsigned char zhongFaBaiNum[3] = {0};
+    
+	bool HuQingYiSe   = true;
+	bool HuMingSiGui  = false;
+    bool HuAnSiGui    = false;
+	bool HuPengPengHu = false;
+    bool HuShouZhuaYi = false;
+
+	unsigned int  hu_flag = 0;
+
+	for(int i=0;i<size();i++) {
+		if(get_status(i)==sFREE ) {
+			free_num++;
+		}
+
+        Card_t curCard = get_kind(i);
+
+        if(curCard==ZHONG || curCard==FA || curCard==BAI) {
+            zhongFaBaiNum[curCard-ZHONG] += 1;
+        }
+
+		if(	curCard/9!=color ) {
+			HuQingYiSe = false;
+		}
+        
+		if( curCard==huKind ) {
+			if(get_status(i)==sPENG) {
+				HuMingSiGui = true;
+            } else {
+                last_card_same_num++;
+                if(last_card_same_num==4) {
+                    HuAnSiGui = true;
+                }
+            }
+		}
+        
+		int freeSameCard = 1;
+		for(int k=i+1;k<i+4;k++) {
+			if(curCard==get_kind(k) && get_status(i)==sFREE && get_status(k)==sFREE) {
+				freeSameCard++;
+            }
+        }
+        if(freeSameCard==2||freeSameCard==4)
+			couple_num++;
+
+
+        int sameCard = 1;
+        for(int k=i+1;k<i+4;k++) {
+			if(curCard==get_kind(k) && get_status(k)==sFREE) {
+				sameCard++;
+            }
+        }
+
+        if(sameCard==4)
+			four_num++;
+	}
+    
+	if(free_num==2)
+	{
+		HuShouZhuaYi = true;
+	}
+	else
+	{
+		int len = size()-active_place;
+        
+		int l_couple=0;
+		for(int k=active_place;k<size();k++)
+		{
+			int l_num=1;
+			for(int t=k+1;t<size();t++)
+				if(get_kind(k)==get_kind(t))
+					l_num++;
+                
+			if(l_num==3)
+				len -= 3;
+
+            l_num=0;
+
+            for(int t=active_place;t<size();t++)
+				if(get_kind(k)==get_kind(t))
+					l_num++;
+
+            if(l_num==2)
+				l_couple++;
+		}
+        
+		if(len==2&&l_couple==2)
+			HuPengPengHu = true;
+	}
+}
+
 /***************************************************
     to be removed
 ***************************************************/

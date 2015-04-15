@@ -100,6 +100,8 @@ public:
     void _Order(SimpleList &cards) const;
 
     bool IsKaWuXing(Card_t kind)const;
+
+    void get_statistics()const;
     /*to be removed*/
     bool pattern_match(const SimpleList &cards) const;
     /***************************************************
