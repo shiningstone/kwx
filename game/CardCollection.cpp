@@ -335,8 +335,6 @@ void CardInHand::_Remove3Sequence(SimpleList &cards) const {
                     SimpleList newList;
                     int idx = 0;
 
-                    newList.len = cards.len - 3;
-
                     for(int k=0;k<cards.len;k++) {
                         if(k==0 || k==i || k==j) {
                             continue;
@@ -344,40 +342,86 @@ void CardInHand::_Remove3Sequence(SimpleList &cards) const {
                             newList.kind[idx++] = cards.kind[k];
                         }
                     }
+                    newList.len = cards.len - 3;
 
                     memcpy(&cards,&newList,sizeof(SimpleList));
+					return ;
                 }
             }
         }
     }
 }
 
-/*this method could be very time-consuming*/
-bool CardInHand::PatternMatch2(const SimpleList &cards) const {
-    SimpleList remainCards;
-    memcpy(&remainCards,&cards,sizeof(SimpleList));
-
-    while(remainCards.len>0) {
-        if(_Has3Same(remainCards)) {
-            SimpleList subList;
-            memcpy(&subList,&remainCards,sizeof(SimpleList));
-            
-            _Remove3Same(subList);
-
-            if( PatternMatch2(subList) ) {
-                return true;
+bool CardInHand::_6Couples(const SimpleList &cards) const {
+    if( cards.len==12 ) {
+        for(int i=0;i<12;i+=2) {
+            if( cards.kind[i]==cards.kind[i+1] ) {
+                continue;
+            } else {
+                return false;
             }
         }
-
-        if(_Has3Sequence(remainCards)) {
-            _Remove3Sequence(remainCards);
-            return PatternMatch2(remainCards);
-        } else {
-            return false;
-        }
+    } else {
+        return false;
     }
 
     return true;
+}
+
+bool CardInHand::_IsCharDismatched(const SimpleList &cards) const {
+	int zhongNum = 0;
+	int faNum=0;
+	int baiNum=0;
+    
+	for(int i=0;i<cards.len;i++) {
+		if(cards.kind[i]==ZHONG)
+			zhongNum++;
+		if(cards.kind[i]==FA)
+			faNum++;
+		if(cards.kind[i]==BAI)
+			baiNum++;
+	}
+
+    if(zhongNum==1 ||faNum==1 || baiNum == 1 ) {
+		return true;
+    } else if(zhongNum==2 && faNum==2 && baiNum==2 && cards.len!=12) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool CardInHand::PatternMatch2(const SimpleList &cards) const {
+    if(_IsCharDismatched(cards)) {
+        return false;
+    } else if(_6Couples(cards)) {
+        return true;
+    } else {
+        SimpleList remainCards;
+        memcpy(&remainCards,&cards,sizeof(SimpleList));
+        
+        while(remainCards.len>0) {
+            if(_Has3Same(remainCards)) {
+                SimpleList subList;
+                memcpy(&subList,&remainCards,sizeof(SimpleList));
+                
+                _Remove3Same(subList);
+        
+                if( PatternMatch2(subList) ) {
+                    return true;
+                }
+            }
+        
+            if(_Has3Sequence(remainCards)) {
+                _Remove3Sequence(remainCards);
+                return PatternMatch2(remainCards);
+            } else {
+                return false;
+            }
+        }
+        
+        return true;
+    }
 }
 
 bool CardInHand::PatternMatch(const SimpleList &cards) const{

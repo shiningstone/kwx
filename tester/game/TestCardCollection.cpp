@@ -10,7 +10,7 @@
 class TestCardInHand : public CardInHand {
 public:
     void Load(Card_t first,...);
-    bool Exec();
+    bool Match();
 private:
     SimpleList _sample;
 };
@@ -36,7 +36,7 @@ void TestCardInHand::Load(Card_t first,...) {
     _sample = cards;
 }
 
-bool TestCardInHand::Exec() {
+bool TestCardInHand::Match() {
     bool result = PatternMatch2(_sample);
     if(result) {
         printf("match    : ");
@@ -60,13 +60,48 @@ void test_pattern_match() {
     TestCardInHand cards;
 
     cards.Load(TIAO_1,TIAO_1,TIAO_1,CARDS_END);
-    assert( cards.Exec() );
-
-    cards.Load(TIAO_1,TIAO_2,TIAO_1,CARDS_END);
-    assert( !cards.Exec() );
+    assert( cards.Match() );
 
     cards.Load(TIAO_1,TIAO_2,TIAO_3,CARDS_END);
-    assert( cards.Exec() );
+    assert( cards.Match() );
+
+    cards.Load(TIAO_1,TIAO_2,TIAO_1,CARDS_END);
+    assert( !cards.Match() );
+
+    cards.Load(TIAO_8,TIAO_9,TONG_1,CARDS_END);
+    assert( !cards.Match() );
+
+    cards.Load(TIAO_1,TIAO_2,TIAO_3,TIAO_4,CARDS_END);
+    assert( !cards.Match() );
+
+    
+
+    cards.Load(TIAO_1,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_4,CARDS_END);
+    assert( cards.Match() );
+
+    cards.Load(TIAO_1,TIAO_2,TIAO_2,TIAO_2,TIAO_2,TIAO_3,CARDS_END);
+    assert( cards.Match() );
+
+    cards.Load(TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_3,TIAO_3,CARDS_END);
+    assert( cards.Match() );
+
+
+
+    cards.Load(TIAO_1,TIAO_2,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_4,CARDS_END);
+    assert( cards.Match() );
+
+    cards.Load(TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_4,CARDS_END);
+    assert( cards.Match() );
+
+
+
+    cards.Load(TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_4,CARDS_END);
+    assert( cards.Match() );
+
+
+
+    cards.Load(TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TIAO_6,TIAO_6,CARDS_END);
+    assert( cards.Match() );
 }
 
 /**********************************
