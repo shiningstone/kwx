@@ -37,7 +37,7 @@ void TestCardInHand::Load(Card_t first,...) {
 }
 
 bool TestCardInHand::Match() {
-    bool result = PatternMatch2(_sample);
+    bool result = PatternMatch(_sample);
     if(result) {
         printf("match    : ");
     } else {

@@ -92,6 +92,9 @@ public:
     bool PatternMatch(const SimpleList &cards) const;
     bool CanHu(const SimpleList &cards)const;
 
+    SimpleList _Displace(const SimpleList &input, int changeIdx, Card_t kind) const;
+    void _Order(SimpleList &cards) const;
+    
     bool pattern_match(const SimpleList &cards) const;
     /***************************************************
             effect

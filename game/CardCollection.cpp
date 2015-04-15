@@ -298,7 +298,7 @@ void CardInHand::switch_group_status(int gIdx) {
 }
 
 /***************************************************
-        logic
+        SimpleList logic
 ***************************************************/
 bool CardInHand::_Has3Same(const SimpleList &cards) const  {
     if(cards.kind[0]==cards.kind[1]&&cards.kind[0]==cards.kind[2]) {
@@ -403,6 +403,28 @@ void CardInHand::_Remove(SimpleList &cards,int idx1,int idx2) const {
     }
 
     cards.len -= 2;
+}
+
+/* _Displace+_Order has efficiency problem */
+SimpleList CardInHand::_Displace(const SimpleList &input, int changeIdx, Card_t kind) const {
+    SimpleList newList = input;
+    newList.kind[changeIdx] = kind;
+
+    _Order(newList);
+    
+    return newList;
+}
+
+void CardInHand::_Order(SimpleList &input) const {
+	for(int i=0;i<input.len;i++) {
+		for(int j=i+1;j<input.len;j++) {
+			if(input.kind[j]<input.kind[i]) {
+                Card_t temp   = input.kind[i];
+				input.kind[i] = input.kind[j];
+				input.kind[j] = temp;
+			}
+		}
+	}
 }
 
 bool CardInHand::PatternMatch(const SimpleList &cards) const {
