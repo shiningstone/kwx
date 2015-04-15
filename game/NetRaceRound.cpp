@@ -223,23 +223,22 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 	}
 	else if(kind==ck_WU_TIAO||kind==ck_WU_TONG)
 	{
-		int k;
-		int its_si   = _cardInHand->size()-1;
-		int its_liu  = _cardInHand->size()-1;
-		int its_five = _cardInHand->size()-1;
+		int Pos4   = 0;
+		int Pos6   = 0;
         
-		for(k=_cardInHand->active_place;k<_cardInHand->size();k++)
-			if(_cardInHand->get_kind(k)==kind-1)
-				its_si=k;
-			else if(_cardInHand->get_kind(k)==kind+1)
-				its_liu=k;
-		if(its_si!=_cardInHand->size()&&its_liu!=_cardInHand->size())
-		{
+		for(int i=_cardInHand->active_place;i<_cardInHand->size();i++) {
+			if(_cardInHand->get_kind(i)==kind-1)
+				Pos4 = i-_cardInHand->active_place;
+			else if(_cardInHand->get_kind(i)==kind+1)
+				Pos6 = i-_cardInHand->active_place;
+        }
+            
+		if(Pos4!=_cardInHand->size()-1 && Pos6!=_cardInHand->size()-1) {/*BUG???*/
 			int active=_cardInHand->active_place;
 			int active_len=_cardInHand->size()-_cardInHand->active_place;
 
             CARD_KIND temp[MAX_HANDIN_NUM];
-			array_sort2(active,its_si-active,its_liu-active,active_len,ck_NOT_DEFINED,ck_NOT_DEFINED,temp);
+			array_remove(active,active_len,Pos4,Pos6,temp);
 			if(cards_stable(temp,active_len-2)==1)
 			{
 				score *= 4;
@@ -400,83 +399,13 @@ int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 
 int NetRRound::pattern_match(CARD_KIND data[],int len)
 {
-	int i=0;
-	int zhong_num,fa_num,bai_num;
-	zhong_num=0;
-	fa_num=0;
-	bai_num=0;
-	for(int j=0;j<len;j++)
-	{
-		if(data[j]==ZHONG)
-			zhong_num++;
-		if(data[j]==FA)
-			fa_num++;
-		if(data[j]==BAI)
-			bai_num++;
-	}
-	if(zhong_num==1 ||fa_num==1 || bai_num == 1 )
-		return 0;
-	else if(zhong_num==fa_num&&zhong_num==bai_num&&zhong_num==2&&len!=12)
-		return 0;
-	while(i<len)
-	{
-		if(len-i>=3)
-		{
-			if( data[i+2]==data[i] && data[i+1]==data[i] ||
-			(data[i+2]==data[i]+2 && data[i+1]==data[i]+1)&&
-			(data[i+2]/9==data[i]/9&&data[i+2]/9==data[i+1]/9) )
-				i += 3;
-			else if(len-i>=6)
-			{
-				if( (data[i+1]/9==data[i]/9 && data[i+2]/9==data[i]/9 &&
-					data[i+3]/9==data[i]/9 && data[i+4]/9==data[i]/9 && data[i+5]/9==data[i]/9)
-				&&( ( data[i+1]==data[i]+1 && data[i+2]==data[i]+1 &&
-				data[i+3]==data[i]+2 && data[i+4]==data[i]+2 && data[i+5]==data[i]+3 ) ||
-					( data[i+1]==data[i]+1 && data[i+2]==data[i]+1 &&
-				data[i+3]==data[i]+1 && data[i+4]==data[i]+1 && data[i+5]==data[i]+2) ||
-					( data[i+1]==data[i] && data[i+2]==data[i]+1 &&
-				data[i+3]==data[i]+1 && data[i+4]==data[i]+2 && data[i+5]==data[i]+2) ) )
-					i += 6;
-				else if(len-i>=9)
-				{
-					if( (data[i]/9==data[i+1]/9&&data[i]/9==data[i+2]/9&&data[i]/9==data[i+3]/9&&
-					data[i]/9==data[i+4]/9&&data[i]/9==data[i+5]/9&&data[i]/9==data[i+7]/9 && data[i]/9==data[i+8]/9)
-						&&( data[i+1]==data[i]+1 && data[i+2]==data[i]+1 && data[i+3]==data[i]+1 &&
-					data[i+4]==data[i]+2 && data[i+5]==data[i]+2 && data[i+6]==data[i]+2  &&
-					data[i+7]==data[i]+3 && data[i+8]==data[i]+3 || data[i+1]==data[i] &&
-					data[i+2]==data[i]+1 && data[i+3]==data[i]+1 && data[i+4]==data[i]+1 &&
-					data[i+5]==data[i]+2 && data[i+6]==data[i]+2 && data[i+7]==data[i]+2 && data[i+8]==data[i]+3) )
-						i += 9;
-					else if(len-i==12)
-					{
-						if(  (data[i]/9==data[i+1]/9&&data[i]/9==data[i+2]/9&&data[i]/9==data[i+3]/9&&
-						data[i]/9==data[i+4]/9&&data[i]/9==data[i+5]/9&&data[i]/9==data[i+7]/9 && 
-						data[i]/9==data[i+8]/9&&data[i]/9==data[i+9]/9&&data[i]/9==data[i+10]/9&&data[i]/9==data[i+11]/9)
-							&&(data[i+1]==data[i] && data[i+2]==data[i]+1 && data[i+3]==data[i]+1 &&
-						data[i+4]==data[i]+1 && data[i+5]==data[i]+1 && data[i+6]==data[i]+2  &&
-						data[i+7]==data[i]+2 && data[i+8]==data[i]+2 && data[i+9]==data[i]+2  &&
-						data[i+10]==data[i]+3 && data[i+11]==data[i]+3) || (data[i+1]==data[i] &&
-						data[i+2]==data[i+3] && data[i+4]==data[i+5] && data[i+6]==data[i+7] &&
-						data[i+8]==data[i+9] && data[i+10]==data[i+11]) )
-							i +=12;
-						else
-							break;
-					}
-					else
-						break;
-				}
-				else
-					break;
-			}
-			else
-				break;
-		}
-		else
-			break;
-	}
-	if(i==len)
-		return 1;
-	return 0;
+    SimpleList cards;
+    cards.len = len;
+    for(int i=0;i<cards.len;i++) {
+        cards.kind[i] = data[i];
+    }
+
+    return _cardInHand->PatternMatch2(cards);
 }
 
 int NetRRound::cards_stable(CARD_KIND clist[],int len)
@@ -601,15 +530,15 @@ void NetRRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KI
     _Sort(rlist,len);
 }
 
-void NetRRound::array_sort2(int idx,int index1,int index2,int len,CARD_KIND kind1,CARD_KIND kind2,CARD_KIND rlist[])
+void NetRRound::array_remove(int start,int len,int index1,int index2,CARD_KIND rlist[])
 {
-    CardList::iterator it = _cardInHand->begin()+idx;
+    CardList::iterator it = _cardInHand->begin()+start;
     
 	for(int i=0;i<len;i++)
 		if(i==index1)
-			rlist[index1]=kind1;
+			rlist[index1]=ck_NOT_DEFINED;
 		else if(i==index2)
-			rlist[index2]=kind2;
+			rlist[index2]=ck_NOT_DEFINED;
 		else
 			rlist[i]=(CARD_KIND)((*(it+i))->kind);
         
