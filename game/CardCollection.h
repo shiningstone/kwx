@@ -43,6 +43,7 @@ public:
     CardStatus_t get_status(unsigned int idx) const;
     bool   canPlay(unsigned int idx) const;
     void   set_status(unsigned int idx,CardStatus_t status);
+    void   lock_all_cards();
 
     int    generate_raw(Card_t *array);
 
@@ -101,7 +102,7 @@ public:
 
     bool IsKaWuXing(Card_t kind)const;
 
-    void get_statistics()const;
+    void get_statistics(Card_t huKind)const;
     /*to be removed*/
     bool pattern_match(const SimpleList &cards) const;
     /***************************************************

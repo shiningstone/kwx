@@ -208,7 +208,7 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 	}
 	else if(kind==ck_WU_TIAO||kind==ck_WU_TONG)
 	{
-	    if(_cardInHand->IsKaWuXing(kind)) {
+	    if(_cardInHand->IsKaWuXing((Card_t)kind)) {
             score *= 4;
             hu_flag |= RH_KAWUXIN;
         }
@@ -324,7 +324,7 @@ int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 	}
 	else if(kind==ck_WU_TIAO||kind==ck_WU_TONG)
 	{
-		if(_cardInHand->IsKaWuXing(kind)) {
+		if(_cardInHand->IsKaWuXing((Card_t)kind)) {
             score *= 4;
         }
 	}
@@ -336,7 +336,7 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
     SimpleList cards;
     cards.len = len;
     for(int i=0;i<cards.len;i++) {
-        cards.kind[i] = clist[i];
+        cards.kind[i] = (Card_t)clist[i];
     }
 
     return _cardInHand->CanHu(cards);
@@ -392,7 +392,7 @@ int NetRRound::hu_check(CARD_KIND data_kind)
 
 void NetRRound::load(const SimpleList &input,CARD_KIND output[]) {
     for(int i=0;i<input.len;i++) {
-        output[i] = input.kind[i];
+        output[i] = (CARD_KIND)input.kind[i];
     }
 }
 
@@ -401,7 +401,7 @@ bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist
     SimpleList cards;
     cards.len = _cardInHand->size()-_cardInHand->active_place;
     for(int i=0;i<cards.len;i++) {
-        cards.kind[i] = _cardInHand[_cardInHand->active_place+i]->kind;
+        cards.kind[i] = _cardInHand->at(_cardInHand->active_place+i)->kind;
     }
 
     _cardInHand->_Displace(cards,index-_cardInHand->active_place,(Card_t)kind);
@@ -429,7 +429,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		int index;
         
 		for(int i=0;i<newCards.len;i++) {
-			if(newCards[i].kind==otherHandedOut) {
+			if(newCards.kind[i]==otherHandedOut) {
 				index=i;
 				break;
 			}
@@ -677,12 +677,14 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 			}
 	}
 
+    _cardInHand->pop_back();
 	if(hu_check(kind)==1)
 	{
 		card_score=cal_score(kind,isCardFromOthers,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(!isCardFromOthers||(isCardFromOthers==1&&(tingStatus==1||card_score!=1)))
 			res|=a_HU;
 	}
+    _cardInHand->push_back(card);
 
 	if(!isCardFromOthers)
 	{
@@ -752,7 +754,7 @@ ACT_RES NetRRound::others_action(bool isCardFromOthers,ARRAY_ACTION act,Card_t k
 		_cardInHand->active_place += 4;
 	} else if(act==a_JUMP) {
 		if(!isCardFromOthers) {
-			node.status  = c_FREE;
+			node.status  = sFREE;
             node.canPlay = false;
             
 			_cardInHand->delete_card(_cardInHand->size()-1,1);
@@ -907,7 +909,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	else if(act==a_JUMP)
 	{
 		if(!isCardFromOther) {
-			node.status=c_FREE;
+			node.status=sFREE;
             
 			_cardInHand->delete_card(_cardInHand->size()-1,1);
             _cardInHand->insert_card(node,1);

@@ -53,6 +53,12 @@ void CardList::set_status(unsigned int idx,CardStatus_t status) {
 	}
 }
 
+void CardList::lock_all_cards() {
+	for (int i=0;i<=size()-1;i++) {
+        at(i)->canPlay = false;
+	}
+}
+
 void CardList::push_back(Card_t kind) {
     CardNode_t *card = new CardNode_t;
     card->kind    = kind;
@@ -185,12 +191,6 @@ void CardInHand::perform(ActionId_t act) {
     DBG_SHOW();
 }
 
-void CardInHand::lock_all_cards() {
-	for (int i=0;i<=size()-1;i++) {
-        at(i)->canPlay = false;
-	}
-}
-
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
         for(int i=active_place;i>0;i--) {
@@ -303,7 +303,7 @@ void CardInHand::switch_group_status(int gIdx) {
     }
 }
 
-SimpleList CardInHand::_Remove(Card_t kouKind) {
+SimpleList CardInHand::_Remove(Card_t kouKind) const {
     SimpleList remainCards;
 	int        match  = 0;
     
@@ -536,7 +536,7 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
     return false;
 }
 
-void CardInHand::get_statistic(Card_t huKind) const {
+void CardInHand::get_statistics(Card_t huKind) const {
 	unsigned char color = huKind/9;;
 
     unsigned char free_num = 0;
