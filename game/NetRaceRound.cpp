@@ -397,43 +397,15 @@ int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 	return score;
 }
 
-int NetRRound::pattern_match(CARD_KIND data[],int len)
+int NetRRound::cards_stable(CARD_KIND clist[],int len)
 {
     SimpleList cards;
     cards.len = len;
     for(int i=0;i<cards.len;i++) {
-        cards.kind[i] = data[i];
+        cards.kind[i] = clist[i];
     }
 
-    return _cardInHand->PatternMatch2(cards);
-}
-
-int NetRRound::cards_stable(CARD_KIND clist[],int len)
-{
-	CARD_KIND temp_list2[MAX_HANDIN_NUM-2];
-	int i=0;
-	if( len==2 && clist[0]==clist[1] )
-		return 1;
-    
-	while(i<len-1)
-	{
-		if(	clist[i]==clist[i+1] )
-		{
-			if(i!=0)
-				memcpy(temp_list2,clist,i*sizeof(CARD_KIND));
-            
-			if(i<len-2)
-				memcpy(&temp_list2[i],&clist[i+2],(len-i-2)*sizeof(CARD_KIND));
-
-            if(pattern_match(temp_list2,len-2)==1)
-				return 1;
-
-            i += 2;
-		}
-		else
-			i++;
-	}
-	return 0;
+    return _cardInHand->CanHu(cards);
 }
 
 void NetRRound::task_check(unsigned int flag)

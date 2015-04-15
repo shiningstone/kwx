@@ -40,7 +40,6 @@ private:
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
     int card_delete(unsigned int from,unsigned int len);
     void card_insert(CARD data,int times);
-    int pattern_match(CARD_KIND data[],int len);
     int cards_stable(CARD_KIND clist[],int len);
     long cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     int cal_times(CARD_KIND kind,CARD_KIND data[],int len);

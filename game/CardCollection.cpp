@@ -322,36 +322,6 @@ bool CardInHand::_Has3Sequence(const SimpleList &cards) const  {
     return false;
 }
 
-void CardInHand::_Remove3Same(SimpleList &cards) const {
-    memcpy(cards.kind,&(cards.kind[3]),cards.len-3);
-    cards.len -= 3;
-}
-
-void CardInHand::_Remove3Sequence(SimpleList &cards) const {
-    for(int i=1;i<cards.len;i++) {
-        if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
-            for(int j=i+1;j<cards.len;j++) {
-                if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
-                    SimpleList newList;
-                    int idx = 0;
-
-                    for(int k=0;k<cards.len;k++) {
-                        if(k==0 || k==i || k==j) {
-                            continue;
-                        } else {
-                            newList.kind[idx++] = cards.kind[k];
-                        }
-                    }
-                    newList.len = cards.len - 3;
-
-                    memcpy(&cards,&newList,sizeof(SimpleList));
-					return ;
-                }
-            }
-        }
-    }
-}
-
 bool CardInHand::_6Couples(const SimpleList &cards) const {
     if( cards.len==12 ) {
         for(int i=0;i<12;i+=2) {
@@ -391,7 +361,51 @@ bool CardInHand::_IsCharDismatched(const SimpleList &cards) const {
     }
 }
 
-bool CardInHand::PatternMatch2(const SimpleList &cards) const {
+void CardInHand::_Remove3Same(SimpleList &cards) const {
+    memcpy(cards.kind,&(cards.kind[3]),cards.len-3);
+    cards.len -= 3;
+}
+
+void CardInHand::_Remove3Sequence(SimpleList &cards) const {
+    for(int i=1;i<cards.len;i++) {
+        if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
+            for(int j=i+1;j<cards.len;j++) {
+                if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
+                    SimpleList newList;
+                    int idx = 0;
+
+                    for(int k=0;k<cards.len;k++) {
+                        if(k==0 || k==i || k==j) {
+                            continue;
+                        } else {
+                            newList.kind[idx++] = cards.kind[k];
+                        }
+                    }
+                    newList.len = cards.len - 3;
+
+                    memcpy(&cards,&newList,sizeof(SimpleList));
+					return ;
+                }
+            }
+        }
+    }
+}
+
+void CardInHand::_Remove(SimpleList &cards,int idx1,int idx2) const {
+    int idx = 0;
+    for(int i=0;i<cards.len;i++) {
+        if(i==idx1 || i==idx2) {
+            continue;
+        } else {
+            cards.kind[idx] = cards.kind[i];
+            idx++;
+        }
+    }
+
+    cards.len -= 2;
+}
+
+bool CardInHand::PatternMatch(const SimpleList &cards) const {
     if(_IsCharDismatched(cards)) {
         return false;
     } else if(_6Couples(cards)) {
@@ -407,14 +421,14 @@ bool CardInHand::PatternMatch2(const SimpleList &cards) const {
                 
                 _Remove3Same(subList);
         
-                if( PatternMatch2(subList) ) {
+                if( PatternMatch(subList) ) {
                     return true;
                 }
             }
         
             if(_Has3Sequence(remainCards)) {
                 _Remove3Sequence(remainCards);
-                return PatternMatch2(remainCards);
+                return PatternMatch(remainCards);
             } else {
                 return false;
             }
@@ -424,7 +438,34 @@ bool CardInHand::PatternMatch2(const SimpleList &cards) const {
     }
 }
 
-bool CardInHand::PatternMatch(const SimpleList &cards) const{
+bool CardInHand::CanHu(const SimpleList &cards) const {
+	int i=0;
+    
+	while(i<cards.len-1) {
+		if(	cards.kind[i]==cards.kind[i+1] ) {
+            SimpleList remainCards;
+
+            memcpy(&remainCards,&cards,sizeof(SimpleList));
+			_Remove(remainCards,i,i+1);
+
+            if(PatternMatch(remainCards)) {
+				return true;
+            } else {
+                i += 2;
+            }
+		}
+		else {
+            i++;
+        }
+	}
+    
+	return false;
+}
+
+/***************************************************
+    to be removed
+***************************************************/
+bool CardInHand::pattern_match(const SimpleList &cards) const{
 	int zhong_num=0;
 	int fa_num=0;
 	int bai_num=0;

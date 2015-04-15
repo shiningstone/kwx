@@ -88,9 +88,11 @@ public:
     bool _6Couples(const SimpleList &cards) const;
     void _Remove3Same(SimpleList &cards)const ;
     void _Remove3Sequence(SimpleList &cards)const ;
-    bool PatternMatch2(const SimpleList &cards) const;
-
+    void _Remove(SimpleList &cards,int idx1,int idx2) const;
     bool PatternMatch(const SimpleList &cards) const;
+    bool CanHu(const SimpleList &cards)const;
+
+    bool pattern_match(const SimpleList &cards) const;
     /***************************************************
             effect
     ***************************************************/
