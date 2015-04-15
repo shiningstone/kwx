@@ -307,6 +307,8 @@ SimpleList CardInHand::_Remove(Card_t kouKind) const {
     SimpleList remainCards;
 	int        match  = 0;
     
+    remainCards.len = 0;
+
 	for(int i=active_place;i<size();i++) {
 		if(get_status(i)!=sMING_KOU) {
             if(get_kind(i)==kouKind && match<3) {
@@ -354,11 +356,13 @@ bool CardInHand::_Has3Sequence(const SimpleList &cards) const  {
 int CardInHand::_GetSequenceCoupleNum(const SimpleList &cards) const {
     int coupleNum = 0;
     
-    for(int i=0;i<cards.len;i+=2) {
-        if( cards.kind[i]==cards.kind[i+1] ) {
-            coupleNum++;
-        }
-    }
+	if(cards.len%2==0) {
+	    for(int i=0;i<cards.len;i+=2) {
+	        if( cards.kind[i]==cards.kind[i+1] ) {
+	            coupleNum++;
+	        }
+	    }
+	}
 
     return coupleNum;
 }

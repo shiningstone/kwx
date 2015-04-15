@@ -354,6 +354,13 @@ int NetRRound::hu_check(CARD_KIND data_kind)
 	CARD_KIND temp_kind=data_kind;
 	int res=0;
 
+    CardNode_t *last = _cardInHand->back();
+    CardNode_t *node = new CardNode_t;
+    node->kind = last->kind;
+    node->status = last->status;
+    node->canPlay = last->canPlay;
+    _cardInHand->pop_back();
+
 	int index=_cardInHand->active_place;
 	int i;
 	for(i=index;i<_cardInHand->size();i++)
@@ -386,6 +393,8 @@ int NetRRound::hu_check(CARD_KIND data_kind)
 	}
 
 	res=cards_stable(temp_list,_cardInHand->size()-_cardInHand->active_place+1);
+
+    _cardInHand->push_back(node);
 
 	return res;
 }
@@ -677,14 +686,12 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 			}
 	}
 
-    _cardInHand->pop_back();
 	if(hu_check(kind)==1)
 	{
 		card_score=cal_score(kind,isCardFromOthers,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(!isCardFromOthers||(isCardFromOthers==1&&(tingStatus==1||card_score!=1)))
 			res|=a_HU;
 	}
-    _cardInHand->push_back(card);
 
 	if(!isCardFromOthers)
 	{
@@ -839,7 +846,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			if(_cardInHand->get_kind(i)==node.kind)
 				_cardInHand->delete_card(i,1);
 		}
-        _cardInHand->insert_card(node,1);
+        _cardInHand->insert_card(node,4);
 		_cardInHand->active_place += 4;
 	}
 	else if(act==a_AN_GANG) {
