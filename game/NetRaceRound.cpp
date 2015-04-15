@@ -18,16 +18,6 @@ NetRRound::~NetRRound() {
     LOGGER_DEREGISTER(_logger);
 }
 
-void NetRRound::card_insert(CARD data,int times) {
-    CardNode_t node;
-
-    node.kind    = (Card_t)data.kind;
-    node.status  = (CardStatus_t)data.status;
-    node.canPlay = (data.can_play==cps_YES)?true:false;
-    
-    _cardInHand->insert_card(node,times);
-}
-
 long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
 	int i;
@@ -567,21 +557,21 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
     _cardInHand->clear();
 	_cardInHand->active_place =0;
 
-	CARD temp;
+	CardNode_t node;
 	unsigned char ac=a_JUMP;
 	for(i=0;i<len;i++)
 	{
-		temp.kind=(CARD_KIND)(card_array[i]/4);
-		temp.status=c_FREE;
-		temp.can_play=cps_YES;
+		node.kind    = (Card_t)(card_array[i]/4);
+		node.status  = sFREE;
+		node.canPlay = true;
         
-		if(i==13)
-		{
-			ac=hand_in((CARD_KIND)(card_array[i]/4),0,0,false,a_JUMP,0,false);
-		}
-		else
-			card_insert(temp,1);
+		if(i==13) {
+			ac = hand_in((CARD_KIND)(card_array[i]/4),0,0,false,a_JUMP,0,false);
+        } else {
+			_cardInHand->insert_card(node,1);
+        }
 	}
+    
 	return ac;
 }
 
@@ -777,18 +767,18 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 {
     LOGGER_WRITE("%x %s : %d (isCardFromOther=%d)",this,__FUNCTION__,act,isCardFromOther);
 
-	CARD temp_data;
 	InsertPlaceForMG=-1;
 
+	CARD temp_data;
 	temp_data.can_play=cps_YES;
 	temp_data.kind=(CARD_KIND)_cardInHand->back()->kind;
 
-	if(act==a_PENG)
-	{
-        CardNode_t node;
-        node.kind=(Card_t)temp_data.kind;
+    CardNode_t node;
+    node.kind    = (Card_t)_cardInHand->back()->kind;
+    node.canPlay = false;
+
+	if(act==a_PENG) {
         node.status=sPENG;
-		node.canPlay=cps_NO;
 
         for(int i=_cardInHand->active_place;i<_cardInHand->size();i++) {
 			if(_cardInHand->get_kind(i)==node.kind){
@@ -801,12 +791,8 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
         _cardInHand->insert_card(node,3);
         _cardInHand->active_place += 3;
 	}
-	else if(act==a_KOU)
-	{
-        CardNode_t node;
-        node.kind=(Card_t)temp_data.kind;
+	else if(act==a_KOU) {
         node.status=sMING_KOU;
-		node.canPlay=cps_NO;
 
 		for(int i=_cardInHand->size()-1;i>=_cardInHand->active_place;i--)
 			if(_cardInHand->get_status(i)==sMING_KOU)
@@ -818,47 +804,46 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 				i++;
 			}
 	}
-	else if(act==a_KOU_CANCEL)
-	{
-		temp_data.status=c_FREE;
-		temp_data.can_play=cps_YES;
-		for(int i=_cardInHand->active_place-1;i>=0;i--)
-			if(_cardInHand->get_status(i)==sMING_KOU)
-			{
-				temp_data.kind=(CARD_KIND)_cardInHand->get_kind(i);
+	else if(act==a_KOU_CANCEL) {
+		node.status  = sFREE;
+		node.canPlay = true;
+        
+		for(int i=_cardInHand->active_place-1;i>=0;i--) {
+			if(_cardInHand->get_status(i)==sMING_KOU) {
+				node.kind = _cardInHand->get_kind(i);
+                
 				_cardInHand->delete_card(i,1);
+				_cardInHand->insert_card(node,1);
 				_cardInHand->active_place-=1;
-				card_insert(temp_data,1);
 			}
+        }
 	}
-	else if(act==a_MING_GANG)
-	{
+	else if(act==a_MING_GANG) {
+		node.status = sMING_GANG;
+
 		bool ifFirst=true;
-		temp_data.status=c_MING_GANG;
-		temp_data.can_play=cps_NO;
-		for(int i=_cardInHand->size()-1;i>=0;i--)
-		{
-			if(_cardInHand->get_status(i)==sPENG&& _cardInHand->get_kind(i)==temp_data.kind)
-			{
+		for(int i=_cardInHand->size()-1;i>=0;i--) {
+			if(_cardInHand->get_status(i)==sPENG&&_cardInHand->get_kind(i)==node.kind) {
 				if(ifFirst)
 					InsertPlaceForMG=i-2;
+                
 				ifFirst=false;
+
+                _cardInHand->active_place--;
+			} else if(_cardInHand->get_status(i)==sMING_KOU&& _cardInHand->get_kind(i)==node.kind) {
 				_cardInHand->active_place--;
-			}
-			else if(_cardInHand->get_status(i)==sMING_KOU&& _cardInHand->get_kind(i)==temp_data.kind)
-				_cardInHand->active_place--;
-			if(_cardInHand->get_kind(i)==temp_data.kind)
+            }
+
+			if(_cardInHand->get_kind(i)==node.kind)
 				_cardInHand->delete_card(i,1);
 		}
-		card_insert(temp_data,4);
+        _cardInHand->insert_card(node,1);
 		_cardInHand->active_place += 4;
 	}
-	else if(act==a_AN_GANG)
-	{
+	else if(act==a_AN_GANG) {
 		_cardInHand->perform(aAN_GANG);
 	}
-	else if(act==a_SHOU_GANG)
-	{
+	else if(act==a_SHOU_GANG) {
 		int card_num;
 		int i;
 		for(i=_cardInHand->active_place;i<_cardInHand->size()-1;i++)
@@ -867,42 +852,40 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			for(int j=i+1;j<_cardInHand->size()-1;j++)
 				if(_cardInHand->get_kind(i)==_cardInHand->get_kind(j))
 					card_num++;
-			if(card_num==4)
-			{
-				temp_data.kind=(CARD_KIND)_cardInHand->get_kind(i);
+			if(card_num==4) {
+				node.kind = _cardInHand->get_kind(i);
 				break;
 			}
 		}
+        
 		for(int k=_cardInHand->size()-1;k>=_cardInHand->active_place;k--)
 		{
 			if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
 				_cardInHand->delete_card(k,1);
 		}
-		//temp_data.kind=_cardInHand->get_kind(i);
-		temp_data.status=c_AN_GANG;
-		temp_data.can_play=cps_NO;
-		card_insert(temp_data,4);
+
+		node.status  = sAN_GANG;
+		node.canPlay = false;
+        _cardInHand->insert_card(node,4);
 		_cardInHand->active_place += 4;
 
-		temp_data.status=c_FREE;
-		temp_data.can_play=cps_YES;
-		temp_data.kind=(CARD_KIND)_cardInHand->back()->kind;
+        /*WHY*/
+		node.kind    = _cardInHand->back()->kind;
+		node.status  = sFREE;
+		node.canPlay = true;
+        
 		_cardInHand->delete_card(_cardInHand->size()-1,1);
-		card_insert(temp_data,1);
+        _cardInHand->insert_card(node,1);
 	}
 	else if(act==a_MING)
 	{
-		unsigned int active_place_indexes=get_ming_indexes();
-		for (int i=_cardInHand->active_place;i<_cardInHand->size();i++)
-		{
-			int m=0;
-			m=active_place_indexes&(1<<i);
-			if(m>0)
-			{
+		unsigned int active_place_indexes = get_ming_indexes();
+        
+		for (int i=_cardInHand->active_place;i<_cardInHand->size();i++) {
+			int m = active_place_indexes&(1<<i);
+			if(m>0) {
 				_cardInHand->at(i)->canPlay=true;
-			}
-			else
-			{
+			} else {
 				_cardInHand->at(i)->canPlay=false;
 			}
 			
@@ -910,25 +893,24 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	}
 	else if(act==a_HU)
 	{
-		temp_data.status=c_FREE;
-		temp_data.can_play=cps_NO;
+		node.status  = sFREE;
+		node.canPlay = false;
         
-		if(isCardFromOther)
-			card_insert(temp_data,1);
-		else
-		{
+		if(isCardFromOther) {
+			_cardInHand->insert_card(node,1);
+        } else {
 			_cardInHand->delete_card(_cardInHand->size()-1,1);
-			card_insert(temp_data,1);
+            _cardInHand->insert_card(node,1);
 		}
 	
 	}
 	else if(act==a_JUMP)
 	{
-		if(!isCardFromOther)
-		{
-			temp_data.status=c_FREE;
+		if(!isCardFromOther) {
+			node.status=c_FREE;
+            
 			_cardInHand->delete_card(_cardInHand->size()-1,1);
-			card_insert(temp_data,1);
+            _cardInHand->insert_card(node,1);
 		}
 	}
 
