@@ -464,7 +464,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
         !IsTing(_curPlayer) ) {
-		_players[_curPlayer]->get_parter()->LockAllCards();
+		_players[_curPlayer]->_cards->lock_all_cards();
 		_players[_curPlayer]->get_parter()->set_ting_status(1);
 
         turnToMing = true;
@@ -792,7 +792,7 @@ void RoundManager::WaitForOthersChoose() {
 
         UpdateCards((PlayerDir_t)_curPlayer,a_MING);
 
-        _players[_curPlayer]->get_parter()->LockAllCards();
+        _players[_curPlayer]->_cards->lock_all_cards();
         _players[_curPlayer]->get_parter()->set_ting_status(1);
     }
 

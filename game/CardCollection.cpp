@@ -185,6 +185,12 @@ void CardInHand::perform(ActionId_t act) {
     DBG_SHOW();
 }
 
+void CardInHand::lock_all_cards() {
+	for (int i=0;i<=size()-1;i++) {
+        at(i)->canPlay = false;
+	}
+}
+
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
         for(int i=active_place;i>0;i--) {
@@ -500,6 +506,32 @@ bool CardInHand::CanHu(const SimpleList &cards) const {
 	return false;
 }
 
+bool CardInHand::IsKaWuXing(Card_t kind) const {
+    int Pos4   = INVALID;
+    int Pos6   = INVALID;
+    
+    for(int i=active_place;i<size();i++) {
+        if(get_kind(i)==kind-1)
+            Pos4 = i-active_place;
+        else if(get_kind(i)==kind+1)
+            Pos6 = i-active_place;
+    }
+        
+    if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
+        SimpleList remain;
+        remain.len = size()-active_place;
+        for(int i=0;i<remain.len;i++) {
+            remain.kind[i] = get_kind(active_place+i);
+        }
+        
+        _Remove(remain,Pos4,Pos6);
+        if(CanHu(remain)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 /***************************************************
     to be removed
 ***************************************************/
