@@ -38,7 +38,6 @@ private:
 	int hu_cards_num[MAX_HANDIN_NUM];
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-    int card_delete(unsigned int from,unsigned int len);
     void load(const SimpleList &input,CARD_KIND output[]);
     void card_insert(CARD data,int times);
     int cards_stable(CARD_KIND clist[],int len);

@@ -18,11 +18,6 @@ NetRRound::~NetRRound() {
     LOGGER_DEREGISTER(_logger);
 }
 
-int NetRRound::card_delete(unsigned int from,unsigned int len) {
-    _cardInHand->delete_card(from,len);
-	return 0;
-}
-
 void NetRRound::card_insert(CARD data,int times) {
     CardNode_t node;
 
@@ -721,10 +716,11 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 		return ck_NOT_DEFINED;
 	}
 
-	card_delete(place,1);
+    _cardInHand->delete_card(place,1);
 
     return l_kind;
 }
+
 
 void NetRRound::LockAllCards()
 {
@@ -732,58 +728,45 @@ void NetRRound::LockAllCards()
 
 void NetRRound::MingCancel()
 {
-	for(int a=0;a<_cardInHand->size();a++)
-	{
-		if(a<_cardInHand->active_place)
-            _cardInHand->at(a)->canPlay = false;
-		else
-            _cardInHand->at(a)->canPlay = true;
-	}
 }
+
 
 ACT_RES NetRRound::others_action(unsigned char who_give,ARRAY_ACTION act,Card_t kind)
 {
     LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
 
-	CARD temp_data;
 	InsertPlaceForMG=0;
 
-	temp_data.can_play=cps_YES;
-	temp_data.kind = (CARD_KIND)kind;
+    CardNode_t node;
+    node.kind    = kind;
+    node.canPlay = false;
 
 	if(act==a_PENG) {
-        card_delete(_cardInHand->active_place,3);
-
-        CardNode_t node;
-        node.kind=kind;
         node.status=sPENG;
-		node.canPlay=cps_NO;
+        
+        _cardInHand->delete_card(_cardInHand->active_place,3);
         _cardInHand->insert_card(node,3);
         _cardInHand->active_place += 3;
 	} else if(act==a_MING_GANG) {
-        card_delete(_cardInHand->active_place,4);
-
-        CardNode_t node;
-        node.kind=kind;
         node.status=sMING_GANG;
-		node.canPlay=cps_NO;
+
+        _cardInHand->delete_card(_cardInHand->active_place,4);
         _cardInHand->insert_card(node,4);
 		_cardInHand->active_place += 4;
 	} else if(act==a_AN_GANG) {
-        card_delete(_cardInHand->active_place,4);
-
-        CardNode_t node;
         node.kind=CARD_UNKNOWN;
         node.status=sAN_GANG;
-		node.canPlay=cps_NO;
+
+        _cardInHand->delete_card(_cardInHand->active_place,4);
         _cardInHand->insert_card(node,4);
 		_cardInHand->active_place += 4;
 	} else if(act==a_JUMP) {
-		if(who_give==0)
-		{
-			temp_data.status=c_FREE;
-			card_delete(_cardInHand->size()-1,1);
-			card_insert(temp_data,1);
+		if(who_give==0) {
+			node.status  = c_FREE;
+            node.canPlay = false;
+            
+			_cardInHand->delete_card(_cardInHand->size()-1,1);
+            _cardInHand->insert_card(node,1);
 		}
 	}
 
@@ -809,7 +792,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 
         for(int i=_cardInHand->active_place;i<_cardInHand->size();i++) {
 			if(_cardInHand->get_kind(i)==node.kind){
-				card_delete(i,2);
+				_cardInHand->delete_card(i,2);
 				break;
 			}
         }
@@ -829,7 +812,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			if(_cardInHand->get_status(i)==sMING_KOU)
 			{
 				node.kind=_cardInHand->get_kind(i);
-				card_delete(i,1);
+				_cardInHand->delete_card(i,1);
 				_cardInHand->insert_card(node,1);
                 _cardInHand->active_place+=1;
 				i++;
@@ -843,7 +826,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			if(_cardInHand->get_status(i)==sMING_KOU)
 			{
 				temp_data.kind=(CARD_KIND)_cardInHand->get_kind(i);
-				card_delete(i,1);
+				_cardInHand->delete_card(i,1);
 				_cardInHand->active_place-=1;
 				card_insert(temp_data,1);
 			}
@@ -865,7 +848,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			else if(_cardInHand->get_status(i)==sMING_KOU&& _cardInHand->get_kind(i)==temp_data.kind)
 				_cardInHand->active_place--;
 			if(_cardInHand->get_kind(i)==temp_data.kind)
-				card_delete(i,1);
+				_cardInHand->delete_card(i,1);
 		}
 		card_insert(temp_data,4);
 		_cardInHand->active_place += 4;
@@ -893,7 +876,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		for(int k=_cardInHand->size()-1;k>=_cardInHand->active_place;k--)
 		{
 			if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
-				card_delete(k,1);
+				_cardInHand->delete_card(k,1);
 		}
 		//temp_data.kind=_cardInHand->get_kind(i);
 		temp_data.status=c_AN_GANG;
@@ -904,7 +887,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		temp_data.status=c_FREE;
 		temp_data.can_play=cps_YES;
 		temp_data.kind=(CARD_KIND)_cardInHand->back()->kind;
-		card_delete(_cardInHand->size()-1,1);
+		_cardInHand->delete_card(_cardInHand->size()-1,1);
 		card_insert(temp_data,1);
 	}
 	else if(act==a_MING)
@@ -934,7 +917,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			card_insert(temp_data,1);
 		else
 		{
-			card_delete(_cardInHand->size()-1,1);
+			_cardInHand->delete_card(_cardInHand->size()-1,1);
 			card_insert(temp_data,1);
 		}
 	
@@ -944,7 +927,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		if(!isCardFromOther)
 		{
 			temp_data.status=c_FREE;
-			card_delete(_cardInHand->size()-1,1);
+			_cardInHand->delete_card(_cardInHand->size()-1,1);
 			card_insert(temp_data,1);
 		}
 	}

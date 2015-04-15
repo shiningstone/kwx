@@ -615,9 +615,9 @@ void RoundManager::RecvMingCancel() {
     UpdateCards(MIDDLE,a_KOU_CANCEL);
     _actionToDo=a_JUMP;
     
-    _players[1]->get_parter()->MingCancel();
-    _players[1]->get_parter()->set_ming_indexes(0);
-    _players[1]->get_parter()->set_ting_status(0);
+    _players[MIDDLE]->_cards->cancel_ming();
+    _players[MIDDLE]->get_parter()->set_ming_indexes(0);
+    _players[MIDDLE]->get_parter()->set_ting_status(0);
 
     _uiManager->MingCancelEffect();
 }

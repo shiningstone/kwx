@@ -319,6 +319,13 @@ SimpleList CardInHand::_Remove(Card_t kouKind) {
 
     return remainCards;
 }
+
+void CardInHand::cancel_ming() {
+	for(int i=active_place;i<size()-1;i++) {
+        at(i)->canPlay = true;
+	}
+}
+
 /***************************************************
         SimpleList logic
 ***************************************************/

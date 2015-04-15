@@ -81,6 +81,8 @@ public:
     void ClearKouCardInfo();
 
     SimpleList _Remove(Card_t kouKind) const;
+
+    void cancel_ming();
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
