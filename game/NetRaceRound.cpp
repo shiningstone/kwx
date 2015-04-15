@@ -18,7 +18,7 @@ NetRRound::~NetRRound() {
     LOGGER_DEREGISTER(_logger);
 }
 
-long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
+long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
 	int i;
 	unsigned char color;
@@ -129,7 +129,7 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 		score *= 2;
 		hu_flag|=RH_MING;//明牌
 	}
-	if(who_give==0)
+	if(!isCardFromOthers)
 	{
 		score *= 2;
 		hu_flag|=RH_ZIMO;//自摸
@@ -147,11 +147,11 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
 	if((continue_gang_times!=0)&&(last_action_WithGold==a_MING_GANG||last_action_WithGold==a_AN_GANG||last_action_WithGold==a_QIANG_GANG))//杠胡
 	{
 		score *= 2;
-		if(who_give==0&&last_action_WithGold==a_QIANG_GANG)
+		if(!isCardFromOthers&&last_action_WithGold==a_QIANG_GANG)
 			hu_flag |= RH_QIANGGANG;
-		else if(who_give==0&&isGangHua)
+		else if(!isCardFromOthers&&isGangHua)
 			hu_flag |= RH_GANGHUA;
-		else if(who_give!=0)
+		else if(isCardFromOthers)
 			hu_flag |= RH_GANGPAO;
 	}
 	if(zhong_num>=3&&fa_num>=3&&bai_num>=3)//大三元
@@ -600,7 +600,7 @@ unsigned char NetRRound::ActiontodoCheckAgain()
 	return res;
 }
 
-unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
+unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
 	int num = 0;
 	unsigned char res = 0x0;
@@ -622,7 +622,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
 					card_num++;
 			}
-			if(card_num==4 &&who_give==0&&!is_last_one)
+			if(card_num==4 &&!isCardFromOthers&&!is_last_one)
 			{
 				res |= a_SHOU_GANG;
 				break;
@@ -634,7 +634,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 			{
 				if(_cardInHand->get_status(i)==sPENG)
 				{
-					if(who_give==0&&!is_last_one)
+					if(!isCardFromOthers&&!is_last_one)
 					{
 						res |= a_MING_GANG;
 					}
@@ -648,14 +648,14 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 		}
 		if(num==3)
 		{
-			if(who_give==0&&!is_last_one)
+			if(!isCardFromOthers&&!is_last_one)
 				res |= (a_MING_GANG | a_AN_GANG);
 			else if(!is_last_one)
 				res |= (a_MING_GANG | a_PENG);
 			else if(is_last_one)
 				res |= a_PENG;
 		}
-		else if(num==2&&who_give!=0)
+		else if(num==2&&isCardFromOthers)
 		{
 				res |= a_PENG;
 		}
@@ -668,7 +668,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 			{
 				if(!is_last_one)
 				{
-					if(who_give==0)
+					if(!isCardFromOthers)
 						res |= (a_MING_GANG | a_AN_GANG);
 					else
 						res |= a_MING_GANG;
@@ -679,12 +679,12 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 
 	if(hu_check(kind)==1)
 	{
-		card_score=cal_score(kind,who_give,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
-		if(who_give==0||(who_give==1&&(tingStatus==1||card_score!=1)))
+		card_score=cal_score(kind,isCardFromOthers,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		if(!isCardFromOthers||(isCardFromOthers==1&&(tingStatus==1||card_score!=1)))
 			res|=a_HU;
 	}
 
-	if(who_give==0)
+	if(!isCardFromOthers)
 	{
 		if(rr_ting_flag==0 && !is_last_one)
 		{
@@ -693,8 +693,8 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char who_give,unsigned 
 		}
 	}
 
-    LOGGER_WRITE("NETWORK : %x %s action %d: kind %d,who_give %d,tingStatus %d,is_last_one %d",
-        (int)this,__FUNCTION__,res,kind,who_give,tingStatus,is_last_one);
+    LOGGER_WRITE("NETWORK : %x %s action %d: kind %d,isCardFromOthers %d,tingStatus %d,is_last_one %d",
+        (int)this,__FUNCTION__,res,kind,isCardFromOthers,tingStatus,is_last_one);
 	return res;
 }
 /*if ting place=_cardInHand->size()*/
@@ -721,9 +721,9 @@ void NetRRound::MingCancel()
 }
 
 
-ACT_RES NetRRound::others_action(unsigned char who_give,ARRAY_ACTION act,Card_t kind)
+ACT_RES NetRRound::others_action(bool isCardFromOthers,ARRAY_ACTION act,Card_t kind)
 {
-    LOGGER_WRITE("%x %s : %d (who_give=%d)",this,__FUNCTION__,act,who_give);
+    LOGGER_WRITE("%x %s : %d (isCardFromOthers=%d)",this,__FUNCTION__,act,isCardFromOthers);
 
 	InsertPlaceForMG=0;
 
@@ -751,7 +751,7 @@ ACT_RES NetRRound::others_action(unsigned char who_give,ARRAY_ACTION act,Card_t 
         _cardInHand->insert_card(node,4);
 		_cardInHand->active_place += 4;
 	} else if(act==a_JUMP) {
-		if(who_give==0) {
+		if(!isCardFromOthers) {
 			node.status  = c_FREE;
             node.canPlay = false;
             
