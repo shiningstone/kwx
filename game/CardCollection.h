@@ -80,7 +80,7 @@ public:
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
     /***************************************************
-            logic
+            antificial intelligence (for single-game only)
     ***************************************************/
     bool _Has3Same(const SimpleList &cards) const ;
     bool _Has3Sequence(const SimpleList &cards) const ;
