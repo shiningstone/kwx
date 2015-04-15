@@ -112,6 +112,11 @@ void test_card_list() {
 	CardInHand list;
 
 	list.init(cards,sizeof(cards)/sizeof(cards[0]));
+	//test index
+	Card_t kind0 = list[0]->kind;
+	Card_t kind1 = list[2]->kind;
+	Card_t kind2 = list[4]->kind;
+	printf("%d %d %d\n", kind0, kind1, kind2);
 	//test show
 	list.show();
 	//test get

@@ -234,12 +234,14 @@ long NetRRound::cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one
         }
             
 		if(Pos4!=_cardInHand->size()-1 && Pos6!=_cardInHand->size()-1) {/*BUG???*/
-			int active=_cardInHand->active_place;
-			int active_len=_cardInHand->size()-_cardInHand->active_place;
-
-            CARD_KIND temp[MAX_HANDIN_NUM];
-			array_remove(active,active_len,Pos4,Pos6,temp);
-			if(cards_stable(temp,active_len-2)==1)
+            SimpleList remain;
+            remain.len = _cardInHand->size()-_cardInHand->active_place;
+            for(int i=0;i<remain.len;i++) {
+                remain.kind[i] = _cardInHand[_cardInHand->active_place+i]->kind;
+            }
+            
+			_cardInHand->_Remove(remain,Pos4,Pos6);
+			if(_cardInHand->CanHu(remain))
 			{
 				score *= 4;
 				hu_flag |= RH_KAWUXIN;
@@ -476,113 +478,60 @@ void NetRRound::_CreateByDisplace(CARD_KIND newCards[],int newLen,CARD origCards
     }
 }
 
-void NetRRound::_Sort(CARD_KIND list[],int len) {
-	for(int i=0;i<len;i++) {
-		CARD_KIND kind = list[i];
-        
-		for(int j=i+1;j<len;j++) {
-			if(list[j]<kind) {
-				list[i] = list[j];
-				list[j] = kind;
-				kind    = list[i];
-			}
-		}
-	}
+void NetRRound::load(const SimpleList &input,CARD_KIND output[]) {
+    for(int i=0;i<input.len;i++) {
+        output[i] = input.kind[i];
+    }
 }
 
-void NetRRound::array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rlist[])
+bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
 {
-    _CreateByDisplace(rlist,len,idx,index,kind);
-    _Sort(rlist,len);
-}
+    SimpleList cards;
+    cards.len = _cardInHand->size()-_cardInHand->active_place;
+    for(int i=0;i<cards.len;i++) {
+        cards.kind[i] = _cardInHand[_cardInHand->active_place+i]->kind;
+    }
 
-void NetRRound::array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[])
-{
-    _CreateByDisplace(rlist,len,clist,index,kind);
-    _Sort(rlist,len);
-}
+    _cardInHand->_Displace(cards,index-_cardInHand->active_place,(Card_t)kind);
+    _cardInHand->_Order(cards);
 
-void NetRRound::array_remove(int start,int len,int index1,int index2,CARD_KIND rlist[])
-{
-    CardList::iterator it = _cardInHand->begin()+start;
-    
-	for(int i=0;i<len;i++)
-		if(i==index1)
-			rlist[index1]=ck_NOT_DEFINED;
-		else if(i==index2)
-			rlist[index2]=ck_NOT_DEFINED;
-		else
-			rlist[i]=(CARD_KIND)((*(it+i))->kind);
-        
-    _Sort(rlist,len);
-}
+    load(cards,rlist);
 
-unsigned int NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
-{
-	int active=_cardInHand->active_place;
-	int len=_cardInHand->size()-_cardInHand->active_place;
-
-	array_sort(active,index-active,len,CARD_KIND(kind),rlist);
-	if(cards_stable(rlist,len)==1)
-		return 1;
-
-	return 0;
-}
-
-int NetRRound::_AssumingKou(CARD newCards[], CARD_KIND kouKind) {
-	for(int i=0;i<MAX_HANDIN_NUM;i++)
-		newCards[i].kind=ck_NOT_DEFINED;
-
-	int remain = 0;
-	int match  = 0;
-	for(int i=_cardInHand->active_place;i<_cardInHand->size();i++)
-	{
-		if(_cardInHand->get_status(i)==sMING_KOU) {
-			continue;
-        } else if(_cardInHand->get_kind(i)==kouKind&&match<3) {
-			match++;
- 		} else {
-			newCards[remain++].kind=(CARD_KIND)_cardInHand->get_kind(i);
-        }
-	}
-
-    return remain;
+    return _cardInHand->CanHu(cards);
 }
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 {
-	CARD newCards[MAX_HANDIN_NUM];
-    int  newLen = _AssumingKou(newCards,card);
+    SimpleList newCards = _cardInHand->_Remove((Card_t)card);
     
-	CARD_KIND temp_list2[MAX_HANDIN_NUM];
-	memset(temp_list2,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
-
-	if(no==1)
-	{
-		for(int i=0;i<newLen;i++) {
+	if(no==MIDDLE) {
+		for(int i=0;i<newCards.len;i++) {
 			for(int k=ck_YI_TIAO;k<=BAI;k++) {
-				array_sort(newCards,i,newLen,CARD_KIND(k),temp_list2);
-				if(cards_stable(temp_list2,newLen)==1)
-					return 1;
+                SimpleList remain = _cardInHand->_Displace(newCards,i,(Card_t)k);
+				if(_cardInHand->CanHu(remain)) {
+					return true;
+                }
 			}
         }
 	} else {
 		int index;
-		for(int a=0;a<newLen;a++) {
-			if(newCards[a].kind==otherHandedOut) {
-				index=a;
+        
+		for(int i=0;i<newCards.len;i++) {
+			if(newCards[i].kind==otherHandedOut) {
+				index=i;
 				break;
 			}
 		}
         
 		for(int k=ck_YI_TIAO;k<=BAI;k++) {
-			array_sort(newCards,index,newLen,CARD_KIND(k),temp_list2);
-			if(cards_stable(temp_list2,newLen)==1)
-				return 1;
+            SimpleList remain = _cardInHand->_Displace(newCards,index,(Card_t)k);
+            if(_cardInHand->CanHu(remain)) {
+                return true;
+            }
 		}
 	}
     
-	return 0;
+	return false;
 }
 
 void NetRRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
@@ -657,7 +606,7 @@ unsigned int NetRRound::ming_check()
 		}
 		for(int k=ck_YI_TIAO;k<=BAI;k++)
 		{
-			if(ting_check(i,cur_card,k,temp_list)==1)
+			if(ting_check(i,cur_card,k,temp_list))
 			{
 				res |= (1<<i);
 				hu_cards[i][m]=CARD_KIND(k);

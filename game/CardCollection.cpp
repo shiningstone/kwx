@@ -297,6 +297,22 @@ void CardInHand::switch_group_status(int gIdx) {
     }
 }
 
+SimpleList CardInHand::_Remove(Card_t kouKind) {
+    SimpleList remainCards;
+	int        match  = 0;
+    
+	for(int i=active_place;i<size();i++) {
+		if(get_status(i)!=sMING_KOU) {
+            if(get_kind(i)==kouKind && match<3) {
+    			match++;
+     		} else {
+    			remainCards.kind[remainCards.len++] = get_kind(i);
+            }
+        }
+	}
+
+    return remainCards;
+}
 /***************************************************
         SimpleList logic
 ***************************************************/

@@ -39,20 +39,14 @@ private:
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
     int card_delete(unsigned int from,unsigned int len);
+    void load(const SimpleList &input,CARD_KIND output[]);
     void card_insert(CARD data,int times);
     int cards_stable(CARD_KIND clist[],int len);
     long cal_score(CARD_KIND kind,unsigned char who_give,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     int cal_times(CARD_KIND kind,CARD_KIND data[],int len);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
     int hu_check(CARD_KIND data_kind); //0:not 1:hu
-    unsigned int ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);
-    void _CreateByDisplace(CARD_KIND newCards[],int newLen,int start,int substitutePos,CARD_KIND substituteKind);
-    void _CreateByDisplace(CARD_KIND newCards[],int newLen,CARD origCards[],int substitutePos,CARD_KIND substituteKind);
-    void _Sort(CARD_KIND list[],int len);
-    void array_sort(CARD clist[],int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
-    void array_sort(int idx,int index,int len,CARD_KIND kind,CARD_KIND rlist[]);
-    void array_remove(int start,int len,int index1,int index2,CARD_KIND rlist[]);
-    int _AssumingKou(CARD newCards[], CARD_KIND kouKind);
+    bool ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);
 public:
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     unsigned int ming_check();

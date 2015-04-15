@@ -79,6 +79,8 @@ public:
     int  FindCards(int cardIdx[],Card_t card) const;
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
+
+    SimpleList _Remove(Card_t kouKind) const;
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
@@ -94,7 +96,8 @@ public:
 
     SimpleList _Displace(const SimpleList &input, int changeIdx, Card_t kind) const;
     void _Order(SimpleList &cards) const;
-    
+
+    /*to be removed*/
     bool pattern_match(const SimpleList &cards) const;
     /***************************************************
             effect
