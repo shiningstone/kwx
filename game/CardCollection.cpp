@@ -351,20 +351,16 @@ bool CardInHand::_Has3Sequence(const SimpleList &cards) const  {
     return false;
 }
 
-bool CardInHand::_6Couples(const SimpleList &cards) const {
-    if( cards.len==12 ) {
-        for(int i=0;i<12;i+=2) {
-            if( cards.kind[i]==cards.kind[i+1] ) {
-                continue;
-            } else {
-                return false;
-            }
+int CardInHand::_GetSequenceCoupleNum(const SimpleList &cards) const {
+    int coupleNum = 0;
+    
+    for(int i=0;i<cards.len;i+=2) {
+        if( cards.kind[i]==cards.kind[i+1] ) {
+            coupleNum++;
         }
-    } else {
-        return false;
     }
 
-    return true;
+    return coupleNum;
 }
 
 bool CardInHand::_IsCharDismatched(const SimpleList &cards) const {
@@ -459,7 +455,7 @@ void CardInHand::_Order(SimpleList &input) const {
 bool CardInHand::PatternMatch(const SimpleList &cards) const {
     if(_IsCharDismatched(cards)) {
         return false;
-    } else if(_6Couples(cards)) {
+    } else if(_GetSequenceCoupleNum(cards)==6) {
         return true;
     } else {
         SimpleList remainCards;

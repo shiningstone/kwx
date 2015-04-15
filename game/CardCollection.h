@@ -89,7 +89,7 @@ public:
     bool _Has3Same(const SimpleList &cards) const ;
     bool _Has3Sequence(const SimpleList &cards) const ;
     bool _IsCharDismatched(const SimpleList &cards) const;
-    bool _6Couples(const SimpleList &cards) const;
+    int  _GetSequenceCoupleNum(const SimpleList &cards) const;
     void _Remove3Same(SimpleList &cards)const ;
     void _Remove3Sequence(SimpleList &cards)const ;
     void _Remove(SimpleList &cards,int idx1,int idx2) const;
