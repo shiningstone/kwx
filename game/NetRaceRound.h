@@ -38,7 +38,7 @@ private:
 	int hu_cards_num[MAX_HANDIN_NUM];
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-    void load(const SimpleList &input,CARD_KIND output[]);
+    void load(const SmartList &input,CARD_KIND output[]);
     int cards_stable(CARD_KIND clist[],int len);
     long cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     int cal_times(CARD_KIND kind,CARD_KIND data[],int len);

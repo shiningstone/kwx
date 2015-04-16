@@ -333,7 +333,7 @@ int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
 
 int NetRRound::cards_stable(CARD_KIND clist[],int len)
 {
-    SimpleList cards;
+    SmartList cards;
     cards.len = len;
     for(int i=0;i<cards.len;i++) {
         cards.kind[i] = (Card_t)clist[i];
@@ -350,7 +350,7 @@ void NetRRound::task_check(unsigned int flag)
 
 int NetRRound::hu_check(CARD_KIND newCard)
 {
-    SimpleList cards;
+    SmartList cards;
 
     cards.len = _cardInHand.size()-1;/*the last is not included*/
     for(int i=0;i<cards.len;i++) {
@@ -362,7 +362,7 @@ int NetRRound::hu_check(CARD_KIND newCard)
     return _cardInHand->CardsStable(cards);
 }
 
-void NetRRound::load(const SimpleList &input,CARD_KIND output[]) {
+void NetRRound::load(const SmartList &input,CARD_KIND output[]) {
     for(int i=0;i<input.len;i++) {
         output[i] = (CARD_KIND)input.kind[i];
     }
@@ -370,7 +370,7 @@ void NetRRound::load(const SimpleList &input,CARD_KIND output[]) {
 
 bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
 {
-    SimpleList cards;
+    SmartList cards;
     cards.len = _cardInHand->size()-_cardInHand->active_place;
     for(int i=0;i<cards.len;i++) {
         cards.kind[i] = _cardInHand->at(_cardInHand->active_place+i)->kind;
@@ -386,12 +386,12 @@ bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 {
-    SimpleList newCards = _cardInHand->_Remove((Card_t)card);
+    SmartList newCards = _cardInHand->_Remove((Card_t)card);
     
 	if(no==MIDDLE) {
 		for(int i=0;i<newCards.len;i++) {
 			for(int k=ck_YI_TIAO;k<=BAI;k++) {
-                SimpleList remain = _cardInHand->_Displace(newCards,i,(Card_t)k);
+                SmartList remain = _cardInHand->_Displace(newCards,i,(Card_t)k);
 				if(_cardInHand->CardsStable(remain)) {
 					return true;
                 }
@@ -408,7 +408,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		}
         
 		for(int k=ck_YI_TIAO;k<=BAI;k++) {
-            SimpleList remain = _cardInHand->_Displace(newCards,index,(Card_t)k);
+            SmartList remain = _cardInHand->_Displace(newCards,index,(Card_t)k);
             if(_cardInHand->CardsStable(remain)) {
                 return true;
             }

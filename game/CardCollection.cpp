@@ -313,8 +313,8 @@ void CardInHand::switch_group_status(int gIdx) {
     }
 }
 
-SimpleList CardInHand::_Remove(Card_t kouKind) const {
-    SimpleList remainCards;
+SmartList CardInHand::_Remove(Card_t kouKind) const {
+    SmartList remainCards;
 	int        match  = 0;
     
     remainCards.len = 0;
@@ -339,9 +339,9 @@ void CardInHand::cancel_ming() {
 }
 
 /***************************************************
-        SimpleList logic
+        SmartList logic
 ***************************************************/
-bool CardInHand::_IsFirstInGroupSame(const SimpleList &cards) const  {
+bool CardInHand::_IsFirstInGroupSame(const SmartList &cards) const  {
     if(cards.kind[0]==cards.kind[1]&&cards.kind[0]==cards.kind[2]) {
         return true;
     } else {
@@ -349,7 +349,7 @@ bool CardInHand::_IsFirstInGroupSame(const SimpleList &cards) const  {
     }
 }
 
-bool CardInHand::_IsFirstInGroupSequence(const SimpleList &cards) const  {
+bool CardInHand::_IsFirstInGroupSequence(const SmartList &cards) const  {
     for(int i=1;i<cards.len;i++) {
         if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
             for(int j=i+1;j<cards.len;j++) {
@@ -363,7 +363,7 @@ bool CardInHand::_IsFirstInGroupSequence(const SimpleList &cards) const  {
     return false;
 }
 
-int CardInHand::_GetContinuousCoupleNum(const SimpleList &cards) const {
+int CardInHand::_GetContinuousCoupleNum(const SmartList &cards) const {
     int coupleNum = 0;
     
 	if(cards.len%2==0) {
@@ -377,7 +377,7 @@ int CardInHand::_GetContinuousCoupleNum(const SimpleList &cards) const {
     return coupleNum;
 }
 
-bool CardInHand::_IsCharDismatched(const SimpleList &cards) const {
+bool CardInHand::_IsCharDismatched(const SmartList &cards) const {
 	int zhongNum = 0;
 	int faNum=0;
 	int baiNum=0;
@@ -400,17 +400,17 @@ bool CardInHand::_IsCharDismatched(const SimpleList &cards) const {
     }
 }
 
-void CardInHand::_Remove3Same(SimpleList &cards) const {
+void CardInHand::_Remove3Same(SmartList &cards) const {
     memcpy(cards.kind,&(cards.kind[3]),cards.len-3);
     cards.len -= 3;
 }
 
-void CardInHand::_Remove3Sequence(SimpleList &cards) const {
+void CardInHand::_Remove3Sequence(SmartList &cards) const {
     for(int i=1;i<cards.len;i++) {
         if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
             for(int j=i+1;j<cards.len;j++) {
                 if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
-                    SimpleList newList;
+                    SmartList newList;
                     int idx = 0;
 
                     for(int k=0;k<cards.len;k++) {
@@ -422,7 +422,7 @@ void CardInHand::_Remove3Sequence(SimpleList &cards) const {
                     }
                     newList.len = cards.len - 3;
 
-                    memcpy(&cards,&newList,sizeof(SimpleList));
+                    memcpy(&cards,&newList,sizeof(SmartList));
 					return ;
                 }
             }
@@ -430,7 +430,7 @@ void CardInHand::_Remove3Sequence(SimpleList &cards) const {
     }
 }
 
-void CardInHand::_Remove(SimpleList &cards,int idx1,int idx2) const {
+void CardInHand::_Remove(SmartList &cards,int idx1,int idx2) const {
     int idx = 0;
     for(int i=0;i<cards.len;i++) {
         if(i==idx1 || i==idx2) {
@@ -445,8 +445,8 @@ void CardInHand::_Remove(SimpleList &cards,int idx1,int idx2) const {
 }
 
 /* _Displace+_Order has efficiency problem */
-SimpleList CardInHand::_Displace(const SimpleList &input, int changeIdx, Card_t kind) const {
-    SimpleList newList = input;
+SmartList CardInHand::_Displace(const SmartList &input, int changeIdx, Card_t kind) const {
+    SmartList newList = input;
     newList.kind[changeIdx] = kind;
 
     _Order(newList);
@@ -454,7 +454,7 @@ SimpleList CardInHand::_Displace(const SimpleList &input, int changeIdx, Card_t 
     return newList;
 }
 
-void CardInHand::_Order(SimpleList &input) const {
+void CardInHand::_Order(SmartList &input) const {
 	for(int i=0;i<input.len;i++) {
 		for(int j=i+1;j<input.len;j++) {
 			if(input.kind[j]<input.kind[i]) {
@@ -466,7 +466,7 @@ void CardInHand::_Order(SimpleList &input) const {
 	}
 }
 
-void CardInHand::_Insert(SimpleList &cards,Card_t newCard) const {
+void CardInHand::_Insert(SmartList &cards,Card_t newCard) const {
     for(int i=cards.len;i>=0;i--) {
         Card_t kind = cards.kind[i];
         
@@ -481,19 +481,19 @@ void CardInHand::_Insert(SimpleList &cards,Card_t newCard) const {
     cards.len++;
 }
 
-bool CardInHand::PatternMatch(const SimpleList &cards) const {
+bool CardInHand::PatternMatch(const SmartList &cards) const {
     if(_IsCharDismatched(cards)) {
         return false;
     } else if(_GetContinuousCoupleNum(cards)==6) {
         return true;
     } else {
-        SimpleList remainCards;
-        memcpy(&remainCards,&cards,sizeof(SimpleList));
+        SmartList remainCards;
+        memcpy(&remainCards,&cards,sizeof(SmartList));
         
         while(remainCards.len>0) {
             if(_IsFirstInGroupSame(remainCards)) {
-                SimpleList subList;
-                memcpy(&subList,&remainCards,sizeof(SimpleList));
+                SmartList subList;
+                memcpy(&subList,&remainCards,sizeof(SmartList));
                 
                 _Remove3Same(subList);
         
@@ -515,14 +515,14 @@ bool CardInHand::PatternMatch(const SimpleList &cards) const {
 }
 
 /*BUG???: cards_stable 如果有一组三个或者四个，被删掉就胡不了*/
-bool CardInHand::CardsStable(const SimpleList &cards) const {
+bool CardInHand::CardsStable(const SmartList &cards) const {
 	int i=0;
     
 	while(i<cards.len-1) {
 		if(	cards.kind[i]==cards.kind[i+1] ) {
-            SimpleList remainCards;
+            SmartList remainCards;
 
-            memcpy(&remainCards,&cards,sizeof(SimpleList));
+            memcpy(&remainCards,&cards,sizeof(SmartList));
 			_Remove(remainCards,i,i+1);
 
             if(PatternMatch(remainCards)) {
@@ -551,7 +551,7 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
     }
         
     if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
-        SimpleList remain;
+        SmartList remain;
         remain.len = size()-active_place;
         for(int i=0;i<remain.len;i++) {
             remain.kind[i] = get_kind(active_place+i);
@@ -667,7 +667,7 @@ void CardInHand::get_statistics(Card_t huKind) const {
 /***************************************************
     to be removed
 ***************************************************/
-bool CardInHand::pattern_match(const SimpleList &cards) const{
+bool CardInHand::pattern_match(const SmartList &cards) const{
 	int zhong_num=0;
 	int fa_num=0;
 	int bai_num=0;

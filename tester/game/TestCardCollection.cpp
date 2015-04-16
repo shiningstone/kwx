@@ -12,13 +12,13 @@ public:
     void Load(Card_t first,...);
     bool Match();
 private:
-    SimpleList _sample;
+    SmartList _sample;
 };
 
 #define CARDS_END CARD_UNKNOWN
 
 void TestCardInHand::Load(Card_t first,...) {
-    SimpleList cards;
+    SmartList cards;
     cards.len = 0;
     cards.kind[cards.len] = first;
     cards.len++;
