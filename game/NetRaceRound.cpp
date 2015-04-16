@@ -352,12 +352,12 @@ int NetRRound::hu_check(CARD_KIND newCard)
 {
     SmartList cards;
 
-    cards.len = _cardInHand.size()-1;/*the last is not included*/
+    cards.len = _cardInHand->size()-1;/*the last is not included*/
     for(int i=0;i<cards.len;i++) {
         cards.kind[i] = _cardInHand->at(i)->kind;
     }
 
-    _cardInHand->_Insert(cards,newCard);
+    _cardInHand->_Insert(cards,(Card_t)newCard);
 
     return _cardInHand->CardsStable(cards);
 }
