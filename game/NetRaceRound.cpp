@@ -348,55 +348,26 @@ void NetRRound::task_check(unsigned int flag)
 		rr_aim=0;
 }
 
-int NetRRound::hu_check(CARD_KIND data_kind)
+int NetRRound::hu_check(CARD_KIND newCard)
 {
-	CARD_KIND temp_list[MAX_HANDIN_NUM];
-	CARD_KIND temp_kind=data_kind;
-	int res=0;
+    SimpleList cards;
+    bool Inserted = false;
+    
+    cards.len = _cardInHand->size();
+    for(int i=0;i<cards.len;i++) {
+        Card_t kind = _cardInHand->at(i)->kind;
+        
+        if(kind<newCard) {
+            cards.kind[i] = _cardInHand->at(i)->kind;
+        } else if(!Inserted) {
+            cards.kind[i] = (Card_t)newCard;
+            Inserted = true;
+        } else {
+            cards.kind[i] = _cardInHand->at(i-1)->kind;
+        }
+    }
 
-    CardNode_t *last = _cardInHand->back();
-    CardNode_t *node = new CardNode_t;
-    node->kind = last->kind;
-    node->status = last->status;
-    node->canPlay = last->canPlay;
-    _cardInHand->pop_back();
-
-	int index=_cardInHand->active_place;
-	int i;
-	for(i=index;i<_cardInHand->size();i++)
-	{
-		if(temp_kind<=_cardInHand->get_kind(i))
-			break;
-	}
-	if(i==index)
-	{
-		temp_list[0]=temp_kind;
-		for(int j=0;j<_cardInHand->size()-index;j++)
-			temp_list[j+1]=(CARD_KIND)_cardInHand->get_kind(j+index);
-	}
-	else if(i==_cardInHand->size())
-	{
-		for(int j=0;j<_cardInHand->size()-index;j++)
-			temp_list[j]=(CARD_KIND)_cardInHand->get_kind(j+index);
-
-        temp_list[_cardInHand->size()-index]=temp_kind;
-	}
-	else
-	{
-		for(int j=index;j<i;j++)
-			temp_list[j-index]=(CARD_KIND)_cardInHand->get_kind(j);
-
-        temp_list[i-index]=temp_kind;
-
-        for(int j=i-index;j<_cardInHand->size()-index;j++)
-			temp_list[j+1]=(CARD_KIND)_cardInHand->get_kind(j+index);
-	}
-
-	res=cards_stable(temp_list,_cardInHand->size()-_cardInHand->active_place+1);
-
-    _cardInHand->push_back(node);
-
-	return res;
+    return _cardInHand->CardsStable(cards);
 }
 
 void NetRRound::load(const SimpleList &input,CARD_KIND output[]) {
@@ -764,7 +735,7 @@ ACT_RES NetRRound::others_action(bool isCardFromOthers,ARRAY_ACTION act,Card_t k
 			node.status  = sFREE;
             node.canPlay = false;
             
-			_cardInHand->delete_card(_cardInHand->size()-1,1);
+			_cardInHand->pop_back();
             _cardInHand->insert_card(node,1);
 		}
 	}
@@ -804,8 +775,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
         node.status=sMING_KOU;
 
 		for(int i=_cardInHand->size()-1;i>=_cardInHand->active_place;i--)
-			if(_cardInHand->get_status(i)==sMING_KOU)
-			{
+			if(_cardInHand->get_status(i)==sMING_KOU) {
 				node.kind=_cardInHand->get_kind(i);
 				_cardInHand->delete_card(i,1);
 				_cardInHand->insert_card(node,1);
@@ -883,7 +853,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		node.status  = sFREE;
 		node.canPlay = true;
         
-		_cardInHand->delete_card(_cardInHand->size()-1,1);
+		_cardInHand->pop_back();
         _cardInHand->insert_card(node,1);
 	}
 	else if(act==a_MING)
@@ -908,7 +878,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		if(isCardFromOther) {
 			_cardInHand->insert_card(node,1);
         } else {
-			_cardInHand->delete_card(_cardInHand->size()-1,1);
+			_cardInHand->pop_back();
             _cardInHand->insert_card(node,1);
 		}
 	
@@ -918,7 +888,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		if(!isCardFromOther) {
 			node.status=sFREE;
             
-			_cardInHand->delete_card(_cardInHand->size()-1,1);
+			_cardInHand->pop_back();
             _cardInHand->insert_card(node,1);
 		}
 	}
