@@ -779,19 +779,27 @@ SmartList::SmartList(const CardInHand &cards) {
     }
 }
 
-bool SmartList::_IsFirstInGroupSame(const SmartList &cards) const  {
-    if(cards.kind[0]==cards.kind[1]&&cards.kind[0]==cards.kind[2]) {
+SmartList::SmartList(const SmartList &orig) {
+    len = orig.len;
+
+    for(int i=0;i<len;i++) {
+        kind[i] = orig.kind[i];
+    }
+}
+
+bool SmartList::_IsFirstInGroupSame() const  {
+    if(kind[0]==kind[1]&&kind[0]==kind[2]) {
         return true;
     } else {
         return false;
     }
 }
 
-bool SmartList::_IsFirstInGroupSequence(const SmartList &cards) const  {
-    for(int i=1;i<cards.len;i++) {
-        if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
-            for(int j=i+1;j<cards.len;j++) {
-                if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
+bool SmartList::_IsFirstInGroupSequence() const  {
+    for(int i=1;i<len;i++) {
+        if((kind[i]==kind[0]+1) && (kind[i]/9==kind[0]/9)) {
+            for(int j=i+1;j<len;j++) {
+                if((kind[j]==kind[0]+2) && (kind[j]/9==kind[0]/9)) {
                     return true;
                 }
             }
@@ -801,12 +809,12 @@ bool SmartList::_IsFirstInGroupSequence(const SmartList &cards) const  {
     return false;
 }
 
-int SmartList::_GetContinuousCoupleNum(const SmartList &cards) const {
+int SmartList::_GetContinuousCoupleNum() const {
     int coupleNum = 0;
     
-	if(cards.len%2==0) {
-	    for(int i=0;i<cards.len;i+=2) {
-	        if( cards.kind[i]==cards.kind[i+1] ) {
+	if(len%2==0) {
+	    for(int i=0;i<len;i+=2) {
+	        if( kind[i]==kind[i+1] ) {
 	            coupleNum++;
 	        }
 	    }
@@ -815,52 +823,49 @@ int SmartList::_GetContinuousCoupleNum(const SmartList &cards) const {
     return coupleNum;
 }
 
-bool SmartList::_IsCharDismatched(const SmartList &cards) const {
+bool SmartList::_IsCharDismatched() const {
 	int zhongNum = 0;
 	int faNum=0;
 	int baiNum=0;
     
-	for(int i=0;i<cards.len;i++) {
-		if(cards.kind[i]==ZHONG)
+	for(int i=0;i<len;i++) {
+		if(kind[i]==ZHONG)
 			zhongNum++;
-		if(cards.kind[i]==FA)
+		if(kind[i]==FA)
 			faNum++;
-		if(cards.kind[i]==BAI)
+		if(kind[i]==BAI)
 			baiNum++;
 	}
 
     if(zhongNum==1 ||faNum==1 || baiNum == 1 ) {
 		return true;
-    } else if(zhongNum==2 && faNum==2 && baiNum==2 && cards.len!=12) {
+    } else if(zhongNum==2 && faNum==2 && baiNum==2 && len!=12) {
         return true;
     } else {
         return false;
     }
 }
 
-void SmartList::_Remove3Same(SmartList &cards) const {
-    memcpy(cards.kind,&(cards.kind[3]),cards.len-3);
-    cards.len -= 3;
+void SmartList::_Remove3Same() {
+    len -= 3;
+    memcpy(kind,&(kind[3]),len);
 }
 
-void SmartList::_Remove3Sequence(SmartList &cards) const {
-    for(int i=1;i<cards.len;i++) {
-        if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
-            for(int j=i+1;j<cards.len;j++) {
-                if((cards.kind[j]==cards.kind[0]+2) && (cards.kind[j]/9==cards.kind[0]/9)) {
-                    SmartList newList;
+void SmartList::_Remove3Sequence() {
+    for(int i=1;i<len;i++) {
+        if((kind[i]==kind[0]+1) && (kind[i]/9==kind[0]/9)) {
+            for(int j=i+1;j<len;j++) {
+                if((kind[j]==kind[0]+2) && (kind[j]/9==kind[0]/9)) {
                     int idx = 0;
 
-                    for(int k=0;k<cards.len;k++) {
+                    for(int k=0;k<len;k++) {
                         if(k==0 || k==i || k==j) {
                             continue;
                         } else {
-                            newList.kind[idx++] = cards.kind[k];
+                            kind[idx++] = kind[k];
                         }
                     }
-                    newList.len = cards.len - 3;
-
-                    memcpy(&cards,&newList,sizeof(SmartList));
+                    len -= 3;
 					return ;
                 }
             }
@@ -868,81 +873,72 @@ void SmartList::_Remove3Sequence(SmartList &cards) const {
     }
 }
 
-void SmartList::_Remove(SmartList &cards,int idx1,int idx2) const {
+void SmartList::_Remove(int idx1,int idx2) {
     int idx = 0;
-    for(int i=0;i<cards.len;i++) {
+    
+    for(int i=0;i<len;i++) {
         if(i==idx1 || i==idx2) {
             continue;
         } else {
-            cards.kind[idx] = cards.kind[i];
+            kind[idx] = kind[i];
             idx++;
         }
     }
 
-    cards.len -= 2;
+    len -= 2;
 }
 
-/* _Displace+_Order has efficiency problem */
-SmartList SmartList::_Displace(const SmartList &input, int changeIdx, Card_t kind) const {
-    SmartList newList = input;
-    newList.kind[changeIdx] = kind;
-
-    _Order(newList);
-    
-    return newList;
+void SmartList::_Displace(int changeIdx, Card_t card) {
+    kind[changeIdx] = card;
+    _Order();
 }
 
-void SmartList::_Order(SmartList &input) const {
-	for(int i=0;i<input.len;i++) {
-		for(int j=i+1;j<input.len;j++) {
-			if(input.kind[j]<input.kind[i]) {
-                Card_t temp   = input.kind[i];
-				input.kind[i] = input.kind[j];
-				input.kind[j] = temp;
+void SmartList::_Order() {
+	for(int i=0;i<len;i++) {
+		for(int j=i+1;j<len;j++) {
+			if(kind[j]<kind[i]) {
+                Card_t temp   = kind[i];
+				kind[i] = kind[j];
+				kind[j] = temp;
 			}
 		}
 	}
 }
 
-void SmartList::_Insert(SmartList &cards,Card_t newCard) const {
-    for(int i=cards.len;i>=0;i--) {
-        Card_t kind = cards.kind[i];
-        
-        if(newCard<kind) {
-            cards.kind[i] = cards.kind[i-1];
+void SmartList::_Insert(Card_t newCard) {
+    for(int i=len;i>=0;i--) {
+        if(newCard<kind[i]) {
+            kind[i] = kind[i-1];
         } else {
-            cards.kind[i] = (Card_t)newCard;
+            kind[i] = (Card_t)newCard;
             break;
         }
     }
 
-    cards.len++;
+    len++;
 }
 
-bool SmartList::PatternMatch(const SmartList &cards) const {
-    if(_IsCharDismatched(cards)) {
+bool SmartList::PatternMatch() const {
+    if(_IsCharDismatched()) {
         return false;
-    } else if(_GetContinuousCoupleNum(cards)==6) {
+    } else if(_GetContinuousCoupleNum()==6) {
         return true;
     } else {
-        SmartList remainCards;
-        memcpy(&remainCards,&cards,sizeof(SmartList));
+        SmartList remainCards(*this);
         
         while(remainCards.len>0) {
-            if(_IsFirstInGroupSame(remainCards)) {
-                SmartList subList;
-                memcpy(&subList,&remainCards,sizeof(SmartList));
+            if(remainCards._IsFirstInGroupSame()) {
+                SmartList subList(remainCards);
                 
-                _Remove3Same(subList);
-        
-                if( PatternMatch(subList) ) {
+                subList._Remove3Same();
+                if( subList.PatternMatch() ) {
                     return true;
                 }
             }
         
-            if(_IsFirstInGroupSequence(remainCards)) {
-                _Remove3Sequence(remainCards);
-                return PatternMatch(remainCards);
+            if(remainCards._IsFirstInGroupSequence()) {
+                remainCards._Remove3Sequence();
+                return remainCards.PatternMatch();
             } else {
                 return false;
             }
@@ -953,17 +949,15 @@ bool SmartList::PatternMatch(const SmartList &cards) const {
 }
 
 /*BUG???: cards_stable 如果有一组三个或者四个，被删掉就胡不了*/
-bool SmartList::CardsStable(const SmartList &cards) const {
+bool SmartList::CardsStable() const {
 	int i=0;
     
-	while(i<cards.len-1) {
-		if(	cards.kind[i]==cards.kind[i+1] ) {
-            SmartList remainCards;
+	while(i<len-1) {
+		if(	kind[i]==kind[i+1] ) {
+            SmartList remainCards(*this);
 
-            memcpy(&remainCards,&cards,sizeof(SmartList));
-			_Remove(remainCards,i,i+1);
-
-            if(PatternMatch(remainCards)) {
+			remainCards._Remove(i,i+1);
+            if(remainCards.PatternMatch()) {
 				return true;
             } else {
                 i += 2;
