@@ -24,12 +24,6 @@ typedef struct _CardNode_t {
 	bool         canPlay;
 }CardNode_t;
 
-class SmartList {
-public:
-    Card_t  kind[18];
-    int     len;
-};
-
 class CardList : public vector<CardNode_t *> {
 public:
     CardList();
@@ -52,6 +46,7 @@ protected:
     Logger *_logger;
 };
 
+class SmartList;
 class CardInHand : public CardList {
 public:
     void   init(Card_t *cards,int len);
@@ -126,6 +121,29 @@ private:
     }KouCards_t;
 
     KouCards_t _bufKouCards;
+};
+
+class SmartList {
+public:
+    SmartList();
+    SmartList(const CardInHand &cards);
+    
+    bool _IsFirstInGroupSame(const SmartList &cards) const ;
+    bool _IsFirstInGroupSequence(const SmartList &cards) const ;
+    bool _IsCharDismatched(const SmartList &cards) const;
+    int  _GetContinuousCoupleNum(const SmartList &cards) const;
+    void _Remove3Same(SmartList &cards)const ;
+    void _Remove3Sequence(SmartList &cards)const ;
+    void _Remove(SmartList &cards,int idx1,int idx2) const;
+    bool PatternMatch(const SmartList &cards) const;
+    bool CardsStable(const SmartList &cards)const;
+
+    SmartList _Displace(const SmartList &input, int changeIdx, Card_t kind) const;
+    void _Order(SmartList &cards) const;
+    void _Insert(SmartList &cards,Card_t kind) const;
+
+    Card_t  kind[18];
+    int     len;
 };
 
 #endif
