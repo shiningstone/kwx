@@ -33,21 +33,11 @@ int DsInstruction::Dispatch() {
     return 0;
 }
 
-int DsInstruction::GetAvailActions(int actNum,ActionId_t actions[]) {
+int DsInstruction::GetAvailActions(int actNum,const ActionId_t actions[]) {
     int actionToDo = 0;
     
     for (int i=0;i<actNum; i++) {
         actionToDo |= actions[i];
-    }
-
-    return actionToDo;
-}
-
-int DsInstruction::GetAvailActions(const Reminds_t &remind) {
-    int actionToDo = 0;
-    
-    for (int i=0;i<remind.actionNum; i++) {
-        actionToDo |= remind.actions[i];
     }
 
     return actionToDo;

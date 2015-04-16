@@ -17,8 +17,7 @@ public:
     virtual int Construct(const DsMsg &msg);
     virtual int Dispatch();
 
-    static int GetAvailActions(const Reminds_t &remind);
-    static int GetAvailActions(int actNum,ActionId_t actions[]);
+    static int GetAvailActions(int actNum,const ActionId_t actions[]);
     RequestId_t      request;
 protected:
     DsInstruction();

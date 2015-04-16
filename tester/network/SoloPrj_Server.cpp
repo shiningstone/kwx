@@ -152,9 +152,25 @@ void test_basic() {
     消息格式 : lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00
 ****************************************************/
 #define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
-#define SEND_DATA    "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\send.txt"
 
 #include <stdio.h>
+
+char MONITOR_FILE[128] = {0};
+char SEND_DATA_FILE[128] = {0};
+
+void SetFile(char *name) {
+    memset(MONITOR_FILE,0,128);
+    strcpy(MONITOR_FILE,WORKING_PATH);
+    strcat(MONITOR_FILE,name);
+    strcat(MONITOR_FILE,"_monitor.txt");
+    //printf("monitor file is %s\n",MONITOR_FILE);
+
+    memset(SEND_DATA_FILE,0,128);
+    strcpy(SEND_DATA_FILE,WORKING_PATH);
+    strcat(SEND_DATA_FILE,name);
+    strcat(SEND_DATA_FILE,"_send.txt");
+    //printf("send data is %s\n",SEND_DATA_FILE);
+}
 
 void show(char *buf,int len) {
     for (int i=0;i<len;i++) {
@@ -168,7 +184,7 @@ void show(char *buf,int len) {
 }
 
 int GetLine(char *buf,int line=1) {
-    FILE * fsend = fopen(SEND_DATA,"r");
+    FILE * fsend = fopen(SEND_DATA_FILE,"r");
     assert(fsend!=NULL);
 
     int i = 1;
@@ -198,12 +214,12 @@ int ExtractHeader(char *buf) {
 }
 
 int GetSendData(char *buf,int line=1) {
-    FILE * fsend = fopen(SEND_DATA,"r");
+    FILE * fsend = fopen(SEND_DATA_FILE,"r");
     assert(fsend!=NULL);
 
     char str[512] = {0};
     if(GetLine(str,line)==-1) {
-        printf("read line %d from %s fail\n",line,SEND_DATA);
+        printf("read line %d from %s fail\n",line,SEND_DATA_FILE);
         return -1;
     } else {
         ExtractHeader(str);
@@ -294,33 +310,6 @@ static void SaveLog(FILE *fp,char *dir,const char *buf,int len) {
     fwrite(str,strLen,1,fp);
 }
 
-void test_smart_game_server() {
-    fmonitor = fopen(WORKING_PATH"monitor.txt","w");
-    assert(fmonitor!=NULL);
-
-    ServerSocket SERVER;
-    bool start = false;
-    int  choice = STRING;
-
-    while(1) {
-        if(start) {
-            char recvBuf[512] = {0};
-            int  recvLen = 0;
-
-        	SERVER.Recv(recvBuf,&recvLen);
-            SaveLog(fmonitor,"RECV",recvBuf,recvLen);
-            handle_requests(SERVER,recvBuf,recvLen);
-        } else {
-        	SERVER.Start();
-            printf("server started\n");
-            start = true;
-        }
-    }
-
-    fclose(fmonitor);
-	SERVER.Stop();
-}
-
 #ifndef DELAY
 #define DELAY 500
 #endif
@@ -334,7 +323,7 @@ static void SendLine(ServerSocket SERVER,int lineNo) {
     SaveLog(fmonitor,"SEND",sendBuf,sendLen);
 }
 
-void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[512] = {0};
     int  sendLen = 0;
 
@@ -407,18 +396,73 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void round2_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[512] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+    }
+}
+
+typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
+REQUEST_HANDLER gHandle = NULL;
+
+void test_smart_game_round_x() {
+    fmonitor = fopen(MONITOR_FILE,"w");
+    assert(fmonitor!=NULL);
+
+    ServerSocket SERVER;
+    bool start = false;
+    int  choice = STRING;
+
+    while(1) {
+        if(start) {
+            char recvBuf[512] = {0};
+            int  recvLen = 0;
+
+        	SERVER.Recv(recvBuf,&recvLen);
+            SaveLog(fmonitor,"RECV",recvBuf,recvLen);
+            round1_handle_requests(SERVER,recvBuf,recvLen);
+        } else {
+        	SERVER.Start();
+            printf("server started\n");
+            start = true;
+        }
+    }
+
+    fclose(fmonitor);
+	SERVER.Stop();
+}
+
 //#define NETWORK_TRANSFER_ONLY
 void test_server_console() {
     test_string_to_hex();
 
 #ifdef NETWORK_TRANSFER_ONLY
     test_basic();
+
+    SetFile("");
     test_read_send_data();
 #else
     #if 0
     test_game_server()();
+
+    SetFile("Round1");
+    gHandle = round1_handle_requests;
+    test_smart_game_round_x();
+
+
     #endif
-    test_smart_game_server();
+    
+    SetFile("Round2");
+    gHandle = round2_handle_requests;
+    test_smart_game_round_x();
 #endif
 }
 

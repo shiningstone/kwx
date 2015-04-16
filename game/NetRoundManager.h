@@ -32,6 +32,8 @@ public:
     KwxMessenger   *_messenger;
     MsgQueue       *_msgQueue;
 
+    int GetAvailActions(int actNum,const ActionId_t actions[]);
+
     void HandleMsg(void * aMsg);
     void ListenToMessenger();
     void RecvMsg(void* val);
