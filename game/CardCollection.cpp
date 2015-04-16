@@ -649,7 +649,7 @@ void CardInHand::get_statistics(Card_t huKind) const {
             }
             
             if(sameCount==4) {
-                return false;
+                break;
             } else if(sameCount==3) {
                 usedLen   += 3;
                 GroupSameCount++;

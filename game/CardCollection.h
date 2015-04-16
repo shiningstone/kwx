@@ -23,11 +23,12 @@ typedef struct _CardNode_t {
 	CardStatus_t status;
 	bool         canPlay;
 }CardNode_t;
-    
-typedef struct {
+
+class SimpleList {
+public:
     Card_t  kind[18];
     int     len;
-}SimpleList;
+};
 
 class CardList : public vector<CardNode_t *> {
 public:
