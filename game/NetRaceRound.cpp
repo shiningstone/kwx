@@ -351,21 +351,13 @@ void NetRRound::task_check(unsigned int flag)
 int NetRRound::hu_check(CARD_KIND newCard)
 {
     SimpleList cards;
-    bool Inserted = false;
-    
-    cards.len = _cardInHand->size();
+
+    cards.len = _cardInHand.size()-1;/*the last is not included*/
     for(int i=0;i<cards.len;i++) {
-        Card_t kind = _cardInHand->at(i)->kind;
-        
-        if(kind<newCard) {
-            cards.kind[i] = _cardInHand->at(i)->kind;
-        } else if(!Inserted) {
-            cards.kind[i] = (Card_t)newCard;
-            Inserted = true;
-        } else {
-            cards.kind[i] = _cardInHand->at(i-1)->kind;
-        }
+        cards.kind[i] = _cardInHand->at(i)->kind;
     }
+
+    _cardInHand->_Insert(cards,newCard);
 
     return _cardInHand->CardsStable(cards);
 }

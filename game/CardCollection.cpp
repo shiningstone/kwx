@@ -466,6 +466,21 @@ void CardInHand::_Order(SimpleList &input) const {
 	}
 }
 
+void CardInHand::_Insert(SimpleList &cards,Card_t newCard) const {
+    for(int i=cards.len;i>=0;i--) {
+        Card_t kind = cards.kind[i];
+        
+        if(newCard<kind) {
+            cards.kind[i] = cards.kind[i-1];
+        } else {
+            cards.kind[i] = (Card_t)newCard;
+            break;
+        }
+    }
+
+    cards.len++;
+}
+
 bool CardInHand::PatternMatch(const SimpleList &cards) const {
     if(_IsCharDismatched(cards)) {
         return false;

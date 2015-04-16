@@ -99,6 +99,7 @@ public:
 
     SimpleList _Displace(const SimpleList &input, int changeIdx, Card_t kind) const;
     void _Order(SimpleList &cards) const;
+    void _Insert(SimpleList &cards,Card_t kind) const;
 
     bool IsKaWuXing(Card_t kind)const;
 
