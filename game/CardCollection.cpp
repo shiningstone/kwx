@@ -64,7 +64,7 @@ void CardList::set_status(unsigned int idx,CardStatus_t status) {
 }
 
 void CardList::lock_all_cards() {
-	for (int i=0;i<=size()-1;i++) {
+	for (int i=0;i<size();i++) {
         at(i)->canPlay = false;
 	}
 }
@@ -333,7 +333,7 @@ SimpleList CardInHand::_Remove(Card_t kouKind) const {
 }
 
 void CardInHand::cancel_ming() {
-	for(int i=active_place;i<size()-1;i++) {
+	for(int i=active_place;i<size();i++) {
         at(i)->canPlay = true;
 	}
 }
@@ -621,7 +621,7 @@ void CardInHand::get_statistics(Card_t huKind) const {
  	} else {
 		int totalLen = size()-active_place;
         int usedLen  = 0;
-        int same3Count = 0;
+        int GroupSameCount = 0;
         
 		for(int i=active_place;i<size();i+=usedLen) {
 			int sameCount = 1;
@@ -637,13 +637,13 @@ void CardInHand::get_statistics(Card_t huKind) const {
                 return false;
             } else if(sameCount==3) {
                 usedLen   += 3;
-                same3Count++;
+                GroupSameCount++;
             } else if(sameCount==2) {
                 usedLen   += 2;
             }
 		}
         
-		if(same3Count==4) {
+		if(GroupSameCount==4) {
 			HuPengPengHu = true;
         }
 	}

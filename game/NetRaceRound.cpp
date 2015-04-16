@@ -179,7 +179,7 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 			hu_flag |= RH_ANSIGUI;//暗四归
 		}
 	}
-	if(couple_num==7&&_cardInHand->size()-1==HAND_IN_CARD_NUM)
+	if(couple_num==7&&_cardInHand->size()==HAND_IN_CARD_NUM)
 	{
 		score *= 4;
 		int j;
@@ -855,10 +855,10 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	else if(act==a_SHOU_GANG) {
 		int card_num;
 		int i;
-		for(i=_cardInHand->active_place;i<_cardInHand->size()-1;i++)
+		for(i=_cardInHand->active_place;i<_cardInHand->size();i++)
 		{
 			card_num=1;
-			for(int j=i+1;j<_cardInHand->size()-1;j++)
+			for(int j=i+1;j<_cardInHand->size();j++)
 				if(_cardInHand->get_kind(i)==_cardInHand->get_kind(j))
 					card_num++;
 			if(card_num==4) {
@@ -867,7 +867,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			}
 		}
         
-		for(int k=_cardInHand->size()-1;k>=_cardInHand->active_place;k--)
+		for(int k=_cardInHand->size();k>=_cardInHand->active_place;k--)
 		{
 			if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
 				_cardInHand->delete_card(k,1);

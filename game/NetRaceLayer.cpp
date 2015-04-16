@@ -4049,7 +4049,7 @@ bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
     Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
     int groupChosen=-1;
     
-    for(int i=0;i<cards->size()-1;i++) {
+    for(int i=0;i<cards->size();i++) {
         cardsInHand[i]=_GetCardInHand(MIDDLE,i);
         cardsInHand[i]->_ID = MIDDLE;
     }
