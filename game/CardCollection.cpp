@@ -3,6 +3,16 @@
 
 #define MAX_HANDIN_NUM 18
 
+/*************************************************
+    命名说明:
+        GroupGang        4个一样花色
+        GroupSame        3个一样花色
+        GroupSequence    3个连续花色
+        Couple           一对
+        Char             字    
+*************************************************/
+
+
 //#define DEBUG
 #ifdef DEBUG
 #define DBG_SHOW() show()
@@ -331,7 +341,7 @@ void CardInHand::cancel_ming() {
 /***************************************************
         SimpleList logic
 ***************************************************/
-bool CardInHand::_Has3Same(const SimpleList &cards) const  {
+bool CardInHand::_IsFirstInGroupSame(const SimpleList &cards) const  {
     if(cards.kind[0]==cards.kind[1]&&cards.kind[0]==cards.kind[2]) {
         return true;
     } else {
@@ -339,7 +349,7 @@ bool CardInHand::_Has3Same(const SimpleList &cards) const  {
     }
 }
 
-bool CardInHand::_Has3Sequence(const SimpleList &cards) const  {
+bool CardInHand::_IsFirstInGroupSequence(const SimpleList &cards) const  {
     for(int i=1;i<cards.len;i++) {
         if((cards.kind[i]==cards.kind[0]+1) && (cards.kind[i]/9==cards.kind[0]/9)) {
             for(int j=i+1;j<cards.len;j++) {
@@ -353,7 +363,7 @@ bool CardInHand::_Has3Sequence(const SimpleList &cards) const  {
     return false;
 }
 
-int CardInHand::_GetSequenceCoupleNum(const SimpleList &cards) const {
+int CardInHand::_GetContinuousCoupleNum(const SimpleList &cards) const {
     int coupleNum = 0;
     
 	if(cards.len%2==0) {
@@ -459,14 +469,14 @@ void CardInHand::_Order(SimpleList &input) const {
 bool CardInHand::PatternMatch(const SimpleList &cards) const {
     if(_IsCharDismatched(cards)) {
         return false;
-    } else if(_GetSequenceCoupleNum(cards)==6) {
+    } else if(_GetContinuousCoupleNum(cards)==6) {
         return true;
     } else {
         SimpleList remainCards;
         memcpy(&remainCards,&cards,sizeof(SimpleList));
         
         while(remainCards.len>0) {
-            if(_Has3Same(remainCards)) {
+            if(_IsFirstInGroupSame(remainCards)) {
                 SimpleList subList;
                 memcpy(&subList,&remainCards,sizeof(SimpleList));
                 
@@ -477,7 +487,7 @@ bool CardInHand::PatternMatch(const SimpleList &cards) const {
                 }
             }
         
-            if(_Has3Sequence(remainCards)) {
+            if(_IsFirstInGroupSequence(remainCards)) {
                 _Remove3Sequence(remainCards);
                 return PatternMatch(remainCards);
             } else {
@@ -489,7 +499,8 @@ bool CardInHand::PatternMatch(const SimpleList &cards) const {
     }
 }
 
-bool CardInHand::CanHu(const SimpleList &cards) const {
+/*BUG???: cards_stable 如果有一组三个或者四个，被删掉就胡不了*/
+bool CardInHand::CardsStable(const SimpleList &cards) const {
 	int i=0;
     
 	while(i<cards.len-1) {
@@ -532,7 +543,7 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
         }
         
         _Remove(remain,Pos4,Pos6);
-        if(CanHu(remain)) {
+        if(CardsStable(remain)) {
             return true;
         }
     }
@@ -605,37 +616,36 @@ void CardInHand::get_statistics(Card_t huKind) const {
 			four_num++;
 	}
     
-	if(free_num==2)
-	{
+	if(free_num==2) {
 		HuShouZhuaYi = true;
-	}
-	else
-	{
-		int len = size()-active_place;
+ 	} else {
+		int totalLen = size()-active_place;
+        int usedLen  = 0;
+        int same3Count = 0;
         
-		int l_couple=0;
-		for(int k=active_place;k<size();k++)
-		{
-			int l_num=1;
-			for(int t=k+1;t<size();t++)
-				if(get_kind(k)==get_kind(t))
-					l_num++;
-                
-			if(l_num==3)
-				len -= 3;
-
-            l_num=0;
-
-            for(int t=active_place;t<size();t++)
-				if(get_kind(k)==get_kind(t))
-					l_num++;
-
-            if(l_num==2)
-				l_couple++;
+		for(int i=active_place;i<size();i+=usedLen) {
+			int sameCount = 1;
+            
+			for(int j=i+1;j<size();j++) {
+                if(get_kind(j)==get_kind(i)) {
+                    sameCount++;
+                }
+                    
+            }
+            
+            if(sameCount==4) {
+                return false;
+            } else if(sameCount==3) {
+                usedLen   += 3;
+                same3Count++;
+            } else if(sameCount==2) {
+                usedLen   += 2;
+            }
 		}
         
-		if(len==2&&l_couple==2)
+		if(same3Count==4) {
 			HuPengPengHu = true;
+        }
 	}
 }
 

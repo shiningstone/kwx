@@ -87,15 +87,15 @@ public:
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
-    bool _Has3Same(const SimpleList &cards) const ;
-    bool _Has3Sequence(const SimpleList &cards) const ;
+    bool _IsFirstInGroupSame(const SimpleList &cards) const ;
+    bool _IsFirstInGroupSequence(const SimpleList &cards) const ;
     bool _IsCharDismatched(const SimpleList &cards) const;
-    int  _GetSequenceCoupleNum(const SimpleList &cards) const;
+    int  _GetContinuousCoupleNum(const SimpleList &cards) const;
     void _Remove3Same(SimpleList &cards)const ;
     void _Remove3Sequence(SimpleList &cards)const ;
     void _Remove(SimpleList &cards,int idx1,int idx2) const;
     bool PatternMatch(const SimpleList &cards) const;
-    bool CanHu(const SimpleList &cards)const;
+    bool CardsStable(const SimpleList &cards)const;
 
     SimpleList _Displace(const SimpleList &input, int changeIdx, Card_t kind) const;
     void _Order(SimpleList &cards) const;

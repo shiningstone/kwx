@@ -339,7 +339,7 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
         cards.kind[i] = (Card_t)clist[i];
     }
 
-    return _cardInHand->CanHu(cards);
+    return _cardInHand->CardsStable(cards);
 }
 
 void NetRRound::task_check(unsigned int flag)
@@ -418,7 +418,7 @@ bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist
 
     load(cards,rlist);
 
-    return _cardInHand->CanHu(cards);
+    return _cardInHand->CardsStable(cards);
 }
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
@@ -429,7 +429,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		for(int i=0;i<newCards.len;i++) {
 			for(int k=ck_YI_TIAO;k<=BAI;k++) {
                 SimpleList remain = _cardInHand->_Displace(newCards,i,(Card_t)k);
-				if(_cardInHand->CanHu(remain)) {
+				if(_cardInHand->CardsStable(remain)) {
 					return true;
                 }
 			}
@@ -446,7 +446,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
         
 		for(int k=ck_YI_TIAO;k<=BAI;k++) {
             SimpleList remain = _cardInHand->_Displace(newCards,index,(Card_t)k);
-            if(_cardInHand->CanHu(remain)) {
+            if(_cardInHand->CardsStable(remain)) {
                 return true;
             }
 		}
