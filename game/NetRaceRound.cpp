@@ -339,7 +339,7 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
         cards.kind[i] = (Card_t)clist[i];
     }
 
-    return _cardInHand->CardsStable(cards);
+    return cards.CardsStable(cards);
 }
 
 void NetRRound::task_check(unsigned int flag)
@@ -350,16 +350,11 @@ void NetRRound::task_check(unsigned int flag)
 
 int NetRRound::hu_check(CARD_KIND newCard)
 {
-    SmartList cards;
+    SmartList cards(*_cardInHand);
+    cards.len--;                     /*the last should not be included*/
+    cards._Insert((Card_t)newCard);  /*the last inserted in order*/
 
-    cards.len = _cardInHand->size()-1;/*the last is not included*/
-    for(int i=0;i<cards.len;i++) {
-        cards.kind[i] = _cardInHand->at(i)->kind;
-    }
-
-    _cardInHand->_Insert(cards,(Card_t)newCard);
-
-    return _cardInHand->CardsStable(cards);
+    return cards.CardsStable();
 }
 
 void NetRRound::load(const SmartList &input,CARD_KIND output[]) {
@@ -376,12 +371,11 @@ bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist
         cards.kind[i] = _cardInHand->at(_cardInHand->active_place+i)->kind;
     }
 
-    _cardInHand->_Displace(cards,index-_cardInHand->active_place,(Card_t)kind);
-    _cardInHand->_Order(cards);
+    cards._Displace(index-_cardInHand->active_place,(Card_t)kind);
 
     load(cards,rlist);
 
-    return _cardInHand->CardsStable(cards);
+    return cards.CardsStable();
 }
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
@@ -391,8 +385,9 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 	if(no==MIDDLE) {
 		for(int i=0;i<newCards.len;i++) {
 			for(int k=ck_YI_TIAO;k<=BAI;k++) {
-                SmartList remain = _cardInHand->_Displace(newCards,i,(Card_t)k);
-				if(_cardInHand->CardsStable(remain)) {
+                SmartList remain(*_cardInHand);
+                remain._Displace(i,(Card_t)k);
+				if(remain.CardsStable()) {
 					return true;
                 }
 			}
@@ -408,8 +403,9 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		}
         
 		for(int k=ck_YI_TIAO;k<=BAI;k++) {
-            SmartList remain = _cardInHand->_Displace(newCards,index,(Card_t)k);
-            if(_cardInHand->CardsStable(remain)) {
+            SmartList remain(*_cardInHand);
+            remain._Displace(index,(Card_t)k);
+            if(remain.CardsStable()) {
                 return true;
             }
 		}

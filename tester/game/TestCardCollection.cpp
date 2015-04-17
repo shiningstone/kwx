@@ -7,7 +7,7 @@
 /**********************************
     support
 **********************************/
-class TestCardInHand : public CardInHand {
+class TestSmartList : public CardInHand {
 public:
     void Load(Card_t first,...);
     bool Match();
@@ -17,7 +17,7 @@ private:
 
 #define CARDS_END CARD_UNKNOWN
 
-void TestCardInHand::Load(Card_t first,...) {
+void TestSmartList::Load(Card_t first,...) {
     SmartList cards;
     cards.len = 0;
     cards.kind[cards.len] = first;
@@ -36,8 +36,8 @@ void TestCardInHand::Load(Card_t first,...) {
     _sample = cards;
 }
 
-bool TestCardInHand::Match() {
-    bool result = PatternMatch(_sample);
+bool TestSmartList::Match() {
+    bool result = _sample.PatternMatch();
     if(result) {
         printf("match    : ");
     } else {
@@ -57,7 +57,7 @@ bool TestCardInHand::Match() {
     testcases
 **********************************/
 void test_pattern_match() {
-    TestCardInHand cards;
+    TestSmartList cards;
 
     cards.Load(TIAO_1,TIAO_1,TIAO_1,CARDS_END);
     assert( cards.Match() );

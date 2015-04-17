@@ -83,23 +83,10 @@ public:
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
-    bool _IsFirstInGroupSame(const SmartList &cards) const ;
-    bool _IsFirstInGroupSequence(const SmartList &cards) const ;
-    bool _IsCharDismatched(const SmartList &cards) const;
-    int  _GetContinuousCoupleNum(const SmartList &cards) const;
-    void _Remove3Same(SmartList &cards) const;
-    void _Remove3Sequence(SmartList &cards)const ;
     void _Remove(SmartList &cards,int idx1,int idx2) const;
-    bool PatternMatch(const SmartList &cards) const;
-    bool CardsStable(const SmartList &cards)const;
-
-    SmartList _Displace(const SmartList &input, int changeIdx, Card_t kind) const;
-    void _Order(SmartList &cards) const;
-    void _Insert(SmartList &cards,Card_t kind) const;
-
     bool IsKaWuXing(Card_t kind)const;
-
     void get_statistics(Card_t huKind)const;
+    
     /*to be removed*/
     bool pattern_match(const SmartList &cards) const;
     /***************************************************
