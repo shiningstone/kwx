@@ -436,7 +436,7 @@ void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 
 unsigned int NetRRound::ming_check()
 {
-	unsigned int res =0;
+	unsigned int handoutMask =0;
 
 	hu_places_num=0;
 	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
@@ -454,10 +454,9 @@ unsigned int NetRRound::ming_check()
             
             if(cur_card==last_card)
             {
-                res |= ( ( res&( 1<<(i-1) ) )<<1 );
+                handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );
 
                 hu_cards_num[i]=hu_cards_num[i-1];
-                
                 memcpy(hu_cards[i],hu_cards[i-1],sizeof(CARD_KIND)*9);
                 memcpy(huTiemsForEveryOne[i],huTiemsForEveryOne[i-1],sizeof(int)*9);
             } else {
@@ -468,7 +467,8 @@ unsigned int NetRRound::ming_check()
                     memset(temp_list,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
 
                     if(ting_check(i,cur_card,k,temp_list)) {
-                        res |= (1<<i);
+                        handoutMask |= (1<<i);
+                        
                         hu_cards[i][huKindIdx]=CARD_KIND(k);
                         hu_cards_num[i]++;
                         
@@ -490,13 +490,15 @@ unsigned int NetRRound::ming_check()
         }
 	}
     
-	for(int i=0;i<MAX_HANDIN_NUM;i++)
-		if(res&(1<<i))
+	for(int i=0;i<MAX_HANDIN_NUM;i++) {
+		if(handoutMask&(1<<i)) {
 			hu_places_num++;
+        }
+    }
 
-    hu_places=res;
+    hu_places = handoutMask;
 
-    return res;
+    return handoutMask;
 }
 
 unsigned char NetRRound::init(int card_array[],int len,int aim)

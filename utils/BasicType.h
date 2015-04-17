@@ -80,16 +80,6 @@ typedef enum {
     NORMAL_APPERANCE,
 }CartApperance_t;
 
-typedef struct {
-    Card_t       kind;
-    int          tingNum;
-}TingInfoItem;
-
-typedef struct {
-    int          kindNum;
-    TingInfoItem card[9];/* why 9??? */
-}TingInfo_t;
-
 typedef enum {
     AN_GANG = 1,
     MING_GANG,
@@ -97,6 +87,27 @@ typedef enum {
 }GoldKind_t;
 
 typedef int TagId_t;
+
+typedef struct _TingItem_t {
+    Card_t        kind;        /* 可以胡的花色 */
+    int           remain;      /* 剩余张数     */
+    int           fan;         /* 番数         */
+}TingItem_t;
+
+typedef struct _MsgTingInfo_t {
+    int           cardNum;      /* 可以胡的花色数目 */
+    TingItem_t    *cards;       
+}TingInfo_t   ;
+
+typedef struct _MingChoice_t {
+    Card_t        kind;         /*可以出的花色*/
+    TingInfo_t    ting;          
+}MingChoice_t;
+
+typedef struct _MingInfo_t {
+    INT8U         choiceNum;    /*可以出的花色数目*/
+    MingChoice_t  *handouts;    
+}MingInfo_t;
 
 #endif
 

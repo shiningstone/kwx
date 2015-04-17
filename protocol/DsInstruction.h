@@ -53,7 +53,7 @@ public:
     virtual int Construct(const DsMsg &msg);
     
     Status_t        status;
-    MsgTingInfo_t   ting;
+    TingInfo_t      ting;
 };
 
 class ShowCardNotif : public DsInstruction {
@@ -64,7 +64,7 @@ public:
     
     INT8U            seat;
     Card_t           kind;
-    MsgTingInfo_t    ting;
+    TingInfo_t       ting;
 };
 
 class ActionResponse : public DsInstruction {
@@ -173,7 +173,7 @@ class TingInfoResponse : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
     
-    MsgTingInfo_t    info;
+    TingInfo_t       info;
 };
 
 #endif
