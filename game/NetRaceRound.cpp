@@ -351,13 +351,14 @@ void NetRRound::task_check(unsigned int flag)
 int NetRRound::hu_check(CARD_KIND newCard)
 {
     SmartList cards(*_cardInHand);
+    
     cards.len--;                     /*the last should not be included*/
     cards.insert((Card_t)newCard);   /*the last inserted in order*/
 
     return cards.can_hu();
 }
 
-void NetRRound::load(const SmartList &input,CARD_KIND output[]) {
+void NetRRound::transform(const SmartList &input,CARD_KIND output[]) {
     for(int i=0;i<input.len;i++) {
         output[i] = (CARD_KIND)input.kind[i];
     }
@@ -365,15 +366,10 @@ void NetRRound::load(const SmartList &input,CARD_KIND output[]) {
 
 bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
 {
-    SmartList cards;
-    cards.len = _cardInHand->size()-_cardInHand->active_place;
-    for(int i=0;i<cards.len;i++) {
-        cards.kind[i] = _cardInHand->at(_cardInHand->active_place+i)->kind;
-    }
-
+    SmartList cards(*_cardInHand,true);
     cards.displace(index-_cardInHand->active_place,(Card_t)kind);
 
-    load(cards,rlist);
+    transform(cards,rlist);
 
     return cards.can_hu();
 }
