@@ -52,7 +52,7 @@ typedef enum {
     ZHONG,
     FA,
     BAI,        
-    CARD_MAX,
+    CARD_KIND_MAX,
     CARD_UNKNOWN = 0xff,
 }Card_t;
 

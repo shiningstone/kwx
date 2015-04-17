@@ -4,7 +4,7 @@
 using namespace cocos2d::ui;
 USING_NS_CC;
 
-const char * VoiceCards[SEX_MAX][CARD_MAX] = {
+const char * VoiceCards[SEX_MAX][CARD_KIND_MAX] = {
     {
         "Music/1tiao.ogg","Music/2tiao.ogg","Music/3tiao.ogg","Music/4tiao.ogg","Music/5tiao.ogg",
         "Music/6tiao.ogg","Music/7tiao.ogg","Music/8tiao.ogg","Music/9tiao.ogg",

@@ -380,7 +380,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
     
 	if(no==MIDDLE) {
 		for(int i=0;i<newCards.len;i++) {
-			for(int k=ck_YI_TIAO;k<=BAI;k++) {
+			for(int k=0;k<CARD_KIND_MAX;k++) {
                 SmartList remain(*_cardInHand);
                 remain.displace(i,(Card_t)k);
 				if(remain.can_hu()) {
@@ -389,57 +389,39 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 			}
         }
 	} else {
-		int index;
-        
 		for(int i=0;i<newCards.len;i++) {
 			if(newCards.kind[i]==otherHandedOut) {
-				index=i;
-				break;
+                for(int k=0;k<CARD_KIND_MAX;k++) {
+                    SmartList remain(*_cardInHand);
+                    remain.displace(i,(Card_t)k);
+                    if(remain.can_hu()) {
+                        return true;
+                    }
+                }
+
+                return false;
 			}
-		}
-        
-		for(int k=ck_YI_TIAO;k<=BAI;k++) {
-            SmartList remain(*_cardInHand);
-            remain.displace(index,(Card_t)k);
-            if(remain.can_hu()) {
-                return true;
-            }
 		}
 	}
     
 	return false;
 }
 
-void NetRRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
-{
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-		for(int b=0;b<9;b++)
-			curArray[a][b]=hu_cards[a][b];
-}
-void NetRRound::get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9])
-{
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-		for(int b=0;b<9;b++)
-			curArray[a][b]=huTiemsForEveryOne[a][b]*2;
-}
-void NetRRound::get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM])
-{
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-			//curArray[a]=hu_NumForEveryCard[a];
-			curArray[a]=hu_cards_num[a];
-}
 void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 {
 	int temp=0;
+    
 	for(int a=0;a<MAX_HANDIN_NUM;a++)
 	{
 		if(hu_cards[a][0]==-1)
 			continue;
+
 		for(int b=0;b<9;b++)
 		{
 			if(hu_cards[a][b]==-1)
 				break;
-			int num=0;
+
+            int num=0;
 			for(int c=0;c<_cardInHand->size();c++)
 			{
 				if(_cardInHand->get_status(c)==sFREE||_cardInHand->get_status(c)==c_AN_GANG||_cardInHand->get_status(c)==sMING_KOU)
@@ -451,6 +433,7 @@ void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 		}
 	}
 }
+
 unsigned int NetRRound::ming_check()
 {
 	unsigned int res =0;
@@ -878,6 +861,25 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	}
 
 	return ar_DONE;
+}
+
+void NetRRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
+{
+	for(int a=0;a<MAX_HANDIN_NUM;a++)
+		for(int b=0;b<9;b++)
+			curArray[a][b]=hu_cards[a][b];
+}
+void NetRRound::get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9])
+{
+	for(int a=0;a<MAX_HANDIN_NUM;a++)
+		for(int b=0;b<9;b++)
+			curArray[a][b]=huTiemsForEveryOne[a][b]*2;
+}
+void NetRRound::get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM])
+{
+	for(int a=0;a<MAX_HANDIN_NUM;a++)
+			//curArray[a]=hu_NumForEveryCard[a];
+			curArray[a]=hu_cards_num[a];
 }
 
 unsigned int NetRRound::get_aim()
