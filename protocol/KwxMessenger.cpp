@@ -112,3 +112,17 @@ int RequestTingInfo::Set() {
     return 0;
 }
 
+int RequestEnterRoom::Set(int id) {
+    SetRequestCode(REQ_GAME_SEND_ENTER);
+
+    Key_t key = EnvVariable::getInstance()->GetKey();
+    RoomPath_t roomPath = EnvVariable::getInstance()->GetRoomPath(id);
+
+    INT32U keyid = _htonl((INT32U)key);
+    INT32U roomId = _htonl((INT32U)roomPath);
+    
+    _add_item( new Item((Item_t)132,4,(INT8U *)&keyid) );
+    _add_item( new Item((Item_t)131,4,(INT8U *)&roomId) );
+
+    return 0;
+}

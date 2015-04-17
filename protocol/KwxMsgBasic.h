@@ -9,6 +9,7 @@
 #define UP_STREAM     0
 #define DOWN_STREAM   1
 
+typedef INT32U Key_t;
 typedef INT32U RoomPath_t;
 typedef INT32U RoomId_t;
 typedef INT32U TableId_t;
@@ -23,6 +24,9 @@ typedef enum {
 }Status_t;
 
 typedef enum {
+    /*********************************************
+        牌局动作REQUEST
+    *********************************************/
     /* Upstream & Downstream : request and its response */
     REQ_GAME_SEND_START         = 43,
     REQ_GAME_SEND_SHOWCARD      = 48,
@@ -43,6 +47,19 @@ typedef enum {
     REQ_GAME_RECV_SHOWCARD      = 75,
     REQ_GAME_RECV_ACTION        = 76,
     REQ_GAME_RECV_START         = 77,
+    
+    /*********************************************
+        牌局无关REQUEST
+    *********************************************/
+    /* upstream */
+    HEART_BEAT                  = 40,
+    
+    /* upstream & downstream */
+    REQ_GAME_SEND_ENTER         = 44,
+
+    /* downstream */
+    REQ_GAME_RECV_ENTER         = 71,
+    
 }RequestId_t;
 
 #endif

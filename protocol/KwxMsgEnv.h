@@ -15,7 +15,11 @@ class EnvVariable {
 public:
 	static EnvVariable *getInstance();
 
-	INT8U    _protocol;
+    RoomPath_t GetKey();
+    RoomPath_t GetRoomPath(int id);
+
+    
+    INT8U    _protocol;
 	INT32U   _userId;
     INT8U    _language;
     INT8U    _platform;

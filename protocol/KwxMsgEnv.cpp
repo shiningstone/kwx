@@ -31,6 +31,19 @@ EnvVariable::EnvVariable() {
 #endif
 }
 
+
+Key_t EnvVariable::GetKey() {
+    return 0x01020304;
+}
+
+RoomPath_t EnvVariable::GetRoomPath(int id) {
+    return 0x05060708;
+}
+
+
+
+
+
 SeatInfo *SeatInfo::_instance[MAX_JOINABLE_TABLE] = {0};
 
 SeatInfo *SeatInfo::getInstance(int threadId) {

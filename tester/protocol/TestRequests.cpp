@@ -14,6 +14,9 @@
 #include "./../../RaceType.h"
 #include "./../CTestCase.h"
 
+/*********************************************
+    牌局动作REQUEST
+*********************************************/
 class TestSendGameStart : public CTestCase {
 public:
     virtual int Execute() {
@@ -306,7 +309,7 @@ public:
 
             5,
             60,1,                  //seatId
-            61,0,                  //who show card: 0 server
+            61,2,                  //who show card
             62,2,                  //next player
             131,0,4,0,0,0,1,       //action : 碰
             132,0,1,2,             //card :   3条
@@ -324,7 +327,7 @@ public:
         assert( aMsg->GetRequestCode()==REQ_GAME_RECV_ACTION );
         assert( aMsg->GetLevel()==7 );
         assert( action.seat==1 );
-        assert( action.isFromServer==true );
+        assert( action.whoGive==2 );
         assert( action.next==2 );
         assert( action.actions[0]==a_PENG );
         assert( action.card[0]==TIAO_3 );
@@ -813,7 +816,7 @@ public:
     }
 };
 
-void testRequests() {
+void testGameActions() {
 	CTestCase *aCase;
     
     SeatInfo *seat = SeatInfo::getInstance();
@@ -873,3 +876,89 @@ void testRequests() {
     aCase = new TestRecvTingInfoResponse();
     aCase->Execute();
 }
+
+/*********************************************
+    牌局无关REQUEST
+*********************************************/
+class TestSendEnter : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,44,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
+            0x00,45,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            2,
+            132,0,4,1,2,3,4,         //KEY
+            131,0,4,5,6,7,8,         //roomPath
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        RequestEnterRoom aMsg;
+        aMsg.Set(0);
+        len = aMsg.Serialize(buf);
+
+        assert(len==sizeof(msgInNetwork));
+        assert(!memcmp(buf,msgInNetwork,len));
+
+        return 0;
+    }
+};
+
+class TestRecvEnterResponse : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code
+            7,                     //package level
+            0x00,28,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            1,
+            131,0,4,1,2,0,3,        //ting info : 胡2条，剩2张，赢3番
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        TingInfoResponse ting;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        ting.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_GET_TINGINFO );
+        assert( aMsg->GetLevel()==7 );
+        assert( ting.info.cards[0].kind==TIAO_2);
+        assert( ting.info.cards[0].remain==2 );
+        assert( ting.info.cards[0].fan==3 );
+
+        return 0;
+    }
+};
+
+void testOtherRequests() {
+	CTestCase *aCase;
+
+    aCase = new TestSendEnter();
+    aCase->Execute();
+    
+    aCase = new TestRecvEnterResponse();
+    aCase->Execute();
+}
+
+void testRequests() {
+    testGameActions();
+    testOtherRequests();
+}
+

@@ -30,6 +30,8 @@ private:
     static Logger       *_logger;
 };
 
+
+
 class RequestSendAction : public UsMsg {
 public:
     int Set(ActionId_t code,Card_t card);
@@ -48,6 +50,12 @@ public:
 class RequestTingInfo : public UsMsg {
 public:
     int Set();
+};
+
+
+class RequestEnterRoom : public UsMsg {
+public:
+    int Set(int id=0);
 };
 
 #endif
