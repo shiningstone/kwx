@@ -77,6 +77,7 @@ public:
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
 
+    SmartList CardInHand::_CreateFreeList() const;
     SmartList _Remove(Card_t kouKind) const;
 
     void cancel_ming();
@@ -120,7 +121,7 @@ public:
 
     Card_t  kind[18];
     int     len;
-    
+
 protected:
     bool _IsFirstInGroupSame() const ;
     bool _IsFirstInGroupSequence(int seqIdx[3]) const ;
