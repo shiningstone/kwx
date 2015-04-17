@@ -339,7 +339,7 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
         cards.kind[i] = (Card_t)clist[i];
     }
 
-    return cards.CardsStable(cards);
+    return cards.can_hu(cards);
 }
 
 void NetRRound::task_check(unsigned int flag)
@@ -352,9 +352,9 @@ int NetRRound::hu_check(CARD_KIND newCard)
 {
     SmartList cards(*_cardInHand);
     cards.len--;                     /*the last should not be included*/
-    cards._Insert((Card_t)newCard);  /*the last inserted in order*/
+    cards.insert((Card_t)newCard);   /*the last inserted in order*/
 
-    return cards.CardsStable();
+    return cards.can_hu();
 }
 
 void NetRRound::load(const SmartList &input,CARD_KIND output[]) {
@@ -371,11 +371,11 @@ bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist
         cards.kind[i] = _cardInHand->at(_cardInHand->active_place+i)->kind;
     }
 
-    cards._Displace(index-_cardInHand->active_place,(Card_t)kind);
+    cards.displace(index-_cardInHand->active_place,(Card_t)kind);
 
     load(cards,rlist);
 
-    return cards.CardsStable();
+    return cards.can_hu();
 }
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
@@ -386,8 +386,8 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		for(int i=0;i<newCards.len;i++) {
 			for(int k=ck_YI_TIAO;k<=BAI;k++) {
                 SmartList remain(*_cardInHand);
-                remain._Displace(i,(Card_t)k);
-				if(remain.CardsStable()) {
+                remain.displace(i,(Card_t)k);
+				if(remain.can_hu()) {
 					return true;
                 }
 			}
@@ -404,8 +404,8 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
         
 		for(int k=ck_YI_TIAO;k<=BAI;k++) {
             SmartList remain(*_cardInHand);
-            remain._Displace(index,(Card_t)k);
-            if(remain.CardsStable()) {
+            remain.displace(index,(Card_t)k);
+            if(remain.can_hu()) {
                 return true;
             }
 		}

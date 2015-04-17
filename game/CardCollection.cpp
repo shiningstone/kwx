@@ -361,8 +361,8 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
         }
 
         int deletes[] = {Pos4,Pos6};
-        remain._Remove(2,deletes);
-        if(remain.CardsStable()) {
+        remain.remove(2,deletes);
+        if(remain.can_hu()) {
             return true;
         }
     }
@@ -469,94 +469,6 @@ void CardInHand::get_statistics(Card_t huKind) const {
 }
 
 /***************************************************
-    to be removed
-***************************************************/
-bool CardInHand::pattern_match(const SmartList &cards) const{
-	int zhong_num=0;
-	int fa_num=0;
-	int bai_num=0;
-    
-	for(int i=0;i<cards.len;i++) {
-		if(cards.kind[i]==ZHONG)
-			zhong_num++;
-		if(cards.kind[i]==FA)
-			fa_num++;
-		if(cards.kind[i]==BAI)
-			bai_num++;
-	}
-
-    if(zhong_num==1 ||fa_num==1 || bai_num == 1 ) {
-		return false;
-    } else if(fa_num==2 && bai_num==2 && zhong_num==2 && cards.len!=12) {
-        return false;
-    }
-    
-	int i=0;
-
-	while(i<cards.len)
-	{
-		if(cards.len-i>=3)
-		{
-			if( cards.kind[i+2]==cards.kind[i] && cards.kind[i+1]==cards.kind[i] ||
-			(cards.kind[i+2]==cards.kind[i]+2 && cards.kind[i+1]==cards.kind[i]+1)&&(cards.kind[i+2]/9==cards.kind[i]/9 && cards.kind[i+2]/9==cards.kind[i+1]/9) )
-				i += 3;
-			else if(cards.len-i>=6)
-			{
-				if( (cards.kind[i+1]/9==cards.kind[i]/9 && cards.kind[i+2]/9==cards.kind[i]/9 &&
-					cards.kind[i+3]/9==cards.kind[i]/9 && cards.kind[i+4]/9==cards.kind[i]/9 && cards.kind[i+5]/9==cards.kind[i]/9)
-				&&( ( cards.kind[i+1]==cards.kind[i]+1 && cards.kind[i+2]==cards.kind[i]+1 &&
-				cards.kind[i+3]==cards.kind[i]+2 && cards.kind[i+4]==cards.kind[i]+2 && cards.kind[i+5]==cards.kind[i]+3 ) ||
-					( cards.kind[i+1]==cards.kind[i]+1 && cards.kind[i+2]==cards.kind[i]+1 &&
-				cards.kind[i+3]==cards.kind[i]+1 && cards.kind[i+4]==cards.kind[i]+1 && cards.kind[i+5]==cards.kind[i]+2) ||
-					( cards.kind[i+1]==cards.kind[i] && cards.kind[i+2]==cards.kind[i]+1 &&
-				cards.kind[i+3]==cards.kind[i]+1 && cards.kind[i+4]==cards.kind[i]+2 && cards.kind[i+5]==cards.kind[i]+2) ) )
-					i += 6;
-				else if(cards.len-i>=9)
-				{
-					if( (cards.kind[i]/9==cards.kind[i+1]/9&&cards.kind[i]/9==cards.kind[i+2]/9&&cards.kind[i]/9==cards.kind[i+3]/9&&
-					cards.kind[i]/9==cards.kind[i+4]/9&&cards.kind[i]/9==cards.kind[i+5]/9&&cards.kind[i]/9==cards.kind[i+7]/9 && cards.kind[i]/9==cards.kind[i+8]/9)
-						&&( cards.kind[i+1]==cards.kind[i]+1 && cards.kind[i+2]==cards.kind[i]+1 && cards.kind[i+3]==cards.kind[i]+1 &&
-					cards.kind[i+4]==cards.kind[i]+2 && cards.kind[i+5]==cards.kind[i]+2 && cards.kind[i+6]==cards.kind[i]+2  &&
-					cards.kind[i+7]==cards.kind[i]+3 && cards.kind[i+8]==cards.kind[i]+3 || cards.kind[i+1]==cards.kind[i] &&
-					cards.kind[i+2]==cards.kind[i]+1 && cards.kind[i+3]==cards.kind[i]+1 && cards.kind[i+4]==cards.kind[i]+1 &&
-					cards.kind[i+5]==cards.kind[i]+2 && cards.kind[i+6]==cards.kind[i]+2 && cards.kind[i+7]==cards.kind[i]+2 && cards.kind[i+8]==cards.kind[i]+3) )
-						i += 9;
-					else if(cards.len-i==12)
-					{
-						if(  (cards.kind[i]/9==cards.kind[i+1]/9&&cards.kind[i]/9==cards.kind[i+2]/9&&cards.kind[i]/9==cards.kind[i+3]/9&&
-						cards.kind[i]/9==cards.kind[i+4]/9&&cards.kind[i]/9==cards.kind[i+5]/9&&cards.kind[i]/9==cards.kind[i+7]/9 && 
-						cards.kind[i]/9==cards.kind[i+8]/9&&cards.kind[i]/9==cards.kind[i+9]/9&&cards.kind[i]/9==cards.kind[i+10]/9&&cards.kind[i]/9==cards.kind[i+11]/9)
-							&&(cards.kind[i+1]==cards.kind[i] && cards.kind[i+2]==cards.kind[i]+1 && cards.kind[i+3]==cards.kind[i]+1 &&
-						cards.kind[i+4]==cards.kind[i]+1 && cards.kind[i+5]==cards.kind[i]+1 && cards.kind[i+6]==cards.kind[i]+2  &&
-						cards.kind[i+7]==cards.kind[i]+2 && cards.kind[i+8]==cards.kind[i]+2 && cards.kind[i+9]==cards.kind[i]+2  &&
-						cards.kind[i+10]==cards.kind[i]+3 && cards.kind[i+11]==cards.kind[i]+3) || (cards.kind[i+1]==cards.kind[i] &&
-						cards.kind[i+2]==cards.kind[i+3] && cards.kind[i+4]==cards.kind[i+5] && cards.kind[i+6]==cards.kind[i+7] &&
-						cards.kind[i+8]==cards.kind[i+9] && cards.kind[i+10]==cards.kind[i+11]) )
-							i +=12;
-						else
-							break;
-					}
-					else
-						break;
-				}
-				else
-					break;
-			}
-			else
-				break;
-		}
-		else
-			break;
-	}
-
-	if(i==cards.len) {
-		return true;
-    } else {
-        return false;
-    }
-}
-
-/***************************************************
         effect
 ***************************************************/
 void CardInHand::add_effect_card() {
@@ -656,7 +568,21 @@ bool SmartList::_IsCharDismatched() const {
     }
 }
 
-void SmartList::_Remove(int deleteNum,int deletes[]) {
+void SmartList::displace(int changeIdx, Card_t card) {
+    kind[changeIdx] = card;
+
+    for(int i=0;i<len;i++) {
+        for(int j=i+1;j<len;j++) {
+            if(kind[j]<kind[i]) {
+                Card_t temp   = kind[i];
+                kind[i] = kind[j];
+                kind[j] = temp;
+            }
+        }
+    }
+}
+
+void SmartList::remove(int deleteNum,int deletes[]) {
 	int deleteIdx = 0;
     int idx = 0;
     
@@ -672,24 +598,7 @@ void SmartList::_Remove(int deleteNum,int deletes[]) {
 	len -= deleteNum;
 }
 
-void SmartList::_Displace(int changeIdx, Card_t card) {
-    kind[changeIdx] = card;
-    _Order();
-}
-
-void SmartList::_Order() {
-	for(int i=0;i<len;i++) {
-		for(int j=i+1;j<len;j++) {
-			if(kind[j]<kind[i]) {
-                Card_t temp   = kind[i];
-				kind[i] = kind[j];
-				kind[j] = temp;
-			}
-		}
-	}
-}
-
-void SmartList::_Insert(Card_t newCard) {
+void SmartList::insert(Card_t newCard) {
     for(int i=len;i>=0;i--) {
         if(newCard<kind[i]) {
             kind[i] = kind[i-1];
@@ -702,7 +611,7 @@ void SmartList::_Insert(Card_t newCard) {
     len++;
 }
 
-bool SmartList::PatternMatch() const {
+bool SmartList::_PatternMatch() const {
     if(_IsCharDismatched()) {
         return false;
     } else if(_GetContinuousCoupleNum()==6) {
@@ -715,18 +624,18 @@ bool SmartList::PatternMatch() const {
                 SmartList subList(remainCards);
 
                 int deletes[] = {0,1,2};
-                subList._Remove(3,deletes);
+                subList.remove(3,deletes);
                 
-                if( subList.PatternMatch() ) {
+                if( subList._PatternMatch() ) {
                     return true;
                 }
             }
 
             int seqIdx[3];
             if(remainCards._IsFirstInGroupSequence(seqIdx)) {
-                remainCards._Remove(3,seqIdx);
+                remainCards.remove(3,seqIdx);
                 
-                return remainCards.PatternMatch();
+                return remainCards._PatternMatch();
             } else {
                 return false;
             }
@@ -737,7 +646,7 @@ bool SmartList::PatternMatch() const {
 }
 
 /*BUG???: cards_stable 如果有一组三个或者四个，被删掉就胡不了*/
-bool SmartList::CardsStable() const {
+bool SmartList::can_hu() const {
 	int i=0;
     
 	while(i<len-1) {
@@ -745,8 +654,8 @@ bool SmartList::CardsStable() const {
             int deletes[] = {i,i+1};
 
             SmartList remainCards(*this);
-			remainCards._Remove(2,deletes);
-            if(remainCards.PatternMatch()) {
+			remainCards.remove(2,deletes);
+            if(remainCards._PatternMatch()) {
 				return true;
             } else {
                 i += 2;

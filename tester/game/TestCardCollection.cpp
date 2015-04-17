@@ -32,7 +32,7 @@ void TestSmartList::Load(Card_t first,...) {
 }
 
 bool TestSmartList::Match() {
-    bool result = PatternMatch();
+    bool result = _PatternMatch();
     if(result) {
         printf("match    : ");
     } else {
@@ -75,7 +75,7 @@ void test_remove() {
 	exp.Load(TIAO_2,TIAO_4,TIAO_6,CARDS_END);
     cards.Load(TIAO_1,TIAO_2,TIAO_3,TIAO_4,TIAO_5,TIAO_6,CARDS_END);
 
-    cards._Remove(3,deletes);
+    cards.remove(3,deletes);
     assert( cards.Equals(exp) );
 
 	exp.Load(TIAO_1,TIAO_5,TIAO_6,CARDS_END);
@@ -84,7 +84,7 @@ void test_remove() {
 	deletes[0] = 1;
 	deletes[1] = 2;
 	deletes[2] = 3;
-    cards._Remove(3,deletes);
+    cards.remove(3,deletes);
     assert( cards.Equals(exp) );
 
 }

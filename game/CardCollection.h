@@ -86,8 +86,6 @@ public:
     bool IsKaWuXing(Card_t kind)const;
     void get_statistics(Card_t huKind)const;
     
-    /*to be removed*/
-    bool pattern_match(const SmartList &cards) const;
     /***************************************************
             effect
     ***************************************************/
@@ -115,20 +113,20 @@ public:
     SmartList(const SmartList &orig);
     SmartList(const CardInHand &cards);
     
+	void remove(int num,int deletes[]);
+    void insert(Card_t kind);
+    void displace(int changeIdx, Card_t kind);
+    bool can_hu()const;
+
+    Card_t  kind[18];
+    int     len;
+    
+protected:
     bool _IsFirstInGroupSame() const ;
     bool _IsFirstInGroupSequence(int seqIdx[3]) const ;
     bool _IsCharDismatched() const;
     int  _GetContinuousCoupleNum() const;
-    bool PatternMatch() const;
-    bool CardsStable()const;
-
-	void _Remove(int num,int deletes[]);
-    void _Displace(int changeIdx, Card_t kind);
-    void _Order();
-    void _Insert(Card_t kind);
-
-    Card_t  kind[18];
-    int     len;
+    bool _PatternMatch() const;
 };
 
 #endif
