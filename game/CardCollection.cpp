@@ -599,11 +599,17 @@ bool SmartList::_IsFirstInGroupSame() const  {
     }
 }
 
-bool SmartList::_IsFirstInGroupSequence() const  {
+bool SmartList::_IsFirstInGroupSequence(int seqIdx[3]) const  {
     for(int i=1;i<len;i++) {
+        int seqNum = 0;
+        seqIdx[seqNum++] = 0;
+
         if((kind[i]==kind[0]+1) && (kind[i]/9==kind[0]/9)) {
+            seqIdx[seqNum++] = i;
+
             for(int j=i+1;j<len;j++) {
                 if((kind[j]==kind[0]+2) && (kind[j]/9==kind[0]/9)) {
+                    seqIdx[seqNum++] = j;
                     return true;
                 }
             }
@@ -647,33 +653,6 @@ bool SmartList::_IsCharDismatched() const {
         return true;
     } else {
         return false;
-    }
-}
-
-void SmartList::_Remove3Same() {
-    len -= 3;
-    memcpy(kind,&(kind[3]),len);
-}
-
-void SmartList::_Remove3Sequence() {
-    for(int i=1;i<len;i++) {
-        if((kind[i]==kind[0]+1) && (kind[i]/9==kind[0]/9)) {
-            for(int j=i+1;j<len;j++) {
-                if((kind[j]==kind[0]+2) && (kind[j]/9==kind[0]/9)) {
-                    int idx = 0;
-
-                    for(int k=0;k<len;k++) {
-                        if(k==0 || k==i || k==j) {
-                            continue;
-                        } else {
-                            kind[idx++] = kind[k];
-                        }
-                    }
-                    len -= 3;
-					return ;
-                }
-            }
-        }
     }
 }
 
@@ -734,15 +713,19 @@ bool SmartList::PatternMatch() const {
         while(remainCards.len>0) {
             if(remainCards._IsFirstInGroupSame()) {
                 SmartList subList(remainCards);
+
+                int deletes[] = {0,1,2};
+                subList._Remove(3,deletes);
                 
-                subList._Remove3Same();
                 if( subList.PatternMatch() ) {
                     return true;
                 }
             }
-        
-            if(remainCards._IsFirstInGroupSequence()) {
-                remainCards._Remove3Sequence();
+
+            int seqIdx[3];
+            if(remainCards._IsFirstInGroupSequence(seqIdx)) {
+                remainCards._Remove(3,seqIdx);
+                
                 return remainCards.PatternMatch();
             } else {
                 return false;

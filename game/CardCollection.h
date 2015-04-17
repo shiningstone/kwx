@@ -116,15 +116,13 @@ public:
     SmartList(const CardInHand &cards);
     
     bool _IsFirstInGroupSame() const ;
-    bool _IsFirstInGroupSequence() const ;
+    bool _IsFirstInGroupSequence(int seqIdx[3]) const ;
     bool _IsCharDismatched() const;
     int  _GetContinuousCoupleNum() const;
     bool PatternMatch() const;
     bool CardsStable()const;
 
 	void _Remove(int num,int deletes[]);
-    void _Remove3Same();
-    void _Remove3Sequence();
     void _Displace(int changeIdx, Card_t kind);
     void _Order();
     void _Insert(Card_t kind);
