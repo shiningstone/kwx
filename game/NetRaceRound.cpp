@@ -437,56 +437,66 @@ void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 unsigned int NetRRound::ming_check()
 {
 	unsigned int res =0;
-	CARD_KIND cur_card/*,last_card*/;
-	int active_len=_cardInHand->size()-_cardInHand->active_place;
-	int index=_cardInHand->active_place;
-	CARD_KIND temp_list[MAX_HANDIN_NUM];
-	CARD_KIND last_card=ck_NOT_DEFINED;
-	memset(temp_list,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
-	//memset(hu_NumForEveryCard,0,sizeof(int)*MAX_HANDIN_NUM);
-	int m=0;
+
 	hu_places_num=0;
 	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
 	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
 	memset(huTiemsForEveryOne,0,sizeof(int)*MAX_HANDIN_NUM*9);
-	for(int i=index;i<_cardInHand->size();i++)
+
+    CARD_KIND last_card=ck_NOT_DEFINED;
+
+	for(int i=_cardInHand->active_place;i<_cardInHand->size();i++)
 	{
-		m=0;
-		if(_cardInHand->get_status(i)==sMING_KOU)
+		if(_cardInHand->get_status(i)==sMING_KOU) {
 			continue;
-		cur_card=(CARD_KIND)_cardInHand->get_kind(i);
-		if(last_card==cur_card)
-		{
-			res |= ( ( res&( 1<<(i-1) ) )<<1 );
-			hu_cards_num[i]=hu_cards_num[i-1];
-			memcpy(hu_cards[i],hu_cards[i-1],sizeof(CARD_KIND)*9);
-			memcpy(huTiemsForEveryOne[i],huTiemsForEveryOne[i-1],sizeof(int)*9);
-			continue;
-		}
-		for(int k=ck_YI_TIAO;k<=BAI;k++)
-		{
-			if(ting_check(i,cur_card,k,temp_list))
-			{
-				res |= (1<<i);
-				hu_cards[i][m]=CARD_KIND(k);
-				hu_cards_num[i]++;
-				int s_core=cal_times(CARD_KIND(k),temp_list,_cardInHand->size()-_cardInHand->active_place);
-				for(int s_l=0;s_l<_cardInHand->active_place;s_l++)
-					if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG)
-					{
-						s_core *= 2;
-						break;
-					}
-				huTiemsForEveryOne[i][m++]=s_core;
-			}
-		}
-		last_card=cur_card;
+        } else {
+            CARD_KIND cur_card = (CARD_KIND)_cardInHand->get_kind(i);;
+            
+            if(cur_card==last_card)
+            {
+                res |= ( ( res&( 1<<(i-1) ) )<<1 );
+
+                hu_cards_num[i]=hu_cards_num[i-1];
+                
+                memcpy(hu_cards[i],hu_cards[i-1],sizeof(CARD_KIND)*9);
+                memcpy(huTiemsForEveryOne[i],huTiemsForEveryOne[i-1],sizeof(int)*9);
+            } else {
+                int huKindIdx = 0;
+                
+                for(int k=0;k<CARD_KIND_MAX;k++) {
+                    CARD_KIND temp_list[MAX_HANDIN_NUM];
+                    memset(temp_list,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
+
+                    if(ting_check(i,cur_card,k,temp_list)) {
+                        res |= (1<<i);
+                        hu_cards[i][huKindIdx]=CARD_KIND(k);
+                        hu_cards_num[i]++;
+                        
+                        int s_core=cal_times(CARD_KIND(k),temp_list,_cardInHand->size()-_cardInHand->active_place);
+
+                        for(int s_l=0;s_l<_cardInHand->active_place;s_l++) {
+                            if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
+                                s_core *= 2;
+                                break;
+                            }
+                        }
+
+                        huTiemsForEveryOne[i][huKindIdx++]=s_core;
+                    }
+                }
+                
+                last_card = cur_card;
+            }
+        }
 	}
+    
 	for(int i=0;i<MAX_HANDIN_NUM;i++)
 		if(res&(1<<i))
 			hu_places_num++;
-	hu_places=res;
-	return res;
+
+    hu_places=res;
+
+    return res;
 }
 
 unsigned char NetRRound::init(int card_array[],int len,int aim)
