@@ -77,7 +77,6 @@ public:
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
 
-    SmartList CardInHand::_CreateFreeList() const;
     SmartList _Remove(Card_t kouKind) const;
 
     void cancel_ming();
@@ -108,26 +107,31 @@ private:
     KouCards_t _bufKouCards;
 };
 
+/***************************************************
+        SmartList: for card kind judge
+***************************************************/
 class SmartList {
 public:
     SmartList();
     SmartList(const SmartList &orig);
-    SmartList(const CardInHand &cards);
+    SmartList(const CardInHand &cards,bool onlyFree=false);
     
 	void remove(int num,int deletes[]);
     void insert(Card_t kind);
     void displace(int changeIdx, Card_t kind);
     bool can_hu()const;
 
+protected:
     Card_t  kind[18];
     int     len;
 
-protected:
     bool _IsFirstInGroupSame() const ;
     bool _IsFirstInGroupSequence(int seqIdx[3]) const ;
     bool _IsCharDismatched() const;
     int  _GetContinuousCoupleNum() const;
     bool _PatternMatch() const;
+
+    friend class TestSmartList;
 };
 
 #endif

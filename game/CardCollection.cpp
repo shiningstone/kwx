@@ -313,22 +313,13 @@ void CardInHand::switch_group_status(int gIdx) {
     }
 }
 
-SmartList CardInHand::_CreateFreeList() const {
-    SmartList  freeCards;
-    
-	for(int i=active_place;i<size();i++) {
-        freeCards.kind[freeCards.len++] = get_kind(i);
-    }
-
-    return freeCards;
-}
-
 SmartList CardInHand::_Remove(Card_t kouKind) const {
     int kouIdx[4];
     FindCards(kouIdx,kouKind);
 
-    SmartList  freeCards = _CreateFreeList();
-	freeCards.remove(3,kouIdx);
+    SmartList  freeCards(*this,true);
+
+    freeCards.remove(3,kouIdx);
     return freeCards;
 }
 
@@ -356,7 +347,8 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
     if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
         int deletes[] = {Pos4,Pos6};
 
-        SmartList freeCards = _CreateFreeList();
+        SmartList freeCards(*this,true);
+        
         freeCards.remove(2,deletes);
         if(freeCards.can_hu()) {
             return true;
@@ -483,19 +475,21 @@ SmartList::SmartList() {
     len = 0;
 }
 
-SmartList::SmartList(const CardInHand &cards) {
-    len = cards.size();
+SmartList::SmartList(const CardInHand &cards,bool onlyFree) {
+	len = 0;
 
-    for(int i=0;i<len;i++) {
-        kind[i] = cards.at(i)->kind;
+    int start = onlyFree?(cards.active_place):0;
+    
+    for(int i=start;i<cards.size();i++) {
+        kind[len++] = cards.at(i)->kind;
     }
 }
 
 SmartList::SmartList(const SmartList &orig) {
-    len = orig.len;
+	len = 0;
 
-    for(int i=0;i<len;i++) {
-        kind[i] = orig.kind[i];
+    for(int i=0;i<orig.len;i++) {
+        kind[len++] = orig.kind[i];
     }
 }
 
