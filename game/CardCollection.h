@@ -83,7 +83,6 @@ public:
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
-    void _Remove(SmartList &cards,int idx1,int idx2) const;
     bool IsKaWuXing(Card_t kind)const;
     void get_statistics(Card_t huKind)const;
     
@@ -123,9 +122,9 @@ public:
     bool PatternMatch() const;
     bool CardsStable()const;
 
+	void _Remove(int num,int deletes[]);
     void _Remove3Same();
     void _Remove3Sequence();
-    void _Remove(int idx1,int idx2);
     void _Displace(int changeIdx, Card_t kind);
     void _Order();
     void _Insert(Card_t kind);

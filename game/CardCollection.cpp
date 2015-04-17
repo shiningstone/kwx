@@ -314,7 +314,7 @@ void CardInHand::switch_group_status(int gIdx) {
 }
 
 SmartList CardInHand::_Remove(Card_t kouKind) const {
-    SmartList remainCards;
+    SmartList  remainCards;
 	int        match  = 0;
     
     remainCards.len = 0;
@@ -342,20 +342,6 @@ void CardInHand::cancel_ming() {
         SmartList logic
 ***************************************************/
 
-void CardInHand::_Remove(SmartList &cards,int idx1,int idx2) const {
-    int idx = 0;
-    for(int i=0;i<cards.len;i++) {
-        if(i==idx1 || i==idx2) {
-            continue;
-        } else {
-            cards.kind[idx] = cards.kind[i];
-            idx++;
-        }
-    }
-
-    cards.len -= 2;
-}
-
 bool CardInHand::IsKaWuXing(Card_t kind) const {
     int Pos4   = INVALID;
     int Pos6   = INVALID;
@@ -373,8 +359,9 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
         for(int i=0;i<remain.len;i++) {
             remain.kind[i] = get_kind(active_place+i);
         }
-        
-        _Remove(remain,Pos4,Pos6);
+
+        int deletes[] = {Pos4,Pos6};
+        remain._Remove(2,deletes);
         if(remain.CardsStable()) {
             return true;
         }
@@ -462,6 +449,7 @@ void CardInHand::get_statistics(Card_t huKind) const {
                 if(get_kind(j)==get_kind(i)) {
                     sameCount++;
                 }
+                    
             }
             
             if(sameCount==4) {
@@ -689,19 +677,20 @@ void SmartList::_Remove3Sequence() {
     }
 }
 
-void SmartList::_Remove(int idx1,int idx2) {
+void SmartList::_Remove(int deleteNum,int deletes[]) {
+	int deleteIdx = 0;
     int idx = 0;
     
     for(int i=0;i<len;i++) {
-        if(i==idx1 || i==idx2) {
-            continue;
+        if(i==deletes[deleteIdx]) {
+            deleteIdx++;
         } else {
             kind[idx] = kind[i];
             idx++;
         }
     }
 
-    len -= 2;
+	len -= deleteNum;
 }
 
 void SmartList::_Displace(int changeIdx, Card_t card) {
@@ -770,9 +759,10 @@ bool SmartList::CardsStable() const {
     
 	while(i<len-1) {
 		if(	kind[i]==kind[i+1] ) {
-            SmartList remainCards(*this);
+            int deletes[] = {i,i+1};
 
-			remainCards._Remove(i,i+1);
+            SmartList remainCards(*this);
+			remainCards._Remove(2,deletes);
             if(remainCards.PatternMatch()) {
 				return true;
             } else {

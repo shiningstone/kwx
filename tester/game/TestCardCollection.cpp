@@ -7,45 +7,40 @@
 /**********************************
     support
 **********************************/
-class TestSmartList : public CardInHand {
+class TestSmartList : public SmartList {
 public:
     void Load(Card_t first,...);
     bool Match();
-private:
-    SmartList _sample;
+	bool Equals(const SmartList &exp);
 };
 
 #define CARDS_END CARD_UNKNOWN
 
 void TestSmartList::Load(Card_t first,...) {
-    SmartList cards;
-    cards.len = 0;
-    cards.kind[cards.len] = first;
-    cards.len++;
+    kind[0] = first;
+    len = 1;
     
     Card_t card;
 
     va_list args;
     va_start(args,first);
     while ((card = va_arg(args, Card_t)) != CARDS_END) {
-        cards.kind[cards.len] = card;
-        cards.len++;
+        kind[len] = card;
+        len++;
     }
     va_end(args);
-
-    _sample = cards;
 }
 
 bool TestSmartList::Match() {
-    bool result = _sample.PatternMatch();
+    bool result = PatternMatch();
     if(result) {
         printf("match    : ");
     } else {
         printf("dismatch : ");
     }
 
-	for(int i=0;i<_sample.len;i++) {
-		printf("%02d ",_sample.kind[i]);
+	for(int i=0;i<len;i++) {
+		printf("%02d ",kind[i]);
 	}
 
     printf("\n");
@@ -53,9 +48,47 @@ bool TestSmartList::Match() {
     return result;
 }
 
+bool TestSmartList::Equals(const SmartList &exp) {
+	if(len==exp.len) {
+		for(int i=0;i<exp.len;i++) {
+			if(kind[i]!=exp.kind[i]) {
+				return false;
+			}	
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 /**********************************
     testcases
 **********************************/
+void test_remove() {
+    TestSmartList cards;
+    TestSmartList exp;
+
+	int i = 0;
+	int deletes[] = {i,i+2,i+4};
+
+	exp.Load(TIAO_2,TIAO_4,TIAO_6,CARDS_END);
+    cards.Load(TIAO_1,TIAO_2,TIAO_3,TIAO_4,TIAO_5,TIAO_6,CARDS_END);
+
+    cards._Remove(3,deletes);
+    assert( cards.Equals(exp) );
+
+	exp.Load(TIAO_1,TIAO_5,TIAO_6,CARDS_END);
+    cards.Load(TIAO_1,TIAO_2,TIAO_3,TIAO_4,TIAO_5,TIAO_6,CARDS_END);
+
+	deletes[0] = 1;
+	deletes[1] = 2;
+	deletes[2] = 3;
+    cards._Remove(3,deletes);
+    assert( cards.Equals(exp) );
+
+}
+
 void test_pattern_match() {
     TestSmartList cards;
 
@@ -128,5 +161,6 @@ void test_card_list() {
 	list.push_back(TIAO_2);
 	list.show();
 
+	test_remove();
     test_pattern_match();
 }
