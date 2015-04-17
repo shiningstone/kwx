@@ -60,10 +60,15 @@ int SeatInfo::Set(RoomPath_t path,RoomId_t room,TableId_t table,SeatId_t seat) {
     _roomPath = path;
     _roomId   = room;
     _tableId  = table;
-    _seatId   = seat;
-    
-    _SetSeatDirMap();
 
+    Set(seat);
+
+    return 0;
+}
+
+int SeatInfo::Set(SeatId_t seat) {
+    _seatId   = seat;
+    _SetSeatDirMap();
     return 0;
 }
 

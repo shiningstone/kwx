@@ -138,6 +138,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_BEGINCARDS:
             _DiRecv((FirstDistZhuang *)di);
             break;
+        case REQ_GAME_DIST_BEGINCARDS_OTHER:
+            _DiRecv((FirstDistNonZhuang *)di);
+            break;
         case REQ_GAME_DIST_CARD_TOOTHER:
             _DiRecv((DistCardNotif *)di);
             break;
@@ -193,13 +196,36 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     INT8U timer     = info->timer;
     _actionToDo     = GetAvailActions(info->remind.actionNum, info->remind.actions);
     delete info;
-    
+
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
 	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
     _uiManager->UpdateClock(timer,MIDDLE);
+}
+
+void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
+    _uiManager->GuiHideReady();
+
+    int cards[13];
+    for(int i=0;i<13;i++) {
+        cards[i] = info->cards[i]*4;
+    }
+    PlayerDir_t me     = (PlayerDir_t)info->seat;
+    PlayerDir_t zhuang = (PlayerDir_t)info->zhuang;
+    INT8U timer        = info->timer;
+    delete info;
+
+    _curPlayer = zhuang;
+    PlayerDir_t other  = (zhuang==LEFT)?RIGHT:LEFT;
+    
+    _players[zhuang]->init(&(_unDistributedCards[0]),14,aim[zhuang]);//玩家手牌初始�?
+    _players[MIDDLE]->init(cards,13,aim[MIDDLE]);
+    _players[other]->init(&(_unDistributedCards[27]),13,aim[other]);
+
+	_uiManager->FirstRoundDistributeEffect(zhuang);//牌局开始发牌效果�?
+    _uiManager->UpdateClock(timer,_curPlayer);
 }
 
 void NetRoundManager::_DiRecv(DistCardNotif *info) {

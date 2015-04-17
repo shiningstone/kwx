@@ -48,9 +48,10 @@ PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
     if( dir<LEFT || dir>RIGHT ) {
         return INVALID_DIR;
     } else {
-        return _seatInfo->GetPlayer(seat);
+        return dir;
     }
 }
+
 /*****************************************************
     Concrete classes
 *****************************************************/

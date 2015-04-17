@@ -41,6 +41,7 @@ public:
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);
     void _DiRecv(FirstDistZhuang *info);
+    void _DiRecv(FirstDistNonZhuang *info);
     void _DiRecv(DistCardNotif *info);
     void _DiRecv(DistCardInfo *info);
     void _DiRecv(ShowCardResponse *info);

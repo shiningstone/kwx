@@ -410,6 +410,20 @@ void round2_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void round3_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[512] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -455,13 +469,16 @@ void test_server_console() {
 
     SetFile("Round1");
     gHandle = round1_handle_requests;
-    test_smart_game_round_x();
 
-
-    #endif
-    
     SetFile("Round2");
     gHandle = round2_handle_requests;
+
+    #endif
+
+    /* 本机非庄家 */
+    SetFile("Round3");
+    gHandle = round3_handle_requests;
+
     test_smart_game_round_x();
 #endif
 }

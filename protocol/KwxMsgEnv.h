@@ -39,6 +39,7 @@ public:
 
     static SeatInfo *getInstance(int threadInfo=0);
     int Set(RoomPath_t path,RoomId_t room,TableId_t table,SeatId_t seat);
+    int Set(SeatId_t seat);
 
     PlayerDir_t GetPlayer(SeatId_t seat) const;
     SeatId_t    GetSeatId(PlayerDir_t dir) const;
