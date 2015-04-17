@@ -339,7 +339,7 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
         cards.kind[i] = (Card_t)clist[i];
     }
 
-    return cards.can_hu(cards);
+    return cards.can_hu();
 }
 
 void NetRRound::task_check(unsigned int flag)

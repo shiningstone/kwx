@@ -131,6 +131,7 @@ protected:
     int  _GetContinuousCoupleNum() const;
     bool _PatternMatch() const;
 
+    friend class NetRRound;       /*temporary*/
     friend class TestSmartList;
 };
 
