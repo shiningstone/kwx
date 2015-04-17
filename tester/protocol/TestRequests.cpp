@@ -919,30 +919,44 @@ public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x00,50,               //request code
+            0x00,44,               //request code
             7,                     //package level
-            0x00,28,               //package size
+            0x00,67,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            1,
-            131,0,4,1,2,0,3,        //ting info : ºú2Ìõ£¬Ê£2ÕÅ£¬Ó®3·¬
+            9,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                    //site:    1
+            134,0,4,0,0,0,1,         //µ×·Ö base score
+            135,0,3,1,1,1,           //player status
+            136,0,12,                //player score
+                0,0,0,100,
+                0,0,0,200,
+                0,0,0,300,
+            137,0,3,0,1,2,           //player name, UTF-16
+            138,0,3,0,1,2            //player image, UTF-16
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
         DsMsg *aMsg = DsMsg::getInstance();
-        TingInfoResponse ting;
+        EnterRoomResponse room;
 
         len = aMsg->Deserialize(msgInNetwork);
-        ting.Construct(*aMsg);
+        room.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
-        assert( aMsg->GetRequestCode()==REQ_GAME_GET_TINGINFO );
+        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ENTER );
         assert( aMsg->GetLevel()==7 );
-        assert( ting.info.cards[0].kind==TIAO_2);
-        assert( ting.info.cards[0].remain==2 );
-        assert( ting.info.cards[0].fan==3 );
 
+        SeatInfo *seat = SeatInfo::getInstance();
+        assert(seat->_roomPath==0x00010203);
+        assert(seat->_roomId==0x04050607);
+        assert(seat->_tableId==0x08090a0b);
+        assert(seat->_seatId==1);
+        
         return 0;
     }
 };

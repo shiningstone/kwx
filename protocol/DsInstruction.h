@@ -176,5 +176,28 @@ public:
     TingInfo_t       info;
 };
 
+
+
+
+class EnterRoomResponse : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+private:    
+    RoomPath_t       roomPath;
+    RoomId_t         roomId;
+    TableId_t        tableId;
+    SeatId_t         seat;
+    
+    int loadFromUtf16(INT8U *buf,const INT8U *input);
+public:    
+    INT32U           baseScore;
+
+    int              playerNum;
+    bool             status[3];
+    INT32U           score[3];
+    INT8U            name[3][128];
+    INT8U            image[3][128];    
+};
+
 #endif
 

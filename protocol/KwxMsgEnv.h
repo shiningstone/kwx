@@ -48,6 +48,8 @@ public:
     PlayerDir_t GetPlayer(SeatId_t seat) const;
     SeatId_t    GetSeatId(PlayerDir_t dir) const;
 private:
+    friend class TestRecvEnterResponse;
+    
     RoomPath_t _roomPath;
     RoomId_t   _roomId;
     TableId_t  _tableId;

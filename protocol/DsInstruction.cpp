@@ -226,3 +226,31 @@ int TingInfoResponse::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int EnterRoomResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    roomPath = msg.GetItemValue(0);
+    roomId   = msg.GetItemValue(1);
+    tableId  = msg.GetItemValue(2);
+    seat     = msg.GetItemValue(3);
+    SeatInfo::getInstance()->Set(roomPath,roomId,tableId,seat);
+    
+    baseScore= msg.GetItemValue(4);
+    
+    playerNum= msg._body->_items[5]->_bufLen;
+    
+    for(int i=0;i<playerNum;i++) {
+        status[i] = msg._body->_items[5]->_buf[i];
+        score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
+        loadFromUtf16(name[i],msg._body->_items[7]->_buf);
+        loadFromUtf16(image[i],msg._body->_items[8]->_buf);
+    }
+    
+    return 0;
+}
+
+int EnterRoomResponse::loadFromUtf16(INT8U *buf,const INT8U *input) {
+    return 0;
+}
+
+
