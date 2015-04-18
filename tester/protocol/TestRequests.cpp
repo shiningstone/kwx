@@ -921,7 +921,7 @@ public:
             'K','W','X',           //KWX
             0x00,44,               //request code
             7,                     //package level
-            0x00,67,               //package size
+            0x00,84,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             9,
