@@ -41,6 +41,7 @@ typedef enum {
     REQ_GAME_DIST_BEGINCARDS    = 56,          
     REQ_GAME_DIST_BEGINCARDS_OTHER = 57,
     REQ_GAME_DIST_DECISION      = 59,
+    REQ_GAME_DIST_HU_CALCULATE  = 60,
     
     /* Downstream : other's request notifications */
     REQ_GAME_DIST_CARD_TOOTHER  = 52,
@@ -51,13 +52,9 @@ typedef enum {
     /*********************************************
         ÅÆ¾ÖÎÞ¹ØREQUEST
     *********************************************/
-    /* upstream */
     HEART_BEAT                  = 40,
     
-    /* upstream & downstream */
     REQ_GAME_SEND_ENTER         = 44,
-
-    /* downstream */
     REQ_GAME_RECV_ENTER         = 71,
     
 }RequestId_t;

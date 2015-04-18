@@ -406,6 +406,8 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
     LOGGER_WRITE("NOTE: profile of players should be updated here\n");
+    LOGGER_WRITE("Start heartbeats\n");
+    KwxHeart::getInstance();
 }
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {

@@ -816,6 +816,39 @@ public:
     }
 };
 
+class TestRecvHuInfoNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code
+            7,                     //package level
+            0x00,28,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            1,
+            131,0,4,1,2,0,3,        //ting info : ºú2Ìõ£¬Ê£2ÕÅ£¬Ó®3·¬
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        TingInfoResponse ting;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        ting.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_GET_TINGINFO );
+        assert( aMsg->GetLevel()==7 );
+        assert( ting.info.cards[0].kind==TIAO_2);
+        assert( ting.info.cards[0].remain==2 );
+        assert( ting.info.cards[0].fan==3 );
+
+        return 0;
+    }
+};
+
 void testGameActions() {
 	CTestCase *aCase;
     
@@ -874,6 +907,9 @@ void testGameActions() {
     aCase->Execute();
     
     aCase = new TestRecvTingInfoResponse();
+    aCase->Execute();
+
+    aCase = new TestRecvHuInfoNotif();
     aCase->Execute();
 }
 
