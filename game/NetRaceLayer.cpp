@@ -471,12 +471,12 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
 			if(dir!=RIGHT) {//each one lay above the previous ones
                 if(!_GetCardInHand((PlayerDir_t)dir,i)) {
-                    myframe->addChild(p_list[i],i+1,        HAND_IN_CARDS_TAG_ID+dir*20+i);
+                    _Add(myframe,p_list[i],HAND_IN_CARDS_TAG_ID+dir*20+i,i+1);
                 }
             }
 			else {//each one lay below the previous ones
                 if(!_GetCardInHand((PlayerDir_t)dir,i)) {
-    				myframe->addChild(p_list[i],list->len-i,HAND_IN_CARDS_TAG_ID+dir*20+i);
+                    _Add(myframe,p_list[i],HAND_IN_CARDS_TAG_ID+dir*20+i,list->len-i);
                 }
             }
             
@@ -6269,6 +6269,10 @@ void NetRaceLayer::_Remove(Node *parent, int childTag) {
     if(parent->getChildByTag(childTag)) {// this judgement is not necessary becaust the interface will do the same thing!!!
         parent->removeChildByTag(childTag,true);
     }
+}
+
+void NetRaceLayer::_Add(Node *parent, Node *child, int childTag,int zOrder) {
+    parent->addChild(child,zOrder,childTag);
 }
 
 void NetRaceLayer::_Show(Node *parent, int childTag, bool flag) {

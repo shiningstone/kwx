@@ -115,6 +115,7 @@ private:
 
     void _ClockAddTime( Sprite *clock, int time );
     void _Remove(Node *parent, int childTag);
+    void _Add(Node *parent, Node *child, int childTag,int zOrder);
     bool _IsClickedOn(Node* button,Touch* touch);
     void _Show(Node *parent, int childTag,bool flag);
 
