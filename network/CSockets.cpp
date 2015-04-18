@@ -38,12 +38,17 @@ void CSocket::Stop() {
 #else
 	close(_connection);
 #endif
+    _connection = INVALID_SOCKET; 
 }
 
 int CSocket::Send(char *buf,int len) {
-    int actLen = send(_connection, buf, len, 0 );
-    _log(SEND,buf,actLen);
-    return actLen;
+    if(_connection!=INVALID_SOCKET) {
+        int actLen = send(_connection, buf, len, 0 );
+        _log(SEND,buf,actLen);
+        return actLen;
+    } else {
+        return 0;
+    }
 }
 
 #include <thread>

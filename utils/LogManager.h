@@ -16,7 +16,7 @@
 #ifndef __LOG_MANAGER__
 #define __LOG_MANAGER__
 
-#define MAX_MODULES         10
+#define MAX_MODULES         64
 #define MODULE_NAME_LEN     32
 
 #define RET_OK              0

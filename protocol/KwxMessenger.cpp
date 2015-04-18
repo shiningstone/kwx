@@ -145,6 +145,7 @@ KwxHeart::KwxHeart(int second) {
 
 KwxHeart::~KwxHeart() {
     _running = false;
+    Sleep(_rate*2000);/* to make sure the last send executed successfully */
     
     _socket->Stop();
     delete _socket;
@@ -161,16 +162,36 @@ void KwxHeart::SetRate(int second) {
 }
 
 void KwxHeart::_Beats() {
-    /*while(_running)*/ {
-        INT8U buf[MSG_MAX_LEN] = {0};
-        int   len = 0;
-        
-        RequestHeartBeat aBeat;
-        aBeat.Set();
-        
-        len = aBeat.Serialize(buf);
+    INT8U buf[MSG_MAX_LEN] = {0};
+    int   len = 0;
+    
+    RequestHeartBeat aBeat;
+    aBeat.Set();
+    len = aBeat.Serialize(buf);
+
+    while(_running) {
         _socket->Send((char *)buf,len);
+
+        #ifdef WIN32
+        Sleep(_rate*1000);
+        #else
+        #endif
     }
+}
+
+KwxHeart* KwxHeart::_instance = NULL;
+
+KwxHeart *KwxHeart::getInstance(int second) {
+    if (_instance==NULL) {
+        _instance = new KwxHeart(second);
+    }
+
+    return _instance;
+}
+
+void KwxHeart::destroyInstance() {
+    delete _instance;
+    _instance = NULL;
 }
 
 int RequestHeartBeat::Set() {

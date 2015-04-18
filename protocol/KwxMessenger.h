@@ -33,16 +33,21 @@ private:
 class CSocket;
 class KwxHeart {
 public:
-    KwxHeart(int second=1);
+    static KwxHeart *getInstance(int second=1);
+    static void destroyInstance();
+
+    void SetRate(int second);
+private:
+    KwxHeart(int second);
     ~KwxHeart();
 
-    void SetRate(int second=1);
-private:
     void    _Beats();
 
     CSocket *_socket;
     int      _rate;
     bool     _running;
+
+    static KwxHeart *_instance;
 };
 
 class RequestSendAction : public UsMsg {

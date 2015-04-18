@@ -216,8 +216,58 @@ class TestHeartBeatOnce : public TestRequest {
 	}
 
 	virtual void ClientActions() {
-        KwxHeart aHeart;
-        aHeart.SetRate(1);
+        KwxHeart *aHeart = KwxHeart::getInstance();
+        Sleep(1);
+        aHeart->destroyInstance();
+    }
+};
+
+class TestHeartBeatContinuous : public TestRequest {
+    static const int EXP_RECVS = 10;
+    
+	virtual void ServerActions() {
+        INT8U msgInNetwork[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        INT8U MESSAGE[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,40,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
+            0x00,38,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            1,
+            131,0,4,1,2,3,4,         //userId
+        };
+
+        SetExpValue(MESSAGE,sizeof(MESSAGE));
+
+        int RecvCount = 0;
+        
+		SERVER.Start();
+
+		while( SERVER.Recv((char *)msgInNetwork,&len) ) {
+            if(++RecvCount>EXP_RECVS) {
+                break;
+            }
+
+            assert(len==ExpLen);
+            assert(!memcmp(msgInNetwork,ExpMessage,len));
+        }
+
+		SERVER.Stop();
+	}
+
+	virtual void ClientActions() {
+        KwxHeart *aHeart = KwxHeart::getInstance();
+        Sleep(1000*1.1*EXP_RECVS);
+        aHeart->destroyInstance();
     }
 };
 
@@ -225,6 +275,11 @@ static void testHeartBeat() {
 	CTestCase *aCase;
 
 	aCase = new TestHeartBeatOnce();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+
+    aCase = new TestHeartBeatContinuous();
 	aCase->Start();
 	aCase->Execute();
 	aCase->Stop();
