@@ -30,7 +30,20 @@ private:
     static Logger       *_logger;
 };
 
+class CSocket;
+class KwxHeart {
+public:
+    KwxHeart(int second=1);
+    ~KwxHeart();
 
+    void SetRate(int second=1);
+private:
+    void    _Beats();
+
+    CSocket *_socket;
+    int      _rate;
+    bool     _running;
+};
 
 class RequestSendAction : public UsMsg {
 public:
@@ -58,7 +71,7 @@ public:
     int Set(int id=0);
 };
 
-class HeartBeat : public UsMsg {
+class RequestHeartBeat : public UsMsg {
 public:
     int Set();
 };

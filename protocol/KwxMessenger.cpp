@@ -17,8 +17,7 @@ Logger       *KwxMessenger::_logger = 0;
 KwxMessenger::KwxMessenger() {
     _messenger = NetMessenger::getInstance();
     
-    /*如果要用StartReceiving，不能调用Start*/
-    #if 0
+   #if 0/*如果要用StartReceiving，不能调用Start*/
     _messenger->Start();
     #endif
     
@@ -127,7 +126,54 @@ int RequestEnterRoom::Set(int id) {
     return 0;
 }
 
-int HeartBeat::Set() {
+/*************************************************
+    Heart beat
+*************************************************/
+#include "./../network/CSockets.h"
+#include <thread>
+
+KwxHeart::KwxHeart(int second) {
+    _socket = new ClientSocket;
+    _socket->Start();
+
+    _rate = second;
+    _running = true;
+
+    std::thread t1(&KwxHeart::_Beats,this);
+    t1.detach();
+}
+
+KwxHeart::~KwxHeart() {
+    _running = false;
+    
+    _socket->Stop();
+    delete _socket;
+}
+
+void KwxHeart::SetRate(int second) {
+    _rate = second;
+
+    if(!_running) {
+        _running = true;
+        std::thread t1(&KwxHeart::_Beats,this);
+        t1.detach();
+    }
+}
+
+void KwxHeart::_Beats() {
+    /*while(_running)*/ {
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+        
+        RequestHeartBeat aBeat;
+        aBeat.Set();
+        
+        len = aBeat.Serialize(buf);
+        _socket->Send((char *)buf,len);
+    }
+}
+
+int RequestHeartBeat::Set() {
     SetRequestCode(HEART_BEAT);
 
     INT32U userId = _htonl(EnvVariable::getInstance()->GetUserId());

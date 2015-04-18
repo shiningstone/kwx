@@ -1020,7 +1020,7 @@ public:
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        HeartBeat aMsg;
+        RequestHeartBeat aMsg;
         aMsg.Set();
         len = aMsg.Serialize(buf);
 

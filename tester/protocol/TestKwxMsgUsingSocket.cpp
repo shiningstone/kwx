@@ -157,9 +157,13 @@ class TestSendAction : public TestRequest {
 
 	virtual void ClientActions() {
         KwxMessenger aMessenger;
+        KwxMessenger::StartReceiving();
+        
         RequestSendAction aMsg;
         aMsg.Set(aPENG,TIAO_3);
         aMessenger.Send(aMsg);
+
+        KwxMessenger::StopReceiving();
     }
 };
 
@@ -187,8 +191,48 @@ static void testAutoRecv() {
 	aCase->Stop();
 }
 
+#include "./../../protocol/KwxMessenger.h"
+class TestHeartBeatOnce : public TestRequest {
+	virtual void ServerActions() {
+        INT8U MESSAGE[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,40,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
+            0x00,38,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            1,
+            131,0,4,1,2,3,4,         //userId
+        };
+
+        SetExpValue(MESSAGE,sizeof(MESSAGE));
+        TestRequest::ServerActions();
+	}
+
+	virtual void ClientActions() {
+        KwxHeart aHeart;
+        aHeart.SetRate(1);
+    }
+};
+
+static void testHeartBeat() {
+	CTestCase *aCase;
+
+	aCase = new TestHeartBeatOnce();
+	aCase->Start();
+	aCase->Execute();
+	aCase->Stop();
+}
+
 void testKwxMsgUsingSocket() {
     testRequests();
     testAutoRecv();
+    testHeartBeat();
     //while(1);
 }
