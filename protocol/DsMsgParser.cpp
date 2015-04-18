@@ -12,6 +12,10 @@ int DsMsgParser::_load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx) {
         cards[i] = (Card_t)msg._body->_items[itemIdx]->_buf[i];
     }
 
+    if(num==1 && cards[0]==CARD_UNKNOWN) {
+        num = 0;
+    }
+
     return 0;
 }
 
