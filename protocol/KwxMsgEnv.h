@@ -16,6 +16,7 @@ public:
 	static EnvVariable *getInstance();
 
     RoomPath_t GetKey();
+    INT32U     GetUserId();
     RoomPath_t GetRoomPath(int id);
 
     

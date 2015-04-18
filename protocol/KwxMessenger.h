@@ -58,4 +58,9 @@ public:
     int Set(int id=0);
 };
 
+class HeartBeat : public UsMsg {
+public:
+    int Set();
+};
+
 #endif

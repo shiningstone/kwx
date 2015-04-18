@@ -126,3 +126,12 @@ int RequestEnterRoom::Set(int id) {
 
     return 0;
 }
+
+int HeartBeat::Set() {
+    SetRequestCode(HEART_BEAT);
+
+    INT32U userId = _htonl(EnvVariable::getInstance()->GetUserId());
+    _add_item( new Item((Item_t)131,4,(INT8U *)&userId) );
+    
+    return 0;
+}

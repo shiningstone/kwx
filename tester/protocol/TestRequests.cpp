@@ -998,6 +998,39 @@ public:
     }
 };
 
+class TestHeartBeat : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x10,                  //protocol version
+            0x01,0x02,0x03,0x04,   //user id
+            0x05,                  //language id
+            0x06,                  //client platform
+            0x07,                  //client build number
+            0x08,0x09,             //customer id
+            0x0a,0x0b,             //product id
+            0x00,40,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
+            0x00,38,               //package size
+            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+
+            1,
+            131,0,4,1,2,3,4,         //userId
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        HeartBeat aMsg;
+        aMsg.Set();
+        len = aMsg.Serialize(buf);
+
+        assert(len==sizeof(msgInNetwork));
+        assert(!memcmp(buf,msgInNetwork,len));
+
+        return 0;
+    }
+};
+
 void testOtherRequests() {
 	CTestCase *aCase;
 
@@ -1008,6 +1041,9 @@ void testOtherRequests() {
     aCase->Execute();
     
     aCase = new TestRecvEnterNotif();
+    aCase->Execute();
+    
+    aCase = new TestHeartBeat();
     aCase->Execute();
 }
 

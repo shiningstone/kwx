@@ -40,7 +40,9 @@ RoomPath_t EnvVariable::GetRoomPath(int id) {
     return 0x05060708;
 }
 
-
+INT32U EnvVariable::GetUserId() {
+    return _userId;
+}
 
 
 
