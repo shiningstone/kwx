@@ -20,4 +20,6 @@ extern int _bytes(char *buf,const char *str);
 
 typedef int (*MsgHandler_t )(const INT8U *msg,int &len);
 
+extern void _delay(int seconds);
+
 #endif

@@ -108,3 +108,12 @@ int _bytes(char *buf,const char *str) {
     return i;
 }
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+void _delay(int seconds) {
+    #ifdef WIN32
+    Sleep(seconds*1000);
+    #else
+    #endif
+}

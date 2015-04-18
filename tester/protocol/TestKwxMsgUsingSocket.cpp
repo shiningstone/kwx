@@ -223,7 +223,7 @@ class TestHeartBeatOnce : public TestRequest {
 };
 
 class TestHeartBeatContinuous : public TestRequest {
-    static const int EXP_RECVS = 10;
+    static const int EXP_RECVS = 3;
     
 	virtual void ServerActions() {
         INT8U msgInNetwork[MSG_MAX_LEN] = {0};

@@ -145,7 +145,7 @@ KwxHeart::KwxHeart(int second) {
 
 KwxHeart::~KwxHeart() {
     _running = false;
-    Sleep(_rate*2000);/* to make sure the last send executed successfully */
+    _delay(_rate*2);/* to make sure the last send executed successfully */
     
     _socket->Stop();
     delete _socket;
@@ -171,11 +171,7 @@ void KwxHeart::_Beats() {
 
     while(_running) {
         _socket->Send((char *)buf,len);
-
-        #ifdef WIN32
-        Sleep(_rate*1000);
-        #else
-        #endif
+        _delay(_rate);
     }
 }
 
