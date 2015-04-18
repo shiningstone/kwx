@@ -199,5 +199,17 @@ public:
     INT8U            image[3][128];    
 };
 
+class EnterRoomNotif : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+
+    int              seat;
+    INT32U           baseScore;
+    bool             status;
+    INT32U           score;
+    INT8U            name[128];
+    INT8U            image[128];    
+};
+
 #endif
 

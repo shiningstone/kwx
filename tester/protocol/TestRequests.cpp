@@ -961,6 +961,43 @@ public:
     }
 };
 
+class TestRecvEnterNotif : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,71,               //request code
+            7,                     //package level
+            0x00,52,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            6,
+            61,2,                    //new comer
+            131,0,4,0,0,0,1,         //µ×·Ö base score
+            61,2,                    //player status
+            131,0,4,0,0,0,1,         //player score
+            131,0,4,1,2,3,4,         //player name
+            131,0,4,5,6,7,8,         //player image
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        EnterRoomNotif player;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        player.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_RECV_ENTER );
+        assert( aMsg->GetLevel()==7 );
+
+        assert(player.seat==2);
+        
+        return 0;
+    }
+};
+
 void testOtherRequests() {
 	CTestCase *aCase;
 
@@ -968,6 +1005,9 @@ void testOtherRequests() {
     aCase->Execute();
     
     aCase = new TestRecvEnterResponse();
+    aCase->Execute();
+    
+    aCase = new TestRecvEnterNotif();
     aCase->Execute();
 }
 

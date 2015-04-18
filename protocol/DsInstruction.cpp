@@ -254,3 +254,11 @@ int EnterRoomResponse::loadFromUtf16(INT8U *buf,const INT8U *input) {
 }
 
 
+int EnterRoomNotif::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    seat     = msg.GetItemValue(0);
+    
+    return 0;
+}
+
