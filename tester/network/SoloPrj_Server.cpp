@@ -489,17 +489,17 @@ void test_server_console() {
     #if 0
     test_game_server()();
 
+    SetFile("Round1");
+    gHandle = round1_handle_requests;
+
     SetFile("Round2");
     gHandle = round2_handle_requests;
+
+    #endif
 
     /* 本机非庄家 */
     SetFile("Round3");
     gHandle = round3_handle_requests;
-
-    #endif
-
-    SetFile("Round1");
-    gHandle = round1_handle_requests;
 
     test_smart_game_round_x();
 #endif

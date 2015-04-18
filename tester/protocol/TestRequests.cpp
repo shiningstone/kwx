@@ -961,6 +961,150 @@ public:
     }
 };
 
+class TestSelfSeatEquals2 : public CTestCase {
+public:
+    void SetSelfSeatEquals2() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,44,               //request code
+            7,                     //package level
+            0x00,84,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,2,                    //site:    1
+            134,0,4,0,0,0,1,         //底分 base score
+            135,0,3,1,1,1,           //player status
+            136,0,12,                //player score
+                0,0,0,100,
+                0,0,0,200,
+                0,0,0,300,
+            137,0,3,0,1,2,           //player name, UTF-16
+            138,0,3,0,1,2            //player image, UTF-16
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        EnterRoomResponse room;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        room.Construct(*aMsg);
+    }
+    
+    virtual int Execute() {
+        SetSelfSeatEquals2();
+        
+        INT8U RemindPkg[] = {
+            'K','W','X',           //KWX
+            0x00,55,               //request code/*下发提醒(下行) REQ_GAME_DIST_REMIND*/
+            7,                     //package level
+            0x00,53,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            60,2,                        //seat
+            61,4,                        //timer
+            62,5,                        //kind :        6条
+            63,1,                        //whogive
+            129,0,4,0,0,0,1,             //remind :      碰
+            130,0,1,0xff,                //gang remind : 不可杠
+            131,0,1,0xff,                //kou remind :  不可扣
+            132,0,4,0xff,0xff,0xff,0xff, //ming remind : 不可明
+            64,3,                        //wait
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        len = aMsg->Deserialize(RemindPkg);
+
+		RemindInfo remind;
+        remind.Construct(*aMsg);
+
+        assert( remind.seat==MIDDLE );
+        assert( remind.whoGive==LEFT );
+        assert( remind.wait==RIGHT );
+
+        return 0;
+    }
+};
+
+class TestSelfSeatEquals3 : public CTestCase {
+public:
+    void SetSelfSeatEquals3() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,44,               //request code
+            7,                     //package level
+            0x00,84,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,3,                    //site:    1
+            134,0,4,0,0,0,1,         //底分 base score
+            135,0,3,1,1,1,           //player status
+            136,0,12,                //player score
+                0,0,0,100,
+                0,0,0,200,
+                0,0,0,300,
+            137,0,3,0,1,2,           //player name, UTF-16
+            138,0,3,0,1,2            //player image, UTF-16
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        EnterRoomResponse room;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        room.Construct(*aMsg);
+    }
+    
+    virtual int Execute() {
+        SetSelfSeatEquals3();
+        
+        INT8U RemindPkg[] = {
+            'K','W','X',           //KWX
+            0x00,55,               //request code/*下发提醒(下行) REQ_GAME_DIST_REMIND*/
+            7,                     //package level
+            0x00,53,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            60,3,                        //seat
+            61,4,                        //timer
+            62,5,                        //kind :        6条
+            63,1,                        //whogive
+            129,0,4,0,0,0,1,             //remind :      碰
+            130,0,1,0xff,                //gang remind : 不可杠
+            131,0,1,0xff,                //kou remind :  不可扣
+            132,0,4,0xff,0xff,0xff,0xff, //ming remind : 不可明
+            64,2,                        //wait
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        len = aMsg->Deserialize(RemindPkg);
+
+		RemindInfo remind;
+        remind.Construct(*aMsg);
+
+        assert( remind.seat==MIDDLE );
+        assert( remind.whoGive==RIGHT );
+        assert( remind.wait==LEFT );
+
+        return 0;
+    }
+};
+
 class TestRecvEnterNotif : public CTestCase {
 public:
     virtual int Execute() {
@@ -1038,6 +1182,15 @@ void testOtherRequests() {
     aCase->Execute();
     
     aCase = new TestRecvEnterResponse();
+    aCase->Execute();
+
+    aCase = new TestSelfSeatEquals2();
+    aCase->Execute();
+
+    aCase = new TestSelfSeatEquals3();
+    aCase->Execute();
+    
+    aCase = new TestRecvEnterResponse();/* TO MAKE SELF SEAT EQUALS 1*/
     aCase->Execute();
     
     aCase = new TestRecvEnterNotif();
