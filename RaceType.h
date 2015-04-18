@@ -116,18 +116,20 @@ typedef enum card_play_status
 
 typedef enum array_action
 {
-	a_JUMP=0x00,
-	a_PENG=0x01,
-	a_MING_GANG=0x02,
-	a_KOU,
-	a_AN_GANG=0x04,
-	a_KOU_CANCEL,
-	a_SHOU_GANG=0x8,
-	a_TING=0x10,
-	a_HU=0x20,
-	a_MING=0x40,
-	a_QIANG_GANG=0x80,
-	a_TIMEOUT=0xff
+    a_JUMP=0x00,
+    a_PENG=0x01,
+    a_MING_GANG=0x02,
+    a_AN_GANG=0x04,
+    a_MING=0x8,
+    a_HU=0x10,
+    a_SHOU_GANG=0x20,
+    a_KOU=0x40,
+    a_KOU_CANCEL=0x80,
+    
+    a_QIANG_GANG=0xfd,
+    a_TING=0xfe,
+
+    a_TIMEOUT=0xff
 }ARRAY_ACTION;
 
 typedef enum robot_target
