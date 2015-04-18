@@ -108,6 +108,10 @@ int _bytes(char *buf,const char *str) {
     return i;
 }
 
+
+/****************************************************************
+    platform dependent
+****************************************************************/
 #ifdef WIN32
 #include <windows.h>
 #endif

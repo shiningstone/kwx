@@ -162,6 +162,16 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_RECV_ACTION:
             _DiRecv((ActionNotif *)di);
             break;
+
+        /*********************************************
+            ÅÆ¾ÖÎÞ¹ØREQUEST
+        *********************************************/
+        case REQ_GAME_SEND_ENTER:
+            _DiRecv((EnterRoomResponse *)di);
+            break;
+        case REQ_GAME_RECV_ENTER:
+            _DiRecv((EnterRoomNotif *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -394,6 +404,14 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     }
 }
 
+void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
+    LOGGER_WRITE("NOTE: profile of players should be updated here\n");
+}
+
+void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
+    LOGGER_WRITE("NOTE: profile of players should be updated here\n");
+}
+
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(dir==MIDDLE) {
         RoundManager::UpdateCards(dir,action);
@@ -463,12 +481,18 @@ void NetRoundManager::CreateRace(Scene *scene) {
     InitPlayers();
 	_isGameStart=false;
 
-    LOGGER_WRITE("NOTE: SeatInfo should be set when get response from server rather than here\n");
     SeatInfo *seat = SeatInfo::getInstance();
     seat->Set(0x00010203,0x04050607,0x08090a0b,1);
 
     ListenToMessenger();
     _messenger->StartReceiving();
+    
+    /**********************************************/
+    /* enter room should be called somewhere else */
+    RequestEnterRoom aReq;
+    aReq.Set();
+    _messenger->Send(aReq);
+    /**********************************************/
     
     _uiManager->CreateRace();
 }

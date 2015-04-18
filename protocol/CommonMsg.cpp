@@ -129,6 +129,12 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_GAME_GET_TINGINFO:
             return new TingInfoResponse();
 
+        case REQ_GAME_SEND_ENTER:
+            return new EnterRoomResponse();
+
+        case REQ_GAME_RECV_ENTER:
+            return new EnterRoomNotif();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }

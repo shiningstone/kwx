@@ -6,8 +6,8 @@
 
 #define MSG_MAX_LEN    1024
 
-#define UP_STREAM     0
-#define DOWN_STREAM   1
+#define UP_STREAM      0
+#define DOWN_STREAM    1
 
 typedef INT32U Key_t;
 typedef INT32U RoomPath_t;

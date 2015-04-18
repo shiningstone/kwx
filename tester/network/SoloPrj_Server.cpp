@@ -324,12 +324,34 @@ static void SendLine(ServerSocket SERVER,int lineNo) {
 }
 
 void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
-    char sendBuf[512] = {0};
-    int  sendLen = 0;
-
     static int handout = 0;
 
-    if(recvBuf[16]==REQ_GAME_SEND_START) {
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        char sendBuf[] = {
+            'K','W','X',           //KWX
+            0x00,44,               //request code
+            7,                     //package level
+            0x00,67,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                    //site:    1
+            134,0,4,0,0,0,1,         //底分 base score
+            135,0,3,1,1,1,           //player status
+            136,0,12,                //player score
+                0,0,0,100,
+                0,0,0,200,
+                0,0,0,300,
+            137,0,3,0,1,2,           //player name, UTF-16
+            138,0,3,0,1,2            //player image, UTF-16
+        };
+        
+        SERVER.Send(sendBuf,sizeof(sendBuf));
+        SaveLog(fmonitor,"SEND",sendBuf,sizeof(sendBuf));
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
         SendLine(SERVER,1);
         SendLine(SERVER,2);
         SendLine(SERVER,3);
@@ -442,7 +464,7 @@ void test_smart_game_round_x() {
 
         	SERVER.Recv(recvBuf,&recvLen);
             SaveLog(fmonitor,"RECV",recvBuf,recvLen);
-            round1_handle_requests(SERVER,recvBuf,recvLen);
+            gHandle(SERVER,recvBuf,recvLen);
         } else {
         	SERVER.Start();
             printf("server started\n");
@@ -467,17 +489,17 @@ void test_server_console() {
     #if 0
     test_game_server()();
 
-    SetFile("Round1");
-    gHandle = round1_handle_requests;
-
     SetFile("Round2");
     gHandle = round2_handle_requests;
-
-    #endif
 
     /* 本机非庄家 */
     SetFile("Round3");
     gHandle = round3_handle_requests;
+
+    #endif
+
+    SetFile("Round1");
+    gHandle = round1_handle_requests;
 
     test_smart_game_round_x();
 #endif
