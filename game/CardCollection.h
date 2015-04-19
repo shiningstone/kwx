@@ -69,6 +69,7 @@ public:
     CardStatus_t kou_group_status(int gIdx) const;
     int          kou_card_index(int gIdx,int cIdx) const;
     void         switch_group_status(int gIdx);
+    void         clear_kou_choices();
     Card_t       KouGroupKind(int gIdx) const;
     
     bool IsKouInclude(Card_t kind) const;

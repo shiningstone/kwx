@@ -473,8 +473,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
                 if(!_GetCardInHand((PlayerDir_t)dir,i)) {
                     _Add(myframe,p_list[i],HAND_IN_CARDS_TAG_ID+dir*20+i,i+1);
                 }
-            }
-			else {//each one lay below the previous ones
+            } else {//each one lay below the previous ones
                 if(!_GetCardInHand((PlayerDir_t)dir,i)) {
                     _Add(myframe,p_list[i],HAND_IN_CARDS_TAG_ID+dir*20+i,list->len-i);
                 }
@@ -3923,9 +3922,9 @@ void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
     myframe->_ID = MIDDLE;
     myframe->runAction(
         Sequence::create(
-            TargetedAction::create(button,
-                ScaleTo::create(0,0)),CallFunc::create([=](){
-                _roundManager->RecvMing();}),NULL));
+            TargetedAction::create(button,ScaleTo::create(0,0)),CallFunc::create([=](){
+            _SwitchCancelBtn(MING_CANCEL);
+            _roundManager->RecvMing(true);}),NULL));
 }
 
 void NetRaceLayer::KouConfirmEffect() {
@@ -4151,11 +4150,25 @@ void NetRaceLayer::ListenToKou(int no) {
     Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(KouListener, myframe);
 }
 
-void NetRaceLayer::QueryKouCards() {
-    auto kouCancel = _object->CreateButton(BTN_CANCEL);
-    kouCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouCancelHandler,this));
-    myframe->addChild(kouCancel,20,MING_KOU_CANCEL);
+void NetRaceLayer::_SwitchCancelBtn(int tag) {
+    _Remove(myframe,MING_KOU_CANCEL);
+    _Remove(myframe,MING_CANCEL);
+
+    auto btn = _object->CreateButton(BTN_CANCEL);
+
+    switch(tag) {
+        case MING_KOU_CANCEL:
+            btn->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::BtnKouCancelHandler,this));
+            break;
+        case MING_CANCEL:
+            btn->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
+            break;
+    }
     
+    myframe->addChild(btn,20,tag);
+}
+
+void NetRaceLayer::QueryKouCards() {
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
     auto ChooseEnsure = _object->CreateButton(BTN_OK);
@@ -4163,6 +4176,8 @@ void NetRaceLayer::QueryKouCards() {
     ChooseEnsure->setVisible(false);
     myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
     
+    _SwitchCancelBtn(MING_KOU_CANCEL);
+
     CARD_ARRAY *cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
     _MaskNonKouCards(cards);
     ListenToKou(MIDDLE);
@@ -4173,9 +4188,7 @@ void NetRaceLayer::QueryMingOutCard() {
     _Remove(myframe,MING_KOU_SIGN);
     _Remove(myframe,MING_KOU_CANCEL);
     
-    auto MingCancel = _object->CreateButton(BTN_CANCEL);
-    MingCancel->addTouchEventListener(CC_CALLBACK_2(NetRaceLayer::MingCancelHandler,this));
-    myframe->addChild(MingCancel,20,MING_CANCEL);
+    _SwitchCancelBtn(MING_CANCEL);
     
     myframe->_ID=MIDDLE;
     myframe->runAction(Sequence::create(CCCallFunc::create([=]() {

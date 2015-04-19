@@ -710,11 +710,9 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 }
 
 void NetRoundManager::RecvKouCancel() {
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        cards->data[i].status=c_FREE;
-    }
+    _players[MIDDLE]->_cards->clear_kou_choices();
 
+    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
     _uiManager->KouCancelEffect(cards);
 }
 
@@ -746,22 +744,21 @@ void NetRoundManager::RecvMingCancel() {
     _uiManager->MingCancelEffect();
 }
 
-void NetRoundManager::RecvMing() {
+void NetRoundManager::RecvMing(bool isFromKouStatus) {
 	_actionToDo=a_MING;
 
-    _ai->KouCardCheck((PlayerDir_t)_curPlayer);
-
-    if(_curPlayer==MIDDLE) {
-        if(_players[MIDDLE]->get_parter()->_cardInHand->kou_group_num()>0) {
+    if(!isFromKouStatus) {
+        _ai->KouCardCheck((PlayerDir_t)_curPlayer);
+        if(_players[MIDDLE]->_cards->kou_group_num()>0) {
             _uiManager->QueryKouCards();
         } else {
-            _isMingTime=true;
-            UpdateCards(MIDDLE,a_MING);
-            
             _uiManager->QueryMingOutCard();
         }
     } else {
-        WaitForOthersChoose();
+        _isMingTime=true;
+        
+        UpdateCards(MIDDLE,a_MING);
+        _uiManager->QueryMingOutCard();
     }
 }
 

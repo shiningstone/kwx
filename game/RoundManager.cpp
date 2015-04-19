@@ -586,11 +586,9 @@ CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
 }
 
 void RoundManager::RecvKouCancel() {
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        cards->data[i].status=c_FREE;
-    }
+    _players[MIDDLE]->_cards->clear_kou_choices();
 
+    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
     _uiManager->KouCancelEffect(cards);
 }
 
@@ -622,7 +620,7 @@ void RoundManager::RecvMingCancel() {
     _uiManager->MingCancelEffect();
 }
 
-void RoundManager::RecvMing() {
+void RoundManager::RecvMing(bool isFromKouStatus) {
 	_actionToDo=a_MING;
 
     _ai->KouCardCheck((PlayerDir_t)_curPlayer);

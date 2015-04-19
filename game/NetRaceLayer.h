@@ -41,6 +41,7 @@ public:
     void MingCancelEffect();
 	void QueryKouCards();
 	void QueryMingOutCard();
+    void _SwitchCancelBtn(int tag);
     
     void ShowActionButtons(int mask);
     Vec2 GetCardPositionInHand(int idx);

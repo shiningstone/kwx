@@ -37,7 +37,7 @@ public:
     virtual void RecvKouCancel();
     virtual void RecvKouConfirm();
     virtual void RecvMingCancel();
-	virtual void RecvMing();
+	virtual void RecvMing(bool isFromKouStatus=false);
 
     virtual void WaitForFirstAction(PlayerDir_t zhuang);
     virtual void WaitForMyAction();

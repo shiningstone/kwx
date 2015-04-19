@@ -313,6 +313,12 @@ void CardInHand::switch_group_status(int gIdx) {
     }
 }
 
+void CardInHand::clear_kou_choices() {
+    for(int i=0;i<_bufKouCards.num;i++) {
+        SetGroupStatus(i,sFREE);
+    }
+}
+
 SmartList CardInHand::_Remove(Card_t kouKind) const {
     int kouIdx[4];
     FindCards(kouIdx,kouKind);
