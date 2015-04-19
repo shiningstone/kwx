@@ -273,8 +273,22 @@ int HuInfoNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int EndInfoNotif::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+    
+    seat      = _GetPlayer(msg.GetItemValue(0));
 
+    INT8U   num[3];
+    Card_t  cards[3][18];
+    DsMsgParser::_load(cards,num,msg,1);
 
+    for(int i=0;i<PLAYER_NUM;i++) {
+        cardNum[i] = num[(i+2)%3];
+        memcpy(card[i], cards[(i+2)%3], sizeof(Card_t)*18);
+    }
+
+    return 0;
+}
 
 int EnterRoomResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);

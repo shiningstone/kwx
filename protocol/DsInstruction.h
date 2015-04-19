@@ -202,6 +202,15 @@ public:
     HuInfo_t         hu[3];
 };
 
+class EndInfoNotif : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+
+    INT8U            seat;
+    INT8U            cardNum[3];
+    Card_t           card[3][18];
+};
+
 class EnterRoomResponse : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);

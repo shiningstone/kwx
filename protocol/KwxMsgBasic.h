@@ -42,6 +42,7 @@ typedef enum {
     REQ_GAME_DIST_BEGINCARDS_OTHER = 57,
     REQ_GAME_DIST_DECISION      = 59,
     REQ_GAME_DIST_HU_CALCULATE  = 60,
+    REQ_GAME_DIST_HU_CALCULATE2 = 61,
     
     /* Downstream : other's request notifications */
     REQ_GAME_DIST_CARD_TOOTHER  = 52,
