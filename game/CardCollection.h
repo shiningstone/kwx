@@ -64,7 +64,10 @@ public:
     int statzhongFaBai[3];             /*zhong, fa, bai*/
     int statGroupSameNum;
     int statSameAsLastCard;
-    int statFanMask;
+
+    void set(int mask);
+    void clr(int mask);
+    int statHuFanMask;
 
     /***************************************************
             kou cards info

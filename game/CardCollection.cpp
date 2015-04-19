@@ -131,7 +131,7 @@ void CardInHand::init(Card_t *cards,int len) {
     statzhongFaBai[1]  = 0;
     statzhongFaBai[2]  = 0;
     statSameAsLastCard = 0;
-    statFanMask        = 0;
+    statHuFanMask      = 0;
 }
 
 void CardInHand::delete_card(int from,int len) {
@@ -357,66 +357,65 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
     return freeCards.is_ka_wu_xing(kind);
 }
 
+void CardInHand::set(int mask) {
+    statHuFanMask |= mask;
+}
+
+void CardInHand::clr(int mask) {
+    statHuFanMask &= ~mask;
+}
+
 void CardInHand::update_statistics(Card_t huKind) {
-	unsigned char color = huKind/9;;
-
-	bool HuQingYiSe   = true;
-	bool HuMingSiGui  = false;
-    bool HuAnSiGui    = false;
-	bool HuPengPengHu = false;
-    bool HuShouZhuaYi = false;
-
-	unsigned int  hu_flag = 0;
-
+    set(RH_QINYISE);
+        
+    int color = huKind/9;;
+        
 	for(int i=0;i<size();i++) {
 		if(get_status(i)==sFREE ) {
 			statFreeCards++;
 		}
 
         Card_t curCard = get_kind(i);
-
         if(curCard==ZHONG || curCard==FA || curCard==BAI) {
             statzhongFaBai[curCard-ZHONG] += 1;
         }
 
 		if(	curCard/9!=color ) {
-			HuQingYiSe = false;
+            clr(RH_QINYISE);
 		}
         
 		if( curCard==huKind ) {
 			if(get_status(i)==sPENG) {
-				HuMingSiGui = true;
+                set(RH_MINGSIGUI);
             } else {
                 statSameAsLastCard++;
                 if(statSameAsLastCard==4) {
-                    HuAnSiGui = true;
+                    set(RH_ANSIGUI);
                 }
             }
 		}
         
 		int freeSameCard = 1;
-		for(int k=i+1;k<i+4;k++) {
-			if(curCard==get_kind(k) && get_status(i)==sFREE && get_status(k)==sFREE) {
-				freeSameCard++;
-            }
-        }
-        if(freeSameCard==2||freeSameCard==4)
-			statCouples++;
-
-
         int sameCard = 1;
-        for(int k=i+1;k<i+4;k++) {
+		for(int k=i+1;k<i+4;k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
+                if( get_status(i)==sFREE ) {
+                    freeSameCard++;
+                }
+                
 				sameCard++;
             }
         }
+
+        if(freeSameCard==2||freeSameCard==4)
+			statCouples++;
 
         if(sameCard==4)
 			statGroupSameNum++;
 	}
     
 	if(statFreeCards==2) {
-		HuShouZhuaYi = true;
+		set(RH_SHOUYIZHUA);
  	} else {
 		int totalLen = size()-FreeStart;
         int usedLen  = 0;
@@ -443,7 +442,7 @@ void CardInHand::update_statistics(Card_t huKind) {
 		}
         
 		if(GroupSameCount==4) {
-			HuPengPengHu = true;
+            set(RH_SIPENG);
         }
 	}
 }
