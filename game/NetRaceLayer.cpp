@@ -3426,7 +3426,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		} else {
 		    _CreateFreeCard(gangCard,gang,(CARD_KIND)card);
 
-            if(list->atcvie_place>=0)/* active_place can less than 0 ???? */
+            if(list->atcvie_place>=0)/* FreeStart can less than 0 ???? */
 			{
                 auto OldGang2Pos = gangCard[0]->getPosition();
                 auto OldGang3Pos = gangCard[1]->getPosition();

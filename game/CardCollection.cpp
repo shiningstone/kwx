@@ -123,10 +123,15 @@ void CardInHand::init(Card_t *cards,int len) {
 	for(int i=0;i<len;i++) {
 		push_back(cards[i]);
 	}
-
-    FreeStart = 0;
-    Last      = len-1;
-    Residue   = (len-FreeStart)%3;
+    
+    statFreeCards      = 0;
+    statCouples        = 0;
+    statGroupSameNum   = 0;
+    statzhongFaBai[0]  = 0;
+    statzhongFaBai[1]  = 0;
+    statzhongFaBai[2]  = 0;
+    statSameAsLastCard = 0;
+    statFanMask        = 0;
 }
 
 void CardInHand::delete_card(int from,int len) {
@@ -183,7 +188,7 @@ void CardInHand::perform(ActionId_t act) {
         delete_card(cardIdx[0],4);
         insert_card(gangCard,4);
         
-        active_place += 4;
+        FreeStart += 4;
         
         /* 在这里排序导致没有插牌效果 */
         CardNode_t cardsAfterGangCard[18];
@@ -203,7 +208,7 @@ void CardInHand::perform(ActionId_t act) {
 
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
-        for(int i=active_place;i>0;i--) {
+        for(int i=FreeStart;i>0;i--) {
             if(get_status(i-1)!=sMING_KOU) {
                 return i;
             } else if(data.kind>=get_kind(i-1)) {
@@ -213,7 +218,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
 
         return 0;
     } else {
-        for(int i=active_place;i<size();i++) {
+        for(int i=FreeStart;i<size();i++) {
             if(get_kind(i)>=data.kind) {
                 return i;
             }
@@ -224,7 +229,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
 }
 
 Card_t CardInHand::_FindGangCard(int cardIdx[]) const{
-    for(int i=active_place; i<size(); i++) {
+    for(int i=FreeStart; i<size(); i++) {
         cardIdx[0] = i;
         int matchCardNum = 1;
             
@@ -247,7 +252,7 @@ Card_t CardInHand::_FindGangCard(int cardIdx[]) const{
 int CardInHand::FindCards(int idx[],Card_t kind) const {
     int num = 0;
     
-    for(int i=active_place; i<size(); i++) {   
+    for(int i=FreeStart; i<size(); i++) {   
         if(get_kind(i)==kind) {
             idx[num++] = i;
         }
@@ -331,7 +336,7 @@ int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
     return idx;
 }
 
-SmartList CardInHand::_Remove(Card_t kouKind) const {
+SmartList CardInHand::_Exclude(Card_t kouKind) const {
     int kouIdx[4];
     FindCards(kouIdx,kouKind);
 
@@ -342,50 +347,19 @@ SmartList CardInHand::_Remove(Card_t kouKind) const {
 }
 
 void CardInHand::cancel_ming() {
-	for(int i=active_place;i<size();i++) {
+	for(int i=FreeStart;i<size();i++) {
         at(i)->canPlay = true;
 	}
 }
 
-/***************************************************
-        SmartList logic
-***************************************************/
-
 bool CardInHand::IsKaWuXing(Card_t kind) const {
-    int Pos4   = INVALID;
-    int Pos6   = INVALID;
-    
-    for(int i=active_place;i<size();i++) {
-        if(get_kind(i)==kind-1)
-            Pos4 = i-active_place;
-        else if(get_kind(i)==kind+1)
-            Pos6 = i-active_place;
-    }
-        
-    if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
-        int deletes[] = {Pos4,Pos6};
-
-        SmartList freeCards(*this,true);
-        
-        freeCards.remove(2,deletes);
-        if(freeCards.can_hu()) {
-            return true;
-        }
-    }
-
-    return false;
+    SmartList freeCards(*this,true);
+    return freeCards.is_ka_wu_xing(kind);
 }
 
-void CardInHand::get_statistics(Card_t huKind) const {
+void CardInHand::update_statistics(Card_t huKind) {
 	unsigned char color = huKind/9;;
 
-    unsigned char free_num = 0;
-	unsigned char couple_num = 0;
-    unsigned char four_num = 0;
-	unsigned char last_card_same_num = 0;
-
-    unsigned char zhongFaBaiNum[3] = {0};
-    
 	bool HuQingYiSe   = true;
 	bool HuMingSiGui  = false;
     bool HuAnSiGui    = false;
@@ -396,13 +370,13 @@ void CardInHand::get_statistics(Card_t huKind) const {
 
 	for(int i=0;i<size();i++) {
 		if(get_status(i)==sFREE ) {
-			free_num++;
+			statFreeCards++;
 		}
 
         Card_t curCard = get_kind(i);
 
         if(curCard==ZHONG || curCard==FA || curCard==BAI) {
-            zhongFaBaiNum[curCard-ZHONG] += 1;
+            statzhongFaBai[curCard-ZHONG] += 1;
         }
 
 		if(	curCard/9!=color ) {
@@ -413,8 +387,8 @@ void CardInHand::get_statistics(Card_t huKind) const {
 			if(get_status(i)==sPENG) {
 				HuMingSiGui = true;
             } else {
-                last_card_same_num++;
-                if(last_card_same_num==4) {
+                statSameAsLastCard++;
+                if(statSameAsLastCard==4) {
                     HuAnSiGui = true;
                 }
             }
@@ -427,7 +401,7 @@ void CardInHand::get_statistics(Card_t huKind) const {
             }
         }
         if(freeSameCard==2||freeSameCard==4)
-			couple_num++;
+			statCouples++;
 
 
         int sameCard = 1;
@@ -438,17 +412,17 @@ void CardInHand::get_statistics(Card_t huKind) const {
         }
 
         if(sameCard==4)
-			four_num++;
+			statGroupSameNum++;
 	}
     
-	if(free_num==2) {
+	if(statFreeCards==2) {
 		HuShouZhuaYi = true;
  	} else {
-		int totalLen = size()-active_place;
+		int totalLen = size()-FreeStart;
         int usedLen  = 0;
         int GroupSameCount = 0;
         
-		for(int i=active_place;i<size();i+=usedLen) {
+		for(int i=FreeStart;i<size();i+=usedLen) {
 			int sameCount = 1;
             
 			for(int j=i+1;j<size();j++) {
@@ -496,7 +470,7 @@ SmartList::SmartList() {
 SmartList::SmartList(const CardInHand &cards,bool onlyFree) {
 	len = 0;
 
-    int start = onlyFree?(cards.active_place):0;
+    int start = onlyFree?(cards.FreeStart):0;
     
     for(int i=start;i<cards.size();i++) {
         kind[len++] = cards.at(i)->kind;
@@ -651,6 +625,30 @@ bool SmartList::_PatternMatch() const {
         
         return true;
     }
+}
+
+bool SmartList::is_ka_wu_xing(Card_t wuXing) const {
+    int Pos4   = INVALID;
+    int Pos6   = INVALID;
+    
+    for(int i=0;i<len;i++) {
+        if(kind[i]==wuXing-1)
+            Pos4 = i;
+        else if(kind[i]==wuXing+1)
+            Pos6 = i;
+    }
+        
+    if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
+        int deletes[] = {Pos4,Pos6};
+
+        SmartList remain(*this);
+        remain.remove(2,deletes);
+        if(remain.can_hu()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*BUG???: cards_stable 如果有一组三个或者四个，被删掉就胡不了*/

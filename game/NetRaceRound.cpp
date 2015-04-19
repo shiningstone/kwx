@@ -89,9 +89,9 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
     
 	if(free_num!=2)
 	{
-		int len=_cardInHand->size()-_cardInHand->active_place;
+		int len=_cardInHand->size()-_cardInHand->FreeStart;
 		int l_couple=0;
-		for(int k=_cardInHand->active_place;k<_cardInHand->size();k++)
+		for(int k=_cardInHand->FreeStart;k<_cardInHand->size();k++)
 		{
 			int l_num=1;
 			for(int t=k+1;t<_cardInHand->size();t++)
@@ -103,7 +103,7 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 
             l_num=0;
 
-            for(int t=_cardInHand->active_place;t<_cardInHand->size();t++)
+            for(int t=_cardInHand->FreeStart;t<_cardInHand->size();t++)
 				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(t))
 					l_num++;
 
@@ -367,7 +367,7 @@ void NetRRound::transform(const SmartList &input,CARD_KIND output[]) {
 bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
 {
     SmartList cards(*_cardInHand,true);
-    cards.displace(index-_cardInHand->active_place,(Card_t)kind);
+    cards.displace(index-_cardInHand->FreeStart,(Card_t)kind);
 
     transform(cards,rlist);
 
@@ -376,7 +376,7 @@ bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 {
-    SmartList newCards = _cardInHand->_Remove((Card_t)card);
+    SmartList newCards = _cardInHand->_Exclude((Card_t)card);
     
 	if(no==MIDDLE) {
 		for(int i=0;i<newCards.len;i++) {
@@ -445,7 +445,7 @@ unsigned int NetRRound::ming_check()
 
     CARD_KIND last_card=ck_NOT_DEFINED;
 
-	for(int i=_cardInHand->active_place;i<_cardInHand->size();i++)
+	for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
 	{
 		if(_cardInHand->get_status(i)==sMING_KOU) {
 			continue;
@@ -472,9 +472,9 @@ unsigned int NetRRound::ming_check()
                         hu_cards[i][huKindIdx]=CARD_KIND(k);
                         hu_cards_num[i]++;
                         
-                        int s_core=cal_times(CARD_KIND(k),temp_list,_cardInHand->size()-_cardInHand->active_place);
+                        int s_core=cal_times(CARD_KIND(k),temp_list,_cardInHand->size()-_cardInHand->FreeStart);
 
-                        for(int s_l=0;s_l<_cardInHand->active_place;s_l++) {
+                        for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
                             if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
                                 s_core *= 2;
                                 break;
@@ -514,7 +514,7 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
 
     _cardInHand->clear();
-	_cardInHand->active_place =0;
+	_cardInHand->FreeStart =0;
 
 	CardNode_t node;
 	unsigned char ac=a_JUMP;
@@ -540,7 +540,7 @@ unsigned char NetRRound::ActiontodoCheckAgain()
 
 	unsigned char res = 0x0;
 	int card_num;
-	for(int i=_cardInHand->active_place;i<_cardInHand->size();i++)
+	for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
 	{
 		card_num=1;
 		for(int k=i+1;k<_cardInHand->size();k++)
@@ -573,7 +573,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 	if(rr_ting_flag==0)
 	{
 		int card_num;
-		for(int i=_cardInHand->active_place;i<_cardInHand->size();i++)
+		for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
 		{
 			card_num=1;
 			for(int k=i+1;k<_cardInHand->size();k++)
@@ -622,7 +622,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 	else
 	{
 
-		for(int i=0;i<_cardInHand->active_place;i++)
+		for(int i=0;i<_cardInHand->FreeStart;i++)
 			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==kind)
 			{
 				if(!is_last_one)
@@ -693,22 +693,22 @@ ACT_RES NetRRound::others_action(bool isCardFromOthers,ARRAY_ACTION act,Card_t k
 	if(act==a_PENG) {
         node.status=sPENG;
         
-        _cardInHand->delete_card(_cardInHand->active_place,3);
+        _cardInHand->delete_card(_cardInHand->FreeStart,3);
         _cardInHand->insert_card(node,3);
-        _cardInHand->active_place += 3;
+        _cardInHand->FreeStart += 3;
 	} else if(act==a_MING_GANG) {
         node.status=sMING_GANG;
 
-        _cardInHand->delete_card(_cardInHand->active_place,4);
+        _cardInHand->delete_card(_cardInHand->FreeStart,4);
         _cardInHand->insert_card(node,4);
-		_cardInHand->active_place += 4;
+		_cardInHand->FreeStart += 4;
 	} else if(act==a_AN_GANG) {
         node.kind=CARD_UNKNOWN;
         node.status=sAN_GANG;
 
-        _cardInHand->delete_card(_cardInHand->active_place,4);
+        _cardInHand->delete_card(_cardInHand->FreeStart,4);
         _cardInHand->insert_card(node,4);
-		_cardInHand->active_place += 4;
+		_cardInHand->FreeStart += 4;
 	} else if(act==a_JUMP) {
 		if(!isCardFromOthers) {
 			node.status  = sFREE;
@@ -739,7 +739,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	if(act==a_PENG) {
         node.status=sPENG;
 
-        for(int i=_cardInHand->active_place;i<_cardInHand->size();i++) {
+        for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++) {
 			if(_cardInHand->get_kind(i)==node.kind){
 				_cardInHand->delete_card(i,2);
 				break;
@@ -748,17 +748,17 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 
         _cardInHand->pop_back();
         _cardInHand->insert_card(node,3);
-        _cardInHand->active_place += 3;
+        _cardInHand->FreeStart += 3;
 	}
 	else if(act==a_KOU) {
         node.status=sMING_KOU;
 
-		for(int i=_cardInHand->size()-1;i>=_cardInHand->active_place;i--)
+		for(int i=_cardInHand->size()-1;i>=_cardInHand->FreeStart;i--)
 			if(_cardInHand->get_status(i)==sMING_KOU) {
 				node.kind=_cardInHand->get_kind(i);
 				_cardInHand->delete_card(i,1);
 				_cardInHand->insert_card(node,1);
-                _cardInHand->active_place+=1;
+                _cardInHand->FreeStart+=1;
 				i++;
 			}
 	}
@@ -766,13 +766,13 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		node.status  = sFREE;
 		node.canPlay = true;
         
-		for(int i=_cardInHand->active_place-1;i>=0;i--) {
+		for(int i=_cardInHand->FreeStart-1;i>=0;i--) {
 			if(_cardInHand->get_status(i)==sMING_KOU) {
 				node.kind = _cardInHand->get_kind(i);
                 
 				_cardInHand->delete_card(i,1);
 				_cardInHand->insert_card(node,1);
-				_cardInHand->active_place-=1;
+				_cardInHand->FreeStart-=1;
 			}
         }
 	}
@@ -787,16 +787,16 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
                 
 				ifFirst=false;
 
-                _cardInHand->active_place--;
+                _cardInHand->FreeStart--;
 			} else if(_cardInHand->get_status(i)==sMING_KOU&& _cardInHand->get_kind(i)==node.kind) {
-				_cardInHand->active_place--;
+				_cardInHand->FreeStart--;
             }
 
 			if(_cardInHand->get_kind(i)==node.kind)
 				_cardInHand->delete_card(i,1);
 		}
         _cardInHand->insert_card(node,4);
-		_cardInHand->active_place += 4;
+		_cardInHand->FreeStart += 4;
 	}
 	else if(act==a_AN_GANG) {
 		_cardInHand->perform(aAN_GANG);
@@ -804,7 +804,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	else if(act==a_SHOU_GANG) {
 		int card_num;
 		int i;
-		for(i=_cardInHand->active_place;i<_cardInHand->size();i++)
+		for(i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
 		{
 			card_num=1;
 			for(int j=i+1;j<_cardInHand->size();j++)
@@ -816,7 +816,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 			}
 		}
         
-		for(int k=_cardInHand->size();k>=_cardInHand->active_place;k--)
+		for(int k=_cardInHand->size();k>=_cardInHand->FreeStart;k--)
 		{
 			if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
 				_cardInHand->delete_card(k,1);
@@ -825,7 +825,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		node.status  = sAN_GANG;
 		node.canPlay = false;
         _cardInHand->insert_card(node,4);
-		_cardInHand->active_place += 4;
+		_cardInHand->FreeStart += 4;
 
         /*WHY*/
 		node.kind    = _cardInHand->back()->kind;
@@ -839,7 +839,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	{
 		unsigned int active_place_indexes = get_ming_indexes();
         
-		for (int i=_cardInHand->active_place;i<_cardInHand->size();i++) {
+		for (int i=_cardInHand->FreeStart;i<_cardInHand->size();i++) {
 			int m = active_place_indexes&(1<<i);
 			if(m>0) {
 				_cardInHand->at(i)->canPlay=true;
@@ -973,7 +973,7 @@ CARD_ARRAY* NetRRound::get_card_list() {
     }
 
     card_list->len = _cardInHand->size();
-    card_list->atcvie_place = _cardInHand->active_place;
+    card_list->atcvie_place = _cardInHand->FreeStart;
     
 	return card_list;
 }

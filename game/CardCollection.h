@@ -56,11 +56,15 @@ public:
 
     void   perform(ActionId_t act);
     
-    int active_place;
+    int    FreeStart;
 
-    int FreeStart;
-    int Last;
-    int Residue;
+    /* statistics , only used for calculating score */
+    int statFreeCards;
+    int statCouples;
+    int statzhongFaBai[3];             /*zhong, fa, bai*/
+    int statGroupSameNum;
+    int statSameAsLastCard;
+    int statFanMask;
 
     /***************************************************
             kou cards info
@@ -79,14 +83,14 @@ public:
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
 
-    SmartList _Remove(Card_t kouKind) const;
+    SmartList _Exclude(Card_t kouKind) const;
 
     void cancel_ming();
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
     bool IsKaWuXing(Card_t kind)const;
-    void get_statistics(Card_t huKind)const;
+    void update_statistics(Card_t huKind);
     
     /***************************************************
             effect
@@ -121,6 +125,7 @@ public:
 	void remove(int num,int deletes[]);
     void insert(Card_t kind);
     void displace(int changeIdx, Card_t kind);
+    bool is_ka_wu_xing(Card_t wuXing)const;
     bool can_hu()const;
 
 protected:

@@ -80,7 +80,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
 
     cards->ClearKouCardInfo();
         
-    for(int i=cards->active_place; i<cards->size(); i++){
+    for(int i=cards->FreeStart; i<cards->size(); i++){
         auto kind = cards->get_kind(i);
         
         if( !cards->IsKouInclude(kind) ) {
