@@ -290,7 +290,7 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len);
 FILE *fmonitor = NULL;
 
 static void SaveLog(FILE *fp,char *dir,const char *buf,int len) {
-    char str[512] = {0};
+    char str[1024] = {0};
     int strLen = 0;
 
     strcat(str,dir);    strLen += strlen(dir);
@@ -308,6 +308,7 @@ static void SaveLog(FILE *fp,char *dir,const char *buf,int len) {
     strLen += 2;
 
     fwrite(str,strLen,1,fp);
+    fflush(fp);
 }
 
 #ifndef DELAY
@@ -425,10 +426,14 @@ void round2_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     static int handout = 0;
 
     if(recvBuf[16]==REQ_GAME_SEND_START) {
+        handout++;
         SendLine(SERVER,1);
         SendLine(SERVER,2);
         SendLine(SERVER,3);
         SendLine(SERVER,4);
+    } else if(recvBuf[16]==REQ_GAME_SEND_ACTION && handout==1) {
+        SendLine(SERVER,5);
+        SendLine(SERVER,6);
     }
 }
 
@@ -472,8 +477,8 @@ void test_smart_game_round_x() {
         }
     }
 
-    fclose(fmonitor);
 	SERVER.Stop();
+    fclose(fmonitor);
 }
 
 //#define NETWORK_TRANSFER_ONLY

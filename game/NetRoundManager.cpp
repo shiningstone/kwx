@@ -568,6 +568,12 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
         SetWin(SINGLE_WIN,dir);
     }
 
+    if(dir==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(aHU);
+        _messenger->Send(aReq);
+    }
+
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
