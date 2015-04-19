@@ -49,6 +49,8 @@ public:
     void _DiRecv(RemindInfo *info);
     void _DiRecv(ActionResponse *info);
     void _DiRecv(ActionNotif *info);
+    void _UpdateWin(HuInfo_t *player);
+    void _DiRecv(HuInfoNotif *info);
 
     void _DiRecv(EnterRoomResponse *info);
     void _DiRecv(EnterRoomNotif *info);

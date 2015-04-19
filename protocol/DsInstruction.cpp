@@ -265,7 +265,7 @@ int HuInfoNotif::Construct(const DsMsg &msg) {
         hu[i].score  = score[(i+2)%3];
         hu[i].bet    = bet[(i+2)%3];
         hu[i].cardNum= cardNum[(i+2)%3];
-        for(int k=0;k>hu[i].cardNum;k++) {
+        for(int k=0;k<hu[i].cardNum;k++) {
             memcpy(hu[i].card, card[(i+2)%3], sizeof(Card_t)*18);
         }
     }

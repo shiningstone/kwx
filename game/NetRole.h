@@ -23,6 +23,7 @@ public:
     virtual ROBOT_TARGET get_robot_hu_target(){return SAME_TIAO_TARGET;}
 
 	virtual unsigned char init(int card_array[],int len,int aim);
+    virtual unsigned char init(Card_t card_array[],int len,int aim);
     
     bool          _isReady;
     UserProfile_t _profile;    

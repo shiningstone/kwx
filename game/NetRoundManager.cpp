@@ -162,6 +162,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_RECV_ACTION:
             _DiRecv((ActionNotif *)di);
             break;
+        case REQ_GAME_DIST_HU_CALCULATE:
+            _DiRecv((HuInfoNotif *)di);
+            break;
 
         /*********************************************
             ÅÆ¾ÖÎÞ¹ØREQUEST
@@ -404,6 +407,52 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     }
 }
 
+void NetRoundManager::_UpdateWin(HuInfo_t *player) {
+    int winnerNum = 0;
+    int winner = 0;
+    int loser = 0;
+    
+    for(int i=0;i<PLAYER_NUM;i++) {
+        if( player[i].winType==ZI_MO ) {
+            SetWin(SINGLE_WIN,i);
+            break;
+        } else if( player[i].winType==HU_PAI ) {
+            winner = i;
+            winnerNum++;
+        } else if( player[i].winType==DIAN_PAO ) {
+            loser = i;
+        }
+    }
+
+    if(winnerNum==1) {
+        SetWin(SINGLE_WIN,winner);
+    } else {
+        SetWin(DOUBLE_WIN,loser);
+    }
+}
+
+void NetRoundManager::_DiRecv(HuInfoNotif *info) {
+    _UpdateWin(info->hu);
+
+    for(int i=0;i<PLAYER_NUM;i++) {
+        _players[i]->init(info->hu[i].card, info->hu[i].cardNum, aim[i]);
+    }
+
+    delete info;
+    
+    if(_isWaitDecision) {
+        _isWaitDecision = false;
+        _actionToDo = _tempActionToDo;
+        _tempActionToDo = a_JUMP;
+    }
+
+    if(_isQiangGangAsking) {
+        _lastActionWithGold = a_QIANG_GANG;
+    }
+
+    _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
+}
+
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
     LOGGER_WRITE("NOTE: profile of players should be updated here\n");
     LOGGER_WRITE("Start heartbeats\n");
@@ -552,29 +601,11 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
-    if(_isWaitDecision) {
-        _isWaitDecision = false;
-        _actionToDo = _tempActionToDo;
-        _tempActionToDo = a_JUMP;
-    }
-
-    if(_isQiangGangAsking) {
-        _lastActionWithGold = a_QIANG_GANG;
-    }
-
-    if(_isDoubleHuAsking) {
-        SetWin(DOUBLE_WIN,_curPlayer);
-    } else {
-        SetWin(SINGLE_WIN,dir);
-    }
-
     if(dir==MIDDLE) {
         RequestSendAction aReq;
         aReq.Set(aHU);
         _messenger->Send(aReq);
     }
-
-    _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
 void NetRoundManager::RecvGang(PlayerDir_t dir) {

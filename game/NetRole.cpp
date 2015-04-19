@@ -35,6 +35,15 @@ unsigned char NetRole::init(int card_array[],int len,int aim) {
 	return _act->init(card_array,len,aim);
 }
 
+unsigned char NetRole::init(Card_t cards[],int len,int aim) {
+    int card_array[14];
+    for(int i=0;i<len;i++) {
+        card_array[i] = cards[i]*4;
+    }
+    
+	return init(card_array,len,aim);
+}
+
 NetRRound* NetRole::get_parter() {
 	return _act;
 }

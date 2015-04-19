@@ -823,7 +823,7 @@ public:
             'K','W','X',
             0x00,0x3c,            //request code  REQ_GAME_DIST_HU_CALCULATE 60
             0x01,
-            0x00,116,             //package size
+            0x00,121,             //package size
             0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
             
             0x09,
@@ -849,6 +849,7 @@ public:
         len = aMsg->Deserialize(msgInNetwork);
         info.Construct(*aMsg);
 
+        assert(msgInNetwork[7]==sizeof(msgInNetwork));
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_HU_CALCULATE );
         assert( aMsg->GetLevel()==1 );
@@ -909,6 +910,7 @@ public:
         len = aMsg->Deserialize(msgInNetwork);
         info.Construct(*aMsg);
 
+        assert(msgInNetwork[7]==sizeof(msgInNetwork));
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_DIST_HU_CALCULATE );
         assert( aMsg->GetLevel()==1 );

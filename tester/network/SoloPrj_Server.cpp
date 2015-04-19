@@ -10,7 +10,7 @@ typedef enum {
     HEX,
 };
 
-#define BUF_LEN 512
+#define BUF_LEN 2048
 
 void test_string_to_hex() {
     char buf[BUF_LEN] = {0};
@@ -189,8 +189,8 @@ int GetLine(char *buf,int line=1) {
 
     int i = 1;
     while(i<=line) {
-        memset(buf,0,512);
-        if(fgets(buf,512,fsend)==NULL) {
+        memset(buf,0,BUF_LEN);
+        if(fgets(buf,BUF_LEN,fsend)==NULL) {
             return -1;
         } else {
             if(!strncmp(buf,"//",2)) {
@@ -217,7 +217,7 @@ int GetSendData(char *buf,int line=1) {
     FILE * fsend = fopen(SEND_DATA_FILE,"r");
     assert(fsend!=NULL);
 
-    char str[512] = {0};
+    char str[BUF_LEN] = {0};
     if(GetLine(str,line)==-1) {
         printf("read line %d from %s fail\n",line,SEND_DATA_FILE);
         return -1;
@@ -237,7 +237,7 @@ void test_read_send_data() {
         }
 
 
-        char sendBuf[512] = {0};
+        char sendBuf[BUF_LEN] = {0};
         int  len = GetSendData(sendBuf,choice);
         show(sendBuf,len);
     }
@@ -256,9 +256,9 @@ void test_game_server() {
 
     while(1) {
         if(start) {
-            char sendBuf[512] = {0};
+            char sendBuf[BUF_LEN] = {0};
             int  sendLen = 0;
-            char recvBuf[512] = {0};
+            char recvBuf[BUF_LEN] = {0};
             int  recvLen = 0;
 
         	SERVER.Recv(recvBuf,&recvLen);
@@ -290,7 +290,7 @@ void handle_requests(ServerSocket SERVER,char *recvBuf,int len);
 FILE *fmonitor = NULL;
 
 static void SaveLog(FILE *fp,char *dir,const char *buf,int len) {
-    char str[1024] = {0};
+    char str[BUF_LEN] = {0};
     int strLen = 0;
 
     strcat(str,dir);    strLen += strlen(dir);
@@ -315,7 +315,7 @@ static void SaveLog(FILE *fp,char *dir,const char *buf,int len) {
 #define DELAY 500
 #endif
 static void SendLine(ServerSocket SERVER,int lineNo) {
-    char sendBuf[512] = {0};
+    char sendBuf[2048] = {0};
     int  sendLen = 0;
     
     Sleep(DELAY);
@@ -420,7 +420,7 @@ void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
 }
 
 void round2_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
-    char sendBuf[512] = {0};
+    char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
 
     static int handout = 0;
@@ -438,7 +438,7 @@ void round2_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
 }
 
 void round3_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
-    char sendBuf[512] = {0};
+    char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
 
     static int handout = 0;
@@ -464,7 +464,7 @@ void test_smart_game_round_x() {
 
     while(1) {
         if(start) {
-            char recvBuf[512] = {0};
+            char recvBuf[BUF_LEN] = {0};
             int  recvLen = 0;
 
         	SERVER.Recv(recvBuf,&recvLen);

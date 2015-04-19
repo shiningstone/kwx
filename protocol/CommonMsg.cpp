@@ -128,6 +128,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
 
         case REQ_GAME_GET_TINGINFO:
             return new TingInfoResponse();
+            
+        case REQ_GAME_DIST_HU_CALCULATE:
+            return new HuInfoNotif();
 
         case REQ_GAME_SEND_ENTER:
             return new EnterRoomResponse();
