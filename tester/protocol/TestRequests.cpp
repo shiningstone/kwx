@@ -396,7 +396,7 @@ public:
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
-            129,0,4,0,0,0,0x40,    //remind:             明
+            129,0,4,0,0,0,8,       //remind:             明
             130,0,1,0xff,          //gang remind:        不可杠
             131,0,1,0xff,          //kou remind:         不可扣
             132,0,12,
@@ -452,7 +452,7 @@ public:
             61,1,                  //timer
             62,2,                  //reserved card num
             63,3,                  //card:               发4条
-            129,0,4,0,0,0,0x40,    //remind:             明
+            129,0,4,0,0,0,8,       //remind:             明
             130,0,1,0xff,          //gang remind:        不可杠
             131,0,1,0xff,          //kou remind:         不可扣
             132,0,20,
@@ -816,34 +816,105 @@ public:
     }
 };
 
-class TestRecvHuInfoNotif : public CTestCase {
+class TestRecvHuInfoNotif_MeWin : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
-            'K','W','X',           //KWX
-            0x00,50,               //request code
-            7,                     //package level
-            0x00,28,               //package size
-            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
-
-            1,
-            131,0,4,1,2,0,3,        //ting info : 胡2条，剩2张，赢3番
+            'K','W','X',
+            0x00,0x3c,            //request code  REQ_GAME_DIST_HU_CALCULATE 60
+            0x01,
+            0x00,116,             //package size
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            
+            0x09,
+            0x3c,0x01,
+            0x3d,0x02,
+            0x81,0x00,0x04,0x00,0x00,0x40,0x00,                    /* fan :   MIDDLE*/
+            0x82,0x00,0x03,0x01,0x00,0x00,                         /* winner: MIDDLE*/
+            0x83,0x00,0x0c,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            0x84,0x00,0x0c,0x10,0x00,0x00,0x00,0x20,0x00,0x00,0x00,0x30,0x00,0x00,0x00,
+            0x85,0x00,0x01,0xff,
+            0x86,0x00,0x01,0xff,
+            0x87,0x00,42,
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x09,0x09,0x0a,0x0a,0x0a,0xff,/*MIDDLE 14*/
+                0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x01,0x02,0x04,0xff,     /*RIGHT  13*/
+                0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x01,0x02,0x04,          /*LEFT   13*/
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
         DsMsg *aMsg = DsMsg::getInstance();
-        TingInfoResponse ting;
+        HuInfoNotif info;
 
         len = aMsg->Deserialize(msgInNetwork);
-        ting.Construct(*aMsg);
+        info.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
-        assert( aMsg->GetRequestCode()==REQ_GAME_GET_TINGINFO );
-        assert( aMsg->GetLevel()==7 );
-        assert( ting.info.cards[0].kind==TIAO_2);
-        assert( ting.info.cards[0].remain==2 );
-        assert( ting.info.cards[0].fan==3 );
+        assert( aMsg->GetRequestCode()==REQ_GAME_DIST_HU_CALCULATE );
+        assert( aMsg->GetLevel()==1 );
+        
+        assert( info.zhuang==RIGHT );
+
+        assert( info.hu[MIDDLE].winType==HU_PAI );
+
+        assert( info.hu[MIDDLE].fan==0x4000 );
+        assert( info.hu[MIDDLE].score==0x10000000 );
+        assert( info.hu[MIDDLE].bet==0x10000000 );
+        assert( info.hu[MIDDLE].cardNum==14 );
+        
+        assert( info.hu[RIGHT].fan==0 );
+        assert( info.hu[RIGHT].score==0 );
+        assert( info.hu[RIGHT].bet==0x20000000 );
+        assert( info.hu[RIGHT].cardNum==13 );
+        
+        assert( info.hu[LEFT].fan==0 );
+        assert( info.hu[LEFT].score==0 );
+        assert( info.hu[LEFT].bet==0x30000000 );
+        assert( info.hu[LEFT].cardNum==13 );
+        
+        return 0;
+    }
+};
+
+class TestRecvHuInfoNotif_DoubleWin : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',
+            0x00,0x3c,            //request code  REQ_GAME_DIST_HU_CALCULATE 60
+            0x01,
+            0x00,124,             //package size
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            
+            0x09,
+            0x3c,0x01,
+            0x3d,0x02,
+            0x81,0x00,0x08,0x00,0x00,0x40,0x00,0x00,0x00,0x40,0x00,           /* fan :   MIDDLE & LEFT*/
+            0x82,0x00,0x03,0x01,0x00,0x01,                                    /* winner: MIDDLE & LEFT*/
+            0x83,0x00,0x0c,0x10,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+            0x84,0x00,0x0c,0x10,0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x03,0x00,0x00,0x00,
+            0x85,0x00,0x01,0xff,
+            0x86,0x00,0x01,0xff,
+            0x87,0x00,43,
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x09,0x09,0x0a,0x0a,0x0a,0xff,/*MIDDLE 14*/
+                0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x01,0x02,0x04,0xff,     /*RIGHT  13*/
+                0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x01,0x02,0x04,0x06,     /*LEFT   14*/
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        HuInfoNotif info;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        info.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_DIST_HU_CALCULATE );
+        assert( aMsg->GetLevel()==1 );
+        
+        assert( info.zhuang==RIGHT );
+
 
         return 0;
     }
@@ -909,7 +980,7 @@ void testGameActions() {
     aCase = new TestRecvTingInfoResponse();
     aCase->Execute();
 
-    aCase = new TestRecvHuInfoNotif();
+    aCase = new TestRecvHuInfoNotif_MeWin();
     aCase->Execute();
 }
 

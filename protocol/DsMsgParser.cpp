@@ -5,6 +5,67 @@
 #include "CommonMsg.h"
 #include "DsMsgParser.h"
 
+int DsMsgParser::_load(INT8U *status,INT8U &num,const DsMsg &msg,int itemIdx) {
+    num = (INT8U)msg.GetItemBufLen(itemIdx);
+    
+    for(int i=0;i<num;i++) {
+        status[i] = (bool)msg._body->_items[itemIdx]->_buf[i];
+    }
+
+    return 0;
+}
+
+int DsMsgParser::_load(INT32U *fan, const bool *status,const DsMsg &msg,int itemIdx) {
+    int idx      = 0;
+    
+    for(int i=0;i<PLAYER_NUM;i++) {
+        if(status[i]) {
+            *(fan+i) = _ntohl(*((INT32U *)(msg._body->_items[itemIdx]->_buf+idx)));
+            idx += 4;
+        } else {
+            *(fan+i) = 0;
+        }
+    }
+
+    return 0;
+}
+
+int DsMsgParser::_load(INT32U *score, INT8U &num, const DsMsg &msg,int itemIdx) {
+    num = (INT8U)msg.GetItemBufLen(itemIdx)/4;
+    
+    for(int i=0;i<PLAYER_NUM;i++) {
+        score[i] = _ntohl(*((INT32U *)(msg._body->_items[itemIdx]->_buf+4*i)));
+    }
+
+    return 0;
+}
+
+int DsMsgParser::_load(Card_t cards[3][18],INT8U cardNum[3],const DsMsg &msg,int itemIdx) {
+    int totalNum = (INT8U)msg.GetItemBufLen(itemIdx);
+
+    int player = 0;
+    int idx    = 0;
+    int i      = 0;
+    
+    while(i<totalNum) {
+        Card_t kind = (Card_t)msg._body->_items[itemIdx]->_buf[i];
+        
+        if(kind!=CARD_UNKNOWN) {
+            cards[player][idx] = kind;
+            idx++;
+        } else {
+            cardNum[player++] = idx;
+            idx = 0;
+        }
+
+        i++;
+    }
+
+    cardNum[player++] = idx;
+
+    return 0;
+}
+
 int DsMsgParser::_load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx) {
     num = (INT8U)msg.GetItemBufLen(itemIdx);
     
