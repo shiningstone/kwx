@@ -677,6 +677,10 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     
 	if(_isMingTime) {
 		_isMingTime=false;
+        
+        RequestSendAction aReq;
+        aReq.Set(aMING);
+        _messenger->Send(aReq);
 	} else {
         if(_actionToDo&a_MING) {
             _actionToDo = a_JUMP;
@@ -724,7 +728,16 @@ void NetRoundManager::RecvKouConfirm() {
     }   
     
     UpdateCards(MIDDLE,a_KOU);
+
+
+    Card_t kinds[4];
+    int    kindNum = _players[MIDDLE]->_cards->get_kou_kinds(kinds);
     
+    RequestSendAction aReq;
+    aReq.Set(aKOU,kindNum,kinds);
+    _messenger->Send(aReq);
+
+
     auto ming_indexesCur=_players[MIDDLE]->get_parter()->ming_check();
     _players[MIDDLE]->get_parter()->set_ming_indexes(ming_indexesCur);
 

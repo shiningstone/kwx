@@ -89,6 +89,27 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
     return 0;
 }
 
+int RequestSendAction::Set(ActionId_t action,int kindNum,Card_t card[]) {
+    SetRequestCode(REQ_GAME_SEND_ACTION);
+    
+    INT32U actionId = _htonl(action);
+    INT8U  cardKind[4] = {0};
+
+    if(kindNum==1 && card==NULL) {
+        cardKind[0] = CARD_UNKNOWN;
+    } else {
+        for(int i=0;i<kindNum;i++) {
+            cardKind[i] = (INT8U)card;
+        }
+    }
+
+    AddSeatInfo();
+    _add_item( new Item((Item_t)134,4,(INT8U *)&actionId) );
+    _add_item( new Item((Item_t)135,kindNum,(INT8U *)&cardKind) );
+
+    return 0;
+}
+
 int RequestGameStart::Set() {
     SetRequestCode(REQ_GAME_SEND_START);
     AddSeatInfo();

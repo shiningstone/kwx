@@ -2,6 +2,10 @@
 #ifndef __UTIL_BASIC__
 #define __UTIL_BASIC__
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 typedef unsigned char  INT8U;
 typedef unsigned short INT16U;
 typedef int            INT32U;

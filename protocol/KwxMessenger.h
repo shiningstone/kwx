@@ -52,7 +52,8 @@ private:
 
 class RequestSendAction : public UsMsg {
 public:
-    int Set(ActionId_t code,Card_t card);
+    int Set(ActionId_t action,Card_t card);
+    int Set(ActionId_t code,int kindNum=1,Card_t cards[]=NULL);
 };
 
 class RequestGameStart : public UsMsg {

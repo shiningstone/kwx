@@ -70,6 +70,7 @@ public:
     int          kou_card_index(int gIdx,int cIdx) const;
     void         switch_group_status(int gIdx);
     void         clear_kou_choices();
+    int          get_kou_kinds(Card_t kouKind[]) const;
     Card_t       KouGroupKind(int gIdx) const;
     
     bool IsKouInclude(Card_t kind) const;

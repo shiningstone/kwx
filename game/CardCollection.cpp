@@ -319,6 +319,18 @@ void CardInHand::clear_kou_choices() {
     }
 }
 
+int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
+    int idx = 0;
+    
+    for(int i=0;i<_bufKouCards.num;i++) {
+        if(kou_group_status(i)==sMING_KOU) {
+            kouKind[idx++] = KouGroupKind(i);    
+        }
+    }
+
+    return idx;
+}
+
 SmartList CardInHand::_Remove(Card_t kouKind) const {
     int kouIdx[4];
     FindCards(kouIdx,kouKind);
