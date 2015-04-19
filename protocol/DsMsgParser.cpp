@@ -9,7 +9,7 @@ int DsMsgParser::_load(INT8U *status,INT8U &num,const DsMsg &msg,int itemIdx) {
     num = (INT8U)msg.GetItemBufLen(itemIdx);
     
     for(int i=0;i<num;i++) {
-        status[i] = (bool)msg._body->_items[itemIdx]->_buf[i];
+        status[i] = msg._body->_items[itemIdx]->_buf[i];
     }
 
     return 0;
@@ -99,7 +99,7 @@ int DsMsgParser::_load(ActionId_t *actions,INT8U &num,const DsMsg &msg,int itemI
     return 0;
 }
 
-int DsMsgParser::_load(TingInfo_t    &ting,const INT8U *inMsg) {
+int DsMsgParser::_load(TingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
     if(_ntohl(*(INT32U *)(inMsg))==0xffffffff) {
@@ -123,7 +123,7 @@ int DsMsgParser::_load(TingInfo_t    &ting,const INT8U *inMsg) {
     }
 }
 
-int DsMsgParser::_unload(TingInfo_t    &ting) {
+int DsMsgParser::_unload(TingInfo_t &ting) {
     if(ting.cardNum>0) {
         delete []ting.cards;
 
