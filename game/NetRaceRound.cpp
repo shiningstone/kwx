@@ -7,10 +7,11 @@
 USING_NS_CC;
 
 NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
-:_fan(fan),_aim(aim) {
+:_fan(fan),_AIM(aim) {
     _cardInHand = cardInHand;
+	_fan=0;
+
 	hu_len=0;
-	kind_hu=0;
     card_list = new CARD_ARRAY;
 
     _logger = LOGGER_REGISTER("RaceRound");
@@ -66,18 +67,18 @@ long NetRRound::sum_up_score(unsigned int fan) {
 long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
     _cardInHand->update_statistics(kind);
-    kind_hu = _cardInHand->statHuFanMask;
+    _fan = _cardInHand->statHuFanMask;
     
     if(is_last_one) {
-		kind_hu|=RH_HAIDILAO;//海底捞
+		_fan|=RH_HAIDILAO;//海底捞
     }
 
 	if(rr_ting_flag==1) {
-		kind_hu|=RH_MING;//明牌
+		_fan|=RH_MING;//明牌
 	}
 
 	if(!isCardFromOthers) {
-		kind_hu|=RH_ZIMO;//自摸
+		_fan|=RH_ZIMO;//自摸
 	}
 
 	if((continue_gang_times!=0)
@@ -86,17 +87,17 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
             ||last_action_WithGold==a_QIANG_GANG))//杠胡
 	{
 		if(!isCardFromOthers&&last_action_WithGold==a_QIANG_GANG)
-			kind_hu |= RH_QIANGGANG;
+			_fan |= RH_QIANGGANG;
 		else if(!isCardFromOthers&&isGangHua)
-			kind_hu |= RH_GANGHUA;
+			_fan |= RH_GANGHUA;
 		else if(isCardFromOthers)
-			kind_hu |= RH_GANGPAO;
+			_fan |= RH_GANGPAO;
 	}
 
-    long score = sum_up_score(kind_hu);
+    long score = sum_up_score(_fan);
     
-	if(rr_aim!=RA_NOTASK)
-		task_check(kind_hu);
+	if(_AIM!=RA_NOTASK)
+		task_check(_fan);
     
 	return score;
 }
@@ -119,8 +120,8 @@ int NetRRound::cards_stable(CARD_KIND clist[],int len)
 
 void NetRRound::task_check(unsigned int flag)
 {
-	if( !(flag&rr_aim) )
-		rr_aim=0;
+	if( !(flag&_AIM) )
+		_aimDone=0;
 }
 
 int NetRRound::hu_check(CARD_KIND newCard)
@@ -280,7 +281,7 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 {
 	int i;
 
-	rr_aim = aim;
+	_AIM = aim;
 	rr_ting_flag = 0;
 	card_score=0;
 	hu_len=0;
@@ -671,7 +672,7 @@ void NetRRound::get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM])
 
 unsigned int NetRRound::get_aim()
 {
-	return rr_aim;
+	return _aimDone;
 }
 
 unsigned int NetRRound::get_ming_indexes()
@@ -755,7 +756,7 @@ CARD_ARRAY* NetRRound::get_card_list() {
 
 bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)
 {
-	*hu_kind=kind_hu;
+	*hu_kind=_fan;
 	return true;
 }
 

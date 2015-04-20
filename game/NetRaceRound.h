@@ -19,10 +19,10 @@ public:
 private:
     Logger *_logger;
 
-    const HuTarget_t _aim;
+    const HuTarget_t _AIM;
+    HuTarget_t       _aimDone;
 	HuFan_t         &_fan;
 
-    unsigned int  rr_aim;
     unsigned char rr_ting_flag;
     unsigned int  archive_ming_indexes;
     
@@ -30,7 +30,7 @@ private:
 
     long card_score;
 	int InsertPlaceForMG;
-	unsigned int kind_hu;
+	unsigned int _fan;
 	int hu_places;
 	int hu_places_num;
 	CARD_KIND hucards[9];
