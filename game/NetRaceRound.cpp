@@ -7,9 +7,9 @@
 USING_NS_CC;
 
 NetRRound::NetRRound(CardInHand *cardInHand) {
+    _cardInHand = cardInHand;
 	hu_len=0;
 	kind_hu=0;
-    _cardInHand = cardInHand;
     card_list = new CARD_ARRAY;
 
     _logger = LOGGER_REGISTER("RaceRound");
@@ -100,12 +100,9 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 	return score;
 }
 
-int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len)
-{
+int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len) {
     _cardInHand->update_statistics(kind);
-
-    unsigned int huKind = _cardInHand->statHuFanMask;
-    long score = sum_up_score(huKind);
+    return sum_up_score(_cardInHand->statHuFanMask);
 }
 
 int NetRRound::cards_stable(CARD_KIND clist[],int len)

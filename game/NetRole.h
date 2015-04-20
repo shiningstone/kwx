@@ -11,6 +11,9 @@
 #include "NetRaceRound.h"
 #include "DataBase.h"
 
+typedef unsigned int HuTarget_t;
+typedef unsigned int HuFan_t;
+
 class NetRole {
 public:
 	NetRole();
@@ -37,8 +40,12 @@ public:
     /**************************************************
             user's card info
     **************************************************/
+    /* during game */
     CardList   *_river;
     CardInHand *_cards;
+    /* after  game */
+    HuTarget_t  _aim;
+    HuFan_t     _fan;
     /**************************************************
             user's profile
     **************************************************/

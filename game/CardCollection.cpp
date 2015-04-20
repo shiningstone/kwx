@@ -12,6 +12,7 @@
         GroupSequence    3¸öÁ¬Ðø»¨É«
         Couple           Ò»¶Ô
         Char             ×Ö    
+        fan              ·¬ÐÍ
 *************************************************/
 
 
@@ -354,6 +355,9 @@ void CardInHand::cancel_ming() {
 	}
 }
 
+/***************************************************
+        ·¬ÐÍ¼ÆËã
+***************************************************/
 void CardInHand::_JudgeDaXiaoSanYuan() {
     if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {//å¤§ä¸‰å…ƒ
         _set(statHuFanMask,RH_DASANYUAN);

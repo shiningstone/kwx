@@ -3,6 +3,7 @@
 
 NetRole::NetRole() {
     _isReady = false;
+    
     memset(&_profile,0,sizeof(UserProfile_t));
     _cards = new CardInHand();
     _river = new CardList();
@@ -32,6 +33,7 @@ NetRole::~NetRole() {
         user's action
 **************************************************/
 unsigned char NetRole::init(int card_array[],int len,int aim) {
+    _aim = aim;
 	return _act->init(card_array,len,aim);
 }
 
