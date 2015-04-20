@@ -277,10 +277,11 @@ unsigned int NetRRound::ming_check()
     return handoutMask;
 }
 
-unsigned char NetRRound::init(int card_array[],int len)
+unsigned char NetRRound::init(int card_array[],int len,int aim)
 {
 	int i;
 
+	_AIM = aim;
 	rr_ting_flag = 0;
 	card_score=0;
 	hu_len=0;
