@@ -1,4 +1,6 @@
 
+#include "./../RaceType.h"
+
 #include "./../utils/UtilBasic.h"
 
 #include "CardCollection.h"
@@ -359,11 +361,11 @@ void CardInHand::cancel_ming() {
         ·¬ĞÍ¼ÆËã
 ***************************************************/
 void CardInHand::_JudgeDaXiaoSanYuan() {
-    if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {//å¤§ä¸‰å…ƒ
+    if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {//å¤§ä¸‰å…?
         _set(statHuFanMask,RH_DASANYUAN);
     } else if( (statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]==2) 
             || (statzhongFaBai[0]==2&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) 
-            || (statzhongFaBai[0]>=3&&statzhongFaBai[1]==2&&statzhongFaBai[2]>=3) ) {//å°ä¸‰å…ƒ
+            || (statzhongFaBai[0]>=3&&statzhongFaBai[1]==2&&statzhongFaBai[2]>=3) ) {//å°ä¸‰å…?
         _set(statHuFanMask,RH_XIAOSANYUAN);
     }
 }

@@ -3,11 +3,12 @@
 
 NetRole::NetRole() {
     _isReady = false;
-    
-    memset(&_profile,0,sizeof(UserProfile_t));
-    _cards = new CardInHand();
-    _river = new CardList();
-    _act   = new NetRRound(_cards);
+    memset(&_profile,0,sizeof(UserProfile_t));
+    _aim   = 0;
+    _fan   = 0;
+    _cards = NULL;
+    _river = NULL;
+    _act   = NULL;
 
     _logger = LOGGER_REGISTER("NetRole");
 }
@@ -15,16 +16,21 @@ NetRole::NetRole() {
 NetRole::NetRole(int id) {//this is for default settings ( robot ) 
     _isReady = false;
     memset(&_profile,0,sizeof(UserProfile_t));
-    _cards = new CardInHand();
-    _river = new CardList();
-    _act   = new NetRRound(_cards);
+    _aim   = 0;
+    _fan   = 0;
+    _cards = NULL;
+    _river = NULL;
+    _act   = NULL;
 
     _logger = LOGGER_REGISTER("NetRole");
 }
 
 NetRole::~NetRole() {
-    delete _act;
-    delete _river;
+    if(_act!=NULL) {
+        delete _act;
+        delete _river;
+        delete _cards;
+    }
     
     LOGGER_DEREGISTER(_logger);
 }
@@ -34,6 +40,11 @@ NetRole::~NetRole() {
 **************************************************/
 unsigned char NetRole::init(int card_array[],int len,int aim) {
     _aim = aim;
+
+    _cards = new CardInHand();
+    _river = new CardList();
+    _act   = new NetRRound(_cards,_fan,_aim);
+
 	return _act->init(card_array,len,aim);
 }
 

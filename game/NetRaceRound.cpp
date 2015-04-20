@@ -6,7 +6,8 @@
 
 USING_NS_CC;
 
-NetRRound::NetRRound(CardInHand *cardInHand) {
+NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
+:_fan(fan),_aim(aim) {
     _cardInHand = cardInHand;
 	hu_len=0;
 	kind_hu=0;

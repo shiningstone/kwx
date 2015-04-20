@@ -111,5 +111,8 @@ typedef struct _MingInfo_t {
     MingChoice_t  *handouts;    
 }MingInfo_t;
 
+typedef unsigned int HuTarget_t;
+typedef unsigned int HuFan_t;
+
 #endif
 

@@ -12,12 +12,15 @@ class CardList;
 class NetRRound
 {
 public:
-	NetRRound(CardInHand *cardInHand);
+	NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim);
     virtual ~NetRRound();
 
     CardInHand *_cardInHand;
 private:
     Logger *_logger;
+
+    const HuTarget_t _aim;
+	HuFan_t         &_fan;
 
     unsigned int  rr_aim;
     unsigned char rr_ting_flag;

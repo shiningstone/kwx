@@ -11,9 +11,6 @@
 #include "NetRaceRound.h"
 #include "DataBase.h"
 
-typedef unsigned int HuTarget_t;
-typedef unsigned int HuFan_t;
-
 class NetRole {
 public:
 	NetRole();

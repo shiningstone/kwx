@@ -137,10 +137,47 @@ void test_pattern_match() {
     assert( cards.Match() );
 }
 
+class son {
+public:
+	son(int &aim, int score);
+
+	int &_aim;
+	int _score;
+};
+
+son::son(int &aim, int score)
+:_aim(aim) {
+	_score = score;
+}
+
+class father {
+public:
+	int aim;
+	int score;
+
+	son *_son;
+
+	void init();
+};
+
+void father::init() {
+	_son = new son(aim,score);
+}
+
+void test_reference() {
+	father aFather;
+	aFather.init();
+
+	printf("father aim is %d\n",aFather.aim);
+	aFather._son->_aim = 5;
+	printf("father aim is %d\n",aFather.aim);
+}
 /**********************************
     main
 **********************************/
 void test_card_list() {
+	test_reference();
+
 	Card_t cards[] = {TIAO_1,TONG_1,ZHONG,FA,BAI};
 	CardInHand list;
 
