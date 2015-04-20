@@ -413,6 +413,8 @@ void CardInHand::_JudgePengPengHu() {
             GroupSameCount++;
         } else if(sameCount==2) {
             usedLen   += 2;
+        } else {
+            usedLen   += 1;
         }
     }
     
