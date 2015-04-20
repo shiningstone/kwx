@@ -799,6 +799,18 @@ void RoundManager::WaitForOthersChoose() {
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
 
+void RoundManager::_DistributeTo(PlayerDir_t dir) {
+    _players[dir]->get_parter()->hand_in(
+        _lastHandedOutCard,
+        _isCardFromOthers,
+        _players[dir]->get_parter()->get_ting_status(),
+        (_distributedNum==TOTAL_CARD_NUM),
+        _lastActionWithGold,
+        _continue_gang_times,
+        _isGangHua
+    );
+}
+
 void RoundManager::WaitForResponse(PlayerDir_t dir) {
     unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
     
@@ -861,6 +873,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _continue_gang_times,
                 _isGangHua
             );
+        _players[no]->_cards->pop_back();
         
         if(no==MIDDLE&&_isTuoGuan) {
             if(IsTing(MIDDLE)&&(action1&a_HU))
@@ -895,6 +908,9 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _continue_gang_times,
                 _isGangHua
             );
+        _players[no1]->_cards->pop_back();
+
+        
         if(no1==1&&_isTuoGuan)
         {
             if(_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
@@ -922,6 +938,9 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         if((action1&a_HU)&&(action2&a_HU))
         {
             _uiManager->HideClock();
+
+            _DistributeTo((PlayerDir_t)no);
+            _DistributeTo((PlayerDir_t)no1);
             
             if((no!=MIDDLE&&no1!=MIDDLE) || (no==MIDDLE||no1==MIDDLE&&IsTing(MIDDLE))){ 
                 SetWin(DOUBLE_WIN,(PlayerDir_t)_curPlayer);
@@ -941,6 +960,12 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             }
         } else if(action1&a_HU||action2&a_HU)//点炮
         {
+            if(action1&a_HU) {
+                _DistributeTo((PlayerDir_t)no);
+            } else {
+                _DistributeTo((PlayerDir_t)no1);
+            }
+            
             _uiManager->HideClock();
             
             if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU))) {
@@ -965,6 +990,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         else if(action1!=a_JUMP)//下家
         {
             _actionToDo=action1;
+            _DistributeTo((PlayerDir_t)no);
             if(no==1)
             {
                 _uiManager->UpdateClock(0,no);
@@ -981,6 +1007,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         else if(action2!=a_JUMP)//上家
         {
             _actionToDo=action2;
+            _DistributeTo((PlayerDir_t)no1);
             if(no1==1)
             {
                 _uiManager->UpdateClock(0,no1);
@@ -999,6 +1026,8 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             _actionToDo=action1;
             _curPlayer=(_curPlayer+1)%3;
             _uiManager->UpdateClock(0,_curPlayer);
+            _DistributeTo((PlayerDir_t)_curPlayer);
+            
             DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
         }
     }

@@ -28,6 +28,8 @@ public:
     RoundManager(NetRaceLayer *uiManager);
     ~RoundManager();
 
+    void _DistributeTo(PlayerDir_t dir);
+
     virtual void RecvPeng(PlayerDir_t dir);
     virtual void RecvHu(PlayerDir_t dir);
     virtual void RecvGang(PlayerDir_t dir);
