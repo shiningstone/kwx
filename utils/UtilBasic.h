@@ -15,6 +15,9 @@ extern INT32U _htonl(INT32U n);
 extern INT16U _ntohs(INT16U n);
 extern INT16U _htons(INT16U n);
 
+extern void _set(INT32U value,INT32U mask);
+extern void _clr(INT32U value,INT32U mask);
+extern bool _is_active(INT32U value,INT32U mask);
 /****************************************
 string tranfer to bytes
     seperator should be ','

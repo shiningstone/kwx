@@ -95,7 +95,7 @@ void NetMessenger::_collect_bytes() {
 		if( _inStart < _outStart )  {
 			availLen   = _outStart - _inStart;
 		} else {  
-			availLen   = BUFF_SIZE - _inStart;
+			availLen   = BUFF_SIZE - _inStart;    /* BUG: it could be package loss when _inStart==_outStart */
 		}  
   
         if(!_keepListen) {

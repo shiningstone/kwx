@@ -65,8 +65,6 @@ public:
     int statGroupSameNum;
     int statSameAsLastCard;
 
-    void set(int mask);
-    void clr(int mask);
     int statHuFanMask;
 
     /***************************************************

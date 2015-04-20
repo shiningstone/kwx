@@ -1,4 +1,6 @@
 
+#include "./../utils/UtilBasic.h"
+
 #include "CardCollection.h"
 
 #define MAX_HANDIN_NUM 18
@@ -357,16 +359,8 @@ bool CardInHand::IsKaWuXing(Card_t kind) const {
     return freeCards.is_ka_wu_xing(kind);
 }
 
-void CardInHand::set(int mask) {
-    statHuFanMask |= mask;
-}
-
-void CardInHand::clr(int mask) {
-    statHuFanMask &= ~mask;
-}
-
 void CardInHand::update_statistics(Card_t huKind) {
-    set(RH_QINYISE);
+    _set(statHuFanMask,RH_QINYISE);
         
     int color = huKind/9;;
         
@@ -381,16 +375,16 @@ void CardInHand::update_statistics(Card_t huKind) {
         }
 
 		if(	curCard/9!=color ) {
-            clr(RH_QINYISE);
+            _clr(statHuFanMask,RH_QINYISE);
 		}
         
 		if( curCard==huKind ) {
 			if(get_status(i)==sPENG) {
-                set(RH_MINGSIGUI);
+                _set(statHuFanMask,RH_MINGSIGUI);
             } else {
                 statSameAsLastCard++;
                 if(statSameAsLastCard==4) {
-                    set(RH_ANSIGUI);
+                    _set(statHuFanMask,RH_ANSIGUI);
                 }
             }
 		}
@@ -415,7 +409,7 @@ void CardInHand::update_statistics(Card_t huKind) {
 	}
     
 	if(statFreeCards==2) {
-		set(RH_SHOUYIZHUA);
+		_set(statHuFanMask,RH_SHOUYIZHUA);
  	} else {
 		int totalLen = size()-FreeStart;
         int usedLen  = 0;
@@ -442,7 +436,7 @@ void CardInHand::update_statistics(Card_t huKind) {
 		}
         
 		if(GroupSameCount==4) {
-            set(RH_SIPENG);
+            _set(statHuFanMask,RH_SIPENG);
         }
 	}
 }

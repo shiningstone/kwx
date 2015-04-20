@@ -2,6 +2,9 @@
 #include <string.h>
 #include "UtilBasic.h"
 
+/****************************************
+    endian conversion
+****************************************/
 INT32U _ntohl(INT32U n) {
     char *p = (char *)&n;
     char ha[4] = {0};
@@ -30,6 +33,21 @@ INT16U _ntohs(INT16U n) {
 
 INT16U _htons(INT16U n) {
     return _ntohs(n);
+}
+
+/****************************************
+    bit operation
+****************************************/
+void _set(INT32U value,INT32U mask) {
+    value |= mask;
+}
+
+void _clr(INT32U value,INT32U mask) {
+    value &= ~mask;
+}
+
+bool _is_active(INT32U value,INT32U mask) {
+    return (value & mask);
 }
 
 /****************************************
