@@ -45,7 +45,7 @@ unsigned char NetRole::init(int card_array[],int len,int aim) {
     _river = new CardList();
     _act   = new NetRRound(_cards,_fan,_aim);
 
-	return _act->init(card_array,len,aim);
+	return _act->init(card_array,len);
 }
 
 unsigned char NetRole::init(Card_t cards[],int len,int aim) {

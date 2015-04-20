@@ -52,7 +52,7 @@ private:
 public:
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     unsigned int ming_check();
-	unsigned char init(int card_array[],int len,int aim);
+	unsigned char init(int card_array[],int len);
     unsigned char hand_in(CARD_KIND kind,unsigned char isCardFromOthers,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     CARD_KIND hand_out(unsigned int place);
     ACT_RES action(bool isCardFromOther,ARRAY_ACTION act);
