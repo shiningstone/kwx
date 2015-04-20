@@ -354,9 +354,65 @@ void CardInHand::cancel_ming() {
 	}
 }
 
-bool CardInHand::IsKaWuXing(Card_t kind) const {
+void CardInHand::_JudgeDaXiaoSanYuan() {
+    if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {//大三元
+        _set(statHuFanMask,RH_DASANYUAN);
+    } else if( (statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]==2) 
+            || (statzhongFaBai[0]==2&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) 
+            || (statzhongFaBai[0]>=3&&statzhongFaBai[1]==2&&statzhongFaBai[2]>=3) ) {//小三元
+        _set(statHuFanMask,RH_XIAOSANYUAN);
+    }
+}
+
+void CardInHand::_JudgeKaWuXing(Card_t kind) {
     SmartList freeCards(*this,true);
-    return freeCards.is_ka_wu_xing(kind);
+    if( freeCards.is_ka_wu_xing(kind) ) {
+        _set(statHuFanMask,RH_KAWUXIN);
+    }
+}
+
+void CardInHand::_JudgeQiDui() {
+    if(statzhongFaBai[0]==2&&statzhongFaBai[1]==2&&statzhongFaBai[2]==2) {
+        _set(statHuFanMask,RH_SANYUANQIDUI);
+    } 
+    
+    if(statGroupSameNum==1) {
+        _set(statHuFanMask,RH_HAOHUAQIDUI);
+    } else if(statGroupSameNum==2) {
+        _set(statHuFanMask,RH_CHAOHAOHUAQIDUI);
+    } else if(statGroupSameNum==3) {
+        _set(statHuFanMask,RH_CHAOCHAOHAOHUAQIDUI);
+    } else {
+        _set(statHuFanMask,RH_QIDUI);
+    }
+}
+
+void CardInHand::_JudgePengPengHu() {
+    int usedLen  = 0;
+    int GroupSameCount = 0;
+    
+    for(int i=FreeStart;i<size();i+=usedLen) {
+        int sameCount = 1;
+        
+        for(int j=i+1;j<size();j++) {
+            if(get_kind(j)==get_kind(i)) {
+                sameCount++;
+            }
+        }
+        
+        if(sameCount==4) {
+            break;
+        } else if(sameCount==3) {
+            usedLen   += 3;
+            GroupSameCount++;
+        } else if(sameCount==2) {
+            usedLen   += 2;
+        }
+    }
+    
+    if(GroupSameCount==4) {
+        _set(statHuFanMask,RH_SIPENG);
+    }
 }
 
 void CardInHand::update_statistics(Card_t huKind) {
@@ -411,64 +467,15 @@ void CardInHand::update_statistics(Card_t huKind) {
 	if(statFreeCards==2) {
 		_set(statHuFanMask,RH_SHOUYIZHUA);
  	} else {
-		int totalLen = size()-FreeStart;
-        int usedLen  = 0;
-        int GroupSameCount = 0;
-        
-		for(int i=FreeStart;i<size();i+=usedLen) {
-			int sameCount = 1;
-            
-			for(int j=i+1;j<size();j++) {
-                if(get_kind(j)==get_kind(i)) {
-                    sameCount++;
-                }
-                    
-            }
-            
-            if(sameCount==4) {
-                break;
-            } else if(sameCount==3) {
-                usedLen   += 3;
-                GroupSameCount++;
-            } else if(sameCount==2) {
-                usedLen   += 2;
-            }
-		}
-        
-		if(GroupSameCount==4) {
-            _set(statHuFanMask,RH_SIPENG);
-        }
+		_JudgePengPengHu();
 	}
 
-
-    if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {//大三元
-        _set(statHuFanMask,RH_DASANYUAN);
-    } else if( (statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]==2) 
-            || (statzhongFaBai[0]==2&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) 
-            || (statzhongFaBai[0]>=3&&statzhongFaBai[1]==2&&statzhongFaBai[2]>=3) ) {//小三元
-        _set(statHuFanMask,RH_XIAOSANYUAN);
-    }
-
-
+    _JudgeDaXiaoSanYuan();
 
     if(statCouples==7 && size()==14) {
-        if(statzhongFaBai[0]==2&&statzhongFaBai[1]==2&&statzhongFaBai[2]==2) {
-            _set(statHuFanMask,RH_SANYUANQIDUI);
-        } 
-
-        if(statGroupSameNum==1) {
-            _set(statHuFanMask,RH_HAOHUAQIDUI);
-        } else if(statGroupSameNum==2) {
-            _set(statHuFanMask,RH_CHAOHAOHUAQIDUI);
-        } else if(statGroupSameNum==3) {
-            _set(statHuFanMask,RH_CHAOCHAOHAOHUAQIDUI);
-        } else {
-            _set(statHuFanMask,RH_QIDUI);
-        }
+        _JudgeQiDui();
     } else {
-        if(IsKaWuXing(huKind)) {
-            _set(statHuFanMask,RH_KAWUXIN);
-        }
+        _JudgeKaWuXing(huKind);
     }
 }
 
