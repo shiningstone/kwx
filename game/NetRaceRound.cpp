@@ -20,63 +20,46 @@ NetRRound::~NetRRound() {
     LOGGER_DEREGISTER(_logger);
 }
 
+typedef struct {
+    INT32U fan;
+    INT32U score;
+}FanScore_t;
+
+FanScore_t TblFanScore[] = {
+    /*  fan               coefficient*/
+	{ RH_QIANGGANG        , 2},
+	{ RH_GANGHUA          , 2},
+	{ RH_GANGPAO          , 2},
+	{ RH_HAIDILAO         , 2},
+	{ RH_MING             , 2},
+	{ RH_ZIMO             , 2},
+	{ RH_QINYISE          , 4},
+	{ RH_SIPENG           , 2},
+	{ RH_DASANYUAN        , 8},
+	{ RH_XIAOSANYUAN      , 4},
+	{ RH_ANSIGUI          , 4},
+	{ RH_MINGSIGUI        , 2},
+	{ RH_QIDUI            , 4},
+	{ RH_SANYUANQIDUI     , 32},
+	{ RH_HAOHUAQIDUI      , 8},
+	{ RH_CHAOHAOHUAQIDUI  , 32},
+	{ RH_CHAOCHAOHAOHUAQIDUI, 128},
+	{ RH_KAWUXIN          , 4},
+};
+
 long NetRRound::sum_up_score(unsigned int fan) {
 	long score = 1;
+    
+    int i = 0;
+    while(i<sizeof(TblFanScore)/sizeof(FanScore_t)) {
+        if(_is_active(fan,TblFanScore[i].fan)) {
+            score *= TblFanScore[i].score;
+        }
 
-	if(_is_active(fan,RH_QIANGGANG)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_GANGHUA)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_GANGPAO)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_HAIDILAO)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_MING)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_ZIMO)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_QINYISE)) {
-		score *= 4;
-	}
-	if(_is_active(fan,RH_SIPENG)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_DASANYUAN)) {
-		score *= 8;
-	}
-	if(_is_active(fan,RH_XIAOSANYUAN)) {
-		score *= 4;
-	}
-	if(_is_active(fan,RH_ANSIGUI)) {
-		score *= 4;
-	}
-	if(_is_active(fan,RH_MINGSIGUI)) {
-		score *= 2;
-	}
-	if(_is_active(fan,RH_QIDUI)) {
-		score *= 4;
-	}
-	if(_is_active(fan,RH_SANYUANQIDUI)) {
-		score *= 32;
-	}
-	if(_is_active(fan,RH_HAOHUAQIDUI)) {
-		score *= 8;
-	}
-	if(_is_active(fan,RH_CHAOHAOHUAQIDUI)) {
-		score *= 32;
-	}
-	if(_is_active(fan,RH_CHAOCHAOHAOHUAQIDUI)) {
-		score *= 128;
-	}
-	if(_is_active(fan,RH_KAWUXIN)) {
-		score *= 4;
-	}
+        i++;
+    }
+
+    return score;
 }
 
 long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
