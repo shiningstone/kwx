@@ -1,4 +1,6 @@
 
+#include "./../utils/UtilBasic.h"
+
 #include "NetRaceRound.h"
 #include "CardCollection.h"
 
@@ -39,114 +41,24 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 	long score = 1;
 	color=kind/9;
 
-    //this process could be moved to _cardInHand
-	for(i=0;i<_cardInHand->size();i++)
-	{
-		if(	_cardInHand->get_kind(i)/9!=color )
-		{
-			HuQingYiSe = false;
-		}
-		if(_cardInHand->get_status(i)==sFREE )
-		{
-			free_num++;
-		}
-		if( _cardInHand->get_kind(i)==(Card_t)kind )
-		{
-			if(_cardInHand->get_status(i)==sPENG)
-				HuMingSiGui = true;
-			last_card_same_num++;
-		}
-        
-		int l_cards=1;
-		for(int k=i+1;k<_cardInHand->size();k++)
-			if(_cardInHand->get_kind(i)==_cardInHand->get_kind(k) &&
-			 _cardInHand->get_status(i)==sFREE && _cardInHand->get_status(k)==sFREE)
-				l_cards++;
-        if(l_cards==2||l_cards==4)
-			couple_num++;
-
-        l_four_flag=1;
-        for(int k=i+1;k<_cardInHand->size();k++)
-			if(_cardInHand->get_kind(i)==_cardInHand->get_kind(k) &&
-			_cardInHand->get_status(k)==sFREE)
-				l_four_flag++;
-        if(l_four_flag==4)
-			four_num++;
-
-		if(_cardInHand->get_kind(i)==ZHONG)
-		{
-			zhong_num++;
-		}
-		else if(_cardInHand->get_kind(i)==FA)
-		{
-			fa_num++;
-		}
-		else if(_cardInHand->get_kind(i)==BAI)
-		{
-			bai_num++;
-		}
-	}
+    _cardInHand->update_statistics(kind);
+    hu_flag = _cardInHand->statHuFanMask;
     
-	if(free_num!=2)
-	{
-		int len=_cardInHand->size()-_cardInHand->FreeStart;
-		int l_couple=0;
-		for(int k=_cardInHand->FreeStart;k<_cardInHand->size();k++)
-		{
-			int l_num=1;
-			for(int t=k+1;t<_cardInHand->size();t++)
-				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(t))
-					l_num++;
-                
-			if(l_num==3)
-				len -= 3;
-
-            l_num=0;
-
-            for(int t=_cardInHand->FreeStart;t<_cardInHand->size();t++)
-				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(t))
-					l_num++;
-
-            if(l_num==2)
-				l_couple++;
-		}
-		if(len==2&&l_couple==2)
-			HuPengPengHu = true;
-	}
-	else
-	{
-		score *=4;
-		hu_flag|=RH_SHOUYIZHUA;//手抓一
-	}
-    
-	if(is_last_one)
-	{
-		score *= 2;
+    if(is_last_one) {
 		hu_flag|=RH_HAIDILAO;//海底捞
-	}
-	if(rr_ting_flag==1)
-	{
-		score *= 2;
+    }
+
+	if(rr_ting_flag==1) {
 		hu_flag|=RH_MING;//明牌
 	}
-	if(!isCardFromOthers)
-	{
-		score *= 2;
+
+	if(!isCardFromOthers) {
 		hu_flag|=RH_ZIMO;//自摸
 	}
-	if(HuQingYiSe)
-	{
-		score *= 4;
-		hu_flag |=RH_QINYISE;//清一色
-	}
-	if(HuPengPengHu)
-	{
-		score *= 2;
-		hu_flag |=RH_SIPENG;//碰碰胡
-	}
+
+
 	if((continue_gang_times!=0)&&(last_action_WithGold==a_MING_GANG||last_action_WithGold==a_AN_GANG||last_action_WithGold==a_QIANG_GANG))//杠胡
 	{
-		score *= 2;
 		if(!isCardFromOthers&&last_action_WithGold==a_QIANG_GANG)
 			hu_flag |= RH_QIANGGANG;
 		else if(!isCardFromOthers&&isGangHua)
@@ -154,65 +66,62 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 		else if(isCardFromOthers)
 			hu_flag |= RH_GANGPAO;
 	}
-	if(zhong_num>=3&&fa_num>=3&&bai_num>=3)//大三元
-	{
+
+	if(_is_active(hu_flag,RH_QIANGGANG)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_GANGHUA)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_GANGPAO)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_HAIDILAO)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_MING)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_ZIMO)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_QINYISE)) {
+		score *= 4;
+	}
+	if(_is_active(hu_flag,RH_SIPENG)) {
+		score *= 2;
+	}
+	if(_is_active(hu_flag,RH_DASANYUAN)) {
 		score *= 8;
-		hu_flag |= RH_DASANYUAN;
 	}
-	else if( (zhong_num>=3&&fa_num>=3&&bai_num==2) ||
-			 (zhong_num==2&&fa_num>=3&&bai_num>=3) ||
-			 (zhong_num>=3&&fa_num==2&&bai_num>=3) )
-	{
+	if(_is_active(hu_flag,RH_XIAOSANYUAN)) {
 		score *= 4;
-		hu_flag |= RH_XIAOSANYUAN;//小三元
 	}
-	if(last_card_same_num==4)
-	{
-		if(HuMingSiGui)
-		{
-			score *= 2;
-			hu_flag |= RH_MINGSIGUI;//明四归
-		}
-		else
-		{
-			score *= 4;
-			hu_flag |= RH_ANSIGUI;//暗四归
-		}
-	}
-	if(couple_num==7&&_cardInHand->size()==HAND_IN_CARD_NUM)
-	{
+	if(_is_active(hu_flag,RH_ANSIGUI)) {
 		score *= 4;
-		int j;
-		if(zhong_num==2&&fa_num==2&&bai_num==2)
-		{
-			score *= 8;
-			hu_flag |= RH_SANYUANQIDUI;//三元七对
-		}
-		if(four_num==1)
-		{
-			score *= 2;
-			hu_flag |= RH_HAOHUAQIDUI;//豪华七对
-		}
-		else if(four_num==2)
-		{
-			score *= 8;
-			hu_flag |= RH_CHAOHAOHUAQIDUI;//超豪华七对
-		}
-		else if(four_num==3)
-		{
-			score *= 32;
-			hu_flag |= RH_CHAOCHAOHAOHUAQIDUI;//超超豪华七对
-		}
-		else
-			hu_flag |= RH_QIDUI;//七对
 	}
-	else if(kind==ck_WU_TIAO||kind==ck_WU_TONG)
-	{
-	    if(_cardInHand->IsKaWuXing((Card_t)kind)) {
-            score *= 4;
-            hu_flag |= RH_KAWUXIN;
-        }
+	if(_is_active(hu_flag,RH_MINGSIGUI)) {
+		score *= 2;
 	}
+	if(_is_active(hu_flag,RH_QIDUI)) {
+		score *= 4;
+	}
+	if(_is_active(hu_flag,RH_SANYUANQIDUI)) {
+		score *= 32;
+	}
+	if(_is_active(hu_flag,RH_HAOHUAQIDUI)) {
+		score *= 8;
+	}
+	if(_is_active(hu_flag,RH_CHAOHAOHUAQIDUI)) {
+		score *= 32;
+	}
+	if(_is_active(hu_flag,RH_CHAOCHAOHAOHUAQIDUI)) {
+		score *= 128;
+	}
+	if(_is_active(hu_flag,RH_KAWUXIN)) {
+		score *= 4;
+	}
+
     
 	kind_hu=hu_flag;
     

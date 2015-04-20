@@ -439,6 +439,37 @@ void CardInHand::update_statistics(Card_t huKind) {
             _set(statHuFanMask,RH_SIPENG);
         }
 	}
+
+
+    if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {//大三元
+        _set(statHuFanMask,RH_DASANYUAN);
+    } else if( (statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]==2) 
+            || (statzhongFaBai[0]==2&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) 
+            || (statzhongFaBai[0]>=3&&statzhongFaBai[1]==2&&statzhongFaBai[2]>=3) ) {//小三元
+        _set(statHuFanMask,RH_XIAOSANYUAN);
+    }
+
+
+
+    if(statCouples==7 && size()==14) {
+        if(statzhongFaBai[0]==2&&statzhongFaBai[1]==2&&statzhongFaBai[2]==2) {
+            _set(statHuFanMask,RH_SANYUANQIDUI);
+        } 
+
+        if(statGroupSameNum==1) {
+            _set(statHuFanMask,RH_HAOHUAQIDUI);
+        } else if(statGroupSameNum==2) {
+            _set(statHuFanMask,RH_CHAOHAOHUAQIDUI);
+        } else if(statGroupSameNum==3) {
+            _set(statHuFanMask,RH_CHAOCHAOHAOHUAQIDUI);
+        } else {
+            _set(statHuFanMask,RH_QIDUI);
+        }
+    } else {
+        if(IsKaWuXing(huKind)) {
+            _set(statHuFanMask,RH_KAWUXIN);
+        }
+    }
 }
 
 /***************************************************
