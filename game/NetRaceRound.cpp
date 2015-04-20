@@ -20,113 +20,99 @@ NetRRound::~NetRRound() {
     LOGGER_DEREGISTER(_logger);
 }
 
+long NetRRound::sum_up_score(unsigned int fan) {
+	long score = 1;
+
+	if(_is_active(fan,RH_QIANGGANG)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_GANGHUA)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_GANGPAO)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_HAIDILAO)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_MING)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_ZIMO)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_QINYISE)) {
+		score *= 4;
+	}
+	if(_is_active(fan,RH_SIPENG)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_DASANYUAN)) {
+		score *= 8;
+	}
+	if(_is_active(fan,RH_XIAOSANYUAN)) {
+		score *= 4;
+	}
+	if(_is_active(fan,RH_ANSIGUI)) {
+		score *= 4;
+	}
+	if(_is_active(fan,RH_MINGSIGUI)) {
+		score *= 2;
+	}
+	if(_is_active(fan,RH_QIDUI)) {
+		score *= 4;
+	}
+	if(_is_active(fan,RH_SANYUANQIDUI)) {
+		score *= 32;
+	}
+	if(_is_active(fan,RH_HAOHUAQIDUI)) {
+		score *= 8;
+	}
+	if(_is_active(fan,RH_CHAOHAOHUAQIDUI)) {
+		score *= 32;
+	}
+	if(_is_active(fan,RH_CHAOCHAOHAOHUAQIDUI)) {
+		score *= 128;
+	}
+	if(_is_active(fan,RH_KAWUXIN)) {
+		score *= 4;
+	}
+}
+
 long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
-	int i;
-	unsigned char color;
-	unsigned char l_four_flag=0;
-	bool HuQingYiSe = true;
-	bool HuMingSiGui = false;
-	bool HuPengPengHu = false;
-	unsigned char free_num=0;
-	unsigned char couple_num=0;
-    
-	unsigned char zhong_num=0;
-	unsigned char fa_num=0;
-	unsigned char bai_num=0;
-
-    unsigned char four_num=0;
-	unsigned char last_card_same_num=0;
-	unsigned int  hu_flag = 0;
-	long score = 1;
-	color=kind/9;
-
     _cardInHand->update_statistics(kind);
-    hu_flag = _cardInHand->statHuFanMask;
+    kind_hu = _cardInHand->statHuFanMask;
     
     if(is_last_one) {
-		hu_flag|=RH_HAIDILAO;//海底捞
+		kind_hu|=RH_HAIDILAO;//海底捞
     }
 
 	if(rr_ting_flag==1) {
-		hu_flag|=RH_MING;//明牌
+		kind_hu|=RH_MING;//明牌
 	}
 
 	if(!isCardFromOthers) {
-		hu_flag|=RH_ZIMO;//自摸
+		kind_hu|=RH_ZIMO;//自摸
 	}
 
-
-	if((continue_gang_times!=0)&&(last_action_WithGold==a_MING_GANG||last_action_WithGold==a_AN_GANG||last_action_WithGold==a_QIANG_GANG))//杠胡
+	if((continue_gang_times!=0)
+        &&(last_action_WithGold==a_MING_GANG
+            ||last_action_WithGold==a_AN_GANG
+            ||last_action_WithGold==a_QIANG_GANG))//杠胡
 	{
 		if(!isCardFromOthers&&last_action_WithGold==a_QIANG_GANG)
-			hu_flag |= RH_QIANGGANG;
+			kind_hu |= RH_QIANGGANG;
 		else if(!isCardFromOthers&&isGangHua)
-			hu_flag |= RH_GANGHUA;
+			kind_hu |= RH_GANGHUA;
 		else if(isCardFromOthers)
-			hu_flag |= RH_GANGPAO;
+			kind_hu |= RH_GANGPAO;
 	}
 
-	if(_is_active(hu_flag,RH_QIANGGANG)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_GANGHUA)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_GANGPAO)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_HAIDILAO)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_MING)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_ZIMO)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_QINYISE)) {
-		score *= 4;
-	}
-	if(_is_active(hu_flag,RH_SIPENG)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_DASANYUAN)) {
-		score *= 8;
-	}
-	if(_is_active(hu_flag,RH_XIAOSANYUAN)) {
-		score *= 4;
-	}
-	if(_is_active(hu_flag,RH_ANSIGUI)) {
-		score *= 4;
-	}
-	if(_is_active(hu_flag,RH_MINGSIGUI)) {
-		score *= 2;
-	}
-	if(_is_active(hu_flag,RH_QIDUI)) {
-		score *= 4;
-	}
-	if(_is_active(hu_flag,RH_SANYUANQIDUI)) {
-		score *= 32;
-	}
-	if(_is_active(hu_flag,RH_HAOHUAQIDUI)) {
-		score *= 8;
-	}
-	if(_is_active(hu_flag,RH_CHAOHAOHUAQIDUI)) {
-		score *= 32;
-	}
-	if(_is_active(hu_flag,RH_CHAOCHAOHAOHUAQIDUI)) {
-		score *= 128;
-	}
-	if(_is_active(hu_flag,RH_KAWUXIN)) {
-		score *= 4;
-	}
-
-    
-	kind_hu=hu_flag;
+    long score = sum_up_score(kind_hu);
     
 	if(rr_aim!=RA_NOTASK)
-		task_check(hu_flag);
+		task_check(kind_hu);
     
 	return score;
 }

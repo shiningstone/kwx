@@ -40,6 +40,7 @@ private:
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
     void transform(const SmartList &input,CARD_KIND output[]);
     int cards_stable(CARD_KIND clist[],int len);
+    long sum_up_score(unsigned int fan);
     long cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     int cal_times(CARD_KIND kind,CARD_KIND data[],int len);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
