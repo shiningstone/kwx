@@ -3,7 +3,8 @@
 
 NetRole::NetRole() {
     _isReady = false;
-    memset(&_profile,0,sizeof(UserProfile_t));
+    memset(&_profile,0,sizeof(UserProfile_t));
+
     _aim   = 0;
     _fan   = 0;
     _cards = NULL;

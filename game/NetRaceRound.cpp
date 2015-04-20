@@ -66,7 +66,7 @@ long NetRRound::sum_up_score(unsigned int fan) {
 
 long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
 {
-    _cardInHand->update_statistics(kind);
+    _cardInHand->update_statistics((Card_t)kind);
     _fan = _cardInHand->statHuFanMask;
     
     if(is_last_one) {
@@ -103,7 +103,7 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 }
 
 int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len) {
-    _cardInHand->update_statistics(kind);
+    _cardInHand->update_statistics((Card_t)kind);
     return sum_up_score(_cardInHand->statHuFanMask);
 }
 

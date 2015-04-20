@@ -30,7 +30,6 @@ private:
 
     long card_score;
 	int InsertPlaceForMG;
-	unsigned int _fan;
 	int hu_places;
 	int hu_places_num;
 	CARD_KIND hucards[9];
