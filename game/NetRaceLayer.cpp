@@ -554,14 +554,14 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
 
     switch(dir) {
         case MIDDLE:
-            x += _GetCardInHand(MIDDLE,cardLen-1)->getPosition().x+30;
+            x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
             y += 60 + 13*(_roundManager->IsTing(dir));
             break;
         case LEFT:
             y = _GetCardInHand(LEFT,cardLen-1)->getPosition().y-20;//+5;
             break;
         case RIGHT:
-            y = _GetCardInHand(RIGHT,cardLen-1)->getPosition().y+86;
+            y = _GetCardInHand(RIGHT,cardLen)->getPosition().y+86;
             break;
     }
     
@@ -1857,7 +1857,6 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
                 _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(MIDDLE));
     			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
-		_roundManager->_isCardFromOthers = true;
 		_roundManager->WaitForResponse(MIDDLE);}),
         NULL));
 }
@@ -2525,7 +2524,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		return;
 	}
     
-    for(int i=cards.start; i<cards.last; i++) {
+    for(int i=cards.start; i<=cards.last; i++) {
 		_GetCardInHand(MIDDLE,i)->setOpacity(255);
     }
 
