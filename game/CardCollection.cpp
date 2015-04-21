@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "./../RaceType.h"
 
 #include "./../utils/UtilBasic.h"

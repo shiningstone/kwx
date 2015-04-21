@@ -70,7 +70,7 @@ void GameScene::race_start_again()
 		    }
 	    }
         sprintf(buf+usedBytes, "\n");
-        log(buf);
+        //log(buf);
 
         set_cards_sequence(card_seq);
 		set_aims_sequence(aim);

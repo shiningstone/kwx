@@ -99,13 +99,13 @@ int RequestSendAction::Set(ActionId_t action,int kindNum,Card_t card[]) {
         cardKind[0] = CARD_UNKNOWN;
     } else {
         for(int i=0;i<kindNum;i++) {
-            cardKind[i] = (INT8U)card;
+            cardKind[i] = (INT8U)card[i];
         }
     }
 
     AddSeatInfo();
     _add_item( new Item((Item_t)134,4,(INT8U *)&actionId) );
-    _add_item( new Item((Item_t)135,kindNum,(INT8U *)&cardKind) );
+    _add_item( new Item((Item_t)135,kindNum,(INT8U *)cardKind) );
 
     return 0;
 }

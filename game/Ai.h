@@ -4,6 +4,8 @@
 
 #include "RaceType.h"
 
+#include "./../utils/BasicType.h"
+
 class RoundManager;
 class Ai {
 public:

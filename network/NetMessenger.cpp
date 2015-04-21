@@ -135,7 +135,7 @@ NetMessenger * NetMessenger::getInstance() {
 
 void NetMessenger::destroyInstance() {
     _keepListen = false;
-    _handle_msg = false;
+    _handle_msg = 0;
     delete _instance;
     _instance = 0;
 }

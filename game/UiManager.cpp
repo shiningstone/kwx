@@ -1,4 +1,7 @@
 
+#include "Ai.h"
+#include "NetRaceLayer.h"
+#include "RoundManager.h"
 #include "UiManager.h"
 
 /*************************************

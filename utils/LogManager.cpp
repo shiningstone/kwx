@@ -55,7 +55,7 @@ int Logger::Write(const char * format, ...) {
         vsprintf( buf+strlen(_owner)+strlen("[]: "), format, args );
         va_end(args);
 
-        log(buf);
+        log("%s",buf);
     }
 
     return RET_OK;
@@ -81,7 +81,7 @@ int Logger::WriteArray(const char *pkg,int len) {
 	
     sprintf(buf+usedBytes, "\n");
 
-    log(buf);
+    log("%s",buf);
 
     return RET_OK;
 }

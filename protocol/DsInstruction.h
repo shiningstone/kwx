@@ -180,7 +180,7 @@ typedef enum {
     HU_PAI = 1,
     ZI_MO,
     DIAN_PAO,
-};
+}HuKind_t;
 
 typedef struct {
     INT8U   winType;
