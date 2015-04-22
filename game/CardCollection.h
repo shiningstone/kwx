@@ -49,6 +49,8 @@ protected:
 class SmartList;
 class CardInHand : public CardList {
 public:
+    CardInHand();
+    
     void   init(Card_t *cards,int len);
     void   delete_card(int from,int len);
     void   insert_card(CardNode_t data);

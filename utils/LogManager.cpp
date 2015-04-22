@@ -24,7 +24,7 @@ void Logger::Set(bool value) {
 }
 
 #ifdef __UNIT_TEST__
-#define log(x) printf(x)
+#define log(x,y) printf(x,y)
 #else
 /*************************************
     use cocos2d log function

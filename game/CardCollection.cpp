@@ -124,6 +124,19 @@ int CardList::generate_raw(Card_t * array) {
 /***********************************************
 
 ***********************************************/
+CardInHand::CardInHand() {
+    IsMing = false;
+    
+    statFreeCards      = 0;
+    statCouples        = 0;
+    statGroupSameNum   = 0;
+    statzhongFaBai[0]  = 0;
+    statzhongFaBai[1]  = 0;
+    statzhongFaBai[2]  = 0;
+    statSameAsLastCard = 0;
+    statHuFanMask      = 0;
+}
+
 void CardInHand::init(Card_t *cards,int len) {
     clear();
 
