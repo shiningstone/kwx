@@ -57,6 +57,7 @@ public:
     void   perform(ActionId_t act);
     
     int    FreeStart;
+    bool   IsMing;
 
     /* statistics , only used for calculating score */
     int statFreeCards;
@@ -129,6 +130,7 @@ public:
 	void remove(int num,int deletes[]);
     void insert(Card_t kind);
     void displace(int changeIdx, Card_t kind);
+    
     bool is_ka_wu_xing(Card_t wuXing)const;
     bool can_hu()const;
 

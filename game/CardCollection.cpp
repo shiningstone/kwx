@@ -130,6 +130,8 @@ void CardInHand::init(Card_t *cards,int len) {
 	for(int i=0;i<len;i++) {
 		push_back(cards[i]);
 	}
+
+    IsMing = false;
     
     statFreeCards      = 0;
     statCouples        = 0;
@@ -473,6 +475,10 @@ void CardInHand::update_statistics(Card_t huKind) {
         if(sameCard==4)
 			statGroupSameNum++;
 	}
+
+    if(IsMing) {
+		_set(statHuFanMask,RH_MING);
+    }
     
 	if(statFreeCards==2) {
 		_set(statHuFanMask,RH_SHOUYIZHUA);

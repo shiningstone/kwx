@@ -23,7 +23,6 @@ private:
     HuTarget_t       _aimDone;
 	HuFan_t         &_fan;
 
-    unsigned char rr_ting_flag;
     unsigned int  archive_ming_indexes;
     
     CARD_ARRAY *card_list;

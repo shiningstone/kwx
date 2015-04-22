@@ -70,21 +70,17 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
     _fan = _cardInHand->statHuFanMask;
     
     if(is_last_one) {
-		_fan|=RH_HAIDILAO;//海底捞
+		_fan|=RH_HAIDILAO;
     }
 
-	if(rr_ting_flag==1) {
-		_fan|=RH_MING;//明牌
-	}
-
 	if(!isCardFromOthers) {
-		_fan|=RH_ZIMO;//自摸
+		_fan|=RH_ZIMO;
 	}
 
 	if((continue_gang_times!=0)
         &&(last_action_WithGold==a_MING_GANG
             ||last_action_WithGold==a_AN_GANG
-            ||last_action_WithGold==a_QIANG_GANG))//杠胡
+            ||last_action_WithGold==a_QIANG_GANG))
 	{
 		if(!isCardFromOthers&&last_action_WithGold==a_QIANG_GANG)
 			_fan |= RH_QIANGGANG;
@@ -281,7 +277,6 @@ unsigned char NetRRound::init(int card_array[],int len,int aim)
 {
 	int i;
 
-	rr_ting_flag = 0;
 	card_score=0;
 	hu_len=0;
 	hu_places_num=0;
@@ -345,7 +340,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 	card->canPlay = true;
     _cardInHand->push_back(card);
 
-	if(rr_ting_flag==0)
+	if(!_cardInHand->IsMing)
 	{
 		int card_num;
 		for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
@@ -420,7 +415,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 
 	if(!isCardFromOthers)
 	{
-		if(rr_ting_flag==0 && !is_last_one)
+		if(!_cardInHand->IsMing && !is_last_one)
 		{
 			if(( archive_ming_indexes=ming_check())!=0 )
 				res |= a_MING;
@@ -713,7 +708,8 @@ void NetRRound::set_ming_indexes(unsigned int indexesFlag)
 
 void NetRRound::set_ting_status(unsigned char flag)
 {
-	rr_ting_flag=flag;
+    _cardInHand->IsMing = (flag==1);
+
 	hu_len=0;
 	for(int i=0;i<21;i++)
 		if(hu_check(CARD_KIND(i))==1)
@@ -729,7 +725,7 @@ void NetRRound::get_hu_cards(CARD_KIND c_list[],int *len)
 
 unsigned char NetRRound::get_ting_status()
 {
-	return rr_ting_flag;
+	return _cardInHand->IsMing;
 }
 
 long NetRRound::get_card_score()

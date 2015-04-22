@@ -120,7 +120,7 @@ private:
     bool _IsClickedOn(Node* button,Touch* touch);
     void _Show(Node *parent, int childTag,bool flag);
 
-    /*Ming*/
+    /*IsMing*/
     bool _KouTouchBegan(Touch* touch, Event* event);
     int _FindChosenGroup(Touch *touch,Sprite *cardsInHand[]);
     void _KouTouchEnded(Touch* touch, Event* event);
