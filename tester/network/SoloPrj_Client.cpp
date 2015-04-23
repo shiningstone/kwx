@@ -8,7 +8,7 @@ typedef enum {
     STRING,
 }MessageType_t;
 
-int ctoi(char c) {
+static int ctoi(char c) {
     if( c>='0' && c <= '9' ) {
         return c-'0';
     } else if( (c>='a' && c<='f') || (c>='A' &&c<='F' ) ) {
@@ -38,7 +38,7 @@ void test_client_console() {
 
     printf("please input the IP address of the server:\n");
     scanf("%s",&serverIp);
-    printf("please select the message format(0-HEX, 1-String):\n");
+    printf("please select the message format(0-HEX, 1-String, 2-String and only send):\n");
     scanf_s("%d",&choice);
 
     while(1) {
@@ -58,14 +58,15 @@ void test_client_console() {
             } else {
                 printf("please input a message:\n");
                 scanf_s("%s",buf,256);
-                if( !strcmp(buf,"switch") ) {
+                if( !strcmp(buf,"switch")  && choice<2  ) {
                     choice = 1-choice;
                 }
             }
 
             CLIENT.Send(buf,strlen(buf));
-
-        	CLIENT.Recv(_clientBuff,&_clientBuffLen);
+            if(choice!=2) {
+            	CLIENT.Recv(_clientBuff,&_clientBuffLen);
+            }
         } else {
         	CLIENT.Start(serverIp);
             printf("client started\n");
