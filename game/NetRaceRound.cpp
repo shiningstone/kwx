@@ -179,6 +179,24 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 	return false;
 }
 
+void NetRRound::get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]) {
+    for(int i=0;i<_TingInfo->cardNum;i++) {
+        Card_t huKind = _TingInfo->cards[i]->kind;
+        int    sameKindInHand = 0;
+
+        for(int j=0;j<_cardInHand()->size();j++) {
+            /* why this judgement is required ??? */
+            if(_cardInHand->get_status(j)==sFREE||_cardInHand->get_status(j)==c_AN_GANG||_cardInHand->get_status(j)==sMING_KOU) {
+                if(huKind==_cardInHand->get_kind(j)) {
+                    sameKindInHand++;
+                }
+            }
+        }
+
+        curArray[j][i] = hu_residueForEvery[j][i] - sameKindInHand;
+    }
+}
+
 void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 {
 	int temp=0;

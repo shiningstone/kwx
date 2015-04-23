@@ -23,6 +23,9 @@ private:
     HuTarget_t       _aimDone;
 	HuFan_t         &_fan;
 
+    TingInfo_t       _TingInfo;
+    void get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]);
+
     unsigned int  archive_ming_indexes;
     
     CARD_ARRAY *card_list;
