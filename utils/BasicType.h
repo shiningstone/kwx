@@ -55,6 +55,7 @@ typedef enum {
     FA,
     BAI,        
     CARD_KIND_MAX,
+    CARD_HIDE = 0xfe,
     CARD_UNKNOWN = 0xff,
 }Card_t;
 

@@ -21,7 +21,7 @@ NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
 }
 
 NetRRound::~NetRRound() {
-    /*NOTE : _TingInfo need to be release*/
+    ClearTingInfo();
     delete card_list;
     LOGGER_DEREGISTER(_logger);
 }
@@ -245,12 +245,11 @@ unsigned int NetRRound::ming_check2()
 		if(_cardInHand->get_status(i)==sMING_KOU) {
 			continue;
         } else {
-            CARD_KIND lastHuCard = ck_NOT_DEFINED;
-            CARD_KIND curCard    = (CARD_KIND)_cardInHand->get_kind(i);;
+            Card_t lastHuCard = CARD_UNKNOWN;
+            Card_t curCard    = (CARD_KIND)_cardInHand->get_kind(i);;
             
-            if(curCard==lastHuCard) {
+            if(curCard==lastHuCard && lastHuCard!=CARD_UNKNOWN) {
                 handoutMask |= (1<<i);
-                continue;
             } else {
                 ClearTingInfo();
             
@@ -265,8 +264,9 @@ unsigned int NetRRound::ming_check2()
                         lastHuCard = curCard;
 
                         (huCards+_TingInfo.cardNum)->kind = (Card_t)k;
-                        (huCards+_TingInfo.cardNum)->fan  = cal_times((Card_t)k);
-                        
+                        (huCards+_TingInfo.cardNum)->fan  = cal_times(k);
+
+                        /* why??? */
                         for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
                             if( _cardInHand->get_kind(s_l)==k&&_cardInHand->get_status(s_l)==sPENG) {
                                 (huCards+_TingInfo.cardNum)->fan *= 2;
