@@ -30,6 +30,18 @@ void StringToHex(char *buf) {
     memcpy(buf,Hex,i);
 }
 
+int ArrayToSend[15][128] = {
+    { 0x4b,0x57,0x58,0x10,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x00,0x2c,0x00,0x2d,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x84,0x00,0x04,0x01,0x02,0x03,0x04,0x83,0x00,0x04,0x05,0x06,0x07,0x08 },
+};
+
+void GetArray(char *buf, int line) {
+    memset(buf,0,128);
+    
+    for(int i=0;i<128;i++) {
+        buf[i] = ArrayToSend[line][i];
+    }
+}
+
 void test_client_console() {
     ClientSocket CLIENT;
     bool start = false;
@@ -41,6 +53,8 @@ void test_client_console() {
     printf("please select the message format(0-HEX, 1-String, 2-String and only send):\n");
     scanf_s("%d",&choice);
 
+    int lineToSend = 0;
+
     while(1) {
         if(start) {
             char buf[256]         = {0};
@@ -49,9 +63,14 @@ void test_client_console() {
 
             if(choice==HEX) {
                 printf("please input a Hex array(use '-' as the seperator):\n");
+                printf("or select a constant array with a 'G', range 'G0-Gf':\n");
                 scanf_s("%s",buf,256);
+
                 if( !strcmp(buf,"switch") ) {
                     choice = 1-choice;
+                } else if( buf[0]=='G' ){
+                    lineToSend = ctoi(buf[1]);
+                    GetArray(buf,lineToSend);
                 } else {
                     StringToHex(buf);            
                 }
@@ -63,7 +82,11 @@ void test_client_console() {
                 }
             }
 
-            CLIENT.Send(buf,strlen(buf));
+            if(choice!=HEX) {
+                CLIENT.Send(buf,strlen(buf));
+            } else {
+                CLIENT.Send(buf,128);
+            }
             if(choice!=2) {
             	CLIENT.Recv(_clientBuff,&_clientBuffLen);
             }
