@@ -11,6 +11,9 @@ NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
     _cardInHand = cardInHand;
 	_fan=0;
 
+    _TingInfo.cardNum = 0;
+    _TingInfo.cards   = NULL;
+
 	hu_len=0;
     card_list = new CARD_ARRAY;
 
@@ -18,8 +21,15 @@ NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
 }
 
 NetRRound::~NetRRound() {
+    /*NOTE : _TingInfo need to be release*/
     delete card_list;
     LOGGER_DEREGISTER(_logger);
+}
+
+void NetRRound::ClearTingInfo() {
+    for(int i=0;i<_TingInfo.cardNum;i++) {
+
+    }
 }
 
 typedef struct {
@@ -98,7 +108,7 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 	return score;
 }
 
-int NetRRound::cal_times(CARD_KIND kind,CARD_KIND data[],int len) {
+int NetRRound::cal_times(CARD_KIND kind) {
     _cardInHand->update_statistics((Card_t)kind);
     return sum_up_score(_cardInHand->statHuFanMask);
 }
@@ -180,8 +190,8 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 }
 
 void NetRRound::get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]) {
-    for(int i=0;i<_TingInfo->cardNum;i++) {
-        Card_t huKind = _TingInfo->cards[i]->kind;
+    for(int i=0;i<_TingInfo.cardNum;i++) {
+        Card_t huKind = _TingInfo.cards[i]->kind;
         int    sameKindInHand = 0;
 
         for(int j=0;j<_cardInHand()->size();j++) {
@@ -222,6 +232,77 @@ void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 			curArray[a][b]=temp;
 		}
 	}
+}
+
+unsigned int NetRRound::ming_check2()
+{
+	unsigned int handoutMask =0;
+
+	hu_places_num=0;
+	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
+	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
+	memset(huTiemsForEveryOne,0,sizeof(int)*MAX_HANDIN_NUM*9);
+
+    CARD_KIND last_card=ck_NOT_DEFINED;
+
+	for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
+	{
+		if(_cardInHand->get_status(i)==sMING_KOU) {
+			continue;
+        } else {
+            CARD_KIND cur_card = (CARD_KIND)_cardInHand->get_kind(i);;
+            
+            if(cur_card==last_card)
+            {
+                handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );
+
+                hu_cards_num[i]=hu_cards_num[i-1];
+                memcpy(hu_cards[i],hu_cards[i-1],sizeof(CARD_KIND)*9);
+                memcpy(huTiemsForEveryOne[i],huTiemsForEveryOne[i-1],sizeof(int)*9);
+            } else {
+                ClearTingInfo();
+            
+                int huKindIdx = 0;
+                
+                for(int k=0;k<CARD_KIND_MAX;k++) {
+                    SmartList cards(*_cardInHand,true);
+                    cards.displace(i-_cardInHand->FreeStart,(Card_t)k);
+
+                    if( cards.can_hu() ) {
+                        handoutMask |= (1<<i);
+
+                        TingItem_t newTingCard = new TingItem_t;
+                        newTingCard->kind = (Card_t)k;
+                        newTingCard->fan  = cal_times(CARD_KIND(k));
+                        
+                        for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
+                            if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
+                                newTingCard->fan *= 2;
+                                break;
+                            }
+                        }
+
+                        _TingInfo.cards[_TingInfo.cardNum] = new newTingCard;
+                        _TingInfo.cardNum++;
+
+                        huKindIdx++;
+                    }
+                }
+                
+                last_card = cur_card;
+            }
+        }
+	}
+    
+	for(int i=0;i<MAX_HANDIN_NUM;i++) {
+		if(handoutMask&(1<<i)) {
+			hu_places_num++;
+        }
+    }
+
+    hu_places = handoutMask;
+
+    return handoutMask;
 }
 
 unsigned int NetRRound::ming_check()
