@@ -108,8 +108,8 @@ long NetRRound::cal_score(CARD_KIND kind,bool isCardFromOthers,bool is_last_one,
 	return score;
 }
 
-int NetRRound::cal_times(CARD_KIND kind) {
-    _cardInHand->update_statistics((Card_t)kind);
+int NetRRound::cal_times(Card_t kind) {
+    _cardInHand->update_statistics(kind);
     return sum_up_score(_cardInHand->statHuFanMask);
 }
 
@@ -191,10 +191,10 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 
 void NetRRound::get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]) {
     for(int i=0;i<_TingInfo.cardNum;i++) {
-        Card_t huKind = _TingInfo.cards[i]->kind;
+        Card_t huKind = _TingInfo.cards[i].kind;
         int    sameKindInHand = 0;
 
-        for(int j=0;j<_cardInHand()->size();j++) {
+        for(int j=0;j<_cardInHand->size();j++) {
             /* why this judgement is required ??? */
             if(_cardInHand->get_status(j)==sFREE||_cardInHand->get_status(j)==c_AN_GANG||_cardInHand->get_status(j)==sMING_KOU) {
                 if(huKind==_cardInHand->get_kind(j)) {
@@ -203,7 +203,7 @@ void NetRRound::get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]) {
             }
         }
 
-        curArray[j][i] = hu_residueForEvery[j][i] - sameKindInHand;
+        curArray[i][huKind] = hu_residueForEvery[i][huKind] - sameKindInHand;
     }
 }
 
@@ -239,30 +239,22 @@ unsigned int NetRRound::ming_check2()
 	unsigned int handoutMask =0;
 
 	hu_places_num=0;
-	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
-	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
-	memset(huTiemsForEveryOne,0,sizeof(int)*MAX_HANDIN_NUM*9);
-
-    CARD_KIND last_card=ck_NOT_DEFINED;
 
 	for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
 	{
 		if(_cardInHand->get_status(i)==sMING_KOU) {
 			continue;
         } else {
-            CARD_KIND cur_card = (CARD_KIND)_cardInHand->get_kind(i);;
+            CARD_KIND lastHuCard = ck_NOT_DEFINED;
+            CARD_KIND curCard    = (CARD_KIND)_cardInHand->get_kind(i);;
             
-            if(cur_card==last_card)
-            {
-                handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );
-
-                hu_cards_num[i]=hu_cards_num[i-1];
-                memcpy(hu_cards[i],hu_cards[i-1],sizeof(CARD_KIND)*9);
-                memcpy(huTiemsForEveryOne[i],huTiemsForEveryOne[i-1],sizeof(int)*9);
+            if(curCard==lastHuCard) {
+                handoutMask |= (1<<i);
+                continue;
             } else {
                 ClearTingInfo();
             
-                int huKindIdx = 0;
+                TingItem_t *huCards = new TingItem_t[9];
                 
                 for(int k=0;k<CARD_KIND_MAX;k++) {
                     SmartList cards(*_cardInHand,true);
@@ -270,26 +262,22 @@ unsigned int NetRRound::ming_check2()
 
                     if( cards.can_hu() ) {
                         handoutMask |= (1<<i);
+                        lastHuCard = curCard;
 
-                        TingItem_t newTingCard = new TingItem_t;
-                        newTingCard->kind = (Card_t)k;
-                        newTingCard->fan  = cal_times(CARD_KIND(k));
+                        (huCards+_TingInfo.cardNum)->kind = (Card_t)k;
+                        (huCards+_TingInfo.cardNum)->fan  = cal_times((Card_t)k);
                         
                         for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
-                            if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
-                                newTingCard->fan *= 2;
+                            if( _cardInHand->get_kind(s_l)==k&&_cardInHand->get_status(s_l)==sPENG) {
+                                (huCards+_TingInfo.cardNum)->fan *= 2;
                                 break;
                             }
                         }
 
-                        _TingInfo.cards[_TingInfo.cardNum] = new newTingCard;
+                        _TingInfo.cards = huCards;
                         _TingInfo.cardNum++;
-
-                        huKindIdx++;
                     }
                 }
-                
-                last_card = cur_card;
             }
         }
 	}
@@ -343,7 +331,7 @@ unsigned int NetRRound::ming_check()
                         hu_cards[i][huKindIdx]=CARD_KIND(k);
                         hu_cards_num[i]++;
                         
-                        int s_core=cal_times(CARD_KIND(k),temp_list,_cardInHand->size()-_cardInHand->FreeStart);
+                        int s_core=cal_times((Card_t)k);
 
                         for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
                             if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
