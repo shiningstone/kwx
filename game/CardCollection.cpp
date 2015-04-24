@@ -440,6 +440,17 @@ void CardInHand::_JudgePengPengHu() {
     }
 }
 
+bool CardInHand::is_shou_gang(Card_t curActKind) {/*BUG??? : should compare with current gang card's kind*/
+    int cardIdx[4] = {0};
+    Card_t kind = _FindGangCard(cardIdx);
+    
+    if(kind!=CARD_UNKNOWN) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void CardInHand::update_statistics(Card_t huKind) {
     _set(statHuFanMask,RH_QINYISE);
         

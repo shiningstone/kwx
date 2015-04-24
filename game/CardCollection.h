@@ -98,7 +98,8 @@ public:
     void _JudgeKaWuXing(Card_t kind) ;
     void _JudgeQiDui() ;
     void _JudgePengPengHu();
-    
+
+    bool is_shou_gang(Card_t curActKind=CARD_UNKNOWN);
     /***************************************************
             effect
     ***************************************************/

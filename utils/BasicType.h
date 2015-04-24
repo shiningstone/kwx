@@ -98,7 +98,7 @@ typedef struct _TingItem_t {
 
 typedef struct _MsgTingInfo_t {
     int           cardNum;      /* 可以胡的花色数目 */
-    TingItem_t    *cards;       
+    TingItem_t    *cards;       /* 注意: 这是一个数组指针，使用者需要负责动态分配内存*/
 }TingInfo_t   ;
 
 typedef struct _MingChoice_t {
@@ -108,7 +108,7 @@ typedef struct _MingChoice_t {
 
 typedef struct _MingInfo_t {
     INT8U         choiceNum;    /*可以出的花色数目*/
-    MingChoice_t  *handouts;    
+    MingChoice_t  *handouts;    /* 注意: 这是一个数组指针，使用者需要负责动态分配内存*/
 }MingInfo_t;
 
 typedef unsigned int HuTarget_t;

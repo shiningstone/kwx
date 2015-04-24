@@ -408,23 +408,14 @@ unsigned char NetRRound::ActiontodoCheckAgain()
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	unsigned char res = 0x0;
-	int card_num;
-	for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
-	{
-		card_num=1;
-		for(int k=i+1;k<_cardInHand->size();k++)
-		{
-			if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
-				card_num++;
-		}
-		if(card_num==4)
-		{
-			res |= a_SHOU_GANG;
-			break;
-		}
-	}
+
+    if(_cardInHand->is_shou_gang()) {
+        res |= aSHOU_GANG;
+    }
+
 	if( ( archive_ming_indexes=ming_check() )!=0 )
-		res |= a_MING;
+		res |= aMING;
+
 	return res;
 }
 
