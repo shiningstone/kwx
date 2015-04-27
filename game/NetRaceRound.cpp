@@ -246,7 +246,7 @@ unsigned int NetRRound::ming_check2()
 			continue;
         } else {
             Card_t lastHuCard = CARD_UNKNOWN;
-            Card_t curCard    = (CARD_KIND)_cardInHand->get_kind(i);;
+            Card_t curCard    = (Card_t)_cardInHand->get_kind(i);;
             
             if(curCard==lastHuCard && lastHuCard!=CARD_UNKNOWN) {
                 handoutMask |= (1<<i);
@@ -264,7 +264,7 @@ unsigned int NetRRound::ming_check2()
                         lastHuCard = curCard;
 
                         (huCards+_TingInfo.cardNum)->kind = (Card_t)k;
-                        (huCards+_TingInfo.cardNum)->fan  = cal_times(k);
+                        (huCards+_TingInfo.cardNum)->fan  = cal_times((Card_t)k);
 
                         /* why??? */
                         for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
