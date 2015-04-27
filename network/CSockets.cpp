@@ -94,6 +94,16 @@ void ServerSocket::Start(const char *serverIp,int port) {
 void ClientSocket::Start(const char *serverIp,int port) {
 	Init();
 
+#ifdef WIN32
+    char strServerIp[128] = {0};
+    FILE * target = fopen("E:\\server_ip.txt","r");
+    if(target!=NULL) {
+        fgets(strServerIp,128,target);
+    } else {
+        strcpy(strServerIp,serverIp);
+    }
+#endif
+
 	_keepAlive   = false;
 	_blockSecond = BLOCKSECONDS;
 
@@ -121,7 +131,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
 #endif   
 
 	sockaddr_in server;
-    server.sin_addr.s_addr=inet_addr(serverIp);
+    server.sin_addr.s_addr=inet_addr(strServerIp);
     server.sin_family=AF_INET;
     server.sin_port=htons(port);
 
