@@ -31,7 +31,7 @@ public:
 	NetRaceLayer();
 	virtual ~NetRaceLayer();
     
-    void Set(RoundManager *rm);
+    void Assign(RoundManager *rm);
 
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);

@@ -29,7 +29,7 @@ NetRaceLayer::NetRaceLayer()
     _logger = LOGGER_REGISTER("NetRaceLayer");
 }
 
-void NetRaceLayer::Set(RoundManager *rm) {
+void NetRaceLayer::Assign(RoundManager *rm) {
     _roundManager = rm;
     _ai = Ai::getInstance(_roundManager);
 }
@@ -1681,15 +1681,43 @@ TargetedAction* NetRaceLayer::_MingAnimation() {
 }
 
 TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou) {
+    _Remove(myframe,SHOW_CARD_INIDCATOR_TAD_ID);
+    
 	auto smallCard = _object->CreateKind(outCard,SMALL);
 	smallCard->runAction(RotateTo::create(0,_layout->RotateAngleOfOutcard(dir)));
-    
-	if(myframe->getChildByTag(SHOW_CARD_INIDCATOR_TAD_ID)) {
-		myframe->removeChildByTag(SHOW_CARD_INIDCATOR_TAD_ID);
+
+	Sprite   * cardOut = _object->Create(LR_OUT_CARD);
+	smallCard->setPosition(Vec2(
+        cardOut->getTextureRect().size.width/2,
+        cardOut->getTextureRect().size.height*0.65));
+	smallCard->setRotation(-90);/* !!! player0 is 90 in the old source, but it seems ok to set it as -90*/
+	smallCard->setScale(0.9);
+	cardOut->addChild(smallCard);
+	cardOut->setAnchorPoint(Vec2(0.5,0.5));
+
+    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->len-2)->getPosition();
+    Vec2 curOutPos;/* here must be something I have not known */
+    if(dir==RIGHT) {
+		curOutPos = Vec2(
+            curOutPosTemp.x,
+            curOutPosTemp.y + cardOut->getTextureRect().size.height*1.5);
 	}
-    
+	else {
+        curOutPos = Vec2(
+            _layout->_playerPosi[dir].basePoint.x + 10,
+            curOutPosTemp.y - 20 - 35);
+	}
+
+    cardOut->setPosition(curOutPos);
+    cardOut->setVisible(false);
+
+    _Remove(myframe,OUT_CARD_FRAME_TAG_ID);
+    myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);/* !!! player2 is 20 in the old source, but it seems ok to set it as 0*/
+
+
 	auto cardInHand = _roundManager->_players[dir]->get_parter()->get_card_list();
 	auto LastCard   = _GetCardInHand(dir,cardInHand->len);
+    
 	auto hideLastInHand = CallFunc::create([=](){
 		if(LastCard)
 			LastCard->setScale(0);
@@ -1704,55 +1732,27 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
 		auto cardBg = _object->Create(FREE_CARD);
 		cardBg->setAnchorPoint(Vec2(0.5,0.5));
 		cardBg->setPosition( Vec2(cardFrame->getTextureRect().size.width*0.515,cardFrame->getTextureRect().size.height*0.515) );
-		cardFrame->addChild(cardBg);
         
 		auto card = _object->CreateKind(outCard,NORMAL);
 		card->setAnchorPoint(Vec2(0.5,0.5));
 		card->setPosition(Vec2(cardBg->getTextureRect().size.width/2,cardBg->getTextureRect().size.height*0.4));
 		cardBg->addChild(card);
         
+		cardFrame->addChild(cardBg);
 		cardFrame->runAction(Sequence::create(
             DelayTime::create(1.5),
             ScaleTo::create(0,0),NULL));
 	});
     
-	if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID))
-		myframe->removeChildByTag(OUT_CARD_FRAME_TAG_ID);
 
-	Sprite   * cardOut = _object->Create(LR_OUT_CARD);
-	smallCard->setPosition(Vec2(
-        cardOut->getTextureRect().size.width/2,
-        cardOut->getTextureRect().size.height*0.65));
-	smallCard->setRotation(-90);/* !!! player0 is 90 in the old source, but it seems ok to set it as -90*/
-	smallCard->setScale(0.9);
-	cardOut->addChild(smallCard);
-	cardOut->setAnchorPoint(Vec2(0.5,0.5));
 
-    Vec2 curOutPos;/* here must be something I have not known */
-    if(dir==RIGHT) {
-		auto curOutPosTemp = _GetCardInHand(dir,cardInHand->len-2)->getPosition();
-		curOutPos = Vec2(
-            curOutPosTemp.x,
-            curOutPosTemp.y + cardOut->getTextureRect().size.height*1.5);
-	}
-	else {
-		auto cardOut_Yposition = _GetCardInHand(dir,cardInHand->len-2)->getPosition().y;
-        curOutPos = Vec2(
-            _layout->_playerPosi[dir].basePoint.x + 10,
-            cardOut_Yposition - 20 - 35);
-	}
 
-    cardOut->setPosition(curOutPos);
-    cardOut->setVisible(false);
-    myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);/* !!! player2 is 20 in the old source, but it seems ok to set it as 0*/
 
-    BezierTo *inHandMoveToOutHand = OthersBizerMove(dir,_roundManager->_players[dir]->_river);
-    
 	Sequence *result = Sequence::create(
                 		hideLastInHand,CallFunc::create([=](){ 
                         _Show(myframe,OUT_CARD_FRAME_TAG_ID,true);} ),Spawn::create(
                     		showAndHideOutcardNotice,
-                    		inHandMoveToOutHand,
+                    		OthersBizerMove(dir,_roundManager->_players[dir]->_river),
                     		_voice->SpeakCard(outCard,
                                 _roundManager->_players[dir]->GetSex()),NULL),
                 		_voice->Speak("give"),NULL);;	

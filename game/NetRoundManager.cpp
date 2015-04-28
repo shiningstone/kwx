@@ -527,7 +527,7 @@ void NetRoundManager::CreateRace(Scene *scene) {
     _uiManager = NetRaceLayer::create();
     scene->addChild(_uiManager);
 
-    _uiManager->Set(this);
+    _uiManager->Assign(this);
 
     InitPlayers();
 	_isGameStart=false;
