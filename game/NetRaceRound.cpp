@@ -360,7 +360,7 @@ unsigned int NetRRound::ming_check()
     return handoutMask;
 }
 
-unsigned char NetRRound::init(int card_array[],int len,int aim)
+unsigned char NetRRound::init(int card_array[],int len)
 {
 	int i;
 
