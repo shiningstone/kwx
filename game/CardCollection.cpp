@@ -496,7 +496,7 @@ void CardInHand::update_statistics(Card_t huKind) {
         
 		int freeSameCard = 1;
         int sameCard = 1;
-		for(int k=i+1;k<i+4;k++) {
+		for(int k=i+1;(k<i+4) & (k<size());k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
                 if( get_status(i)==sFREE ) {
                     freeSameCard++;

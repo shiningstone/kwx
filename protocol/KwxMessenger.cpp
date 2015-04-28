@@ -183,6 +183,7 @@ void KwxHeart::SetRate(int second) {
 }
 
 void KwxHeart::_Beats() {
+    #if 0
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
@@ -194,6 +195,7 @@ void KwxHeart::_Beats() {
         _socket->Send((char *)buf,len);
         _delay(_rate);
     }
+    #endif
 }
 
 KwxHeart* KwxHeart::_instance = NULL;
