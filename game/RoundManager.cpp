@@ -570,10 +570,14 @@ CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
     } else if(status==sAN_GANG) {
         int groupIdx = _players[dir]->_cards->get_idx_in_group(idx);
         
-        if( isTing && ((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) ) {
-            return LAYDOWN_SHOW;
-        } else {
-            return LAYDOWN_HIDE;
+        if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
+            if(!isTing && isMiddleTing) {/* here must be a bug */
+                if(isTing) {
+                    return LAYDOWN_SHOW;
+                } else if(!isTing&&isMiddleTing) {
+                    return LAYDOWN_HIDE;
+                }
+            }
         }
     }
 
