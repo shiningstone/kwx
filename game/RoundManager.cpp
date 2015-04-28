@@ -554,31 +554,26 @@ int RoundManager::_GroupIdx(int idx,CARD_ARRAY *cards) {
 }
 
 CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
-	CARD_ARRAY *cards = _players[dir]->get_parter()->get_card_list();
-    CARD_STATUS status = cards->data[idx].status;
+    CardStatus_t status = _players[dir]->_cards->get_status(idx);
 
     bool isTing       = IsTing(dir);
     bool isMiddleTing = IsTing(MIDDLE);
     
-    if(status==c_FREE) {
+    if(status==sFREE) {
         if(isTing) {
             return LAYDOWN_SHOW ;
         } else if (isMiddleTing) {
             return LAYDOWN_HIDE ;
         }
-    } else if(status==c_PENG || status==c_MING_GANG) {
+    } else if(status==sPENG || status==sMING_GANG) {
         return LAYDOWN_SHOW ;
-    } else if(status==c_AN_GANG) {
-        int groupIdx = _GroupIdx(idx,cards);
+    } else if(status==sAN_GANG) {
+        int groupIdx = _players[dir]->_cards->get_idx_in_group(idx);
         
-        if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
-            if(!isTing && isMiddleTing) {/* here must be a bug */
-                if(isTing) {
-                    return LAYDOWN_SHOW;
-                } else if(!isTing&&isMiddleTing) {
-                    return LAYDOWN_HIDE;
-                }
-            }
+        if( isTing && ((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) ) {
+            return LAYDOWN_SHOW;
+        } else {
+            return LAYDOWN_HIDE;
         }
     }
 

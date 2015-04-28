@@ -197,6 +197,18 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     DBG_SHOW();
 }
 
+int CardInHand::get_idx_in_group(int idxInHand) const {
+    Card_t kind = get_kind(idxInHand);
+
+    for(int i=0;i<4;i++) {
+        if(kind!=get_kind(idxInHand+i+1)) {
+            return 4-i; 
+        }
+    }
+
+    return 1;
+}
+
 void CardInHand::perform(ActionId_t act) {
     if(act==aAN_GANG) {
         int cardIdx[4] = {0};
@@ -250,7 +262,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
     }
 }
 
-Card_t CardInHand::_FindGangCard(int cardIdx[]) const{
+Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group*/
     for(int i=FreeStart; i<size(); i++) {
         cardIdx[0] = i;
         int matchCardNum = 1;
@@ -282,6 +294,7 @@ int CardInHand::FindCards(int idx[],Card_t kind) const {
 
     return num;
 }
+
 
 /***************************************************
         kou cards info

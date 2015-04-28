@@ -56,6 +56,8 @@ public:
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
 
+    int  get_idx_in_group(int idxInHand) const;
+
     void   perform(ActionId_t act);
     
     int    FreeStart;

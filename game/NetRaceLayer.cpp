@@ -524,17 +524,19 @@ void NetRaceLayer::_CardRiverUpdateEffect(PlayerDir_t dir) {
 	show_card_indicator->setVisible(true);
 
     CardList *river = _roundManager->_players[dir]->_river;
+    
     int i = 0;
     while( i<river->size() ) {
 	    _Remove(myframe,HAND_OUT_CARDS_TAG_ID+dir*25+i);
 
-        auto show_card = _object->CreateRiverCard((PlayerDir_t)dir,river->get_kind(i));
         show_card_indicator->stopAllActions();
         
         show_card_indicator->setPosition(_layout->OrigPositionOfRiverCard((PlayerDir_t)dir,i));                      
         show_card_indicator->runAction(RepeatForever::create(Sequence::create(
             MoveTo::create(0.5,_layout->Middle1PositionOfRiverCard((PlayerDir_t)dir,i)),
             MoveTo::create(0.5,_layout->Middle2PositionOfRiverCard((PlayerDir_t)dir,i)),NULL)));
+
+        auto show_card = _object->CreateRiverCard((PlayerDir_t)dir,river->get_kind(i));
         show_card->setPosition(_layout->DestPositionOfRiverCard((PlayerDir_t)dir,i));
 
         myframe->addChild(show_card, 
