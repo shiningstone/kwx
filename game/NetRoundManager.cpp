@@ -533,7 +533,7 @@ void NetRoundManager::CreateRace(Scene *scene) {
 	_isGameStart=false;
 
     SeatInfo *seat = SeatInfo::getInstance();
-    seat->Set(0x00010203,0x04050607,0x08090a0b,1);
+    seat->Set(1,0x10010000,1,1);
 
     ListenToMessenger();
     _messenger->StartReceiving();

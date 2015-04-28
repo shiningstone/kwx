@@ -23,7 +23,7 @@
 #include "./../utils/LogManager.h"
 
 #define DEF_SERVER_IP    "127.0.0.1"
-#define DEF_SOCKET_PORT  6000
+#define DEF_SOCKET_PORT  60905
 
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCKET_BUFF_SIZE 128

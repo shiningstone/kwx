@@ -37,7 +37,7 @@ Key_t EnvVariable::GetKey() {
 }
 
 RoomPath_t EnvVariable::GetRoomPath(int id) {
-    return 0x05060708;
+    return 1;
 }
 
 INT32U EnvVariable::GetUserId() {
@@ -58,14 +58,14 @@ SeatInfo *SeatInfo::getInstance(int threadId) {
 
 SeatInfo::SeatInfo() {
 #ifdef WIN32
-    _roomPath = 0x00010203;
-    _roomId   = 0x04050607;
-    _tableId  = 0x08090a0b;
+    _roomPath = 1;
+    _roomId   = 0x1001000;
+    _tableId  = 1;
     _seatId   = 1;
 #else                          //these values should be initiated when a player join a table.
-    _roomPath = 0x00010203;
-    _roomId   = 0x04050607;
-    _tableId  = 0x08090a0b;
+    _roomPath = 1;
+    _roomId   = 0x1001000;
+    _tableId  = 1;
     _seatId   = 1;
 #endif
 }
