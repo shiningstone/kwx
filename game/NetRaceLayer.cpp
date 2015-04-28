@@ -1697,6 +1697,8 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
 	cardOut->addChild(smallCard);
 	cardOut->setAnchorPoint(Vec2(0.5,0.5));
 
+	auto cardInHand = _roundManager->_players[dir]->get_parter()->get_card_list();
+
     auto curOutPosTemp = _GetCardInHand(dir,cardInHand->len-2)->getPosition();
     Vec2 curOutPos;/* here must be something I have not known */
     if(dir==RIGHT) {
@@ -1716,8 +1718,6 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
     _Remove(myframe,OUT_CARD_FRAME_TAG_ID);
     myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);/* !!! player2 is 20 in the old source, but it seems ok to set it as 0*/
 
-
-	auto cardInHand = _roundManager->_players[dir]->get_parter()->get_card_list();
 	auto LastCard   = _GetCardInHand(dir,cardInHand->len);
     
 	auto hideLastInHand = CallFunc::create([=](){
