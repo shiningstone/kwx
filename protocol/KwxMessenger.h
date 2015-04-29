@@ -33,7 +33,7 @@ private:
 class CSocket;
 class KwxHeart {
 public:
-    static KwxHeart *getInstance(int second=1);
+    static KwxHeart *getInstance(int second=5);
     static void destroyInstance();
 
     void SetRate(int second);
