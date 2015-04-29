@@ -37,7 +37,7 @@ Key_t EnvVariable::GetKey() {
 }
 
 RoomPath_t EnvVariable::GetRoomPath(int id) {
-    return 1;
+    return 11;
 }
 
 INT32U EnvVariable::GetUserId() {

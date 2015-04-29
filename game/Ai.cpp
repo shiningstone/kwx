@@ -21,18 +21,20 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
 {
 	_CollectResouce(res);
 
-	_roundManager->_players[(_roundManager->_curPlayer+1)%3]->get_parter()->get_hu_cards(target1,len1);
-	_roundManager->_players[(_roundManager->_curPlayer+2)%3]->get_parter()->get_hu_cards(target2,len2);
+    int curPlayer     = _roundManager->_curPlayer;
+    CardInHand *cards = _roundManager->_players[curPlayer]->_cards;
+    
+	_roundManager->_players[(curPlayer+1)%3]->get_parter()->get_hu_cards(target1,len1);
+	_roundManager->_players[(curPlayer+2)%3]->get_parter()->get_hu_cards(target2,len2);
 
-    for(int i=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->atcvie_place;
-        i<_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len;i++) {
-		int time = res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].same_times++;
-		res->list[_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->data[i].kind].place[time]=i;
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+		int time = res->list[cards->get_kind(i)].same_times++;
+		res->list[cards->get_kind(i)].place[time]=i;
 	}
 
 	/*init hu target*/
-	if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-		_roundManager->_players[_roundManager->_curPlayer]->init_target(&res->target,*len1,*len2);
+	if( !_roundManager->IsTing(curPlayer) ) {
+		_roundManager->_players[curPlayer]->init_target(&res->target,*len1,*len2);
     }
 }
 
