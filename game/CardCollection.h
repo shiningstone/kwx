@@ -33,6 +33,8 @@ public:
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
+    int    last() const;
+
 	void   show();
 	Card_t get_kind(unsigned int idx) const;
     CardStatus_t get_status(unsigned int idx) const;

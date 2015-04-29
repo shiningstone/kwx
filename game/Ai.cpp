@@ -48,27 +48,29 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 	int len2;
 
     kouRequest = false;
+
+    int curPlayer = _roundManager->_curPlayer;
     
-	if(_roundManager->_curPlayer!=MIDDLE) {
+	if(curPlayer!=MIDDLE) {
 		collect_resources(s_res,list1,list2,&len1,&len2);
-		_roundManager->_players[_roundManager->_curPlayer]->set_robot_hu_target(s_res->target);
+		_roundManager->_players[curPlayer]->set_robot_hu_target(s_res->target);
 	}
 
-    if( !_roundManager->IsTing(_roundManager->_curPlayer) ) {
-		index = _roundManager->_players[_roundManager->_curPlayer]->chose_card(
+    if( !_roundManager->IsTing(curPlayer) ) {
+		index = _roundManager->_players[curPlayer]->chose_card(
             s_res,TOTAL_CARD_NUM - _roundManager->_distributedNum,list1,list2,len1,len2);
 
-		if( index==-1 || index>_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1 ) {
-			index=_roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+		if( index==INVALID || index>_roundManager->_players[curPlayer]->_cards->last() ) {
+			index=_roundManager->_players[curPlayer]->_cards->last();
 		}
         
 		if(s_res->hu_nums>=6 
             && _roundManager->_actionToDo==a_MING 
-            && !_roundManager->IsTing(_roundManager->_curPlayer) ) {
+            && !_roundManager->IsTing(curPlayer) ) {
 			kouRequest = true;
 		}
 	} else {
-		index = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->get_card_list()->len-1;
+		index = _roundManager->_players[curPlayer]->_cards->last();
     }
 
     return index;

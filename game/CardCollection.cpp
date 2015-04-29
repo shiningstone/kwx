@@ -76,6 +76,10 @@ void CardList::lock_all_cards() {
 	}
 }
 
+int CardList::last() const {
+    return size()-1;
+}
+
 void CardList::push_back(Card_t kind) {
     CardNode_t *card = new CardNode_t;
     card->kind    = kind;
