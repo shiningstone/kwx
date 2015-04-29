@@ -614,30 +614,28 @@ ROBOT_TARGET NetPlayer::get_robot_hu_target()
 int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	//unsigned char ting_flag;
-	CARD_ARRAY *list=_act->get_card_list();
+    int show_place = -1;
+	int hu_num     = -1;
+    
+	MRES *res      = new MRES;
 	
-	int show_place=-1;
-	int hu_num=-1;
-	MRES *res=new MRES;
-	
-	for(int i=0;i<MAX_HANDIN_NUM;i++)
+	for(int i=0;i<MAX_HANDIN_NUM;i++) {
 		memset(res->hu_cards[i],ck_NOT_DEFINED,sizeof(CARD_KIND)*9);
-	if( _act->get_ming_check_result(res) )
-	{
-		int s_k;
+    }
+
+	if( _act->get_ming_check_result(res) ) {
 		int s_num;
 		int ming_index=_act->get_ming_indexes();
-		CARD_KIND s_kind;
-		for(int k=0;k<MAX_HANDIN_NUM;k++)
-		{
-			if(ming_index&(1<<k))
-			{
-				s_kind=_act->get_card_list()->data[k].kind;
-				if(Robot_check_pickup_card(s_kind,list1,list2,len1,len2)!=0)
-				{
+        
+		Card_t s_kind;
+		for(int k=0;k<MAX_HANDIN_NUM;k++) {
+			if(ming_index&(1<<k)) {
+			    s_kind = _cards->get_kind(k);
+				if(Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)!=0) {
 					res->hu_cards_num[k]=0;
 					continue;
 				}
+                
 				s_num=0;
 				for(int j=0;j<9;j++)
 					if(res->hu_cards[k][j]>=0)
@@ -647,25 +645,32 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 					}
 				res->hu_cards_num[k]=s_num;
 			}
-			else
+			else {
 				res->hu_cards_num[k]=0;
+            }
 		}
 		hu_num=res->hu_cards_num[0];
-		int l_place=-1;
-		for(s_k=0;s_k<MAX_HANDIN_NUM;s_k++)
+        
+		int l_place    = -1;
+
+		int s_k;
+		for(s_k=0;s_k<MAX_HANDIN_NUM;s_k++) {
 			if(ming_index&(1<<s_k))
 			{
-				s_kind=_act->get_card_list()->data[s_k].kind;
-				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card(s_kind,list1,list2,len1,len2)==0)
+				s_kind = _cards->get_kind(s_k);
+				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)==0)
 					l_place=s_k;
 			}
-		show_place=l_place;
+        }
+
+		show_place = l_place;
 		pres->hu_nums=res->hu_cards_num[l_place];
 	}
-	if(show_place==-1)
-	{
+
+	if(show_place==-1) {
 		show_place=Robot_pickup_single(pres,list1,list2,len1,len2);
 	}
+    
 	if(res)
 		delete res;
 
