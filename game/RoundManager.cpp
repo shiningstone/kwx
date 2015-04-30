@@ -268,8 +268,8 @@ void RoundManager::SetEffectCard(int kind,int status) {
     _curEffectCard.status = (CARD_STATUS)status;
 }
 
-bool RoundManager::IsCurEffectCard(Card card) {
-    if(card.kind==_curEffectCard.kind && card.status==_curEffectCard.status) {
+bool RoundManager::IsCurEffectCard(const CardNode_t *card) {
+    if(card->kind==_curEffectCard.kind && card->status==_curEffectCard.status) {
         return true;
     } else {
         return false;

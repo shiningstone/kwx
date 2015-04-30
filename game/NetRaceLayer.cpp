@@ -339,7 +339,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 					x+=30;
 
                 /* the card showing somewhere else */
-                if( _roundManager->IsCurEffectCard(list->data[i]) )
+                if( _roundManager->IsCurEffectCard(cards->at(i)) )
 					p_list[i]->setVisible(false);
 
 
@@ -2698,6 +2698,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
             move 2 peng cards in hand
         ****************/
 		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
+        auto cards = _roundManager->_players[MIDDLE]->_cards; 
 
         int pengCard[2] = {0};
         _ai->FindPengCards(pengCard,list,card);
@@ -2888,7 +2889,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                     int sameCardNum = 0;
 
                     for(int a=list->atcvie_place-1;a>=0;a--) {
-						if( _roundManager->IsCurEffectCard(list->data[a]) ){
+						if( _roundManager->IsCurEffectCard(cards->at(a)) ){
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
                             
@@ -2971,6 +2972,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         /**********************
             logical
         **********************/
+        auto cards = _roundManager->_players[dir]->_cards; 
 		auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
         Card outCard;
 
@@ -3178,7 +3180,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 					int sameCardNum=0;
 					for(int a=list->atcvie_place-1;a>=0;a--)
 					{
-						if( _roundManager->IsCurEffectCard(list->data[a]) )
+						if( _roundManager->IsCurEffectCard(cards->at(a)) )
 						{
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
@@ -3228,7 +3230,6 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 		myframe->_ID=MIDDLE;
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {
-             auto cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
             _ReOrderCardsInHand(0,_roundManager->_players[MIDDLE]->_cards);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}),CallFunc::create([=](){
@@ -3241,6 +3242,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 {
     myframe->_ID = dir;
 
+    auto cards = _roundManager->_players[dir]->_cards; 
 	auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
 
 	if(_roundManager->_isCardFromOthers) {
@@ -3602,7 +3604,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 					int sameCardNum=0;
 					for(int a=list->atcvie_place-1;a>=0;a--)
 					{
-						if( _roundManager->IsCurEffectCard(list->data[a]) )
+						if( _roundManager->IsCurEffectCard(cards->at(a)) )
 						{
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);
