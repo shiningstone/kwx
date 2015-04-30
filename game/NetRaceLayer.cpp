@@ -258,8 +258,7 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnT
             _roundManager->_players[MIDDLE]->_cards->add_effect_card();
         }
 
-        auto list = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-        _ReOrderCardsInHand(chosenCard,list);
+        _ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
 
         _roundManager->_players[MIDDLE]->_cards->del_effect_card();
     }
@@ -1558,9 +1557,9 @@ Sprite *NetRaceLayer::_GetCardInHand(PlayerDir_t dir,int idx) {
     return (Sprite *)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + dir*20 + idx);
 }
 
-void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards) {
+void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CardInHand *cards) {
     /*NOTE : this function is called after handout ,so the position is 1 bigger than length */
-    const int  LAST      = (cards->len-1);
+    const int  LAST      = cards->last();
 
     if(droppedCard==LAST) {
 		_GetCardInHand(MIDDLE,droppedCard)->setScale(0);
@@ -1573,7 +1572,7 @@ void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards) {
     const auto LAST_POS  = LAST_CARD->getPosition();
     
     /* need to be optimized !!! */
-    for(int i=cards->atcvie_place; i<LAST; i++) {
+    for(int i=cards->FreeStart; i<LAST; i++) {
         auto card = _GetCardInHand(MIDDLE,i);
         auto curPos   = card->getPosition();
         
@@ -1590,34 +1589,36 @@ void NetRaceLayer::_ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards) {
             MoveTo::create(0.06,Vec2(curPos.x-SIZE.width*0.2,curPos.y)),NULL);
                     
         if(i < droppedCard) {
-            if(cards->data[i].kind <= cards->data[LAST].kind)
+            if(cards->get_kind(i) <= cards->get_kind(LAST))
                 continue;
             else {
-                if( i==cards->atcvie_place || cards->data[i-1].kind<=cards->data[LAST].kind )
+                if( i==cards->FreeStart || cards->get_kind(i-1)<=cards->get_kind(LAST) ) {
                     LAST_CARD->runAction(RightInsertSeq);
+                }
                 
                 card->runAction(RightMove);
             }
         } else if(i==droppedCard) {
-            if(i==cards->atcvie_place) {
-                if(cards->data[i+1].kind>cards->data[LAST].kind)
+            if(i==cards->FreeStart) {
+                if(cards->get_kind(i+1)>cards->get_kind(LAST))
                     LAST_CARD->runAction(RightInsertSeq);
             } else if(i==LAST-1) {
-                if(cards->data[i-1].kind<=cards->data[LAST].kind)
+                if(cards->get_kind(i-1)<=cards->get_kind(LAST))
                     LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x,LAST_POS.y)));
             } else {
-                if(cards->data[i-1].kind<=cards->data[LAST].kind&&cards->data[i+1].kind>cards->data[LAST].kind)
+                if(cards->get_kind(i-1)<=cards->get_kind(LAST)
+                    &&cards->get_kind(i+1)>cards->get_kind(LAST))
                     LAST_CARD->runAction(RightInsertSeq);
             }
             
             card->setScale(0);
         } else {/* i>chosenCard */
-            if(cards->data[i].kind>cards->data[LAST].kind)
+            if(cards->get_kind(i)>cards->get_kind(LAST))
                 card->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
             else {
                 if(i==LAST-1)
                     LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
-                else if(cards->data[i+1].kind>cards->data[LAST].kind)
+                else if(cards->get_kind(i+1)>cards->get_kind(LAST))
                     LAST_CARD->runAction(LeftInsertSeq);                    
                 card->runAction(LeftMove);
             }
@@ -3233,7 +3234,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {
              auto cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-            _ReOrderCardsInHand(0,cards);}),
+            _ReOrderCardsInHand(0,_roundManager->_players[MIDDLE]->_cards);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}),CallFunc::create([=](){
             _roundManager->DistributeTo(dir

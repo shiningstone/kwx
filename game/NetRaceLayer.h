@@ -75,7 +75,7 @@ private:
     LayerColor* myframe;
 
     Sprite *_GetCardInHand(PlayerDir_t dir,int idx);
-    void    _ReOrderCardsInHand(int droppedCard,CARD_ARRAY *cards);
+    void    _ReOrderCardsInHand(int droppedCard,CardInHand *cards);
     void    _GetCardsInfo(CardsInfo_t *info);
     int     _FindCard(int start,int end,Touch *touch);
     TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
