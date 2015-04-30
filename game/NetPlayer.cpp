@@ -674,7 +674,3 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 	return show_place;
 }
 
-void NetPlayer::init_target(ROBOT_TARGET *target,int hu_len1,int hu_len2) {
-    *target = _cards->assess_aim();
-}
-

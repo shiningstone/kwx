@@ -34,7 +34,7 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
 
 	/*init hu target*/
 	if( !_roundManager->IsTing(curPlayer) ) {
-		_roundManager->_players[curPlayer]->init_target(&res->target,*len1,*len2);
+		res->target = _roundManager->_players[curPlayer]->_cards->assess_aim();
     }
 }
 
