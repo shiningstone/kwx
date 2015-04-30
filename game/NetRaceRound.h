@@ -71,7 +71,6 @@ public:
 	void set_ting_status(unsigned char flag);
 	unsigned char get_ting_status();
     long get_card_score();
-    CARD_ARRAY *get_card_list();
 	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
 	bool get_ming_check_result(MRES *res);

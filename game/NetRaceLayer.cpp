@@ -3891,8 +3891,8 @@ void NetRaceLayer::_TingHintCreate(Point curPos,int CardPlace)
 /****************************************
         ming
 ****************************************/
-void NetRaceLayer::KouCancelEffect(CARD_ARRAY *cards) {
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
+void NetRaceLayer::KouCancelEffect(CardInHand *cards) {
+    for(int i=cards->FreeStart;i<cards->size();i++) {
         Sprite *card = _GetCardInHand(MIDDLE,i);
         _Remove(card,MING_KOU);
     }

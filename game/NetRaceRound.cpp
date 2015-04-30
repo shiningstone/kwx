@@ -811,22 +811,6 @@ long NetRRound::get_card_score()
 	return card_score;
 }
 
-CARD_ARRAY* NetRRound::get_card_list() {
-    delete card_list;
-    card_list = new CARD_ARRAY;
-    
-    for(int i=0;i<_cardInHand->size();i++) {
-        card_list->data[i].kind = (CARD_KIND)_cardInHand->get_kind(i);
-        card_list->data[i].status = (CARD_STATUS)_cardInHand->get_status(i);
-        card_list->data[i].can_play = _cardInHand->canPlay(i)?cps_YES:cps_NO;
-    }
-
-    card_list->len = _cardInHand->size();
-    card_list->atcvie_place = _cardInHand->FreeStart;
-    
-	return card_list;
-}
-
 bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)
 {
 	*hu_kind=_fan;

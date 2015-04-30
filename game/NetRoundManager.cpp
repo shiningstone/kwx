@@ -624,7 +624,6 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
     Card_t card;
 
     CardInHand *cards = _players[dir]->_cards;
-	auto list=_players[dir]->get_parter()->get_card_list();
 
 	if( _actionToDo&a_AN_GANG || _actionToDo&a_SHOU_GANG ) {
 		_lastActionSource = dir;
@@ -677,8 +676,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
             
 			_curPlayer=dir;
 		}else {
-			GangCard=list->data[list->len-1];
-			RecordOutCard(GangCard);
+			RecordOutCard( cards->get_kind(cards->last()) );
 		}
 
         card = _ai->FindGangCards(gangCardIdx,cards,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
@@ -731,7 +729,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordOutCard(_players[MIDDLE]->get_parter()->get_card_list()->data[chosen]);
+    RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(chosen);
     _players[MIDDLE]->_river->push_back((Card_t)_lastHandedOutCard);
 
@@ -748,22 +746,20 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         turnToMing = true;
     }
 
-    auto cardsInHand = _players[MIDDLE]->get_parter()->get_card_list();
     _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
 }
 
 void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->clear_kou_choices();
-
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    _uiManager->KouCancelEffect(cards);
+    _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
 }
 
 void NetRoundManager::RecvKouConfirm() {
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        if(cards->data[i].status==c_KOU_ENABLE)
-            cards->data[i].status=c_FREE;
+    CardInHand *cards = _players[MIDDLE]->_cards;
+
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        if(cards->get_status(i)==c_KOU_ENABLE)
+            cards->set_status(i,sFREE);
     }   
     
     UpdateCards(MIDDLE,a_KOU);
@@ -823,9 +819,10 @@ void NetRoundManager::WaitForMyChoose() {
 	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
                 (IsTing(_curPlayer) && !_isGangAsking) ) {
-            auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-            Vec2 location = _uiManager->GetCardPositionInHand(cards->len-1);
-            RecvHandout(cards->len-1,location,2);
+            int last = _players[MIDDLE]->_cards->last();
+            
+            Vec2 location = _uiManager->GetCardPositionInHand(last);
+            RecvHandout(last,location,2);
             
 		} else {
 			_isMyShowTime = true;

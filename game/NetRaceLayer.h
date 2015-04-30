@@ -36,7 +36,7 @@ public:
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void GangGoldEffect(int winner,int whoGive);
-    void KouCancelEffect(CARD_ARRAY *cards);
+    void KouCancelEffect(CardInHand *cards);
     void KouConfirmEffect();
     void MingCancelEffect();
 	void QueryKouCards();

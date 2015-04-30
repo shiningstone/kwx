@@ -62,6 +62,7 @@ public:
 
     PlayerDir_t TurnToNext();
 
+    void RecordOutCard( Card_t kind );
     void RecordOutCard( Card card );
     void RenewOutCard();
 

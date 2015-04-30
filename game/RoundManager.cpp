@@ -94,6 +94,11 @@ PlayerDir_t RoundManager::TurnToNext() {
 /***********************************************
         river information
 ***********************************************/
+void RoundManager::RecordOutCard( Card_t kind ) {
+    _gRiver->push_back(kind);
+    _gRiver->show();
+}
+
 void RoundManager::RecordOutCard( Card card ) {
     _gRiver->push_back((Card_t)card.kind);
     _gRiver->show();
@@ -373,7 +378,6 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
     Card_t card;
     
     CardInHand *cards = _players[dir]->_cards;
-	auto list=_players[dir]->get_parter()->get_card_list();
 
 	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
 		_lastActionSource = dir;
@@ -416,8 +420,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
             
 			_curPlayer=dir;
 		}else {
-			GangCard=list->data[list->len-1];
-			RecordOutCard(GangCard);
+			RecordOutCard(cards->get_kind(cards->last()));
 		}
 
         card = _ai->FindGangCards(gangCardIdx,cards,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
@@ -459,7 +462,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[idx]);
+    RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
     _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
     _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 
@@ -588,16 +591,15 @@ CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
 
 void RoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->clear_kou_choices();
-
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    _uiManager->KouCancelEffect(cards);
+    _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
 }
 
 void RoundManager::RecvKouConfirm() {
-    auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        if(cards->data[i].status==c_KOU_ENABLE)
-            cards->data[i].status=c_FREE;
+    CardInHand *cards = _players[MIDDLE]->_cards;
+
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        if(cards->get_status(i)==c_KOU_ENABLE)
+            cards->set_status(i,sFREE);
     }   
     
     UpdateCards(MIDDLE,a_KOU);
@@ -682,10 +684,10 @@ void RoundManager::WaitForMyChoose() {
 	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
                 (IsTing(_curPlayer) && !_isGangAsking) ) {
-            auto cards = _players[MIDDLE]->get_parter()->get_card_list();
-            Vec2 location = _uiManager->GetCardPositionInHand(cards->len-1);
-            RecvHandout(cards->len-1,location,2);
+            int last = _players[MIDDLE]->_cards->last();
             
+            Vec2 location = _uiManager->GetCardPositionInHand(last);
+            RecvHandout(last,location,2);
 		} else {
 			_isMyShowTime = true;
         }
@@ -696,7 +698,6 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
 
     CardInHand *cards = _players[dir]->_cards;
-    auto list=_players[dir]->get_parter()->get_card_list();
 
     if(_actionToDo&a_HU) {
         RecvHu(dir);
@@ -741,8 +742,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
             
             _curPlayer=dir;
         }else {
-            GangCard=list->data[list->len-1];
-            RecordOutCard(GangCard);
+            RecordOutCard(cards->get_kind(cards->last()));
         }
 
         int* gangIdx=new int[4];
@@ -772,7 +772,7 @@ void RoundManager::WaitForOthersChoose() {
 	int index = _ai->ChooseWorstCard(canKou);
     
     if ( canKou ) {
-        _otherHandedOut = (Card_t)_players[_curPlayer]->get_parter()->get_card_list()->data[index].kind;
+        _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);
         
         _ai->KouCardCheck((PlayerDir_t)_curPlayer);
         if(_players[_curPlayer]->get_parter()->_cardInHand->kou_group_num()>0) {
@@ -780,7 +780,7 @@ void RoundManager::WaitForOthersChoose() {
         }
     }
 
-    RecordOutCard(_players[_curPlayer]->get_parter()->get_card_list()->data[index]);
+    RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
 	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
     _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 
