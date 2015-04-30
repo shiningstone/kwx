@@ -284,7 +284,6 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 	float y = _layout->_playerPosi[dir].basePoint.y+10;
 
     CardInHand *cards = _roundManager->_players[dir]->_cards;
-	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
 
 	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==INVALID )
 		_roundManager->_firstMingNo=dir;
@@ -610,8 +609,7 @@ void NetRaceLayer::ListenToDistributeCard() {
 
         auto target = userData->target;
         
-        auto cards = _roundManager->_players[target]->get_parter()->get_card_list();
-		_DistributeCard(target,cards->len-1);
+		_DistributeCard(target,_roundManager->_players[target]->_cards->last());
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 
@@ -707,8 +705,8 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
     timeXH[(zhuang+2)%PLAYER_NUM] = 0.7+0.2+0.2;
 
 	Sprite* lastTwo[2];
-	
-	auto ListOfNo1=_roundManager->_players[MIDDLE]->get_parter()->get_card_list();
+
+    auto cards = _roundManager->_players[MIDDLE]->_cards;
     auto cardWidth = _object->RectSize(FREE_CARD).width;
 
 	int a,b;
@@ -783,7 +781,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		{
 			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{				
-                auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[0+3*i].kind,NORMAL);
+                auto s_card=_object->CreateKind(cards->get_kind(0+3*i),NORMAL);
 
 				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
@@ -811,7 +809,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		{
 			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{
-				auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[1+3*i].kind,NORMAL);
+				auto s_card=_object->CreateKind(cards->get_kind(1+3*i),NORMAL);
                 p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
 				p_list[i]->setPosition(Vec2(REF.x+cardWidth*1.0*i*2+cardWidth, REF.y));
@@ -833,7 +831,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		{
 			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{
-				auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[2+3*i].kind,NORMAL);
+				auto s_card=_object->CreateKind(cards->get_kind(2+3*i),NORMAL);
 
 				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
@@ -850,7 +848,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		}
 		else if(a==3)//DelayTime(2.7)
 		{
-			auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[12].kind,NORMAL);
+			auto s_card=_object->CreateKind(cards->get_kind(12),NORMAL);
 			lastTwo[0]=_object->Create(FREE_CARD,s_card);
 			lastTwo[0]->setAnchorPoint(Vec2(0.0f,0.0f));
 			lastTwo[0]->setPosition(Vec2(
@@ -862,7 +860,7 @@ void NetRaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 			lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[1]+2),ScaleTo::create(0,1),NULL));	
             
 			if(zhuang==MIDDLE) {
-				auto s_card=_object->CreateKind((Card_t)ListOfNo1->data[13].kind,NORMAL);
+				auto s_card=_object->CreateKind(cards->get_kind(13),NORMAL);
 				lastTwo[1]=_object->Create(FREE_CARD,s_card);
 				lastTwo[1]->setAnchorPoint(Vec2(0.0f,0.0f));
 				lastTwo[1]->setPosition(Vec2(
@@ -1693,9 +1691,9 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
 	cardOut->addChild(smallCard);
 	cardOut->setAnchorPoint(Vec2(0.5,0.5));
 
-	auto cardInHand = _roundManager->_players[dir]->get_parter()->get_card_list();
+	auto cardInHand = _roundManager->_players[dir]->_cards;
 
-    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->len-2)->getPosition();
+    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->last()-1)->getPosition();
     Vec2 curOutPos;/* here must be something I have not known */
     if(dir==RIGHT) {
 		curOutPos = Vec2(
@@ -1714,7 +1712,7 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
     _Remove(myframe,OUT_CARD_FRAME_TAG_ID);
     myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);/* !!! player2 is 20 in the old source, but it seems ok to set it as 0*/
 
-	auto LastCard   = _GetCardInHand(dir,cardInHand->len);
+	auto LastCard   = _GetCardInHand(dir,cardInHand->size());
     
 	auto hideLastInHand = CallFunc::create([=](){
 		if(LastCard)
