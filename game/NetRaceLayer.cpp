@@ -4012,9 +4012,9 @@ Node *NetRaceLayer::_NonKouMask(Sprite *card) {
     return mask;
 }
 
-void NetRaceLayer::_MaskNonKouCards(CARD_ARRAY *cards) {
-    for(int i=cards->atcvie_place; i<cards->len; i++) {
-        if(cards->data[i].status!=c_KOU_ENABLE) {
+void NetRaceLayer::_MaskNonKouCards(CardInHand *cards) {
+    for(int i=cards->FreeStart; i<cards->size(); i++) {
+        if(cards->get_status(i)!=c_KOU_ENABLE) {
             Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
             _NonKouMask(card);
         }
@@ -4119,7 +4119,6 @@ void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::ListenToKou(int no) {
-    auto cards=_roundManager->_players[no]->get_parter()->get_card_list();
     auto KouListener = EventListenerTouchOneByOne::create();
     KouListener->setSwallowTouches(true);
     
@@ -4158,8 +4157,7 @@ void NetRaceLayer::QueryKouCards() {
     
     _SwitchCancelBtn(MING_KOU_CANCEL);
 
-    CARD_ARRAY *cards = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-    _MaskNonKouCards(cards);
+    _MaskNonKouCards(_roundManager->_players[MIDDLE]->_cards);
     ListenToKou(MIDDLE);
 }
 
@@ -4770,38 +4768,29 @@ void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor 
 	float y = posOfCards.y - _object->RectSize(PENG_CARD).height/2;
     
 	Sprite *show_card_list[MAX_HANDIN_NUM];
+
+    CardInHand *cards = _roundManager->_players[dir]->_cards;
 	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
     
-	for(int i=0;i<list->len;i++)
+	for(int i=0;i<cards->size();i++)
 	{
 		show_card_list[i]=_object->Create(PENG_CARD);
 		show_card_list[i]->setAnchorPoint(Vec2(0,0.5));
 		show_card_list[i]->setPosition(Vec2(x,y));
 		parent->addChild(show_card_list[i],2);
-		auto s_card=_object->CreateKind((Card_t)list->data[i].kind,MIDDLE_SIZE);
+		auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),MIDDLE_SIZE);
 		s_card->setAnchorPoint(Vec2(0.5,0.5));
 		s_card->setPosition(Vec2(show_card_list[i]->getTextureRect().size.width/2,show_card_list[i]->getTextureRect().size.height*0.6));
 		show_card_list[i]->addChild(s_card,1);
 
         
-		if(list->data[i].status==c_PENG||list->data[i].status==c_MING_KOU)
+		if(cards->get_status(i)==c_PENG||cards->get_status(i)==c_MING_KOU)
 		{
-			if(list->data[i].kind!=list->data[i+1].kind)
+			if(cards->get_kind(i)!=cards->get_kind(i+1))
 			{
 				x+=show_card_list[i]->getTextureRect().size.width*1.1;
 			}
-			else if(list->data[i].kind==list->data[i+1].kind && list->data[i+1].status==c_FREE)
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*1.1;
-			}
-			else
-			{
-				x+=show_card_list[i]->getTextureRect().size.width*0.95;
-			}
-		}
-		else if(list->data[i].status==c_MING_GANG||list->data[i].status==c_AN_GANG)
-		{
-			if(list->data[i].kind!=list->data[i+1].kind)
+			else if(cards->get_kind(i)==cards->get_kind(i+1) && cards->get_status(i+1)==c_FREE)
 			{
 				x+=show_card_list[i]->getTextureRect().size.width*1.1;
 			}
@@ -4810,9 +4799,20 @@ void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor 
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 			}
 		}
-		else if(list->data[i].status==c_FREE)
+		else if(cards->get_status(i)==c_MING_GANG||cards->get_status(i)==c_AN_GANG)
 		{
-			if( win.kind==SINGLE_WIN && win.winner==dir && win.giver==dir && i==(list->len-2) )
+			if(cards->get_kind(i)!=cards->get_kind(i+1))
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*1.1;
+			}
+			else
+			{
+				x+=show_card_list[i]->getTextureRect().size.width*0.95;
+			}
+		}
+		else if(cards->get_status(i)==c_FREE)
+		{
+			if( win.kind==SINGLE_WIN && win.winner==dir && win.giver==dir && i==(cards->size()-2) )
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
@@ -4826,7 +4826,7 @@ void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor 
             auto winCard=_object->Create(PENG_CARD);
             winCard->setAnchorPoint(Vec2(0,0.5));
             winCard->setPosition(Vec2(x+30,y));
-            auto s_card=_object->CreateKind((Card_t)list->data[list->len].kind,MIDDLE_SIZE);
+            auto s_card=_object->CreateKind(cards->get_kind(cards->last()),MIDDLE_SIZE);/*!!! the last card should be the one from others*/
             s_card->setAnchorPoint(Vec2(0.5,0.5));
             s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
             winCard->addChild(s_card,1);
