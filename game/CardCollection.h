@@ -104,6 +104,10 @@ public:
     void _JudgePengPengHu();
 
     bool is_shou_gang(Card_t curActKind=CARD_UNKNOWN);
+    
+    ROBOT_TARGET assess_aim() const;
+    bool PreferQingYiSe(int &targetColor) const;
+    int GetCoupleNum() const;
     /***************************************************
             effect
     ***************************************************/

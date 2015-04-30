@@ -537,6 +537,71 @@ void CardInHand::update_statistics(Card_t huKind) {
 }
 
 /***************************************************
+        ÅÆÐÍÅÐ¶Ï
+***************************************************/
+ROBOT_TARGET CardInHand::assess_aim() const {
+    int color = 0;
+    if(PreferQingYiSe(color)) {
+        if(color==0) {
+            return SAME_TIAO_TARGET;
+        } else if (color==1) {
+            return SAME_TONG_TARGET;
+        }
+    }
+
+    int coupleNum = GetCoupleNum();
+    if(FreeStart==0 && coupleNum>=5) {
+        return SEVEN_COUPLES_TARGET;
+    } else if (coupleNum>=3) {
+        return FOUR_PENG_TARGET;
+    }
+
+    return PI_HU_TARGET;
+}
+
+bool CardInHand::PreferQingYiSe(int &targetColor) const{
+    targetColor  = get_kind(0)/9;
+
+    for(int i=1;i<FreeStart;i++) {
+        if(targetColor!=get_kind(i)/9) {
+            return false;
+        }
+    }
+    
+    int colorNum = FreeStart;
+
+    for(int i=FreeStart;i<size();i++) {
+        if(targetColor!=get_kind(i)/9) {
+            break;
+        } else {
+            colorNum++;
+        }
+    }    
+
+    if(colorNum>=9) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int CardInHand::GetCoupleNum() const {
+    int coupleNum = 0;
+    
+    int i = 0;
+    while(i<size()) {
+        if(get_kind(i)==get_kind(i+1)) {
+            coupleNum++;
+            i += 2;
+        } else {
+            i += 1;
+        }
+    }
+
+    return coupleNum;
+}
+
+/***************************************************
         effect
 ***************************************************/
 void CardInHand::add_effect_card() {
