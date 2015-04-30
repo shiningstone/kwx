@@ -60,6 +60,7 @@ public:
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
 
+    bool   is_wait_handout() const;
     void   perform(ActionId_t act);
     
     int    FreeStart;

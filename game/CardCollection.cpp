@@ -213,6 +213,14 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     DBG_SHOW();
 }
 
+bool CardInHand::is_wait_handout() const {
+    if((size()-FreeStart)%3==2) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void CardInHand::perform(ActionId_t act) {
     if(act==aAN_GANG) {
         int cardIdx[4] = {0};
