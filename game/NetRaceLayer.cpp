@@ -304,7 +304,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
                     _object->LayDownWithFace((PlayerDir_t)dir, p_list[i], cards->get_kind(i),apperance);
                 }
 
-                y += _YofNextCard(dir,i,list,(ting_flag==1),p_list[i]->getTextureRect().size.height);
+                y += _YofNextCard(dir,i,cards,(ting_flag==1),p_list[i]->getTextureRect().size.height);
 			}
 			else if(dir==MIDDLE)
 			{
@@ -3794,11 +3794,11 @@ Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
     }
 }
 
-float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool isTing,float refY) {
+float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTing,float refY) {
     float up = (dir==LEFT)?(-1):1;
     float groupGap = (dir==LEFT)?0.4:0.8;
     
-    switch(cards->data[idx].status) {
+    switch(cards->get_status(idx)) {
         case c_FREE:
             if(isTing||_roundManager->IsTing(MIDDLE)) {
                 return up*(refY*0.65);
@@ -3809,23 +3809,24 @@ float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool 
             return up*(refY*0.65);
         case c_PENG:
             if(isTing||_roundManager->IsTing(MIDDLE)) {
-                if(cards->data[idx+1].status==c_FREE||cards->data[idx+1].status==c_MING_KOU)
+                if(cards->get_status(idx+1)==c_FREE||cards->get_status(idx+1)==c_MING_KOU)
                     return up*refY;
-                else if(cards->data[idx+1].kind!=cards->data[idx].kind)
+                else if(cards->get_kind(idx+1)!=cards->get_kind(idx))
                     return up*(refY*0.65+5);
                 else 
                     return up*(refY*0.65);
             } else {
-                if(cards->data[idx+1].status==c_FREE)
+                if(cards->get_status(idx+1)==c_FREE)
                     return up*(refY*groupGap);
-                else if(cards->data[idx+1].kind!=cards->data[idx].kind)
+                else if(cards->get_kind(idx+1)!=cards->get_kind(idx))
                     return up*(refY*0.65+5);
                 else
                     return up*(refY*0.65);
             }
         case c_MING_GANG:
         case c_AN_GANG:
-            int groupIdx = _roundManager->_GroupIdx(idx,cards);
+            int groupIdx = cards->get_idx_in_group(idx);
+
             if( (dir==LEFT&&groupIdx==1) || (dir==RIGHT&&groupIdx==3)) {
                 return up*(refY*0.65);
             } else if (groupIdx==2) {
@@ -3834,12 +3835,12 @@ float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CARD_ARRAY *cards,bool 
                 return up*(refY*0.65+13);
             } else {
                 if(_roundManager->IsTing(MIDDLE)||isTing==1) {
-                    if(cards->data[idx+1].status==c_FREE||cards->data[idx+1].status==c_MING_KOU)
+                    if(cards->get_status(idx+1)==c_FREE||cards->get_status(idx+1)==c_MING_KOU)
                         return up*refY;
                     else
                         return up*(refY*0.65+5);
                 } else {
-                    if(cards->data[idx+1].status==c_FREE)
+                    if(cards->get_status(idx+1)==c_FREE)
                         return up*(refY*groupGap);
                     else
                         return up*(refY*0.65+5);
