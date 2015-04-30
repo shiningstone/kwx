@@ -90,7 +90,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
         if( !cards->IsKouInclude(kind) ) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
-            if(cards->FindCards(cardIdx, kind)==3 
+            if(cards->find_cards(cardIdx, kind)==3 
                 &&_roundManager->_players[dir]->get_parter()->judge_kou_cards((CARD_KIND)kind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
                 cards->AddKouGroup(kind,cardIdx);
             }
@@ -201,21 +201,6 @@ int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isCardFromOthers,int ga
     }
 
     return newChosen;
-}
-
-Card_t Ai::FindPengCards(int cardIdx[2],CARD_ARRAY *cards,Card_t target) {
-    int matchNum = 0;
-    
-    for(int i=cards->atcvie_place;i<cards->len;i++) {
-        if(target==(Card_t)cards->data[i].kind) {
-            cardIdx[matchNum++] = i;
-            if(matchNum==2) {
-                return target;
-            }
-        }
-    }
-
-    return CARD_UNKNOWN;
 }
 
 int Ai::ReChooseAfterPeng(int chosen,int pengIdx[2]) {

@@ -295,7 +295,7 @@ Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group
     return CARD_UNKNOWN;
 }
 
-int CardInHand::FindCards(int idx[],Card_t kind) const {
+int CardInHand::find_cards(int idx[],Card_t kind) const {
     int num = 0;
     
     for(int i=FreeStart; i<size(); i++) {   
@@ -385,7 +385,7 @@ int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
 
 SmartList CardInHand::_Exclude(Card_t kouKind) const {
     int kouIdx[4];
-    FindCards(kouIdx,kouKind);
+    find_cards(kouIdx,kouKind);
 
     SmartList  freeCards(*this,true);
 

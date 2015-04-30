@@ -2465,7 +2465,7 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
         _UpdateCardsInHand(cards,chosen);
     } else if(touch->getLocation().y>visibleSize.height*0.173) {
 		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)==NULL && ifChosed==true) {
-			int  kind = _roundManager->_players[MIDDLE]->get_parter()->get_card_list()->data[_myTouchedCard].kind;
+			int  kind = _roundManager->_players[MIDDLE]->_cards->get_kind(_myTouchedCard);
 
 			auto freeCard = _object->Create(FREE_CARD);
 			auto card = _object->CreateKind((Card_t)kind,NORMAL);
@@ -2684,11 +2684,10 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         /****************
             move 2 peng cards in hand
         ****************/
-		auto list = _roundManager->_players[1]->get_parter()->get_card_list();
-        auto cards = _roundManager->_players[MIDDLE]->_cards; 
+        CardInHand *cards = _roundManager->_players[MIDDLE]->_cards; 
 
         int pengCard[2] = {0};
-        _ai->FindPengCards(pengCard,list,card);
+        cards->find_cards(pengCard,card);
 
 		int isChosenCanceled=0;
         
@@ -2736,11 +2735,11 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         ****************/
 		auto cardPengSize = _object->RectSize(PENG_CARD);
         
-        const float GAP = (list->atcvie_place==0)? 0.5 : 0;
+        const float GAP = (cards->FreeStart==0)? 0.5 : 0;
         
 		Vector<FiniteTimeAction *> hide2CardsInhand;
 
-		for(int i=list->atcvie_place;i<list->len-1;i++) {
+		for(int i=cards->FreeStart;i<cards->last();i++) {/* ??? why last not size*/
 			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
             Sequence *seq;
 
@@ -2766,13 +2765,13 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                 }
             }
             
-            hide2CardsInhand.insert(i-list->atcvie_place,TargetedAction::create(s_card,seq));
+            hide2CardsInhand.insert(i-cards->FreeStart,TargetedAction::create(s_card,seq));
 		}
         
         /****************
             tag update 
         ****************/
-		for(int a=list->len-1; a>=list->atcvie_place; a--) {
+		for(int a=cards->last(); a>=cards->FreeStart; a--) {
 			int curTag = HAND_IN_CARDS_TAG_ID + 1*20 + a;
             
 			if(!myframe->getChildByTag(curTag))
@@ -2786,21 +2785,21 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 				curCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
 			else if(a==pengCard[0])
 				curCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
-			else if(a<pengCard[0] && a>list->atcvie_place)
+			else if(a<pengCard[0] && a>cards->FreeStart)
 				curCard->setTag(curTag+3);
-            else if(a==list->atcvie_place) {
+            else if(a==cards->FreeStart) {
 				curCard->setTag(curTag+3);
             }
 		}
         /* why not set this value directly??? */
-        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + list->atcvie_place);
-        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_TWO))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + list->atcvie_place+1);
+        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + cards->FreeStart);
+        ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_TWO))->setTag(HAND_IN_CARDS_TAG_ID+1*20 + cards->FreeStart+1);
 
         auto EmptyCard=_object->Create(FREE_CARD);
         EmptyCard->setAnchorPoint(Vec2(1,1));
         EmptyCard->setScale(0);
         EmptyCard->setPosition(Vec2::ZERO);
-        myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID + 1*20 + list->atcvie_place+2);
+        myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID + 1*20 + cards->FreeStart+2);
 
         /****************
             background effect
@@ -2875,7 +2874,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
 				} else  {
                     int sameCardNum = 0;
 
-                    for(int a=list->atcvie_place-1;a>=0;a--) {
+                    for(int a=cards->FreeStart-1;a>=0;a--) {
 						if( _roundManager->IsCurEffectCard(cards->at(a)) ){
 							sameCardNum++;
 							((Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+1*20+a))->setVisible(true);

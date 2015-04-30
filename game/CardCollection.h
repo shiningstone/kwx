@@ -88,7 +88,7 @@ public:
     
     bool IsKouInclude(Card_t kind) const;
     void AddKouGroup(Card_t kind,int *idx);
-    int  FindCards(int cardIdx[],Card_t card) const;
+    int  find_cards(int cardIdx[],Card_t card) const;
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
 
