@@ -99,11 +99,6 @@ void RoundManager::RecordOutCard( Card_t kind ) {
     _gRiver->show();
 }
 
-void RoundManager::RecordOutCard( Card card ) {
-    _gRiver->push_back((Card_t)card.kind);
-    _gRiver->show();
-}
-
 void RoundManager::RenewOutCard() {
     delete _gRiver;
 	_gRiver = new CardList;
@@ -327,19 +322,16 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     _continue_gang_times = 0;
     _lastAction=a_PENG;
     
-    Card         card;
-    CardNode_t * last = _players[_curPlayer]->_river->back();
-    card.kind = (CARD_KIND)last->kind;
+    Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
     _players[_curPlayer]->_river->pop_back();
-    
-    
-    RecordOutCard(card);
-    RecordOutCard(card);
+
+    RecordOutCard(pengCard);
+    RecordOutCard(pengCard);
 
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
 
-    _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
+    _uiManager->PengEffect(dir,prevPlayer,pengCard);
 }
 
 void RoundManager::RecvHu(PlayerDir_t dir) {
@@ -406,12 +398,11 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		_lastAction=a_MING_GANG;
 		_lastActionWithGold=a_MING_GANG;
 
-		Card GangCard;
+		Card_t GangCard;
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
 		if(_isCardFromOthers) {
-            CardNode_t * last = _players[_curPlayer]->_river->back();
-            GangCard.kind = (CARD_KIND)last->kind;
+            GangCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
             _players[_curPlayer]->_river->pop_back();
     
 			RecordOutCard(GangCard);
@@ -423,8 +414,8 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(cards->get_kind(cards->last()));
 		}
 
-        card = _ai->FindGangCards(gangCardIdx,cards,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
-        _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
+        card = _ai->FindGangCards(gangCardIdx,cards,GangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _uiManager->GangEffect(dir,GangCard,gangCardIdx,false,prevPlayer);
 	}
 }
 
@@ -729,11 +720,11 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         _lastAction=a_MING_GANG;
         _lastActionWithGold=a_MING_GANG;
 
-        Card GangCard;
+        Card_t GangCard;
         PlayerDir_t prevPlayer = (PlayerDir_t)dir;
         if(_isCardFromOthers) {
             CardNode_t * last = _players[_curPlayer]->_river->back();
-            GangCard.kind = (CARD_KIND)last->kind;
+            GangCard = last->kind;
             _players[_curPlayer]->_river->pop_back();
 
             RecordOutCard(GangCard);
@@ -746,8 +737,8 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        Card_t card = _ai->FindGangCards(gangIdx,cards,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
-        _uiManager->_MingGangEffect(dir,prevPlayer,card,gangIdx);
+        _ai->FindGangCards(gangIdx,cards,GangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _uiManager->_MingGangEffect(dir,prevPlayer,GangCard,gangIdx);
     }
     else if(_actionToDo&a_MING) {
         RecvMing();

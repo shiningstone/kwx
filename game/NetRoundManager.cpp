@@ -296,9 +296,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     Card_t card        = (Card_t)info->kind;
     delete info;
 
-    Card fake;
-    fake.kind   = (CARD_KIND)card;
-    RecordOutCard(fake);
+    RecordOutCard(card);
 	_lastHandedOutCard = (CARD_KIND)card;
     _actionToDo = a_JUMP;
     
@@ -358,15 +356,12 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 _lastAction=a_MING_GANG;
                 _lastActionWithGold=a_MING_GANG;
                 
-                Card GangCard;
                 if(_isCardFromOthers) {
-                    CardNode_t * last = _players[_curPlayer]->_river->back();
-                    GangCard.kind = (CARD_KIND)last->kind;
                     _players[_curPlayer]->_river->pop_back();
     
-			        RecordOutCard(GangCard);
-			        RecordOutCard(GangCard);
-			        RecordOutCard(GangCard);
+			        RecordOutCard(card);
+			        RecordOutCard(card);
+			        RecordOutCard(card);
                     
                     _curPlayer = dir;
                     
@@ -569,13 +564,11 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     _lastAction=a_PENG;
 
 
-    Card         card;
-    CardNode_t * last = _players[_curPlayer]->_river->back();
-    card.kind = (CARD_KIND)last->kind;
+    Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
     _players[_curPlayer]->_river->pop_back();
     
-    RecordOutCard(card);
-    RecordOutCard(card);
+    RecordOutCard(pengCard);
+    RecordOutCard(pengCard);
 
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
@@ -592,12 +585,12 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
 
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(aPENG,(Card_t)card.kind);
+        aReq.Set(aPENG,pengCard);
         _messenger->Send(aReq);
     }
 
     LOGGER_WRITE("NOTE: maybe this action should be taken later\n");
-    _uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
+    _uiManager->PengEffect(dir,prevPlayer,pengCard);
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
@@ -621,7 +614,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 	_continue_gang_times++;
 
     int* gangCardIdx=new int[4];
-    Card_t card;
+    Card_t gangCard;
 
     CardInHand *cards = _players[dir]->_cards;
 
@@ -638,13 +631,13 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        card = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
+        gangCard = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
         
 		if( !IsTing(_curPlayer) ) {
-			SetEffectCard(card,c_AN_GANG);
+			SetEffectCard(gangCard,c_AN_GANG);
 		}
 
-        _uiManager->GangEffect(dir,card,gangCardIdx);
+        _uiManager->GangEffect(dir,gangCard,gangCardIdx);
 	}
 	else if( _actionToDo & a_MING_GANG ) {
 		_lastActionSource=dir;
@@ -652,17 +645,16 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 		_lastAction=a_MING_GANG;
 		_lastActionWithGold=a_MING_GANG;
 
-		Card GangCard;
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
 		if(_isCardFromOthers) {
             CardNode_t * last = _players[_curPlayer]->_river->back();
-            GangCard.kind = (CARD_KIND)last->kind;
+            gangCard = last->kind;
             _players[_curPlayer]->_river->pop_back();
     
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
+			RecordOutCard(gangCard);
+			RecordOutCard(gangCard);
+			RecordOutCard(gangCard);
             
             _players[dir]->get_parter()->hand_in(
                 _lastHandedOutCard,
@@ -676,16 +668,17 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
             
 			_curPlayer=dir;
 		}else {
-			RecordOutCard( cards->get_kind(cards->last()) );
+		    gangCard = cards->get_kind(cards->last());
+			RecordOutCard( gangCard );
 		}
 
-        card = _ai->FindGangCards(gangCardIdx,cards,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
-        _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
+        _ai->FindGangCards(gangCardIdx,cards,gangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _uiManager->GangEffect(dir,gangCard,gangCardIdx,false,prevPlayer);
 	}
     
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(aAN_GANG,(Card_t)card);
+        aReq.Set(aAN_GANG,gangCard);
         _messenger->Send(aReq);
     }
 }
