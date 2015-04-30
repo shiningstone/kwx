@@ -3226,9 +3226,6 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 {
     myframe->_ID = dir;
 
-    auto cards = _roundManager->_players[dir]->_cards; 
-	auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
-
 	if(_roundManager->_isCardFromOthers) {
         _Remove(myframe,HAND_OUT_CARDS_TAG_ID+prevDir*25 + _roundManager->_players[prevDir]->_river->size());
 	}
@@ -3266,8 +3263,10 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		Sprite   *s_curOutCard;
 		Sequence *hideOutcard;
 
+        CardInHand *cards = _roundManager->_players[MIDDLE]->_cards; 
+        
 		if( !_roundManager->_isCardFromOthers ) {
-			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20 + list->len-1);//gang1
+			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20 + cards->last());//gang1
 			lastInHand->runAction(ScaleTo::create(0,0));
 			
 			s_curOutCard=_object->Create(FREE_CARD);
@@ -3306,7 +3305,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
         int ifLeft=0;
         
         if(_myChosenCard!=INVALID) {
-            if(_myChosenCard < list->len-4) {
+            if(_myChosenCard < cards->size()-4) {
                 ifLeft=1;
             }
 
@@ -3320,7 +3319,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		Vec2    basePos;
         
 		if(!_roundManager->_isCardFromOthers) {
-			baseCard = _GetCardInHand(MIDDLE,list->len-2);
+			baseCard = _GetCardInHand(MIDDLE,cards->size()-2);
 			basePos  = baseCard->getPosition();
             
 			distributeCardPos=Vec2(
@@ -3329,10 +3328,10 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		} else {
             auto Pengsize = _object->RectSize(PENG_CARD);
             
-			baseCard = _GetCardInHand(MIDDLE,list->len-4);
+			baseCard = _GetCardInHand(MIDDLE,cards->size()-4);
 			basePos  = baseCard->getPosition();
 
-            if( list->atcvie_place>0 )
+            if( cards->FreeStart>0 )
 				distributeCardPos = Vec2(
 				    basePos.x + Pengsize.width*3.5 + 30 
 				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
@@ -3410,7 +3409,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		} else {
 		    _CreateFreeCard(gangCard,gang,(CARD_KIND)card);
 
-            if(list->atcvie_place>=0)/* FreeStart can less than 0 ???? */
+            if(cards->FreeStart>=0)/* FreeStart can less than 0 ???? */
 			{
                 auto OldGang2Pos = gangCard[0]->getPosition();
                 auto OldGang3Pos = gangCard[1]->getPosition();
@@ -3450,8 +3449,8 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
             move free cards in hand
         **********************/
 		int actionStartPlace=0;
-		for(int a=0;a<=list->atcvie_place;a++)
-			if(list->data[a].status==c_MING_KOU||list->data[a].status==c_FREE)
+		for(int a=0;a<=cards->FreeStart;a++)
+			if(cards->get_status(a)==c_MING_KOU||cards->get_status(a)==c_FREE)
 			{
 				actionStartPlace=a;
 				break;
@@ -3479,7 +3478,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 			}
 		}
 		else {
-            const float GAP = (list->atcvie_place==0)?0.5:0.0;
+            const float GAP = (cards->FreeStart==0)?0.5:0.0;
             
 			for(int i=actionStartPlace;i<gang[0];i++) {/* right shift */
                 auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
@@ -3496,7 +3495,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                     myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),Sequence::create(
                         ScaleTo::create(0,0),NULL)));
 			} 
-            for(int i=gang[2]+1;i<list->len-1;i++) {/* right shift */
+            for(int i=gang[2]+1;i<cards->size()-1;i++) {/* right shift */
 				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
                 
                 gang_list_seq.insert(i-actionStartPlace,TargetedAction::create(
@@ -3512,22 +3511,23 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
         /**********************
             update tag
         **********************/
-		for(int a=list->len-1;a>=0;a--) {
+		for(int a=cards->last();a>=0;a--) {
 			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
 			if(!myframe->getChildByTag(curTag))
 				continue;
             
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
 			if(!_roundManager->_isCardFromOthers) {
-				if(a==list->len-1)
+				if(a==cards->last())
 					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-				else if(a<list->len-1&&a>gang[2])
+				else if(a<cards->last()&&a>gang[2])
 					EveryCard->setTag(curTag+1);
+                
 				if(a==(gang[2]+1)) {
 					((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_FOUR))->setTag(HAND_IN_CARDS_TAG_ID+1*20+gang[2]+1);
 				}
 			} else {
-				if(gang[0]<list->atcvie_place) {
+				if(gang[0]<cards->FreeStart) {
 					if(a>gang[2])
 						EveryCard->setTag(curTag+1);
                     
@@ -3548,19 +3548,19 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
 						if(a==gang[0])
 							EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-					} else if(a<gang[0]&&a>=list->atcvie_place)
+					} else if(a<gang[0]&&a>=cards->FreeStart)
 						EveryCard->setTag(curTag+4);
                     
-					if(a==list->atcvie_place)
+					if(a==cards->FreeStart)
 					{
 						for(int b=0;b<3;b++)
-							((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
+							((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+cards->FreeStart+b);
 
 						auto EmptyCard=_object->Create(FREE_CARD);
 						EmptyCard->setAnchorPoint(Vec2(1,1));
 						EmptyCard->setScale(0);
 						EmptyCard->setPosition(Vec2::ZERO);
-						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+3);
+						myframe->addChild(EmptyCard,1,HAND_IN_CARDS_TAG_ID+1*20+cards->FreeStart+3);
 					}
 				}
 			}
@@ -3586,7 +3586,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 				else 
 				{
 					int sameCardNum=0;
-					for(int a=list->atcvie_place-1;a>=0;a--)
+					for(int a=cards->FreeStart-1;a>=0;a--)
 					{
 						if( _roundManager->IsCurEffectCard(cards->at(a)) )
 						{
