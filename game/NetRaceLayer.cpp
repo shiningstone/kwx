@@ -2959,20 +2959,19 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             logical
         **********************/
         auto cards = _roundManager->_players[dir]->_cards; 
-		auto list = _roundManager->_players[dir]->get_parter()->get_card_list();
         Card outCard;
 
 		int isChosenCanceled=0;
 		int ifLeft=0;
         
 		if(_myChosenCard!=INVALID) {
-			if(_myChosenCard<list->len-5)
+			if(_myChosenCard<cards->size()-5)
 				ifLeft=1;
 
             int oldChosen = _myChosenCard;
             _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
 
-            if(_myChosenCard==INVALID && oldChosen!=list->len-1) {
+            if(_myChosenCard==INVALID && oldChosen!=cards->last()) {
                 isChosenCanceled=1;
             }
 		}
@@ -2987,10 +2986,10 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             move 4 cards in hand
         **********************/
         Size FreeCardSize = _object->RectSize(FREE_CARD);
-		auto curKindOfGang = list->data[GangCardsPlace[0]].kind;
+		auto curKindOfGang = cards->get_kind(GangCardsPlace[0]);
 
         TargetedAction *moveGangCardInHand[4];
-        _CreateGangCardInHandMotion(moveGangCardInHand, GangCardsPlace, curKindOfGang);
+        _CreateGangCardInHandMotion(moveGangCardInHand, GangCardsPlace, (CARD_KIND)curKindOfGang);
 
 		auto moveAngangCards = Spawn::create(
             moveGangCardEffect[0],moveGangCardEffect[1],moveGangCardEffect[2],moveGangCardEffect[3],
@@ -2999,28 +2998,27 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         /**********************
             move free cards in hand
         **********************/
-        /* is there any possible that a card is activated and its status is FREE ??? */
         int actionStartPlace=0;
-		for(int i=0;i<=list->atcvie_place;i++)
-			if(list->data[i].status==c_MING_KOU || list->data[i].status==c_FREE) {
+		for(int i=0;i<=cards->FreeStart;i++)
+			if(cards->get_status(i)==c_MING_KOU || cards->get_status(i)==c_FREE) {
 				actionStartPlace = i;
 				break;
 			}
         auto GangCardSize = _object->RectSize(AN_GANG_CARD);
 
-        const float GAP = (list->atcvie_place==0)?(0.5):(0.0);
+        const float GAP = (cards->FreeStart==0)?(0.5):(0.0);
         
 		Vector<FiniteTimeAction *>gang_list_seq;
 		Spawn* moveFreeCards;
         
-		if( card==list->data[list->len-1].kind ) {
+		if( card==cards->get_kind(cards->last()) ) {
             int i;
-            for(i=actionStartPlace;i<list->len-1;i++)
+            for(i=actionStartPlace;i<cards->size()-1;i++)
 			{
                 auto curPos = _GetCardInHand(dir,i)->getPosition();
                 TargetedAction *motion;
                 
-				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE))
+				if(i<GangCardsPlace[0]&&(cards->get_status(i)==c_MING_KOU||cards->get_status(i)==c_FREE))
 				{
 					motion=TargetedAction::create( _GetCardInHand(dir,i),
                         Sequence::create(
@@ -3048,19 +3046,19 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                 gang_list_seq.insert(i-actionStartPlace,motion);
 			}
             
-			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+list->len-1),
+			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+cards->size()-1),
                 Sequence::create(
                     DelayTime::create(0.18),
                     ScaleTo::create(0,0),NULL));
             
             gang_list_seq.insert(i-actionStartPlace,motion);
 		} else {
-			for(int i=actionStartPlace;i<=list->len-1;i++)
+			for(int i=actionStartPlace;i<=cards->size()-1;i++)
 			{
                 auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
                 TargetedAction *motion;
                 
-				if(i<GangCardsPlace[0]&&(list->data[i].status==c_MING_KOU||list->data[i].status==c_FREE)) {
+				if(i<GangCardsPlace[0]&&(cards->get_status(i)==c_MING_KOU||cards->get_status(i)==c_FREE)) {
 					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             DelayTime::create(0.18),
@@ -3077,7 +3075,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                             ScaleTo::create(0,0),NULL));
                 } else if(i>GangCardsPlace[3]) {
                     MoveTo* actionMove;
-                    if( (i==list->len-1) && (card!=list->data[list->len-1].kind)) {
+                    if( (i==cards->size()-1) && (card!=cards->get_kind(cards->last()))) {
 						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i-1)->getPosition();
 						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
                         
@@ -3105,7 +3103,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         /**********************
             update tag
         **********************/
-		for(int i=list->len-1;i>=0;i--) {
+		for(int i=cards->size()-1;i>=0;i--) {
 			int curTag=HAND_IN_CARDS_TAG_ID+1*20+i;
             
 			if(!myframe->getChildByTag(curTag))
@@ -3113,7 +3111,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
             
-			if( GangCardsPlace[0]<list->atcvie_place ) {/* peng cards transfer to gang cards */
+			if( GangCardsPlace[0]<cards->FreeStart ) {/* peng cards transfer to gang cards */
 				if(i==GangCardsPlace[3])
 					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
 				else if(i>GangCardsPlace[2] && i<GangCardsPlace[3]) {
@@ -3136,12 +3134,12 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_TWO);
 					if(i==GangCardsPlace[0])
 						EveryCard->setTag(EFFECT_TEMP_CARD_TAG_ONE);
-				} else if(i>=list->atcvie_place && i<GangCardsPlace[0]) {
+				} else if(i>=cards->FreeStart && i<GangCardsPlace[0]) {
 					EveryCard->setTag(curTag+4);      /* leave for 4 space for gang cards*/
                     
-                    if(i==list->atcvie_place) {       /* insert 4 gang cards*/
+                    if(i==cards->FreeStart) {       /* insert 4 gang cards*/
                         for(int b=0;b<4;b++)
-                            ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+list->atcvie_place+b);
+                            ((Sprite*)myframe->getChildByTag(EFFECT_TEMP_CARD_TAG_ONE+b))->setTag(HAND_IN_CARDS_TAG_ID+1*20+cards->FreeStart+b);
                         break;
                     }
                 }
@@ -3164,7 +3162,7 @@ void NetRaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 					_CardInHandUpdateEffect(dir);
 				} else {
 					int sameCardNum=0;
-					for(int a=list->atcvie_place-1;a>=0;a--)
+					for(int a=cards->FreeStart-1;a>=0;a--)
 					{
 						if( _roundManager->IsCurEffectCard(cards->at(a)) )
 						{
