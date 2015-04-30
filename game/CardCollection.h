@@ -5,6 +5,8 @@
 #include <vector>
 using namespace std;
 
+#include "./../RaceType.h"
+
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"
 

@@ -622,9 +622,11 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 
     int* gangCardIdx=new int[4];
     Card_t card;
-    
+
+    CardInHand *cards = _players[dir]->_cards;
 	auto list=_players[dir]->get_parter()->get_card_list();
-	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
+
+	if( _actionToDo&a_AN_GANG || _actionToDo&a_SHOU_GANG ) {
 		_lastActionSource = dir;
         
 		if(_actionToDo&a_AN_GANG) {
@@ -637,7 +639,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        card = _ai->FindGangCards(gangCardIdx,list,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
+        card = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -679,7 +681,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(GangCard);
 		}
 
-        card = _ai->FindGangCards(gangCardIdx,list,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
+        card = _ai->FindGangCards(gangCardIdx,cards,(Card_t)GangCard.kind,_actionToDo,IsTing(dir),_isCardFromOthers);
         _uiManager->GangEffect(dir,(Card_t)GangCard.kind,gangCardIdx,false,prevPlayer);
 	}
     

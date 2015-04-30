@@ -5575,7 +5575,6 @@ void  NetRaceLayer::showall()
 		int no = (winner+a)%3;
 
         CardInHand *cards = _roundManager->_players[no]->_cards;
-		CARD_ARRAY *list=_roundManager->_players[no]->get_parter()->get_card_list();
         
 		for(int ik=0;ik<MAX_HANDIN_NUM;ik++)
 		{
@@ -5686,9 +5685,9 @@ void  NetRaceLayer::showall()
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
 						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 						p_list[i]->addChild(s_card,1);
-						if(list->data[i+1].status==c_FREE)
+						if(cards->get_status(i+1)==c_FREE)
 							x += p_list[i]->getTextureRect().size.width*2;
-						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(list->data[i+1].status!=c_FREE))
+						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)!=c_FREE))
 							x += p_list[i]->getTextureRect().size.width*1.5;
 						else
 							x += p_list[i]->getTextureRect().size.width*1.0;
@@ -5748,7 +5747,7 @@ void  NetRaceLayer::showall()
 				{
 					if(cards->get_status(i)==c_AN_GANG)
 					{
-						if((cards->get_kind(i)==cards->get_kind(i+1))&&(cards->get_kind(i)==cards->get_kind(i+2))&&(cards->get_kind(i)!=list->data[i+3].kind))//2
+						if((cards->get_kind(i)==cards->get_kind(i+1))&&(cards->get_kind(i)==cards->get_kind(i+2))&&(cards->get_kind(i)!=cards->get_kind(i+3)))//2
 						{
 							p_list[i]=_object->Create(LR_OUT_CARD);
 							p_list[i]->setAnchorPoint(Vec2(0.3,0));
@@ -5781,7 +5780,7 @@ void  NetRaceLayer::showall()
 						y+=((p_list[i]->getTextureRect().size.height)*0.65);
 					else if(cards->get_status(i)==c_PENG)
 					{
-						if((cards->get_kind(i+1)!=cards->get_kind(i))||((cards->get_kind(i+1)==cards->get_kind(i))&&(list->data[i+1].status!=cards->get_status(i))))
+						if((cards->get_kind(i+1)!=cards->get_kind(i))||((cards->get_kind(i+1)==cards->get_kind(i))&&(cards->get_status(i+1)!=cards->get_status(i))))
 							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
 						else
 							y+=((p_list[i]->getTextureRect().size.height)*0.65);
@@ -6560,8 +6559,8 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,CardList* outCard)
     
 	if(no==2)
 	{
-		int lenForPlayerTwo=_roundManager->_players[2]->get_parter()->get_card_list()->len-1;
-		auto BizerPosForPlayerTwoTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+lenForPlayerTwo-1)->getPosition();
+		int secondLast = _roundManager->_players[no]->_cards->last()-1;
+		auto BizerPosForPlayerTwoTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+secondLast)->getPosition();
 		auto BizerPosForPlayerTwo=Vec2(BizerPosForPlayerTwoTemp.x,BizerPosForPlayerTwoTemp.y);
 		if((outCard->size()-1)<6)
 		{
@@ -6584,8 +6583,8 @@ BezierTo* NetRaceLayer::OthersBizerMove(int no,CardList* outCard)
 	}
 	else if(no==0)
 	{
-		auto l_list_len=_roundManager->_players[no]->get_parter()->get_card_list()->len-1;
-		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+l_list_len-1);
+		int secondLast = _roundManager->_players[no]->_cards->last()-1;
+		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+secondLast);
 		if((outCard->size()-1)<6)
 		{
 			config.controlPoint_1=Vec2(_layout->_playerPosi[no].basePoint.x+110,l_card->getPosition().y-35);

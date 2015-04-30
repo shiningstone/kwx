@@ -1,4 +1,5 @@
 
+#include "CardCollection.h"
 #include "NetRole.h"
 #include "NetRaceLayer.h"
 #include "RoundManager.h"
@@ -129,44 +130,44 @@ void Ai::MingKouChoose(PlayerDir_t dir) {
 /*************************************
         card process
 *************************************/
-Card_t Ai::FindGangCards(int cardIdx[4],CARD_ARRAY *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers) {
+Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers) {
     if( gangType & a_AN_GANG || gangType & a_SHOU_GANG ) {
         if(!isTing) {
             /*BUG here : only the first group can be found*/
-            for(int i=cards->atcvie_place; i<cards->len; i++) {
+            for(int i=cards->FreeStart; i<cards->size(); i++) {
                 int matchCardNum = 0;
                 cardIdx[0]       = i;
                 
-                for(int j=i+1; j<cards->len; j++) {
-                    if(cards->data[i].kind==cards->data[j].kind) {
+                for(int j=i+1; j<cards->size(); j++) {
+                    if(cards->get_kind(i)==cards->get_kind(j)) {
                         matchCardNum++;
                         cardIdx[matchCardNum] = j;
                         
                         if(matchCardNum==3) {
-                            return (Card_t)cards->data[i].kind;
+                            return cards->get_kind(i);
                         }
                     }
                 }
             }
         } else {
-            cardIdx[3] = cards->len-1;
+            cardIdx[3] = cards->size()-1;
         
             int p = 0;
-            for(int i=0; i<cards->atcvie_place; i++){
-                if(cards->data[i].kind==cards->data[cardIdx[3]].kind) {
+            for(int i=0; i<cards->FreeStart; i++){
+                if(cards->get_kind(i)==cards->get_kind(cardIdx[3])) {
                     cardIdx[p++]=i;
                     if(p==3) {
-                        return (Card_t)cards->data[i].kind;
+                        return cards->get_kind(i);
                     }
                 }
             }
         }
     } else {
-		int last = isCardFromOthers ? (cards->len) : (cards->len-1);
+		int last = isCardFromOthers ? (cards->size()) : (cards->size()-1);
 
         int matchCardNum = 0;
 		for(int i=0;i<last;i++) {
-			if(target==cards->data[i].kind) {
+			if(target==cards->get_kind(i)) {
                 cardIdx[matchCardNum++] = i;
                 
                 if(matchCardNum==3) {
