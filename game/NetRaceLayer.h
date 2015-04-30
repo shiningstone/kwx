@@ -63,27 +63,19 @@ private:
     const static int DIST_BATCHES     = 4;   /*card number of distribute batch*/
     const static int DIST_BATCH_CARDS = 4;   /*card number of distribute batch*/
 
-    typedef struct {
-        CARD_ARRAY *list;
-        int         start;
-        int         last;
-        int         residual;
-    }CardsInfo_t;
-    
     Logger *_logger;
 
     LayerColor* myframe;
 
     Sprite *_GetCardInHand(PlayerDir_t dir,int idx);
     void    _ReOrderCardsInHand(int droppedCard,CardInHand *cards);
-    void    _GetCardsInfo(CardsInfo_t *info);
     int     _FindCard(int start,int end,Touch *touch);
     TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
     Spawn *_CreateHuBackgroundEffect(PlayerDir_t dir);
     
     void _OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isCardFromOthers,Card_t card = CARD_UNKNOWN);
-    void _UpdateNonChosenCards(const CardsInfo_t &cards, int chosen);
-    void _UpdateCardsInHand(const CardsInfo_t &cards, int chosen);
+    void _UpdateNonChosenCards(const CardInHand *cards, int chosen);
+    void _UpdateCardsInHand(const CardInHand *cards, int chosen);
     void _ShowMenuButtons();
     void _CreateMeneButtons();
     void _CreateHeadImage();

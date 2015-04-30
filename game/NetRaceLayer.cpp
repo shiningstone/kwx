@@ -2036,26 +2036,26 @@ void NetRaceLayer::_StartParticleSystem(float delta)
 	m_SmallParticle->isAutoRemoveOnFinish();
 }
 
-void NetRaceLayer::_UpdateNonChosenCards(const CardsInfo_t &cards, int chosen) {
+void NetRaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
     auto cardSize = _object->RectSize(FREE_CARD);
 
     float y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
-    auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
+    auto startPos = _GetCardInHand(MIDDLE,cards->FreeStart)->getPosition();
     
-    for(int i=cards.start; i<=cards.last; i++) {
+    for(int i=cards->FreeStart; i<=cards->last(); i++) {
         auto loopCard=_GetCardInHand(MIDDLE,i);
 
         if(i==chosen) {
             continue;
         } else if(i<chosen) {
-            loopCard->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start), y1));
+            loopCard->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart), y1));
             loopCard->setScale(1);
             loopCard->_ID = 1;
         } else if(i>chosen) {
-            if( i==cards.last && cards.residual==2 ) {
-                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards.start)+30+14,y1));
+            if( i==cards->last() && cards->is_wait_handout() ) {
+                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+30+14,y1));
             } else {
-                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards.start)+14,y1));
+                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+14,y1));
             }
             
             loopCard->setScale(1);
@@ -2064,23 +2064,23 @@ void NetRaceLayer::_UpdateNonChosenCards(const CardsInfo_t &cards, int chosen) {
     }
 }
 
-void NetRaceLayer::_UpdateCardsInHand(const CardsInfo_t &cards, int chosen) {
-    if(cards.list->data[chosen].can_play==cps_YES) {/* I think the cards behind start all can play ???*/                 
+void NetRaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
+    if(cards->canPlay(chosen)) {/* I think the cards behind start all can play ???*/                 
 
         _UpdateNonChosenCards(cards,chosen);
 
         float x1 = _layout->_playerPosi[MIDDLE].basePoint.x+10;
         float y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
         auto cardSize = _object->RectSize(FREE_CARD);
-        auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
+        auto startPos = _GetCardInHand(MIDDLE,cards->FreeStart)->getPosition();
         auto loopCard = _GetCardInHand(MIDDLE,chosen);
 
         _myChosenCard = chosen;
 
-        if( chosen==cards.last && cards.residual==2 ) {/* logic changed !!!*/
-            loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards.start)+30,y1+10));
+        if( chosen==cards->last() && cards->is_wait_handout() ) {/* logic changed !!!*/
+            loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards->FreeStart)+30,y1+10));
         } else {
-            loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards.start),   y1+10));
+            loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards->FreeStart),   y1+10));
         }
 
         /* provide hint bar when ming choose */
@@ -2385,15 +2385,6 @@ void NetRaceLayer::ListenToCardTouch() {
    }
 }
 
-/*****************************/
-/* only used when select card */
-void NetRaceLayer::_GetCardsInfo(CardsInfo_t *info) {
-    info->list  = _roundManager->_players[MIDDLE]->get_parter()->get_card_list();
-    info->start = info->list->atcvie_place;
-    info->last   = info->list->len - 1;
-    info->residual = (info->list->len - info->list->atcvie_place)%3;
-}
-/*****************************/
 int NetRaceLayer::_FindCard(int start,int end,Touch *touch) {
     for(int i=start;i<=end;i++) {
         if( _IsClickedOn(_GetCardInHand(MIDDLE,i),touch) ) {
@@ -2428,22 +2419,21 @@ bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
         x1 = _layout->_playerPosi[MIDDLE].basePoint.x+10;
         y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
 
-        CardsInfo_t cards = {0};
-        _GetCardsInfo(&cards);
+        CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
         
-        const auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
+        const auto startPos = _GetCardInHand(MIDDLE,cards->FreeStart)->getPosition();
         const auto cardSize = _object->RectSize(FREE_CARD);
 
-        for(int i=cards.start; i<=cards.last; i++) {
+        for(int i=cards->FreeStart; i<=cards->last(); i++) {
             auto card = _GetCardInHand(MIDDLE,i);
             card->_ID = 1;
             card->setScale(1);
             card->setAnchorPoint(Vec2(0,0));
 
-            if(i==cards.last && cards.residual==2) {
-                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start)+30,y1));
+            if(i==cards->last() && cards->is_wait_handout()) {
+                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart)+30,y1));
             } else {
-                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards.start),y1));
+                card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart),y1));
             }
         }
         
@@ -2454,8 +2444,7 @@ bool NetRaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
-    CardsInfo_t cards = {0};
-    _GetCardsInfo(&cards);
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
 	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && touch->getLocation().y>visibleSize.height*0.173) {
 		myframe->getChildByTag(CHOOSE_CARD_TAG_ID)->setPosition(touch->getLocation());
@@ -2463,7 +2452,7 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 		return;
 	} 
     
-    for(int i=cards.start; i<=cards.last; i++) {
+    for(int i=cards->FreeStart; i<=cards->last(); i++) {
         _GetCardInHand(MIDDLE,i)->setOpacity(255);
 	}
     
@@ -2471,7 +2460,7 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 		myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
     }
     
-    int chosen = _FindCard(cards.start, cards.last, touch);
+    int chosen = _FindCard(cards->FreeStart, cards->last(), touch);
     if(chosen!=INVALID) {
         _UpdateCardsInHand(cards,chosen);
     } else if(touch->getLocation().y>visibleSize.height*0.173) {
@@ -2500,8 +2489,7 @@ void NetRaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 }
 
 void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
-    CardsInfo_t cards = {0};
-    _GetCardsInfo(&cards);
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
 	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL 
         && (touch->getLocation().y>visibleSize.height*0.2)) {
@@ -2520,34 +2508,35 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		return;
 	}
     
-    for(int i=cards.start; i<=cards.last; i++) {
+    for(int i=cards->FreeStart; i<=cards->last(); i++) {
 		_GetCardInHand(MIDDLE,i)->setOpacity(255);
     }
 
     _Remove(myframe,CHOOSE_CARD_TAG_ID);
     
-	int chosen = _FindCard(cards.start, cards.last, touch);
+	int chosen = _FindCard(cards->FreeStart, cards->last(), touch);
     if(chosen!=INVALID) {
         _UpdateNonChosenCards(cards,chosen);
 
 		float x = _layout->_playerPosi[MIDDLE].basePoint.x+10;
 		float y = _layout->_playerPosi[MIDDLE].basePoint.y+10;
 		auto cardSize = _object->RectSize(FREE_CARD);
-        auto startPos = _GetCardInHand(MIDDLE,cards.start)->getPosition();
+        auto startPos = _GetCardInHand(MIDDLE,cards->FreeStart)->getPosition();
 
         _myChosenCard = chosen;
 
         Sprite *loopCard = _GetCardInHand(MIDDLE,chosen);
 		bool ChooseConfirm = false;
 
-        if(chosen==cards.last) {
+        if(chosen==cards->last()) {
             if(loopCard->_ID!=100) {
                 loopCard->_ID=100;
-                
-                if(cards.residual==1)
-                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen-cards.start),y+10));
-                else if(cards.residual==2)
-                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen-cards.start)+30,y+10));
+
+                if(cards->is_wait_handout()) {
+                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen - cards->FreeStart)+30,y+10));
+                } else {
+                    loopCard->setPosition(Vec2(startPos.x + cardSize.width*(chosen - cards->FreeStart),y+10));
+                }
                 
                 if(loopCard->getScale()==1) {
                     loopCard->runAction(_voice->Speak("select"));
@@ -2560,7 +2549,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
         } else {
             if(loopCard->_ID!=100) {
                 loopCard->_ID=100;
-                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen-cards.start),y+10));
+                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(chosen - cards->FreeStart),y+10));
                 if(loopCard->getScale()==1)
                     loopCard->runAction(_voice->Speak("select"));
                 loopCard->setScale(1.2);
@@ -2569,7 +2558,7 @@ void NetRaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
             }
         }
 
-        if(chosen!=cards.last) {/* why??? */
+        if(chosen!=cards->last()) {/* why??? */
             if(_roundManager->_actionToDo==a_MING && !_roundManager->IsTing(MIDDLE)
                 && _roundManager->_isMingTime ) {
                 while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)) )
@@ -3717,13 +3706,10 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
     					_roundManager->_isGangAsking = false;
-                        
-                        CardsInfo_t cards;
-                        _GetCardsInfo(&cards);
-                        
-                        Vec2 location = _GetCardInHand(MIDDLE,cards.last)->getPosition();
 
-                        _roundManager->RecvHandout(cards.last,location,2);/*bug??? forced to handout last card*/
+                        int last = _roundManager->_players[MIDDLE]->_cards->last();
+                        Vec2 location = _GetCardInHand(MIDDLE,last)->getPosition();
+                        _roundManager->RecvHandout(last,location,2);/*bug??? forced to handout last card*/
                     }),NULL));
 			} else
 				myframe->runAction(hideQiReminder);
