@@ -2686,7 +2686,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
         ****************/
         CardInHand *cards = _roundManager->_players[MIDDLE]->_cards; 
 
-        int pengCard[2] = {0};
+        int pengCard[4] = {0};
         cards->find_cards(pengCard,card);
 
 		int isChosenCanceled=0;
