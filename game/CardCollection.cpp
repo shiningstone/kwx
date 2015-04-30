@@ -80,6 +80,18 @@ int CardList::last() const {
     return size()-1;
 }
 
+int CardList::get_idx_in_group(int idxInHand) const {
+    Card_t kind = get_kind(idxInHand);
+
+    for(int i=0;i<4;i++) {
+        if(kind!=get_kind(idxInHand+i+1)) {
+            return 4-i; 
+        }
+    }
+
+    return 1;
+}
+
 void CardList::push_back(Card_t kind) {
     CardNode_t *card = new CardNode_t;
     card->kind    = kind;
@@ -199,18 +211,6 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     }
 
     DBG_SHOW();
-}
-
-int CardInHand::get_idx_in_group(int idxInHand) const {
-    Card_t kind = get_kind(idxInHand);
-
-    for(int i=0;i<4;i++) {
-        if(kind!=get_kind(idxInHand+i+1)) {
-            return 4-i; 
-        }
-    }
-
-    return 1;
 }
 
 void CardInHand::perform(ActionId_t act) {

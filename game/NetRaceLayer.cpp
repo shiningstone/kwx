@@ -283,6 +283,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 	float x = _layout->_playerPosi[dir].basePoint.x+10; 
 	float y = _layout->_playerPosi[dir].basePoint.y+10;
 
+    CardInHand *cards = _roundManager->_players[dir]->_cards;
 	CARD_ARRAY *list=_roundManager->_players[dir]->get_parter()->get_card_list();
 
 	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==INVALID )
@@ -297,7 +298,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		//if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
 			if(dir==LEFT || dir==RIGHT) {
-				p_list[i] = _CreateCardInHand(dir,i,list,(ting_flag==1),Vec2(x,y));
+				p_list[i] = _CreateCardInHand(dir,i,cards,(ting_flag==1),Vec2(x,y));
                 
 				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
                 if(apperance!=NORMAL_APPERANCE) {
@@ -3768,8 +3769,8 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 ********************************************************/
 /* this function is only for others */
 Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
-                                        CARD_ARRAY *cards,bool isTing,const Vec2 &refer) {
-    switch( cards->data[idx].status ) {
+                                        CardList *cards,bool isTing,const Vec2 &refer) {
+    switch( cards->get_status(idx) ) {
         case c_FREE:
             {
                 Sprite *card;
@@ -3787,9 +3788,7 @@ Sprite *NetRaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
                 return card;
             }
         case c_AN_GANG:
-            if(cards->data[idx].kind==cards->data[idx+1].kind
-                &&cards->data[idx].kind!=cards->data[idx+2].kind
-                &&!isTing&&_roundManager->IsTing(MIDDLE))
+            if(cards->get_idx_in_group(idx)==3 && !isTing&&_roundManager->IsTing(MIDDLE))
                 return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
             else
                 return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);

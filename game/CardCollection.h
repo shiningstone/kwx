@@ -34,6 +34,8 @@ public:
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
     int    last() const;
+    int  get_idx_in_group(int idxInHand) const;
+
 
 	void   show();
 	Card_t get_kind(unsigned int idx) const;
@@ -57,8 +59,6 @@ public:
     void   delete_card(int from,int len);
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
-
-    int  get_idx_in_group(int idxInHand) const;
 
     void   perform(ActionId_t act);
     
