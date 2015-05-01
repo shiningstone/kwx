@@ -17,10 +17,6 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
     _lastWin.giver  = INVALID_DIR;
 
 	_gRiver = new CardList;
-	for(int i=0;i<TOTAL_CARD_NUM;i++) {
-		_unDistributedCards[i]=i;
-	}
-    _distributedNum = 0;
 
     for(int i=0;i<PLAYER_NUM;i++) {
         _players[i] = NULL;
@@ -139,69 +135,19 @@ void RoundManager::_GenerateIds(int ids[]) {
 }
 
 int RoundManager::Shuffle() {
-	for(int j=0;j<2;j++) {//伪随机数列生成
-		for(int i=0;i<TOTAL_CARD_NUM;i++) {
-			int tmp = _unDistributedCards[i];
-			int cur = rand()%TOTAL_CARD_NUM;
-			_unDistributedCards[i] = _unDistributedCards[cur];
-			_unDistributedCards[cur] = tmp;
-		}
-	}
-	////////////////////测试/////////////////////////
-	//[0,3]一条 [4,7]二条 [8,11]三条 [12,15]四条 [16,19]五条 [20,23]六条 [24,27]七条 [28,31]八条 [32,35]九条 
-	//[36,39]一筒 [40,43]二筒 [44,47]三筒 [48,51]四筒 [52,55]五筒 [56,59]六筒 [60,63]七筒 [64,67]八筒 [68,71]九筒
-	//[72,75]红中 [76,79]发财 [80,83]白板
-	int oneSeq[14]={0,0,0,8,9,10,12,16,20,24,28,32,36,39};
-	int twoSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
-	int threeSeq[13]={36,36,36,40,40,44,44,48,56,60,64,68,68};
-	_unDistributedCards[40]=0;
-	_unDistributedCards[41]=4;
-	_unDistributedCards[42]=8;
-	_unDistributedCards[43]=12;
-	_unDistributedCards[44]=16;
-	_unDistributedCards[45]=20;
-	_unDistributedCards[46]=24;
-	_unDistributedCards[47]=80;
-	_unDistributedCards[48]=80;
-	_unDistributedCards[49]=80;
-	_unDistributedCards[50]=80;
-	_unDistributedCards[51]=80;
-	int c=0;
-	for(int a=0;a<14;a++)
-	{
-		if(oneSeq[a]<0||oneSeq[a]>83)
-		{
-			CCLOG("ERROR CARDS");
-			return 0;
-		}
-		_unDistributedCards[c++]=oneSeq[a];
-	}
-	for(int a=0;a<13;a++)
-	{
-		if(twoSeq[a]<0||twoSeq[a]>83)
-		{
-			CCLOG("ERROR CARDS");
-			return 0;
-		}
-		_unDistributedCards[c++]=twoSeq[a];
-	}
-	for(int a=0;a<13;a++)
-	{
-		if(threeSeq[a]<0||threeSeq[a]>83)
-		{
-			CCLOG("ERROR CARDS");
-			return 0;
-		}
-		_unDistributedCards[c++]=threeSeq[a];
-	}
-
+#if 0
+    _LoadRandomCardSequence();
+#else
+    load_test_round(1,_unDistributedCards);
+#endif
+    _distributedNum = 0;
 
     char p[TOTAL_CARD_NUM] = {0};
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        p[i] = (_unDistributedCards[i])/4;
+        p[i] = (_unDistributedCards[i]);
     }
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
-
+    
     _isGangAsking = false;
     _isQiangGangAsking = false;
     _isDoubleHuAsking = false;
@@ -225,8 +171,6 @@ int RoundManager::Shuffle() {
     _lastActionSource = INVALID;
 
     _curPlayer = GetLastWinner();
-
-    _distributedNum = 0;
 
     return 0;
 }
@@ -949,7 +893,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actionToDo=action1;
         _curPlayer=(_curPlayer+1)%3;
         _uiManager->UpdateClock(0,_curPlayer);
-        DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
+        DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]));
     }
 }
 
@@ -979,7 +923,7 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     if(!_isCardFromOthers) {
         QiangGangHuJudge(dir);
     } else {
-        DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]/4));
+        DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]));
     }
 }
 
@@ -994,6 +938,27 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
         _players[dir]->get_parter()->action(_isCardFromOthers,a_SHOU_GANG);
     } else {
         _players[dir]->get_parter()->action(_isCardFromOthers,action);
+    }
+}
+
+void RoundManager::_LoadRandomCardSequence() {
+    int cards[TOTAL_CARD_NUM]; 
+
+	for(int i=0;i<TOTAL_CARD_NUM;i++) {
+		cards[i]=i;
+	}
+
+	for(int j=0;j<2;j++) {//伪随机数列生成
+		for(int i=0;i<TOTAL_CARD_NUM;i++) {
+			int tmp = cards[i];
+			int cur = rand()%TOTAL_CARD_NUM;
+			cards[i] = cards[cur];
+			cards[cur] = tmp;
+		}
+	}
+
+    for(int i=0;i<TOTAL_CARD_NUM;i++) {
+        _unDistributedCards[i] = cards[i]/4;
     }
 }
 

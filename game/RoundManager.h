@@ -15,6 +15,8 @@ using namespace ui;
 #include "./../utils/LogManager.h"
 #include "CardCollection.h"
 
+extern void load_test_round(int idx,int *output);
+
 class NetRole;
 
 class RoundManager {
@@ -129,6 +131,8 @@ protected:
     
     Logger *_logger;
 private:
+    void _LoadRandomCardSequence();
+
     static RoundManager *_instance;
 };
 

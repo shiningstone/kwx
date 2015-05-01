@@ -377,12 +377,12 @@ unsigned char NetRRound::init(int card_array[],int len)
 	unsigned char ac=a_JUMP;
 	for(i=0;i<len;i++)
 	{
-		node.kind    = (Card_t)(card_array[i]/4);
+		node.kind    = (Card_t)(card_array[i]);
 		node.status  = sFREE;
 		node.canPlay = true;
         
 		if(i==13) {
-			ac = hand_in((CARD_KIND)(card_array[i]/4),0,0,false,a_JUMP,0,false);
+			ac = hand_in((CARD_KIND)(card_array[i]),0,0,false,a_JUMP,0,false);
         } else {
 			_cardInHand->insert_card(node,1);
         }
