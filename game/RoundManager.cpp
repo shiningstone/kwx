@@ -842,43 +842,9 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             WaitForOthersAction((PlayerDir_t)dir);
         }
     }else{
-        int no=((PlayerDir_t)dir+1)%3;
+        int no1=((PlayerDir_t)dir+1)%3;
         
         unsigned char action1 = 
-            _players[no]->get_parter()->hand_in(
-                _lastHandedOutCard,
-                _isCardFromOthers,
-                curTingStatus,
-                (_distributedNum==TOTAL_CARD_NUM),
-                _lastActionWithGold,
-                _continue_gang_times,
-                _isGangHua
-            );
-        
-        if(no==MIDDLE&&_isTuoGuan) {
-            if(IsTing(MIDDLE)&&(action1&a_HU))
-                action1=a_HU;
-            else
-                action1=a_JUMP;
-        } else if(no!=MIDDLE) {
-            if(_players[no]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1 = a_JUMP;
-            }
-            else if(_players[no]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1 = a_JUMP;
-            }
-            else if(_players[no]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1=a_JUMP;
-        }
-        
-        int no1=((PlayerDir_t)dir+2)%3;
-        
-        unsigned char action2=
             _players[no1]->get_parter()->hand_in(
                 _lastHandedOutCard,
                 _isCardFromOthers,
@@ -888,26 +854,61 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _continue_gang_times,
                 _isGangHua
             );
-        if(no1==1&&_isTuoGuan)
+        
+        if(no1==MIDDLE&&_isTuoGuan) {
+            if(IsTing(MIDDLE)&&(action1&a_HU)) {
+                action1=a_HU;
+            } else {
+                action1=a_JUMP;
+            }
+        } else if(no1!=MIDDLE) {
+            if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            {
+                if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1 = a_JUMP;
+            }
+            else if(_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
+            {
+                if(_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1 = a_JUMP;
+            }
+            else if(_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+                if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
+                    action1=a_JUMP;
+        }
+        
+        int no2=((PlayerDir_t)dir+2)%3;
+        
+        unsigned char action2=
+            _players[no2]->get_parter()->hand_in(
+                _lastHandedOutCard,
+                _isCardFromOthers,
+                curTingStatus,
+                (_distributedNum==TOTAL_CARD_NUM),
+                _lastActionWithGold,
+                _continue_gang_times,
+                _isGangHua
+            );
+        if(no2==1&&_isTuoGuan)
         {
             if(_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
                 action2=a_HU;
             else
                 action2=a_JUMP;
         }
-        if(no1!=MIDDLE)
+        if(no2!=MIDDLE)
         {
-            if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
+            if(_players[no2]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
                 if(_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
                     action2 = a_JUMP;
             }
-            else if(_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
+            else if(_players[no2]->get_robot_hu_target()==SAME_TONG_TARGET)
             {
                 if(_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
                     action2 = a_JUMP;
             }
-            else if(_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
+            else if(_players[no2]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
                 if(!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
                     action2=a_JUMP;
         }
@@ -916,17 +917,17 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         {
             _uiManager->HideClock();
             
-            if((no!=MIDDLE&&no1!=MIDDLE) || (no==MIDDLE||no1==MIDDLE&&IsTing(MIDDLE))){ 
+            if((no1!=MIDDLE&&no2!=MIDDLE) || (no1==MIDDLE||no2==MIDDLE&&IsTing(MIDDLE))){ 
                 SetWin(DOUBLE_WIN,(PlayerDir_t)_curPlayer);
                 _uiManager->_HuEffect(_lastWin);
                 _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
-            } else if((no==MIDDLE||no1==MIDDLE) && !IsTing(MIDDLE)) {
+            } else if((no1==MIDDLE||no2==MIDDLE) && !IsTing(MIDDLE)) {
                 _isDoubleHuAsking = true;
-                if(no==1) {
-                    _otherOneForDouble = no1;
+                if(no1==1) {
+                    _otherOneForDouble = no2;
                     _actionToDo=action1;
                 } else {
-                    _otherOneForDouble = no;
+                    _otherOneForDouble = no1;
                     _actionToDo=action2;
                 }                   
                 WaitForMyAction();
@@ -936,11 +937,11 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
         {
             _uiManager->HideClock();
             
-            if((no==1&&(action1&a_HU))||(no1==1&&(action2&a_HU))) {
+            if((no1==1&&(action1&a_HU))||(no2==1&&(action2&a_HU))) {
                 if(_players[1]->get_parter()->get_ting_status()==1) {
                     RecvHu(MIDDLE);
                 } else {
-                    if(no==1)
+                    if(no1==1)
                         _actionToDo=action1;
                     else
                         _actionToDo=action2;
@@ -948,32 +949,16 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                     return;
                 }
             }
-            else if(no!=1&&(action1&a_HU)) {
-                RecvHu((PlayerDir_t)no);
-            }
-            else if(no1!=1&&(action2&a_HU)) {
+            else if(no1!=1&&(action1&a_HU)) {
                 RecvHu((PlayerDir_t)no1);
+            }
+            else if(no2!=1&&(action2&a_HU)) {
+                RecvHu((PlayerDir_t)no2);
             }
         }
         else if(action1!=a_JUMP)//下家
         {
             _actionToDo=action1;
-            if(no==1)
-            {
-                _uiManager->UpdateClock(0,no);
-                WaitForMyAction();
-                return;
-            }
-            else
-            {
-                _uiManager->UpdateClock(0,no);
-                WaitForOthersAction((PlayerDir_t)no);
-                return;
-            }
-        }
-        else if(action2!=a_JUMP)//上家
-        {
-            _actionToDo=action2;
             if(no1==1)
             {
                 _uiManager->UpdateClock(0,no1);
@@ -984,6 +969,22 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             {
                 _uiManager->UpdateClock(0,no1);
                 WaitForOthersAction((PlayerDir_t)no1);
+                return;
+            }
+        }
+        else if(action2!=a_JUMP)//上家
+        {
+            _actionToDo=action2;
+            if(no2==1)
+            {
+                _uiManager->UpdateClock(0,no2);
+                WaitForMyAction();
+                return;
+            }
+            else
+            {
+                _uiManager->UpdateClock(0,no2);
+                WaitForOthersAction((PlayerDir_t)no2);
                 return;
             }
         }
