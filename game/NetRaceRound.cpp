@@ -453,17 +453,15 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 				}
 			}
 		}
-		if(num==3)
-		{
+
+		if(num==4) {
 			if(!isCardFromOthers&&!is_last_one)
 				res |= (a_MING_GANG | a_AN_GANG);
 			else if(!is_last_one)
 				res |= (a_MING_GANG | a_PENG);
 			else if(is_last_one)
 				res |= a_PENG;
-		}
-		else if(num==3&&isCardFromOthers)
-		{
+		} else if(num==3&&isCardFromOthers) {
 				res |= a_PENG;
 		}
 	}

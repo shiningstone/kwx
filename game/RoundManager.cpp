@@ -138,7 +138,7 @@ int RoundManager::Shuffle() {
 #if 0
     _LoadRandomCardSequence();
 #else
-    load_test_round(1,_unDistributedCards);
+    load_test_round(2,_unDistributedCards);
 #endif
     _distributedNum = 0;
 
