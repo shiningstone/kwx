@@ -226,7 +226,7 @@ int RoundManager::Shuffle() {
 
     _curPlayer = GetLastWinner();
 
-    _distributedNum = 40;
+    _distributedNum = 0;
 
     return 0;
 }

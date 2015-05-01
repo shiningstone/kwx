@@ -462,7 +462,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isCardFromOthers,u
 			else if(is_last_one)
 				res |= a_PENG;
 		}
-		else if(num==2&&isCardFromOthers)
+		else if(num==3&&isCardFromOthers)
 		{
 				res |= a_PENG;
 		}
