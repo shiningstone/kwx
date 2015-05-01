@@ -3713,6 +3713,8 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 			} else
 				myframe->runAction(hideQiReminder);
 		} else {
+            _roundManager->_players[MIDDLE]->_cards->pop_back();
+        
 			if(_roundManager->_isQiangGangAsking) {
 				_roundManager->_isQiangGangAsking=false;
 

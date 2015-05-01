@@ -17,6 +17,7 @@ RoundManager::RoundManager(NetRaceLayer *uiManager) {
     _lastWin.giver  = INVALID_DIR;
 
 	_gRiver = new CardList;
+    _distributedNum = 0;
 
     for(int i=0;i<PLAYER_NUM;i++) {
         _players[i] = NULL;
@@ -138,7 +139,7 @@ int RoundManager::Shuffle() {
 #if 0
     _LoadRandomCardSequence();
 #else
-    load_test_round(2,_unDistributedCards);
+    load_test_round(1,_unDistributedCards);
 #endif
     _distributedNum = 0;
 
