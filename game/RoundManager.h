@@ -21,6 +21,7 @@ class RoundManager {
     friend class NetRaceLayer;
     friend class Ai;
 private:
+    unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFromOthers(PlayerDir_t dir);
 public:

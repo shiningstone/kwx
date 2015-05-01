@@ -793,6 +793,37 @@ void RoundManager::WaitForOthersChoose() {
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
 
+unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
+    unsigned char action = 
+        _players[dir]->get_parter()->hand_in(
+            _lastHandedOutCard,
+            _isCardFromOthers,
+            prevTingStatus,
+            (_distributedNum==TOTAL_CARD_NUM),
+            _lastActionWithGold,
+            _continue_gang_times,
+            _isGangHua
+        );
+    
+    if(dir==MIDDLE&&_isTuoGuan) {
+        if(IsTing(MIDDLE)&&(action&a_HU)) {
+            action=a_HU;
+        } else {
+            action=a_JUMP;
+        }
+    } else if(dir!=MIDDLE) {
+        if(_players[dir]->_cards->is_aim_limit(action,(Card_t)_lastHandedOutCard)) {
+            action = a_JUMP;
+        }
+    }
+
+    if(action==a_JUMP) {
+        _players[dir]->_cards->pop_back();
+    }
+
+    return action;
+}
+
 void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
     _isGangHua=false;
     
@@ -830,60 +861,13 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
 }
 
 void RoundManager::_HandleCardFromOthers(PlayerDir_t dir) {
-    unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
+    bool prevTingStatus = IsTing(dir);
     
     int no1=((PlayerDir_t)dir+1)%3;
-    
-    unsigned char action1 = 
-        _players[no1]->get_parter()->hand_in(
-            _lastHandedOutCard,
-            _isCardFromOthers,
-            curTingStatus,
-            (_distributedNum==TOTAL_CARD_NUM),
-            _lastActionWithGold,
-            _continue_gang_times,
-            _isGangHua
-        );
-    
-    if(no1==MIDDLE&&_isTuoGuan) {
-        if(IsTing(MIDDLE)&&(action1&a_HU)) {
-            action1=a_HU;
-        } else {
-            action1=a_JUMP;
-        }
-    } else if(no1!=MIDDLE) {
-        if(_players[no1]->_cards->is_aim_limit(action1,(Card_t)_lastHandedOutCard)) {
-            action1 = a_JUMP;
-        }
-    }
+    unsigned char action1 = _GetPlayerReaction((PlayerDir_t)no1,prevTingStatus);
     
     int no2=((PlayerDir_t)dir+2)%3;
-    
-    unsigned char action2=
-        _players[no2]->get_parter()->hand_in(
-            _lastHandedOutCard,
-            _isCardFromOthers,
-            curTingStatus,
-            (_distributedNum==TOTAL_CARD_NUM),
-            _lastActionWithGold,
-            _continue_gang_times,
-            _isGangHua
-        );
-    
-    if(no2==MIDDLE&&_isTuoGuan) {
-        if(IsTing(MIDDLE)&&(action2&a_HU)) {
-            action2=a_HU;
-        } else {
-            action2=a_JUMP;
-        }
-    } else if(no2!=MIDDLE) {
-        if(_players[no2]->_cards->is_aim_limit(action2,(Card_t)_lastHandedOutCard)) {
-            action2 = a_JUMP;
-        }
-    }
-
-
-    
+    unsigned char action2 = _GetPlayerReaction((PlayerDir_t)no2,prevTingStatus);
     
     if((action1&a_HU)&&(action2&a_HU))
     {
