@@ -65,8 +65,9 @@ public:
     bool   is_wait_handout() const;
     void   perform(ActionId_t act);
     
-    int    FreeStart;
-    bool   IsMing;
+    int          FreeStart;
+    bool         IsMing;
+    ROBOT_TARGET aim;
 
     /* statistics , only used for calculating score */
     int statFreeCards;
@@ -108,7 +109,8 @@ public:
 
     bool is_shou_gang(Card_t curActKind=CARD_UNKNOWN);
     
-    ROBOT_TARGET assess_aim() const;
+    ROBOT_TARGET assess_aim();
+    bool is_aim_limit(unsigned int act, Card_t kind) const;
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
     /***************************************************

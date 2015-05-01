@@ -793,208 +793,187 @@ void RoundManager::WaitForOthersChoose() {
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
 
-void RoundManager::WaitForResponse(PlayerDir_t dir) {
-    unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
+void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
+    _isGangHua=false;
     
-    if(!_isCardFromOthers) {
-        _isGangHua=false;
-
-        if(_lastActionSource==dir&&_continue_gang_times!=0)
-            _isGangHua=true;
-        else
-            _continue_gang_times=0;
-        
-        _actionToDo = 
-            _players[dir]->get_parter()->hand_in(
-                _lastHandedOutCard,
-                _isCardFromOthers,
-                curTingStatus,
-                (_distributedNum==TOTAL_CARD_NUM),
-                _lastActionWithGold,
-                _continue_gang_times,
-                _isGangHua
-            );
-        
-        if((PlayerDir_t)dir==MIDDLE) {
-            if(IsTing(MIDDLE)&&(_actionToDo&a_HU)){
-                RecvHu(MIDDLE);
-            }else{
-                if(_isTuoGuan)
-                    _actionToDo=a_JUMP;
-
-                WaitForMyAction();
-            }
+    if(_lastActionSource==dir&&_continue_gang_times!=0)
+        _isGangHua=true;
+    else
+        _continue_gang_times=0;
+    
+    _actionToDo = 
+        _players[dir]->get_parter()->hand_in(
+            _lastHandedOutCard,
+            _isCardFromOthers,
+            _players[dir]->get_parter()->get_ting_status(),
+            (_distributedNum==TOTAL_CARD_NUM),
+            _lastActionWithGold,
+            _continue_gang_times,
+            _isGangHua
+        );
+    
+    if((PlayerDir_t)dir==MIDDLE) {
+        if(IsTing(MIDDLE)&&(_actionToDo&a_HU)){
+            RecvHu(MIDDLE);
         }else{
-            if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
-                    _actionToDo=a_JUMP;
-            }
-            else if(_players[dir]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
-                    _actionToDo=a_JUMP;
-            }
-            else if(_players[dir]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
-                    _actionToDo=a_JUMP;
-
-            WaitForOthersAction((PlayerDir_t)dir);
+            if(_isTuoGuan)
+                _actionToDo=a_JUMP;
+    
+            WaitForMyAction();
         }
     }else{
-        int no1=((PlayerDir_t)dir+1)%3;
+        if(_players[dir]->_cards->is_aim_limit(_actionToDo,(Card_t)_lastHandedOutCard)) {
+            _actionToDo = a_JUMP;
+        }
+        WaitForOthersAction(dir);
+    }
+}
+
+void RoundManager::_HandleCardFromOthers(PlayerDir_t dir) {
+    unsigned char curTingStatus=_players[dir]->get_parter()->get_ting_status();
+    
+    int no1=((PlayerDir_t)dir+1)%3;
+    
+    unsigned char action1 = 
+        _players[no1]->get_parter()->hand_in(
+            _lastHandedOutCard,
+            _isCardFromOthers,
+            curTingStatus,
+            (_distributedNum==TOTAL_CARD_NUM),
+            _lastActionWithGold,
+            _continue_gang_times,
+            _isGangHua
+        );
+    
+    if(no1==MIDDLE&&_isTuoGuan) {
+        if(IsTing(MIDDLE)&&(action1&a_HU)) {
+            action1=a_HU;
+        } else {
+            action1=a_JUMP;
+        }
+    } else if(no1!=MIDDLE) {
+        if(_players[no1]->_cards->is_aim_limit(action1,(Card_t)_lastHandedOutCard)) {
+            action1 = a_JUMP;
+        }
+    }
+    
+    int no2=((PlayerDir_t)dir+2)%3;
+    
+    unsigned char action2=
+        _players[no2]->get_parter()->hand_in(
+            _lastHandedOutCard,
+            _isCardFromOthers,
+            curTingStatus,
+            (_distributedNum==TOTAL_CARD_NUM),
+            _lastActionWithGold,
+            _continue_gang_times,
+            _isGangHua
+        );
+    
+    if(no2==MIDDLE&&_isTuoGuan) {
+        if(IsTing(MIDDLE)&&(action2&a_HU)) {
+            action2=a_HU;
+        } else {
+            action2=a_JUMP;
+        }
+    } else if(no2!=MIDDLE) {
+        if(_players[no2]->_cards->is_aim_limit(action2,(Card_t)_lastHandedOutCard)) {
+            action2 = a_JUMP;
+        }
+    }
+
+
+    
+    
+    if((action1&a_HU)&&(action2&a_HU))
+    {
+        _uiManager->HideClock();
         
-        unsigned char action1 = 
-            _players[no1]->get_parter()->hand_in(
-                _lastHandedOutCard,
-                _isCardFromOthers,
-                curTingStatus,
-                (_distributedNum==TOTAL_CARD_NUM),
-                _lastActionWithGold,
-                _continue_gang_times,
-                _isGangHua
-            );
-        
-        if(no1==MIDDLE&&_isTuoGuan) {
-            if(IsTing(MIDDLE)&&(action1&a_HU)) {
-                action1=a_HU;
+        if((no1!=MIDDLE&&no2!=MIDDLE) || (no1==MIDDLE||no2==MIDDLE&&IsTing(MIDDLE))){ 
+            SetWin(DOUBLE_WIN,(PlayerDir_t)_curPlayer);
+            _uiManager->_HuEffect(_lastWin);
+            _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
+        } else if((no1==MIDDLE||no2==MIDDLE) && !IsTing(MIDDLE)) {
+            _isDoubleHuAsking = true;
+            if(no1==1) {
+                _otherOneForDouble = no2;
+                _actionToDo=action1;
             } else {
-                action1=a_JUMP;
-            }
-        } else if(no1!=MIDDLE) {
-            if(_players[no1]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1 = a_JUMP;
-            }
-            else if(_players[no1]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1 = a_JUMP;
-            }
-            else if(_players[no1]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(action1&a_HU)&&!(action1&a_AN_GANG)&&!(action1&a_SHOU_GANG)&&!(action1&a_MING_GANG))
-                    action1=a_JUMP;
+                _otherOneForDouble = no1;
+                _actionToDo=action2;
+            }                   
+            WaitForMyAction();
+            return;
         }
+    } else if(action1&a_HU||action2&a_HU)//点炮
+    {
+        _uiManager->HideClock();
         
-        int no2=((PlayerDir_t)dir+2)%3;
-        
-        unsigned char action2=
-            _players[no2]->get_parter()->hand_in(
-                _lastHandedOutCard,
-                _isCardFromOthers,
-                curTingStatus,
-                (_distributedNum==TOTAL_CARD_NUM),
-                _lastActionWithGold,
-                _continue_gang_times,
-                _isGangHua
-            );
-        if(no2==1&&_isTuoGuan)
-        {
-            if(_players[1]->get_parter()->get_ting_status()==1&&(action1&a_HU))
-                action2=a_HU;
-            else
-                action2=a_JUMP;
-        }
-        if(no2!=MIDDLE)
-        {
-            if(_players[no2]->get_robot_hu_target()==SAME_TIAO_TARGET)
-            {
-                if(_lastHandedOutCard/9!=0&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
-                    action2 = a_JUMP;
-            }
-            else if(_players[no2]->get_robot_hu_target()==SAME_TONG_TARGET)
-            {
-                if(_lastHandedOutCard/9!=1&&!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
-                    action2 = a_JUMP;
-            }
-            else if(_players[no2]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
-                if(!(action2&a_HU)&&!(action2&a_AN_GANG)&&!(action2&a_SHOU_GANG)&&!(action2&a_MING_GANG))
-                    action2=a_JUMP;
-        }
-        
-        if((action1&a_HU)&&(action2&a_HU))
-        {
-            _uiManager->HideClock();
-            
-            if((no1!=MIDDLE&&no2!=MIDDLE) || (no1==MIDDLE||no2==MIDDLE&&IsTing(MIDDLE))){ 
-                SetWin(DOUBLE_WIN,(PlayerDir_t)_curPlayer);
-                _uiManager->_HuEffect(_lastWin);
-                _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
-            } else if((no1==MIDDLE||no2==MIDDLE) && !IsTing(MIDDLE)) {
-                _isDoubleHuAsking = true;
-                if(no1==1) {
-                    _otherOneForDouble = no2;
+        if((no1==1&&(action1&a_HU))||(no2==1&&(action2&a_HU))) {
+            if(_players[1]->get_parter()->get_ting_status()==1) {
+                RecvHu(MIDDLE);
+            } else {
+                if(no1==1)
                     _actionToDo=action1;
-                } else {
-                    _otherOneForDouble = no1;
+                else
                     _actionToDo=action2;
-                }                   
                 WaitForMyAction();
                 return;
             }
-        } else if(action1&a_HU||action2&a_HU)//点炮
-        {
-            _uiManager->HideClock();
-            
-            if((no1==1&&(action1&a_HU))||(no2==1&&(action2&a_HU))) {
-                if(_players[1]->get_parter()->get_ting_status()==1) {
-                    RecvHu(MIDDLE);
-                } else {
-                    if(no1==1)
-                        _actionToDo=action1;
-                    else
-                        _actionToDo=action2;
-                    WaitForMyAction();
-                    return;
-                }
-            }
-            else if(no1!=1&&(action1&a_HU)) {
-                RecvHu((PlayerDir_t)no1);
-            }
-            else if(no2!=1&&(action2&a_HU)) {
-                RecvHu((PlayerDir_t)no2);
-            }
         }
-        else if(action1!=a_JUMP)//下家
-        {
-            _actionToDo=action1;
-            if(no1==1)
-            {
-                _uiManager->UpdateClock(0,no1);
-                WaitForMyAction();
-                return;
-            }
-            else
-            {
-                _uiManager->UpdateClock(0,no1);
-                WaitForOthersAction((PlayerDir_t)no1);
-                return;
-            }
+        else if(no1!=1&&(action1&a_HU)) {
+            RecvHu((PlayerDir_t)no1);
         }
-        else if(action2!=a_JUMP)//上家
-        {
-            _actionToDo=action2;
-            if(no2==1)
-            {
-                _uiManager->UpdateClock(0,no2);
-                WaitForMyAction();
-                return;
-            }
-            else
-            {
-                _uiManager->UpdateClock(0,no2);
-                WaitForOthersAction((PlayerDir_t)no2);
-                return;
-            }
+        else if(no2!=1&&(action2&a_HU)) {
+            RecvHu((PlayerDir_t)no2);
         }
-        else if(action1==action2&&action1==a_JUMP)
+    }
+    else if(action1!=a_JUMP)//下家
+    {
+        _actionToDo=action1;
+        if(no1==1)
         {
-            _actionToDo=action1;
-            _curPlayer=(_curPlayer+1)%3;
-            _uiManager->UpdateClock(0,_curPlayer);
-            DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
+            _uiManager->UpdateClock(0,no1);
+            WaitForMyAction();
+            return;
         }
+        else
+        {
+            _uiManager->UpdateClock(0,no1);
+            WaitForOthersAction((PlayerDir_t)no1);
+            return;
+        }
+    }
+    else if(action2!=a_JUMP)//上家
+    {
+        _actionToDo=action2;
+        if(no2==1)
+        {
+            _uiManager->UpdateClock(0,no2);
+            WaitForMyAction();
+            return;
+        }
+        else
+        {
+            _uiManager->UpdateClock(0,no2);
+            WaitForOthersAction((PlayerDir_t)no2);
+            return;
+        }
+    }
+    else if(action1==action2&&action1==a_JUMP)
+    {
+        _actionToDo=action1;
+        _curPlayer=(_curPlayer+1)%3;
+        _uiManager->UpdateClock(0,_curPlayer);
+        DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
+    }
+}
+
+void RoundManager::WaitForResponse(PlayerDir_t dir) {
+    if(!_isCardFromOthers) {
+        _HandleCardNewDistributed(dir);
+    } else {
+        _HandleCardFromOthers(dir);
     }
 }
 

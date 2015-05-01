@@ -20,6 +20,9 @@ class NetRole;
 class RoundManager {
     friend class NetRaceLayer;
     friend class Ai;
+private:
+    void _HandleCardNewDistributed(PlayerDir_t dir);
+    void _HandleCardFromOthers(PlayerDir_t dir);
 public:
     static RoundManager *getInstance();
     static void  destroyInstance();
