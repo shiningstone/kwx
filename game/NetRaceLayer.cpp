@@ -252,7 +252,8 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnT
             myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
         }
     } else {
-        int last = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->size()-1;
+        int last = _roundManager->_players[MIDDLE]->_cards->last();
+        
         if( chosenCard!=last+1 )/* _cardInHand is 1 shorter than it was before handout */
         {
             _roundManager->_players[MIDDLE]->_cards->add_effect_card();

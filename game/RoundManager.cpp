@@ -798,6 +798,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
     
     if(!_isCardFromOthers) {
         _isGangHua=false;
+
         if(_lastActionSource==dir&&_continue_gang_times!=0)
             _isGangHua=true;
         else
@@ -814,8 +815,16 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
                 _isGangHua
             );
         
-        if(dir!=MIDDLE)
-        {
+        if((PlayerDir_t)dir==MIDDLE) {
+            if(IsTing(MIDDLE)&&(_actionToDo&a_HU)){
+                RecvHu(MIDDLE);
+            }else{
+                if(_isTuoGuan)
+                    _actionToDo=a_JUMP;
+
+                WaitForMyAction();
+            }
+        }else{
             if(_players[dir]->get_robot_hu_target()==SAME_TIAO_TARGET)
             {
                 if(_lastHandedOutCard/9!=0&&!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
@@ -829,17 +838,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
             else if(_players[dir]->get_robot_hu_target()==SEVEN_COUPLES_TARGET)
                 if(!(_actionToDo&a_HU)&&!(_actionToDo&a_AN_GANG)&&!(_actionToDo&a_SHOU_GANG)&&!(_actionToDo&a_MING_GANG))
                     _actionToDo=a_JUMP;
-        }
-        
-        if((PlayerDir_t)dir==MIDDLE) {
-            if(IsTing(MIDDLE)&&(_actionToDo&a_HU)){
-                RecvHu(MIDDLE);
-            }else{
-                if(_isTuoGuan)
-                    _actionToDo=a_JUMP;
-                WaitForMyAction();
-            }
-        }else{
+
             WaitForOthersAction((PlayerDir_t)dir);
         }
     }else{
