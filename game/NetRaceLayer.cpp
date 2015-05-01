@@ -1839,12 +1839,12 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
             _DeleteActionReminder();}),NULL);
 
 	myframe->_ID = MIDDLE;
-	_roundManager->_isCardFromOthers = false;
     
 	myframe->runAction(Sequence::create(
         allEffect,
         DelayTime::create(0.12),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
+    		_roundManager->_isCardFromOthers = false;}),CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
             _roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
@@ -1854,6 +1854,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
                 _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(MIDDLE));
     			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
+		_roundManager->_isCardFromOthers = true;
 		_roundManager->WaitForResponse(MIDDLE);}),
         NULL));
 }
