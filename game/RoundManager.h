@@ -23,7 +23,7 @@ class RoundManager {
 private:
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
-    void _HandleCardFromOthers(PlayerDir_t dir);
+    void _HandleCardFrom(PlayerDir_t dir);
 public:
     static RoundManager *getInstance();
     static void  destroyInstance();

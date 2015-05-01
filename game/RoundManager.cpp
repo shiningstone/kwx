@@ -860,7 +860,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
     }
 }
 
-void RoundManager::_HandleCardFromOthers(PlayerDir_t dir) {
+void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
     bool prevTingStatus = IsTing(dir);
     
     int no1=((PlayerDir_t)dir+1)%3;
@@ -957,7 +957,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
     if(!_isCardFromOthers) {
         _HandleCardNewDistributed(dir);
     } else {
-        _HandleCardFromOthers(dir);
+        _HandleCardFrom(dir);
     }
 }
 
