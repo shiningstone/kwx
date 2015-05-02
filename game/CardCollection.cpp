@@ -476,6 +476,21 @@ bool CardInHand::is_shou_gang(Card_t curActKind) {/*BUG??? : should compare with
     }
 }
 
+bool CardInHand::can_hu(Card_t newCard) const {
+    SmartList cards(*this);
+    cards.len--;                    /*the last should not be included*/
+    cards.insert(newCard);          /*the last inserted in order*/
+
+    return cards.can_hu();
+}
+
+bool CardInHand::can_hu(int position, int newKind) const {
+    SmartList cards(*this,true);
+    cards.displace(position-FreeStart,(Card_t)newKind);
+
+    return cards.can_hu();
+}
+
 void CardInHand::update_statistics(Card_t huKind) {
     _set(statHuFanMask,RH_QINYISE);
         

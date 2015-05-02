@@ -74,29 +74,6 @@ void NetRRound::task_check(unsigned int flag)
 		_aimDone=0;
 }
 
-bool NetRRound::canHu(Card_t newCard) {
-    SmartList cards(*_cardInHand);
-    cards.len--;                    /*the last should not be included*/
-    cards.insert(newCard);          /*the last inserted in order*/
-
-    return cards.can_hu();
-}
-
-bool NetRRound::canHu(int index, int kind, CARD_KIND newCards[]) {
-    SmartList cards(*_cardInHand,true);
-    cards.displace(index-_cardInHand->FreeStart,(Card_t)kind);
-
-    if(cards.can_hu()) {
-        for(int i=0;i<cards.len;i++) {
-            newCards[i] = (CARD_KIND)cards.kind[i];
-        }
-
-        return true;
-    } else {
-        return false;
-    }
-}
-
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 {
     SmartList newCards = _cardInHand->_Exclude((Card_t)card);
@@ -104,9 +81,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 	if(no==MIDDLE) {
 		for(int i=0;i<newCards.len;i++) {
 			for(int k=0;k<CARD_KIND_MAX;k++) {
-                SmartList remain(*_cardInHand);
-                remain.displace(i,(Card_t)k);
-				if(remain.can_hu()) {
+				if(_cardInHand->can_hu(i,k)) {
 					return true;
                 }
 			}
@@ -115,9 +90,7 @@ int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
 		for(int i=0;i<newCards.len;i++) {
 			if(newCards.kind[i]==otherHandedOut) {
                 for(int k=0;k<CARD_KIND_MAX;k++) {
-                    SmartList remain(*_cardInHand);
-                    remain.displace(i,(Card_t)k);
-                    if(remain.can_hu()) {
+                    if(_cardInHand->can_hu(i,k)) {
                         return true;
                     }
                 }
@@ -186,7 +159,7 @@ unsigned int NetRRound::ming_check2() {
 			continue;
         } else {
             Card_t lastHuCard = CARD_UNKNOWN;
-            Card_t curCard    = (Card_t)_cardInHand->get_kind(i);;
+            Card_t curCard    = _cardInHand->get_kind(i);;
             
             if(curCard==lastHuCard && lastHuCard!=CARD_UNKNOWN) {
                 handoutMask |= (1<<i);
@@ -196,10 +169,7 @@ unsigned int NetRRound::ming_check2() {
                 TingItem_t *huCards = new TingItem_t[9];
                 
                 for(int k=0;k<CARD_KIND_MAX;k++) {
-                    SmartList cards(*_cardInHand,true);
-                    cards.displace(i-_cardInHand->FreeStart,(Card_t)k);
-
-                    if( cards.can_hu() ) {
+                    if( _cardInHand->can_hu(i,k) ) {
                         handoutMask |= (1<<i);
                         lastHuCard = curCard;
 
@@ -262,10 +232,7 @@ unsigned int NetRRound::ming_check()
                 int huKindIdx = 0;
                 
                 for(int k=0;k<CARD_KIND_MAX;k++) {
-                    CARD_KIND temp_list[MAX_HANDIN_NUM];
-                    memset(temp_list,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
-
-                    if( canHu(i, k, temp_list) ) {
+                    if( _cardInHand->can_hu(i,k) ) {
                         handoutMask |= (1<<i);
                         
                         hu_cards[i][huKindIdx]=CARD_KIND(k);
@@ -422,7 +389,7 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
 			}
 	}
 
-	if(canHu((Card_t)kind)) {
+	if(_cardInHand->can_hu((Card_t)kind)) {
 		card_score = calcScore((Card_t)kind,isNewDistributed,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
 		if(isNewDistributed || (tingStatus==1||card_score!=1)) {
 			res|=a_HU;
@@ -728,7 +695,7 @@ void NetRRound::set_ting_status(unsigned char flag)
 
 	hu_len=0;
 	for(int i=0;i<21;i++) {
-		if(canHu((Card_t)i)) {
+		if(_cardInHand->can_hu((Card_t)i)) {
 			hucards[hu_len++]=CARD_KIND(i);
         }
     }

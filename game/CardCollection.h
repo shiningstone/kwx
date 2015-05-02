@@ -108,6 +108,8 @@ public:
     void _JudgePengPengHu();
 
     bool is_shou_gang(Card_t curActKind=CARD_UNKNOWN);
+    bool can_hu(Card_t newCard) const;
+    bool can_hu(int position, int newKind) const;
     
     ROBOT_TARGET assess_aim();
     bool is_aim_limit(unsigned int act, Card_t kind) const;
@@ -160,6 +162,7 @@ protected:
     int  _GetContinuousCoupleNum() const;
     bool _PatternMatch() const;
 
+    friend class CardInHand;
     friend class NetRRound;       /*temporary*/
     friend class TestSmartList;
 };

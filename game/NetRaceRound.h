@@ -49,8 +49,6 @@ private:
     long calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     long calcTimes(Card_t kind);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
-    bool canHu(Card_t kind); //0:not 1:hu
-    bool canHu(int index,int kind,CARD_KIND rlist[]);
 public:
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     unsigned int ming_check();
