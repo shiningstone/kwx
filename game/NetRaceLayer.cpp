@@ -166,6 +166,7 @@ void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
 		_CardRiverUpdateEffect(dir);}), CCCallFunc::create([=]() {
         _roundManager->UpdateCards(dir,a_JUMP);}),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
+        _roundManager->_isNewDistributed=false;
 		_roundManager->WaitForResponse(dir);}),NULL));
 }
 
@@ -1840,7 +1841,6 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
         DelayTime::create(0.12),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
-            _roundManager->_isNewDistributed = true;
             _roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
     		if(_isCardInHandUpdated)
@@ -3708,8 +3708,6 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
 			} else
 				myframe->runAction(hideQiReminder);
 		} else {
-            _roundManager->_players[MIDDLE]->_cards->pop_back();
-        
 			if(_roundManager->_isQiangGangAsking) {
 				_roundManager->_isQiangGangAsking=false;
 

@@ -377,6 +377,10 @@ void RoundManager::RecvQi() {
 		_tempActionToDo=a_JUMP;
 	}
 
+    if(!_isNewDistributed) {
+        _players[MIDDLE]->_cards->pop_back();
+    }
+
     _uiManager->QiEffect();
 }
 
@@ -584,6 +588,7 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _curPlayer = zhuang;
     _ai->UpdateAtFirstRound(_actionToDo);
 
+    _isNewDistributed = true;
     if(zhuang==MIDDLE) {
         WaitForMyAction();
     } else {
