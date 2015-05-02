@@ -1839,8 +1839,8 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
         allEffect,
         DelayTime::create(0.12),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
-    		_roundManager->_isNewDistributed = true;}),CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
+            _roundManager->_isNewDistributed = true;
             _roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
     		if(_isCardInHandUpdated)

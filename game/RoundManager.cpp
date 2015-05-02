@@ -908,7 +908,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 
 void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
     if(_distributedNum<TOTAL_CARD_NUM+1) {
-		_lastHandedOutCard = card;
+		_lastHandedOutCard = (CARD_KIND)card;
         _isNewDistributed  = true;
 
         DistributeInfo_t distInfo;
@@ -932,10 +932,6 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
 }
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
-    if(action==a_PENG) {
-        _isNewDistributed = false;
-    }
-
     if(_actionToDo&a_AN_GANG) {
         _players[dir]->get_parter()->action(_isNewDistributed,a_AN_GANG);
     } else if(_actionToDo&a_SHOU_GANG) {
