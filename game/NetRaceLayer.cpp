@@ -604,12 +604,7 @@ void NetRaceLayer::ListenToDistributeCard() {
 
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DistributeInfo_t *>(event->getUserData());
-        
-		_roundManager->_lastHandedOutCard = (CARD_KIND)userData->card;
-        _roundManager->_isNewDistributed  = true;
-
         auto target = userData->target;
-        
 		_DistributeCard(target,_roundManager->_players[target]->_cards->last());
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
