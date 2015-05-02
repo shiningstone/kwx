@@ -491,6 +491,35 @@ bool CardInHand::can_hu(int position, int newKind) const {
     return cards.can_hu();
 }
 
+bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) const {
+    SmartList newCards = _Exclude(kouKind);
+    
+	if(dir==MIDDLE) {
+		for(int i=0;i<newCards.len;i++) {
+			for(int k=0;k<CARD_KIND_MAX;k++) {
+				if(can_hu(i,k)) {
+					return true;
+                }
+			}
+        }
+	} else {
+		for(int i=0;i<newCards.len;i++) {
+			if(newCards.kind[i]==otherHandedOut) {
+                for(int k=0;k<CARD_KIND_MAX;k++) {
+                    if(can_hu(i,k)) {
+                        return true;
+                    }
+                }
+
+                return false;
+			}
+		}
+	}
+    
+	return false;
+}
+
+
 void CardInHand::update_statistics(Card_t huKind) {
     _set(statHuFanMask,RH_QINYISE);
         

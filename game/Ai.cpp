@@ -92,7 +92,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
             if(cards->find_cards(cardIdx, kind)==3 
-                &&_roundManager->_players[dir]->get_parter()->judge_kou_cards((CARD_KIND)kind,dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+                &&_roundManager->_players[dir]->_cards->can_kou(kind,dir,(Card_t)_roundManager->_otherHandedOut)) {
                 cards->AddKouGroup(kind,cardIdx);
             }
         }
@@ -104,9 +104,7 @@ void Ai::Refresh() {
     
     for( int group=0; group<cards->kou_group_num(); group++ ) {
         if(cards->kou_group_status(group)!=sMING_KOU) {
-            if(_roundManager->_players[MIDDLE]->get_parter()->judge_kou_cards(
-                (CARD_KIND)cards->KouGroupKind(group), MIDDLE, (CARD_KIND)_roundManager->_otherHandedOut))
-            {
+            if( _roundManager->_players[MIDDLE]->_cards->can_kou(cards->KouGroupKind(group)) ) {
                 cards->SetGroupStatus(group,sKOU_ENABLE);
             } else {
                 cards->SetGroupStatus(group,sFREE);
@@ -118,10 +116,8 @@ void Ai::Refresh() {
 void Ai::MingKouChoose(PlayerDir_t dir) {
     CardInHand *cards = _roundManager->_players[dir]->get_parter()->_cardInHand;
     
-	for(int i=0;i<cards->kou_group_num();i++)
-	{
-		if(_roundManager->_players[dir]->get_parter()->judge_kou_cards(
-            (CARD_KIND)cards->KouGroupKind(i),dir,(CARD_KIND)_roundManager->_otherHandedOut)) {
+	for(int i=0;i<cards->kou_group_num();i++) {
+		if(_roundManager->_players[dir]->_cards->can_kou(cards->KouGroupKind(i),dir,(Card_t)_roundManager->_otherHandedOut)) {
 		    cards->SetGroupStatus(i,sMING_KOU);
 		}
 	}

@@ -74,35 +74,6 @@ void NetRRound::task_check(unsigned int flag)
 		_aimDone=0;
 }
 
-int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
-{
-    SmartList newCards = _cardInHand->_Exclude((Card_t)card);
-    
-	if(no==MIDDLE) {
-		for(int i=0;i<newCards.len;i++) {
-			for(int k=0;k<CARD_KIND_MAX;k++) {
-				if(_cardInHand->can_hu(i,k)) {
-					return true;
-                }
-			}
-        }
-	} else {
-		for(int i=0;i<newCards.len;i++) {
-			if(newCards.kind[i]==otherHandedOut) {
-                for(int k=0;k<CARD_KIND_MAX;k++) {
-                    if(_cardInHand->can_hu(i,k)) {
-                        return true;
-                    }
-                }
-
-                return false;
-			}
-		}
-	}
-    
-	return false;
-}
-
 void NetRRound::get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]) {
     for(int i=0;i<_TingInfo.cardNum;i++) {
         Card_t huKind = _TingInfo.cards[i].kind;
