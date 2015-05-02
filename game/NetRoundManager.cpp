@@ -203,7 +203,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
 
     int cards[14];
     for(int i=0;i<14;i++) {
-        cards[i] = info->cards[i]*4;
+        cards[i] = info->cards[i];
     }
     PlayerDir_t dir = (PlayerDir_t)info->seat;
     INT8U timer     = info->timer;
@@ -223,7 +223,7 @@ void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
 
     int cards[13];
     for(int i=0;i<13;i++) {
-        cards[i] = info->cards[i]*4;
+        cards[i] = info->cards[i];
     }
     PlayerDir_t me     = (PlayerDir_t)info->seat;
     PlayerDir_t zhuang = (PlayerDir_t)info->zhuang;
