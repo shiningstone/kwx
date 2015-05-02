@@ -12,25 +12,26 @@ NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
     _cardInHand = cardInHand;
 	_fan=0;
 
-    _TingInfo.cardNum = 0;
-    _TingInfo.cards   = NULL;
+    InitTingInfo();
 
 	hu_len=0;
-    card_list = new CARD_ARRAY;
 
     _logger = LOGGER_REGISTER("RaceRound");
 }
 
 NetRRound::~NetRRound() {
-    ClearTingInfo();
-    delete card_list;
+    InitTingInfo();
+
     LOGGER_DEREGISTER(_logger);
 }
 
-void NetRRound::ClearTingInfo() {
-    for(int i=0;i<_TingInfo.cardNum;i++) {
-
+void NetRRound::InitTingInfo() {
+    if(_TingInfo.cards!=NULL) {
+        delete[] _TingInfo.cards;
     }
+
+    _TingInfo.cardNum = 0;
+    _TingInfo.cards   = NULL;
 }
 
 long NetRRound::calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
@@ -135,7 +136,7 @@ unsigned int NetRRound::ming_check2() {
             if(curCard==lastHuCard && lastHuCard!=CARD_UNKNOWN) {
                 handoutMask |= (1<<i);
             } else {
-                ClearTingInfo();
+                InitTingInfo();
             
                 TingItem_t *huCards = new TingItem_t[9];
                 

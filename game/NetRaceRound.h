@@ -28,12 +28,10 @@ private:
     TingInfo_t       _TingInfo;
     void get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]);
     unsigned int ming_check2();
-    void ClearTingInfo();
+    void InitTingInfo();
 
     unsigned int  archive_ming_indexes;
     
-    CARD_ARRAY *card_list;
-
     long card_score;
 	int InsertPlaceForMG;
 	int hu_places;
