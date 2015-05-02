@@ -73,7 +73,7 @@ private:
     TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
     Spawn *_CreateHuBackgroundEffect(PlayerDir_t dir);
     
-    void _OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isCardFromOthers,Card_t card = CARD_UNKNOWN);
+    void _OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isNewDistributed,Card_t card = CARD_UNKNOWN);
     void _UpdateNonChosenCards(const CardInHand *cards, int chosen);
     void _UpdateCardsInHand(const CardInHand *cards, int chosen);
     void _ShowMenuButtons();

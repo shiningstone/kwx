@@ -109,7 +109,7 @@ protected:
     bool _isGangHua;
     int  _otherOneForDouble;//this could be calculated via GetWin.
     bool _isWaitDecision;
-    bool _isCardFromOthers;
+    bool _isNewDistributed;
 
     Card _curEffectCard;
     void CancelEffectCard();

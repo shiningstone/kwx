@@ -606,7 +606,7 @@ void NetRaceLayer::ListenToDistributeCard() {
 		auto userData = static_cast<DistributeInfo_t *>(event->getUserData());
         
 		_roundManager->_lastHandedOutCard = (CARD_KIND)userData->card;
-        _roundManager->_isCardFromOthers  = false;
+        _roundManager->_isNewDistributed  = true;
 
         auto target = userData->target;
         
@@ -1763,13 +1763,13 @@ TargetedAction *NetRaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCa
     return TargetedAction::create(cardOut,result);
 }
 
-void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isCardFromOthers,Card_t card) {
+void NetRaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isNewDistributed,Card_t card) {
     Sequence *gang_seq;
     
     auto hideOutCard = Sequence::create(NULL);
     auto goldEffect  = CallFunc::create([=](){NULL;});
 
-    if(isCardFromOthers) {
+    if(!isNewDistributed) {
         hideOutCard = Sequence::create(CCCallFunc::create([=](){
             _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);}),TargetedAction::create(
             myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID),Sequence::create(
@@ -1844,7 +1844,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
         allEffect,
         DelayTime::create(0.12),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
-    		_roundManager->_isCardFromOthers = false;}),CCCallFunc::create([=]() {
+    		_roundManager->_isNewDistributed = true;}),CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
             _roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
@@ -1854,7 +1854,7 @@ void NetRaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turn
                 _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(MIDDLE));
     			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
-		_roundManager->_isCardFromOthers = true;
+		_roundManager->_isNewDistributed = false;
 		_roundManager->WaitForResponse(MIDDLE);}),
         NULL));
 }
@@ -3228,12 +3228,12 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 {
     myframe->_ID = dir;
 
-	if(_roundManager->_isCardFromOthers) {
+	if(!_roundManager->_isNewDistributed) {
         _Remove(myframe,HAND_OUT_CARDS_TAG_ID+prevDir*25 + _roundManager->_players[prevDir]->_river->size());
 	}
     
     if(dir!=MIDDLE) {
-        _OthersMingGangEffect(dir,prevDir,_roundManager->_isCardFromOthers,card);
+        _OthersMingGangEffect(dir,prevDir,_roundManager->_isNewDistributed,card);
 	} else {
 		for(int node=0;node<3;node++) {
 		    _Remove(myframe,PENG_EFFECT_NODE_ID+node);
@@ -3267,7 +3267,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 
         CardInHand *cards = _roundManager->_players[MIDDLE]->_cards; 
         
-		if( !_roundManager->_isCardFromOthers ) {
+		if( _roundManager->_isNewDistributed ) {
 			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20 + cards->last());//gang1
 			lastInHand->runAction(ScaleTo::create(0,0));
 			
@@ -3311,7 +3311,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
                 ifLeft=1;
             }
 
-            _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,gang,_roundManager->_isCardFromOthers);
+            _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,gang,_roundManager->_isNewDistributed);
             if(_myChosenCard==INVALID) {
                 isChosenCanceled=1;
             }
@@ -3320,7 +3320,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		Sprite* baseCard;
 		Vec2    basePos;
         
-		if(!_roundManager->_isCardFromOthers) {
+		if(_roundManager->_isNewDistributed) {
 			baseCard = _GetCardInHand(MIDDLE,cards->size()-2);
 			basePos  = baseCard->getPosition();
             
@@ -3357,7 +3357,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
         _AttachKindTexture(show_card,(CARD_KIND)card);
         
 		show_card->setAnchorPoint(Vec2(0,0));
-		if(!_roundManager->_isCardFromOthers) {
+		if(_roundManager->_isNewDistributed) {
 			show_card->setPosition(_layout->OrigPositionOfGangCard(0,cardPengSize));
 		} else {
 			show_card->setPosition(s_curOutCard->getPosition());
@@ -3365,7 +3365,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		show_card->setScale(0);
 		myframe->addChild(show_card,29,SINGLE_ACTION_EFFECT_TAG_ID);
 
-		if(_roundManager->_isCardFromOthers) {
+		if(!_roundManager->_isNewDistributed) {
 			gangCardsMotion[0] = TargetedAction::create(show_card,Sequence::create(
                 DelayTime::create(0.42),
                 ScaleTo::create(0,1),
@@ -3377,7 +3377,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 				    origin.y+visibleSize.height*0.255)),
 				MoveTo::create(0.12,Vec2(
 				    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,
-				    origin.y+visibleSize.height*0.255)),NULL)),NULL;
+				    origin.y+visibleSize.height*0.255)),NULL)),NULL;/* the last NULL is non effect, BUG HERE???*/
             gangCard0Motion = Sequence::create(gangCardsMotion[0],NULL);
 		} else {
 			gangCardsMotion[0] = TargetedAction::create(s_curOutCard,Sequence::create(
@@ -3406,7 +3406,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
         TargetedAction *gangCardInHandMotion[3];
         Sprite *gangCard[3];
 
-        if(!_roundManager->_isCardFromOthers) {
+        if(_roundManager->_isNewDistributed) {
             _CreateMingGangCardInHandMotion(gangCardInHandMotion,gang,(CARD_KIND)card);
 		} else {
 		    _CreateFreeCard(gangCard,gang,(CARD_KIND)card);
@@ -3461,7 +3461,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
             
 		Vector<FiniteTimeAction *>gang_list_seq;
         
-		if(!_roundManager->_isCardFromOthers) {
+		if(_roundManager->_isNewDistributed) {
 			for(int i=actionStartPlace; i<=gang[0]; i++) {/* right shift */
 				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
 
@@ -3519,7 +3519,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 				continue;
             
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
-			if(!_roundManager->_isCardFromOthers) {
+			if(_roundManager->_isNewDistributed) {
 				if(a==cards->last())
 					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
 				else if(a<cards->last()&&a>gang[2])
@@ -3640,7 +3640,7 @@ void NetRaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t c
 		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
             _roundManager->UpdateCards(dir,a_MING_GANG);}),
             DelayTime::create(0.48),CallFunc::create([=](){
-			if(_roundManager->_isCardFromOthers)
+			if(!_roundManager->_isNewDistributed)
 				GoldNumInsert(dir,MING_GANG,prevDir);}),CallFunc::create([=](){
             _roundManager->ActionAfterGang(dir);}),NULL));
 	}
@@ -3700,7 +3700,7 @@ void NetRaceLayer::_QiEffect(PlayerDir_t dir) {
         
     ********************************/
 	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && dir==MIDDLE) {/*??? is this judgement neccessary */
-		if(!_roundManager->_isCardFromOthers) {
+		if(_roundManager->_isNewDistributed) {
 			if(_roundManager->_isGangAsking) {
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
@@ -4824,7 +4824,7 @@ void NetRaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor 
 
     if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN && win.giver!=dir))
     {
-        if(_roundManager->_isCardFromOthers)
+        if(!_roundManager->_isNewDistributed)
         {
             auto winCard=_object->Create(PENG_CARD);
             winCard->setAnchorPoint(Vec2(0,0.5));
@@ -5975,7 +5975,7 @@ void NetRaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType typ
 				_roundManager->_isWaitDecision=false;
 				_roundManager->_tempActionToDo=a_JUMP;
                 
-				if(_roundManager->_isCardFromOthers) {
+				if(!_roundManager->_isNewDistributed) {
 					if(_roundManager->_isQiangGangAsking) {
 						_roundManager->_isQiangGangAsking=false;
                         

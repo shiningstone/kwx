@@ -266,7 +266,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     INT8U timer        = info->timer;
 
     _curPlayer        = MIDDLE;
-    _isCardFromOthers = false;
+    _isNewDistributed = true;
     _actionToDo       = GetAvailActions(info->remind.actionNum,info->remind.actions);
     delete info;
 
@@ -305,7 +305,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     _players[dir]->get_parter()->_cardInHand->pop_back();
     _players[dir]->_river->push_back(card);
         
-	_isCardFromOthers = true;
+	_isNewDistributed = false;
 
     _uiManager->OthersHandoutEffect(dir,false);
 }
@@ -319,9 +319,9 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     delete info;
 
     if(dir!=whoGive) {
-        _isCardFromOthers = true;
+        _isNewDistributed = false;
     } else {
-        _isCardFromOthers = false;
+        _isNewDistributed = true;
     }
 
     _isMyShowTime = true;
@@ -356,7 +356,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 _lastAction=a_MING_GANG;
                 _lastActionWithGold=a_MING_GANG;
                 
-                if(_isCardFromOthers) {
+                if(!_isNewDistributed) {
                     _players[_curPlayer]->_river->pop_back();
     
 			        RecordOutCard(card);
@@ -367,7 +367,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                     
                     _players[dir]->get_parter()->hand_in(
                         (CARD_KIND)card,
-                        _isCardFromOthers,
+                        _isNewDistributed,
                         false,
                         (_distributedNum==TOTAL_CARD_NUM),
                         _lastActionWithGold,
@@ -463,15 +463,15 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
         RoundManager::UpdateCards(dir,action);
     } else {
         if(action==a_PENG) {
-            _isCardFromOthers = true;
+            _isNewDistributed = false;
         }
         
         if(_actionToDo&a_AN_GANG) {
-            _players[dir]->get_parter()->others_action(_isCardFromOthers,a_AN_GANG,actKind);
+            _players[dir]->get_parter()->others_action(_isNewDistributed,a_AN_GANG,actKind);
         } else if(_actionToDo&a_SHOU_GANG) {
-            _players[dir]->get_parter()->others_action(_isCardFromOthers,a_SHOU_GANG,actKind);
+            _players[dir]->get_parter()->others_action(_isNewDistributed,a_SHOU_GANG,actKind);
         } else {
-            _players[dir]->get_parter()->others_action(_isCardFromOthers,action,actKind);
+            _players[dir]->get_parter()->others_action(_isNewDistributed,action,actKind);
         }
     }
 }
@@ -491,7 +491,7 @@ void NetRoundManager::ServerWaitForMyAction() {
         _isGangAsking = true;
 	}
 
-	if(!_isCardFromOthers) {
+	if(_isNewDistributed) {
 		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
 			_continue_gang_times=0;
         }
@@ -575,7 +575,7 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
 
     _players[dir]->get_parter()->hand_in(
         _lastHandedOutCard,
-        _isCardFromOthers,
+        _isNewDistributed,
         false,
         (_distributedNum==TOTAL_CARD_NUM),
         _lastActionWithGold,
@@ -631,7 +631,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        gangCard = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
+        gangCard = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(gangCard,c_AN_GANG);
@@ -647,7 +647,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
-		if(_isCardFromOthers) {
+		if(!_isNewDistributed) {
             CardNode_t * last = _players[_curPlayer]->_river->back();
             gangCard = last->kind;
             _players[_curPlayer]->_river->pop_back();
@@ -672,7 +672,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard( gangCard );
 		}
 
-        _ai->FindGangCards(gangCardIdx,cards,gangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _ai->FindGangCards(gangCardIdx,cards,gangCard,_actionToDo,IsTing(dir),_isNewDistributed);
         _uiManager->GangEffect(dir,gangCard,gangCardIdx,false,prevPlayer);
 	}
     
@@ -809,7 +809,7 @@ void NetRoundManager::WaitForMyAction() {
 }
 
 void NetRoundManager::WaitForMyChoose() {
-	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
+	if(_isNewDistributed) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
                 (IsTing(_curPlayer) && !_isGangAsking) ) {
             int last = _players[MIDDLE]->_cards->last();

@@ -152,7 +152,7 @@ int RoundManager::Shuffle() {
     _isGangAsking = false;
     _isQiangGangAsking = false;
     _isDoubleHuAsking = false;
-    _isCardFromOthers = false;
+    _isNewDistributed = true;
     _firstMingNo = INVALID;
     _qiangGangTargetNo = INVALID;
     _otherOneForDouble = INVALID;
@@ -329,7 +329,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold=a_SHOU_GANG;
 		}
         
-        card = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
+        card = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -346,7 +346,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		Card_t GangCard;
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
-		if(_isCardFromOthers) {
+		if(!_isNewDistributed) {
             GangCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
             _players[_curPlayer]->_river->pop_back();
     
@@ -359,7 +359,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(cards->get_kind(cards->last()));
 		}
 
-        card = _ai->FindGangCards(gangCardIdx,cards,GangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        card = _ai->FindGangCards(gangCardIdx,cards,GangCard,_actionToDo,IsTing(dir),_isNewDistributed);
         _uiManager->GangEffect(dir,GangCard,gangCardIdx,false,prevPlayer);
 	}
 }
@@ -419,13 +419,13 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 
     _qiangGangTargetNo = dir;
 
-	_isCardFromOthers=true;
+	_isNewDistributed=false;
 	unsigned char curTingStatus=_players[_curPlayer]->get_parter()->get_ting_status();
     
 	int no1=(_curPlayer+1)%3;
     unsigned char action1=_players[no1]->get_parter()->hand_in(
         _lastHandedOutCard,
-        _isCardFromOthers,
+        _isNewDistributed,
         curTingStatus,
         false,
         a_QIANG_GANG,
@@ -436,7 +436,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	int no2=(_curPlayer+2)%3;
 	unsigned char action2=_players[no2]->get_parter()->hand_in(
         _lastHandedOutCard,
-        _isCardFromOthers,
+        _isNewDistributed,
         curTingStatus,
         false,
         a_QIANG_GANG,
@@ -477,7 +477,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         
         _uiManager->SingleWin(win);
 	} else {
-		_isCardFromOthers=false;
+		_isNewDistributed=true;
 
         _uiManager->GangGoldEffect(_qiangGangTargetNo,_curPlayer);
 	}
@@ -606,7 +606,7 @@ void RoundManager::WaitForMyAction() {
         _isGangAsking = true;
 	}
 
-	if(!_isCardFromOthers) {
+	if(_isNewDistributed) {
 		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
 			_continue_gang_times=0;
         }
@@ -617,7 +617,7 @@ void RoundManager::WaitForMyAction() {
 }
 
 void RoundManager::WaitForMyChoose() {
-	if(!_isCardFromOthers) {/* is this judgement neccessary??? */
+	if(_isNewDistributed) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
                 (IsTing(_curPlayer) && !_isGangAsking) ) {
             int last = _players[MIDDLE]->_cards->last();
@@ -652,7 +652,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        Card_t card = _ai->FindGangCards(gangIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isCardFromOthers);
+        Card_t card = _ai->FindGangCards(gangIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
 
         if( !IsTing(dir) ) {
             SetEffectCard(card,c_AN_GANG);
@@ -667,7 +667,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 
         Card_t GangCard;
         PlayerDir_t prevPlayer = (PlayerDir_t)dir;
-        if(_isCardFromOthers) {
+        if(!_isNewDistributed) {
             CardNode_t * last = _players[_curPlayer]->_river->back();
             GangCard = last->kind;
             _players[_curPlayer]->_river->pop_back();
@@ -682,7 +682,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        _ai->FindGangCards(gangIdx,cards,GangCard,_actionToDo,IsTing(dir),_isCardFromOthers);
+        _ai->FindGangCards(gangIdx,cards,GangCard,_actionToDo,IsTing(dir),_isNewDistributed);
         _uiManager->_MingGangEffect(dir,prevPlayer,GangCard,gangIdx);
     }
     else if(_actionToDo&a_MING) {
@@ -733,7 +733,7 @@ void RoundManager::WaitForOthersChoose() {
         _players[_curPlayer]->get_parter()->set_ting_status(1);
     }
 
-	_isCardFromOthers=true;
+	_isNewDistributed = false;
 
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
 }
@@ -742,7 +742,7 @@ unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatu
     unsigned char action = 
         _players[dir]->get_parter()->hand_in(
             _lastHandedOutCard,
-            _isCardFromOthers,
+            _isNewDistributed,
             prevTingStatus,
             (_distributedNum==TOTAL_CARD_NUM),
             _lastActionWithGold,
@@ -780,7 +780,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
     _actionToDo = 
         _players[dir]->get_parter()->hand_in(
             _lastHandedOutCard,
-            _isCardFromOthers,
+            _isNewDistributed,
             _players[dir]->get_parter()->get_ting_status(),
             (_distributedNum==TOTAL_CARD_NUM),
             _lastActionWithGold,
@@ -899,7 +899,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
 }
 
 void RoundManager::WaitForResponse(PlayerDir_t dir) {
-    if(!_isCardFromOthers) {
+    if(_isNewDistributed) {
         _HandleCardNewDistributed(dir);
     } else {
         _HandleCardFrom(dir);
@@ -921,7 +921,7 @@ void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
 }
 
 void RoundManager::ActionAfterGang(PlayerDir_t dir) {
-    if(!_isCardFromOthers) {
+    if(_isNewDistributed) {
         QiangGangHuJudge(dir);
     } else {
         DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]));
@@ -930,15 +930,15 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(action==a_PENG) {
-        _isCardFromOthers = true;
+        _isNewDistributed = false;
     }
 
     if(_actionToDo&a_AN_GANG) {
-        _players[dir]->get_parter()->action(_isCardFromOthers,a_AN_GANG);
+        _players[dir]->get_parter()->action(_isNewDistributed,a_AN_GANG);
     } else if(_actionToDo&a_SHOU_GANG) {
-        _players[dir]->get_parter()->action(_isCardFromOthers,a_SHOU_GANG);
+        _players[dir]->get_parter()->action(_isNewDistributed,a_SHOU_GANG);
     } else {
-        _players[dir]->get_parter()->action(_isCardFromOthers,action);
+        _players[dir]->get_parter()->action(_isNewDistributed,action);
     }
 }
 

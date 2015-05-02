@@ -130,7 +130,7 @@ void Ai::MingKouChoose(PlayerDir_t dir) {
 /*************************************
         card process
 *************************************/
-Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isCardFromOthers) {
+Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isNewDistributed) {
     if( gangType & a_AN_GANG || gangType & a_SHOU_GANG ) {
         if(!isTing) {
             /*BUG here : only the first group can be found*/
@@ -163,7 +163,7 @@ Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gang
             }
         }
     } else {
-		int last = isCardFromOthers ? (cards->size()) : (cards->size()-1);
+		int last = isNewDistributed ? (cards->size()-1) : (cards->size());
 
         int matchCardNum = 0;
 		for(int i=0;i<last;i++) {
@@ -180,10 +180,10 @@ Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gang
     return CARD_UNKNOWN;
 }
 
-int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isCardFromOthers,int gang4) {
+int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isNewDistributed,int gang4) {
     int newChosen = 0;
 
-    if(!isCardFromOthers) {
+    if(isNewDistributed) {
         if(chosen>gangIdx[2]) {
             newChosen = chosen + 1;
         } else {
