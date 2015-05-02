@@ -46,14 +46,11 @@ private:
 	int hu_cards_num[MAX_HANDIN_NUM];
 	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
 	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-    void transform(const SmartList &input,CARD_KIND output[]);
-    int cards_stable(CARD_KIND clist[],int len);
-    long sum_up_score(unsigned int fan);
-    long cal_score(CARD_KIND kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
-    int cal_times(Card_t kind);
+    long calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
+    long calcTimes(Card_t kind);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
-    int hu_check(CARD_KIND data_kind); //0:not 1:hu
-    bool ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[]);
+    bool canHu(Card_t kind); //0:not 1:hu
+    bool canHu(int index,int kind,CARD_KIND rlist[]);
 public:
 	int judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut);
     unsigned int ming_check();

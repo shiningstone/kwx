@@ -1,6 +1,7 @@
 
 #include "./../utils/UtilBasic.h"
 
+#include "Ai.h"
 #include "NetRaceRound.h"
 #include "CardCollection.h"
 
@@ -32,66 +33,22 @@ void NetRRound::ClearTingInfo() {
     }
 }
 
-typedef struct {
-    INT32U fan;
-    INT32U score;
-}FanScore_t;
-
-FanScore_t TblFanScore[] = {
-    /*  fan               coefficient*/
-	{ RH_QIANGGANG        , 2},
-	{ RH_GANGHUA          , 2},
-	{ RH_GANGPAO          , 2},
-	{ RH_HAIDILAO         , 2},
-	{ RH_MING             , 2},
-	{ RH_ZIMO             , 2},
-	{ RH_QINYISE          , 4},
-	{ RH_SIPENG           , 2},
-	{ RH_DASANYUAN        , 8},
-	{ RH_XIAOSANYUAN      , 4},
-	{ RH_ANSIGUI          , 4},
-	{ RH_MINGSIGUI        , 2},
-	{ RH_QIDUI            , 4},
-	{ RH_SANYUANQIDUI     , 32},
-	{ RH_HAOHUAQIDUI      , 8},
-	{ RH_CHAOHAOHUAQIDUI  , 32},
-	{ RH_CHAOCHAOHAOHUAQIDUI, 128},
-	{ RH_KAWUXIN          , 4},
-};
-
-long NetRRound::sum_up_score(unsigned int fan) {
-	long score = 1;
-    
-    int i = 0;
-    while(i<sizeof(TblFanScore)/sizeof(FanScore_t)) {
-        if(_is_active(fan,TblFanScore[i].fan)) {
-            score *= TblFanScore[i].score;
-        }
-
-        i++;
-    }
-
-    return score;
-}
-
-long NetRRound::cal_score(CARD_KIND kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
-{
-    _cardInHand->update_statistics((Card_t)kind);
+long NetRRound::calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+    _cardInHand->update_statistics(kind);
     _fan = _cardInHand->statHuFanMask;
     
     if(is_last_one) {
-		_fan|=RH_HAIDILAO;
+		_fan |= RH_HAIDILAO;
     }
 
 	if(isNewDistributed) {
-		_fan|=RH_ZIMO;
+		_fan |= RH_ZIMO;
 	}
 
 	if((continue_gang_times!=0)
         &&(last_action_WithGold==a_MING_GANG
             ||last_action_WithGold==a_AN_GANG
-            ||last_action_WithGold==a_QIANG_GANG))
-	{
+            ||last_action_WithGold==a_QIANG_GANG)) {
 		if(isNewDistributed&&last_action_WithGold==a_QIANG_GANG)
 			_fan |= RH_QIANGGANG;
 		else if(isNewDistributed&&isGangHua)
@@ -100,28 +57,15 @@ long NetRRound::cal_score(CARD_KIND kind,bool isNewDistributed,bool is_last_one,
 			_fan |= RH_GANGPAO;
 	}
 
-    long score = sum_up_score(_fan);
-    
 	if(_AIM!=RA_NOTASK)
 		task_check(_fan);
     
-	return score;
+	return Ai::getInstance()->sum_up_score(_fan);
 }
 
-int NetRRound::cal_times(Card_t kind) {
+long NetRRound::calcTimes(Card_t kind) {
     _cardInHand->update_statistics(kind);
-    return sum_up_score(_cardInHand->statHuFanMask);
-}
-
-int NetRRound::cards_stable(CARD_KIND clist[],int len)
-{
-    SmartList cards;
-    cards.len = len;
-    for(int i=0;i<cards.len;i++) {
-        cards.kind[i] = (Card_t)clist[i];
-    }
-
-    return cards.can_hu();
+    return Ai::getInstance()->sum_up_score(_cardInHand->statHuFanMask);
 }
 
 void NetRRound::task_check(unsigned int flag)
@@ -130,30 +74,27 @@ void NetRRound::task_check(unsigned int flag)
 		_aimDone=0;
 }
 
-int NetRRound::hu_check(CARD_KIND newCard)
-{
+bool NetRRound::canHu(Card_t newCard) {
     SmartList cards(*_cardInHand);
-    
-    cards.len--;                     /*the last should not be included*/
-    cards.insert((Card_t)newCard);   /*the last inserted in order*/
+    cards.len--;                    /*the last should not be included*/
+    cards.insert(newCard);          /*the last inserted in order*/
 
     return cards.can_hu();
 }
 
-void NetRRound::transform(const SmartList &input,CARD_KIND output[]) {
-    for(int i=0;i<input.len;i++) {
-        output[i] = (CARD_KIND)input.kind[i];
-    }
-}
-
-bool NetRRound::ting_check(int index,CARD_KIND cur_card,int kind,CARD_KIND rlist[])
-{
+bool NetRRound::canHu(int index, int kind, CARD_KIND newCards[]) {
     SmartList cards(*_cardInHand,true);
     cards.displace(index-_cardInHand->FreeStart,(Card_t)kind);
 
-    transform(cards,rlist);
+    if(cards.can_hu()) {
+        for(int i=0;i<cards.len;i++) {
+            newCards[i] = (CARD_KIND)cards.kind[i];
+        }
 
-    return cards.can_hu();
+        return true;
+    } else {
+        return false;
+    }
 }
 
 int NetRRound::judge_kou_cards(CARD_KIND card,int no,CARD_KIND otherHandedOut)
@@ -234,8 +175,7 @@ void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
 	}
 }
 
-unsigned int NetRRound::ming_check2()
-{
+unsigned int NetRRound::ming_check2() {
 	unsigned int handoutMask =0;
 
 	hu_places_num=0;
@@ -264,7 +204,7 @@ unsigned int NetRRound::ming_check2()
                         lastHuCard = curCard;
 
                         (huCards+_TingInfo.cardNum)->kind = (Card_t)k;
-                        (huCards+_TingInfo.cardNum)->fan  = cal_times((Card_t)k);
+                        (huCards+_TingInfo.cardNum)->fan  = calcTimes((Card_t)k);
 
                         /* why??? */
                         for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
@@ -325,13 +265,13 @@ unsigned int NetRRound::ming_check()
                     CARD_KIND temp_list[MAX_HANDIN_NUM];
                     memset(temp_list,ck_NOT_DEFINED,MAX_HANDIN_NUM*sizeof(CARD_KIND));
 
-                    if(ting_check(i,cur_card,k,temp_list)) {
+                    if( canHu(i, k, temp_list) ) {
                         handoutMask |= (1<<i);
                         
                         hu_cards[i][huKindIdx]=CARD_KIND(k);
                         hu_cards_num[i]++;
                         
-                        int s_core=cal_times((Card_t)k);
+                        int s_core = calcTimes((Card_t)k);
 
                         for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
                             if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
@@ -482,11 +422,11 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
 			}
 	}
 
-	if(hu_check(kind)==1)
-	{
-		card_score=cal_score(kind,isNewDistributed,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
-		if(isNewDistributed || (tingStatus==1||card_score!=1))
+	if(canHu((Card_t)kind)) {
+		card_score = calcScore((Card_t)kind,isNewDistributed,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		if(isNewDistributed || (tingStatus==1||card_score!=1)) {
 			res|=a_HU;
+        }
 	}
 
 	if(isNewDistributed)
@@ -787,9 +727,11 @@ void NetRRound::set_ting_status(unsigned char flag)
     _cardInHand->IsMing = (flag==1);
 
 	hu_len=0;
-	for(int i=0;i<21;i++)
-		if(hu_check(CARD_KIND(i))==1)
+	for(int i=0;i<21;i++) {
+		if(canHu((Card_t)i)) {
 			hucards[hu_len++]=CARD_KIND(i);
+        }
+    }
 }
 
 void NetRRound::get_hu_cards(CARD_KIND c_list[],int *len)

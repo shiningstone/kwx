@@ -31,12 +31,17 @@ public:
         round info
 *************************************/
     void UpdateAtFirstRound(int &actionToDo);
-    
+
+/*************************************
+        game calculation
+*************************************/
+    long sum_up_score(unsigned int fan);
+
 /***************************************
         singleton
 ***************************************/
 public:
-    static Ai *getInstance(RoundManager *roundManager);
+    static Ai *getInstance(RoundManager *roundManager = NULL);
     static void  destroyInstance();
 protected:
     Ai(RoundManager *roundManager);
