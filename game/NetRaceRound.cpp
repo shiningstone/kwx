@@ -241,8 +241,6 @@ unsigned int NetRRound::ming_check()
 
 unsigned char NetRRound::init(int card_array[],int len)
 {
-	int i;
-
 	card_score=0;
 	hu_len=0;
 	hu_places_num=0;
@@ -252,22 +250,21 @@ unsigned char NetRRound::init(int card_array[],int len)
     _cardInHand->clear();
 	_cardInHand->FreeStart =0;
 
-	CardNode_t node;
-	unsigned char ac=a_JUMP;
-	for(i=0;i<len;i++)
-	{
+	for(int i=0;i<13;i++) {
+        CardNode_t node;
+
 		node.kind    = (Card_t)(card_array[i]);
 		node.status  = sFREE;
 		node.canPlay = true;
         
-		if(i==13) {
-			ac = hand_in((CARD_KIND)(card_array[i]),0,0,false,a_JUMP,0,false);
-        } else {
-			_cardInHand->insert_card(node,1);
-        }
+		_cardInHand->insert_card(node,1);
 	}
-    
-	return ac;
+
+    if(len<14) {/*NON-ZHUANG*/
+        return a_JUMP;
+    } else {
+        return hand_in((CARD_KIND)(card_array[i]),0,0,false,a_JUMP,0,false);
+    }
 }
 
 unsigned char NetRRound::ActiontodoCheckAgain()
@@ -280,8 +277,9 @@ unsigned char NetRRound::ActiontodoCheckAgain()
         res |= aSHOU_GANG;
     }
 
-	if( ( archive_ming_indexes=ming_check() )!=0 )
+	if( ( archive_ming_indexes=ming_check() )!=0 ) {
 		res |= aMING;
+    }
 
 	return res;
 }
@@ -381,32 +379,22 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
         (int)this,__FUNCTION__,res,kind,isNewDistributed,tingStatus,is_last_one);
 	return res;
 }
+
 /*if ting place=_cardInHand->size()*/
 CARD_KIND NetRRound::hand_out(unsigned int place)
 {
-	CARD_KIND l_kind = (CARD_KIND)_cardInHand->get_kind(place);
-
 	if( _cardInHand->get_status(place) != sFREE ){
 		return ck_NOT_DEFINED;
 	}
 
+	CARD_KIND l_kind = (CARD_KIND)_cardInHand->get_kind(place);
     _cardInHand->delete_card(place,1);
 
     return l_kind;
 }
 
 
-void NetRRound::LockAllCards()
-{
-}
-
-void NetRRound::MingCancel()
-{
-}
-
-
-ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind)
-{
+ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
 
 	InsertPlaceForMG=0;

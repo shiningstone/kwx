@@ -53,8 +53,6 @@ public:
     CARD_KIND hand_out(unsigned int place);
     ACT_RES action(bool isCardFromOther,ARRAY_ACTION act);
     ACT_RES others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind);
-	void MingCancel();
-	void LockAllCards();
     unsigned int get_aim();
 	unsigned int get_ming_indexes();
 	int *get_ming_reserved_cards_num(CardList *river);
