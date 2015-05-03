@@ -285,7 +285,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==INVALID )
 		_roundManager->_firstMingNo=dir;
 
-	unsigned char ting_flag = _roundManager->_players[dir]->get_parter()->get_ting_status();
+	bool isMing = _roundManager->_players[dir]->_cards->IsMing;
 
 	Sprite *p_list[MAX_HANDIN_NUM];
     
@@ -293,20 +293,20 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		//if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
 			if(dir==LEFT || dir==RIGHT) {
-				p_list[i] = _CreateCardInHand(dir,i,cards,(ting_flag==1),Vec2(x,y));
+				p_list[i] = _CreateCardInHand(dir,i,cards,isMing,Vec2(x,y));
                 
 				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
                 if(apperance!=NORMAL_APPERANCE) {
                     _object->LayDownWithFace((PlayerDir_t)dir, p_list[i], cards->get_kind(i),apperance);
                 }
 
-                y += _YofNextCard(dir,i,cards,(ting_flag==1),p_list[i]->getTextureRect().size.height);
+                y += _YofNextCard(dir,i,cards,isMing,p_list[i]->getTextureRect().size.height);
 			}
 			else if(dir==MIDDLE)
 			{
 				if(cards->get_status(i)==c_FREE||cards->get_status(i)==c_MING_KOU)
 				{
-					if(ting_flag==1)
+					if(isMing)
 						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)dir,x,y);
 					else
 						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)dir,x,y);
@@ -340,13 +340,13 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
 
                 if(cards->get_status(i)==c_FREE) {
-					if(ting_flag==1) {
+					if(isMing) {
 					    _object->LayDownWithFace(p_list[i], cards->get_kind(i), 0.6);
 					} else {
 					    _object->LayDownWithFace(p_list[i], cards->get_kind(i), 0.4);
 					}
                     
-					if(ting_flag==1||(_roundManager->_actionToDo==a_MING&&ting_flag==0))
+					if(isMing||(_roundManager->_actionToDo==a_MING&&!isMing))
 					{
 						if(cards->canPlay(i))
 						{
@@ -371,7 +371,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 				}
 				else if(cards->get_status(i)==c_MING_KOU)
 				{
-					if(ting_flag!=1)
+					if(!isMing)
 					{
 						auto KouSign=_object->Create(MING_KOU_CARD);
 						KouSign->setAnchorPoint(Vec2(0.5,0.5));
@@ -483,7 +483,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		}//for each card
 	}
     
-	if(dir==MIDDLE&&ting_flag!=0)
+	if(dir==MIDDLE&&isMing)
 	{
 		if(!myframe->getChildByTag(TING_SING_BUTTON))
 		{
