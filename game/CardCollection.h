@@ -116,6 +116,10 @@ public:
     bool is_aim_limit(unsigned int act, Card_t kind) const;
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
+
+    long CalcTimes(Card_t kind);
+    bool CollectTingInfo(int position,TingInfo_t &ting);
+    bool collect_ming_info(MingInfo_t &ming);
     /***************************************************
             effect
     ***************************************************/

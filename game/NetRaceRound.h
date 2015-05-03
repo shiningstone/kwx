@@ -25,13 +25,6 @@ private:
     HuTarget_t       _aimDone;
 	HuFan_t         &_fan;
 
-    MingInfo_t       _MingInfo;
-    TingInfo_t       *_TingInfo;
-    
-    void get_hu_residueForEvery2(int curArray[MAX_HANDIN_NUM][9]);
-    unsigned int ming_check2();
-    void InitMingInfo();
-
     unsigned int  archive_ming_indexes;
     
     long card_score;

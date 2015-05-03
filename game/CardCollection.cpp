@@ -491,6 +491,61 @@ bool CardInHand::can_hu(int position, int newKind) const {
     return cards.can_hu();
 }
 
+#include "Ai.h"
+long CardInHand::CalcTimes(Card_t kind) {
+    update_statistics(kind);
+    return Ai::getInstance()->sum_up_score(statHuFanMask);
+}
+
+bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting) {
+    ting.cardNum = 0;
+    ting.cards   = new TingItem_t[9];
+
+    for(int k=0;k<CARD_KIND_MAX;k++) {
+        if( can_hu(position,k) ) {
+            (ting.cards + ting.cardNum)->kind = (Card_t)k;
+            (ting.cards + ting.cardNum)->fan  = CalcTimes((Card_t)k);
+     
+            for(int i=0;i<FreeStart;i++) {
+                if( get_kind(i)==k && get_status(i)==sPENG) {
+                    (ting.cards + ting.cardNum)->fan *= 2;      /*MingSiGui???*/
+                    break;
+                }
+            }
+    
+            ting.cardNum++;
+        }
+    }
+
+    return (ting.cardNum>0);
+}
+
+bool CardInHand::collect_ming_info(MingInfo_t &ming) {
+    ming.choiceNum = 0;
+    ming.handouts  = new MingChoice_t[18];
+
+    Card_t prevCardCanHu = CARD_UNKNOWN;
+    
+    for(int i=FreeStart;i<size();i++) {
+        if(get_status(i)==sMING_KOU) {
+            continue;
+        }
+
+        Card_t kind = get_kind(i);
+        if(kind==prevCardCanHu && prevCardCanHu!=CARD_UNKNOWN) {
+            continue;
+        }
+
+        MingChoice_t *choice = ming.handouts + ming.choiceNum;
+        if( CollectTingInfo(i,choice->ting) ) {
+            choice->kind = kind;
+            ming.choiceNum++;
+        }
+    }
+
+    return (ming.choiceNum>0);
+}
+
 bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) const {
     SmartList newCards = _Exclude(kouKind);
     
