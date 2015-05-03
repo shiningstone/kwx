@@ -45,7 +45,6 @@ public:
     CardStatus_t get_status(unsigned int idx) const;
     bool   canPlay(unsigned int idx) const;
     void   set_status(unsigned int idx,CardStatus_t status);
-    void   lock_all_cards();
 
     int    generate_raw(Card_t *array);
 
@@ -62,7 +61,7 @@ public:
     void   delete_card(int from,int len);
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
-    void   set_ming(bool flag, int handout=INVALID/*not required when flag==false*/);
+    void   lock_all_cards(bool lock);
 
     bool   is_wait_handout() const;
     void   perform(ActionId_t act);
@@ -98,7 +97,15 @@ public:
 
     SmartList _Exclude(Card_t kouKind) const;
 
+    void set_ming(int handout);
     void cancel_ming();
+
+    /***************************************************
+            effect
+    ***************************************************/
+    void add_effect_card();
+    void del_effect_card();
+
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
@@ -119,6 +126,9 @@ public:
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
 
+    /*********************************
+            ming info
+    *********************************/
     MingInfo_t _ming;
     TingInfo_t *_ting;
     long CalcTimes(Card_t kind);
@@ -126,11 +136,6 @@ public:
     bool collect_ming_info(const CardList *river);
     void get_hu_cards(CARD_KIND cards[],int *len) const;
 
-    /***************************************************
-            effect
-    ***************************************************/
-    void add_effect_card();
-    void del_effect_card();
 private:
     int    _FindInsertPoint(CardNode_t data) const;
     Card_t _FindGangCard(int cardIdx[]) const;

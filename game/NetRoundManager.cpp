@@ -737,7 +737,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     bool turnToMing = false;
 	if(_actionToDo==a_MING && !IsTing(_curPlayer) ) {
 		_players[_curPlayer]->get_parter()->set_ting_status(1);
-        _players[_curPlayer]->_cards->set_ming(true,chosen);
+        _players[_curPlayer]->_cards->set_ming(chosen);
 
         turnToMing = true;
     }

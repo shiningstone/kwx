@@ -70,12 +70,6 @@ void CardList::set_status(unsigned int idx,CardStatus_t status) {
 	}
 }
 
-void CardList::lock_all_cards() {
-	for (int i=0;i<size();i++) {
-        at(i)->canPlay = false;
-	}
-}
-
 int CardList::last() const {
     return size()-1;
 }
@@ -223,20 +217,10 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     DBG_SHOW();
 }
 
-void CardInHand::set_ming(bool flag, int handout) {
-    IsMing = flag;
-
-    if(IsMing && handout!=INVALID) {
-		lock_all_cards();
-
-        Card_t kind = get_kind(handout);
-        for(int i=0;i<_ming.choiceNum;i++) {
-            if((_ming.handouts+i)->kind==kind) {
-                _ting = &((_ming.handouts+i)->ting);
-                break;
-            }
-        }
-    }
+void CardInHand::lock_all_cards(bool lock) {
+	for (int i=FreeStart;i<size();i++) {
+        at(i)->canPlay = !lock;
+	}
 }
 
 bool CardInHand::is_wait_handout() const {
@@ -419,12 +403,22 @@ SmartList CardInHand::_Exclude(Card_t kouKind) const {
     return freeCards;
 }
 
-void CardInHand::cancel_ming() {
-    set_ming(false);
+void CardInHand::set_ming(int handout) {
+    IsMing = true;
+	lock_all_cards(true);
 
-	for(int i=FreeStart;i<size();i++) {
-        at(i)->canPlay = true;
-	}
+    Card_t kind = get_kind(handout);
+    for(int i=0;i<_ming.choiceNum;i++) {
+        if((_ming.handouts+i)->kind==kind) {
+            _ting = &((_ming.handouts+i)->ting);
+            break;
+        }
+    }
+}
+
+void CardInHand::cancel_ming() {
+    IsMing = false;
+    lock_all_cards(false);
 }
 
 /***************************************************
@@ -701,6 +695,9 @@ bool CardInHand::is_aim_limit(unsigned int act, Card_t kind) const {
     return false;
 }
 
+/**************************************************
+        ming info
+**************************************************/
 #include "Ai.h"
 long CardInHand::CalcTimes(Card_t kind) {
     update_statistics(kind);
@@ -720,7 +717,7 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
             tingCard->fan  = CalcTimes((Card_t)k);
             for(int i=0;i<FreeStart;i++) {
                 if( get_kind(i)==k && get_status(i)==sPENG) {
-                    tingCard->fan *= 2;      /*MingSiGui???*/
+                    tingCard->fan *= 2;      /*BUG why ? MingSiGui???*/
                     break;
                 }
             }
