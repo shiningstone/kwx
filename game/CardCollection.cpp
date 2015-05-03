@@ -227,8 +227,9 @@ void CardInHand::set_ming(bool flag, int handout) {
     IsMing = flag;
 
     if(IsMing && handout!=INVALID) {
+		lock_all_cards();
+
         Card_t kind = get_kind(handout);
-        
         for(int i=0;i<_ming.choiceNum;i++) {
             if((_ming.handouts+i)->kind==kind) {
                 _ting = &((_ming.handouts+i)->ting);
@@ -419,6 +420,8 @@ SmartList CardInHand::_Exclude(Card_t kouKind) const {
 }
 
 void CardInHand::cancel_ming() {
+    set_ming(false);
+
 	for(int i=FreeStart;i<size();i++) {
         at(i)->canPlay = true;
 	}

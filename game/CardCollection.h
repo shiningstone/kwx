@@ -62,7 +62,7 @@ public:
     void   delete_card(int from,int len);
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
-    void   set_ming(bool flag, int handout=INVALID);
+    void   set_ming(bool flag, int handout=INVALID/*not required when flag==false*/);
 
     bool   is_wait_handout() const;
     void   perform(ActionId_t act);
