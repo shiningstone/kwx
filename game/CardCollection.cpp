@@ -161,7 +161,6 @@ CardInHand::CardInHand() {
     statzhongFaBai[0]  = 0;
     statzhongFaBai[1]  = 0;
     statzhongFaBai[2]  = 0;
-    statSameAsLastCard = 0;
     statHuFanMask      = 0;
 }
 
@@ -180,7 +179,6 @@ void CardInHand::init(Card_t *cards,int len) {
     statzhongFaBai[0]  = 0;
     statzhongFaBai[1]  = 0;
     statzhongFaBai[2]  = 0;
-    statSameAsLastCard = 0;
     statHuFanMask      = 0;
 }
 
@@ -431,34 +429,34 @@ void CardInHand::cancel_ming() {
 ***************************************************/
 void CardInHand::_JudgeDaXiaoSanYuan() {
     if(statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) {
-        _set(statHuFanMask,RH_DASANYUAN);
+        _SetHu(RH_DASANYUAN);
     } else if( (statzhongFaBai[0]>=3&&statzhongFaBai[1]>=3&&statzhongFaBai[2]==2) 
             || (statzhongFaBai[0]==2&&statzhongFaBai[1]>=3&&statzhongFaBai[2]>=3) 
             || (statzhongFaBai[0]>=3&&statzhongFaBai[1]==2&&statzhongFaBai[2]>=3) ) {
-        _set(statHuFanMask,RH_XIAOSANYUAN);
+        _SetHu(RH_XIAOSANYUAN);
     }
 }
 
 void CardInHand::_JudgeKaWuXing(Card_t kind) {
     SmartList freeCards(*this,true);
     if( freeCards.is_ka_wu_xing(kind) ) {
-        _set(statHuFanMask,RH_KAWUXIN);
+        _SetHu(RH_KAWUXIN);
     }
 }
 
 void CardInHand::_JudgeQiDui() {
     if(statzhongFaBai[0]==2&&statzhongFaBai[1]==2&&statzhongFaBai[2]==2) {
-        _set(statHuFanMask,RH_SANYUANQIDUI);
+        _SetHu(RH_SANYUANQIDUI);
     } 
     
     if(statGroupSameNum==1) {
-        _set(statHuFanMask,RH_HAOHUAQIDUI);
+        _SetHu(RH_HAOHUAQIDUI);
     } else if(statGroupSameNum==2) {
-        _set(statHuFanMask,RH_CHAOHAOHUAQIDUI);
+        _SetHu(RH_CHAOHAOHUAQIDUI);
     } else if(statGroupSameNum==3) {
-        _set(statHuFanMask,RH_CHAOCHAOHAOHUAQIDUI);
+        _SetHu(RH_CHAOCHAOHAOHUAQIDUI);
     } else {
-        _set(statHuFanMask,RH_QIDUI);
+        _SetHu(RH_QIDUI);
     }
 }
 
@@ -488,7 +486,7 @@ void CardInHand::_JudgePengPengHu() {
     }
     
     if(GroupSameCount==4) {
-        _set(statHuFanMask,RH_SIPENG);
+        _SetHu(RH_SIPENG);
     }
 }
 
@@ -546,11 +544,15 @@ bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) c
 	return false;
 }
 
+void CardInHand::_SetHu(INT32U hu) {
+    _set(statHuFanMask,hu);
+}
 
 void CardInHand::update_statistics(Card_t huKind) {
-    _set(statHuFanMask,RH_QINYISE);
+    _SetHu(RH_QINYISE);
         
-    int color = huKind/9;;
+    int color = huKind/9;
+    int sameAsHuKind = 1;
         
 	for(int i=0;i<size();i++) {
 		if(get_status(i)==sFREE ) {
@@ -568,11 +570,11 @@ void CardInHand::update_statistics(Card_t huKind) {
         
 		if( curCard==huKind ) {
 			if(get_status(i)==sPENG) {
-                _set(statHuFanMask,RH_MINGSIGUI);
+                _SetHu(RH_MINGSIGUI);
             } else {
-                statSameAsLastCard++;
-                if(statSameAsLastCard==4) {
-                    _set(statHuFanMask,RH_ANSIGUI);
+                sameAsHuKind++;
+                if(sameAsHuKind==4) {
+                    _SetHu(RH_ANSIGUI);
                 }
             }
 		}
@@ -597,11 +599,11 @@ void CardInHand::update_statistics(Card_t huKind) {
 	}
 
     if(IsMing) {
-		_set(statHuFanMask,RH_MING);
+		_SetHu(RH_MING);
     }
     
 	if(statFreeCards==2) {
-		_set(statHuFanMask,RH_SHOUYIZHUA);
+		_SetHu(RH_SHOUYIZHUA);
  	} else {
 		_JudgePengPengHu();
 	}

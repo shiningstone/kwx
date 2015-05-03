@@ -76,7 +76,6 @@ public:
     int statCouples;
     int statzhongFaBai[3];             /*zhong, fa, bai*/
     int statGroupSameNum;
-    int statSameAsLastCard;
 
     int statHuFanMask;
 
@@ -108,6 +107,7 @@ public:
     void _JudgeKaWuXing(Card_t kind) ;
     void _JudgeQiDui() ;
     void _JudgePengPengHu();
+    void _SetHu(INT32U hu);
 
     bool is_shou_gang(Card_t curActKind=CARD_UNKNOWN);
     bool can_hu(Card_t newCard) const;
