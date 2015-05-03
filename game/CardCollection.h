@@ -35,7 +35,8 @@ public:
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
 
-    int    last() const;
+    int  last() const;
+    int  get_num(Card_t kind) const;
     int  get_idx_in_group(int idxInHand) const;
 
 
@@ -118,11 +119,11 @@ public:
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
 
-    MingInfo_t ming;
-    TingInfo_t *ting;
+    MingInfo_t _ming;
+    TingInfo_t *_ting;
     long CalcTimes(Card_t kind);
-    bool CollectTingInfo(int position,TingInfo_t &ting);
-    bool collect_ming_info();
+    bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
+    bool collect_ming_info(const CardList *river);
     void get_hu_cards(CARD_KIND cards[],int *len) const;
 
     /***************************************************
