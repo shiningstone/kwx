@@ -582,11 +582,6 @@ void NetRRound::set_ting_status(unsigned char flag)
     }
 }
 
-unsigned char NetRRound::get_ting_status()
-{
-	return _cardInHand->IsMing;
-}
-
 long NetRRound::get_card_score()
 {
 	return card_score;

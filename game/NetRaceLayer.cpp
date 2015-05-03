@@ -471,7 +471,7 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
             
 			if(dir==MIDDLE
                 &&_roundManager->_actionToDo==a_MING
-                &&_roundManager->_players[MIDDLE]->get_parter()->get_ting_status()!=1
+                &&!_roundManager->_players[MIDDLE]->_cards->IsMing
                 &&cards->canPlay(i)) {
 				p_list[i]->setZOrder(30);
             }
@@ -4867,9 +4867,8 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	float x = 162;
 	float y = origin.y+visibleSize.height*0.1256-10;
 
-	int tagNum=BarOfPlayer->getTag();
-	unsigned char tingStatus=_roundManager->_players[tagNum]->get_parter()->get_ting_status();
-	auto curScore=_roundManager->_players[tagNum]->get_parter()->get_card_score();
+	int tagNum    = BarOfPlayer->getTag();
+	auto curScore = _roundManager->_players[tagNum]->get_parter()->get_card_score();
 
     WinInfo_t win;
     _roundManager->GetWin(win);
@@ -4904,7 +4903,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	}
 	if(num&RH_MING)
 	{
-		if(tingStatus==1 &&
+		if(_roundManager->_players[tagNum]->_cards->IsMing &&
                 ((win.kind==SINGLE_WIN && tagNum==win.winner)
                 ||(win.kind==DOUBLE_WIN && (tagNum!=win.giver)))) {
 			auto kindOfHuBkg = Sprite::createWithSpriteFrameName("result_fx_item_back.png");//背景

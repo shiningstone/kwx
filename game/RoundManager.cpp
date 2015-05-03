@@ -80,7 +80,7 @@ bool RoundManager::IsWinner(int no) {
         general operations
 ***********************************************/
 bool RoundManager::IsTing(int id) {
-    return _players[id]->get_parter()->get_ting_status();
+    return _players[id]->_cards->IsMing;
 }
 
 PlayerDir_t RoundManager::TurnToNext() {
@@ -424,13 +424,12 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
     _qiangGangTargetNo = dir;
 
 	_isNewDistributed=false;
-	unsigned char curTingStatus=_players[_curPlayer]->get_parter()->get_ting_status();
-    
+
 	int no1=(_curPlayer+1)%3;
     unsigned char action1=_players[no1]->get_parter()->hand_in(
         _lastHandedOutCard,
         _isNewDistributed,
-        curTingStatus,
+        _players[_curPlayer]->_cards->IsMing,
         false,
         a_QIANG_GANG,
         _continue_gang_times,
@@ -441,7 +440,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	unsigned char action2=_players[no2]->get_parter()->hand_in(
         _lastHandedOutCard,
         _isNewDistributed,
-        curTingStatus,
+        _players[_curPlayer]->_cards->IsMing,
         false,
         a_QIANG_GANG,
         _continue_gang_times,
@@ -786,7 +785,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
         _players[dir]->get_parter()->hand_in(
             _lastHandedOutCard,
             _isNewDistributed,
-            _players[dir]->get_parter()->get_ting_status(),
+            _players[dir]->_cards->IsMing,
             (_distributedNum==TOTAL_CARD_NUM),
             _lastActionWithGold,
             _continue_gang_times,
@@ -844,7 +843,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _uiManager->HideClock();
         
         if((no1==1&&(action1&a_HU))||(no2==1&&(action2&a_HU))) {
-            if(_players[1]->get_parter()->get_ting_status()==1) {
+            if(_players[1]->_cards->IsMing) {
                 RecvHu(MIDDLE);
             } else {
                 if(no1==1)

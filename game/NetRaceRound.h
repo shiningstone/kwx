@@ -54,7 +54,6 @@ public:
 	void set_ming_indexes(unsigned int indexesFlag);
 	unsigned char ActiontodoCheckAgain();
 	void set_ting_status(unsigned char flag);
-	unsigned char get_ting_status();
     long get_card_score();
 	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
