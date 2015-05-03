@@ -3855,9 +3855,10 @@ void NetRaceLayer::_TingHintCreate(Point curPos,int CardPlace)
 {
     Hu_cardOut_place = CardPlace;
 
-    int choiceIdx = CardPlace-6;
-
-    TingInfo_t &ting = (_roundManager->_players[MIDDLE]->_cards->_ming.handouts + choiceIdx)->ting;
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
+    
+    int    choiceIdx = CardPlace - cards->FreeStart - cards->kou_cards_num();
+    TingInfo_t &ting = (cards->_ming.handouts + choiceIdx)->ting;
 
     Card_t huCards[9];
     int    times[9];

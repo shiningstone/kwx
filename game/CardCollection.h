@@ -65,7 +65,7 @@ public:
 
     bool   is_wait_handout() const;
     void   perform(ActionId_t act);
-    
+
     int          FreeStart;
     bool         IsMing;
     ROBOT_TARGET aim;
@@ -81,6 +81,8 @@ public:
     /***************************************************
             kou cards info
     ***************************************************/
+    int          kou_cards_num() const;
+
     int          kou_group_num() const;
     CardStatus_t kou_group_status(int gIdx) const;
     int          kou_card_index(int gIdx,int cIdx) const;

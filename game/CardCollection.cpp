@@ -321,6 +321,18 @@ int CardInHand::find_cards(int idx[],Card_t kind) const {
 /***************************************************
         kou cards info
 ***************************************************/
+int CardInHand::kou_cards_num() const {/*this function could be optimized by recording kou operation*/
+    int num = 0;
+
+    for(int i=FreeStart;i<size();i++) {
+        if(get_status(i)==sMING_KOU) {
+            num++;
+        }
+    }
+
+    return num;
+}
+
 void CardInHand::ClearKouCardInfo() {
     memset(&_bufKouCards,0,sizeof(KouCards_t));
 }
