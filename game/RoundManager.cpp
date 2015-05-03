@@ -722,6 +722,8 @@ void RoundManager::WaitForOthersChoose() {
         if(_players[_curPlayer]->get_parter()->_cardInHand->kou_group_num()>0) {
             _ai->MingKouChoose((PlayerDir_t)_curPlayer);
         }
+
+        _players[_curPlayer]->_cards->collect_ming_info(_gRiver);
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
@@ -729,17 +731,16 @@ void RoundManager::WaitForOthersChoose() {
     _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
 
     if(canKou) {
-        _uiManager->TingHintBarOfOthers(_curPlayer,index);
-
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
         if(_players[_curPlayer]->get_parter()->_cardInHand->kou_group_num()>0)
             UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
 
         UpdateCards((PlayerDir_t)_curPlayer,a_MING);
 
-        _players[_curPlayer]->_cards->collect_ming_info(_gRiver);
         _players[_curPlayer]->_cards->set_ming(index);
         _players[_curPlayer]->get_parter()->set_ting_status(1);
+
+        _uiManager->TingHintBarOfOthers(_curPlayer,index);
     }
 
 	_isNewDistributed = false;

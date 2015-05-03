@@ -135,6 +135,10 @@ void test_pattern_match() {
 
     cards.Load(TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TIAO_6,TIAO_6,CARDS_END);
     assert( cards.Match() );
+
+
+    cards.Load(TONG_1,TONG_1,TONG_1,TONG_1,TONG_2,TONG_2,TONG_3,TONG_3,TONG_4,TONG_6,TONG_7,TONG_9,CARDS_END);
+    assert( cards.Match() );
 }
 
 class son {

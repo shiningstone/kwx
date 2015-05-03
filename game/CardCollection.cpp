@@ -420,10 +420,15 @@ void CardInHand::set_ming(int handout) {
 	lock_all_cards(true);
 
     Card_t kind = get_kind(handout);
-    for(int i=0;i<_ming.choiceNum;i++) {
-        if((_ming.handouts+i)->kind==kind) {
-            _ting = &((_ming.handouts+i)->ting);
-            break;
+
+    if(kind==CARD_UNKNOWN) {
+        _ting = &((_ming.handouts+_ming.choiceNum-1)->ting);
+    } else {
+        for(int i=0;i<_ming.choiceNum;i++) {
+            if((_ming.handouts+i)->kind==kind) {
+                _ting = &((_ming.handouts+i)->ting);
+                break;
+            }
         }
     }
 }
@@ -531,7 +536,9 @@ bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) c
 	if(dir==MIDDLE) {
 		for(int i=0;i<newCards.len;i++) {
 			for(int k=0;k<CARD_KIND_MAX;k++) {
-				if(can_hu(i,k)) {
+                SmartList cards(newCards);
+                cards.displace(i,(Card_t)k);
+				if(cards.can_hu()) {
 					return true;
                 }
 			}
@@ -540,7 +547,9 @@ bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) c
 		for(int i=0;i<newCards.len;i++) {
 			if(newCards.kind[i]==otherHandedOut) {
                 for(int k=0;k<CARD_KIND_MAX;k++) {
-                    if(can_hu(i,k)) {
+                    SmartList cards(newCards);
+                    cards.displace(i,(Card_t)k);
+                    if(cards.can_hu()) {
                         return true;
                     }
                 }
