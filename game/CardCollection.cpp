@@ -213,6 +213,21 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     DBG_SHOW();
 }
 
+void CardInHand::set_ming(bool flag, int handout) {
+    IsMing = flag;
+
+    if(IsMing && handout!=INVALID) {
+        Card_t kind = get_kind(handout);
+        
+        for(int i=0;i<ming.choiceNum;i++) {
+            if((ming.handouts+i)->kind==kind) {
+                ting = &((ming.handouts+i)->ting);
+                break;
+            }
+        }
+    }
+}
+
 bool CardInHand::is_wait_handout() const {
     if((size()-FreeStart)%3==2) {
         return true;
@@ -491,61 +506,6 @@ bool CardInHand::can_hu(int position, int newKind) const {
     return cards.can_hu();
 }
 
-#include "Ai.h"
-long CardInHand::CalcTimes(Card_t kind) {
-    update_statistics(kind);
-    return Ai::getInstance()->sum_up_score(statHuFanMask);
-}
-
-bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting) {
-    ting.cardNum = 0;
-    ting.cards   = new TingItem_t[9];
-
-    for(int k=0;k<CARD_KIND_MAX;k++) {
-        if( can_hu(position,k) ) {
-            (ting.cards + ting.cardNum)->kind = (Card_t)k;
-            (ting.cards + ting.cardNum)->fan  = CalcTimes((Card_t)k);
-     
-            for(int i=0;i<FreeStart;i++) {
-                if( get_kind(i)==k && get_status(i)==sPENG) {
-                    (ting.cards + ting.cardNum)->fan *= 2;      /*MingSiGui???*/
-                    break;
-                }
-            }
-    
-            ting.cardNum++;
-        }
-    }
-
-    return (ting.cardNum>0);
-}
-
-bool CardInHand::collect_ming_info(MingInfo_t &ming) {
-    ming.choiceNum = 0;
-    ming.handouts  = new MingChoice_t[18];
-
-    Card_t prevCardCanHu = CARD_UNKNOWN;
-    
-    for(int i=FreeStart;i<size();i++) {
-        if(get_status(i)==sMING_KOU) {
-            continue;
-        }
-
-        Card_t kind = get_kind(i);
-        if(kind==prevCardCanHu && prevCardCanHu!=CARD_UNKNOWN) {
-            continue;
-        }
-
-        MingChoice_t *choice = ming.handouts + ming.choiceNum;
-        if( CollectTingInfo(i,choice->ting) ) {
-            choice->kind = kind;
-            ming.choiceNum++;
-        }
-    }
-
-    return (ming.choiceNum>0);
-}
-
 bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) const {
     SmartList newCards = _Exclude(kouKind);
     
@@ -722,6 +682,71 @@ bool CardInHand::is_aim_limit(unsigned int act, Card_t kind) const {
             return true;
 
     return false;
+}
+
+#include "Ai.h"
+long CardInHand::CalcTimes(Card_t kind) {
+    update_statistics(kind);
+    return Ai::getInstance()->sum_up_score(statHuFanMask);
+}
+
+bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting) {
+    ting.cardNum = 0;
+    ting.cards   = new TingItem_t[9];
+
+    for(int k=0;k<CARD_KIND_MAX;k++) {
+        if( can_hu(position,k) ) {
+            (ting.cards + ting.cardNum)->kind = (Card_t)k;
+            (ting.cards + ting.cardNum)->fan  = CalcTimes((Card_t)k);
+     
+            for(int i=0;i<FreeStart;i++) {
+                if( get_kind(i)==k && get_status(i)==sPENG) {
+                    (ting.cards + ting.cardNum)->fan *= 2;      /*MingSiGui???*/
+                    break;
+                }
+            }
+    
+            ting.cardNum++;
+        }
+    }
+
+    return (ting.cardNum>0);
+}
+
+bool CardInHand::collect_ming_info() {
+    ming.choiceNum = 0;
+    ming.handouts  = new MingChoice_t[18];
+
+    ting = NULL;
+
+    Card_t prevCardCanHu = CARD_UNKNOWN;
+    
+    for(int i=FreeStart;i<size();i++) {
+        if(get_status(i)==sMING_KOU) {
+            continue;
+        }
+
+        Card_t kind = get_kind(i);
+        if(kind==prevCardCanHu && prevCardCanHu!=CARD_UNKNOWN) {
+            continue;
+        }
+
+        MingChoice_t *choice = ming.handouts + ming.choiceNum;
+        if( CollectTingInfo(i,choice->ting) ) {
+            choice->kind = kind;
+            ming.choiceNum++;
+        }
+    }
+
+    return (ming.choiceNum>0);
+}
+
+void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) const {
+	*len = ting->cardNum;
+
+    for(int i=0;i<ting->cardNum;i++) {
+		cards[i] = (CARD_KIND)(ting->cards+i)->kind;
+    }
 }
 
 /***************************************************

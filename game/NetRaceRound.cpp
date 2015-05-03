@@ -574,7 +574,7 @@ void NetRRound::set_ming_indexes(unsigned int indexesFlag)
 
 void NetRRound::set_ting_status(unsigned char flag)
 {
-    _cardInHand->IsMing = (flag==1);
+    _cardInHand->set_ming(flag==1);
 
 	hu_len=0;
 	for(int i=0;i<21;i++) {

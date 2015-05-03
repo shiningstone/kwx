@@ -61,6 +61,7 @@ public:
     void   delete_card(int from,int len);
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
+    void   set_ming(bool flag, int handout=INVALID);
 
     bool   is_wait_handout() const;
     void   perform(ActionId_t act);
@@ -117,9 +118,13 @@ public:
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
 
+    MingInfo_t ming;
+    TingInfo_t *ting;
     long CalcTimes(Card_t kind);
     bool CollectTingInfo(int position,TingInfo_t &ting);
-    bool collect_ming_info(MingInfo_t &ming);
+    bool collect_ming_info();
+    void get_hu_cards(CARD_KIND cards[],int *len) const;
+
     /***************************************************
             effect
     ***************************************************/
