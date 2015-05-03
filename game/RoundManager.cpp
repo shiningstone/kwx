@@ -565,6 +565,10 @@ void RoundManager::RecvMingCancel() {
 void RoundManager::RecvMing(bool isFromKouStatus) {
 	_actionToDo=a_MING;
 
+    if(!isFromKouStatus) {
+        _players[_curPlayer]->_cards->collect_ming_info(_gRiver);
+    }
+
     _ai->KouCardCheck((PlayerDir_t)_curPlayer);
 
     if(_curPlayer==MIDDLE) {
@@ -733,6 +737,7 @@ void RoundManager::WaitForOthersChoose() {
 
         UpdateCards((PlayerDir_t)_curPlayer,a_MING);
 
+        _players[_curPlayer]->_cards->collect_ming_info(_gRiver);
         _players[_curPlayer]->_cards->set_ming(index);
         _players[_curPlayer]->get_parter()->set_ting_status(1);
     }

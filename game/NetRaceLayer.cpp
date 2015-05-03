@@ -3828,55 +3828,45 @@ float NetRaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool is
         ting hint bar
 ******************************************************/
 void NetRaceLayer::_UpdateTingNum(PlayerDir_t dir) {
-    _roundManager->_players[dir]->get_parter()->get_ming_reserved_cards_num(_roundManager->_gRiver);
-    
-	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
+    TingInfo_t *ting = _roundManager->_players[dir]->_cards->_ting;
 
-	_roundManager->_players[dir]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	_roundManager->_players[dir]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-
-	int cardNum = hu_NumForEveryCard[Hu_cardOut_place];
-
-	for(int i=0;i<cardNum;i++) {
+	for(int i=0;i<ting->cardNum;i++) {
 		Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
 		curCardBar->removeChildByTag(2);
 
-        auto residueNum = _CreateNumberSign(hu_residueForEvery[Hu_cardOut_place][i]);
+        auto residueNum = _CreateNumberSign((ting->cards+i)->remain);
         curCardBar->addChild(residueNum,1,2);
 	}
 }
 
 void NetRaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
-	Hu_cardOut_place = outCardIdx;
-    
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];
-	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];
-	_roundManager->_players[curNo]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);
-	_roundManager->_players[curNo]->get_parter()->get_hu_cards(hu_cards);
+    TingInfo_t *ting = _roundManager->_players[curNo]->_cards->_ting;
 
-    auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,(Card_t *)hu_cards[outCardIdx],hu_NumForEveryCard[outCardIdx]);
+    Card_t huCards[9];
+    for(int i=0;i<ting->cardNum;i++) {
+        huCards[i] = (ting->cards+i)->kind;
+    }
+
+    auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,huCards,ting->cardNum);
     myframe->addChild(tingSignBar,30,TING_SING_LEFTBAR+curNo/2);
 }
 
 void NetRaceLayer::_TingHintCreate(Point curPos,int CardPlace)
 {
-	_roundManager->_players[MIDDLE]->get_parter()->get_ming_reserved_cards_num(_roundManager->_gRiver);
-    
-	Hu_cardOut_place=CardPlace;
-	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型--
-	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
-	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
-	_roundManager->_players[MIDDLE]->get_parter()->get_hu_NumForEveryCard(hu_NumForEveryCard);//张数
-	_roundManager->_players[MIDDLE]->get_parter()->get_hu_residueForEvery(hu_residueForEvery);//剩余牌数
-	_roundManager->_players[MIDDLE]->get_parter()->get_huTiemsForEveryOne(huTiemsForEveryOne);//番型
-	_roundManager->_players[MIDDLE]->get_parter()->get_hu_cards(hu_cards);//胡哪几张牌
+    int choiceIdx = CardPlace-6;
+    TingInfo_t &ting = (_roundManager->_players[MIDDLE]->_cards->_ming.handouts + choiceIdx)->ting;
 
-	int cardNum=hu_NumForEveryCard[CardPlace];
+    Card_t huCards[9];
+    int    times[9];
+    int    remains[9];
+    for(int i=0;i<ting.cardNum;i++) {
+        huCards[i] = (ting.cards+i)->kind;
+        times[i]   = (ting.cards+i)->fan;
+        remains[i] = (ting.cards+i)->remain;
+    }
 
     auto tingSignBar = _object->CreateTingInfoBar(
-        curPos,(Card_t *)hu_cards[CardPlace],cardNum,huTiemsForEveryOne[CardPlace],hu_residueForEvery[CardPlace]);
+        curPos,huCards,ting.cardNum,times,remains);
 	myframe->addChild(tingSignBar, 30, TING_SING_BAR);
 }
 
