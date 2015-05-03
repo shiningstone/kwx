@@ -3853,7 +3853,10 @@ void NetRaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
 
 void NetRaceLayer::_TingHintCreate(Point curPos,int CardPlace)
 {
+    Hu_cardOut_place = CardPlace;
+
     int choiceIdx = CardPlace-6;
+
     TingInfo_t &ting = (_roundManager->_players[MIDDLE]->_cards->_ming.handouts + choiceIdx)->ting;
 
     Card_t huCards[9];
