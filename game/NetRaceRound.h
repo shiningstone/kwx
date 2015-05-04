@@ -24,24 +24,12 @@ private:
     const HuTarget_t _AIM;
     HuTarget_t       _aimDone;
 	HuFan_t         &_fan;
+    long             _score;
 
-    unsigned int  archive_ming_indexes;
-    
-    long card_score;
 	int InsertPlaceForMG;
-	int hu_places;
-	int hu_places_num;
-	CARD_KIND hucards[9];
-	int hu_len;
-	int huTiemsForEveryOne[MAX_HANDIN_NUM][9];//番型
-	int hu_reserved_num[MAX_HANDIN_NUM];//总剩余牌数
-	int hu_residueForEvery[MAX_HANDIN_NUM][9];//剩余牌数
-	int hu_cards_num[MAX_HANDIN_NUM];
-	int hu_NumForEveryCard[MAX_HANDIN_NUM];//胡张数
-	CARD_KIND hu_cards[MAX_HANDIN_NUM][9];//胡哪几张牌
+    
     long calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
-    long calcTimes(Card_t kind);
-    void task_check(unsigned int flag);//修改1//,unsigned char last_action
+    void taskCheck(unsigned int flag);
 public:
     unsigned char hand_in(CARD_KIND kind,unsigned char isNewDistributed,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     CARD_KIND hand_out(unsigned int place);
@@ -49,10 +37,9 @@ public:
     ACT_RES others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind);
 	unsigned char ActiontodoCheckAgain();
 
-    unsigned int get_aim();
-    
-    long get_score();
-	bool get_hu_flag(unsigned int *hu_kind);
+    HuTarget_t get_aim() const;
+    long get_score() const;
+	bool get_hu_flag(HuTarget_t *hu_kind) const;
 };
 
 #endif // _RACE_ROUND_H_

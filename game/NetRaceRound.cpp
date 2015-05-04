@@ -12,8 +12,6 @@ NetRRound::NetRRound(CardInHand *cardInHand,HuFan_t &fan,HuTarget_t aim)
     _cardInHand = cardInHand;
 	_fan=0;
 
-	hu_len=0;
-
     _logger = LOGGER_REGISTER("RaceRound");
 }
 
@@ -46,17 +44,12 @@ long NetRRound::calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,uns
 	}
 
 	if(_AIM!=RA_NOTASK)
-		task_check(_fan);
+		taskCheck(_fan);
     
 	return Ai::getInstance()->sum_up_score(_fan);
 }
 
-long NetRRound::calcTimes(Card_t kind) {
-    _cardInHand->update_statistics(kind);
-    return Ai::getInstance()->sum_up_score(_cardInHand->statHuFanMask);
-}
-
-void NetRRound::task_check(unsigned int flag)
+void NetRRound::taskCheck(unsigned int flag)
 {
 	if( !(flag&_AIM) )
 		_aimDone=0;
@@ -64,11 +57,7 @@ void NetRRound::task_check(unsigned int flag)
 
 unsigned char NetRRound::init(int card_array[],int len)
 {
-	card_score=0;
-	hu_len=0;
-	hu_places_num=0;
-	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
-	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
+	_score=0;
 
     _cardInHand->clear();
 	_cardInHand->FreeStart =0;
@@ -183,8 +172,8 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
 	}
 
 	if(_cardInHand->can_hu((Card_t)kind)) {
-		card_score = calcScore((Card_t)kind,isNewDistributed,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
-		if(isNewDistributed || (tingStatus==1||card_score!=1)) {
+		_score = calcScore((Card_t)kind,isNewDistributed,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+		if(isNewDistributed || (tingStatus==1||_score!=1)) {
 			res|=a_HU;
         }
 	}
@@ -407,18 +396,15 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	return ar_DONE;
 }
 
-unsigned int NetRRound::get_aim()
-{
+HuTarget_t NetRRound::get_aim() const {
 	return _aimDone;
 }
 
-long NetRRound::get_score()
-{
-	return card_score;
+long NetRRound::get_score() const {
+	return _score;
 }
 
-bool NetRRound::get_hu_flag(unsigned int *hu_kind)
-{
+bool NetRRound::get_hu_flag(HuTarget_t *hu_kind) const {
 	*hu_kind=_fan;
 	return true;
 }
