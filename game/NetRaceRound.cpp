@@ -135,24 +135,24 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistribute
         	res |= a_PENG;
         }
 	} else {
-
-		for(int i=0;i<_cardInHand->FreeStart;i++)
-			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==newCard)
-			{
-				if(!isLastOne)
-				{
+		for(int i=0;i<_cardInHand->FreeStart;i++) {
+			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==newCard) {
+				if(!isLastOne) {
 					if(isNewDistributed)
 						res |= (a_MING_GANG | a_AN_GANG);
 					else
 						res |= a_MING_GANG;
 				}
+                
 				break;
 			}
+        }
 	}
 
 	if(_cardInHand->can_hu((Card_t)newCard)) {
 		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
-		if(isNewDistributed || (tingStatus==1||_score!=1)) {
+
+		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* only ming can hu dianpao ??? */
 			res|=a_HU;
         }
 	}
