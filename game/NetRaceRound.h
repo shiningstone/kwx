@@ -38,8 +38,8 @@ public:
 	unsigned char ActiontodoCheckAgain();
 
     HuTarget_t get_aim() const;
-    long get_score() const;
-	bool get_hu_flag(HuTarget_t *hu_kind) const;
+	HuTarget_t get_hu_flag() const;
+    long       get_score() const;
 };
 
 #endif // _RACE_ROUND_H_

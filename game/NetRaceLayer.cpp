@@ -5429,7 +5429,7 @@ void NetRaceLayer::raceAccount(float delta)
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+1)%3);
                 auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+2)%3);
             
-                _roundManager->_players[win.winner]->get_parter()->get_hu_flag(&num);
+                num = _roundManager->_players[win.winner]->get_parter()->get_hu_flag();
                 AccountShows(WinBar,win.winner);
                 AccountShows(WinBarPlus,(win.winner+1)%3);
                 AccountShows(WinBarMinus,(win.winner+2)%3);
@@ -5450,8 +5450,8 @@ void NetRaceLayer::raceAccount(float delta)
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+1)%3);
                 auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+2)%3);
             
-                _roundManager->_players[(win.giver+1)%3]->get_parter()->get_hu_flag(&num);
-                _roundManager->_players[(win.giver+2)%3]->get_parter()->get_hu_flag(&numDoubule);
+                num = _roundManager->_players[(win.giver+1)%3]->get_parter()->get_hu_flag();
+                numDoubule = _roundManager->_players[(win.giver+2)%3]->get_parter()->get_hu_flag();
             
                 AccountShows(WinBar,win.giver);
                 AccountShows(WinBarPlus,(win.giver+1)%3);

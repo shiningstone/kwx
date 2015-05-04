@@ -400,12 +400,11 @@ HuTarget_t NetRRound::get_aim() const {
 	return _aimDone;
 }
 
-long NetRRound::get_score() const {
-	return _score;
+HuTarget_t NetRRound::get_hu_flag() const {
+	return _fan;
 }
 
-bool NetRRound::get_hu_flag(HuTarget_t *hu_kind) const {
-	*hu_kind=_fan;
-	return true;
+long NetRRound::get_score() const {
+	return _score;
 }
 
