@@ -95,7 +95,6 @@ unsigned char NetRRound::ActiontodoCheckAgain() {
 }
 
 unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistributed,unsigned char tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
-	int num = 0;
 	unsigned char res = 0x0;
 
     _cardInHand->push_back((Card_t)newCard);
@@ -106,6 +105,7 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistribute
             break;
 		}
 
+        int freeNum = 0;
 		for(int i=0;i<_cardInHand->size()-1;i++) {
 			if(_cardInHand->get_kind(i)==newCard) {
 				if(_cardInHand->get_status(i)==sPENG) {
@@ -114,24 +114,27 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistribute
                         break;
 					}
 				} else if(_cardInHand->get_status(i)==sFREE) {
-					num++;
+					freeNum++;
 				}
 			}
 		}
 
-		if(num==3) {/*BUG ??? should always judge isNewDistributed*/
-			if(isNewDistributed&&!isLastOne)
-				res |= (a_MING_GANG | a_AN_GANG);
-			else if(!isLastOne)
-				res |= (a_MING_GANG | a_PENG);
-			else if(isLastOne)
-				res |= a_PENG;
-		} else if(num==2&&!isNewDistributed) {
-				res |= a_PENG;
-		}
-	}
-	else
-	{
+        if(freeNum==3) {
+            if(isNewDistributed) {
+                if(!isLastOne) {
+                    res |= (a_MING_GANG | a_AN_GANG);
+                }
+            } else {
+                if(!isLastOne) {
+                    res |= (a_MING_GANG | a_PENG);
+                } else {
+                    res |= a_PENG;
+                }
+            }
+        } else if(freeNum==2&&!isNewDistributed) {
+        	res |= a_PENG;
+        }
+	} else {
 
 		for(int i=0;i<_cardInHand->FreeStart;i++)
 			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==newCard)
