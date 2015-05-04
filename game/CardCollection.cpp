@@ -504,7 +504,7 @@ void CardInHand::_JudgePengPengHu() {
     }
 }
 
-bool CardInHand::is_shou_gang(Card_t curActKind) {/*BUG??? : should compare with current gang card's kind*/
+bool CardInHand::has_shou_gang(Card_t curActKind) {/*BUG??? : should compare with current gang card's kind*/
     int cardIdx[4] = {0};
     Card_t kind = _FindGangCard(cardIdx);
     

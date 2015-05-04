@@ -19,11 +19,11 @@ NetRRound::~NetRRound() {
     LOGGER_DEREGISTER(_logger);
 }
 
-long NetRRound::calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+long NetRRound::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cardInHand->update_statistics(kind);
     _fan = _cardInHand->statHuFanMask;
     
-    if(is_last_one) {
+    if(isLastOne) {
 		_fan |= RH_HAIDILAO;
     }
 
@@ -83,7 +83,7 @@ unsigned char NetRRound::ActiontodoCheckAgain() {
 
 	unsigned char res = 0x0;
 
-    if(_cardInHand->is_shou_gang()) {/*BUG HERE??? always shougang*/
+    if(_cardInHand->has_shou_gang()) {/*BUG HERE??? always shougang*/
         res |= aSHOU_GANG;
     }
 
@@ -94,60 +94,39 @@ unsigned char NetRRound::ActiontodoCheckAgain() {
 	return res;
 }
 
-unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistributed,unsigned char tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
 	int num = 0;
 	unsigned char res = 0x0;
 
-    CardNode_t *card = new CardNode_t;
-	card->kind     = (Card_t)kind;
-	card->status   = sFREE;
-	card->canPlay = true;
-    _cardInHand->push_back(card);
+    _cardInHand->push_back((Card_t)newCard);
 
-	if(!_cardInHand->IsMing)
-	{
-		int card_num;
-		for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
-		{
-			card_num=1;
-			for(int k=i+1;k<_cardInHand->size();k++)
-			{
-				if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
-					card_num++;
-			}
-			if(card_num==4 &&isNewDistributed&&!is_last_one)
-			{
-				res |= a_SHOU_GANG;
-				break;
-			}
+	if(!_cardInHand->IsMing) {
+        if( _cardInHand->has_shou_gang() && isNewDistributed && !isLastOne ) {
+            res |= a_SHOU_GANG;
+            break;
 		}
-		for(int i=0;i<_cardInHand->size();i++)
-		{
-			if(_cardInHand->get_kind(i)==kind)
-			{
-				if(_cardInHand->get_status(i)==sPENG)
-				{
-					if(isNewDistributed&&!is_last_one)
-					{
+
+		for(int i=0;i<_cardInHand->size()-1;i++) {
+			if(_cardInHand->get_kind(i)==newCard) {
+				if(_cardInHand->get_status(i)==sPENG) {
+					if(isNewDistributed&&!isLastOne) {
 						res |= a_MING_GANG;
+                        break;
 					}
-					break;
-				}
-				else if(_cardInHand->get_status(i)==sFREE)
-				{
+				} else if(_cardInHand->get_status(i)==sFREE) {
 					num++;
 				}
 			}
 		}
 
-		if(num==4) {
-			if(isNewDistributed&&!is_last_one)
+		if(num==3) {/*BUG ??? should always judge isNewDistributed*/
+			if(isNewDistributed&&!isLastOne)
 				res |= (a_MING_GANG | a_AN_GANG);
-			else if(!is_last_one)
+			else if(!isLastOne)
 				res |= (a_MING_GANG | a_PENG);
-			else if(is_last_one)
+			else if(isLastOne)
 				res |= a_PENG;
-		} else if(num==3&&!isNewDistributed) {
+		} else if(num==2&&!isNewDistributed) {
 				res |= a_PENG;
 		}
 	}
@@ -155,9 +134,9 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
 	{
 
 		for(int i=0;i<_cardInHand->FreeStart;i++)
-			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==kind)
+			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==newCard)
 			{
-				if(!is_last_one)
+				if(!isLastOne)
 				{
 					if(isNewDistributed)
 						res |= (a_MING_GANG | a_AN_GANG);
@@ -168,8 +147,8 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
 			}
 	}
 
-	if(_cardInHand->can_hu((Card_t)kind)) {
-		_score = calcScore((Card_t)kind,isNewDistributed,is_last_one,last_action_WithGold,continue_gang_times,isGangHua);
+	if(_cardInHand->can_hu((Card_t)newCard)) {
+		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
 		if(isNewDistributed || (tingStatus==1||_score!=1)) {
 			res|=a_HU;
         }
@@ -178,14 +157,14 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
     /* BUG ??? ming can implemented after some action take place, such as PENG/GANG */
     /*     !!! maybe done by ActiontodoCheckAgain                                   */
 	if(isNewDistributed) {
-		if(!_cardInHand->IsMing && !is_last_one) {
+		if(!_cardInHand->IsMing && !isLastOne) {
 			if(_cardInHand->collect_ming_info())
 				res |= a_MING;
 		}
 	}
 
-    LOGGER_WRITE("NETWORK : %x %s action %d: kind %d,isNewDistributed %d,tingStatus %d,is_last_one %d",
-        (int)this,__FUNCTION__,res,kind,isNewDistributed,tingStatus,is_last_one);
+    LOGGER_WRITE("NETWORK : %x %s action %d: newCard %d,isNewDistributed %d,tingStatus %d,isLastOne %d",
+        (int)this,__FUNCTION__,res,newCard,isNewDistributed,tingStatus,isLastOne);
 	return res;
 }
 

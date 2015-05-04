@@ -118,7 +118,7 @@ public:
     void _JudgePengPengHu();
     void _SetHu(INT32U hu);
 
-    bool is_shou_gang(Card_t curActKind=CARD_UNKNOWN);
+    bool has_shou_gang(Card_t curActKind=CARD_UNKNOWN);
     bool can_hu(Card_t newCard) const;
     bool can_hu(int position, int newKind) const;
     bool can_kou(Card_t kouKind,PlayerDir_t dir=MIDDLE,Card_t otherHandedOut=CARD_UNKNOWN/*should provided when non-MIDDLE*/) const;
