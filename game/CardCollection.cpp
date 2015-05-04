@@ -795,10 +795,14 @@ bool CardInHand::can_handout(int idx) const {
 }
 
 void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) const {
-	*len = _ting->cardNum;
+    if(_ting!=NULL) {
+	    *len = _ting->cardNum;
 
-    for(int i=0;i<_ting->cardNum;i++) {
-		cards[i] = (CARD_KIND)(_ting->cards+i)->kind;
+        for(int i=0;i<_ting->cardNum;i++) {
+		    cards[i] = (CARD_KIND)(_ting->cards+i)->kind;
+        }
+    } else {
+        *len = 0;
     }
 }
 

@@ -24,8 +24,10 @@ void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int 
 
     int curPlayer     = _roundManager->_curPlayer;
     CardInHand *cards = _roundManager->_players[curPlayer]->_cards;
-    
+
+    _roundManager->_players[(curPlayer+1)%3]->_cards->collect_ming_info();
 	_roundManager->_players[(curPlayer+1)%3]->_cards->get_hu_cards(target1,len1);
+    _roundManager->_players[(curPlayer+2)%3]->_cards->collect_ming_info();
 	_roundManager->_players[(curPlayer+2)%3]->_cards->get_hu_cards(target2,len2);
 
     for(int i=cards->FreeStart;i<cards->size();i++) {
