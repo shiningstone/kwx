@@ -145,7 +145,8 @@ int CardList::generate_raw(Card_t * array) {
 
 ***********************************************/
 CardInHand::CardInHand() {
-    IsMing = false;
+    IsMing    = false;
+	FreeStart = 0;
     
     statFreeCards      = 0;
     statCouples        = 0;
@@ -163,8 +164,9 @@ void CardInHand::init(Card_t *cards,int len) {
 		push_back(cards[i]);
 	}
 
-    IsMing = false;
-    
+    IsMing    = false;
+	FreeStart = 0;
+
     statFreeCards      = 0;
     statCouples        = 0;
     statGroupSameNum   = 0;

@@ -49,10 +49,10 @@ long NetRRound::calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,uns
 	return Ai::getInstance()->sum_up_score(_fan);
 }
 
-void NetRRound::taskCheck(unsigned int flag)
-{
-	if( !(flag&_AIM) )
+void NetRRound::taskCheck(unsigned int flag) {
+	if( !(flag&_AIM) ) {
 		_aimDone=0;
+    }
 }
 
 unsigned char NetRRound::init(int card_array[],int len)
@@ -60,7 +60,6 @@ unsigned char NetRRound::init(int card_array[],int len)
 	_score=0;
 
     _cardInHand->clear();
-	_cardInHand->FreeStart =0;
 
 	for(int i=0;i<13;i++) {
         CardNode_t node;
@@ -79,13 +78,12 @@ unsigned char NetRRound::init(int card_array[],int len)
     }
 }
 
-unsigned char NetRRound::ActiontodoCheckAgain()
-{
+unsigned char NetRRound::ActiontodoCheckAgain() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	unsigned char res = 0x0;
 
-    if(_cardInHand->is_shou_gang()) {
+    if(_cardInHand->is_shou_gang()) {/*BUG HERE??? always shougang*/
         res |= aSHOU_GANG;
     }
 
@@ -96,8 +94,7 @@ unsigned char NetRRound::ActiontodoCheckAgain()
 	return res;
 }
 
-unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua)
-{
+unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
 	int num = 0;
 	unsigned char res = 0x0;
 
@@ -192,7 +189,6 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
 	return res;
 }
 
-/*if ting place=_cardInHand->size()*/
 CARD_KIND NetRRound::hand_out(unsigned int place)
 {
 	if( _cardInHand->get_status(place) != sFREE ){
