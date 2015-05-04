@@ -254,9 +254,7 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnT
         }
     } else {
         _roundManager->_players[MIDDLE]->_cards->add_effect_card();
-
         _ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
-
         _roundManager->_players[MIDDLE]->_cards->del_effect_card();
     }
     
@@ -505,8 +503,9 @@ void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		}
 	}
     
-	if(dir==MIDDLE&&myframe->getChildByTag(TING_SING_BUTTON))
+	if(dir==MIDDLE&&myframe->getChildByTag(TING_SING_BUTTON)) {
 		_UpdateTingNum(MIDDLE);
+    }
 }
 
 void NetRaceLayer::_CardRiverUpdateEffect(PlayerDir_t dir) {

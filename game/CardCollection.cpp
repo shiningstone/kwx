@@ -755,35 +755,39 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
 }
 
 bool CardInHand::collect_ming_info(const CardList *river) {
-    _mingChoicesMask = 0;
-    _ming.choiceNum = 0;
-    _ming.handouts  = new MingChoice_t[18];
-
-    _ting = NULL;
-
-    Card_t prevCardCanHu = CARD_UNKNOWN;
-    
-    for(int i=FreeStart;i<size();i++) {
-        if(get_status(i)==sMING_KOU) {
-            continue;
+    if(IsMing) {
+        return true;
+    } else {
+        _mingChoicesMask = 0;
+        _ming.choiceNum = 0;
+        _ming.handouts  = new MingChoice_t[18];
+        
+        _ting = NULL;
+        
+        Card_t prevCardCanHu = CARD_UNKNOWN;
+        
+        for(int i=FreeStart;i<size();i++) {
+            if(get_status(i)==sMING_KOU) {
+                continue;
+            }
+        
+            Card_t kind = get_kind(i);
+            if(kind==prevCardCanHu && prevCardCanHu!=CARD_UNKNOWN) {
+                _mingChoicesMask |= 1<<i;          /*??? handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );*/
+                continue;
+            }
+        
+            MingChoice_t *choice = _ming.handouts + _ming.choiceNum;
+            if( CollectTingInfo(i,choice->ting,river) ) {
+                choice->kind = kind;
+                
+                _ming.choiceNum++;
+                _mingChoicesMask |= 1<<i;
+            }
         }
-
-        Card_t kind = get_kind(i);
-        if(kind==prevCardCanHu && prevCardCanHu!=CARD_UNKNOWN) {
-            _mingChoicesMask |= 1<<i;          /*??? handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );*/
-            continue;
-        }
-
-        MingChoice_t *choice = _ming.handouts + _ming.choiceNum;
-        if( CollectTingInfo(i,choice->ting,river) ) {
-            choice->kind = kind;
-            
-            _ming.choiceNum++;
-            _mingChoicesMask |= 1<<i;
-        }
+        
+        return (_ming.choiceNum>0);
     }
-
-    return (_ming.choiceNum>0);
 }
 
 bool CardInHand::can_handout(int idx) const {
