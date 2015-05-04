@@ -624,10 +624,8 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
     }
 
 	if( _act->get_ming_check_result(res) ) {
-		int ming_index = _act->get_ming_indexes();
-        
 		for(int k=0;k<MAX_HANDIN_NUM;k++) {
-			if(ming_index&(1<<k)) {
+			if(_act->_cardInHand->can_handout(k)) {
 			    Card_t s_kind = _cards->get_kind(k);
 				if(Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)!=0) {
 					res->hu_cards_num[k]=0;
@@ -650,13 +648,11 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
         
 		int l_place    = -1;
 
-		int s_k;
-		for(s_k=0;s_k<MAX_HANDIN_NUM;s_k++) {
-			if(ming_index&(1<<s_k))
-			{
-				Card_t s_kind = _cards->get_kind(s_k);
-				if(res->hu_cards_num[s_k]>=hu_num&&Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)==0)
-					l_place=s_k;
+		for(int i=0;i<MAX_HANDIN_NUM;i++) {
+			if(_act->_cardInHand->can_handout(i)) {
+				Card_t s_kind = _cards->get_kind(i);
+				if(res->hu_cards_num[i]>=hu_num&&Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)==0)
+					l_place=i;
 			}
         }
 

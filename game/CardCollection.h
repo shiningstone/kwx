@@ -131,12 +131,15 @@ public:
     /*********************************
             ming info
     *********************************/
-    MingInfo_t _ming;
+    MingInfo_t  _ming;
     TingInfo_t *_ting;
     long CalcTimes(Card_t kind);
     bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
-    bool collect_ming_info(const CardList *river);
+    bool collect_ming_info(const CardList *river = NULL/*if don't care about remain number*/);
     void get_hu_cards(CARD_KIND cards[],int *len) const;
+    bool can_handout(int idx) const;
+    
+    INT32U      _mingChoicesMask;             /* NOTE : this mask starts with FreeStart, not 0 */
 
 private:
     int    _FindInsertPoint(CardNode_t data) const;

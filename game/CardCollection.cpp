@@ -743,7 +743,9 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
                 }
             }
 
-            tingCard->remain = 4 - get_num((Card_t)k) - river->get_num((Card_t)k);
+            if(river!=NULL) {
+                tingCard->remain = 4 - get_num((Card_t)k) - river->get_num((Card_t)k);
+            }
             
             ting.cardNum++;
         }
@@ -753,6 +755,7 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
 }
 
 bool CardInHand::collect_ming_info(const CardList *river) {
+    _mingChoicesMask = 0;
     _ming.choiceNum = 0;
     _ming.handouts  = new MingChoice_t[18];
 
@@ -767,17 +770,28 @@ bool CardInHand::collect_ming_info(const CardList *river) {
 
         Card_t kind = get_kind(i);
         if(kind==prevCardCanHu && prevCardCanHu!=CARD_UNKNOWN) {
+            _mingChoicesMask |= 1<<i;          /*??? handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );*/
             continue;
         }
 
         MingChoice_t *choice = _ming.handouts + _ming.choiceNum;
         if( CollectTingInfo(i,choice->ting,river) ) {
             choice->kind = kind;
+            
             _ming.choiceNum++;
+            _mingChoicesMask |= 1<<i;
         }
     }
 
     return (_ming.choiceNum>0);
+}
+
+bool CardInHand::can_handout(int idx) const {
+    if( _mingChoicesMask & (1<<idx) ) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) const {

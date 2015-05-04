@@ -759,7 +759,7 @@ void NetRoundManager::RecvKouConfirm() {
     }   
     
     UpdateCards(MIDDLE,a_KOU);
-
+    cards->collect_ming_info(_gRiver);
 
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->get_kou_kinds(kinds);
@@ -767,10 +767,6 @@ void NetRoundManager::RecvKouConfirm() {
     RequestSendAction aReq;
     aReq.Set(aKOU,kindNum,kinds);
     _messenger->Send(aReq);
-
-
-    auto ming_indexesCur=_players[MIDDLE]->get_parter()->ming_check();
-    _players[MIDDLE]->get_parter()->set_ming_indexes(ming_indexesCur);
 
     _uiManager->KouConfirmEffect();
 }
@@ -782,7 +778,7 @@ void NetRoundManager::RecvMingCancel() {
     _actionToDo=a_JUMP;
     
     _players[MIDDLE]->_cards->cancel_ming();
-    _players[MIDDLE]->get_parter()->set_ming_indexes(0);
+    /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
     _players[MIDDLE]->get_parter()->set_ting_status(0);
 
     _uiManager->MingCancelEffect();

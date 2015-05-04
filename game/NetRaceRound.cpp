@@ -191,7 +191,7 @@ unsigned char NetRRound::ActiontodoCheckAgain()
         res |= aSHOU_GANG;
     }
 
-	if( ( archive_ming_indexes=ming_check() )!=0 ) {
+	if( _cardInHand->collect_ming_info() ) {
 		res |= aMING;
     }
 
@@ -280,11 +280,11 @@ unsigned char NetRRound::hand_in(CARD_KIND kind,unsigned char isNewDistributed,u
         }
 	}
 
-	if(isNewDistributed)
-	{
-		if(!_cardInHand->IsMing && !is_last_one)
-		{
-			if(( archive_ming_indexes=ming_check())!=0 )
+    /* BUG ??? ming can implemented after some action take place, such as PENG/GANG */
+    /*     !!! maybe done by ActiontodoCheckAgain                                   */
+	if(isNewDistributed) {
+		if(!_cardInHand->IsMing && !is_last_one) {
+			if(_cardInHand->collect_ming_info())
 				res |= a_MING;
 		}
 	}
@@ -464,16 +464,12 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	}
 	else if(act==a_MING)
 	{
-		unsigned int active_place_indexes = get_ming_indexes();
-        
 		for (int i=_cardInHand->FreeStart;i<_cardInHand->size();i++) {
-			int m = active_place_indexes&(1<<i);
-			if(m>0) {
+			if(_cardInHand->can_handout(i)) {
 				_cardInHand->at(i)->canPlay=true;
 			} else {
 				_cardInHand->at(i)->canPlay=false;
 			}
-			
 		}
 	}
 	else if(act==a_HU)
@@ -535,11 +531,6 @@ unsigned int NetRRound::get_aim()
 	return _aimDone;
 }
 
-unsigned int NetRRound::get_ming_indexes()
-{
-	return archive_ming_indexes;
-}
-
 int *NetRRound::get_ming_reserved_cards_num(CardList *river)
 {
 	int i;	
@@ -565,11 +556,6 @@ int *NetRRound::get_ming_reserved_cards_num(CardList *river)
 				}
 		}
 	return hu_reserved_num;
-}
-
-void NetRRound::set_ming_indexes(unsigned int indexesFlag)
-{
-	archive_ming_indexes=indexesFlag;
 }
 
 void NetRRound::set_ting_status(unsigned char flag)

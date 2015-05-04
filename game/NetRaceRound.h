@@ -49,9 +49,7 @@ public:
     ACT_RES action(bool isCardFromOther,ARRAY_ACTION act);
     ACT_RES others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind);
     unsigned int get_aim();
-	unsigned int get_ming_indexes();
 	int *get_ming_reserved_cards_num(CardList *river);
-	void set_ming_indexes(unsigned int indexesFlag);
 	unsigned char ActiontodoCheckAgain();
 	void set_ting_status(unsigned char flag);
     long get_card_score();
