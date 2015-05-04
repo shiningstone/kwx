@@ -62,70 +62,6 @@ void NetRRound::task_check(unsigned int flag)
 		_aimDone=0;
 }
 
-unsigned int NetRRound::ming_check()
-{
-	unsigned int handoutMask =0;
-
-	hu_places_num=0;
-	memset(hu_cards_num,0,sizeof(int)*MAX_HANDIN_NUM);
-	memset(hu_cards,0xff,sizeof(CARD_KIND)*MAX_HANDIN_NUM*9);
-	memset(huTiemsForEveryOne,0,sizeof(int)*MAX_HANDIN_NUM*9);
-
-    CARD_KIND last_card=ck_NOT_DEFINED;
-
-	for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
-	{
-		if(_cardInHand->get_status(i)==sMING_KOU) {
-			continue;
-        } else {
-            CARD_KIND cur_card = (CARD_KIND)_cardInHand->get_kind(i);;
-            
-            if(cur_card==last_card)
-            {
-                handoutMask |= ( ( handoutMask&( 1<<(i-1) ) )<<1 );
-
-                hu_cards_num[i]=hu_cards_num[i-1];
-                memcpy(hu_cards[i],hu_cards[i-1],sizeof(CARD_KIND)*9);
-                memcpy(huTiemsForEveryOne[i],huTiemsForEveryOne[i-1],sizeof(int)*9);
-            } else {
-                int huKindIdx = 0;
-                
-                for(int k=0;k<CARD_KIND_MAX;k++) {
-                    if( _cardInHand->can_hu(i,k) ) {
-                        handoutMask |= (1<<i);
-                        
-                        hu_cards[i][huKindIdx]=CARD_KIND(k);
-                        hu_cards_num[i]++;
-                        
-                        int s_core = calcTimes((Card_t)k);
-
-                        for(int s_l=0;s_l<_cardInHand->FreeStart;s_l++) {
-                            if( _cardInHand->get_kind(s_l)==CARD_KIND(k)&&_cardInHand->get_status(s_l)==sPENG) {
-                                s_core *= 2;
-                                break;
-                            }
-                        }
-
-                        huTiemsForEveryOne[i][huKindIdx++]=s_core;
-                    }
-                }
-                
-                last_card = cur_card;
-            }
-        }
-	}
-    
-	for(int i=0;i<MAX_HANDIN_NUM;i++) {
-		if(handoutMask&(1<<i)) {
-			hu_places_num++;
-        }
-    }
-
-    hu_places = handoutMask;
-
-    return handoutMask;
-}
-
 unsigned char NetRRound::init(int card_array[],int len)
 {
 	card_score=0;
@@ -476,22 +412,12 @@ unsigned int NetRRound::get_aim()
 	return _aimDone;
 }
 
-void NetRRound::set_ting_status(unsigned char flag)
-{
-	hu_len=0;
-	for(int i=0;i<21;i++) {
-		if(_cardInHand->can_hu((Card_t)i)) {
-			hucards[hu_len++]=CARD_KIND(i);
-        }
-    }
-}
-
-long NetRRound::get_card_score()
+long NetRRound::get_score()
 {
 	return card_score;
 }
 
-bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)
+bool NetRRound::get_hu_flag(unsigned int *hu_kind)
 {
 	*hu_kind=_fan;
 	return true;

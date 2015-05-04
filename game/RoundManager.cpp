@@ -410,7 +410,6 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 	if(_actionToDo==a_MING && 
         !IsTing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(idx);
-		_players[_curPlayer]->get_parter()->set_ting_status(1);
 
         turnToMing = true;
     }
@@ -555,7 +554,6 @@ void RoundManager::RecvMingCancel() {
     
     _players[MIDDLE]->_cards->cancel_ming();
     /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
-    _players[MIDDLE]->get_parter()->set_ting_status(0);
 
     _uiManager->MingCancelEffect();
 }
@@ -736,7 +734,6 @@ void RoundManager::WaitForOthersChoose() {
         UpdateCards((PlayerDir_t)_curPlayer,a_MING);
 
         _players[_curPlayer]->_cards->set_ming(index);
-        _players[_curPlayer]->get_parter()->set_ting_status(1);
 
         _uiManager->TingHintBarOfOthers(_curPlayer,index);
     }

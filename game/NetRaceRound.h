@@ -51,10 +51,8 @@ public:
 
     unsigned int get_aim();
     
-    unsigned int ming_check();
-	void set_ting_status(unsigned char flag);
-    long get_card_score();
-	bool get_Hu_Flag(unsigned int *hu_kind);
+    long get_score();
+	bool get_hu_flag(unsigned int *hu_kind);
 };
 
 #endif // _RACE_ROUND_H_

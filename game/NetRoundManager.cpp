@@ -736,7 +736,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && !IsTing(_curPlayer) ) {
-		_players[_curPlayer]->get_parter()->set_ting_status(1);
         _players[_curPlayer]->_cards->set_ming(chosen);
 
         turnToMing = true;
@@ -779,7 +778,6 @@ void NetRoundManager::RecvMingCancel() {
     
     _players[MIDDLE]->_cards->cancel_ming();
     /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
-    _players[MIDDLE]->get_parter()->set_ting_status(0);
 
     _uiManager->MingCancelEffect();
 }

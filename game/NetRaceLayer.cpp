@@ -4448,7 +4448,7 @@ void NetRaceLayer::_CalcMingGangGold(int winner,int giver,int goldOfPlayer[3]) {
 }
 
 void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive) {
-    auto score = _roundManager->_players[winner]->get_parter()->get_card_score();
+    auto score = _roundManager->_players[winner]->get_parter()->get_score();
     goldOfPlayer[winner] = score*PREMIUM_LEAST;
     
     if(whoGive==winner) {
@@ -4465,7 +4465,7 @@ void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGiv
 
 void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int giver) {
     for(int i=1;i<3;i++) {
-        auto score = _roundManager->_players[(giver+i)%3]->get_parter()->get_card_score();
+        auto score = _roundManager->_players[(giver+i)%3]->get_parter()->get_score();
         int  ting  = _roundManager->IsTing((giver+i)%3);
 
         goldOfPlayer[(giver+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
@@ -4862,7 +4862,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	float y = origin.y+visibleSize.height*0.1256-10;
 
 	int tagNum    = BarOfPlayer->getTag();
-	auto curScore = _roundManager->_players[tagNum]->get_parter()->get_card_score();
+	auto curScore = _roundManager->_players[tagNum]->get_parter()->get_score();
 
     WinInfo_t win;
     _roundManager->GetWin(win);
@@ -5429,7 +5429,7 @@ void NetRaceLayer::raceAccount(float delta)
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+1)%3);
                 auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+2)%3);
             
-                _roundManager->_players[win.winner]->get_parter()->get_Hu_Flag(&num);
+                _roundManager->_players[win.winner]->get_parter()->get_hu_flag(&num);
                 AccountShows(WinBar,win.winner);
                 AccountShows(WinBarPlus,(win.winner+1)%3);
                 AccountShows(WinBarMinus,(win.winner+2)%3);
@@ -5450,8 +5450,8 @@ void NetRaceLayer::raceAccount(float delta)
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+1)%3);
                 auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+2)%3);
             
-                _roundManager->_players[(win.giver+1)%3]->get_parter()->get_Hu_Flag(&num);
-                _roundManager->_players[(win.giver+2)%3]->get_parter()->get_Hu_Flag(&numDoubule);
+                _roundManager->_players[(win.giver+1)%3]->get_parter()->get_hu_flag(&num);
+                _roundManager->_players[(win.giver+2)%3]->get_parter()->get_hu_flag(&numDoubule);
             
                 AccountShows(WinBar,win.giver);
                 AccountShows(WinBarPlus,(win.giver+1)%3);
