@@ -62,33 +62,6 @@ void NetRRound::task_check(unsigned int flag)
 		_aimDone=0;
 }
 
-void NetRRound::get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9])
-{
-	int temp=0;
-    
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-	{
-		if(hu_cards[a][0]==-1)
-			continue;
-
-		for(int b=0;b<9;b++)
-		{
-			if(hu_cards[a][b]==-1)
-				break;
-
-            int num=0;
-			for(int c=0;c<_cardInHand->size();c++)
-			{
-				if(_cardInHand->get_status(c)==sFREE||_cardInHand->get_status(c)==c_AN_GANG||_cardInHand->get_status(c)==sMING_KOU)
-					if(hu_cards[a][b]==_cardInHand->get_kind(c))
-						num++;
-			}
-			temp=hu_residueForEvery[a][b]-num;
-			curArray[a][b]=temp;
-		}
-	}
-}
-
 unsigned int NetRRound::ming_check()
 {
 	unsigned int handoutMask =0;
@@ -498,64 +471,9 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 	return ar_DONE;
 }
 
-void NetRRound::get_hu_cards(CARD_KIND curArray[MAX_HANDIN_NUM][9])
-{
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-		for(int b=0;b<9;b++)
-			curArray[a][b]=hu_cards[a][b];
-}
-
-void NetRRound::get_hu_cards(CARD_KIND c_list[],int *len)
-{
-	*len=hu_len;
-    
-	for(int k=0;k<hu_len;k++)
-		c_list[k]=hucards[k];
-}
-
-void NetRRound::get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9])
-{
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-		for(int b=0;b<9;b++)
-			curArray[a][b]=huTiemsForEveryOne[a][b]*2;
-}
-void NetRRound::get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM])
-{
-	for(int a=0;a<MAX_HANDIN_NUM;a++)
-			//curArray[a]=hu_NumForEveryCard[a];
-			curArray[a]=hu_cards_num[a];
-}
-
 unsigned int NetRRound::get_aim()
 {
 	return _aimDone;
-}
-
-int *NetRRound::get_ming_reserved_cards_num(CardList *river)
-{
-	int i;	
-	memset(hu_residueForEvery,0,sizeof(int)*MAX_HANDIN_NUM*9);
-
-	int m=0;
-	for(i=0;i<MAX_HANDIN_NUM;i++)
-		if(archive_ming_indexes&(1<<i))
-		{
-			m=0;
-			for(int j=0;j<9;j++)
-				if(hu_cards[i][j]!=-1)
-				{
-					int k=1;
-					int default_reserved_cards=4;
-
-                    for(int idx=0;idx<river->size();idx++) {
-						if(river->get_kind(idx)==hu_cards[i][j])
-							default_reserved_cards--;
-                    }
-					hu_residueForEvery[i][m++]=default_reserved_cards;
-					hu_reserved_num[i] += default_reserved_cards;
-				}
-		}
-	return hu_reserved_num;
 }
 
 void NetRRound::set_ting_status(unsigned char flag)

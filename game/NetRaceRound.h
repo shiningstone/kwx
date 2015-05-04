@@ -43,23 +43,19 @@ private:
     long calcTimes(Card_t kind);
     void task_check(unsigned int flag);//修改1//,unsigned char last_action
 public:
-    unsigned int ming_check();
     unsigned char hand_in(CARD_KIND kind,unsigned char isNewDistributed,unsigned char tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     CARD_KIND hand_out(unsigned int place);
     ACT_RES action(bool isCardFromOther,ARRAY_ACTION act);
     ACT_RES others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind);
-    unsigned int get_aim();
-	int *get_ming_reserved_cards_num(CardList *river);
 	unsigned char ActiontodoCheckAgain();
+
+    unsigned int get_aim();
+    
+    unsigned int ming_check();
 	void set_ting_status(unsigned char flag);
     long get_card_score();
-	void get_hu_cards(CARD_KIND c_list[],int *len);
 	bool get_Hu_Flag(unsigned int *hu_kind);
 	bool get_ming_check_result(MRES *res);
-	void get_hu_NumForEveryCard(int curArray[MAX_HANDIN_NUM]);//张数
-	void get_hu_residueForEvery(int curArray[MAX_HANDIN_NUM][9]);//剩余牌数
-	void get_huTiemsForEveryOne(int curArray[MAX_HANDIN_NUM][9]);//番型
-	void get_hu_cards(CARD_KIND hu_cards[MAX_HANDIN_NUM][9]);//胡哪几张牌	
 };
 
 #endif // _RACE_ROUND_H_

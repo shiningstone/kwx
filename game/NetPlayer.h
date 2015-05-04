@@ -31,8 +31,6 @@ class NetPlayer:public NetRole
 		int Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 		int Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 	public:
-		void get_hu_cards(CARD_KIND c_list[],int *len);
-
 		void set_robot_hu_target(ROBOT_TARGET par_target);
 		ROBOT_TARGET get_robot_hu_target();
 		int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
