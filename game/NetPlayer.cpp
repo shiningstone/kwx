@@ -623,7 +623,7 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 		memset(res->hu_cards[i],ck_NOT_DEFINED,sizeof(CARD_KIND)*9);
     }
 
-	if( _act->get_ming_check_result(res) ) {
+	if( _act->_cardInHand->get_ming_info(res) ) {
 		for(int k=0;k<MAX_HANDIN_NUM;k++) {
 			if(_act->_cardInHand->can_handout(k)) {
 			    Card_t s_kind = _cards->get_kind(k);

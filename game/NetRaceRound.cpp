@@ -497,22 +497,3 @@ bool NetRRound::get_Hu_Flag(unsigned int *hu_kind)
 	return true;
 }
 
-bool NetRRound::get_ming_check_result(MRES *res)
-{
-	//unsigned int result;
-	if(hu_places_num!=0)
-	{
-		res->hu_places_num=hu_places_num;
-		res->hu_places=hu_places;
-		for(int i=0;i<MAX_HANDIN_NUM;i++)
-			res->hu_cards_num[i]=hu_cards_num[i];
-		for(int i=0;i<MAX_HANDIN_NUM;i++)
-			for(int j=0;j<hu_cards_num[i];j++)
-				res->hu_cards[i][j]=hu_cards[i][j];
-
-		return true;
-	}
-	else
-		return false;
-}
-

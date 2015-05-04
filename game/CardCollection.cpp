@@ -1,8 +1,6 @@
 
 #include <string.h>
 
-#include "./../RaceType.h"
-
 #include "./../utils/UtilBasic.h"
 
 #include "CardCollection.h"
@@ -802,6 +800,24 @@ void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) const {
     }
 }
 
+bool CardInHand::get_ming_info(MRES *res) const {
+	if(_ming.choiceNum>0) {
+		res->hu_places_num = _ming.choiceNum;
+		res->hu_places     = _mingChoicesMask;
+
+        for(int i=0;i<_ming.choiceNum;i++) {
+            MingChoice_t *handout = _ming.handouts + i;
+            
+			res->hu_cards_num[i] = handout->ting.cardNum;
+			for(int j=0;j<res->hu_cards_num[i];j++)
+				res->hu_cards[i][j] = (CARD_KIND)(handout->ting.cards+j)->kind;
+        }
+
+        return true;
+	} else {
+        return false;
+    }
+}
 /***************************************************
         effect
 ***************************************************/

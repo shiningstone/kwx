@@ -138,6 +138,7 @@ public:
     bool collect_ming_info(const CardList *river = NULL/*if don't care about remain number*/);
     void get_hu_cards(CARD_KIND cards[],int *len) const;
     bool can_handout(int idx) const;
+    bool get_ming_info(MRES *res) const;
     
     INT32U      _mingChoicesMask;             /* NOTE : this mask starts with FreeStart, not 0 */
 

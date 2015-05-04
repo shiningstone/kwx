@@ -55,7 +55,6 @@ public:
 	void set_ting_status(unsigned char flag);
     long get_card_score();
 	bool get_Hu_Flag(unsigned int *hu_kind);
-	bool get_ming_check_result(MRES *res);
 };
 
 #endif // _RACE_ROUND_H_
