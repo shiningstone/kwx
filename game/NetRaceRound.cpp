@@ -102,7 +102,6 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistribute
 	if(!_cardInHand->IsMing) {
         if( _cardInHand->has_shou_gang() && isNewDistributed && !isLastOne ) {
             res |= a_SHOU_GANG;
-            break;
 		}
 
         int freeNum = 0;
