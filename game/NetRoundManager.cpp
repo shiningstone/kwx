@@ -462,16 +462,16 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
     if(dir==MIDDLE) {
         RoundManager::UpdateCards(dir,action);
     } else {
-        if(action==a_PENG) {
+        if(action==aPENG) {
             _isNewDistributed = false;
         }
         
-        if(_actionToDo&a_AN_GANG) {
-            _players[dir]->get_parter()->others_action(_isNewDistributed,a_AN_GANG,actKind);
-        } else if(_actionToDo&a_SHOU_GANG) {
-            _players[dir]->get_parter()->others_action(_isNewDistributed,a_SHOU_GANG,actKind);
+        if(_actionToDo&aAN_GANG) {
+            _players[dir]->get_parter()->others_action(_isNewDistributed,aAN_GANG,actKind);
+        } else if(_actionToDo&aSHOU_GANG) {
+            _players[dir]->get_parter()->others_action(_isNewDistributed,aSHOU_GANG,actKind);
         } else {
-            _players[dir]->get_parter()->others_action(_isNewDistributed,action,actKind);
+            _players[dir]->get_parter()->others_action(_isNewDistributed,(ActionId_t)action,actKind);
         }
     }
 }

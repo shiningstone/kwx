@@ -133,42 +133,9 @@ Card_t NetRRound::hand_out(unsigned int place) {
     return kind;
 }
 
-ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind) {
+ACT_RES NetRRound::others_action(bool isNewDistributed,ActionId_t act,Card_t kind) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
-
-    CardNode_t node;
-    node.kind    = kind;
-    node.canPlay = false;
-
-	if(act==a_PENG) {
-        node.status=sPENG;
-        
-        _cardInHand->delete_card(_cardInHand->FreeStart,3);
-        _cardInHand->insert_card(node,3);
-        _cardInHand->FreeStart += 3;
-	} else if(act==a_MING_GANG) {
-        node.status=sMING_GANG;
-
-        _cardInHand->delete_card(_cardInHand->FreeStart,4);
-        _cardInHand->insert_card(node,4);
-		_cardInHand->FreeStart += 4;
-	} else if(act==a_AN_GANG) {
-        node.kind=CARD_UNKNOWN;
-        node.status=sAN_GANG;
-
-        _cardInHand->delete_card(_cardInHand->FreeStart,4);
-        _cardInHand->insert_card(node,4);
-		_cardInHand->FreeStart += 4;
-	} else if(act==a_JUMP) {
-		if(isNewDistributed) {
-			node.status  = sFREE;
-            node.canPlay = false;
-            
-			_cardInHand->pop_back();
-            _cardInHand->insert_card(node,1);
-		}
-	}
-
+    _cardInHand->others_perform(isNewDistributed,act,kind);
 	return ar_DONE;
 }
 

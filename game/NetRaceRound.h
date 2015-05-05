@@ -36,7 +36,7 @@ public:
 	ActionMask_t ActiontodoCheckAgain();
 
     ACT_RES action(bool isNewDistributed,ARRAY_ACTION act);
-    ACT_RES others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind);
+    ACT_RES others_action(bool isNewDistributed,ActionId_t act,Card_t kind);
 
     HuTarget_t get_aim() const;
 	HuTarget_t get_hu_flag() const;

@@ -441,6 +441,41 @@ void CardInHand::perform(ActionId_t act,bool isZimo) {
     DBG_SHOW();
 }
 
+void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind) {
+    CardNode_t node;
+    node.kind    = kind;
+    node.canPlay = false;
+
+	if(act==a_PENG) {
+        node.status=sPENG;
+        
+        delete_card(FreeStart,3);
+        insert_card(node,3);
+        FreeStart += 3;
+	} else if(act==a_MING_GANG) {
+        node.status=sMING_GANG;
+
+        delete_card(FreeStart,4);
+        insert_card(node,4);
+		FreeStart += 4;
+	} else if(act==a_AN_GANG) {
+        node.kind=CARD_UNKNOWN;
+        node.status=sAN_GANG;
+
+        delete_card(FreeStart,4);
+        insert_card(node,4);
+		FreeStart += 4;
+	} else if(act==a_JUMP) {
+		if(isNewDistributed) {
+			node.status  = sFREE;
+            node.canPlay = false;
+            
+			pop_back();
+            insert_card(node,1);
+		}
+	}
+}
+
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
         for(int i=FreeStart;i>0;i--) {

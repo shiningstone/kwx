@@ -65,9 +65,10 @@ public:
     void   lock_all_cards(bool lock);
 
     bool   is_wait_handout() const;
-    void   perform(ActionId_t act,bool isZimo=false);
     int    find_free_cards(int cardIdx[],Card_t card) const;
 
+    void   perform(ActionId_t act,bool isZimo=false);
+    void   others_perform(bool isNewDistributed,ActionId_t act,Card_t kind);
 
     int          FreeStart;
     bool         IsMing;
