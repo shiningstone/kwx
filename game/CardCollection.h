@@ -77,6 +77,7 @@ public:
     ***************************************************/
 private:
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
+    void   _MingGang(Card_t kind);
     void   _Peng(Card_t kind);
     void   _Kou();
     void   _CancelKou();

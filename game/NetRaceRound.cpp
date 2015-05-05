@@ -198,26 +198,7 @@ ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
         _cardInHand->perform(aKOU_CANCEL);
 	}
 	else if(act==a_MING_GANG) {
-		node.status = sMING_GANG;
-
-		bool ifFirst=true;
-		for(int i=_cardInHand->size()-1;i>=0;i--) {
-			if(_cardInHand->get_status(i)==sPENG&&_cardInHand->get_kind(i)==node.kind) {
-				if(ifFirst)
-					InsertPlaceForMG = i-2;
-                
-				ifFirst=false;
-
-                _cardInHand->FreeStart--;
-			} else if(_cardInHand->get_status(i)==sMING_KOU&& _cardInHand->get_kind(i)==node.kind) {
-				_cardInHand->FreeStart--;
-            }
-
-			if(_cardInHand->get_kind(i)==node.kind)
-				_cardInHand->delete_card(i,1);
-		}
-        _cardInHand->insert_card(node,4);
-		_cardInHand->FreeStart += 4;
+        _cardInHand->perform(aMING_GANG);
 	}
 	else if(act==a_AN_GANG) {
 		_cardInHand->perform(aAN_GANG);

@@ -287,6 +287,26 @@ void CardInHand::_AnGang(Card_t card) {
     }
 }
 
+void CardInHand::_MingGang(Card_t kind) {
+    CardNode_t node;
+    node.kind    = kind;
+    node.status  = sMING_GANG;
+    node.canPlay = false;
+    
+    for(int i=last();i>=0;i--) {
+        if(get_kind(i)==kind) {
+            if(get_status(i)==sPENG || get_status(i)==sMING_KOU) {
+                FreeStart--;
+            }
+            
+            delete_card(i,1);
+        }
+    }
+    
+    insert_card(node,4);
+    FreeStart += 4;
+}
+
 void CardInHand::_Peng(Card_t card) {
     CardNode_t node;
     node.kind    = card;
@@ -343,6 +363,8 @@ void CardInHand::_CancelKou() {
 void CardInHand::perform(ActionId_t act) {
     if(act==aAN_GANG) {
         _AnGang();
+    } else if(act==aMING_GANG) {
+        _MingGang(get_kind(last()));
     } else if(act==aPENG) {
         _Peng(get_kind(last()));
     } else if(act==aKOU) {
