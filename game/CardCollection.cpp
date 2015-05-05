@@ -306,11 +306,49 @@ void CardInHand::_Peng(Card_t card) {
     FreeStart += 3;
 }
 
+void CardInHand::_Kou() {
+    CardNode_t node;
+    node.canPlay = false;
+    node.status  = sMING_KOU;
+    
+    for(int i=last();i>=FreeStart;i--) {
+        if(get_status(i)==sMING_KOU) {
+            node.kind=get_kind(i);
+            
+            delete_card(i,1);
+            insert_card(node,1);
+            FreeStart += 1;
+            
+            i++;
+        }
+    }
+}
+
+void CardInHand::_CancelKou() {
+    CardNode_t node;
+    node.status  = sFREE;
+    node.canPlay = true;
+    
+    for(int i=FreeStart-1;i>=0;i--) {
+        if(get_status(i)==sMING_KOU) {
+            node.kind = get_kind(i);
+            
+            delete_card(i,1);
+            insert_card(node,1);
+            FreeStart-=1;
+        }
+    }
+}
+
 void CardInHand::perform(ActionId_t act) {
     if(act==aAN_GANG) {
         _AnGang();
     } else if(act==aPENG) {
         _Peng(get_kind(last()));
+    } else if(act==aKOU) {
+        _Kou();
+    } else if(act==aKOU_CANCEL) {
+        _CancelKou();
     }
 
     DBG_SHOW();

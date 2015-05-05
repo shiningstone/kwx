@@ -192,30 +192,10 @@ ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
         _cardInHand->perform(aPENG);
 	}
 	else if(act==a_KOU) {
-        node.status=sMING_KOU;
-
-		for(int i=_cardInHand->size()-1;i>=_cardInHand->FreeStart;i--)
-			if(_cardInHand->get_status(i)==sMING_KOU) {
-				node.kind=_cardInHand->get_kind(i);
-				_cardInHand->delete_card(i,1);
-				_cardInHand->insert_card(node,1);
-                _cardInHand->FreeStart+=1;
-				i++;
-			}
+        _cardInHand->perform(aKOU);
 	}
 	else if(act==a_KOU_CANCEL) {
-		node.status  = sFREE;
-		node.canPlay = true;
-        
-		for(int i=_cardInHand->FreeStart-1;i>=0;i--) {
-			if(_cardInHand->get_status(i)==sMING_KOU) {
-				node.kind = _cardInHand->get_kind(i);
-                
-				_cardInHand->delete_card(i,1);
-				_cardInHand->insert_card(node,1);
-				_cardInHand->FreeStart-=1;
-			}
-        }
+        _cardInHand->perform(aKOU_CANCEL);
 	}
 	else if(act==a_MING_GANG) {
 		node.status = sMING_GANG;
