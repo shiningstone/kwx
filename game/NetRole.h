@@ -21,27 +21,40 @@ public:
     virtual void set_robot_hu_target(ROBOT_TARGET par_target){}
     virtual ROBOT_TARGET get_robot_hu_target(){return SAME_TIAO_TARGET;}
 
-	virtual unsigned char init(int card_array[],int len,int aim);
-    virtual unsigned char init(Card_t card_array[],int len,int aim);
+    virtual unsigned char init(int cards[],int len,int aim);
+    virtual unsigned char init(Card_t cards[],int len,int aim);
     
     bool          _isReady;
     UserProfile_t _profile;    
-    NetRRound    *_act;
 
     /**************************************************
             user's action
     **************************************************/
-    virtual NetRRound* get_parter();
+    long calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//·ÖÊý¼ÆËã
+    void taskCheck(unsigned int flag);
 
+    ActionMask_t hand_in(Card_t kind,bool isNewDistributed,bool tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
+    Card_t       hand_out(unsigned int place);
+	ActionMask_t ActiontodoCheckAgain();
+
+    ACT_RES action(bool isNewDistributed,ARRAY_ACTION act);
+    ACT_RES others_action(bool isNewDistributed,ActionId_t act,Card_t kind);
+
+    HuTarget_t get_aim() const;
+	HuTarget_t get_hu_flag() const;
+    long       get_score() const;
+
+    HuTarget_t       _AIM;
+    HuTarget_t       _aimDone;
+    HuFan_t          _fan;
+    long             _score;
     /**************************************************
             user's card info
     **************************************************/
     /* during game */
     CardList   *_river;
     CardInHand *_cards;
-    /* after  game */
-    HuTarget_t  _aim;
-    HuFan_t     _fan;
+
     /**************************************************
             user's profile
     **************************************************/

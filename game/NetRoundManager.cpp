@@ -248,7 +248,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     delete info;
 
     ServerDistributeTo(target,card);
-    _players[target]->get_parter()->hand_in(
+    _players[target]->hand_in(
         card,
         false,
         IsTing(target),
@@ -271,7 +271,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     delete info;
 
     ServerDistributeTo(target,card);
-    _players[MIDDLE]->get_parter()->hand_in(
+    _players[MIDDLE]->hand_in(
         card,
         false,
         IsTing(MIDDLE),
@@ -302,7 +302,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     
     _curPlayer = dir;
 
-    _players[dir]->get_parter()->_cardInHand->pop_back();
+    _players[dir]->_cards->pop_back();
     _players[dir]->_river->push_back(card);
         
 	_isNewDistributed = false;
@@ -365,7 +365,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                     
                     _curPlayer = dir;
                     
-                    _players[dir]->get_parter()->hand_in(
+                    _players[dir]->hand_in(
                         card,
                         _isNewDistributed,
                         false,
@@ -467,11 +467,11 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
         }
         
         if(_actionToDo&aAN_GANG) {
-            _players[dir]->get_parter()->others_action(_isNewDistributed,aAN_GANG,actKind);
+            _players[dir]->others_action(_isNewDistributed,aAN_GANG,actKind);
         } else if(_actionToDo&aSHOU_GANG) {
-            _players[dir]->get_parter()->others_action(_isNewDistributed,aSHOU_GANG,actKind);
+            _players[dir]->others_action(_isNewDistributed,aSHOU_GANG,actKind);
         } else {
-            _players[dir]->get_parter()->others_action(_isNewDistributed,(ActionId_t)action,actKind);
+            _players[dir]->others_action(_isNewDistributed,(ActionId_t)action,actKind);
         }
     }
 }
@@ -576,7 +576,7 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
 
-    _players[dir]->get_parter()->hand_in(
+    _players[dir]->hand_in(
         _lastHandedOutCard,
         _isNewDistributed,
         false,
@@ -659,7 +659,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(gangCard);
 			RecordOutCard(gangCard);
             
-            _players[dir]->get_parter()->hand_in(
+            _players[dir]->hand_in(
                 _lastHandedOutCard,
                 true,
                 false,
@@ -726,7 +726,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	}
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
-    _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(chosen);
+    _lastHandedOutCard = _players[MIDDLE]->hand_out(chosen);
     _players[MIDDLE]->_river->push_back(_lastHandedOutCard);
 
     RequestShowCard aReq;

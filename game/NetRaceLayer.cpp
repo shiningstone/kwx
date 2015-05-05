@@ -258,9 +258,9 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnT
         _roundManager->_players[MIDDLE]->_cards->del_effect_card();
     }
     
-    CardNode_t *node = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->back();
-    _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
-    _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
+    CardNode_t *node = _roundManager->_players[MIDDLE]->_cards->back();
+    _roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
+    _roundManager->_players[MIDDLE]->_cards->pop_back();
 
 	_MyHandoutEffect(_roundManager->_lastHandedOutCard,touch,time,turnToMing);
 }
@@ -2596,7 +2596,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
                                 NetRaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
                                 _roundManager->UpdateCards(dir,a_PENG,card);
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
-                    			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
+                    			_roundManager->_actionToDo = _roundManager->_players[dir]->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
 		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
@@ -2903,7 +2903,7 @@ void NetRaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card
             it is unneccessary for net-game???
         ***************************************/
 		myframe->runAction( Sequence::create(CCCallFunc::create([=](){
-    			_roundManager->_actionToDo = _roundManager->_players[dir]->get_parter()->ActiontodoCheckAgain();
+    			_roundManager->_actionToDo = _roundManager->_players[dir]->ActiontodoCheckAgain();
     			_roundManager->WaitForMyAction();}),NULL));
 	}
 }
@@ -3911,7 +3911,7 @@ void NetRaceLayer::MingCancelEffect() {
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         NetRaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->_actionToDo=_roundManager->_players[MIDDLE]->get_parter()->ActiontodoCheckAgain();
+        _roundManager->_actionToDo=_roundManager->_players[MIDDLE]->ActiontodoCheckAgain();
         _roundManager->WaitForMyAction();}),NULL));
 }
 
@@ -4007,7 +4007,7 @@ void NetRaceLayer::_MaskNonKouCards(CardInHand *cards) {
 }
 
 bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
-    auto cards=_roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
+    auto cards=_roundManager->_players[MIDDLE]->_cards;
 
     Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
     int groupChosen=-1;
@@ -4037,7 +4037,7 @@ bool NetRaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
 
 /* !!! only one group one time */
 int NetRaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
-    CardInHand *cards = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
 
     for(int group=0; group<cards->kou_group_num(); group++) {
         for(int i=0;i<3;i++) {
@@ -4054,7 +4054,7 @@ int NetRaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
 }
 
 void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
-    CardInHand *cards = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
     Sprite *cardsInHand[MAX_HANDIN_NUM];
     for(int i=0; i<cards->size(); i++) {
@@ -4447,7 +4447,7 @@ void NetRaceLayer::_CalcMingGangGold(int winner,int giver,int goldOfPlayer[3]) {
 }
 
 void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive) {
-    auto score = _roundManager->_players[winner]->get_parter()->get_score();
+    auto score = _roundManager->_players[winner]->get_score();
     goldOfPlayer[winner] = score*PREMIUM_LEAST;
     
     if(whoGive==winner) {
@@ -4464,7 +4464,7 @@ void NetRaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGiv
 
 void NetRaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int giver) {
     for(int i=1;i<3;i++) {
-        auto score = _roundManager->_players[(giver+i)%3]->get_parter()->get_score();
+        auto score = _roundManager->_players[(giver+i)%3]->get_score();
         int  ting  = _roundManager->IsTing((giver+i)%3);
 
         goldOfPlayer[(giver+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
@@ -4861,7 +4861,7 @@ void NetRaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	float y = origin.y+visibleSize.height*0.1256-10;
 
 	int tagNum    = BarOfPlayer->getTag();
-	auto curScore = _roundManager->_players[tagNum]->get_parter()->get_score();
+	auto curScore = _roundManager->_players[tagNum]->get_score();
 
     WinInfo_t win;
     _roundManager->GetWin(win);
@@ -5428,7 +5428,7 @@ void NetRaceLayer::raceAccount(float delta)
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+1)%3);
                 auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.winner+2)%3);
             
-                num = _roundManager->_players[win.winner]->get_parter()->get_hu_flag();
+                num = _roundManager->_players[win.winner]->get_hu_flag();
                 AccountShows(WinBar,win.winner);
                 AccountShows(WinBarPlus,(win.winner+1)%3);
                 AccountShows(WinBarMinus,(win.winner+2)%3);
@@ -5449,8 +5449,8 @@ void NetRaceLayer::raceAccount(float delta)
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+1)%3);
                 auto WinBarMinus=(LayerColor*)raceAccoutLayer->getChildByTag((win.giver+2)%3);
             
-                num = _roundManager->_players[(win.giver+1)%3]->get_parter()->get_hu_flag();
-                numDoubule = _roundManager->_players[(win.giver+2)%3]->get_parter()->get_hu_flag();
+                num = _roundManager->_players[(win.giver+1)%3]->get_hu_flag();
+                numDoubule = _roundManager->_players[(win.giver+2)%3]->get_hu_flag();
             
                 AccountShows(WinBar,win.giver);
                 AccountShows(WinBarPlus,(win.giver+1)%3);

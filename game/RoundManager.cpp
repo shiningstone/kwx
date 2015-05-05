@@ -403,7 +403,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 	}
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
-    _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
+    _lastHandedOutCard = _players[_curPlayer]->hand_out(idx);
     _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
     bool turnToMing = false;
@@ -425,7 +425,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	_isNewDistributed=false;
 
 	int no1=(_curPlayer+1)%3;
-    unsigned char action1=_players[no1]->get_parter()->hand_in(
+    unsigned char action1=_players[no1]->hand_in(
         _lastHandedOutCard,
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
@@ -436,7 +436,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
     );
 
 	int no2=(_curPlayer+2)%3;
-	unsigned char action2=_players[no2]->get_parter()->hand_in(
+	unsigned char action2=_players[no2]->hand_in(
         _lastHandedOutCard,
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
@@ -568,7 +568,7 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
     _ai->KouCardCheck((PlayerDir_t)_curPlayer);
 
     if(_curPlayer==MIDDLE) {
-        if(_players[MIDDLE]->get_parter()->_cardInHand->kou_group_num()>0) {
+        if(_players[MIDDLE]->_cards->kou_group_num()>0) {
             _uiManager->QueryKouCards();
         } else {
             _isMingTime=true;
@@ -711,18 +711,18 @@ void RoundManager::WaitForOthersChoose() {
         _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);
         
         _ai->KouCardCheck((PlayerDir_t)_curPlayer);
-        if(_players[_curPlayer]->get_parter()->_cardInHand->kou_group_num()>0) {
+        if(_players[_curPlayer]->_cards->kou_group_num()>0) {
             _ai->MingKouChoose((PlayerDir_t)_curPlayer);
         }
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
-	_lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(index);
+	_lastHandedOutCard = _players[_curPlayer]->hand_out(index);
     _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
     if(canKou) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
-        if(_players[_curPlayer]->get_parter()->_cardInHand->kou_group_num()>0)
+        if(_players[_curPlayer]->_cards->kou_group_num()>0)
             UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
     }
 
@@ -740,7 +740,7 @@ void RoundManager::WaitForOthersChoose() {
 
 unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
     ActionMask_t actions = 
-        _players[dir]->get_parter()->hand_in(
+        _players[dir]->hand_in(
             _lastHandedOutCard,
             _isNewDistributed,
             prevTingStatus,
@@ -778,7 +778,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
         _continue_gang_times=0;
     
     _actionToDo = 
-        _players[dir]->get_parter()->hand_in(
+        _players[dir]->hand_in(
             _lastHandedOutCard,
             _isNewDistributed,
             _players[dir]->_cards->IsMing,
@@ -933,11 +933,11 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(_actionToDo&a_AN_GANG) {
-        _players[dir]->get_parter()->action(_isNewDistributed,a_AN_GANG);
+        _players[dir]->action(_isNewDistributed,a_AN_GANG);
     } else if(_actionToDo&a_SHOU_GANG) {
-        _players[dir]->get_parter()->action(_isNewDistributed,a_SHOU_GANG);
+        _players[dir]->action(_isNewDistributed,a_SHOU_GANG);
     } else {
-        _players[dir]->get_parter()->action(_isNewDistributed,action);
+        _players[dir]->action(_isNewDistributed,action);
     }
 }
 

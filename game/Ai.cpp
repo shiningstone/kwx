@@ -83,7 +83,7 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
         kou card info
 *************************************/
 void Ai::KouCardCheck(PlayerDir_t dir) {
-    CardInHand *cards = _roundManager->_players[dir]->get_parter()->_cardInHand;
+    CardInHand *cards = _roundManager->_players[dir]->_cards;
 
     cards->ClearKouCardInfo();
         
@@ -102,7 +102,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
 }
 
 void Ai::Refresh() {
-    CardInHand *cards = _roundManager->_players[MIDDLE]->get_parter()->_cardInHand;
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
     for( int group=0; group<cards->kou_group_num(); group++ ) {
         if(cards->kou_group_status(group)!=sMING_KOU) {
@@ -116,7 +116,7 @@ void Ai::Refresh() {
 }
 
 void Ai::MingKouChoose(PlayerDir_t dir) {
-    CardInHand *cards = _roundManager->_players[dir]->get_parter()->_cardInHand;
+    CardInHand *cards = _roundManager->_players[dir]->_cards;
     
 	for(int i=0;i<cards->kou_group_num();i++) {
 		if(_roundManager->_players[dir]->_cards->can_kou(cards->KouGroupKind(i),dir,(Card_t)_roundManager->_otherHandedOut)) {
@@ -221,7 +221,7 @@ int Ai::ReChooseAfterPeng(int chosen,int pengIdx[2]) {
 *************************************/
 void Ai::UpdateAtFirstRound(int &actionToDo) {
     if(_roundManager->_MODE==LOCAL_GAME) {
-        actionToDo = _roundManager->_players[_roundManager->_curPlayer]->get_parter()->ActiontodoCheckAgain();
+        actionToDo = _roundManager->_players[_roundManager->_curPlayer]->ActiontodoCheckAgain();
     }
 }
 
