@@ -65,7 +65,7 @@ public:
     void   lock_all_cards(bool lock);
 
     bool   is_wait_handout() const;
-    void   perform(ActionId_t act);
+    void   perform(ActionId_t act,bool isZimo=false);
     int    find_free_cards(int cardIdx[],Card_t card) const;
 
 
@@ -84,6 +84,7 @@ private:
     void   _ShouGang();
     void   _Peng(Card_t kind);
     void   _Ming();
+    void   _Hu(bool isNewDistributed);
     
     void   _Kou();
     void   _CancelKou();

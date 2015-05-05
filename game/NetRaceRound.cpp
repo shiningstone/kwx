@@ -178,16 +178,6 @@ ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
 {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
 
-	InsertPlaceForMG=-1;
-
-	CARD temp_data;
-	temp_data.can_play=cps_YES;
-	temp_data.kind=(CARD_KIND)_cardInHand->back()->kind;
-
-    CardNode_t node;
-    node.kind    = (Card_t)_cardInHand->back()->kind;
-    node.canPlay = false;
-
 	if(act==a_PENG) {
         _cardInHand->perform(aPENG);
 	}
@@ -212,21 +202,15 @@ ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
 	}
 	else if(act==a_HU)
 	{
-		node.status  = sFREE;
-		node.canPlay = false;
-        
-		if(isNewDistributed) {
-			_cardInHand->pop_back();
-            _cardInHand->insert_card(node,1);
-        } else {
-			_cardInHand->insert_card(node,1);
-		}
-	
+		_cardInHand->perform(aHU,isNewDistributed);
 	}
 	else if(act==a_JUMP)
 	{
 		if(isNewDistributed) {
-			node.status=sFREE;
+            CardNode_t node;
+            node.kind    = (Card_t)_cardInHand->back()->kind;
+            node.canPlay = false;
+			node.status  = sFREE;
             
 			_cardInHand->pop_back();
             _cardInHand->insert_card(node,1);

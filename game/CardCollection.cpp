@@ -323,7 +323,7 @@ void CardInHand::_ShouGang() {
     FreeStart += 4;
     
     /* WHY??? redundant??? */
-    node.kind    = back()->kind;
+    node.kind    = get_kind(last());
     node.status  = sFREE;
     node.canPlay = true;
     
@@ -360,6 +360,19 @@ void CardInHand::_Ming() {
     }
 }
 
+void CardInHand::_Hu(bool isZimo) {
+    CardNode_t node;
+    node.kind    = get_kind(last());
+    node.status  = sFREE;
+    node.canPlay = false;
+    
+    if(isZimo) {
+        pop_back();
+    }
+
+    insert_card(node,1);
+}
+
 void CardInHand::_Kou() {
     CardNode_t node;
     node.canPlay = false;
@@ -394,7 +407,7 @@ void CardInHand::_CancelKou() {
     }
 }
 
-void CardInHand::perform(ActionId_t act) {
+void CardInHand::perform(ActionId_t act,bool isZimo) {
     if(act==aAN_GANG) {
         _AnGang();
     } else if(act==aMING_GANG) {
@@ -405,6 +418,8 @@ void CardInHand::perform(ActionId_t act) {
         _Peng(get_kind(last()));
     } else if(act==aMING) {
         _Ming();
+    } else if(act==aHU) {
+        _Hu(isZimo);
     } else if(act==aKOU) {
         _Kou();
     } else if(act==aKOU_CANCEL) {
