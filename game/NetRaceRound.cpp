@@ -95,64 +95,15 @@ unsigned char NetRRound::ActiontodoCheckAgain() {
 }
 
 unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistributed,unsigned char tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
-	unsigned char res = 0x0;
-
     _cardInHand->push_back((Card_t)newCard);
 
-	if(!_cardInHand->IsMing) {
-        if( _cardInHand->has_shou_gang() && isNewDistributed && !isLastOne ) {
-            res |= a_SHOU_GANG;
-		}
-
-        int freeNum = 0;
-		for(int i=0;i<_cardInHand->size()-1;i++) {
-			if(_cardInHand->get_kind(i)==newCard) {
-				if(_cardInHand->get_status(i)==sPENG) {
-					if(isNewDistributed&&!isLastOne) {
-						res |= a_MING_GANG;
-                        break;
-					}
-				} else if(_cardInHand->get_status(i)==sFREE) {
-					freeNum++;
-				}
-			}
-		}
-
-        if(freeNum==3) {
-            if(isNewDistributed) {
-                if(!isLastOne) {
-                    res |= (a_MING_GANG | a_AN_GANG);
-                }
-            } else {
-                if(!isLastOne) {
-                    res |= (a_MING_GANG | a_PENG);
-                } else {
-                    res |= a_PENG;
-                }
-            }
-        } else if(freeNum==2&&!isNewDistributed) {
-        	res |= a_PENG;
-        }
-	} else {
-		for(int i=0;i<_cardInHand->FreeStart;i++) {
-			if(_cardInHand->get_status(i)==sMING_KOU && _cardInHand->get_kind(i)==newCard) {
-				if(!isLastOne) {
-					if(isNewDistributed)
-						res |= (a_MING_GANG | a_AN_GANG);
-					else
-						res |= a_MING_GANG;
-				}
-                
-				break;
-			}
-        }
-	}
+	ActionMask_t action = _cardInHand->judge_action(isNewDistributed,isLastOne);
 
 	if(_cardInHand->can_hu((Card_t)newCard)) {
 		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
 
-		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* only ming can hu dianpao ??? */
-			res|=a_HU;
+		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
+			action |= a_HU;
         }
 	}
 
@@ -161,13 +112,14 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistribute
 	if(isNewDistributed) {
 		if(!_cardInHand->IsMing && !isLastOne) {
 			if(_cardInHand->collect_ming_info())
-				res |= a_MING;
+				action |= a_MING;
 		}
 	}
 
     LOGGER_WRITE("NETWORK : %x %s action %d: newCard %d,isNewDistributed %d,tingStatus %d,isLastOne %d",
-        (int)this,__FUNCTION__,res,newCard,isNewDistributed,tingStatus,isLastOne);
-	return res;
+        (int)this,__FUNCTION__,action,newCard,isNewDistributed,tingStatus,isLastOne);
+    
+	return action;
 }
 
 CARD_KIND NetRRound::hand_out(unsigned int place)
