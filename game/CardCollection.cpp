@@ -259,32 +259,58 @@ int CardInHand::find_free_cards(int idx[],Card_t kind) const {
     return FindCards(idx,kind,FreeStart);
 }
 
+void CardInHand::_AnGang(Card_t card) {
+    int cardIdx[4] = {0};
+
+    Card_t kind = (card==CARD_UNKNOWN) ? _FindGangCard(cardIdx) : card;
+    
+    CardNode_t gangCard;
+    gangCard.kind    = kind;
+    gangCard.status  = sAN_GANG;
+    gangCard.canPlay = false;
+    
+    delete_card(cardIdx[0],4);
+    insert_card(gangCard,4);
+    
+    FreeStart += 4;
+    
+    /* BUG : 在这里排序导致没有插牌效果 */
+    CardNode_t cardsAfterGangCard[18];
+    int cardsNum = 0;
+    for(int i=cardIdx[3]+1;i<size();i++) {
+        cardsAfterGangCard[cardsNum++] = *at(i);
+    }
+    
+    for(int i=0;i<cardsNum;i++) {
+        delete_card(cardIdx[3]+1+i,1);
+        insert_card(cardsAfterGangCard[i],1);
+    }
+}
+
+void CardInHand::_Peng(Card_t card) {
+    CardNode_t node;
+    node.kind    = card;
+    node.canPlay = false;
+    node.status  = sPENG;
+    
+    for(int i=FreeStart;i<size();i++) {
+        if(get_kind(i)==card){
+            delete_card(i,2);
+            break;
+        }
+    }
+    
+    pop_back();
+    insert_card(node,3);
+    
+    FreeStart += 3;
+}
+
 void CardInHand::perform(ActionId_t act) {
     if(act==aAN_GANG) {
-        int cardIdx[4] = {0};
-        Card_t kind = _FindGangCard(cardIdx);
-
-        CardNode_t gangCard;
-        gangCard.kind    = kind;
-        gangCard.status  = sAN_GANG;
-        gangCard.canPlay = false;
-
-        delete_card(cardIdx[0],4);
-        insert_card(gangCard,4);
-        
-        FreeStart += 4;
-        
-        /* 在这里排序导致没有插牌效果 */
-        CardNode_t cardsAfterGangCard[18];
-        int cardsNum = 0;
-        for(int i=cardIdx[3]+1;i<size();i++) {
-            cardsAfterGangCard[cardsNum++] = *at(i);
-        }
-
-        for(int i=0;i<cardsNum;i++) {
-            delete_card(cardIdx[3]+1+i,1);
-            insert_card(cardsAfterGangCard[i],1);
-        }
+        _AnGang();
+    } else if(act==aPENG) {
+        _Peng(get_kind(last()));
     }
 
     DBG_SHOW();

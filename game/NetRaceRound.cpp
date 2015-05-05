@@ -138,8 +138,6 @@ CARD_KIND NetRRound::hand_out(unsigned int place)
 ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
 
-	InsertPlaceForMG=0;
-
     CardNode_t node;
     node.kind    = kind;
     node.canPlay = false;
@@ -176,9 +174,9 @@ ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t k
 	return ar_DONE;
 }
 
-ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
+ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
 {
-    LOGGER_WRITE("%x %s : %d (isCardFromOther=%d)",this,__FUNCTION__,act,isCardFromOther);
+    LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
 
 	InsertPlaceForMG=-1;
 
@@ -191,18 +189,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
     node.canPlay = false;
 
 	if(act==a_PENG) {
-        node.status=sPENG;
-
-        for(int i=_cardInHand->FreeStart;i<_cardInHand->size();i++) {
-			if(_cardInHand->get_kind(i)==node.kind){
-				_cardInHand->delete_card(i,2);
-				break;
-			}
-        }
-
-        _cardInHand->pop_back();
-        _cardInHand->insert_card(node,3);
-        _cardInHand->FreeStart += 3;
+        _cardInHand->perform(aPENG);
 	}
 	else if(act==a_KOU) {
         node.status=sMING_KOU;
@@ -237,7 +224,7 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		for(int i=_cardInHand->size()-1;i>=0;i--) {
 			if(_cardInHand->get_status(i)==sPENG&&_cardInHand->get_kind(i)==node.kind) {
 				if(ifFirst)
-					InsertPlaceForMG=i-2;
+					InsertPlaceForMG = i-2;
                 
 				ifFirst=false;
 
@@ -304,17 +291,17 @@ ACT_RES NetRRound::action(bool isCardFromOther,ARRAY_ACTION act)
 		node.status  = sFREE;
 		node.canPlay = false;
         
-		if(isCardFromOther) {
-			_cardInHand->insert_card(node,1);
-        } else {
+		if(isNewDistributed) {
 			_cardInHand->pop_back();
             _cardInHand->insert_card(node,1);
+        } else {
+			_cardInHand->insert_card(node,1);
 		}
 	
 	}
 	else if(act==a_JUMP)
 	{
-		if(!isCardFromOther) {
+		if(isNewDistributed) {
 			node.status=sFREE;
             
 			_cardInHand->pop_back();

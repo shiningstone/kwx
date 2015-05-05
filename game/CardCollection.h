@@ -72,6 +72,13 @@ public:
     bool         IsMing;
     ROBOT_TARGET aim;
 
+    /***************************************************
+            action
+    ***************************************************/
+private:
+    void   _AnGang(Card_t kind = CARD_UNKNOWN);
+    void   _Peng(Card_t kind);
+public:
     /* statistics , only used for calculating score */
     int statFreeCards;
     int statCouples;
