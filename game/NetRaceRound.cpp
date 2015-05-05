@@ -204,48 +204,11 @@ ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
 		_cardInHand->perform(aAN_GANG);
 	}
 	else if(act==a_SHOU_GANG) {
-		int card_num;
-		int i;
-		for(i=_cardInHand->FreeStart;i<_cardInHand->size();i++)
-		{
-			card_num=1;
-			for(int j=i+1;j<_cardInHand->size();j++)
-				if(_cardInHand->get_kind(i)==_cardInHand->get_kind(j))
-					card_num++;
-			if(card_num==4) {
-				node.kind = _cardInHand->get_kind(i);
-				break;
-			}
-		}
-        
-		for(int k=_cardInHand->size();k>=_cardInHand->FreeStart;k--)
-		{
-			if(_cardInHand->get_kind(k)==_cardInHand->get_kind(i))
-				_cardInHand->delete_card(k,1);
-		}
-
-		node.status  = sAN_GANG;
-		node.canPlay = false;
-        _cardInHand->insert_card(node,4);
-		_cardInHand->FreeStart += 4;
-
-        /*WHY*/
-		node.kind    = _cardInHand->back()->kind;
-		node.status  = sFREE;
-		node.canPlay = true;
-        
-		_cardInHand->pop_back();
-        _cardInHand->insert_card(node,1);
+		_cardInHand->perform(aSHOU_GANG);
 	}
 	else if(act==a_MING)
 	{
-		for (int i=_cardInHand->FreeStart;i<_cardInHand->size();i++) {
-			if(_cardInHand->can_handout(i)) {
-				_cardInHand->at(i)->canPlay=true;
-			} else {
-				_cardInHand->at(i)->canPlay=false;
-			}
-		}
+		_cardInHand->perform(aMING);
 	}
 	else if(act==a_HU)
 	{

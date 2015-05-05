@@ -243,7 +243,7 @@ bool CardInHand::is_wait_handout() const {
     }
 }
 
-Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group*/
+Card_t CardInHand::FindGangCards(int cardIdx[]) const{/*BUG : always first group*/
     for(int i=FreeStart; i<size(); i++) {
         int matchNum = FindCards(cardIdx,get_kind(i),i);
 
@@ -262,7 +262,7 @@ int CardInHand::find_free_cards(int idx[],Card_t kind) const {
 void CardInHand::_AnGang(Card_t card) {
     int cardIdx[4] = {0};
 
-    Card_t kind = (card==CARD_UNKNOWN) ? _FindGangCard(cardIdx) : card;
+    Card_t kind = (card==CARD_UNKNOWN) ? FindGangCards(cardIdx) : card;
     
     CardNode_t gangCard;
     gangCard.kind    = kind;
@@ -307,6 +307,30 @@ void CardInHand::_MingGang(Card_t kind) {
     FreeStart += 4;
 }
 
+void CardInHand::_ShouGang() {
+    int gangIdx[4];
+    Card_t kind = FindGangCards(gangIdx);
+
+    CardNode_t node;
+    node.kind    = kind;
+    node.status  = sAN_GANG;
+    node.canPlay = false;
+    
+    pop_back();
+    delete_card(gangIdx[0],3);
+    
+    insert_card(node,4);
+    FreeStart += 4;
+    
+    /* WHY??? redundant??? */
+    node.kind    = back()->kind;
+    node.status  = sFREE;
+    node.canPlay = true;
+    
+    pop_back();
+    insert_card(node,1);
+}
+
 void CardInHand::_Peng(Card_t card) {
     CardNode_t node;
     node.kind    = card;
@@ -324,6 +348,16 @@ void CardInHand::_Peng(Card_t card) {
     insert_card(node,3);
     
     FreeStart += 3;
+}
+
+void CardInHand::_Ming() {
+    for (int i=FreeStart;i<size();i++) {
+        if(can_handout(i)) {
+            at(i)->canPlay=true;
+        } else {
+            at(i)->canPlay=false;
+        }
+    }
 }
 
 void CardInHand::_Kou() {
@@ -365,8 +399,12 @@ void CardInHand::perform(ActionId_t act) {
         _AnGang();
     } else if(act==aMING_GANG) {
         _MingGang(get_kind(last()));
+    } else if(act==aSHOU_GANG) {
+        _ShouGang();
     } else if(act==aPENG) {
         _Peng(get_kind(last()));
+    } else if(act==aMING) {
+        _Ming();
     } else if(act==aKOU) {
         _Kou();
     } else if(act==aKOU_CANCEL) {
@@ -586,7 +624,7 @@ void CardInHand::_JudgePengPengHu() {
 
 bool CardInHand::has_shou_gang() const {/*BUG??? : should compare with current gang card's kind*/
     int cardIdx[4] = {0};
-    Card_t kind = _FindGangCard(cardIdx);
+    Card_t kind = FindGangCards(cardIdx);
     
     if(kind!=CARD_UNKNOWN) {
         return true;

@@ -68,6 +68,7 @@ public:
     void   perform(ActionId_t act);
     int    find_free_cards(int cardIdx[],Card_t card) const;
 
+
     int          FreeStart;
     bool         IsMing;
     ROBOT_TARGET aim;
@@ -76,11 +77,17 @@ public:
             action
     ***************************************************/
 private:
+    Card_t FindGangCards(int cardIdx[]) const;
+
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind);
+    void   _ShouGang();
     void   _Peng(Card_t kind);
+    void   _Ming();
+    
     void   _Kou();
     void   _CancelKou();
+    
 public:
     /* statistics , only used for calculating score */
     int statFreeCards;
@@ -160,7 +167,6 @@ public:
 
 private:
     int    _FindInsertPoint(CardNode_t data) const;
-    Card_t _FindGangCard(int cardIdx[]) const;
 
     typedef struct {
         int    idx[3];
