@@ -162,7 +162,7 @@ void NetRaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
     myframe->_ID = dir;
     
 	myframe->runAction(Sequence::create(
-        _OthersShowCardEffect(dir,(Card_t)_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
+        _OthersShowCardEffect(dir,_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
 		_CardRiverUpdateEffect(dir);}), CCCallFunc::create([=]() {
         _roundManager->UpdateCards(dir,a_JUMP);}),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
@@ -262,7 +262,7 @@ void NetRaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnT
     _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->insert_card(*node,1);
     _roundManager->_players[MIDDLE]->get_parter()->_cardInHand->pop_back();
 
-	_MyHandoutEffect((Card_t)_roundManager->_lastHandedOutCard,touch,time,turnToMing);
+	_MyHandoutEffect(_roundManager->_lastHandedOutCard,touch,time,turnToMing);
 }
 
 void NetRaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
@@ -562,7 +562,7 @@ Vec2 NetRaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
 void NetRaceLayer::_DistributeCard(PlayerDir_t dir,int lenOfInHand) {
     const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
 
-    Sprite *lastCard = _object->CreateDistributeCard(dir,(Card_t)_roundManager->_lastHandedOutCard);
+    Sprite *lastCard = _object->CreateDistributeCard(dir,_roundManager->_lastHandedOutCard);
 	lastCard->setPosition(lastCardPosition);
     
 	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);

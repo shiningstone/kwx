@@ -404,7 +404,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
     _lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(idx);
-    _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
+    _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
@@ -717,8 +717,8 @@ void RoundManager::WaitForOthersChoose() {
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
-	_lastHandedOutCard=_players[_curPlayer]->get_parter()->hand_out(index);
-    _players[_curPlayer]->_river->push_back((Card_t)_lastHandedOutCard);
+	_lastHandedOutCard = _players[_curPlayer]->get_parter()->hand_out(index);
+    _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
     if(canKou) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
@@ -757,7 +757,7 @@ unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatu
             action=a_JUMP;
         }
     } else if(dir!=MIDDLE) {
-        if(_players[dir]->_cards->is_aim_limit(action,(Card_t)_lastHandedOutCard)) {
+        if(_players[dir]->_cards->is_aim_limit(action,_lastHandedOutCard)) {
             action = a_JUMP;
         }
     }
@@ -798,7 +798,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
             WaitForMyAction();
         }
     }else{
-        if(_players[dir]->_cards->is_aim_limit(_actionToDo,(Card_t)_lastHandedOutCard)) {
+        if(_players[dir]->_cards->is_aim_limit(_actionToDo,_lastHandedOutCard)) {
             _actionToDo = a_JUMP;
         }
         WaitForOthersAction(dir);
@@ -908,7 +908,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 
 void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
     if(_distributedNum<TOTAL_CARD_NUM+1) {
-		_lastHandedOutCard = (CARD_KIND)card;
+		_lastHandedOutCard = card;
         _isNewDistributed  = true;
 
         DistributeInfo_t distInfo;

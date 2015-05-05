@@ -74,11 +74,11 @@ unsigned char NetRRound::init(int card_array[],int len)
     if(len<14) {/*NON-ZHUANG*/
         return a_JUMP;
     } else {
-        return hand_in((CARD_KIND)(card_array[13]),0,0,false,a_JUMP,0,false);
+        return hand_in((Card_t)(card_array[13]),0,0,false,a_JUMP,0,false);
     }
 }
 
-unsigned char NetRRound::ActiontodoCheckAgain() {
+ActionMask_t NetRRound::ActiontodoCheckAgain() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	unsigned char res = 0x0;
@@ -94,7 +94,7 @@ unsigned char NetRRound::ActiontodoCheckAgain() {
 	return res;
 }
 
-unsigned char NetRRound::hand_in(CARD_KIND newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+ActionMask_t NetRRound::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cardInHand->push_back((Card_t)newCard);
 
 	ActionMask_t action = _cardInHand->judge_action(isNewDistributed,isLastOne);
@@ -103,7 +103,7 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,bool isNewDistributed,bool ti
 		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
 
 		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
-			action |= a_HU;
+			action |= aHU;
         }
 	}
 
@@ -112,7 +112,7 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,bool isNewDistributed,bool ti
 	if(isNewDistributed) {
 		if(!_cardInHand->IsMing && !isLastOne) {
 			if(_cardInHand->collect_ming_info())
-				action |= a_MING;
+				action |= aMING;
 		}
 	}
 
@@ -122,18 +122,16 @@ unsigned char NetRRound::hand_in(CARD_KIND newCard,bool isNewDistributed,bool ti
 	return action;
 }
 
-CARD_KIND NetRRound::hand_out(unsigned int place)
-{
+Card_t NetRRound::hand_out(unsigned int place) {
 	if( _cardInHand->get_status(place) != sFREE ){
-		return ck_NOT_DEFINED;
+		return CARD_UNKNOWN;
 	}
 
-	CARD_KIND l_kind = (CARD_KIND)_cardInHand->get_kind(place);
+	Card_t kind = _cardInHand->get_kind(place);
     _cardInHand->delete_card(place,1);
 
-    return l_kind;
+    return kind;
 }
-
 
 ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t kind) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);

@@ -249,7 +249,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
 
     ServerDistributeTo(target,card);
     _players[target]->get_parter()->hand_in(
-        (CARD_KIND)card,
+        card,
         false,
         IsTing(target),
         (_distributedNum==TOTAL_CARD_NUM),
@@ -272,7 +272,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
 
     ServerDistributeTo(target,card);
     _players[MIDDLE]->get_parter()->hand_in(
-        (CARD_KIND)card,
+        card,
         false,
         IsTing(MIDDLE),
         (_distributedNum==TOTAL_CARD_NUM),
@@ -297,7 +297,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     delete info;
 
     RecordOutCard(card);
-	_lastHandedOutCard = (CARD_KIND)card;
+	_lastHandedOutCard = card;
     _actionToDo = a_JUMP;
     
     _curPlayer = dir;
@@ -366,7 +366,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                     _curPlayer = dir;
                     
                     _players[dir]->get_parter()->hand_in(
-                        (CARD_KIND)card,
+                        card,
                         _isNewDistributed,
                         false,
                         (_distributedNum==TOTAL_CARD_NUM),
@@ -503,7 +503,7 @@ void NetRoundManager::ServerWaitForMyAction() {
 
 void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
     if(_distributedNum<TOTAL_CARD_NUM+1) {
-		_lastHandedOutCard = (CARD_KIND)card;
+		_lastHandedOutCard = card;
         _isNewDistributed  = true;
 
         DistributeInfo_t distInfo;
@@ -727,11 +727,10 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     _lastHandedOutCard = _players[MIDDLE]->get_parter()->hand_out(chosen);
-    _players[MIDDLE]->_river->push_back((Card_t)_lastHandedOutCard);
+    _players[MIDDLE]->_river->push_back(_lastHandedOutCard);
 
-    Card_t card = (Card_t)_lastHandedOutCard;
     RequestShowCard aReq;
-    aReq.Set(card);
+    aReq.Set(_lastHandedOutCard);
     _messenger->Send(aReq);
 
     bool turnToMing = false;

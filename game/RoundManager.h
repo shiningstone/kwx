@@ -120,7 +120,7 @@ protected:
     int  _tempActionToDo;
     int  _actionToDo;
         
-    CARD_KIND  _lastHandedOutCard;
+    Card_t  _lastHandedOutCard;
     int  _lastAction;
     int  _lastActionWithGold;
     int  _lastActionSource;
