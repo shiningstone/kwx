@@ -739,7 +739,7 @@ void RoundManager::WaitForOthersChoose() {
 }
 
 unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
-    unsigned char action = 
+    ActionMask_t actions = 
         _players[dir]->get_parter()->hand_in(
             _lastHandedOutCard,
             _isNewDistributed,
@@ -751,22 +751,22 @@ unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatu
         );
     
     if(dir==MIDDLE&&_isTuoGuan) {
-        if(IsTing(MIDDLE)&&(action&a_HU)) {
-            action=a_HU;
+        if(IsTing(MIDDLE)&&(actions&a_HU)) {
+            actions=a_HU;
         } else {
-            action=a_JUMP;
+            actions=a_JUMP;
         }
     } else if(dir!=MIDDLE) {
-        if(_players[dir]->_cards->is_aim_limit(action,_lastHandedOutCard)) {
-            action = a_JUMP;
+        if(_players[dir]->_cards->is_aim_limit(actions,_lastHandedOutCard)) {
+            actions = a_JUMP;
         }
     }
 
-    if(action==a_JUMP) {
+    if(actions==a_JUMP) {
         _players[dir]->_cards->pop_back();
     }
 
-    return action;
+    return actions;
 }
 
 void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {

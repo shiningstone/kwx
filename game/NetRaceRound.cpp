@@ -97,29 +97,29 @@ ActionMask_t NetRRound::ActiontodoCheckAgain() {
 ActionMask_t NetRRound::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cardInHand->push_back((Card_t)newCard);
 
-	ActionMask_t action = _cardInHand->judge_action(isNewDistributed,isLastOne);
+	ActionMask_t actions = _cardInHand->judge_action(isNewDistributed,isLastOne);
 
 	if(_cardInHand->can_hu((Card_t)newCard)) {
 		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
 
 		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
-			action |= aHU;
+			actions |= aHU;
         }
 	}
 
-    /* BUG ??? ming can implemented after some action take place, such as PENG/GANG */
+    /* BUG ??? ming can implemented after some actions take place, such as PENG/GANG */
     /*     !!! maybe done by ActiontodoCheckAgain                                   */
 	if(isNewDistributed) {
 		if(!_cardInHand->IsMing && !isLastOne) {
 			if(_cardInHand->collect_ming_info())
-				action |= aMING;
+				actions |= aMING;
 		}
 	}
 
-    LOGGER_WRITE("NETWORK : %x %s action %d: newCard %d,isNewDistributed %d,tingStatus %d,isLastOne %d",
-        (int)this,__FUNCTION__,action,newCard,isNewDistributed,tingStatus,isLastOne);
+    LOGGER_WRITE("NETWORK : %x %s actions %d: newCard %d,isNewDistributed %d,tingStatus %d,isLastOne %d",
+        (int)this,__FUNCTION__,actions,newCard,isNewDistributed,tingStatus,isLastOne);
     
-	return action;
+	return actions;
 }
 
 Card_t NetRRound::hand_out(unsigned int place) {
