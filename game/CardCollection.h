@@ -38,19 +38,19 @@ public:
     int  last() const;
     int  get_num(Card_t kind) const;
     int  get_idx_in_group(int idxInHand) const;
-    int  find_cards(int idx[],Card_t kind,int start = 0) const;
 
-
-	void   show();
+	void show();
 	Card_t get_kind(unsigned int idx) const;
     CardStatus_t get_status(unsigned int idx) const;
-    bool   canPlay(unsigned int idx) const;
-    void   set_status(unsigned int idx,CardStatus_t status);
+    bool canPlay(unsigned int idx) const;
+    void set_status(unsigned int idx,CardStatus_t status);
 
     int    generate_raw(Card_t *array);
 
 protected:
     Logger *_logger;
+
+    int  FindCards(int idx[],Card_t kind,int start = 0) const;
 };
 
 class SmartList;

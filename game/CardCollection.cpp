@@ -84,7 +84,7 @@ int CardList::get_num(Card_t kind) const {
     return num;
 }
 
-int CardList::find_cards(int idx[],Card_t kind,int start) const {
+int CardList::FindCards(int idx[],Card_t kind,int start) const {
     int num = 0;
     
     for(int i=start; i<size(); i++) {   
@@ -245,7 +245,7 @@ bool CardInHand::is_wait_handout() const {
 
 Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group*/
     for(int i=FreeStart; i<size(); i++) {
-        int matchNum = find_free_cards(cardIdx,get_kind(i));
+        int matchNum = FindCards(cardIdx,get_kind(i),i);
 
         if(matchNum==4) {
             return get_kind(i);
@@ -256,15 +256,7 @@ Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group
 }
 
 int CardInHand::find_free_cards(int idx[],Card_t kind) const {
-    int num = 0;
-    
-    for(int i=FreeStart; i<size(); i++) {   
-        if(get_kind(i)==kind) {
-            idx[num++] = i;
-        }
-    }
-
-    return num;
+    return FindCards(idx,kind,FreeStart);
 }
 
 void CardInHand::perform(ActionId_t act) {
