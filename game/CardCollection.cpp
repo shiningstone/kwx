@@ -563,54 +563,48 @@ ActionMask_t CardInHand::judge_action(bool isNewDistributed, bool isLastOne) con
     Card_t       newCard = get_kind(last());
     ActionMask_t act = 0;
         
-	if(!IsMing) {
-        if( has_shou_gang() && isNewDistributed && !isLastOne ) {
-            act |= aSHOU_GANG;
-		}
-
-        int freeNum = 0;
-		for(int i=0;i<last();i++) {
-			if(get_kind(i)==newCard) {
-				if(get_status(i)==sPENG) {
-					if(isNewDistributed&&!isLastOne) {
-						act |= aMING_GANG;
-                        break;
-					}
-				} else if(get_status(i)==sFREE) {
-					freeNum++;
-				}
-			}
-		}
-
-        if(freeNum==3) {
-            if(isNewDistributed) {
-                if(!isLastOne) {
-                    act |= (aMING_GANG | aAN_GANG);
-                }
-            } else {
-                if(!isLastOne) {
-                    act |= (aMING_GANG | aPENG);
-                } else {
-                    act |= aPENG;
-                }
-            }
-        } else if(freeNum==2&&!isNewDistributed) {
-        	act |= aPENG;
-        }
-	} else {
-		for(int i=0;i<FreeStart;i++) {
-			if(get_status(i)==sMING_KOU && get_kind(i)==newCard) {
-				if(!isLastOne) {
-					if(isNewDistributed)
-						act |= (aMING_GANG | aAN_GANG);
-					else
-						act |= aMING_GANG;
-				}
-                
-				break;
-			}
-        }
+    if( has_shou_gang() && isNewDistributed && !isLastOne ) {
+        act |= aSHOU_GANG;
 	}
+
+    int num = 0;
+	for(int i=0;i<last();i++) {
+		if(get_kind(i)==newCard) {
+            CardStatus_t status = get_status(i);
+            
+			if(status==sPENG) {
+				if(isNewDistributed&&!isLastOne) {
+					act |= aMING_GANG;
+                    break;
+				}
+			} else if(status==sMING_KOU) {
+                if(!isLastOne) {
+                    act |= aMING_GANG;
+
+                    if(isNewDistributed) {
+                        act |= aAN_GANG;
+                    }
+                }
+                
+                break;
+            } else if(status==sFREE) {
+				num++;
+			}
+		}
+	}
+
+    if(num==3) {
+        if(!isLastOne) {
+            act |= aMING_GANG | aPENG;
+        }
+
+        if(isNewDistributed) {
+            act &= ~aPENG;
+            act |= aAN_GANG;
+        }
+    } else if(num==2 && !isNewDistributed) {
+    	act |= aPENG;
+    }
 
 	return act;
 }
