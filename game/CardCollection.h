@@ -85,6 +85,7 @@ private:
     void   _Peng(Card_t kind);
     void   _Ming();
     void   _Hu(bool isNewDistributed);
+    void   _AcceptNewCard();
     
     void   _Kou();
     void   _CancelKou();

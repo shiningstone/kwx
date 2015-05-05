@@ -407,6 +407,16 @@ void CardInHand::_CancelKou() {
     }
 }
 
+void CardInHand::_AcceptNewCard() {
+    CardNode_t node;
+    node.kind    = get_kind(last());
+    node.canPlay = false;
+    node.status  = sFREE;
+    
+    pop_back();
+    insert_card(node,1);
+}
+
 void CardInHand::perform(ActionId_t act,bool isZimo) {
     if(act==aAN_GANG) {
         _AnGang();
@@ -424,6 +434,8 @@ void CardInHand::perform(ActionId_t act,bool isZimo) {
         _Kou();
     } else if(act==aKOU_CANCEL) {
         _CancelKou();
+    } else {
+        _AcceptNewCard();
     }
 
     DBG_SHOW();

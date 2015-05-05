@@ -94,7 +94,7 @@ unsigned char NetRRound::ActiontodoCheckAgain() {
 	return res;
 }
 
-unsigned char NetRRound::hand_in(CARD_KIND newCard,unsigned char isNewDistributed,unsigned char tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+unsigned char NetRRound::hand_in(CARD_KIND newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cardInHand->push_back((Card_t)newCard);
 
 	ActionMask_t action = _cardInHand->judge_action(isNewDistributed,isLastOne);
@@ -174,49 +174,9 @@ ACT_RES NetRRound::others_action(bool isNewDistributed,ARRAY_ACTION act,Card_t k
 	return ar_DONE;
 }
 
-ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act)
-{
+ACT_RES NetRRound::action(bool isNewDistributed,ARRAY_ACTION act) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
-
-	if(act==a_PENG) {
-        _cardInHand->perform(aPENG);
-	}
-	else if(act==a_KOU) {
-        _cardInHand->perform(aKOU);
-	}
-	else if(act==a_KOU_CANCEL) {
-        _cardInHand->perform(aKOU_CANCEL);
-	}
-	else if(act==a_MING_GANG) {
-        _cardInHand->perform(aMING_GANG);
-	}
-	else if(act==a_AN_GANG) {
-		_cardInHand->perform(aAN_GANG);
-	}
-	else if(act==a_SHOU_GANG) {
-		_cardInHand->perform(aSHOU_GANG);
-	}
-	else if(act==a_MING)
-	{
-		_cardInHand->perform(aMING);
-	}
-	else if(act==a_HU)
-	{
-		_cardInHand->perform(aHU,isNewDistributed);
-	}
-	else if(act==a_JUMP)
-	{
-		if(isNewDistributed) {
-            CardNode_t node;
-            node.kind    = (Card_t)_cardInHand->back()->kind;
-            node.canPlay = false;
-			node.status  = sFREE;
-            
-			_cardInHand->pop_back();
-            _cardInHand->insert_card(node,1);
-		}
-	}
-
+    _cardInHand->perform((ActionId_t)act,isNewDistributed);
 	return ar_DONE;
 }
 
