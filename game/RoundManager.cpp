@@ -263,7 +263,7 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
-    
+
     _continue_gang_times = 0;
     _lastAction=a_PENG;
     
@@ -273,6 +273,10 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     RecordOutCard(pengCard);
     RecordOutCard(pengCard);
 
+    if(dir==MIDDLE) {
+        _isMyShowTime = true;
+    }
+    
     prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
 
