@@ -93,7 +93,7 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
         if( !cards->IsKouInclude(kind) ) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
-            if(cards->find_cards(cardIdx, kind)==3 
+            if(cards->find_free_cards(cardIdx, kind)==3 
                 &&_roundManager->_players[dir]->_cards->can_kou(kind,dir,(Card_t)_roundManager->_otherHandedOut)) {
                 cards->AddKouGroup(kind,cardIdx);
             }

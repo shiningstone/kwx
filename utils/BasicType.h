@@ -32,6 +32,8 @@ typedef enum {
     aKOU_CANCEL= 0x80,
 }ActionId_t;/*ARRAY_ACTION???*/
 
+typedef INT32U ActionMask_t;
+
 typedef enum {
     TIAO_1,
     TIAO_2,

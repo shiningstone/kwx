@@ -38,6 +38,7 @@ public:
     int  last() const;
     int  get_num(Card_t kind) const;
     int  get_idx_in_group(int idxInHand) const;
+    int  find_cards(int idx[],Card_t kind,int start = 0) const;
 
 
 	void   show();
@@ -65,6 +66,7 @@ public:
 
     bool   is_wait_handout() const;
     void   perform(ActionId_t act);
+    int    find_free_cards(int cardIdx[],Card_t card) const;
 
     int          FreeStart;
     bool         IsMing;
@@ -93,7 +95,6 @@ public:
     
     bool IsKouInclude(Card_t kind) const;
     void AddKouGroup(Card_t kind,int *idx);
-    int  find_cards(int cardIdx[],Card_t card) const;
     void SetGroupStatus(int gIdx,CardStatus_t status);
     void ClearKouCardInfo();
 
@@ -109,6 +110,11 @@ public:
     void del_effect_card();
 
     /***************************************************
+            strategy
+    ***************************************************/
+    ActionMask_t judge_action(bool isNewDistribute, bool isLast) const;
+    
+    /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
     void update_statistics(Card_t huKind);
@@ -118,7 +124,7 @@ public:
     void _JudgePengPengHu();
     void _SetHu(INT32U hu);
 
-    bool has_shou_gang(Card_t curActKind=CARD_UNKNOWN);
+    bool has_shou_gang() const;
     bool can_hu(Card_t newCard) const;
     bool can_hu(int position, int newKind) const;
     bool can_kou(Card_t kouKind,PlayerDir_t dir=MIDDLE,Card_t otherHandedOut=CARD_UNKNOWN/*should provided when non-MIDDLE*/) const;

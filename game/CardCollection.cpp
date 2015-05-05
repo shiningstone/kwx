@@ -84,6 +84,18 @@ int CardList::get_num(Card_t kind) const {
     return num;
 }
 
+int CardList::find_cards(int idx[],Card_t kind,int start) const {
+    int num = 0;
+    
+    for(int i=start; i<size(); i++) {   
+        if(get_kind(i)==kind) {
+            idx[num++] = i;
+        }
+    }
+
+    return num;
+}
+
 int CardList::get_idx_in_group(int idxInHand) const {
     Card_t kind = get_kind(idxInHand);
 
@@ -231,6 +243,30 @@ bool CardInHand::is_wait_handout() const {
     }
 }
 
+Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group*/
+    for(int i=FreeStart; i<size(); i++) {
+        int matchNum = find_free_cards(cardIdx,get_kind(i));
+
+        if(matchNum==4) {
+            return get_kind(i);
+        }
+    }
+    
+    return CARD_UNKNOWN;
+}
+
+int CardInHand::find_free_cards(int idx[],Card_t kind) const {
+    int num = 0;
+    
+    for(int i=FreeStart; i<size(); i++) {   
+        if(get_kind(i)==kind) {
+            idx[num++] = i;
+        }
+    }
+
+    return num;
+}
+
 void CardInHand::perform(ActionId_t act) {
     if(act==aAN_GANG) {
         int cardIdx[4] = {0};
@@ -283,40 +319,6 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
         return size();
     }
 }
-
-Card_t CardInHand::_FindGangCard(int cardIdx[]) const{/*BUG : always first group*/
-    for(int i=FreeStart; i<size(); i++) {
-        cardIdx[0] = i;
-        int matchCardNum = 1;
-            
-        for(int j=i+1; j<size(); j++) {
-            if(get_kind(i)==get_kind(j)) {
-                cardIdx[matchCardNum++] = j;
-
-                if(matchCardNum==4) {
-                    return get_kind(cardIdx[0]);
-                }
-            } else {
-                break;
-            }
-        }
-    }
-    
-    return CARD_UNKNOWN;
-}
-
-int CardInHand::find_cards(int idx[],Card_t kind) const {
-    int num = 0;
-    
-    for(int i=FreeStart; i<size(); i++) {   
-        if(get_kind(i)==kind) {
-            idx[num++] = i;
-        }
-    }
-
-    return num;
-}
-
 
 /***************************************************
         kou cards info
@@ -407,7 +409,7 @@ int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
 
 SmartList CardInHand::_Exclude(Card_t kouKind) const {
     int kouIdx[4];
-    find_cards(kouIdx,kouKind);
+    find_free_cards(kouIdx,kouKind);
 
     SmartList  freeCards(*this,true);
 
@@ -504,7 +506,7 @@ void CardInHand::_JudgePengPengHu() {
     }
 }
 
-bool CardInHand::has_shou_gang(Card_t curActKind) {/*BUG??? : should compare with current gang card's kind*/
+bool CardInHand::has_shou_gang() const {/*BUG??? : should compare with current gang card's kind*/
     int cardIdx[4] = {0};
     Card_t kind = _FindGangCard(cardIdx);
     
@@ -562,6 +564,68 @@ bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) c
 	return false;
 }
 
+/***************************************************
+        strategy
+***************************************************/
+ActionMask_t CardInHand::judge_action(bool isNewDistributed, bool isLastOne) const {
+    Card_t       newCard = get_kind(last());
+    ActionMask_t act = 0;
+        
+	if(!IsMing) {
+        if( has_shou_gang() && isNewDistributed && !isLastOne ) {
+            act |= aSHOU_GANG;
+		}
+
+        int freeNum = 0;
+		for(int i=0;i<last();i++) {
+			if(get_kind(i)==newCard) {
+				if(get_status(i)==sPENG) {
+					if(isNewDistributed&&!isLastOne) {
+						act |= aMING_GANG;
+                        break;
+					}
+				} else if(get_status(i)==sFREE) {
+					freeNum++;
+				}
+			}
+		}
+
+        if(freeNum==3) {
+            if(isNewDistributed) {
+                if(!isLastOne) {
+                    act |= (aMING_GANG | aAN_GANG);
+                }
+            } else {
+                if(!isLastOne) {
+                    act |= (aMING_GANG | aPENG);
+                } else {
+                    act |= aPENG;
+                }
+            }
+        } else if(freeNum==2&&!isNewDistributed) {
+        	act |= aPENG;
+        }
+	} else {
+		for(int i=0;i<FreeStart;i++) {
+			if(get_status(i)==sMING_KOU && get_kind(i)==newCard) {
+				if(!isLastOne) {
+					if(isNewDistributed)
+						act |= (aMING_GANG | aAN_GANG);
+					else
+						act |= aMING_GANG;
+				}
+                
+				break;
+			}
+        }
+	}
+
+	return act;
+}
+
+/***************************************************
+        antificial intelligence (for single-game only)
+***************************************************/
 void CardInHand::_SetHu(INT32U hu) {
     _set(statHuFanMask,hu);
 }
