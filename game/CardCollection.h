@@ -101,10 +101,15 @@ public:
     int statHuFanMask;
 
     /***************************************************
+            robot interface
+    ***************************************************/
+    void         choose_all_kou_cards(Card_t handingout);
+    
+    /***************************************************
             kou cards info
     ***************************************************/
     void         scan_kou_cards(Card_t handingout = CARD_UNKNOWN/* it is not necessary for MIDDLE */);
-
+    
     int          kou_cards_num() const;
 
     int          kou_group_num() const;

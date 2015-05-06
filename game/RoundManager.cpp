@@ -712,11 +712,7 @@ void RoundManager::WaitForOthersChoose() {
     
     if ( canKou ) {
         _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);
-        
-        _players[_curPlayer]->_cards->scan_kou_cards(_otherHandedOut);
-        if(_players[_curPlayer]->_cards->kou_group_num()>0) {
-            _ai->MingKouChoose((PlayerDir_t)_curPlayer);
-        }
+        _players[_curPlayer]->_cards->choose_all_kou_cards(_otherHandedOut);
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));

@@ -595,6 +595,16 @@ void CardInHand::scan_kou_cards(Card_t handingout) {
     }
 }
 
+void CardInHand::choose_all_kou_cards(Card_t handingout) {
+    scan_kou_cards(handingout);
+
+	for(int i=0;i<kou_group_num();i++) {
+		if(can_kou(KouGroupKind(i),handingout)) {
+		    SetGroupStatus(i,sMING_KOU);
+		}
+	}
+}
+
 void CardInHand::clear_kou_choices() {
     for(int i=0;i<_bufKouCards.num;i++) {
         SetGroupStatus(i,sFREE);
