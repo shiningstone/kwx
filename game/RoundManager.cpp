@@ -107,7 +107,6 @@ void RoundManager::RenewOutCard() {
 ***********************************************/
 #include "NetRole.h"
 #include "NetPlayer.h"
-#include "NetRaceRound.h"
 
 void RoundManager::InitPlayers() {
 	_players[0] = new NetPlayer();

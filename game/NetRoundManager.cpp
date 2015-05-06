@@ -8,8 +8,8 @@ USING_NS_CC;
 #include "./../protocol/KwxMessenger.h"
 
 #include "RaceType.h"
-#include "NetRaceRound.h"
 
+#include "CardCollection.h"
 #include "NetRole.h"
 #include "NetRaceLayer.h"
 #include "RoundManager.h"
@@ -54,7 +54,6 @@ NetRoundManager::~NetRoundManager() {
 ***********************************************/
 #include "NetRole.h"
 #include "NetPlayer.h"
-#include "NetRaceRound.h"
 
 void NetRoundManager::InitPlayers() {
 	_players[0] = new NetPlayer();
