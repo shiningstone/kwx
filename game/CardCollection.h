@@ -74,8 +74,8 @@ public:
     bool         IsMing;
     ROBOT_TARGET aim;
 
-    Card_t FindGangCards(int cardIdx[]) const;
-    Card_t FindMingGangCards(int idx[],Card_t kind) const;
+    Card_t find_an_gang_cards(int cardIdx[]) const;
+    Card_t find_ming_gang_cards(int idx[],Card_t kind) const;
     /***************************************************
             action
     ***************************************************/

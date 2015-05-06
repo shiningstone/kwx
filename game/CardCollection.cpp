@@ -243,7 +243,7 @@ bool CardInHand::is_wait_handout() const {
     }
 }
 
-Card_t CardInHand::FindGangCards(int cardIdx[]) const{/*BUG : always first group*/
+Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first group*/
     for(int i=FreeStart; i<size(); i++) {
         int matchNum = FindCards(cardIdx,get_kind(i),i);
 
@@ -255,7 +255,7 @@ Card_t CardInHand::FindGangCards(int cardIdx[]) const{/*BUG : always first group
     return CARD_UNKNOWN;
 }
 
-Card_t CardInHand::FindMingGangCards(int idx[],Card_t kind) const{
+Card_t CardInHand::find_ming_gang_cards(int idx[],Card_t kind) const{
     if(FindCards(idx,kind)==4) {
         return kind;
     } else {
@@ -270,7 +270,7 @@ int CardInHand::find_free_cards(int idx[],Card_t kind) const {
 void CardInHand::_AnGang(Card_t card) {
     int cardIdx[4] = {0};
 
-    Card_t kind = (card==CARD_UNKNOWN) ? FindGangCards(cardIdx) : card;
+    Card_t kind = (card==CARD_UNKNOWN) ? find_an_gang_cards(cardIdx) : card;
     
     CardNode_t gangCard;
     gangCard.kind    = kind;
@@ -317,7 +317,7 @@ void CardInHand::_MingGang(Card_t kind) {
 
 void CardInHand::_ShouGang() {
     int gangIdx[4];
-    Card_t kind = FindGangCards(gangIdx);
+    Card_t kind = find_an_gang_cards(gangIdx);
 
     CardNode_t node;
     node.kind    = kind;
@@ -732,7 +732,7 @@ void CardInHand::_JudgePengPengHu() {
 
 bool CardInHand::has_shou_gang() const {/*BUG??? : should compare with current gang card's kind*/
     int cardIdx[4] = {0};
-    Card_t kind = FindGangCards(cardIdx);
+    Card_t kind = find_an_gang_cards(cardIdx);
     
     if(kind!=CARD_UNKNOWN) {
         return true;

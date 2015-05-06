@@ -633,7 +633,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold = aSHOU_GANG;
 		}
         
-        gangCard = cards->FindGangCards(gangCardIdx);
+        gangCard = cards->find_an_gang_cards(gangCardIdx);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(gangCard,c_AN_GANG);
@@ -674,7 +674,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard( gangCard );
 		}
 
-        gangCard = cards->FindMingGangCards(gangCardIdx,gangCard);
+        gangCard = cards->find_ming_gang_cards(gangCardIdx,gangCard);
         _uiManager->GangEffect(dir,gangCard,gangCardIdx,false,prevPlayer);
 	}
     

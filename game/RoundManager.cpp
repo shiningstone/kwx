@@ -333,7 +333,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold = aSHOU_GANG;
 		}
         
-        card = cards->FindGangCards(gangCardIdx);
+        card = cards->find_an_gang_cards(gangCardIdx);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -363,7 +363,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(cards->get_kind(cards->last()));
 		}
 
-        card = cards->FindMingGangCards(gangCardIdx,card);
+        card = cards->find_ming_gang_cards(gangCardIdx,card);
         _uiManager->GangEffect(dir,GangCard,gangCardIdx,false,prevPlayer);
 	}
 }
@@ -659,7 +659,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        Card_t card = cards->FindGangCards(gangIdx);
+        Card_t card = cards->find_an_gang_cards(gangIdx);
 
         if( !IsTing(dir) ) {
             SetEffectCard(card,c_AN_GANG);
@@ -690,7 +690,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        GangCard = cards->FindMingGangCards(gangIdx,GangCard);
+        GangCard = cards->find_ming_gang_cards(gangIdx,GangCard);
         _uiManager->_MingGangEffect(dir,prevPlayer,GangCard,gangIdx);
     }
     else if(_actionToDo&a_MING) {
