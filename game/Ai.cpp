@@ -82,30 +82,11 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 /*************************************
         kou card info
 *************************************/
-void Ai::KouCardCheck(PlayerDir_t dir) {
-    CardInHand *cards = _roundManager->_players[dir]->_cards;
-
-    cards->ClearKouCardInfo();
-        
-    for(int i=cards->FreeStart; i<cards->size(); i++){
-        auto kind = cards->get_kind(i);
-        
-        if( !cards->IsKouInclude(kind) ) {
-            int cardIdx[4] = {-1,-1,-1,-1};
-            
-            if(cards->find_free_cards(cardIdx, kind)==3 
-                &&_roundManager->_players[dir]->_cards->can_kou(kind,dir,(Card_t)_roundManager->_otherHandedOut)) {
-                cards->AddKouGroup(kind,cardIdx);
-            }
-        }
-    }
-}
-
 void Ai::MingKouChoose(PlayerDir_t dir) {
     CardInHand *cards = _roundManager->_players[dir]->_cards;
     
 	for(int i=0;i<cards->kou_group_num();i++) {
-		if(_roundManager->_players[dir]->_cards->can_kou(cards->KouGroupKind(i),dir,(Card_t)_roundManager->_otherHandedOut)) {
+		if(_roundManager->_players[dir]->_cards->can_kou(cards->KouGroupKind(i),(Card_t)_roundManager->_otherHandedOut)) {
 		    cards->SetGroupStatus(i,sMING_KOU);
 		}
 	}

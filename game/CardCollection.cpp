@@ -770,38 +770,6 @@ bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
 	return false;
 }
 
-bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) const {
-    SmartList newCards = _Exclude(kouKind);
-    
-	if(dir==MIDDLE) {
-		for(int i=0;i<newCards.len;i++) {
-			for(int k=0;k<CARD_KIND_MAX;k++) {
-                SmartList cards(newCards);
-                cards.displace(i,(Card_t)k);
-				if(cards.can_hu()) {
-					return true;
-                }
-			}
-        }
-	} else {
-		for(int i=0;i<newCards.len;i++) {
-			if(newCards.kind[i]==otherHandedOut) {
-                for(int k=0;k<CARD_KIND_MAX;k++) {
-                    SmartList cards(newCards);
-                    cards.displace(i,(Card_t)k);
-                    if(cards.can_hu()) {
-                        return true;
-                    }
-                }
-
-                return false;
-			}
-		}
-	}
-    
-	return false;
-}
-
 /***************************************************
         strategy
 ***************************************************/

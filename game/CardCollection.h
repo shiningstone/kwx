@@ -151,7 +151,6 @@ public:
     bool can_hu(Card_t newCard) const;
     bool can_hu(int position, int newKind) const;
     bool can_kou(Card_t kouKind,Card_t handingout=CARD_UNKNOWN) const;
-    bool can_kou(Card_t kouKind,PlayerDir_t dir=MIDDLE,Card_t handingout=CARD_UNKNOWN/*should provided when non-MIDDLE*/) const;
     
     ROBOT_TARGET assess_aim();
     bool is_aim_limit(unsigned int act, Card_t kind) const;

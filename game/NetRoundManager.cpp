@@ -784,7 +784,7 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
 	_actionToDo=a_MING;
 
     if(!isFromKouStatus) {
-        _ai->KouCardCheck((PlayerDir_t)_curPlayer);
+        _players[MIDDLE]->_cards->scan_kou_cards();
         if(_players[MIDDLE]->_cards->kou_group_num()>0) {
             _uiManager->QueryKouCards();
         } else {
