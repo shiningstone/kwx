@@ -20,11 +20,7 @@ private:
     
     void _CollectResouce(HAH *res);
 
-/*************************************
-        kou card info
-*************************************/
 public:
-    void MingKouChoose(PlayerDir_t dir);
 /*************************************
         round info
 *************************************/

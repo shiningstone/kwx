@@ -80,19 +80,6 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 }
 
 /*************************************
-        kou card info
-*************************************/
-void Ai::MingKouChoose(PlayerDir_t dir) {
-    CardInHand *cards = _roundManager->_players[dir]->_cards;
-    
-	for(int i=0;i<cards->kou_group_num();i++) {
-		if(_roundManager->_players[dir]->_cards->can_kou(cards->KouGroupKind(i),(Card_t)_roundManager->_otherHandedOut)) {
-		    cards->SetGroupStatus(i,sMING_KOU);
-		}
-	}
-}
-
-/*************************************
         card process
 *************************************/
 Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isNewDistributed) {
