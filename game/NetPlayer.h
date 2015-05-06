@@ -7,8 +7,6 @@
 #include "RaceType.h"
 
 #include "NetRole.h"
-#include "NetRaceRound.h"
-#include "DataBase.h"
 
 class Logger;
 class NetPlayer:public NetRole

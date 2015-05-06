@@ -4,6 +4,7 @@
 #include "RaceType.h"
 #include "Raction.h"
 
+#include "CardCollection.h"
 #include "NetRole.h"
 #include "NetRaceLayer.h"
 #include "RoundManager.h"

@@ -1,7 +1,8 @@
 
-#include "NetPlayer.h"
-
 #include "./../utils/LogManager.h"
+
+#include "CardCollection.h"
+#include "NetPlayer.h"
 
 USING_NS_CC;
 

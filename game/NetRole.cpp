@@ -1,4 +1,7 @@
 
+#include "./../utils/LogManager.h"
+
+#include "CardCollection.h"
 #include "NetRole.h"
 
 NetRole::NetRole() {
