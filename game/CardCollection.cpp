@@ -567,6 +567,34 @@ void CardInHand::switch_group_status(int gIdx) {
     }
 }
 
+void CardInHand::refresh_kou_cards() {
+    for( int group=0; group<kou_group_num(); group++ ) {
+        if(kou_group_status(group)!=sMING_KOU) {
+            if( can_kou(KouGroupKind(group)) ) {
+                SetGroupStatus(group,sKOU_ENABLE);
+            } else {
+                SetGroupStatus(group,sFREE);
+            }
+        }
+    }
+}
+
+void CardInHand::scan_kou_cards(Card_t handingout) {
+    ClearKouCardInfo();
+        
+    for(int i=FreeStart; i<size(); i++){
+        auto kind = get_kind(i);
+        
+        if( !IsKouInclude(kind) ) {
+            int cardIdx[4] = {-1,-1,-1,-1};
+            
+            if(find_free_cards(cardIdx, kind)==3  && can_kou(kind,handingout)) {
+                AddKouGroup(kind,cardIdx);
+            }
+        }
+    }
+}
+
 void CardInHand::clear_kou_choices() {
     for(int i=0;i<_bufKouCards.num;i++) {
         SetGroupStatus(i,sFREE);
@@ -708,6 +736,38 @@ bool CardInHand::can_hu(int position, int newKind) const {
     cards.displace(position-FreeStart,(Card_t)newKind);
 
     return cards.can_hu();
+}
+
+bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
+    SmartList newCards = _Exclude(kouKind);
+    
+	if(handingout==CARD_UNKNOWN) {
+		for(int i=0;i<newCards.len;i++) {
+			for(int k=0;k<CARD_KIND_MAX;k++) {
+                SmartList cards(newCards);
+                cards.displace(i,(Card_t)k);
+				if(cards.can_hu()) {
+					return true;
+                }
+			}
+        }
+	} else {
+		for(int i=0;i<newCards.len;i++) {
+			if(newCards.kind[i]==handingout) {
+                for(int k=0;k<CARD_KIND_MAX;k++) {
+                    SmartList cards(newCards);
+                    cards.displace(i,(Card_t)k);
+                    if(cards.can_hu()) {
+                        return true;
+                    }
+                }
+
+                return false;
+			}
+		}
+	}
+    
+	return false;
 }
 
 bool CardInHand::can_kou(Card_t kouKind,PlayerDir_t dir,Card_t otherHandedOut) const {

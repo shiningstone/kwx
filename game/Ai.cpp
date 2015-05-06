@@ -101,20 +101,6 @@ void Ai::KouCardCheck(PlayerDir_t dir) {
     }
 }
 
-void Ai::Refresh() {
-    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
-    
-    for( int group=0; group<cards->kou_group_num(); group++ ) {
-        if(cards->kou_group_status(group)!=sMING_KOU) {
-            if( _roundManager->_players[MIDDLE]->_cards->can_kou(cards->KouGroupKind(group)) ) {
-                cards->SetGroupStatus(group,sKOU_ENABLE);
-            } else {
-                cards->SetGroupStatus(group,sFREE);
-            }
-        }
-    }
-}
-
 void Ai::MingKouChoose(PlayerDir_t dir) {
     CardInHand *cards = _roundManager->_players[dir]->_cards;
     

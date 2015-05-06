@@ -24,7 +24,6 @@ private:
         kou card info
 *************************************/
 public:
-    void Refresh();
     void KouCardCheck(PlayerDir_t dir);
     void MingKouChoose(PlayerDir_t dir);
 /*************************************

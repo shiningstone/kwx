@@ -4067,7 +4067,7 @@ void NetRaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
         cards->switch_group_status(groupChosen);
     }
 
-    _ai->Refresh();
+    cards->refresh_kou_cards();
     
     for(int group=0;group<cards->kou_group_num();group++) {
         for(int i=0;i<3;i++) {

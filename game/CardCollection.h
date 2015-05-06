@@ -103,12 +103,15 @@ public:
     /***************************************************
             kou cards info
     ***************************************************/
+    void         scan_kou_cards(Card_t handingout = CARD_UNKNOWN/* it is not necessary for MIDDLE */);
+
     int          kou_cards_num() const;
 
     int          kou_group_num() const;
     CardStatus_t kou_group_status(int gIdx) const;
     int          kou_card_index(int gIdx,int cIdx) const;
     void         switch_group_status(int gIdx);
+    void         refresh_kou_cards();
     void         clear_kou_choices();
     int          get_kou_kinds(Card_t kouKind[]) const;
     Card_t       KouGroupKind(int gIdx) const;
@@ -147,7 +150,8 @@ public:
     bool has_shou_gang() const;
     bool can_hu(Card_t newCard) const;
     bool can_hu(int position, int newKind) const;
-    bool can_kou(Card_t kouKind,PlayerDir_t dir=MIDDLE,Card_t otherHandedOut=CARD_UNKNOWN/*should provided when non-MIDDLE*/) const;
+    bool can_kou(Card_t kouKind,Card_t handingout=CARD_UNKNOWN) const;
+    bool can_kou(Card_t kouKind,PlayerDir_t dir=MIDDLE,Card_t handingout=CARD_UNKNOWN/*should provided when non-MIDDLE*/) const;
     
     ROBOT_TARGET assess_aim();
     bool is_aim_limit(unsigned int act, Card_t kind) const;
