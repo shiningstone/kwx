@@ -333,7 +333,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold = aSHOU_GANG;
 		}
         
-        card = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
+        card = cards->FindGangCards(gangCardIdx);
         
 		if( !IsTing(_curPlayer) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -363,7 +363,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(cards->get_kind(cards->last()));
 		}
 
-        card = _ai->FindGangCards(gangCardIdx,cards,GangCard,_actionToDo,IsTing(dir),_isNewDistributed);
+        card = cards->FindMingGangCards(gangCardIdx,card);
         _uiManager->GangEffect(dir,GangCard,gangCardIdx,false,prevPlayer);
 	}
 }
@@ -659,7 +659,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         }
 
         int* gangIdx=new int[4];
-        Card_t card = _ai->FindGangCards(gangIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
+        Card_t card = cards->FindGangCards(gangIdx);
 
         if( !IsTing(dir) ) {
             SetEffectCard(card,c_AN_GANG);
@@ -685,11 +685,12 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
             
             _curPlayer=dir;
         }else {
-            RecordOutCard(cards->get_kind(cards->last()));
+            GangCard = cards->get_kind(cards->last());/*BUG : what if I have gang cards but do not act gang*/
+            RecordOutCard(GangCard);
         }
 
         int* gangIdx=new int[4];
-        _ai->FindGangCards(gangIdx,cards,GangCard,_actionToDo,IsTing(dir),_isNewDistributed);
+        GangCard = cards->FindMingGangCards(gangIdx,GangCard);
         _uiManager->_MingGangEffect(dir,prevPlayer,GangCard,gangIdx);
     }
     else if(_actionToDo&a_MING) {

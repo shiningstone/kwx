@@ -255,6 +255,14 @@ Card_t CardInHand::FindGangCards(int cardIdx[]) const{/*BUG : always first group
     return CARD_UNKNOWN;
 }
 
+Card_t CardInHand::FindMingGangCards(int idx[],Card_t kind) const{
+    if(FindCards(idx,kind)==4) {
+        return kind;
+    } else {
+        return CARD_UNKNOWN;
+    }
+}
+
 int CardInHand::find_free_cards(int idx[],Card_t kind) const {
     return FindCards(idx,kind,FreeStart);
 }

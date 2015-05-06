@@ -82,55 +82,6 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 /*************************************
         card process
 *************************************/
-Card_t Ai::FindGangCards(int cardIdx[4],CardInHand *cards,Card_t target,int gangType,bool isTing,bool isNewDistributed) {
-    if( gangType & a_AN_GANG || gangType & a_SHOU_GANG ) {
-        if(!isTing) {
-            /*BUG here : only the first group can be found*/
-            for(int i=cards->FreeStart; i<cards->size(); i++) {
-                int matchCardNum = 0;
-                cardIdx[0]       = i;
-                
-                for(int j=i+1; j<cards->size(); j++) {
-                    if(cards->get_kind(i)==cards->get_kind(j)) {
-                        matchCardNum++;
-                        cardIdx[matchCardNum] = j;
-                        
-                        if(matchCardNum==3) {
-                            return cards->get_kind(i);
-                        }
-                    }
-                }
-            }
-        } else {
-            cardIdx[3] = cards->size()-1;
-        
-            int p = 0;
-            for(int i=0; i<cards->FreeStart; i++){
-                if(cards->get_kind(i)==cards->get_kind(cardIdx[3])) {
-                    cardIdx[p++]=i;
-                    if(p==3) {
-                        return cards->get_kind(i);
-                    }
-                }
-            }
-        }
-    } else {
-		int last = isNewDistributed ? (cards->size()-1) : (cards->size());
-
-        int matchCardNum = 0;
-		for(int i=0;i<last;i++) {
-			if(target==cards->get_kind(i)) {
-                cardIdx[matchCardNum++] = i;
-                
-                if(matchCardNum==3) {
-                    return target;
-                }
-			}
-		}
-    }
-
-    return CARD_UNKNOWN;
-}
 
 int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isNewDistributed,int gang4) {
     int newChosen = 0;

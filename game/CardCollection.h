@@ -74,12 +74,12 @@ public:
     bool         IsMing;
     ROBOT_TARGET aim;
 
+    Card_t FindGangCards(int cardIdx[]) const;
+    Card_t FindMingGangCards(int idx[],Card_t kind) const;
     /***************************************************
             action
     ***************************************************/
 private:
-    Card_t FindGangCards(int cardIdx[]) const;
-
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind);
     void   _ShouGang();
