@@ -353,7 +353,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 _lastActionSource=dir;
                 _actionToDo=a_MING_GANG;
                 _lastAction=a_MING_GANG;
-                _lastActionWithGold=a_MING_GANG;
+                _lastActionWithGold=aMING_GANG;
                 
                 if(!_isNewDistributed) {
                     _players[_curPlayer]->_river->pop_back();
@@ -387,11 +387,11 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 if(_actionToDo&a_AN_GANG) {
                     _actionToDo=a_AN_GANG;
                     _lastAction=a_AN_GANG;
-                    _lastActionWithGold=a_AN_GANG;
+                    _lastActionWithGold=aAN_GANG;
                 } else if(_actionToDo&a_SHOU_GANG) {
                     _actionToDo=a_SHOU_GANG;
                     _lastAction=a_SHOU_GANG;
-                    _lastActionWithGold=a_SHOU_GANG;
+                    _lastActionWithGold = aSHOU_GANG;
                 }
                 
                 int *gangCardIdx = new int(4);
@@ -441,7 +441,7 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     }
 
     if(_isQiangGangAsking) {
-        _lastActionWithGold = a_QIANG_GANG;
+        _lastActionWithGold = aQIANG_GANG;
     }
 
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
@@ -626,11 +626,11 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 		if(_actionToDo&a_AN_GANG) {
 			_actionToDo=a_AN_GANG;
 			_lastAction=a_AN_GANG;
-			_lastActionWithGold=a_AN_GANG;
+			_lastActionWithGold = aAN_GANG;
 		} else if(_actionToDo&a_SHOU_GANG) {
 			_actionToDo=a_SHOU_GANG;
 			_lastAction=a_SHOU_GANG;
-			_lastActionWithGold=a_SHOU_GANG;
+			_lastActionWithGold = aSHOU_GANG;
 		}
         
         gangCard = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
@@ -645,7 +645,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 		_lastActionSource=dir;
 		_actionToDo=a_MING_GANG;
 		_lastAction=a_MING_GANG;
-		_lastActionWithGold=a_MING_GANG;
+		_lastActionWithGold = aMING_GANG;
 
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         

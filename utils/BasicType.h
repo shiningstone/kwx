@@ -30,6 +30,9 @@ typedef enum {
     aSHOU_GANG = 0x20,
     aKOU       = 0x40,
     aKOU_CANCEL= 0x80,
+
+    aQIANG_GANG= 0xfd,
+    aTING      = 0xfe,
 }ActionId_t;/*ARRAY_ACTION???*/
 
 typedef INT32U ActionMask_t;

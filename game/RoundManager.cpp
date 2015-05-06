@@ -168,7 +168,7 @@ int RoundManager::Shuffle() {
 	_actionToDo=a_JUMP;
 	_continue_gang_times=0;
     _lastAction = INVALID;
-    _lastActionWithGold = INVALID;
+    _lastActionWithGold = aQi;
     _lastActionSource = INVALID;
 
     _curPlayer = GetLastWinner();
@@ -291,7 +291,7 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
     }
 
     if(_isQiangGangAsking) {
-        _lastActionWithGold = a_QIANG_GANG;
+        _lastActionWithGold = aQIANG_GANG;
     }
 
     if(_isDoubleHuAsking) {
@@ -326,11 +326,11 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		if(_actionToDo&a_AN_GANG) {
 			_actionToDo=a_AN_GANG;
 			_lastAction=a_AN_GANG;
-			_lastActionWithGold=a_AN_GANG;
+			_lastActionWithGold = aAN_GANG;
 		} else if(_actionToDo&a_SHOU_GANG) {
 			_actionToDo=a_SHOU_GANG;
 			_lastAction=a_SHOU_GANG;
-			_lastActionWithGold=a_SHOU_GANG;
+			_lastActionWithGold = aSHOU_GANG;
 		}
         
         card = _ai->FindGangCards(gangCardIdx,cards,CARD_UNKNOWN,_actionToDo,IsTing(dir),_isNewDistributed);
@@ -345,7 +345,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		_lastActionSource=dir;
 		_actionToDo=a_MING_GANG;
 		_lastAction=a_MING_GANG;
-		_lastActionWithGold=a_MING_GANG;
+		_lastActionWithGold = aMING_GANG;
 
 		Card_t GangCard;
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
@@ -434,7 +434,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
         false,
-        a_QIANG_GANG,
+        aQIANG_GANG,
         _continue_gang_times,
         _isGangHua
     );
@@ -445,7 +445,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
         false,
-        a_QIANG_GANG,
+        aQIANG_GANG,
         _continue_gang_times,
         _isGangHua
     );
@@ -464,7 +464,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         }
 
         _isDoubleHuAsking = true;
-        _lastActionWithGold=a_QIANG_GANG;
+        _lastActionWithGold = aQIANG_GANG;
 
         _uiManager->DoubleWin(win);
 	} else if(action1&a_HU||action2&a_HU) {
@@ -479,7 +479,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
             _actionToDo=action2;
 
         _isQiangGangAsking=true;
-        _lastActionWithGold=a_QIANG_GANG;
+        _lastActionWithGold = aQIANG_GANG;
         
         _uiManager->SingleWin(win);
 	} else {
@@ -652,11 +652,11 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         if(_actionToDo&a_AN_GANG) {
             _actionToDo=a_AN_GANG;
             _lastAction=a_AN_GANG;
-            _lastActionWithGold=a_AN_GANG;
+            _lastActionWithGold = aAN_GANG;
         } else if(_actionToDo&a_SHOU_GANG) {
             _actionToDo=a_SHOU_GANG;
             _lastAction=a_SHOU_GANG;
-            _lastActionWithGold=a_SHOU_GANG;
+            _lastActionWithGold = aSHOU_GANG;
         }
 
         int* gangIdx=new int[4];
@@ -671,7 +671,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         _lastActionSource=dir;
         _actionToDo=a_MING_GANG;
         _lastAction=a_MING_GANG;
-        _lastActionWithGold=a_MING_GANG;
+        _lastActionWithGold = aMING_GANG;
 
         Card_t GangCard;
         PlayerDir_t prevPlayer = (PlayerDir_t)dir;
@@ -937,11 +937,11 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
 
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(_actionToDo&a_AN_GANG) {
-        _players[dir]->action(_isNewDistributed,a_AN_GANG);
+        _players[dir]->action(_isNewDistributed,aAN_GANG);
     } else if(_actionToDo&a_SHOU_GANG) {
-        _players[dir]->action(_isNewDistributed,a_SHOU_GANG);
+        _players[dir]->action(_isNewDistributed,aSHOU_GANG);
     } else {
-        _players[dir]->action(_isNewDistributed,action);
+        _players[dir]->action(_isNewDistributed,(ActionId_t)action);
     }
 }
 

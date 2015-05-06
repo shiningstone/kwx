@@ -64,12 +64,12 @@ unsigned char NetRole::init(Card_t cards[],int len,int aim) {
     if(len<14) {/*NON-ZHUANG*/
         return a_JUMP;
     } else {
-        return hand_in(cards[13],0,0,false,a_JUMP,0,false);
+        return hand_in(cards[13],0,0,false,aQi,0,false);
     }
 }
 
 #include "Ai.h"
-long NetRole::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+long NetRole::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cards->update_statistics(kind);
     _fan = _cards->statHuFanMask;
     
@@ -82,10 +82,10 @@ long NetRole::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,unsigne
 	}
 
 	if((continue_gang_times!=0)
-        &&(last_action_WithGold==a_MING_GANG
-            ||last_action_WithGold==a_AN_GANG
-            ||last_action_WithGold==a_QIANG_GANG)) {
-		if(isNewDistributed&&last_action_WithGold==a_QIANG_GANG)
+        &&(last_action_WithGold==aMING_GANG
+            ||last_action_WithGold==aAN_GANG
+            ||last_action_WithGold==aQIANG_GANG)) {
+		if(isNewDistributed&&last_action_WithGold==aQIANG_GANG)
 			_fan |= RH_QIANGGANG;
 		else if(isNewDistributed&&isGangHua)
 			_fan |= RH_GANGHUA;
@@ -121,7 +121,7 @@ ActionMask_t NetRole::ActiontodoCheckAgain() {
 	return res;
 }
 
-ActionMask_t NetRole::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+ActionMask_t NetRole::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cards->push_back((Card_t)newCard);
 
 	ActionMask_t actions = _cards->judge_action(isNewDistributed,isLastOne);
@@ -166,7 +166,7 @@ ACT_RES NetRole::others_action(bool isNewDistributed,ActionId_t act,Card_t kind)
 	return ar_DONE;
 }
 
-ACT_RES NetRole::action(bool isNewDistributed,ARRAY_ACTION act) {
+ACT_RES NetRole::action(bool isNewDistributed,ActionId_t act) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
     _cards->perform((ActionId_t)act,isNewDistributed);
 	return ar_DONE;

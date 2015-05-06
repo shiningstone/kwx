@@ -122,7 +122,7 @@ protected:
         
     Card_t  _lastHandedOutCard;
     int  _lastAction;
-    int  _lastActionWithGold;
+    ActionId_t  _lastActionWithGold;
     int  _lastActionSource;
 
     bool _isMyShowTime;

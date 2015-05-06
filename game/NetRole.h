@@ -26,14 +26,14 @@ public:
     /**************************************************
             user's action
     **************************************************/
-    long calcScore(Card_t kind,bool isNewDistributed,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
+    long calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//分数计算
     void taskCheck(unsigned int flag);
 
-    ActionMask_t hand_in(Card_t kind,bool isNewDistributed,bool tingStatus,bool is_last_one,unsigned char last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
+    ActionMask_t hand_in(Card_t kind,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     Card_t       hand_out(unsigned int place);
 	ActionMask_t ActiontodoCheckAgain();
 
-    ACT_RES action(bool isNewDistributed,ARRAY_ACTION act);
+    ACT_RES action(bool isNewDistributed,ActionId_t act);
     ACT_RES others_action(bool isNewDistributed,ActionId_t act,Card_t kind);
 
     HuTarget_t get_aim() const;
