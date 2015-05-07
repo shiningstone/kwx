@@ -345,7 +345,6 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		_lastAction=a_MING_GANG;
 		_lastActionWithGold = aMING_GANG;
 
-		Card_t GangCard;
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
 		if(!_isNewDistributed) {
