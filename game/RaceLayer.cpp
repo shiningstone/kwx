@@ -3,7 +3,7 @@
 #include "HelloWorldScene.h"
 #include "RoundManager.h"
 
-#include "NetPlayer.h"
+#include "PlayerOthers.h"
 
 using namespace cocos2d::ui;
 USING_NS_CC;

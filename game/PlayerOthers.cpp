@@ -2,23 +2,23 @@
 #include "./../utils/LogManager.h"
 
 #include "CardCollection.h"
-#include "NetPlayer.h"
+#include "PlayerOthers.h"
 
 USING_NS_CC;
 
-NetPlayer::NetPlayer() {
-    _logger = LOGGER_REGISTER("NetPlayer");
+PlayerOthers::PlayerOthers() {
+    _logger = LOGGER_REGISTER("PlayerOthers");
 }
 
-NetPlayer::NetPlayer(int id) {//this is for default settings ( robot ) 
+PlayerOthers::PlayerOthers(int id) {//this is for default settings ( robot ) 
     _logger = LOGGER_REGISTER("NetPlayer_%d");
 }
 
-NetPlayer::~NetPlayer() {
+PlayerOthers::~PlayerOthers() {
     LOGGER_DEREGISTER(_logger);
 }
 
-int NetPlayer::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int j,k;
 	for(j=0;j<len1;j++)
@@ -33,7 +33,7 @@ int NetPlayer::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIN
 	return -1;
 }
 
-int NetPlayer::river_reserved_card(HAH *hash_table,int card)
+int PlayerOthers::river_reserved_card(HAH *hash_table,int card)
 {
 	int num=0;
 	for(int i=0;i<hash_table->river_len;i++)
@@ -46,7 +46,7 @@ int NetPlayer::river_reserved_card(HAH *hash_table,int card)
 	return (4-num);
 }
 
-int NetPlayer::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
+int PlayerOthers::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 {
 	if(card_array->list[card].same_times==1||card_array->list[card].same_times==2)
 	{
@@ -85,7 +85,7 @@ int NetPlayer::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 	return -1;
 }
 
-int NetPlayer::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
 	int offset=color*9;
@@ -285,7 +285,7 @@ int NetPlayer::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_K
 	return chose_place;
 }
 
-int NetPlayer::Robot_pickup_for_sevencouples(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::Robot_pickup_for_sevencouples(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {	
 	int chose_place=-1;
 
@@ -371,7 +371,7 @@ int NetPlayer::Robot_pickup_for_sevencouples(HAH *card_array,CARD_KIND list1[],C
 	return chose_place;
 }
 
-int NetPlayer::Robot_pickup_for_fourpeng(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::Robot_pickup_for_fourpeng(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
 	
@@ -491,7 +491,7 @@ int NetPlayer::Robot_pickup_for_fourpeng(HAH *card_array,CARD_KIND list1[],CARD_
 	return chose_place;
 }
 
-int NetPlayer::Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
 	int index1=card_array->river_len-1;
@@ -577,7 +577,7 @@ int NetPlayer::Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KI
 	}
 	return chose_place;
 }
-int NetPlayer::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
 	
@@ -602,17 +602,17 @@ int NetPlayer::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND l
 	return chose_place;
 }
 
-void NetPlayer::set_robot_hu_target(ROBOT_TARGET par_target)
+void PlayerOthers::set_robot_hu_target(ROBOT_TARGET par_target)
 {
 	g_target=par_target;
 }
 
-ROBOT_TARGET NetPlayer::get_robot_hu_target()
+ROBOT_TARGET PlayerOthers::get_robot_hu_target()
 {
 	return g_target;
 }
 
-int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	//unsigned char ting_flag;
     int show_place = -1;
@@ -672,7 +672,7 @@ int NetPlayer::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list
 }
 
 #include "RoundManager.h"
-void NetPlayer::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,const RoundManager &context) const
+void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,const RoundManager &context) const
 {
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
@@ -702,7 +702,7 @@ void NetPlayer::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int
     }
 }
 
-int NetPlayer::choose_worst(const RoundManager &context,bool &canKou) const {
+int PlayerOthers::choose_worst(const RoundManager &context,bool &canKou) const {
     HAH *s_res = new HAH;
 	int index;
     

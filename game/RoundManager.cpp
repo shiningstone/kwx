@@ -104,12 +104,12 @@ void RoundManager::RenewOutCard() {
         player information
 ***********************************************/
 #include "Player.h"
-#include "NetPlayer.h"
+#include "PlayerOthers.h"
 
 void RoundManager::InitPlayers() {
-	_players[0] = new NetPlayer();
+	_players[0] = new PlayerOthers();
 	_players[1] = new Player();
-	_players[2] = new NetPlayer();
+	_players[2] = new PlayerOthers();
 
     Database *database = Database::getInstance();
 
@@ -710,7 +710,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 void RoundManager::WaitForOthersChoose() {
     bool canKou = false;
 
-	NetPlayer *player = static_cast<NetPlayer *>(_players[_curPlayer]);
+	PlayerOthers *player = static_cast<PlayerOthers *>(_players[_curPlayer]);
 	int index = player->choose_worst(*this,canKou);
     
     if ( canKou ) {

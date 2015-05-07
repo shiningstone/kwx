@@ -52,12 +52,12 @@ NetRoundManager::~NetRoundManager() {
         player information
 ***********************************************/
 #include "Player.h"
-#include "NetPlayer.h"
+#include "PlayerOthers.h"
 
 void NetRoundManager::InitPlayers() {
-	_players[0] = new NetPlayer();
+	_players[0] = new PlayerOthers();
 	_players[1] = new Player();
-	_players[2] = new NetPlayer();
+	_players[2] = new PlayerOthers();
 
     Database *database = Database::getInstance();
 

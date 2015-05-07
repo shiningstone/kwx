@@ -151,7 +151,7 @@ void test_basic() {
     发送消息实现
     消息格式 : lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00
 ****************************************************/
-#define WORKING_PATH "E:\\VisualProject\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
+#define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
 
 #include <stdio.h>
 

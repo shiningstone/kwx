@@ -1,20 +1,18 @@
 
-#ifndef __NET_PLAYER__
-#define __NET_PLAYER__
-
-/* This file is copied from Robot.h/Robot.cpp */
+#ifndef __PLAYER_OTHERS__
+#define __PLAYER_OTHERS__
 
 #include "RaceType.h"
 
 #include "Player.h"
 
 class Logger;
-class NetPlayer:public Player
+class PlayerOthers:public Player
 {
 	public:
-		NetPlayer();
-        NetPlayer(int id);
-		virtual ~NetPlayer();
+		PlayerOthers();
+        PlayerOthers(int id);
+		virtual ~PlayerOthers();
     private:
         Logger   *_logger;
 
@@ -37,4 +35,5 @@ class NetPlayer:public Player
 		int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 };
 
-#endif // __ROBOT_H__
+#endif 
+
