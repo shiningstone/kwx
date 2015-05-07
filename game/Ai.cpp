@@ -80,48 +80,6 @@ int Ai::ChooseWorstCard(bool &kouRequest) {
 }
 
 /*************************************
-        card process
-*************************************/
-
-int Ai::ReChooseAfterGang(int chosen,int gangIdx[3],bool isNewDistributed,int gang4) {
-    int newChosen = 0;
-
-    if(isNewDistributed) {
-        if(chosen>gangIdx[2]) {
-            newChosen = chosen + 1;
-        } else {
-            newChosen = chosen;
-        }
-    } else {
-        if(chosen<gangIdx[0]) {
-            newChosen = chosen + 4;
-        } else if(chosen==gangIdx[0]||chosen==gangIdx[1]||chosen==gangIdx[2]) {
-            newChosen = INVALID;
-        } else if(gang4!=INVALID && chosen==gang4) {
-            newChosen = INVALID;
-        } else {
-            newChosen = chosen + 1;
-        }
-    }
-
-    return newChosen;
-}
-
-int Ai::ReChooseAfterPeng(int chosen,int pengIdx[2]) {
-    int newChosen = 0;
-
-    if(chosen > pengIdx[1]) {
-        newChosen = chosen + 1;
-    } else if(chosen== pengIdx[1] || chosen==pengIdx[0]) {
-        newChosen = INVALID;
-    } else if(chosen<pengIdx[0]) {
-        newChosen = chosen + 3;
-    }
-
-    return newChosen;
-}
-
-/*************************************
         round info
 *************************************/
 void Ai::UpdateAtFirstRound(int &actionToDo) {

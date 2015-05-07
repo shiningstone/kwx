@@ -137,6 +137,8 @@ public:
     void add_effect_card();
     void del_effect_card();
 
+    static int rechoose_after_gang(int chosen,int gangIdx[3],bool isNewDistributed,int gang4=INVALID/* not necessary for MingGang*/);
+    static int rechoose_after_peng(int chosen,int pengIdx[2]);
     /***************************************************
             strategy
     ***************************************************/

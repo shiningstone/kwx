@@ -2682,7 +2682,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
 		int isChosenCanceled=0;
         
 		if(_myChosenCard!=INVALID) {
-            _myChosenCard = _ai->ReChooseAfterPeng(_myChosenCard,pengCard);
+            _myChosenCard = cards->rechoose_after_peng(_myChosenCard,pengCard);
             
             if(_myChosenCard==INVALID) {
                 isChosenCanceled = 1;
@@ -2959,7 +2959,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 				ifLeft=1;
 
             int oldChosen = _myChosenCard;
-            _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
+            _myChosenCard = cards->rechoose_after_gang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
 
             if(_myChosenCard==INVALID && oldChosen!=cards->last()) {
                 isChosenCanceled=1;
@@ -3299,7 +3299,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
                 ifLeft=1;
             }
 
-            _myChosenCard = _ai->ReChooseAfterGang(_myChosenCard,gang,_roundManager->_isNewDistributed);
+            _myChosenCard = cards->rechoose_after_gang(_myChosenCard,gang,_roundManager->_isNewDistributed);
             if(_myChosenCard==INVALID) {
                 isChosenCanceled=1;
             }
