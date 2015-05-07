@@ -14,18 +14,7 @@ public:
     int  ChooseWorstCard(bool &kouRequest);
 private:
     RoundManager *_roundManager;
-    
-    void _CollectResouce(HAH *res);
 
-public:
-
-/*************************************
-        game calculation
-*************************************/
-
-/***************************************
-        singleton
-***************************************/
 public:
     static Ai *getInstance(RoundManager *roundManager = NULL);
     static void  destroyInstance();

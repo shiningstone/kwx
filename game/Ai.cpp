@@ -5,7 +5,8 @@
 #include "RoundManager.h"
 #include "Ai.h"
 
-void Ai::_CollectResouce(HAH *res) {
+void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)
+{
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
 
@@ -16,18 +17,11 @@ void Ai::_CollectResouce(HAH *res) {
     for(int i=0;i<_roundManager->_gRiver->size();i++) {
 		res->card_in_river[res->river_len++] = (CARD_KIND)_roundManager->_gRiver->get_kind(i);
     }
-}
 
-void Ai::collect_resources(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2)
-{
-	_CollectResouce(res);
-
-    int curPlayer     = _roundManager->_curPlayer;
+    int     curPlayer = _roundManager->_curPlayer;
     CardInHand *cards = _roundManager->_players[curPlayer]->_cards;
 
-    _roundManager->_players[(curPlayer+1)%3]->_cards->collect_ming_info();
 	_roundManager->_players[(curPlayer+1)%3]->_cards->get_hu_cards(target1,len1);
-    _roundManager->_players[(curPlayer+2)%3]->_cards->collect_ming_info();
 	_roundManager->_players[(curPlayer+2)%3]->_cards->get_hu_cards(target2,len2);
 
     for(int i=cards->FreeStart;i<cards->size();i++) {

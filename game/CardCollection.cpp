@@ -1080,7 +1080,9 @@ bool CardInHand::can_handout(int idx) const {
     }
 }
 
-void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) const {
+void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) {
+    collect_ming_info();
+    
     if(_ting!=NULL) {
 	    *len = _ting->cardNum;
 

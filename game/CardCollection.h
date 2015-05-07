@@ -165,6 +165,7 @@ public:
     int GetCoupleNum() const;
 
     static long sum_up_score(unsigned int fan);
+    static long choose_smart(bool &canKou);
     /*********************************
             ming info
     *********************************/
@@ -173,7 +174,7 @@ public:
     long CalcTimes(Card_t kind);
     bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
     bool collect_ming_info(const CardList *river = NULL/*if don't care about remain number*/);
-    void get_hu_cards(CARD_KIND cards[],int *len) const;
+    void get_hu_cards(CARD_KIND cards[],int *len);
     bool can_handout(int idx) const;
     bool get_ming_info(MRES *res) const;
     
