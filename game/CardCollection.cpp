@@ -1001,7 +1001,6 @@ bool CardInHand::is_aim_limit(unsigned int act, Card_t kind) const {
 /**************************************************
         ming info
 **************************************************/
-#include "Ai.h"
 long CardInHand::CalcTimes(Card_t kind) {
     update_statistics(kind);
     return sum_up_score(statHuFanMask);
@@ -1188,6 +1187,76 @@ FanScore_t TblFanScore[] = {
 	{ RH_CHAOCHAOHAOHUAQIDUI, 128},
 	{ RH_KAWUXIN          , 4},
 };
+
+#include "Player.h"
+#include "RoundManager.h"
+void CardInHand::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,const RoundManager &context) const
+{
+	memset(res,0,sizeof(HAH));
+	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
+
+    res->reserved_card_num = TOTAL_CARD_NUM - context._distributedNum;
+    
+	CARD s_card;
+
+    for(int i=0;i<context._gRiver->size();i++) {
+		res->card_in_river[res->river_len++] = (CARD_KIND)context._gRiver->get_kind(i);
+    }
+
+    int     curPlayer = context._curPlayer;
+    CardInHand *cards = context._players[curPlayer]->_cards;
+
+	context._players[(curPlayer+1)%3]->_cards->get_hu_cards(target1,len1);
+	context._players[(curPlayer+2)%3]->_cards->get_hu_cards(target2,len2);
+
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+		int time = res->list[cards->get_kind(i)].same_times++;
+		res->list[cards->get_kind(i)].place[time]=i;
+	}
+
+	/*init hu target*/
+	if( !context.IsTing(curPlayer) ) {
+		res->target = context._players[curPlayer]->_cards->assess_aim();
+    }
+}
+
+int CardInHand::choose_worst(const RoundManager &context,bool &canKou) const {
+    HAH *s_res = new HAH;
+	int index;
+    
+	CARD_KIND list1[9];
+	CARD_KIND list2[9];
+	int len1;
+	int len2;
+
+    canKou = false;
+
+    int curPlayer = context._curPlayer;
+    
+	if(curPlayer!=MIDDLE) {
+		_SetContext(s_res,list1,list2,&len1,&len2,context);
+		context._players[curPlayer]->set_robot_hu_target(s_res->target);
+	}
+
+    if( !context.IsTing(curPlayer) ) {
+		index = context._players[curPlayer]->chose_card(
+            s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
+
+		if( index==INVALID || index>context._players[curPlayer]->_cards->last() ) {
+			index=context._players[curPlayer]->_cards->last();
+		}
+        
+		if(s_res->hu_nums>=6 
+            && context._actionToDo==a_MING 
+            && !context.IsTing(curPlayer) ) {
+			canKou = true;
+		}
+	} else {
+		index = context._players[curPlayer]->_cards->last();
+    }
+
+    return index;
+}
 
 long CardInHand::sum_up_score(unsigned int fan) {
 	long score = 1;

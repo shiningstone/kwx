@@ -54,6 +54,7 @@ protected:
 };
 
 class SmartList;
+class RoundManager;
 class CardInHand : public CardList {
 public:
     CardInHand();
@@ -164,8 +165,10 @@ public:
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
 
+    void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,const RoundManager &context) const;
+    int  choose_worst(const RoundManager &context,bool &canKou) const;
+
     static long sum_up_score(unsigned int fan);
-    static long choose_smart(bool &canKou);
     /*********************************
             ming info
     *********************************/

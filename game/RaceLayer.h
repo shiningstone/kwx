@@ -13,7 +13,6 @@ using namespace CocosDenshion;
 #include "./../multimedia/GameLayout.h"
 #include "./../multimedia/GraphicObject.h"
 #include "./../multimedia/GraphicEffect.h"
-#include "Ai.h"
 #include "DataBase.h"
 #include "CardCollection.h"
 typedef struct {
@@ -50,7 +49,6 @@ protected:
     GameLayout     *_layout;
     GraphicEffect  *_effect;
     GObjectFactory *_object;
-    Ai             *_ai;
 private:
     float _AddBtnQi(const Vec2 &ref);
     float _AddBtnHu(const Vec2 &ref);

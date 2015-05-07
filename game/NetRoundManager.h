@@ -20,11 +20,9 @@ class KwxMessenger;
 
 class NetRoundManager : public RoundManager {
     friend class RaceLayer;
-    friend class Ai;
 public:
     static NetRoundManager *getInstance();
     static void  destroyInstance();
-    Ai             *_ai;
 
 /******************/
 /* networks start */

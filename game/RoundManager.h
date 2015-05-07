@@ -20,7 +20,7 @@ class Player;
 
 class RoundManager {
     friend class RaceLayer;
-    friend class Ai;
+	friend class CardInHand;
 private:
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
@@ -28,7 +28,6 @@ private:
 public:
     static RoundManager *getInstance();
     static void  destroyInstance();
-    Ai             *_ai;
 
     RoundManager(RaceLayer *uiManager);
     ~RoundManager();
@@ -71,7 +70,7 @@ public:
     void RenewOutCard();
 
     virtual void InitPlayers();
-    bool IsTing(int player);
+    bool IsTing(int player) const;
 
     
     int  Shuffle();

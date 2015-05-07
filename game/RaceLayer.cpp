@@ -30,7 +30,6 @@ RaceLayer::RaceLayer()
 
 void RaceLayer::Assign(RoundManager *rm) {
     _roundManager = rm;
-    _ai = Ai::getInstance(_roundManager);
 }
 
 RaceLayer::~RaceLayer()

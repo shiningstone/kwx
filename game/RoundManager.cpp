@@ -23,7 +23,6 @@ RoundManager::RoundManager(RaceLayer *uiManager) {
         _players[i] = NULL;
     }
 
-    _ai = Ai::getInstance(this);
     _logger = LOGGER_REGISTER("RoundManager");
 }
 
@@ -79,7 +78,7 @@ bool RoundManager::IsWinner(int no) {
 /***********************************************
         general operations
 ***********************************************/
-bool RoundManager::IsTing(int id) {
+bool RoundManager::IsTing(int id) const{
     return _players[id]->_cards->IsMing;
 }
 
@@ -710,7 +709,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 
 void RoundManager::WaitForOthersChoose() {
     bool canKou = false;
-	int index = _ai->ChooseWorstCard(canKou);
+	int index = _players[_curPlayer]->_cards->choose_worst(*this,canKou);
     
     if ( canKou ) {
         _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);

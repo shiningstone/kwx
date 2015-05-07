@@ -34,7 +34,6 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
         _players[i] = NULL;
     }
 
-    _ai = Ai::getInstance(this);
     _messenger = new KwxMessenger();
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
