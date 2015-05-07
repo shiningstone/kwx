@@ -20,7 +20,7 @@ class Player;
 
 class RoundManager {
     friend class RaceLayer;
-	friend class CardInHand;
+	friend class NetPlayer;
 private:
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);

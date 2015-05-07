@@ -709,7 +709,9 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 
 void RoundManager::WaitForOthersChoose() {
     bool canKou = false;
-	int index = _players[_curPlayer]->_cards->choose_worst(*this,canKou);
+
+	NetPlayer *player = static_cast<NetPlayer *>(_players[_curPlayer]);
+	int index = player->choose_worst(*this,canKou);
     
     if ( canKou ) {
         _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);
