@@ -5,7 +5,6 @@
 using namespace CocosDenshion;
 
 #include "account.h"
-#include "Role.h"
 #include "Resources.h"
 
 #include "./../utils/BasicType.h"

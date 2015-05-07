@@ -9,7 +9,6 @@ USING_NS_CC;
 using namespace ui;
 
 #include "RaceType.h"
-#include "OutCardList.h"
 
 #include "./../utils/BasicType.h"
 #include "./../utils/LogManager.h"

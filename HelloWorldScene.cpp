@@ -1,7 +1,6 @@
 #include "HelloWorldScene.h"
 #include "IMLoadScene.h"
 #include "EnterRoomScene.h"
-#include "GameScene.h"
 #include "game/NetRaceLayer.h"
 #include "game/RoundManager.h"
 #include "game/NetRoundManager.h"

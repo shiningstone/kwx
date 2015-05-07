@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "RaceType.h"
-#include "Raction.h"
 
 #include "CardCollection.h"
 #include "NetRole.h"

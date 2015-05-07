@@ -13,7 +13,6 @@ using namespace ui;
 #include "./../protocol/DsInstruction.h"
 
 #include "RaceType.h"
-#include "OutCardList.h"
 
 class NetRole;
 class RoundManager;
