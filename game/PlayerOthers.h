@@ -6,6 +6,25 @@
 
 #include "Player.h"
 
+typedef struct _KindPosition {
+    Card_t        val;
+    int           position[4];
+}KindPosition;
+
+typedef struct _PositionInfo {
+    int           kindNum;
+    KindPosition  kind[MAX_HANDIN_NUM];
+}PositionInfo;
+
+typedef struct _Context_t {
+    CardList     *river;
+    int           remain;
+    PositionInfo  cards;
+    TingInfo_t   *OthersTing[2];
+    int           huNum;
+    ROBOT_TARGET  aim;
+}Context_t;
+
 class Logger;
 class PlayerOthers:public Player
 {
@@ -14,11 +33,11 @@ class PlayerOthers:public Player
         PlayerOthers(int id);
 		virtual ~PlayerOthers();
     private:
-        Logger   *_logger;
-
-		ROBOT_TARGET g_target;
+        Logger      *_logger;
+        Context_t    _ctx;
 	private:
-        void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,const RoundManager &context) const;
+        void _CollectPosition(PositionInfo &info);
+        void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);
         
 		int Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 		int river_reserved_card(HAH *hash_table,int card);//
@@ -29,10 +48,8 @@ class PlayerOthers:public Player
 		int Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 		int Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 	public:
-        int  choose_worst(const RoundManager &context,bool &canKou) const;
-		void set_robot_hu_target(ROBOT_TARGET par_target);
-		ROBOT_TARGET get_robot_hu_target();
-		int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
+        int  choose_worst(RoundManager &context,bool &canKou);
+		int  chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 };
 
 #endif 

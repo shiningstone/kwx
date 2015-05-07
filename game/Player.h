@@ -14,8 +14,6 @@ public:
     ~Player();
 
     virtual int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2){return 0;}
-    virtual void set_robot_hu_target(ROBOT_TARGET par_target){}
-    virtual ROBOT_TARGET get_robot_hu_target(){return SAME_TIAO_TARGET;}
 
     virtual unsigned char init(int cards[],int len,int aim);
     virtual unsigned char init(Card_t cards[],int len,int aim);

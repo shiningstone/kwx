@@ -602,16 +602,6 @@ int PlayerOthers::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIN
 	return chose_place;
 }
 
-void PlayerOthers::set_robot_hu_target(ROBOT_TARGET par_target)
-{
-	g_target=par_target;
-}
-
-ROBOT_TARGET PlayerOthers::get_robot_hu_target()
-{
-	return g_target;
-}
-
 int PlayerOthers::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	//unsigned char ting_flag;
@@ -672,8 +662,49 @@ int PlayerOthers::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND l
 }
 
 #include "RoundManager.h"
-void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,const RoundManager &context) const
+
+void PlayerOthers::_CollectPosition(PositionInfo &info) {
+    Card_t prev = CARD_UNKNOWN;
+    int  kindIdx = 0;
+    int  posIdx = 0;
+
+    for(int i=_cards->FreeStart;i<_cards->size();i++) {
+        Card_t kind = _cards->get_kind(i);
+        
+        if(kind!=prev) {
+            prev = kind;
+            
+            kindIdx++;
+            posIdx = 0;
+
+            info.kind[kindIdx-1].val = kind;
+            info.kind[kindIdx-1].position[posIdx] = i;
+            posIdx++;
+        } else {
+            info.kind[kindIdx-1].position[posIdx] = i;
+            posIdx++;
+        }
+    }
+
+    info.kindNum = kindIdx;
+}
+
+void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context)
 {
+    memset(&_ctx,0,sizeof(Context_t));
+    _ctx.river  = context._gRiver;
+    _ctx.remain = TOTAL_CARD_NUM - context._distributedNum;
+
+    _CollectPosition(_ctx.cards);
+    if( !_cards->IsMing ) {
+        _ctx.aim = _cards->assess_aim();
+    }
+
+    int curPlayer = context._curPlayer;
+    _ctx.OthersTing[0] = context._players[(curPlayer+1)%3]->_cards->_ting;
+    _ctx.OthersTing[1] = context._players[(curPlayer+2)%3]->_cards->_ting;
+
+    /*******************************************/
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
 
@@ -685,7 +716,6 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
 		res->card_in_river[res->river_len++] = (CARD_KIND)context._gRiver->get_kind(i);
     }
 
-    int     curPlayer = context._curPlayer;
     CardInHand *cards = context._players[curPlayer]->_cards;
 
 	context._players[(curPlayer+1)%3]->_cards->get_hu_cards(target1,len1);
@@ -702,7 +732,7 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
     }
 }
 
-int PlayerOthers::choose_worst(const RoundManager &context,bool &canKou) const {
+int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
     HAH *s_res = new HAH;
 	int index;
     
@@ -717,7 +747,6 @@ int PlayerOthers::choose_worst(const RoundManager &context,bool &canKou) const {
     
 	if(curPlayer!=MIDDLE) {
 		_SetContext(s_res,list1,list2,&len1,&len2,context);
-		context._players[curPlayer]->set_robot_hu_target(s_res->target);
 	}
 
     if( !context.IsTing(curPlayer) ) {
