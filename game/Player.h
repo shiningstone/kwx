@@ -1,5 +1,5 @@
-#ifndef __NET_ROLE_H__
-#define __NET_ROLE_H__
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
 
 #include "./../RaceType.h"
 
@@ -7,11 +7,11 @@
 
 #include "DataBase.h"
 
-class NetRole {
+class Player {
 public:
-	NetRole();
-    NetRole(int id);
-    ~NetRole();
+	Player();
+    Player(int id);
+    ~Player();
 
     virtual int chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2){return 0;}
     virtual void set_robot_hu_target(ROBOT_TARGET par_target){}

@@ -8,7 +8,7 @@
 
 #ifndef __UNIT_TEST__
 #include "./../game/Ai.h"
-#include "./../game/NetRaceLayer.h"
+#include "./../game/RaceLayer.h"
 #include "./../game/RoundManager.h"
 #include "./../game/NetRoundManager.h"
 #endif

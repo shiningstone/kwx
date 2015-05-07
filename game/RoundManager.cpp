@@ -4,11 +4,11 @@
 #include "RaceType.h"
 
 #include "CardCollection.h"
-#include "NetRole.h"
-#include "NetRaceLayer.h"
+#include "Player.h"
+#include "RaceLayer.h"
 #include "RoundManager.h"
 
-RoundManager::RoundManager(NetRaceLayer *uiManager) {
+RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
 
     _uiManager = uiManager;
@@ -104,12 +104,12 @@ void RoundManager::RenewOutCard() {
 /***********************************************
         player information
 ***********************************************/
-#include "NetRole.h"
+#include "Player.h"
 #include "NetPlayer.h"
 
 void RoundManager::InitPlayers() {
 	_players[0] = new NetPlayer();
-	_players[1] = new NetRole();
+	_players[1] = new Player();
 	_players[2] = new NetPlayer();
 
     Database *database = Database::getInstance();
@@ -224,7 +224,7 @@ bool RoundManager::IsCurEffectCard(const CardNode_t *card) {
        main interface
 ****************************************/
 void RoundManager::CreateRace(Scene *scene) {
-    _uiManager = NetRaceLayer::create();
+    _uiManager = RaceLayer::create();
     scene->addChild(_uiManager);
 
     _uiManager->Assign(this);

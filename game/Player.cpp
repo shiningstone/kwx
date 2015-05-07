@@ -2,23 +2,23 @@
 #include "./../utils/LogManager.h"
 
 #include "CardCollection.h"
-#include "NetRole.h"
+#include "Player.h"
 
-NetRole::NetRole() {
+Player::Player() {
     _cards = NULL;
     _river = NULL;
 
-    _logger = LOGGER_REGISTER("NetRole");
+    _logger = LOGGER_REGISTER("Player");
 }
 
-NetRole::NetRole(int id) {//this is for default settings ( robot ) 
+Player::Player(int id) {//this is for default settings ( robot ) 
     _cards = NULL;
     _river = NULL;
 
-    _logger = LOGGER_REGISTER("NetRole");
+    _logger = LOGGER_REGISTER("Player");
 }
 
-NetRole::~NetRole() {
+Player::~Player() {
     if(_cards!=NULL) {
         delete _river;
         delete _cards;
@@ -30,7 +30,7 @@ NetRole::~NetRole() {
 /**************************************************
         user's action
 **************************************************/
-unsigned char NetRole::init(int cards[],int len,int aim) {
+unsigned char Player::init(int cards[],int len,int aim) {
     Card_t kinds[14];
     for(int i=0;i<len;i++) {
         kinds[i] = (Card_t)cards[i];
@@ -39,7 +39,7 @@ unsigned char NetRole::init(int cards[],int len,int aim) {
     return init(kinds,len,aim);
 }
 
-unsigned char NetRole::init(Card_t cards[],int len,int aim) {
+unsigned char Player::init(Card_t cards[],int len,int aim) {
     _AIM     = aim;
     _aimDone = 0;
     _fan     = 0;
@@ -69,7 +69,7 @@ unsigned char NetRole::init(Card_t cards[],int len,int aim) {
 }
 
 #include "Ai.h"
-long NetRole::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cards->update_statistics(kind);
     _fan = _cards->statHuFanMask;
     
@@ -99,13 +99,13 @@ long NetRole::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionI
 	return Ai::getInstance()->sum_up_score(_fan);
 }
 
-void NetRole::taskCheck(unsigned int flag) {
+void Player::taskCheck(unsigned int flag) {
 	if( !(flag&_AIM) ) {
 		_aimDone=0;
     }
 }
 
-ActionMask_t NetRole::ActiontodoCheckAgain() {
+ActionMask_t Player::ActiontodoCheckAgain() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	unsigned char res = 0x0;
@@ -121,7 +121,7 @@ ActionMask_t NetRole::ActiontodoCheckAgain() {
 	return res;
 }
 
-ActionMask_t NetRole::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cards->push_back((Card_t)newCard);
 
 	ActionMask_t actions = _cards->judge_action(isNewDistributed,isLastOne);
@@ -149,7 +149,7 @@ ActionMask_t NetRole::hand_in(Card_t newCard,bool isNewDistributed,bool tingStat
 	return actions;
 }
 
-Card_t NetRole::hand_out(unsigned int place) {
+Card_t Player::hand_out(unsigned int place) {
 	if( _cards->get_status(place) != sFREE ){
 		return CARD_UNKNOWN;
 	}
@@ -160,38 +160,38 @@ Card_t NetRole::hand_out(unsigned int place) {
     return kind;
 }
 
-ACT_RES NetRole::others_action(bool isNewDistributed,ActionId_t act,Card_t kind) {
+ACT_RES Player::others_action(bool isNewDistributed,ActionId_t act,Card_t kind) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
     _cards->others_perform(isNewDistributed,act,kind);
 	return ar_DONE;
 }
 
-ACT_RES NetRole::action(bool isNewDistributed,ActionId_t act) {
+ACT_RES Player::action(bool isNewDistributed,ActionId_t act) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
     _cards->perform((ActionId_t)act,isNewDistributed);
 	return ar_DONE;
 }
 
-HuTarget_t NetRole::get_aim() const {
+HuTarget_t Player::get_aim() const {
 	return _aimDone;
 }
 
-HuTarget_t NetRole::get_hu_flag() const {
+HuTarget_t Player::get_hu_flag() const {
 	return _fan;
 }
 
-long NetRole::get_score() const {
+long Player::get_score() const {
 	return _score;
 }
 
 /**************************************************
         user's profile
 **************************************************/
-void NetRole::Set(const UserProfile_t *profile) {
+void Player::Set(const UserProfile_t *profile) {
     memcpy(&_profile,profile,sizeof(UserProfile_t));
 }
 
-Sex_t NetRole::GetSex() {
+Sex_t Player::GetSex() {
     if( !strcmp(_profile.sex,"Boy") ) {
         return BOY;
     } else {
@@ -199,7 +199,7 @@ Sex_t NetRole::GetSex() {
     }
 }
 
-int NetRole::UpdateProperty(int change) {
+int Player::UpdateProperty(int change) {
     _profile.property += change;
     return _profile.property ;
 }

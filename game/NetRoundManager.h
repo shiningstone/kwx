@@ -14,12 +14,12 @@ using namespace ui;
 
 #include "RaceType.h"
 
-class NetRole;
+class Player;
 class RoundManager;
 class KwxMessenger;
 
 class NetRoundManager : public RoundManager {
-    friend class NetRaceLayer;
+    friend class RaceLayer;
     friend class Ai;
 public:
     static NetRoundManager *getInstance();
@@ -61,7 +61,7 @@ public:
 /* networks end   */
 /******************/
 
-    NetRoundManager(NetRaceLayer *uiManager);
+    NetRoundManager(RaceLayer *uiManager);
     ~NetRoundManager();
 
     virtual void RecvPeng(PlayerDir_t dir);

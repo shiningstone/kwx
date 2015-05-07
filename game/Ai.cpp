@@ -1,7 +1,7 @@
 
 #include "CardCollection.h"
-#include "NetRole.h"
-#include "NetRaceLayer.h"
+#include "Player.h"
+#include "RaceLayer.h"
 #include "RoundManager.h"
 #include "Ai.h"
 

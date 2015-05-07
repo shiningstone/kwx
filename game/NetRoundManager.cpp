@@ -10,12 +10,12 @@ USING_NS_CC;
 #include "RaceType.h"
 
 #include "CardCollection.h"
-#include "NetRole.h"
-#include "NetRaceLayer.h"
+#include "Player.h"
+#include "RaceLayer.h"
 #include "RoundManager.h"
 #include "NetRoundManager.h"
 
-NetRoundManager::NetRoundManager(NetRaceLayer *uiManager)
+NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 :RoundManager(uiManager) {
     _MODE = NETWORK_GAME;
 
@@ -52,12 +52,12 @@ NetRoundManager::~NetRoundManager() {
 /***********************************************
         player information
 ***********************************************/
-#include "NetRole.h"
+#include "Player.h"
 #include "NetPlayer.h"
 
 void NetRoundManager::InitPlayers() {
 	_players[0] = new NetPlayer();
-	_players[1] = new NetRole();
+	_players[1] = new Player();
 	_players[2] = new NetPlayer();
 
     Database *database = Database::getInstance();
@@ -528,7 +528,7 @@ void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
        main interface
 ****************************************/
 void NetRoundManager::CreateRace(Scene *scene) {
-    _uiManager = NetRaceLayer::create();
+    _uiManager = RaceLayer::create();
     scene->addChild(_uiManager);
 
     _uiManager->Assign(this);

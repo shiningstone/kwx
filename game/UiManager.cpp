@@ -1,6 +1,6 @@
 
 #include "Ai.h"
-#include "NetRaceLayer.h"
+#include "RaceLayer.h"
 #include "RoundManager.h"
 #include "UiManager.h"
 

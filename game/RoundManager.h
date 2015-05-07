@@ -16,10 +16,10 @@ using namespace ui;
 
 extern void load_test_round(int idx,int *output);
 
-class NetRole;
+class Player;
 
 class RoundManager {
-    friend class NetRaceLayer;
+    friend class RaceLayer;
     friend class Ai;
 private:
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
@@ -30,7 +30,7 @@ public:
     static void  destroyInstance();
     Ai             *_ai;
 
-    RoundManager(NetRaceLayer *uiManager);
+    RoundManager(RaceLayer *uiManager);
     ~RoundManager();
 
     virtual void RecvPeng(PlayerDir_t dir);
@@ -86,11 +86,11 @@ public:
 protected:
     GameMode_t _MODE;
     
-    NetRaceLayer *_uiManager;
+    RaceLayer *_uiManager;
 	int         aim[PLAYER_NUM];
 
     WinInfo_t   _lastWin;
-    NetRole     *_players[PLAYER_NUM];
+    Player     *_players[PLAYER_NUM];
 
     CardList   *_gRiver;
     int         _unDistributedCards[TOTAL_CARD_NUM];

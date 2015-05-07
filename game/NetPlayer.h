@@ -6,10 +6,10 @@
 
 #include "RaceType.h"
 
-#include "NetRole.h"
+#include "Player.h"
 
 class Logger;
-class NetPlayer:public NetRole
+class NetPlayer:public Player
 {
 	public:
 		NetPlayer();

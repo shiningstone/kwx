@@ -1,5 +1,5 @@
-#ifndef __NET_RACE_LAYER_H__
-#define __NET_RACE_LAYER_H__
+#ifndef __RACE_LAYER_H__
+#define __RACE_LAYER_H__
 
 #include "ui/CocosGUI.h"
 using namespace CocosDenshion;
@@ -23,11 +23,11 @@ typedef struct {
 }DistributeInfo_t;
 
 class RoundManager;
-class NetRaceLayer : public cocos2d::Layer
+class RaceLayer : public cocos2d::Layer
 {
 public:
-	NetRaceLayer();
-	virtual ~NetRaceLayer();
+	RaceLayer();
+	virtual ~RaceLayer();
     
     void Assign(RoundManager *rm);
 
@@ -303,6 +303,6 @@ public:
 	void ListenToTingButton();
 
 public:
-	CREATE_FUNC(NetRaceLayer);
+	CREATE_FUNC(RaceLayer);
 };
 #endif //	 __RACE_LAYER_H__
