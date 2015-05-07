@@ -587,7 +587,9 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
     _curPlayer = zhuang;
-    _ai->UpdateAtFirstRound(_actionToDo);
+    if(_MODE==LOCAL_GAME) {
+        _actionToDo = _players[_curPlayer]->ActiontodoCheckAgain();
+    }
 
     _isNewDistributed = true;
     if(zhuang==MIDDLE) {

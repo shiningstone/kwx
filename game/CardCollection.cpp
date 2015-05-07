@@ -1004,7 +1004,7 @@ bool CardInHand::is_aim_limit(unsigned int act, Card_t kind) const {
 #include "Ai.h"
 long CardInHand::CalcTimes(Card_t kind) {
     update_statistics(kind);
-    return Ai::getInstance()->sum_up_score(statHuFanMask);
+    return sum_up_score(statHuFanMask);
 }
 
 bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *river) {
@@ -1158,6 +1158,48 @@ int CardInHand::rechoose_after_peng(int chosen,int pengIdx[2]) {
     }
 
     return newChosen;
+}
+
+typedef struct {
+    INT32U fan;
+    INT32U score;
+}FanScore_t;
+
+FanScore_t TblFanScore[] = {
+    /*  fan               coefficient*/
+	{ RH_QIANGGANG        , 2},
+	{ RH_GANGHUA          , 2},
+	{ RH_GANGPAO          , 2},
+	{ RH_HAIDILAO         , 2},
+	{ RH_MING             , 2},
+	{ RH_ZIMO             , 2},
+	{ RH_QINYISE          , 4},
+	{ RH_SIPENG           , 2},
+	{ RH_DASANYUAN        , 8},
+	{ RH_XIAOSANYUAN      , 4},
+	{ RH_ANSIGUI          , 4},
+	{ RH_MINGSIGUI        , 2},
+	{ RH_QIDUI            , 4},
+	{ RH_SANYUANQIDUI     , 32},
+	{ RH_HAOHUAQIDUI      , 8},
+	{ RH_CHAOHAOHUAQIDUI  , 32},
+	{ RH_CHAOCHAOHAOHUAQIDUI, 128},
+	{ RH_KAWUXIN          , 4},
+};
+
+long CardInHand::sum_up_score(unsigned int fan) {
+	long score = 1;
+    
+    int i = 0;
+    while(i<sizeof(TblFanScore)/sizeof(FanScore_t)) {
+        if(_is_active(fan,TblFanScore[i].fan)) {
+            score *= TblFanScore[i].score;
+        }
+
+        i++;
+    }
+
+    return score;
 }
 
 /***************************************************

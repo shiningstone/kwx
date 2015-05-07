@@ -18,15 +18,10 @@ private:
     void _CollectResouce(HAH *res);
 
 public:
-/*************************************
-        round info
-*************************************/
-    void UpdateAtFirstRound(int &actionToDo);
 
 /*************************************
         game calculation
 *************************************/
-    long sum_up_score(unsigned int fan);
 
 /***************************************
         singleton

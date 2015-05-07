@@ -164,6 +164,7 @@ public:
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;
 
+    static long sum_up_score(unsigned int fan);
     /*********************************
             ming info
     *********************************/

@@ -847,8 +847,6 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
     _curPlayer = zhuang;
-    _ai->UpdateAtFirstRound(_actionToDo);
-
     if(zhuang==MIDDLE) {
         ServerWaitForMyAction();
     } else {

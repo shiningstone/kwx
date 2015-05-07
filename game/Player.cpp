@@ -68,7 +68,6 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     }
 }
 
-#include "Ai.h"
 long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cards->update_statistics(kind);
     _fan = _cards->statHuFanMask;
@@ -96,7 +95,7 @@ long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId
 	if(_AIM!=RA_NOTASK)
 		taskCheck(_fan);
     
-	return Ai::getInstance()->sum_up_score(_fan);
+	return _cards->sum_up_score(_fan);
 }
 
 void Player::taskCheck(unsigned int flag) {
