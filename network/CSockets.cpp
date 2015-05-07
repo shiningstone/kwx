@@ -96,7 +96,9 @@ void ClientSocket::Start(const char *serverIp,int port) {
 
 #ifdef WIN32
     char strServerIp[128] = {0};
-    FILE * target = fopen("E:\\server_ip.txt","r");
+    FILE * target = NULL;
+
+	target = fopen("E:\\server_ip.txt","r");
     if(target!=NULL) {
         fgets(strServerIp,128,target);
     } else {

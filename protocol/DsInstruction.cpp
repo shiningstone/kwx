@@ -13,6 +13,47 @@
 #include "./../game/NetRoundManager.h"
 #endif
 
+#ifdef WIN32
+typedef struct _RequestDesc {
+    RequestId_t id;
+    char        desc[32];
+}RequestDesc;
+
+#define DESC(x) { x,#x }
+
+RequestDesc RequestDescTbl[] = {
+    DESC(REQ_GAME_SEND_START),
+    DESC(REQ_GAME_SEND_SHOWCARD),
+    DESC(REQ_GAME_SEND_ACTION),
+    DESC(REQ_GAME_GET_TINGINFO),
+    DESC(REQ_GAME_DIST_CARD),
+    DESC(REQ_GAME_SEND_CALSCORE),
+    DESC(REQ_GAME_DIST_REMIND),
+    DESC(REQ_GAME_DIST_BEGINCARDS),
+    DESC(REQ_GAME_DIST_BEGINCARDS_OTHER),
+    DESC(REQ_GAME_DIST_DECISION),
+    DESC(REQ_GAME_DIST_HU_CALCULATE),
+    DESC(REQ_GAME_DIST_HU_CALCULATE2),
+    DESC(REQ_GAME_DIST_CARD_TOOTHER),
+    DESC(REQ_GAME_RECV_SHOWCARD),
+    DESC(REQ_GAME_RECV_ACTION),
+    DESC(REQ_GAME_RECV_START),
+    DESC(HEART_BEAT),
+    DESC(REQ_GAME_SEND_ENTER),
+    DESC(REQ_GAME_RECV_ENTER),
+};
+
+char *DsInstruction::Desc(RequestId_t id) const {
+    for(int i=0;i<sizeof(RequestDescTbl)/sizeof(RequestDescTbl[0]);i++) {
+        if(id==RequestDescTbl[i].id) {
+            return RequestDescTbl[i].desc;
+        }
+    }
+
+    return "Request undefined";
+}
+#endif
+
 SeatInfo *DsInstruction::_seatInfo = 0;
 Logger *DsInstruction::_logger = 0;
 

@@ -125,8 +125,13 @@ void NetRoundManager::RecvMsg(void* val) {
 
 void NetRoundManager::HandleMsg(void * aMsg) {
     auto di = static_cast<DsInstruction *>(aMsg);
-    LOGGER_WRITE("get ds instruction %d\n",di->request);
 
+    #ifdef WIN32
+    LOGGER_WRITE("get ds instruction %s\n",di->Desc(di->request));
+    #else
+    LOGGER_WRITE("get ds instruction %d\n",di->request);
+    #endif
+    
     switch(di->request) {
         case REQ_GAME_SEND_START:
             _DiRecv((GameStartResponse *)di);
@@ -244,6 +249,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
     INT8U timer        = info->timer;
+    _distributedNum    = info->remain;
     delete info;
 
     ServerDistributeTo(target,card);
@@ -263,6 +269,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
     INT8U timer        = info->timer;
+    _distributedNum    = info->remain;
 
     _curPlayer        = MIDDLE;
     _isNewDistributed = true;

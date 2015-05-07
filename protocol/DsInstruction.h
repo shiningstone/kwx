@@ -29,6 +29,11 @@ protected:
     NetRoundManager   *_roundManager;
 #endif
     static Logger   *_logger;
+
+#ifdef WIN32
+public:
+    char            *Desc(RequestId_t id)const;
+#endif
 };
 
 class GameStartResponse : public DsInstruction {
