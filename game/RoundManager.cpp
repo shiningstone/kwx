@@ -349,20 +349,21 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
         
 		if(!_isNewDistributed) {
-            GangCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
+            card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
             _players[_curPlayer]->_river->pop_back();
     
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
-			RecordOutCard(GangCard);
+			RecordOutCard(card);
+			RecordOutCard(card);
+			RecordOutCard(card);
             
 			_curPlayer=dir;
 		}else {
-			RecordOutCard(cards->get_kind(cards->last()));
+		    card = cards->get_kind(cards->last());
+			RecordOutCard(card);
 		}
 
         card = cards->find_ming_gang_cards(gangCardIdx,card);
-        _uiManager->GangEffect(dir,GangCard,gangCardIdx,false,prevPlayer);
+        _uiManager->GangEffect(dir,card,gangCardIdx,false,prevPlayer);
 	}
 }
 
