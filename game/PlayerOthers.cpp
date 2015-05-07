@@ -18,6 +18,18 @@ PlayerOthers::~PlayerOthers() {
     LOGGER_DEREGISTER(_logger);
 }
 
+bool PlayerOthers::OthersCanHu(Card_t kind) const {
+    for(int i=0;i<2;i++) {
+        for(int j=0;j<_ctx.OthersTing[i].cardNum;j++) {
+            if(kind==(_ctx.OthersTing[i].cards+j)->kind) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 int PlayerOthers::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int j,k;
@@ -692,10 +704,12 @@ void PlayerOthers::_CollectPosition(PositionInfo &info) {
 void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context)
 {
     memset(&_ctx,0,sizeof(Context_t));
+
     _ctx.river  = context._gRiver;
     _ctx.remain = TOTAL_CARD_NUM - context._distributedNum;
 
     _CollectPosition(_ctx.cards);
+
     if( !_cards->IsMing ) {
         _ctx.aim = _cards->assess_aim();
     }
