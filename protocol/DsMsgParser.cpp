@@ -80,25 +80,6 @@ int DsMsgParser::_load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx) {
     return 0;
 }
 
-int DsMsgParser::_load(ActionId_t *actions,INT8U &num,const DsMsg &msg,int itemIdx) {
-	int i = 0;
-	int actIdx = 0;
-
-    for(i=MAX_AVAIL_ACTIONS-1;i>=0;i--) {
-        if((ActionId_t)msg._body->_items[itemIdx]->_buf[i]==aQi) {
-			break;
-		} else {
-            actions[actIdx++] = (ActionId_t)msg._body->_items[itemIdx]->_buf[i];
-		}
-    }
-
-    actions[actIdx++] = aQi;
-
-    num = actIdx;
-
-    return 0;
-}
-
 int DsMsgParser::_load(TingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
@@ -184,7 +165,7 @@ int DsMsgParser::_unload(MingInfo_t &ming) {
 }
 
 int DsMsgParser::_load(Reminds_t &remind,const DsMsg &msg,int itemIdx) {
-    _load(remind.actions, remind.actionNum,msg, itemIdx);
+    remind.actions = _ntohl(*(INT32U *)(msg._body->_items[itemIdx]->_buf));
     _load(remind.gangCard, remind.gangKindNum, msg, itemIdx+1);
     _load(remind.kouCard, remind.kouKindNum, msg, itemIdx+2);
     _load(remind.ming,msg, itemIdx+3);

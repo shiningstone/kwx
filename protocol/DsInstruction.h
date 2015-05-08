@@ -17,7 +17,6 @@ public:
     virtual int Construct(const DsMsg &msg);
     virtual int Dispatch();
 
-    static int GetAvailActions(int actNum,const ActionId_t actions[]);
     RequestId_t      request;
 protected:
     DsInstruction();
@@ -87,8 +86,7 @@ public:
     INT8U            seat;
     INT8U            whoGive;
     INT8U            next;
-    INT8U            actionNum;
-    ActionId_t       actions[MAX_AVAIL_ACTIONS];
+    ActionMask_t     actions;
     INT8U            cardNum;
     Card_t           card[18];
 };
@@ -169,8 +167,7 @@ public:
     INT8U            seat;
     INT8U            whoGive;
     INT8U            next;
-    INT8U            actionNum;
-    ActionId_t       actions[MAX_AVAIL_ACTIONS];
+    ActionMask_t     actions;
     Card_t           card;
 };
 

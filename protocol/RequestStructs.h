@@ -7,11 +7,8 @@
 
 #include "KwxMsgBasic.h"
 
-#define MAX_AVAIL_ACTIONS 4
-
 typedef struct _Reminds_t {
-    INT8U         actionNum;
-    ActionId_t    actions[MAX_AVAIL_ACTIONS];
+    ActionMask_t  actions;
     INT8U         gangKindNum;
     Card_t        gangCard[4];
     INT8U         kouKindNum;

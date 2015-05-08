@@ -77,16 +77,6 @@ int DsInstruction::Dispatch() {
     return 0;
 }
 
-int DsInstruction::GetAvailActions(int actNum,const ActionId_t actions[]) {
-    int actionToDo = 0;
-    
-    for (int i=0;i<actNum; i++) {
-        actionToDo |= actions[i];
-    }
-
-    return actionToDo;
-}
-
 PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
     PlayerDir_t dir = _seatInfo->GetPlayer(seat);
     if( dir<LEFT || dir>RIGHT ) {
@@ -186,8 +176,7 @@ int ActionNotif::Construct(const DsMsg &msg) {
     seat    = _GetPlayer(msg.GetItemValue(0));
     whoGive = _GetPlayer(msg.GetItemValue(1));
     next    = _GetPlayer(msg.GetItemValue(2));
-
-    DsMsgParser::_load(actions, actionNum, msg, 3);
+    actions = _GetPlayer(msg.GetItemValue(3));
     DsMsgParser::_load(card, cardNum, msg, 4);
     return 0;
 }
@@ -204,7 +193,7 @@ int DistCardInfo::Construct(const DsMsg &msg) {
     remain    = msg.GetItemValue(2);
     kind      = (Card_t)msg.GetItemValue(3);
 
-    DsMsgParser::_load(remind.actions, remind.actionNum, msg, 4);
+    remind.actions = msg.GetItemValue(4);
     DsMsgParser::_load(remind.gangCard, remind.gangKindNum, msg, 5);
     DsMsgParser::_load(remind.kouCard, remind.kouKindNum, msg, 6);
     DsMsgParser::_load(remind.ming, msg, 7);
@@ -257,7 +246,7 @@ int DecisionNotif::Construct(const DsMsg &msg) {
     seat      = _GetPlayer(msg.GetItemValue(0));
     whoGive   = _GetPlayer(msg.GetItemValue(1));
     next      = _GetPlayer(msg.GetItemValue(2));
-    DsMsgParser::_load(actions, actionNum, msg, 3);
+    actions   = _GetPlayer(msg.GetItemValue(3));
     card      = (Card_t)msg.GetItemValue(4);
     return 0;
 }
@@ -346,7 +335,7 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     playerNum= msg._body->_items[5]->_bufLen;
     
     for(int i=0;i<playerNum;i++) {
-        status[i] = msg._body->_items[5]->_buf[i];
+        status[i] = (msg._body->_items[5]->_buf[i]!=0);
         score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
         loadFromUtf16(name[i],msg._body->_items[7]->_buf);
         loadFromUtf16(image[i],msg._body->_items[8]->_buf);

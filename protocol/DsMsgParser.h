@@ -16,7 +16,6 @@ public:
     static int _load(INT32U *score, INT8U &num, const DsMsg &msg,int itemIdx);
     static int _load(Card_t cards[3][18],INT8U num[3],const DsMsg &msg,int itemIdx);
     static int _load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx);
-    static int _load(ActionId_t *actions,INT8U &num,const DsMsg &msg,int itemIdx);
     static int _load(TingInfo_t    &info,const INT8U *inMsg);
     static int _load(MingInfo_t &info,const DsMsg &msg,int itemIdx);
     static int _load(Reminds_t &remind,const DsMsg &msg,int itemIdx);

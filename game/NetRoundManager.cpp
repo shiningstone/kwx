@@ -75,45 +75,6 @@ void NetRoundManager::InitPlayers() {
 /****************************************
        networks
 ****************************************/
-/*this could be settle via a more effective way*/
-int NetRoundManager::GetAvailActions(int actNum,const ActionId_t actions[]) {
-    int actionToDo = 0;
-    
-    for (int i=0;i<actNum; i++) {
-        switch(actions[i]) {
-            case aQi:
-                actionToDo |= a_JUMP;
-                break;
-            case aPENG:
-                actionToDo |= a_PENG;
-                break;
-            case aMING_GANG:
-                actionToDo |= a_MING_GANG;
-                break;
-            case aAN_GANG:
-                actionToDo |= a_AN_GANG;
-                break;
-            case aMING:
-                actionToDo |= a_MING;
-                break;
-            case aHU:
-                actionToDo |= a_HU;
-                break;
-            case aSHOU_GANG:
-                actionToDo |= a_SHOU_GANG;
-                break;
-            case aKOU:
-                actionToDo = a_KOU;
-                break;
-            case aKOU_CANCEL:
-                actionToDo = a_KOU_CANCEL;
-                break;
-        }
-    }
-
-    return actionToDo;
-}
-
 void NetRoundManager::ListenToMessenger() {
     _msgQueue = MsgQueue::getInstance(this);
 }
@@ -210,7 +171,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     }
     PlayerDir_t dir = (PlayerDir_t)info->seat;
     INT8U timer     = info->timer;
-    _actionToDo     = GetAvailActions(info->remind.actionNum, info->remind.actions);
+    _actionToDo     = info->remind.actions;
     delete info;
 
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
@@ -272,7 +233,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
 
     _curPlayer        = MIDDLE;
     _isNewDistributed = true;
-    _actionToDo       = GetAvailActions(info->remind.actionNum,info->remind.actions);
+    _actionToDo     = info->remind.actions;
     delete info;
 
     ServerDistributeTo(target,card);
@@ -320,7 +281,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
     INT8U timer     = info->timer;
     Card_t kind     = info->kind;
-    _actionToDo     = GetAvailActions(info->remind.actionNum,info->remind.actions);
+    _actionToDo     = info->remind.actions;
     delete info;
 
     if(dir!=whoGive) {
@@ -345,7 +306,7 @@ void NetRoundManager::_DiRecv(ActionResponse *info) {
 void NetRoundManager::_DiRecv(ActionNotif *info) {
     PlayerDir_t dir     = (PlayerDir_t)info->seat;
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
-    _actionToDo     = GetAvailActions(info->actionNum, info->actions);
+    _actionToDo     = info->remind.actions;
     Card_t card     = info->card[0];
     delete info;
 

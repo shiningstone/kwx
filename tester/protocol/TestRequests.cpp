@@ -329,7 +329,7 @@ public:
         assert( action.seat==1 );
         assert( action.whoGive==2 );
         assert( action.next==2 );
-        assert( action.actions[0]==a_PENG );
+        assert( action.actions==a_PENG );
         assert( action.card[0]==TIAO_3 );
 
         return 0;
@@ -372,7 +372,7 @@ public:
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
-        assert( dist.remind.actions[0]==a_MING_GANG );
+        assert( dist.remind.actions==a_MING_GANG );
         assert( dist.remind.gangCard[0]==TIAO_4 );
         assert( dist.remind.kouCard[0]==CARD_UNKNOWN);
         assert( dist.remind.ming.choiceNum==0 );
@@ -420,7 +420,7 @@ public:
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
-        assert( dist.remind.actions[0]==a_MING );
+        assert( dist.remind.actions==a_MING );
         assert( dist.remind.gangCard[0]==CARD_UNKNOWN );
         assert( dist.remind.kouCard[0]==CARD_UNKNOWN );
         
@@ -478,7 +478,7 @@ public:
         assert( dist.timer==1 );
         assert( dist.remain==2 );
         assert( dist.kind==TIAO_4 );
-        assert( dist.remind.actions[0]==a_MING );
+        assert( dist.remind.actions==a_MING );
         assert( dist.remind.gangCard[0]==CARD_UNKNOWN );
         assert( dist.remind.kouCard[0]==CARD_UNKNOWN );
         
@@ -610,7 +610,7 @@ public:
         assert( remind.timer==2 );
         assert( remind.kind==TIAO_4 );
         assert( remind.whoGive==LEFT );
-        assert( remind.remind.actions[0]==a_PENG );
+        assert( remind.remind.actions==a_PENG );
         assert( remind.remind.gangCard[0]==CARD_UNKNOWN );
         assert( remind.remind.kouCard[0]==CARD_UNKNOWN );
         assert( remind.remind.ming.choiceNum==0 );
@@ -658,7 +658,7 @@ public:
         assert( dist.seat==MIDDLE );
         assert( dist.remain==1 );
         assert( dist.timer==2 );
-        assert( dist.remind.actions[0]==a_AN_GANG );
+        assert( dist.remind.actions==a_AN_GANG );
         assert( dist.remind.gangCard[0]==TONG_2 );
         assert( dist.remind.kouCard[0]==CARD_UNKNOWN);
         assert( dist.remind.ming.choiceNum==0 );
@@ -740,7 +740,7 @@ public:
         assert( decision.seat==MIDDLE );
         assert( decision.whoGive==1 );
         assert( decision.next==2 );
-        assert( decision.actions[0]==a_PENG );
+        assert( decision.actions==a_PENG );
 		assert( decision.card==TIAO_1);
  
         return 0;
