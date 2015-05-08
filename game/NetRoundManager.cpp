@@ -306,7 +306,7 @@ void NetRoundManager::_DiRecv(ActionResponse *info) {
 void NetRoundManager::_DiRecv(ActionNotif *info) {
     PlayerDir_t dir     = (PlayerDir_t)info->seat;
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
-    _actionToDo     = info->remind.actions;
+    _actionToDo     = info->actions;
     Card_t card     = info->card[0];
     delete info;
 
