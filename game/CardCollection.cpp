@@ -75,7 +75,7 @@ int CardList::last() const {
 int CardList::get_num(Card_t kind) const {
     int num = 0;
     
-    for(int i=0;i<size();i++) {
+    for(INT8U i=0;i<size();i++) {
         if(get_kind(i)==kind) {
             num++;
         }    
@@ -87,7 +87,7 @@ int CardList::get_num(Card_t kind) const {
 int CardList::find_cards(Card_t kind,int *idx,int start) const {
     int num = 0;
     
-    for(int i=start; i<size(); i++) {   
+    for(INT8U i=start; i<size(); i++) {   
         if(get_kind(i)==kind) {
             if(idx!=NULL) {
                 idx[num] = i;
@@ -103,7 +103,7 @@ int CardList::find_cards(Card_t kind,int *idx,int start) const {
 int CardList::get_idx_in_group(int idxInHand) const {
     Card_t kind = get_kind(idxInHand);
 
-    for(int i=0;i<4;i++) {
+    for(INT8U i=0;i<4;i++) {
         if(kind!=get_kind(idxInHand+i+1)) {
             return 4-i; 
         }
@@ -166,7 +166,7 @@ CardInHand::CardInHand() {
 void CardInHand::init(Card_t *cards,int len) {
     clear();
 
-	for(int i=0;i<len;i++) {
+	for(INT8U i=0;i<len;i++) {
 		push_back(cards[i]);
 	}
 
@@ -207,13 +207,13 @@ void CardInHand::insert_card(CardNode_t data,int times) {
     int insertPlace = _FindInsertPoint(data);
 
     if(insertPlace==size()) {
-        for(int i=0;i<times;i++) {
+        for(INT8U i=0;i<times;i++) {
             CardNode_t *card = new CardNode_t;
             memcpy(card,&data,sizeof(CardNode_t));
             push_back(card);
         }
     } else {
-        for(int i=0;i<times;i++) {
+        for(INT8U i=0;i<times;i++) {
             CardNode_t *card = new CardNode_t;
             memcpy(card,&data,sizeof(CardNode_t));
             insert(begin()+insertPlace+i,card);
@@ -224,7 +224,7 @@ void CardInHand::insert_card(CardNode_t data,int times) {
 }
 
 void CardInHand::lock_all_cards(bool lock) {
-	for (int i=FreeStart;i<size();i++) {
+	for(INT8U i=FreeStart;i<size();i++) {
         at(i)->canPlay = !lock;
 	}
 }
@@ -238,7 +238,7 @@ bool CardInHand::is_wait_handout() const {
 }
 
 Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first group*/
-    for(int i=FreeStart; i<size(); i++) {
+    for(INT8U i=FreeStart; i<size(); i++) {
         int matchNum = find_cards(get_kind(i),cardIdx,i);
 
         if(matchNum==4) {
@@ -279,11 +279,11 @@ void CardInHand::_AnGang(Card_t card) {
     /* BUG : 在这里排序导致没有插牌效果 */
     CardNode_t cardsAfterGangCard[18];
     int cardsNum = 0;
-    for(int i=cardIdx[3]+1;i<size();i++) {
+    for(INT8U i=cardIdx[3]+1;i<size();i++) {
         cardsAfterGangCard[cardsNum++] = *at(i);
     }
     
-    for(int i=0;i<cardsNum;i++) {
+    for(INT8U i=0;i<cardsNum;i++) {
         delete_card(cardIdx[3]+1+i,1);
         insert_card(cardsAfterGangCard[i],1);
     }
@@ -295,7 +295,7 @@ void CardInHand::_MingGang(Card_t kind) {
     node.status  = sMING_GANG;
     node.canPlay = false;
     
-    for(int i=last();i>=0;i--) {
+    for(INT8U i=last();i>=0;i--) {
         if(get_kind(i)==kind) {
             if(get_status(i)==sPENG || get_status(i)==sMING_KOU) {
                 FreeStart--;
@@ -339,7 +339,7 @@ void CardInHand::_Peng(Card_t card) {
     node.canPlay = false;
     node.status  = sPENG;
     
-    for(int i=FreeStart;i<size();i++) {
+    for(INT8U i=FreeStart;i<size();i++) {
         if(get_kind(i)==card){
             delete_card(i,2);
             break;
@@ -353,7 +353,7 @@ void CardInHand::_Peng(Card_t card) {
 }
 
 void CardInHand::_Ming() {
-    for (int i=FreeStart;i<size();i++) {
+    for(INT8U i=FreeStart;i<size();i++) {
         if(can_handout(i)) {
             at(i)->canPlay=true;
         } else {
@@ -380,7 +380,7 @@ void CardInHand::_Kou() {
     node.canPlay = false;
     node.status  = sMING_KOU;
     
-    for(int i=last();i>=FreeStart;i--) {
+    for(INT8U i=last();i>=FreeStart;i--) {
         if(get_status(i)==sMING_KOU) {
             node.kind=get_kind(i);
             
@@ -398,7 +398,7 @@ void CardInHand::_CancelKou() {
     node.status  = sFREE;
     node.canPlay = true;
     
-    for(int i=FreeStart-1;i>=0;i--) {
+    for(INT8U i=FreeStart-1;i>=0;i--) {
         if(get_status(i)==sMING_KOU) {
             node.kind = get_kind(i);
             
@@ -480,7 +480,7 @@ void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind
 
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
-        for(int i=FreeStart;i>0;i--) {
+        for(INT8U i=FreeStart;i>0;i--) {
             if(get_status(i-1)!=sMING_KOU) {
                 return i;
             } else if(data.kind>=get_kind(i-1)) {
@@ -490,7 +490,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
 
         return 0;
     } else {
-        for(int i=FreeStart;i<size();i++) {
+        for(INT8U i=FreeStart;i<size();i++) {
             if(get_kind(i)>=data.kind) {
                 return i;
             }
@@ -506,7 +506,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
 int CardInHand::kou_cards_num() const {/*this function could be optimized by recording kou operation*/
     int num = 0;
 
-    for(int i=FreeStart;i<size();i++) {
+    for(INT8U i=FreeStart;i<size();i++) {
         if(get_status(i)==sMING_KOU) {
             num++;
         }
@@ -552,7 +552,7 @@ void CardInHand::AddKouGroup(Card_t kind,int *idx) {
 }
 
 bool CardInHand::IsKouInclude(Card_t kind) const {
-    for(int i=0;i<_bufKouCards.num;i++) {
+    for(INT8U i=0;i<_bufKouCards.num;i++) {
         if(KouGroupKind(i)==kind) {
             return true;
         }
@@ -584,7 +584,7 @@ void CardInHand::refresh_kou_cards() {
 void CardInHand::scan_kou_cards(Card_t handingout) {
     ClearKouCardInfo();
         
-    for(int i=FreeStart; i<size(); i++){
+    for(INT8U i=FreeStart; i<size(); i++){
         auto kind = get_kind(i);
         
         if( !IsKouInclude(kind) ) {
@@ -600,7 +600,7 @@ void CardInHand::scan_kou_cards(Card_t handingout) {
 void CardInHand::choose_all_kou_cards(Card_t handingout) {
     scan_kou_cards(handingout);
 
-	for(int i=0;i<kou_group_num();i++) {
+	for(INT8U i=0;i<kou_group_num();i++) {
 		if(can_kou(KouGroupKind(i),handingout)) {
 		    SetGroupStatus(i,sMING_KOU);
 		}
@@ -608,7 +608,7 @@ void CardInHand::choose_all_kou_cards(Card_t handingout) {
 }
 
 void CardInHand::clear_kou_choices() {
-    for(int i=0;i<_bufKouCards.num;i++) {
+    for(INT8U i=0;i<_bufKouCards.num;i++) {
         SetGroupStatus(i,sFREE);
     }
 }
@@ -616,7 +616,7 @@ void CardInHand::clear_kou_choices() {
 int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
     int idx = 0;
     
-    for(int i=0;i<_bufKouCards.num;i++) {
+    for(INT8U i=0;i<_bufKouCards.num;i++) {
         if(kou_group_status(i)==sMING_KOU) {
             kouKind[idx++] = KouGroupKind(i);    
         }
@@ -644,7 +644,7 @@ void CardInHand::set_ming(int handout) {
     if(kind==CARD_UNKNOWN) {
         _ting = &((_ming.handouts+_ming.choiceNum-1)->ting);
     } else {
-        for(int i=0;i<_ming.choiceNum;i++) {
+        for(INT8U i=0;i<_ming.choiceNum;i++) {
             if((_ming.handouts+i)->kind==kind) {
                 _ting = &((_ming.handouts+i)->ting);
                 break;
@@ -698,10 +698,10 @@ void CardInHand::_JudgePengPengHu() {
     int usedLen  = 0;
     int GroupSameCount = 0;
     
-    for(int i=FreeStart;i<size();i+=usedLen) {
+    for(INT8U i=FreeStart;i<size();i+=usedLen) {
         int sameCount = 1;
         
-        for(int j=i+1;j<size();j++) {
+        for(INT8U j=i+1;j<size();j++) {
             if(get_kind(j)==get_kind(i)) {
                 sameCount++;
             }
@@ -754,8 +754,8 @@ bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
     SmartList newCards = _Exclude(kouKind);
     
 	if(handingout==CARD_UNKNOWN) {
-		for(int i=0;i<newCards.len;i++) {
-			for(int k=0;k<CARD_KIND_MAX;k++) {
+		for(INT8U i=0;i<newCards.len;i++) {
+			for(INT8U k=0;k<CARD_KIND_MAX;k++) {
                 SmartList cards(newCards);
                 cards.displace(i,(Card_t)k);
 				if(cards.can_hu()) {
@@ -764,9 +764,9 @@ bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
 			}
         }
 	} else {
-		for(int i=0;i<newCards.len;i++) {
+		for(INT8U i=0;i<newCards.len;i++) {
 			if(newCards.kind[i]==handingout) {
-                for(int k=0;k<CARD_KIND_MAX;k++) {
+                for(INT8U k=0;k<CARD_KIND_MAX;k++) {
                     SmartList cards(newCards);
                     cards.displace(i,(Card_t)k);
                     if(cards.can_hu()) {
@@ -794,7 +794,7 @@ ActionMask_t CardInHand::judge_action(bool isNewDistributed, bool isLastOne) con
 	}
 
     int num = 0;
-	for(int i=0;i<last();i++) {
+	for(INT8U i=0;i<last();i++) {
 		if(get_kind(i)==newCard) {
             CardStatus_t status = get_status(i);
             
@@ -848,7 +848,7 @@ void CardInHand::update_statistics(Card_t huKind) {
     int color = huKind/9;
     int sameAsHuKind = 1;
         
-	for(int i=0;i<size();i++) {
+	for(INT8U i=0;i<size();i++) {
 		if(get_status(i)==sFREE ) {
 			statFreeCards++;
 		}
@@ -875,7 +875,7 @@ void CardInHand::update_statistics(Card_t huKind) {
         
 		int freeSameCard = 1;
         int sameCard = 1;
-		for(int k=i+1;(k<i+4) & (k<size());k++) {
+		for(INT8U k=i+1;(k<i+4) & (k<size());k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
                 if( get_status(i)==sFREE ) {
                     freeSameCard++;
@@ -939,7 +939,7 @@ ROBOT_TARGET CardInHand::assess_aim() {
 bool CardInHand::PreferQingYiSe(int &targetColor) const{
     targetColor  = get_kind(0)/9;
 
-    for(int i=1;i<FreeStart;i++) {
+    for(INT8U i=1;i<FreeStart;i++) {
         if(targetColor!=get_kind(i)/9) {
             return false;
         }
@@ -947,7 +947,7 @@ bool CardInHand::PreferQingYiSe(int &targetColor) const{
     
     int colorNum = FreeStart;
 
-    for(int i=FreeStart;i<size();i++) {
+    for(INT8U i=FreeStart;i<size();i++) {
         if(targetColor!=get_kind(i)/9) {
             break;
         } else {
@@ -965,7 +965,7 @@ bool CardInHand::PreferQingYiSe(int &targetColor) const{
 int CardInHand::GetCoupleNum() const {
     int coupleNum = 0;
     
-    int i = 0;
+    INT8U i = 0;
     while(i<size()) {
         if(get_kind(i)==get_kind(i+1)) {
             coupleNum++;
@@ -1004,14 +1004,14 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
     ting.cardNum = 0;
     ting.cards   = new TingItem_t[9];
 
-    for(int k=0;k<CARD_KIND_MAX;k++) {
+    for(INT8U k=0;k<CARD_KIND_MAX;k++) {
         if( can_hu(position,k) ) {
             TingItem_t *tingCard = ting.cards + ting.cardNum;
             
             tingCard->kind = (Card_t)k;
             
             tingCard->fan  = CalcTimes((Card_t)k);
-            for(int i=0;i<FreeStart;i++) {
+            for(INT8U i=0;i<FreeStart;i++) {
                 if( get_kind(i)==k && get_status(i)==sPENG) {
                     tingCard->fan *= 2;      /*BUG why ? MingSiGui???*/
                     break;
@@ -1041,7 +1041,7 @@ bool CardInHand::collect_ming_info(const CardList *river) {
         
         Card_t prevCardCanHu = CARD_UNKNOWN;
         
-        for(int i=FreeStart;i<size();i++) {
+        for(INT8U i=FreeStart;i<size();i++) {
             if(get_status(i)==sMING_KOU) {
                 continue;
             }
@@ -1065,6 +1065,26 @@ bool CardInHand::collect_ming_info(const CardList *river) {
     }
 }
 
+void CardInHand::set_ming_info(const MingInfo_t &ming) {
+    _ting = NULL;
+
+    _ming.choiceNum = ming.choiceNum;
+    _ming.handouts  = new MingChoice_t[18];
+
+    for(INT8U i=0;i<ming.choiceNum;i++) {
+        MingChoice_t  *src = ming.handouts + i;
+        MingChoice_t  *choice = _ming.handouts + i;
+
+        choice->kind = src->kind;
+        choice->ting.cardNum = src->ting.cardNum;
+        choice->ting.cards = new TingItem_t[9];
+
+        for(INT8U j=0;j<choice->ting.cardNum;j++) {
+            *(choice->ting.cards+j) = *(src->ting.cards+j);
+        }
+    }
+}
+
 bool CardInHand::can_handout(int idx) const {
     if( _mingChoicesMask & (1<<idx) ) {
         return true;
@@ -1079,7 +1099,7 @@ void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) {
     if(_ting!=NULL) {
 	    *len = _ting->cardNum;
 
-        for(int i=0;i<_ting->cardNum;i++) {
+        for(INT8U i=0;i<_ting->cardNum;i++) {
 		    cards[i] = (CARD_KIND)(_ting->cards+i)->kind;
         }
     } else {
@@ -1092,11 +1112,11 @@ bool CardInHand::get_ming_info(MRES *res) const {
 		res->hu_places_num = _ming.choiceNum;
 		res->hu_places     = _mingChoicesMask;
 
-        for(int i=0;i<_ming.choiceNum;i++) {
+        for(INT8U i=0;i<_ming.choiceNum;i++) {
             MingChoice_t *handout = _ming.handouts + i;
             
 			res->hu_cards_num[i] = handout->ting.cardNum;
-			for(int j=0;j<res->hu_cards_num[i];j++)
+			for(INT8U j=0;j<res->hu_cards_num[i];j++)
 				res->hu_cards[i][j] = (CARD_KIND)(handout->ting.cards+j)->kind;
         }
 
@@ -1209,7 +1229,7 @@ SmartList::SmartList(const CardInHand &cards,bool onlyFree) {
 
     int start = onlyFree?(cards.FreeStart):0;
     
-    for(int i=start;i<cards.size();i++) {
+    for(INT8U i=start;i<cards.size();i++) {
         kind[len++] = cards.at(i)->kind;
     }
 }
@@ -1217,7 +1237,7 @@ SmartList::SmartList(const CardInHand &cards,bool onlyFree) {
 SmartList::SmartList(const SmartList &orig) {
 	len = 0;
 
-    for(int i=0;i<orig.len;i++) {
+    for(INT8U i=0;i<orig.len;i++) {
         kind[len++] = orig.kind[i];
     }
 }
@@ -1231,14 +1251,14 @@ bool SmartList::_IsFirstInGroupSame() const  {
 }
 
 bool SmartList::_IsFirstInGroupSequence(int seqIdx[3]) const  {
-    for(int i=1;i<len;i++) {
+    for(INT8U i=1;i<len;i++) {
         int seqNum = 0;
         seqIdx[seqNum++] = 0;
 
         if((kind[i]==kind[0]+1) && (kind[i]/9==kind[0]/9)) {
             seqIdx[seqNum++] = i;
 
-            for(int j=i+1;j<len;j++) {
+            for(INT8U j=i+1;j<len;j++) {
                 if((kind[j]==kind[0]+2) && (kind[j]/9==kind[0]/9)) {
                     seqIdx[seqNum++] = j;
                     return true;
@@ -1254,7 +1274,7 @@ int SmartList::_GetContinuousCoupleNum() const {
     int coupleNum = 0;
     
 	if(len%2==0) {
-	    for(int i=0;i<len;i+=2) {
+	    for(INT8U i=0;i<len;i+=2) {
 	        if( kind[i]==kind[i+1] ) {
 	            coupleNum++;
 	        }
@@ -1269,7 +1289,7 @@ bool SmartList::_IsCharDismatched() const {
 	int faNum=0;
 	int baiNum=0;
     
-	for(int i=0;i<len;i++) {
+	for(INT8U i=0;i<len;i++) {
 		if(kind[i]==ZHONG)
 			zhongNum++;
 		if(kind[i]==FA)
@@ -1290,8 +1310,8 @@ bool SmartList::_IsCharDismatched() const {
 void SmartList::displace(int changeIdx, Card_t card) {
     kind[changeIdx] = card;
 
-    for(int i=0;i<len;i++) {
-        for(int j=i+1;j<len;j++) {
+    for(INT8U i=0;i<len;i++) {
+        for(INT8U j=i+1;j<len;j++) {
             if(kind[j]<kind[i]) {
                 Card_t temp   = kind[i];
                 kind[i] = kind[j];
@@ -1305,7 +1325,7 @@ void SmartList::remove(int deleteNum,int deletes[]) {
 	int deleteIdx = 0;
     int idx = 0;
     
-    for(int i=0;i<len;i++) {
+    for(INT8U i=0;i<len;i++) {
         if(i==deletes[deleteIdx]) {
             deleteIdx++;
         } else {
@@ -1318,7 +1338,7 @@ void SmartList::remove(int deleteNum,int deletes[]) {
 }
 
 void SmartList::insert(Card_t newCard) {
-    for(int i=len;i>=0;i--) {
+    for(INT8U i=len;i>=0;i--) {
         if(newCard<kind[i]) {
             kind[i] = kind[i-1];
         } else {
@@ -1368,7 +1388,7 @@ bool SmartList::is_ka_wu_xing(Card_t wuXing) const {
     int Pos4   = INVALID;
     int Pos6   = INVALID;
     
-    for(int i=0;i<len;i++) {
+    for(INT8U i=0;i<len;i++) {
         if(kind[i]==wuXing-1)
             Pos4 = i;
         else if(kind[i]==wuXing+1)

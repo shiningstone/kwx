@@ -172,6 +172,11 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     PlayerDir_t dir = (PlayerDir_t)info->seat;
     INT8U timer     = info->timer;
     _actionToDo     = info->remind.actions;
+    
+    if(info->remind.ming.choiceNum>0) {
+
+    }
+
     delete info;
 
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
@@ -234,6 +239,11 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _curPlayer        = MIDDLE;
     _isNewDistributed = true;
     _actionToDo     = info->remind.actions;
+    
+    if(info->remind.ming.choiceNum>0) {
+
+    }
+
     delete info;
 
     ServerDistributeTo(target,card);
@@ -282,6 +292,11 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     INT8U timer     = info->timer;
     Card_t kind     = info->kind;
     _actionToDo     = info->remind.actions;
+    
+    if(info->remind.ming.choiceNum>0) {
+
+    }
+
     delete info;
 
     if(dir!=whoGive) {
