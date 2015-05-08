@@ -1068,7 +1068,7 @@ public:
 
             2,
             132,0,4,1,2,3,4,         //KEY
-            131,0,4,5,6,7,8,         //roomPath
+            131,0,4,0,0,0,11,         //roomPath
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
