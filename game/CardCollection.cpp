@@ -84,12 +84,16 @@ int CardList::get_num(Card_t kind) const {
     return num;
 }
 
-int CardList::FindCards(int idx[],Card_t kind,int start) const {
+int CardList::find_cards(Card_t kind,int *idx,int start) const {
     int num = 0;
     
     for(int i=start; i<size(); i++) {   
         if(get_kind(i)==kind) {
-            idx[num++] = i;
+            if(idx!=NULL) {
+                idx[num] = i;
+            }
+
+            num++;
         }
     }
 
@@ -143,16 +147,6 @@ void CardList::show() {
 	LOGGER_WRITE_ARRAY(kinds,size());	
 }
 
-int CardList::generate_raw(Card_t * array) {
-	CardList::iterator it;
-    int idx = 0;
-
-	for(it=begin();it!=end();it++) {
-		array[idx++] = (*it)->kind;
-	}
-
-    return idx;
-}
 /***********************************************
 
 ***********************************************/
@@ -245,7 +239,7 @@ bool CardInHand::is_wait_handout() const {
 
 Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first group*/
     for(int i=FreeStart; i<size(); i++) {
-        int matchNum = FindCards(cardIdx,get_kind(i),i);
+        int matchNum = find_cards(get_kind(i),cardIdx,i);
 
         if(matchNum==4) {
             return get_kind(i);
@@ -256,7 +250,7 @@ Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first 
 }
 
 Card_t CardInHand::find_ming_gang_cards(int idx[],Card_t kind) const{
-    if(FindCards(idx,kind)==4) {
+    if(find_cards(kind,idx)==4) {
         return kind;
     } else {
         return CARD_UNKNOWN;
@@ -264,7 +258,7 @@ Card_t CardInHand::find_ming_gang_cards(int idx[],Card_t kind) const{
 }
 
 int CardInHand::find_free_cards(int idx[],Card_t kind) const {
-    return FindCards(idx,kind,FreeStart);
+    return find_cards(kind,idx,FreeStart);
 }
 
 void CardInHand::_AnGang(Card_t card) {

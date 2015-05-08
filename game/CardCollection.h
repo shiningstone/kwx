@@ -45,12 +45,10 @@ public:
     bool canPlay(unsigned int idx) const;
     void set_status(unsigned int idx,CardStatus_t status);
 
-    int    generate_raw(Card_t *array);
-
+    int  find_cards(Card_t kind,int *idx=NULL,int start = 0) const;
 protected:
     Logger *_logger;
 
-    int  FindCards(int idx[],Card_t kind,int start = 0) const;
 };
 
 class SmartList;
