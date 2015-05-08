@@ -3827,13 +3827,15 @@ float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTin
 void RaceLayer::_UpdateTingNum(PlayerDir_t dir) {
     TingInfo_t *ting = _roundManager->_players[dir]->_cards->_ting;
 
-	for(int i=0;i<ting->cardNum;i++) {
-		Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
-		curCardBar->removeChildByTag(2);
-
-        auto residueNum = _CreateNumberSign((ting->cards+i)->remain);
-        curCardBar->addChild(residueNum,1,2);
-	}
+    if(ting!=NULL) {
+        for(int i=0;i<ting->cardNum;i++) {
+            Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
+            curCardBar->removeChildByTag(2);
+        
+            auto residueNum = _CreateNumberSign((ting->cards+i)->remain);
+            curCardBar->addChild(residueNum,1,2);
+        }
+    }
 }
 
 void RaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
