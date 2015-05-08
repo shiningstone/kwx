@@ -56,6 +56,7 @@ class RoundManager;
 class CardInHand : public CardList {
 public:
     CardInHand();
+    ~CardInHand();
     
     void   init(Card_t *cards,int len);
     void   delete_card(int from,int len);
@@ -171,8 +172,11 @@ public:
     TingInfo_t *_ting;
     long CalcTimes(Card_t kind);
     bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
+
     bool collect_ming_info(const CardList *river = NULL/*if don't care about remain number*/);
-    void set_ming_info(const MingInfo_t &info);
+    void set_ming_info(const MingInfo_t &info);/* for MIDDLE only*/
+    void set_ting_info(const TingInfo_t &ting);/*for others only*/
+    
     void get_hu_cards(CARD_KIND cards[],int *len);
     bool can_handout(int idx) const;
     bool get_ming_info(MRES *res) const;

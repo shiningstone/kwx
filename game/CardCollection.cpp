@@ -163,6 +163,11 @@ CardInHand::CardInHand() {
     statHuFanMask      = 0;
 }
 
+CardInHand::~CardInHand() {
+    /* memory release */
+    
+}
+
 void CardInHand::init(Card_t *cards,int len) {
     clear();
 
@@ -1082,6 +1087,17 @@ void CardInHand::set_ming_info(const MingInfo_t &ming) {
         for(INT8U j=0;j<choice->ting.cardNum;j++) {
             *(choice->ting.cards+j) = *(src->ting.cards+j);
         }
+    }
+}
+
+/* NOTE : memory release should be pay more attention, since _ting may refer to _ming in SINGLE_GAME */
+void CardInHand::set_ting_info(const TingInfo_t &ting) {
+    _ting = new TingInfo_t;
+    _ting->cardNum = ting.cardNum;
+    _ting->cards = new TingItem_t[9];
+    
+    for(INT8U i=0;i<ting.cardNum;i++) {
+        *(_ting->cards+i) = *(ting.cards+i);
     }
 }
 

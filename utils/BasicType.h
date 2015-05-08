@@ -105,7 +105,7 @@ typedef struct _TingItem_t {
 typedef struct _TingInfo_t {
     int           cardNum;      /* 可以胡的花色数目 */
     TingItem_t    *cards;       /* 注意: 这是一个数组指针，使用者需要负责动态分配内存*/
-}TingInfo_t   ;
+}TingInfo_t;
 
 typedef struct _MingChoice_t {
     Card_t        kind;         /*可以出的花色*/
