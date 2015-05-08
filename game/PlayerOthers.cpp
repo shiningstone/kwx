@@ -30,6 +30,16 @@ bool PlayerOthers::OthersCanHu(Card_t kind) const {
     return false;
 }
 
+int PlayerOthers::AvailNum(Card_t kind) const {
+    int num = _ctx.river->find_cards(kind);
+
+    if(_ctx.remain<10 && num==0) {
+        return 3;
+    } else {
+        return (4-num);
+    }
+}
+
 int PlayerOthers::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int j,k;

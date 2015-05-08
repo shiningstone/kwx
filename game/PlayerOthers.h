@@ -8,6 +8,7 @@
 
 typedef struct _KindPosition {
     Card_t        val;
+    int           num;
     int           position[4];
 }KindPosition;
 
@@ -40,6 +41,7 @@ class PlayerOthers:public Player
         void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);
         
         bool OthersCanHu(Card_t kind) const;
+        int  AvailNum(Card_t kind) const;
 
 		int Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 		int river_reserved_card(HAH *hash_table,int card);//
