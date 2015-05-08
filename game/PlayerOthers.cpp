@@ -20,8 +20,8 @@ PlayerOthers::~PlayerOthers() {
 
 bool PlayerOthers::OthersCanHu(Card_t kind) const {
     for(int i=0;i<2;i++) {
-        for(int j=0;j<_ctx.OthersTing[i].cardNum;j++) {
-            if(kind==(_ctx.OthersTing[i].cards+j)->kind) {
+        for(int j=0;j<_ctx.OthersTing[i]->cardNum;j++) {
+            if(kind==(_ctx.OthersTing[i]->cards+j)->kind) {
                 return true;
             }
         }

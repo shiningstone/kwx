@@ -451,6 +451,40 @@ void round3_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void round4_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==0) {
+        handout++;
+        
+        SendLine(SERVER,10);
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
+        SendLine(SERVER,13);
+        SendLine(SERVER,14);
+        SendLine(SERVER,15);
+        SendLine(SERVER,16);
+        SendLine(SERVER,17);
+        SendLine(SERVER,18);
+        SendLine(SERVER,19);
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -501,10 +535,13 @@ void test_server_console() {
     SetFile("Round3");
     gHandle = round3_handle_requests;
 
-    #endif
     SetFile("Round1");
     gHandle = round1_handle_requests;
 
+    #endif
+    /*没有杠提示*/
+    SetFile("Round4");
+    gHandle = round4_handle_requests;
 
     test_smart_game_round_x();
 #endif

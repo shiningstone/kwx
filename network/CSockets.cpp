@@ -98,8 +98,11 @@ void ClientSocket::Start(const char *serverIp,int port) {
     char strServerIp[128] = {0};
     FILE * target = NULL;
 
+#ifdef USE_REMOTE_SERVER
 	target = fopen("E:\\server_ip.txt","r");
-    if(target!=NULL) {
+#endif
+
+	if(target!=NULL) {
         fgets(strServerIp,128,target);
     } else {
         strcpy(strServerIp,serverIp);

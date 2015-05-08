@@ -8,7 +8,7 @@ using namespace CocosDenshion;
 
 
 /*DEBUG : USED TO CONTROL START A SINGLE GAME OR NETWORK GAME*/
-#define SINGLE_GAME
+//#define SINGLE_GAME
 
 HelloWorld::HelloWorld()
 {

@@ -24,6 +24,8 @@
 
 #define DEF_SERVER_IP    "127.0.0.1"
 #define DEF_SOCKET_PORT  60905
+/*This macro is used to control the client socket connect to local server or remote server*/
+//#define USE_REMOTE_SERVER
 
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
 #define SOCKET_BUFF_SIZE 128
