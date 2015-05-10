@@ -88,7 +88,7 @@ public:
     INT8U            next;
     ActionMask_t     actions;
     INT8U            cardNum;
-    Card_t           card[18];
+    CardNode_t       card[18];
 };
 
 class DistCardInfo : public DsInstruction {

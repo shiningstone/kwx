@@ -331,8 +331,24 @@ void NetRoundManager::_DiRecv(ActionResponse *info) {
 void NetRoundManager::_DiRecv(ActionNotif *info) {
     PlayerDir_t dir     = (PlayerDir_t)info->seat;
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
-    _actionToDo     = info->actions;
-    Card_t card     = info->card[0];
+    Card_t card         = info->card[0].kind;
+    _actionToDo         = info->actions;
+
+    if(_actionToDo==aMING) {
+        CardInHand *cards = _players[_curPlayer]->_cards;
+        cards->clear();
+        
+        for(int i=0;i<info->cardNum;i++) {
+            CardNode_t *node = new CardNode_t;
+            *node = info->card[i];
+            cards->push_back( node );
+        }
+
+        cards->IsMing = true;
+
+        _uiManager->_CardInHandUpdateEffect(dir);
+    }
+    
     delete info;
 
     _curPlayer = whoGive;

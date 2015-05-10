@@ -176,7 +176,7 @@ int ActionNotif::Construct(const DsMsg &msg) {
     seat    = _GetPlayer(msg.GetItemValue(0));
     whoGive = _GetPlayer(msg.GetItemValue(1));
     next    = _GetPlayer(msg.GetItemValue(2));
-    actions = _GetPlayer(msg.GetItemValue(3));
+    actions = msg.GetItemValue(3);
     DsMsgParser::_load(card, cardNum, msg, 4);
     return 0;
 }

@@ -416,6 +416,7 @@ void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,37);
         SendLine(SERVER,38);
         SendLine(SERVER,39);
+        SendLine(SERVER,40);
     }
 }
 
@@ -540,8 +541,8 @@ void test_server_console() {
 
     #endif
     /*没有杠提示*/
-    SetFile("Round4");
-    gHandle = round4_handle_requests;
+    SetFile("Round1");
+    gHandle = round1_handle_requests;
 
     test_smart_game_round_x();
 #endif

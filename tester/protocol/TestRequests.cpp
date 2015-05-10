@@ -330,7 +330,7 @@ public:
         assert( action.whoGive==2 );
         assert( action.next==2 );
         assert( action.actions==a_PENG );
-        assert( action.card[0]==TIAO_3 );
+        assert( action.card[0].kind==TIAO_3 );
 
         return 0;
     }

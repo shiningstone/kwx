@@ -80,6 +80,24 @@ int DsMsgParser::_load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx) {
     return 0;
 }
 
+int DsMsgParser::_load(CardNode_t cards[18],INT8U &num,const DsMsg &msg,int itemIdx) {
+    num = (INT8U)msg.GetItemBufLen(itemIdx);
+    
+    for(int i=0;i<num;i++) {
+        INT8U byte = msg._body->_items[itemIdx]->_buf[i];
+
+        (cards[i]).kind = (Card_t)(byte&0x1f);
+        (cards[i]).status = (CardStatus_t)((byte&0xe0) >> 5);
+        (cards[i]).canPlay = false;
+    }
+
+    if(num==1 && (cards[0]).kind==CARD_UNKNOWN) {
+        num = 0;
+    }
+
+    return 0;
+}
+
 int DsMsgParser::_load(TingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 

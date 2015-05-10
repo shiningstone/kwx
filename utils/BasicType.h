@@ -65,6 +65,22 @@ typedef enum {
 }Card_t;
 
 typedef enum {
+	sFREE = 0,
+	sPENG,
+	sMING_GANG,
+	sAN_GANG,
+	sMING_KOU,
+	sKOU_ENABLE,
+	sUNDEFINDED=0xff,
+}CardStatus_t;
+
+typedef struct _CardNode_t {
+	Card_t       kind;
+	CardStatus_t status;
+	bool         canPlay;
+}CardNode_t;
+
+typedef enum {
     BOY,
     GIRL,
     SEX_MAX,
