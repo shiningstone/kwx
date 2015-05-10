@@ -300,7 +300,7 @@ void CardInHand::_MingGang(Card_t kind) {
     node.status  = sMING_GANG;
     node.canPlay = false;
     
-    for(INT8U i=last();i>=0;i--) {
+    for(int i=last();i>=0;i--) {
         if(get_kind(i)==kind) {
             if(get_status(i)==sPENG || get_status(i)==sMING_KOU) {
                 FreeStart--;
@@ -385,7 +385,7 @@ void CardInHand::_Kou() {
     node.canPlay = false;
     node.status  = sMING_KOU;
     
-    for(INT8U i=last();i>=FreeStart;i--) {
+    for(int i=last();i>=FreeStart;i--) {
         if(get_status(i)==sMING_KOU) {
             node.kind=get_kind(i);
             
@@ -403,7 +403,7 @@ void CardInHand::_CancelKou() {
     node.status  = sFREE;
     node.canPlay = true;
     
-    for(INT8U i=FreeStart-1;i>=0;i--) {
+    for(int i=FreeStart-1;i>=0;i--) {
         if(get_status(i)==sMING_KOU) {
             node.kind = get_kind(i);
             
@@ -485,7 +485,7 @@ void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind
 
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
-        for(INT8U i=FreeStart;i>0;i--) {
+        for(int i=FreeStart;i>0;i--) {
             if(get_status(i-1)!=sMING_KOU) {
                 return i;
             } else if(data.kind>=get_kind(i-1)) {
@@ -1354,7 +1354,7 @@ void SmartList::remove(int deleteNum,int deletes[]) {
 }
 
 void SmartList::insert(Card_t newCard) {
-    for(INT8U i=len;i>=0;i--) {
+    for(int i=len;i>=0;i--) {
         if(newCard<kind[i]) {
             kind[i] = kind[i-1];
         } else {
