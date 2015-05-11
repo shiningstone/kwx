@@ -245,5 +245,13 @@ public:
     INT8U            image[128];    
 };
 
+class CounterNotif : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+
+    int              count;
+    INT32U           seat;
+};
+
 #endif
 

@@ -27,6 +27,7 @@ RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_GET_TINGINFO),
     DESC(REQ_GAME_DIST_CARD),
     DESC(REQ_GAME_SEND_CALSCORE),
+    DESC(REQ_GAME_DIST_DAOJISHI),
     DESC(REQ_GAME_DIST_REMIND),
     DESC(REQ_GAME_DIST_BEGINCARDS),
     DESC(REQ_GAME_DIST_BEGINCARDS_OTHER),
@@ -49,7 +50,7 @@ char *DsInstruction::Desc(RequestId_t id) const {
         }
     }
 
-    return "Request undefined";
+    return "Desc undefined";
 }
 #endif
 
@@ -355,5 +356,14 @@ int EnterRoomNotif::Construct(const DsMsg &msg) {
     seat     = msg.GetItemValue(0);
     
     return 0;
+}
+
+int CounterNotif::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+
+    count     = msg.GetItemValue(0);
+    seat      = _GetPlayer(msg.GetItemValue(1));
+
+	return 0;
 }
 

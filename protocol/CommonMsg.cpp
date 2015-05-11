@@ -138,6 +138,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_GAME_RECV_ENTER:
             return new EnterRoomNotif();
 
+        case REQ_GAME_DIST_DAOJISHI:
+            return new CounterNotif();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }

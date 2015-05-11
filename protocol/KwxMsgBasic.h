@@ -36,7 +36,8 @@ typedef enum {
     /* Downstream : start by server */
     REQ_GAME_DIST_CARD          = 51,
 
-    REQ_GAME_SEND_CALSCORE      = 53,                
+    REQ_GAME_SEND_CALSCORE      = 53,
+    REQ_GAME_DIST_DAOJISHI      = 54,
     REQ_GAME_DIST_REMIND        = 55,             
     REQ_GAME_DIST_BEGINCARDS    = 56,          
     REQ_GAME_DIST_BEGINCARDS_OTHER = 57,

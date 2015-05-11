@@ -139,6 +139,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_RECV_ENTER:
             _DiRecv((EnterRoomNotif *)di);
             break;
+        case REQ_GAME_DIST_DAOJISHI:
+            _DiRecv((CounterNotif *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -463,6 +466,10 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
     LOGGER_WRITE("NOTE: profile of players should be updated here\n");
+}
+
+void NetRoundManager::_DiRecv(CounterNotif *info) {
+    _uiManager->UpdateClock(info->count,info->seat);
 }
 
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {

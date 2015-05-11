@@ -145,6 +145,7 @@ int RoundManager::Shuffle() {
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
         p[i] = (_unDistributedCards[i]);
     }
+    LOGGER_WRITE("new card sequence:\n");
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
     
     _isGangAsking = false;
