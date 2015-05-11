@@ -110,7 +110,7 @@ void SeatInfo::_SetSeatDirMap() {
 
 PlayerDir_t SeatInfo::GetPlayer(SeatId_t seat)const {
     if(seat==0) {
-        return INVALID_DIR;
+        return SERVER;
     } else {
         return _seatToDir[seat-1];
     }

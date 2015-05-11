@@ -18,6 +18,7 @@ typedef enum {
     RIGHT,
     INVALID_DIR,
     DOUBLE_PLAYER = 3,
+    SERVER        = 4,
 }PlayerDir_t;
 
 typedef enum {
@@ -33,6 +34,8 @@ typedef enum {
 
     aQIANG_GANG= 0xfd,
     aTING      = 0xfe,
+
+    aLIU_JU    = 0x80000
 }ActionId_t;/*ARRAY_ACTION???*/
 
 typedef INT32U ActionMask_t;

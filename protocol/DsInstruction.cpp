@@ -80,7 +80,9 @@ int DsInstruction::Dispatch() {
 
 PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
     PlayerDir_t dir = _seatInfo->GetPlayer(seat);
-    if( dir<LEFT || dir>RIGHT ) {
+    if(dir==SERVER) {
+        return SERVER;
+    } else if( dir<LEFT || dir>RIGHT ) {
         return INVALID_DIR;
     } else {
         return dir;
@@ -245,9 +247,9 @@ int DecisionNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
     seat      = _GetPlayer(msg.GetItemValue(0));
-    whoGive   = _GetPlayer(msg.GetItemValue(1));
+    whoGive   = _GetPlayer(msg.GetItemValue(1));/*BUG : seatId==0 if from server*/
     next      = _GetPlayer(msg.GetItemValue(2));
-    actions   = _GetPlayer(msg.GetItemValue(3));
+    actions   = msg.GetItemValue(3);
     card      = (Card_t)msg.GetItemValue(4);
     return 0;
 }
