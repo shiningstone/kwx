@@ -1,0 +1,798 @@
+CSocket]: SEND (045): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	2c 00 2d 00 00 00 00 00 00 00 00 00 00 00 02 84 
+	00 04 01 02 03 04 83 00 04 00 00 00 0b 
+
+[RaceLayer]: RaceLayer::CreateRace
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+cocos2d: fullPathForFilename: No file found at /cc_2x2_white_image. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 84
+[CSocket]: RECV (098): 
+
+	4b 57 58 00 2c 00 00 62 00 00 00 00 00 00 00 00 
+	00 00 00 00 09 83 00 04 00 00 00 0b 84 00 04 00 
+	0f 46 29 85 00 04 00 00 00 01 3c 01 86 00 04 00 
+	00 00 64 87 00 03 01 00 00 88 00 0c 00 03 0d 40 
+	00 00 00 00 00 00 00 00 89 00 10 fe ff 00 6a 00 
+	69 00 61 00 6e 00 67 00 62 00 6f 8a 00 04 fe ff 
+	00 31 
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_ENTER
+
+[NetRoundManager]: NOTE: profile of players should be updated here
+
+[NetRoundManager]: Start heartbeats
+
+The thread 0x1014 has exited with code 0 (0x0).
+[CSocket]: RECV (030): 
+
+	4b 57 58 00 47 00 00 39 00 00 00 00 00 00 00 00 
+	00 00 00 00 06 3d 02 83 00 04 00 00 00 64 
+
+[CSocket]: RECV (027): 
+
+	3e 01 84 00 04 00 00 00 00 85 00 08 fe ff 73 8b 
+	5c 0f 4e 8c 86 00 04 fe ff 00 32 
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_ENTER
+
+[NetRoundManager]: NOTE: profile of players should be updated here
+
+[CSocket]: RECV (057): 
+
+	4b 57 58 00 47 00 00 39 00 00 00 00 00 00 00 00 
+	00 00 00 00 06 3d 03 83 00 04 00 00 00 64 3e 01 
+	84 00 04 00 00 00 00 85 00 08 fe ff 73 8b 5c 0f 
+	4e 8c 86 00 04 fe ff 00 32 
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_ENTER
+
+[NetRoundManager]: NOTE: profile of players should be updated here
+
+[CSocket]: RECV (030): 
+
+	4b 57 58 00 4d 00 00 1e 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 3c 02 82 00 04 ff ff ff 9c 
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_START
+
+[NetRoundManager]: NOTE: Player2's score should set to -100
+
+[CSocket]: RECV (014): 
+
+	4b 57 58 00 4d 00 00 1e 00 00 00 00 00 00 
+
+[CSocket]: RECV (016): 
+
+	00 00 00 00 00 00 02 3c 03 82 00 04 ff ff ff 9c 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_START
+
+[NetRoundManager]: NOTE: Player0's score should set to -100
+
+unsupport convert for format 8 to format 2
+[NetRoundManager]: NETWORK: Request(last winner) not defined
+[CSocket]: SEND (054): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	2b 00 36 00 00 00 00 00 00 00 00 00 00 00 04 83 
+	00 04 00 00 00 0b 84 00 04 00 0f 46 29 85 00 04 
+	00 00 00 01 3c 01 
+
+[CSocket]: RECV (028): 
+
+	4b 57 58 00 2b 00 00 1c 00 00 00 00 00 00 00 00 
+	00 00 00 00 01 83 00 04 ff ff ff 9c 
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_START
+
+[NetRoundManager]: NOTE: Player1's score should set to -100
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????`?2????????x?. Possible missing file.
+[CSocket]: RECV (066): 
+
+	4b 57 58 00 38 00 00 42 00 00 00 00 00 00 00 00 
+	00 00 00 00 08 3c 01 3d 28 3e 14 80 00 0e 0b 04 
+	03 0a 00 08 00 09 0f 01 01 08 0d 11 81 00 04 00 
+	00 00 00 82 00 01 ff 83 00 01 ff 84 00 04 ff ff 
+	ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_BEGINCARDS
+
+	00 00 00 02 02 02 03 04 05 06 07 08 09 09 09 09 
+	09 0a 0a 0b 0b 0c 0e 0f 10 10 11 09 09 09 0a 0a 
+	0b 0b 0c 0e 0f 10 11 11 00 01 02 03 04 05 06 14 
+	14 14 14 14 00 00 00 00 00 00 00 00 00 00 00 00 
+	00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+	00 00 00 00 
+
+[Player]: NETWORK : bc78c20 Player::hand_in actions 0: newCard 17,isNewDistributed 0,tingStatus 0,isLastOne 0
+[RaceLayer]: RaceLayer::FirstRoundDistributeEffect
+[RaceLayer]: RaceLayer::ListenToDistributeCard
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 80
+[CSocket]: RECV (018): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 
+
+[CSocket]: RECV (007): 
+
+	00 00 02 41 14 3c 01 
+
+[d??]: unknown instruction
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 76
+cocos2d: fullPathForFilename: No file found at ??????????????????????????????????????????????????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ??????????????????????????????????????????????????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ??????????????????????????????????????????????????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ??????????????????????????????????????????????????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 72
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 68
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 64
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ????. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 60
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 56
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 52
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 48
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 46
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 45
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????. Possible missing file.
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 44
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????. Possible missing file.
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+[RaceLayer]: RaceLayer::WaitForFirstAction load plist done
+
+cocos2d: fullPathForFilename: No file found at ??? ??. Possible missing file.
+[CardList]: CardList:
+
+	11 
+
+[CSocket]: SEND (056): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	30 00 38 00 00 00 00 00 00 00 00 00 00 00 05 83 
+	00 04 00 00 00 0b 84 00 04 00 0f 46 29 85 00 04 
+	00 00 00 01 3c 01 41 11 
+
+[CSocket]: RECV (030): 
+
+	4b 57 58 00 30 00 00 1e 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 3c 00 83 00 04 ff ff ff ff 
+
+[RaceLayer]: RaceLayer::_DeleteActionReminder
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_SHOWCARD
+
+[NetRoundManager]: NetRoundManager::_DiRecv handout ret = 0
+[Player]: bc78c20 Player::action : 0 (isNewDistributed=1)
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 02 3d 29 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 43
+[Player]: NETWORK : bc78d28 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 02 41 12 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78d28 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (005): 
+
+	4b 57 58 00 34 
+
+[CSocket]: RECV (024): 
+
+	00 00 1d 00 00 00 00 00 00 00 00 00 00 00 00 04 
+	3c 03 3d 2a 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 42
+[Player]: NETWORK : bc78888 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 03 41 12 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78888 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (047): 
+
+	4b 57 58 00 33 00 00 33 00 00 00 00 00 00 00 00 
+	00 00 00 00 08 3c 01 3d 14 3e 2b 3f 07 81 00 04 
+	00 00 00 00 82 00 01 ff 83 00 01 ff 84 00 04 
+
+[CSocket]: RECV (004): 
+
+	ff ff ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 41
+[Player]: NETWORK : bc78c20 Player::hand_in actions 0: newCard 7,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+cocos2d: fullPathForFilename: No file found at ??? ??. Possible missing file.
+[CardList]: CardList:
+
+	11 12 12 04 
+
+[CSocket]: SEND (056): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	30 00 38 00 00 00 00 00 00 00 00 00 00 00 05 83 
+	00 04 00 00 00 0b 84 00 04 00 0f 46 29 85 00 04 
+	00 00 00 01 3c 01 41 04 
+
+[CSocket]: RECV (030): 
+
+	4b 57 58 00 30 00 00 1e 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 3c 00 83 00 04 ff ff ff ff 
+
+[RaceLayer]: RaceLayer::_DeleteActionReminder
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_SHOWCARD
+
+[NetRoundManager]: NetRoundManager::_DiRecv handout ret = 0
+[Player]: bc78c20 Player::action : 0 (isNewDistributed=1)
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 02 3d 2c 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 40
+[Player]: NETWORK : bc78d28 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+[CSocket]: RECV (015): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 
+
+[CSocket]: RECV (017): 
+
+	00 00 00 00 00 03 3c 02 41 12 83 00 04 ff ff ff 
+	ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78d28 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 03 3d 2d 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 39
+[Player]: NETWORK : bc78888 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+[??]: unknown instruction
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 03 41 09 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 09 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78888 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 33 00 00 33 00 00 00 00 00 00 00 00 
+	00 00 00 00 08 3c 01 3d 14 
+
+[CSocket]: RECV (026): 
+
+	3e 2e 3f 0f 81 00 04 00 00 00 00 82 00 01 ff 83 
+	00 01 ff 84 00 04 ff ff ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 38
+[Player]: NETWORK : bc78c20 Player::hand_in actions 0: newCard 15,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+cocos2d: fullPathForFilename: No file found at ??? ??. Possible missing file.
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 
+
+[CSocket]: SEND (056): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	30 00 38 00 00 00 00 00 00 00 00 00 00 00 05 83 
+	00 04 00 00 00 0b 84 00 04 00 0f 46 29 85 00 04 
+	00 00 00 01 3c 01 41 09 
+
+[RaceLayer]: RaceLayer::_DeleteActionReminder
+[CSocket]: RECV (030): 
+
+	4b 57 58 00 30 00 00 1e 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 3c 00 83 00 04 ff ff ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_SHOWCARD
+
+[NetRoundManager]: NetRoundManager::_DiRecv handout ret = 0
+[Player]: bc78c20 Player::action : 0 (isNewDistributed=1)
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 02 3d 2f 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 37
+[Player]: NETWORK : bc78d28 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (018): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 
+
+[CSocket]: RECV (007): 
+
+	00 00 02 41 14 3c 02 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 02 41 14 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78d28 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 03 3d 30 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 36
+[Player]: NETWORK : bc78888 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+6:15 PM 5/10/20156:15 PM 5/10/2015
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+[D?]: unknown instruction
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 03 41 0b 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 0b 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78888 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (003): 
+
+	4b 57 58 
+
+[CSocket]: RECV (048): 
+
+	00 33 00 00 33 00 00 00 00 00 00 00 00 00 00 00 
+	00 08 3c 01 3d 14 3e 31 3f 0a 81 00 04 00 00 00 
+	00 82 00 01 ff 83 00 01 ff 84 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 35
+[Player]: NETWORK : bc78c20 Player::hand_in actions 0: newCard 10,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+[<?]: unknown instruction
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+cocos2d: fullPathForFilename: No file found at ??? ??. Possible missing file.
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 0b 0d 
+
+[CSocket]: SEND (056): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	30 00 38 00 00 00 00 00 00 00 00 00 00 00 05 83 
+	00 04 00 00 00 0b 84 00 04 00 0f 46 29 85 00 04 
+	00 00 00 01 3c 01 41 0d 
+
+[RaceLayer]: RaceLayer::_DeleteActionReminder
+[CSocket]: RECV (030): 
+
+	4b 57 58 00 30 00 00 1e 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 3c 00 83 00 04 ff ff ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_SHOWCARD
+
+[NetRoundManager]: NetRoundManager::_DiRecv handout ret = 0
+[Player]: bc78c20 Player::action : 0 (isNewDistributed=1)
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 02 3d 32 
+
+[CSocket]: RECV (004): 
+
+	3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 34
+[Player]: NETWORK : bc78d28 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 02 41 11 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 0b 0d 11 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78d28 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (038): 
+
+	4b 57 58 00 3b 00 00 26 00 00 00 00 00 00 00 00 
+	00 00 00 00 05 3c 03 3d 02 3e 03 83 00 04 00 00 
+	00 20 84 00 01 11 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_DECISION
+
+[NetRoundManager]: NetRoundManager::HandleMsg undefined request code 59
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 03 
+
+[CSocket]: RECV (004): 
+
+	4b 57 58 00 
+
+[CSocket]: RECV (028): K
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 0b 0d 11 0c 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78888 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (051): 
+
+	4b 57 58 00 33 00 00 33 00 00 00 00 00 00 00 00 
+	00 00 00 00 08 3c 01 3d 14 3e 33 3f 0c 81 00 04 
+	00 00 00 00 82 00 01 ff 83 00 01 ff 84 00 04 ff 
+	ff ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 33
+[Player]: NETWORK : bc78c20 Player::hand_in actions 0: newCard 12,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+cocos2d: fullPathForFilename: No file found at ??? ??. Possible missing file.
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 0b 0d 11 0c 0b 
+
+[CSocket]: SEND (056): 
+
+	4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 
+	30 00 38 00 00 00 00 00 00 00 00 00 00 00 05 83 
+	00 04 00 00 00 0b 84 00 04 00 0f 46 29 85 00 04 
+	00 00 00 01 3c 01 41 0b 
+
+[RaceLayer]: RaceLayer::_DeleteActionReminder
+[CSocket]: RECV (024): 
+
+	4b 57 58 00 30 00 00 1e 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 3c 00 83 
+
+[CSocket]: RECV (006): 
+
+	00 04 ff ff ff ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_SHOWCARD
+
+[NetRoundManager]: NetRoundManager::_DiRecv handout ret = 0
+[Player]: bc78c20 Player::action : 0 (isNewDistributed=1)
+[NetRoundManager]: NetRoundManager::WaitForResponse (1) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 02 3d 34 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 32
+[Player]: NETWORK : bc78d28 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 02 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 02 41 14 83 00 04 ff ff ff ff 
+	
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_SHOWCARD
+
+[CardList]: CardList:
+
+	11 12 12 04 12 09 09 14 0b 0d 11 0c 0b 14 
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????????????????????????k\=???. Possible missing file.
+[Player]: bc78d28 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (029): 
+
+	4b 57 58 00 34 00 00 1d 00 00 00 00 00 00 00 00 
+	00 00 00 00 04 3c 03 3d 35 3e 14 3f ff 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD_TOOTHER
+
+[RaceLayer]: RaceLayer::_DistributeEvent : distribute_card_done
+[RaceLayer]: RaceLayer::_UpdateResidueCards : 31
+[Player]: NETWORK : bc78888 Player::hand_in actions 0: newCard 255,isNewDistributed 0,tingStatus 0,isLastOne 0
+[NetRoundManager]: NetRoundManager::WaitForResponse (0) waiting
+
+[CSocket]: RECV (007): 
+
+	4b 57 58 00 36 00 00 
+
+[CSocket]: RECV (018): 
+
+	19 00 00 00 00 00 00 00 00 00 00 00 00 02 41 14 
+	3c 03 
+
+[????????????????????????????????????????????????????????????????????????	????r??v?]: unknown instruction
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 
+
+[CSocket]: RECV (032): 
+
+	4b 57 58 00 4b 00 00 20 00 00 00 00 00 00 00 00 
+	00 00 00 00 03 3c 03 41 0e 83 00 04 ff ff ff ff 
+	
+
+[CSocket]: RECV (051): 
+
+	4b 57 58 00 33 00 00 33 00 00 00 00 00 00 00 00 
+	00 00 00 00 08 3c 01 3d 14 3e 36 3f 0e 81 00 04 
+	00 00 00 00 82 00 01 ff 83 00 01 ff 84 00 04 ff 
+	ff ff ff 
+
+[CSocket]: RECV (025): 
+
+	4b 57 58 00 36 00 00 19 00 00 00 00 00 00 00 00 
+	00 00 00 00 02 41 14 3c 01 
+
+The thread 0x1ce0 has exited with code 0 (0x0).
+cocos2d: fullPathForFilename: No file found at ??? ??. Possible missing file.
+The thread 0x1f9c has exited with code 0 (0x0).
+The thread 0x1f74 has exited with code 0 (0x0).
+cocos2d: fullPathForFilename: No file found at /cc_fps_images. Possible missing file.

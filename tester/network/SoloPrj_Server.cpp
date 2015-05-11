@@ -452,7 +452,7 @@ void round3_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
-void round4_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+void no_gang_remind_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
 
@@ -541,8 +541,8 @@ void test_server_console() {
 
     #endif
     /*没有杠提示*/
-    SetFile("Round1");
-    gHandle = round1_handle_requests;
+    SetFile("no_gang_remind");
+    gHandle = no_gang_remind_handle_requests;
 
     test_smart_game_round_x();
 #endif

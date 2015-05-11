@@ -1,0 +1,17 @@
+cocos2d: fullPathForFilename: No file found at ?????????????????????????????????????????????????????????????????????8??X?2. Possible missing file.
+[Player]: cc85128 Player::others_action : 0 (isNewDistributed=0)
+[NetRoundManager]: NetRoundManager::WaitForResponse (2) waiting
+
+[CSocket]: RECV (053): 
+
+	4b 57 58 00 37 00 00 35 00 00 00 00 00 00 00 00 
+	00 00 00 00 09 3c 01 3d 03 3e 0b 3f 02 81 00 04 
+	00 00 00 03 82 00 01 0b 83 00 01 ff 84 00 04 ff 
+	ff ff ff 40 00 
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_REMIND
+
+The thread 0x25a4 has exited with code 0 (0x0).
+The thread 0x2d90 has exited with code 0 (0x0).
+The thread 0x2ca0 has exited with code 0 (0x0).
+cocos2d: fullPathForFilename: No file found at /cc_fps_images. Possible missing file.
