@@ -39,6 +39,7 @@ protected:
     static MsgHandler_t _handle_msg;
 private:
     /*** 报文自动接收   ***/
+    bool _is_kwx_exist();
     void _collect_packages();
 
     /*** 报文格式识别   ***/

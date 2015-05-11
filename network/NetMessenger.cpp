@@ -146,10 +146,30 @@ void NetMessenger::destroyInstance() {
 #include "./../protocol/KwxMsgBasic.h"
 #include "./../protocol/MsgFormats.h"
 
+bool NetMessenger::_is_kwx_exist() {
+    int len = BUFF_SIZE-_outStart;
+
+    if(len>=3) {
+        return strstr((char *)_pkgBuf+_outStart,"KWX");
+    } else {
+        char temp[4] = {0};
+        int  i = 0;
+
+        for(i=0;i<len;i++) {
+            temp[i] = _pkgBuf[_outStart+i];
+        }
+        for(i=len;i<3;i++) {
+            temp[i] = _pkgBuf[i-len];
+        }
+
+        return strstr(temp,"KWX");
+    }
+}
+
 int NetMessenger::_get_available_pkg_len() {
     int usedLen = _usedLen();
     
-	if ( strstr((char *)_pkgBuf+_outStart,"KWX") && usedLen>DnHeader::DN_HEADER_LEN  ) {
+	if ( _is_kwx_exist() && usedLen>DnHeader::DN_HEADER_LEN  ) {
 		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf + (_outStart+DnHeader::SIZE)%BUFF_SIZE)));
 		if ( usedLen>=pkgLen ) {
 			return pkgLen;
