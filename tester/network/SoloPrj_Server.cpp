@@ -486,6 +486,45 @@ void no_gang_remind_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+
+void Exception_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==0) {
+        handout++;
+
+        for(int i=10;i<22;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==1) {
+        handout++;
+        
+        for(int i=22;i<30;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==1) {
+        handout++;
+        
+        for(int i=30;i<42;i++) {
+            SendLine(SERVER,i);
+        }
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -541,8 +580,8 @@ void test_server_console() {
 
     #endif
     /*没有杠提示*/
-    SetFile("no_gang_remind");
-    gHandle = no_gang_remind_handle_requests;
+    SetFile("Exception");
+    gHandle = Exception_handle_requests;
 
     test_smart_game_round_x();
 #endif
