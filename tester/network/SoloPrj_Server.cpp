@@ -537,6 +537,23 @@ void Exception_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void E15051202_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        for(int i=1;i<6;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        for(int i=6;i<9;i++) {
+            SendLine(SERVER,i);
+        }
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -592,8 +609,8 @@ void test_server_console() {
 
     #endif
     /*没有杠提示*/
-    SetFile("Exception");
-    gHandle = Exception_handle_requests;
+    SetFile("E15051202");
+    gHandle = E15051202_handle_requests;
 
     test_smart_game_round_x();
 #endif
