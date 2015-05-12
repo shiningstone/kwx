@@ -516,10 +516,22 @@ void Exception_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         for(int i=22;i<30;i++) {
             SendLine(SERVER,i);
         }
-    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==1) {
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==2) {
         handout++;
         
         for(int i=30;i<42;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==3) {
+        handout++;
+        
+        for(int i=42;i<54;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==4) {
+        handout++;
+        
+        for(int i=54;i<61;i++) {
             SendLine(SERVER,i);
         }
     }
