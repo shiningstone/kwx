@@ -818,6 +818,12 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         }
     }
     
+	if(_tempActionToDo!=0) {
+        RequestSendAction aReq;
+        aReq.Set(aQi);
+        _messenger->Send(aReq);
+	}
+
 	if(_isWaitDecision) {
 		_isWaitDecision=false;
 		_tempActionToDo=a_JUMP;
@@ -881,6 +887,10 @@ void NetRoundManager::RecvMingCancel() {
 
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
 	_actionToDo=a_MING;
+    
+    RequestSendAction aAction;
+    aAction.Set(aMING);
+    _messenger->Send(aAction);
 
     if(!isFromKouStatus) {
         _players[MIDDLE]->_cards->scan_kou_cards();
