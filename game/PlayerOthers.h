@@ -7,20 +7,14 @@
 #include "Player.h"
 
 typedef struct _KindPosition {
-    Card_t        val;
     int           num;
     int           position[4];
 }KindPosition;
 
-typedef struct _PositionInfo {
-    int           kindNum;
-    KindPosition  kind[MAX_HANDIN_NUM];
-}PositionInfo;
-
 typedef struct _Context_t {
     CardList     *river;
     int           remain;
-    PositionInfo  cards;
+    KindPosition  cards[TOTAL_CARD_KIND];
     TingInfo_t   *OthersTing[2];
     int           huNum;
     ROBOT_TARGET  aim;
@@ -37,7 +31,11 @@ class PlayerOthers:public Player
         Logger      *_logger;
         Context_t    _ctx;
 	private:
-        void _CollectPosition(PositionInfo &info);
+        bool IsJustInSequence(Card_t kind,int seqIdx);
+        bool IsInSequence(Card_t kind);
+        bool IsStable(Card_t kind);
+
+        void _CollectPosition(KindPosition *info);
         void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);
         
         bool OthersCanHu(Card_t kind) const;

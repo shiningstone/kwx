@@ -40,6 +40,51 @@ int PlayerOthers::AvailNum(Card_t kind) const {
     }
 }
 
+bool PlayerOthers::IsJustInSequence(Card_t kind,int seqIdx) {
+    int num0 = _ctx.cards[kind].num;
+    int num1 = 0;
+    int num2 = 0;
+
+    switch(seqIdx) {
+        case 0:
+            num1 = _ctx.cards[kind+1].num;
+            num2 = _ctx.cards[kind+2].num;
+            break;
+        case 1:
+            num1 = _ctx.cards[kind-1].num;
+            num2 = _ctx.cards[kind+1].num;
+            break;
+        case 2:
+            num1 = _ctx.cards[kind-2].num;
+            num2 = _ctx.cards[kind-1].num;
+            break;
+    }
+
+    if(num0==num1 && num0==num2) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool PlayerOthers::IsInSequence(Card_t kind) {
+    if(kind%9==0) {
+        return IsJustInSequence(kind,0);
+    }
+}
+
+bool PlayerOthers::IsStable(Card_t kind) {
+    int num = _ctx.cards[kind].num;
+    
+    if( num>=3 ) {
+        return true;
+    } else {
+
+    }
+
+    return false;
+}
+
 int PlayerOthers::Robot_check_pickup_card(CARD_KIND kind,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int j,k;
@@ -685,30 +730,24 @@ int PlayerOthers::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND l
 
 #include "RoundManager.h"
 
-void PlayerOthers::_CollectPosition(PositionInfo &info) {
+void PlayerOthers::_CollectPosition(KindPosition *cards) {
     Card_t prev = CARD_UNKNOWN;
-    int  kindIdx = 0;
-    int  posIdx = 0;
 
     for(int i=_cards->FreeStart;i<_cards->size();i++) {
         Card_t kind = _cards->get_kind(i);
         
         if(kind!=prev) {
-            prev = kind;
+            cards[kind].num = 0;
             
-            kindIdx++;
-            posIdx = 0;
+            cards[kind].position[cards[kind].num] = i;
+            cards[kind].num = 1;
 
-            info.kind[kindIdx-1].val = kind;
-            info.kind[kindIdx-1].position[posIdx] = i;
-            posIdx++;
+            prev = kind;
         } else {
-            info.kind[kindIdx-1].position[posIdx] = i;
-            posIdx++;
+            cards[kind].position[cards[kind].num] = i;
+            cards[kind].num++;
         }
     }
-
-    info.kindNum = kindIdx;
 }
 
 void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context)
