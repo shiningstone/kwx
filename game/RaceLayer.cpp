@@ -97,6 +97,14 @@ void RaceLayer::CreateRace()
 
 void RaceLayer::StartGame()
 {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
+    /*!!! maybe lagging ???*/
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
+    LOGGER_WRITE("%s load plist done\n",__FUNCTION__);
+
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
 
 	if(!_isResoucePrepared) {
@@ -142,14 +150,6 @@ void RaceLayer::StartGame()
 
 void RaceLayer::WaitForFirstAction(PlayerDir_t zhuang)
 {
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("BlockOtherImage.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gametrayImage.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("MingTips.plist");
-    /*!!! maybe lagging ???*/
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
-    LOGGER_WRITE("%s load plist done\n",__FUNCTION__);
-
     ListenToCardTouch();
     ((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 
