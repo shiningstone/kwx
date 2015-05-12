@@ -184,6 +184,17 @@ int ActionNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int DecisionNotif::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    seat      = _GetPlayer(msg.GetItemValue(0));
+    whoGive   = _GetPlayer(msg.GetItemValue(1));/*BUG : seatId==0 if from server*/
+    next      = _GetPlayer(msg.GetItemValue(2));
+    actions   = msg.GetItemValue(3);
+    DsMsgParser::_load(card, cardNum, msg, 4);
+    return 0;
+}
+
 DistCardInfo::~DistCardInfo() {
     DsMsgParser::_unload(remind);
 }
@@ -240,17 +251,6 @@ int ScoreNotif::Construct(const DsMsg &msg) {
     val[0] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf)) );
     val[1] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf+4)) );
     val[2] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf+8)) );
-    return 0;
-}
-
-int DecisionNotif::Construct(const DsMsg &msg) {
-    DsInstruction::Construct(msg);
-        
-    seat      = _GetPlayer(msg.GetItemValue(0));
-    whoGive   = _GetPlayer(msg.GetItemValue(1));/*BUG : seatId==0 if from server*/
-    next      = _GetPlayer(msg.GetItemValue(2));
-    actions   = msg.GetItemValue(3);
-    card      = (Card_t)msg.GetItemValue(4);
     return 0;
 }
 

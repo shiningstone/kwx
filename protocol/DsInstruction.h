@@ -91,6 +91,18 @@ public:
     CardNode_t       card[18];
 };
 
+class DecisionNotif : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+    
+    INT8U            seat;
+    INT8U            whoGive;
+    INT8U            next;
+    ActionMask_t     actions;
+    INT8U            cardNum;
+    CardNode_t       card[18];
+};
+
 class DistCardInfo : public DsInstruction {
 public:
     ~DistCardInfo();
@@ -158,17 +170,6 @@ public:
     
     INT8U            seat[3];
     INT32U           val[3];
-};
-
-class DecisionNotif : public DsInstruction {
-public:
-    virtual int Construct(const DsMsg &msg);
-    
-    INT8U            seat;
-    INT8U            whoGive;
-    INT8U            next;
-    ActionMask_t     actions;
-    Card_t           card;
 };
 
 class TingInfoResponse : public DsInstruction {
