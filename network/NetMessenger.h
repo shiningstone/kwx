@@ -52,6 +52,7 @@ private:
     const static int BUFF_SIZE = SOCKET_BUFF_SIZE;
 
 	INT8U _pkgBuf[BUFF_SIZE];
+    bool  _isEmpty;
 	int   _inStart;             /* 数据输入起始偏移  */
 	int   _outStart;            /* 数据存储起始偏移  */
 	int   _usedLen();           /* 已有数据长度      */
