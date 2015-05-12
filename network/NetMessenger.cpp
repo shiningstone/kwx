@@ -161,7 +161,7 @@ bool NetMessenger::_is_kwx_exist() {
     int len = BUFF_SIZE-_outStart;
 
     if(len>=3) {
-        return strstr((char *)_pkgBuf+_outStart,"KWX");
+        return (NULL!=strstr((char *)_pkgBuf+_outStart,"KWX"));
     } else {
         char temp[4] = {0};
         int  i = 0;
@@ -173,7 +173,7 @@ bool NetMessenger::_is_kwx_exist() {
             temp[i] = _pkgBuf[i-len];
         }
 
-        return strstr(temp,"KWX");
+        return (NULL!=strstr(temp,"KWX"));
     }
 }
 
