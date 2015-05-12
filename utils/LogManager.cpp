@@ -70,13 +70,16 @@ int Logger::WriteArray(const char *pkg,int len) {
     usedBytes += 1;
 
 	for(int i=0; i<len; i++) {
-		sprintf(buf+usedBytes, "%02x ",(unsigned char)pkg[i]);
+		sprintf(buf+usedBytes, "0x%02x ",(unsigned char)pkg[i]);
+        #if 1
+        usedBytes += 5;
+        #else
         usedBytes += 3;
-
 		if( (i+1)%16==0 ) {
 			sprintf(buf+usedBytes, "\n\t");
             usedBytes += 2;
 		}
+        #endif
 	}
 	
     sprintf(buf+usedBytes, "\n");
