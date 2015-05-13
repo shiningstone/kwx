@@ -323,9 +323,13 @@ void CardInHand::_ShouGang() {
     node.status  = sAN_GANG;
     node.canPlay = false;
     
+#if 0
     pop_back();
     delete_card(gangIdx[0],3);
-    
+#else
+    delete_card(gangIdx[0],4);
+#endif
+
     insert_card(node,4);
     FreeStart += 4;
     
