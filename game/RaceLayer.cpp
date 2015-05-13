@@ -59,8 +59,6 @@ bool RaceLayer::init() {
 ************************************************/
 void RaceLayer::CreateRace()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	_isResoucePrepared=false;
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
@@ -103,7 +101,6 @@ void RaceLayer::StartGame()
     /*!!! maybe lagging ???*/
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race3.plist");
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("race4.plist");
-    LOGGER_WRITE("%s load plist done\n",__FUNCTION__);
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("TimerImage.plist");
 
@@ -593,8 +590,6 @@ void RaceLayer::_DistributeCard(PlayerDir_t dir,int lenOfInHand) {
 }
 
 void RaceLayer::ListenToDistributeCard() {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
 		auto userData = static_cast<DistributeInfo_t *>(event->getUserData());
         auto target = userData->target;
@@ -685,7 +680,6 @@ void RaceLayer::_RightBatchDistribute(int batchIdx, float delayRef, int cardLen)
 }
 
 void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
-    LOGGER_WRITE("%s",__FUNCTION__);
 	auto VoiceEffect=_voice->Speak("sort.ogg");	
 
 	float timeXH[PLAYER_NUM];
@@ -1110,8 +1104,6 @@ void RaceLayer::_InitResidueCards() {
 
 void RaceLayer::_UpdateResidueCards(int no)
 {
-    LOGGER_WRITE("%s : %d",__FUNCTION__,no);
-
 	if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID))
 		residue_card_bkg->removeChildByTag(RESERVED_BKG_CHILD_TAG_ID,true);
     
@@ -3636,8 +3628,6 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 /* why use different mechanism for single hu and double hu ??? */
 void RaceLayer::_HuEffect(const WinInfo_t &win)
 {
-    LOGGER_WRITE("%s(%d-%d)",__FUNCTION__,win.winner,win.giver);
-
 	((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(false);
 
     _Remove(this,ROBOT_TUO_GUAN);
@@ -4854,8 +4844,6 @@ void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 
 void RaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	//float x=origin.x+visibleSize.width*0.17;
 	float x = 162;
 	float y = origin.y+visibleSize.height*0.1256-10;
@@ -5351,8 +5339,6 @@ void RaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 }
 void RaceLayer::raceAccount(float delta)
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	auto show_card_indicator=this->getChildByTag(SHOWCARD_INDICATOR_TAG_ID);
 	show_card_indicator->setVisible(false);
 	while(this->getChildByTag(GAME_BACK_BAR))
@@ -5546,8 +5532,6 @@ void RaceLayer::raceAccount(float delta)
 
 void  RaceLayer::showall()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
     HideClock();
 	
 	float x,y;
@@ -5838,8 +5822,6 @@ void RaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
 }
 
 void RaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	auto curButton=(Button*)pSender;
 
 	switch (type)
@@ -5891,8 +5873,6 @@ void RaceLayer::BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType 
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            LOGGER_WRITE("%s",__FUNCTION__);
-            
 			if(this->getChildByTag(ROBOT_TUO_GUAN))
 				this->removeChildByTag(ROBOT_TUO_GUAN,true);//TUOGUAN_CANCEL_BUTTON
 			
@@ -6095,8 +6075,6 @@ void RaceLayer::BtnBackHandler(Ref* pSender,cocos2d::ui::Widget::TouchEventType 
 
 void RaceLayer::Back()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("GlobalUI.plist");
 
 	if(this->getChildByTag(TUOGUAN_CANCEL_BUTTON))
@@ -6212,7 +6190,6 @@ Spawn* RaceLayer::simple_tip_effect(Vec2 v,std::string act_name)
 
 
 void RaceLayer::_DistributeEvent(const std::string event_type,void* val) {
-    LOGGER_WRITE("%s : %s",__FUNCTION__,event_type.c_str());
 	_eventDispatcher->dispatchCustomEvent(event_type,val);
 }
 
@@ -6226,7 +6203,6 @@ void RaceLayer::_DeleteStartDealCards() {
 
 void RaceLayer::_DeleteActionReminder()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
 	for(int i=0;i<17;i++){
         _Remove(myframe,REMIND_ACT_TAG_ID+i);
 	}
@@ -6234,7 +6210,6 @@ void RaceLayer::_DeleteActionReminder()
 
 void RaceLayer::_DeleteActionEffect()
 {
-    LOGGER_WRITE("%s",__FUNCTION__);
  	for(int i=0;i<31;i++) {
         _Remove(myframe,MOJI_EFFECT_TAG_ID+i);
 	}
