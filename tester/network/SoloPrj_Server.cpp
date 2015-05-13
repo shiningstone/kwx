@@ -551,6 +551,8 @@ void E15051202_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         for(int i=6;i<9;i++) {
             SendLine(SERVER,i);
         }
+    } else if(recvBuf[16]==REQ_GAME_SEND_ACTION) {
+        SendLine(SERVER,10);
     }
 }
 
