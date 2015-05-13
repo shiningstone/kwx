@@ -742,7 +742,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         RequestSendAction aReq;
         aReq.Set(aQi);
         _messenger->Send(aReq);
-        _messenger->Wait(REQ_GAME_SEND_ACTION);
 	}
 
 	if(_isWaitDecision) {

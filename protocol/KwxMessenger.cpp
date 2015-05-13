@@ -72,6 +72,11 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     len = aMsg.Serialize(buf);
     _messenger->Send(buf,len);
 
+    RequestId_t req = (RequestId_t)aMsg._header->_requestCode;
+    if(req==REQ_GAME_SEND_ACTION) {
+        Wait(req);
+    }
+
     return 0;
 }
 
