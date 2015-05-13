@@ -137,5 +137,6 @@ void _delay(int seconds) {
     #ifdef WIN32
     Sleep(seconds*1000);
     #else
+    Sleep(seconds*1000);
     #endif
 }
