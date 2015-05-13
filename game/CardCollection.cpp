@@ -822,7 +822,7 @@ ActionMask_t CardInHand::judge_action(bool isNewDistributed, bool isLastOne) con
                 }
                 
                 break;
-            } else if(status==sFREE) {
+            } else if(status==sFREE && canPlay(i)) {
 				num++;
 			}
 		}
