@@ -47,6 +47,7 @@ public:
     void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
     void   lock_all_cards(bool lock);
+    int    real_last()const;
 
     bool   is_wait_handout() const;
     int    find_free_cards(int cardIdx[],Card_t card) const;
@@ -74,7 +75,8 @@ private:
     
     void   _Kou();
     void   _CancelKou();
-    
+
+    bool   _IncludingOthersCard;
 public:
     /* statistics , only used for calculating score */
     int statFreeCards;
@@ -126,7 +128,7 @@ public:
     /***************************************************
             strategy
     ***************************************************/
-    ActionMask_t judge_action(bool isNewDistribute, bool isLast) const;
+    ActionMask_t judge_action(Card_t newCard,bool isNewDistribute, bool isLast);
     
     /***************************************************
             antificial intelligence (for single-game only)

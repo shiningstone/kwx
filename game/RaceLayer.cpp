@@ -2405,13 +2405,13 @@ bool RaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
         const auto startPos = _GetCardInHand(MIDDLE,cards->FreeStart)->getPosition();
         const auto cardSize = _object->RectSize(FREE_CARD);
 
-        for(int i=cards->FreeStart; i<=cards->last(); i++) {
+        for(int i=cards->FreeStart; i<=cards->real_last(); i++) {
             auto card = _GetCardInHand(MIDDLE,i);
             card->_ID = 1;
             card->setScale(1);
             card->setAnchorPoint(Vec2(0,0));
 
-            if(i==cards->last() && cards->is_wait_handout()) {
+            if(i==cards->real_last() && cards->is_wait_handout()) {
                 card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart)+30,y1));
             } else {
                 card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart),y1));

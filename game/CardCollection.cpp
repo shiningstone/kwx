@@ -187,6 +187,14 @@ void CardInHand::init(Card_t *cards,int len) {
     statHuFanMask      = 0;
 }
 
+int CardInHand::real_last() const {
+    if(_IncludingOthersCard) {
+        return last()-1;
+    } else {
+        return last();
+    }
+}
+
 void CardInHand::delete_card(int from,int len) {
     CardNode_t *p[18];
     
@@ -794,8 +802,15 @@ bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
 /***************************************************
         strategy
 ***************************************************/
-ActionMask_t CardInHand::judge_action(bool isNewDistributed, bool isLastOne) const {
-    Card_t       newCard = get_kind(last());
+ActionMask_t CardInHand::judge_action(Card_t newCard,bool isNewDistributed, bool isLastOne) {
+    push_back(newCard);
+
+    if(!isNewDistributed) {
+        _IncludingOthersCard = true;
+    } else {
+        _IncludingOthersCard = false;
+    }
+
     ActionMask_t act = 0;
         
     if( has_shou_gang() && isNewDistributed && !isLastOne ) {

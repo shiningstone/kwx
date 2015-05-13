@@ -121,9 +121,7 @@ ActionMask_t Player::ActiontodoCheckAgain() {
 }
 
 ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
-    _cards->push_back((Card_t)newCard);
-
-	ActionMask_t actions = _cards->judge_action(isNewDistributed,isLastOne);
+	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
 	if(_cards->can_hu((Card_t)newCard)) {
 		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
