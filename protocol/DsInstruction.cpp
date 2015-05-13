@@ -185,13 +185,16 @@ int ActionNotif::Construct(const DsMsg &msg) {
 }
 
 int DecisionNotif::Construct(const DsMsg &msg) {
-    DsInstruction::Construct(msg);
-        
-    seat      = _GetPlayer(msg.GetItemValue(0));
-    whoGive   = _GetPlayer(msg.GetItemValue(1));/*BUG : seatId==0 if from server*/
-    next      = _GetPlayer(msg.GetItemValue(2));
-    actions   = msg.GetItemValue(3);
-    DsMsgParser::_load(card, cardNum, msg, 4);
+    ActionNotif *equivalent = new ActionNotif;
+    equivalent->Construct(msg);
+    
+    seat     = equivalent->seat;
+    whoGive  = equivalent->whoGive;
+    next     = equivalent->next;
+    actions  = equivalent->actions;
+    cardNum  = equivalent->cardNum;
+    memcpy(card,equivalent->card,sizeof(CardNode_t)*18);
+
     return 0;
 }
 

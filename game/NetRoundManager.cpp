@@ -416,84 +416,18 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(DecisionNotif *info) {
-    PlayerDir_t dir     = (PlayerDir_t)info->seat;
-    PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
-    Card_t card         = info->card[0].kind;
-    _actionToDo         = info->actions;
-
-    if(_actionToDo==aMING) {
-        CardInHand *cards = _players[_curPlayer]->_cards;
-        cards->clear();
-        
-        for(int i=0;i<info->cardNum;i++) {
-            CardNode_t *node = new CardNode_t;
-            *node = info->card[i];
-            cards->push_back( node );
-        }
-
-        cards->IsMing = true;
-
-        _uiManager->_CardInHandUpdateEffect(dir);
-    }
+    ActionNotif *equivalent = new ActionNotif;
     
+    equivalent->seat    = info->seat;
+    equivalent->whoGive = info->whoGive;
+    equivalent->next    = info->next;
+    equivalent->actions = info->actions;
+    equivalent->cardNum = info->cardNum;
+    memcpy(equivalent->card,info->card,sizeof(CardNode_t)*18);
+
     delete info;
 
-    _curPlayer = whoGive;
-    switch(_actionToDo) {
-        case aPENG:
-            RecvPeng(dir);
-            break;
-        case aMING_GANG:
-            {
-                _lastActionSource=dir;
-                _actionToDo=a_MING_GANG;
-                _lastAction=a_MING_GANG;
-                _lastActionWithGold=aMING_GANG;
-                
-                if(!_isNewDistributed) {
-                    _players[_curPlayer]->_river->pop_back();
-    
-			        RecordOutCard(card);
-			        RecordOutCard(card);
-			        RecordOutCard(card);
-                    
-                    _curPlayer = dir;
-                    
-                    _players[dir]->hand_in(
-                        card,
-                        _isNewDistributed,
-                        false,
-                        (_distributedNum==TOTAL_CARD_NUM),
-                        _lastActionWithGold,
-                        _continue_gang_times,
-                        _isGangHua
-                    );
-                }else {
-                    LOGGER_WRITE("NOTE: this is ming gang by himself");
-                }
-
-                _uiManager->_MingGangEffect(dir,whoGive,card,NULL);
-            }
-            break;
-        case aAN_GANG:
-            {
-                _lastActionSource = dir;
-                
-                if(_actionToDo&a_AN_GANG) {
-                    _actionToDo=a_AN_GANG;
-                    _lastAction=a_AN_GANG;
-                    _lastActionWithGold=aAN_GANG;
-                } else if(_actionToDo&a_SHOU_GANG) {
-                    _actionToDo=a_SHOU_GANG;
-                    _lastAction=a_SHOU_GANG;
-                    _lastActionWithGold = aSHOU_GANG;
-                }
-                
-                int *gangCardIdx = new int(4);
-                _uiManager->GangEffect(dir,CARD_UNKNOWN,gangCardIdx);
-            }
-            break;
-    }
+    _DiRecv(equivalent);
 }
 
 void NetRoundManager::_UpdateWin(HuInfo_t *player) {
