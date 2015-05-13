@@ -6,9 +6,7 @@
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
 
-
-/*DEBUG : USED TO CONTROL START A SINGLE GAME OR NETWORK GAME*/
-//#define SINGLE_GAME
+#include "utils/DebugCtrl.h"
 
 HelloWorld::HelloWorld()
 {
