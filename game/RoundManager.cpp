@@ -569,9 +569,17 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
     }
 
     if(_curPlayer==MIDDLE) {
-        _players[MIDDLE]->_cards->scan_kou_cards();
-        if(_players[MIDDLE]->_cards->kou_group_num()>0) {
-            _uiManager->QueryKouCards();
+        if(!isFromKouStatus) {
+            _players[MIDDLE]->_cards->scan_kou_cards();
+
+            if(_players[MIDDLE]->_cards->kou_group_num()>0) {
+                _uiManager->QueryKouCards();
+            } else {
+                _isMingTime=true;
+                UpdateCards(MIDDLE,a_MING);
+                
+                _uiManager->QueryMingOutCard();
+            }
         } else {
             _isMingTime=true;
             UpdateCards(MIDDLE,a_MING);

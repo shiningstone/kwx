@@ -3900,7 +3900,7 @@ void RaceLayer::KouConfirmEffect() {
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->RecvMing();}),NULL));
+        _roundManager->RecvMing(true);}),NULL));
 }
 
 void RaceLayer::MingCancelEffect() {
