@@ -58,7 +58,8 @@ typedef enum {
     
     REQ_GAME_SEND_ENTER         = 44,
     REQ_GAME_RECV_ENTER         = 71,
-    
+
+    REQ_INVALID                 = 0xff,
 }RequestId_t;
 
 #endif

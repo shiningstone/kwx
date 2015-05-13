@@ -331,6 +331,7 @@ void NetRoundManager::_DiRecv(ActionResponse *info) {
     delete info;
 
     LOGGER_WRITE("NOTE: something should happen here\n");
+    _messenger->Resume();
     //_uiManager->PengEffect(dir,prevPlayer,(Card_t)card.kind);
 }
 
@@ -741,6 +742,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         RequestSendAction aReq;
         aReq.Set(aQi);
         _messenger->Send(aReq);
+        _messenger->Wait(REQ_GAME_SEND_ACTION);
 	}
 
 	if(_isWaitDecision) {

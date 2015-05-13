@@ -22,9 +22,14 @@ public:
 
     int Send(UsMsg &aMsg);/* why cannot declare as const UsMsg??? */
 
+    bool Wait(RequestId_t rsp);
+    void Resume();
+
 private:
     friend class TestKwxAutoRecv;
     static void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
+
+    RequestId_t _waitReq;
 
 	static NetMessenger *_messenger;/*it makes more sense to let KwxMessenger derived from NetMessenger*/
     static Logger       *_logger;

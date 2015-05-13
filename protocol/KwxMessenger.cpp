@@ -20,6 +20,8 @@ KwxMessenger::KwxMessenger() {
    #if 0/*如果要用StartReceiving，不能调用Start*/
     _messenger->Start();
     #endif
+
+    _waitReq = REQ_INVALID;
     
     _logger = LOGGER_REGISTER("KwxMessenger");
 }
@@ -73,6 +75,17 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     return 0;
 }
 
+void KwxMessenger::Resume() {
+    _waitReq = REQ_INVALID;
+}
+
+bool KwxMessenger::Wait(RequestId_t rsp) {
+    while(_waitReq!=REQ_INVALID) {
+        _delay(1);
+    }
+
+    return true;
+}
 /**********************************************************
 	Interfaces
 ***********************************************************/
