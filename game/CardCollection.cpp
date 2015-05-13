@@ -1160,6 +1160,16 @@ bool CardInHand::get_ming_info(MRES *res) const {
         return false;
     }
 }
+
+TingInfo_t &CardInHand::get_ting_info(int idx) {
+    Card_t kind = get_kind(idx);
+
+    for(int i=0;i<_ming.choiceNum;i++) {
+        if(kind==(_ming.handouts+i)->kind) {
+            return (_ming.handouts+i)->ting;
+        }
+    }
+}
 /***************************************************
         effect
 ***************************************************/

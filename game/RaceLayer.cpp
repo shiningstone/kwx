@@ -3847,7 +3847,7 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
     int    choiceIdx = CardPlace - cards->FreeStart - cards->kou_cards_num();
-    TingInfo_t &ting = (cards->_ming.handouts + choiceIdx)->ting;
+    TingInfo_t &ting = cards->get_ting_info(CardPlace);
 
     Card_t huCards[9];
     int    times[9];
