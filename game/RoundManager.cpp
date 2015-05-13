@@ -722,7 +722,7 @@ void RoundManager::WaitForOthersChoose() {
 	PlayerOthers *player = static_cast<PlayerOthers *>(_players[_curPlayer]);
 	int index = player->choose_worst(*this,canKou);
     
-    if ( canKou ) {
+    if ( true ) {
         _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);
         _players[_curPlayer]->_cards->choose_all_kou_cards(_otherHandedOut);
     }
@@ -731,7 +731,7 @@ void RoundManager::WaitForOthersChoose() {
 	_lastHandedOutCard = _players[_curPlayer]->hand_out(index);
     _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
-    if(canKou) {
+    if(true) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
         if(_players[_curPlayer]->_cards->kou_group_num()>0)
             UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
