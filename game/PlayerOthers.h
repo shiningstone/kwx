@@ -31,9 +31,9 @@ class PlayerOthers:public Player
         Logger      *_logger;
         Context_t    _ctx;
 	private:
-        bool IsJustInSequence(Card_t kind,int seqIdx);
-        bool IsInSequence(Card_t kind);
-        bool IsStable(Card_t kind);
+        bool IsJustInSequences(Card_t kind,int seqIdx) const;
+        bool IsInSequences(Card_t kind) const;
+        bool IsStable(Card_t kind) const;
 
         void _CollectPosition(KindPosition *info);
         void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);

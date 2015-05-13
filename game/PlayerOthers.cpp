@@ -40,7 +40,7 @@ int PlayerOthers::AvailNum(Card_t kind) const {
     }
 }
 
-bool PlayerOthers::IsJustInSequence(Card_t kind,int seqIdx) {
+bool PlayerOthers::IsJustInSequences(Card_t kind,int seqIdx) const {
     int num0 = _ctx.cards[kind].num;
     int num1 = 0;
     int num2 = 0;
@@ -67,19 +67,27 @@ bool PlayerOthers::IsJustInSequence(Card_t kind,int seqIdx) {
     }
 }
 
-bool PlayerOthers::IsInSequence(Card_t kind) {
+bool PlayerOthers::IsInSequences(Card_t kind) const {
     if(kind%9==0) {
-        return IsJustInSequence(kind,0);
+        return IsJustInSequences(kind,0);
+    } else if(kind%9==8) {
+        return IsJustInSequences(kind,2);
+    } else {
+        for(int seqIdx=0;seqIdx<3;seqIdx++) {
+            if(IsJustInSequences(kind,seqIdx)) {
+                return true;
+            }
+        }
     }
 }
 
-bool PlayerOthers::IsStable(Card_t kind) {
+bool PlayerOthers::IsStable(Card_t kind) const {
     int num = _ctx.cards[kind].num;
     
     if( num>=3 ) {
         return true;
-    } else {
-
+    } else if(IsInSequences(kind)) {
+        return true;
     }
 
     return false;
