@@ -1548,7 +1548,7 @@ void RaceLayer::_ReOrderCardsInHand(int droppedCard,CardInHand *cards) {
         return;
     }
     
-    const auto SIZE      = _GetCardInHand(MIDDLE,0)->getTextureRect().size;
+    const auto SIZE      = _GetCardInHand(MIDDLE,LAST)->getTextureRect().size;
     /* maybe need to be put into the circulation */
     const auto LAST_CARD = _GetCardInHand(MIDDLE,LAST);
     const auto LAST_POS  = LAST_CARD->getPosition();
