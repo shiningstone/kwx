@@ -184,20 +184,6 @@ int ActionNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
-int DecisionNotif::Construct(const DsMsg &msg) {
-    ActionNotif *equivalent = new ActionNotif;
-    equivalent->Construct(msg);
-    
-    seat     = equivalent->seat;
-    whoGive  = equivalent->whoGive;
-    next     = equivalent->next;
-    actions  = equivalent->actions;
-    cardNum  = equivalent->cardNum;
-    memcpy(card,equivalent->card,sizeof(CardNode_t)*18);
-
-    return 0;
-}
-
 DistCardInfo::~DistCardInfo() {
     DsMsgParser::_unload(remind);
 }

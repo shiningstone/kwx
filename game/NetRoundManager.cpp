@@ -415,21 +415,6 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     }
 }
 
-void NetRoundManager::_DiRecv(DecisionNotif *info) {
-    ActionNotif *equivalent = new ActionNotif;
-    
-    equivalent->seat    = info->seat;
-    equivalent->whoGive = info->whoGive;
-    equivalent->next    = info->next;
-    equivalent->actions = info->actions;
-    equivalent->cardNum = info->cardNum;
-    memcpy(equivalent->card,info->card,sizeof(CardNode_t)*18);
-
-    delete info;
-
-    _DiRecv(equivalent);
-}
-
 void NetRoundManager::_UpdateWin(HuInfo_t *player) {
     int winnerNum = 0;
     int winner = 0;

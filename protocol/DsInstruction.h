@@ -91,17 +91,7 @@ public:
     CardNode_t       card[18];
 };
 
-class DecisionNotif : public DsInstruction {
-public:
-    virtual int Construct(const DsMsg &msg);
-    
-    INT8U            seat;
-    INT8U            whoGive;
-    INT8U            next;
-    ActionMask_t     actions;
-    INT8U            cardNum;
-    CardNode_t       card[18];
-};
+typedef class ActionNotif DecisionNotif;
 
 class DistCardInfo : public DsInstruction {
 public:
