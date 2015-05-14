@@ -632,38 +632,40 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
         _tempActionToDo = a_JUMP;
     }
 
+    _lastActionSource = dir;
 	_continue_gang_times++;
 
-    int* gangCardIdx=new int[4];
+    int* gangCardIdx = new int[4];
     Card_t gangCard;
 
     CardInHand *cards = _players[dir]->_cards;
+    ActionId_t decision = aQi;
 
-	if( _actionToDo&a_AN_GANG || _actionToDo&a_SHOU_GANG ) {
-		_lastActionSource = dir;
-        
+	if( _actionToDo&aAN_GANG || _actionToDo&aSHOU_GANG ) {
 		if(_actionToDo&a_AN_GANG) {
-			_actionToDo=a_AN_GANG;
-			_lastAction=a_AN_GANG;
+            decision = aAN_GANG;
+			_actionToDo=aAN_GANG;
+			_lastAction=aAN_GANG;
 			_lastActionWithGold = aAN_GANG;
-		} else if(_actionToDo&a_SHOU_GANG) {
-			_actionToDo=a_SHOU_GANG;
-			_lastAction=a_SHOU_GANG;
+		} else {
+            decision = aSHOU_GANG;
+			_actionToDo=aSHOU_GANG;
+			_lastAction=aSHOU_GANG;
 			_lastActionWithGold = aSHOU_GANG;
 		}
         
         gangCard = cards->find_an_gang_cards(gangCardIdx);
         
 		if( !IsTing(_curPlayer) ) {
-			SetEffectCard(gangCard,c_AN_GANG);
+			SetEffectCard(gangCard,sAN_GANG);
 		}
 
         _uiManager->GangEffect(dir,gangCard,gangCardIdx);
 	}
-	else if( _actionToDo & a_MING_GANG ) {
-		_lastActionSource=dir;
-		_actionToDo=a_MING_GANG;
-		_lastAction=a_MING_GANG;
+	else if( _actionToDo & aMING_GANG ) {
+        decision = aMING_GANG;
+		_actionToDo=aMING_GANG;
+		_lastAction=aMING_GANG;
 		_lastActionWithGold = aMING_GANG;
 
 		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
@@ -699,7 +701,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
     
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(aAN_GANG,gangCard);
+        aReq.Set(decision,gangCard);
         _messenger->Send(aReq);
     }
 }

@@ -614,20 +614,6 @@ void RoundManager::WaitForMyAction() {
 	}
 }
 
-void RoundManager::WaitForMyChoose() {
-	if(_isNewDistributed) {/* is this judgement neccessary??? */
-		if( _isTuoGuan ||
-                (IsTing(_curPlayer) && !_isGangAsking) ) {
-            int last = _players[MIDDLE]->_cards->last();
-            
-            Vec2 location = _uiManager->GetCardPositionInHand(last);
-            RecvHandout(last,location,2);
-		} else {
-			_isMyShowTime = true;
-        }
-	}
-}
-
 void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
 
@@ -647,6 +633,20 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         
         WaitForOthersChoose();
     }
+}
+
+void RoundManager::WaitForMyChoose() {
+	if(_isNewDistributed) {/* is this judgement neccessary??? */
+		if( _isTuoGuan ||
+                (IsTing(_curPlayer) && !_isGangAsking) ) {
+            int last = _players[MIDDLE]->_cards->last();
+            
+            Vec2 location = _uiManager->GetCardPositionInHand(last);
+            RecvHandout(last,location,2);
+		} else {
+			_isMyShowTime = true;
+        }
+	}
 }
 
 void RoundManager::WaitForOthersChoose() {
