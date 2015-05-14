@@ -395,6 +395,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 _uiManager->_MingGangEffect(dir,whoGive,card,NULL);
             }
             break;
+		case aSHOU_GANG:
         case aAN_GANG:
             {
                 _lastActionSource = dir;
