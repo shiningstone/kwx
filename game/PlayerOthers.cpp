@@ -168,6 +168,63 @@ int PlayerOthers::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 	return -1;
 }
 
+int PlayerOthers::_PickSingleChar() {
+    for(int i=ZHONG;i<ZHONG+3;i++) {
+        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        }
+    }
+
+    return INVALID;
+}
+
+/* 只有一个，而且不连续 */
+int PlayerOthers::_PickSingleAndNonSequence(Card_t HeadKind,Card_t TailKind) {
+    if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind].num==0) {
+        return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+    } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1 && _ctx.cards[TailKind].num==0) {
+        return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+    } else {
+        for(int i=HeadKind+1;i<TailKind;i++) {
+            if(!OthersCanHu((Card_t)i)) {
+                if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
+                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                }
+            }
+        }
+    }
+
+    return INVALID;
+}
+
+int PlayerOthers::_PickSingleAndUnstable(Card_t HeadKind,Card_t TailKind) {
+    if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
+        if(_ctx.cards[HeadKind].num==1 && !IsStable(HeadKind)) {
+            return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+        }
+        if(_ctx.cards[TailKind].num==1 && !IsStable(TailKind)) {
+            return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+        }
+    }
+
+    for(int i=HeadKind;i<TailKind;i++) {
+        if(!OthersCanHu((Card_t)i)) {
+            if(_ctx.cards[i].num==1 && !IsStable((Card_t)i)) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    }
+
+    return INVALID;
+}
+
+#define RETURN_IF_VALID(x) do { \
+    int chosen = x;             \
+                                \
+    if(chosen!=INVALID)         \
+        return chosen;          \
+}while(0)
+
 int PlayerOthers::PickupForSameColor(int reserveColor) {
     const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
     const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
@@ -201,53 +258,13 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
         }
     }
 
-    /*从中发白里选*/
-    for(int i=ZHONG;i<ZHONG+3;i++) {
-        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
-        }
-    }
-
-    if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
-        /*从1/9中选*/
-        if(_ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind+1].num==0) {
-            return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
-        }
-        if(_ctx.cards[TailKind].num==1 && _ctx.cards[TailKind-1].num==0) {
-            return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
-        }
-    } else {
-        for(int i=HeadKind+1;i<TailKind;i++) {
-            if(!OthersCanHu((Card_t)i)) {
-                if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
-                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
-                }
-            }
-        }
-    }
-
-    if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
-        if(_ctx.cards[HeadKind].num==1 && !IsStable(HeadKind)) {
-            return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
-        }
-        if(_ctx.cards[TailKind].num==1 && !IsStable(TailKind)) {
-            return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
-        }
-    }
-
-    for(int i=HeadKind;i<TailKind;i++) {
-        if(!OthersCanHu((Card_t)i)) {
-            if(_ctx.cards[i].num==1 && !IsStable((Card_t)i)) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
-            }
-        }
-    }
+    RETURN_IF_VALID(_PickSingleChar());
+    RETURN_IF_VALID(_PickSingleAndNonSequence(HeadKind,TailKind));
+    RETURN_IF_VALID(_PickSingleAndUnstable(HeadKind,TailKind));
 
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(!OthersCanHu((Card_t)i)) {
-            if(_ctx.cards[i].num>0 && !IsStable((Card_t)i)) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
-            }
+        if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
         }
     }
     
@@ -273,32 +290,17 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
     HeadKind = (Card_t)(reserveColor*9);
     TailKind = (Card_t)(HeadKind+8);
 
-    if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind].num==0) {
-        return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
-    } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1 && _ctx.cards[TailKind].num==0) {
-        return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
-    } else {
-        for(int i=HeadKind+1;i<TailKind;i++) {
-            if(!OthersCanHu((Card_t)i)) {
-                if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
-                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
-                }
-            }
-        }
-    }
+    RETURN_IF_VALID(_PickSingleAndNonSequence(HeadKind,TailKind));
 
     if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1) {
         return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
     } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1) {
         return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
     }
-
     
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(!OthersCanHu((Card_t)i)) {
-            if(_ctx.cards[i].num>0 && !IsStable((Card_t)i)) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
-            }
+        if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
         }
     }
 
