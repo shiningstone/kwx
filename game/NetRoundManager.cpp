@@ -719,6 +719,12 @@ void NetRoundManager::RecvQi() {
 		_tempActionToDo=a_JUMP;
 	}
 
+    if(_curPlayer==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(aQi);
+        _messenger->Send(aReq);
+    }
+    
     _uiManager->QiEffect();
 }
 
