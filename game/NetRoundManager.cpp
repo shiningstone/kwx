@@ -411,7 +411,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 }
                 
                 int *gangCardIdx = new int(4);
-                _uiManager->GangEffect(dir,CARD_UNKNOWN,gangCardIdx);
+                _uiManager->_AnGangEffect(dir,card,gangCardIdx);
             }
             break;
     }

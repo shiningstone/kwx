@@ -465,26 +465,26 @@ void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind
     node.kind    = kind;
     node.canPlay = false;
 
-	if(act==a_PENG) {
+	if(act==aPENG) {
         node.status=sPENG;
         
         delete_card(FreeStart,3);
         insert_card(node,3);
         FreeStart += 3;
-	} else if(act==a_MING_GANG) {
+	} else if(act==aMING_GANG) {
         node.status=sMING_GANG;
 
         delete_card(FreeStart,4);
         insert_card(node,4);
 		FreeStart += 4;
-	} else if(act==a_AN_GANG) {
+	} else if(act==aAN_GANG || act==aSHOU_GANG) {
         node.kind=CARD_UNKNOWN;
         node.status=sAN_GANG;
 
         delete_card(FreeStart,4);
         insert_card(node,4);
 		FreeStart += 4;
-	} else if(act==a_JUMP) {
+	} else if(act==aQi) {
 		if(isNewDistributed) {
 			node.status  = sFREE;
             node.canPlay = false;

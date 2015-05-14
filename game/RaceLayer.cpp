@@ -2910,7 +2910,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
 			GoldNumInsert(dir,AN_GANG,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             RaceLayer::_DeleteActionTip)), CallFunc::create([=](){
-            _roundManager->UpdateCards(dir,a_AN_GANG);}), CCCallFunc::create([=]() {
+            _roundManager->UpdateCards(dir,a_AN_GANG,card);}), CCCallFunc::create([=]() {
             _CardInHandUpdateEffect(dir);}),
             _voice->Speak("down"),CallFunc::create([=](){
             _roundManager->DistributeTo(dir
@@ -5931,7 +5931,9 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
             
 			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitForMyDecision) {
+
 				_DeleteActionTip();
+
 				_roundManager->_isWaitForMyDecision=false;
 				_roundManager->_tempActionToDo=a_JUMP;
                 
