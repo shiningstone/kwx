@@ -449,8 +449,8 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
 
     delete info;
     
-    if(_isWaitDecision) {
-        _isWaitDecision = false;
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision = false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
@@ -498,7 +498,7 @@ void NetRoundManager::ServerWaitForMyAction() {
     _uiManager->ShowActionButtons(_actionToDo);
 
 	if(_actionToDo!=a_JUMP) {
-		_isWaitDecision = true;
+		_isWaitForMyDecision = true;
 		_tempActionToDo=_actionToDo;
 		_actionToDo=a_JUMP;
 	}
@@ -575,8 +575,8 @@ void NetRoundManager::StartGame() {
 void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     PlayerDir_t prevPlayer;
     
-    if(_isWaitDecision) {
-        _isWaitDecision = false;
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision = false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
@@ -626,8 +626,8 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
     if(_isGangAsking)//is this judgement neccessary?
         _isGangAsking = false;
     
-    if(_isWaitDecision) {
-        _isWaitDecision=false;
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision=false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
@@ -714,8 +714,8 @@ void NetRoundManager::RecvQi() {
 	_lastAction=a_JUMP;
 	_actionToDo=a_JUMP;
 
-	if(_isWaitDecision) {
-		_isWaitDecision=false;
+	if(_isWaitForMyDecision) {
+		_isWaitForMyDecision=false;
 		_tempActionToDo=a_JUMP;
 	}
 
@@ -746,8 +746,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         _messenger->Send(aReq);
 	}
 
-	if(_isWaitDecision) {
-		_isWaitDecision=false;
+	if(_isWaitForMyDecision) {
+		_isWaitForMyDecision=false;
 		_tempActionToDo=a_JUMP;
 	}
 

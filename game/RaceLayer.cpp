@@ -4160,8 +4160,8 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            if(_roundManager->_isWaitDecision) {
-				_roundManager->_isWaitDecision = false;
+            if(_roundManager->_isWaitForMyDecision) {
+				_roundManager->_isWaitForMyDecision = false;
 				_roundManager->_actionToDo =_roundManager->_tempActionToDo;
 				_roundManager->_tempActionToDo = a_JUMP;
 			}
@@ -5930,9 +5930,9 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 			layer_color->setOpacity(150);
 			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
             
-			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitDecision) {
+			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitForMyDecision) {
 				_DeleteActionTip();
-				_roundManager->_isWaitDecision=false;
+				_roundManager->_isWaitForMyDecision=false;
 				_roundManager->_tempActionToDo=a_JUMP;
                 
 				if(!_roundManager->_isNewDistributed) {

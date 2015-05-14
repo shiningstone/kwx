@@ -101,7 +101,7 @@ protected:
     int  _curPlayer;
     Card_t  _lastHandedOutCard;
 
-    bool _isWaitDecision;
+    bool _isWaitForMyDecision;
     bool _isNewDistributed;
 
     bool _isGangAsking;

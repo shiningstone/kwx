@@ -150,7 +150,7 @@ int RoundManager::Shuffle() {
     _firstMingNo = INVALID;
     _qiangGangTargetNo = INVALID;
     _otherOneForDouble = INVALID;
-    _isWaitDecision = false;
+    _isWaitForMyDecision = false;
     _isGangHua = false;
     _isMyShowTime = false;
     _isTuoGuan = false;
@@ -238,8 +238,8 @@ void RoundManager::StartGame() {
 void RoundManager::RecvPeng(PlayerDir_t dir) {
     PlayerDir_t prevPlayer;
     
-    if(_isWaitDecision) {
-        _isWaitDecision = false;
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision = false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
@@ -264,8 +264,8 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvHu(PlayerDir_t dir) {
-    if(_isWaitDecision) {
-        _isWaitDecision = false;
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision = false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
@@ -284,8 +284,8 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvGang(PlayerDir_t dir) {
-    if(_isWaitDecision) {
-        _isWaitDecision=false;
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision=false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
@@ -343,8 +343,8 @@ void RoundManager::RecvQi() {
 	_lastAction=a_JUMP;
 	_actionToDo=a_JUMP;
 
-	if(_isWaitDecision) {
-		_isWaitDecision=false;
+	if(_isWaitForMyDecision) {
+		_isWaitForMyDecision=false;
 		_tempActionToDo=a_JUMP;
 	}
 
@@ -368,8 +368,8 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
         }
     }
     
-	if(_isWaitDecision) {
-		_isWaitDecision=false;
+	if(_isWaitForMyDecision) {
+		_isWaitForMyDecision=false;
 		_tempActionToDo=a_JUMP;
 	}
 
@@ -579,8 +579,8 @@ void RoundManager::WaitForMyAction() {
     _uiManager->ShowActionButtons(_actionToDo);
 
 	if(_actionToDo!=a_JUMP) {
-		_isWaitDecision = true;
-		_tempActionToDo=_actionToDo;
+		_isWaitForMyDecision = true;
+		_tempActionToDo = _actionToDo;
 		_actionToDo=a_JUMP;
 	}
 
