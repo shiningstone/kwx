@@ -244,8 +244,7 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
         _tempActionToDo = a_JUMP;
     }
 
-    _continue_gang_times = 0;
-    _lastAction=a_PENG;
+    SetDecision(dir,aPENG);
     
     Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
     _players[_curPlayer]->_river->pop_back();
@@ -884,6 +883,7 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
         _continue_gang_times++;
         _lastActionWithGold = act;
     } else {
+        _continue_gang_times = 0;
         _lastActionWithGold = aQi;
     }
 }
