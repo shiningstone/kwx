@@ -95,11 +95,6 @@ void RoundManager::RecordOutCard( Card_t kind ) {
     _gRiver->show();
 }
 
-void RoundManager::RenewOutCard() {
-    delete _gRiver;
-	_gRiver = new CardList;
-}
-
 /***********************************************
         player information
 ***********************************************/
@@ -179,20 +174,6 @@ int RoundManager::Shuffle() {
 /****************************************
         before start
 ****************************************/
-bool RoundManager::GetReadyStatus(PlayerDir_t dir) {
-    LOGGER_WRITE("NETWORK : %s %d",__FUNCTION__,dir);
-    return true;
-}
-
-bool RoundManager::WaitUntilAllReady() {
-    LOGGER_WRITE("NETWORK : %s",__FUNCTION__);
-    while( !GetReadyStatus(LEFT) || !GetReadyStatus(RIGHT) ) {
-        //delay
-    }
-
-    return true;
-}
-
 void RoundManager::set_aims_sequence(const int p_aim[]) {
     LOGGER_WRITE("%s",__FUNCTION__);
 	for(int i=0;i<3;i++)
@@ -240,9 +221,9 @@ void RoundManager::StartGame() {
     
     _players[MIDDLE]->_isReady = true;
 	_uiManager->GuiShowReady(MIDDLE);
-    WaitUntilAllReady();
 
-    RenewOutCard();
+    _gRiver->clear();
+    
     Shuffle();
 
     int lastWinner = GetLastWinner();

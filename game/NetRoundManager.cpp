@@ -167,8 +167,8 @@ void NetRoundManager::_DiRecv(GameStartNotif *info) {
 
 void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _uiManager->GuiHideReady();
-
-    RenewOutCard();
+    _gRiver->clear();
+    
     Shuffle();
 
     int cards[14];

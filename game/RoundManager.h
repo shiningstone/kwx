@@ -67,15 +67,12 @@ public:
     PlayerDir_t TurnToNext();
 
     void RecordOutCard( Card_t kind );
-    void RenewOutCard();
 
     virtual void InitPlayers();
     bool IsTing(int player) const;
 
     
     int  Shuffle();
-    bool GetReadyStatus(PlayerDir_t dir);
-    bool WaitUntilAllReady();
 
 	void set_aims_sequence(const int p_aim[]);
 
@@ -96,18 +93,25 @@ protected:
     int         _distributedNum;
 
     void        _GenerateIds(int ids[]);
+
     bool _isGameStart;
+
+    int  _curPlayer;
+    Card_t  _lastHandedOutCard;
+
+    bool _isWaitDecision;
+    bool _isNewDistributed;
+
     bool _isGangAsking;
     bool _isQiangGangAsking;
     bool _isDoubleHuAsking;
     int  _firstMingNo;
     int  _continue_gang_times;
+
     int  _qiangGangTargetNo;
-    int  _curPlayer;
+
     bool _isGangHua;
     int  _otherOneForDouble;//this could be calculated via GetWin.
-    bool _isWaitDecision;
-    bool _isNewDistributed;
 
     Card _curEffectCard;
     void CancelEffectCard();
@@ -117,8 +121,7 @@ protected:
     bool _isMingTime;
     int  _tempActionToDo;
     int  _actionToDo;
-        
-    Card_t  _lastHandedOutCard;
+    
     int  _lastAction;
     ActionId_t  _lastActionWithGold;
     int  _lastActionSource;

@@ -50,6 +50,8 @@ protected:
     GraphicEffect  *_effect;
     GObjectFactory *_object;
 private:
+    
+
     float _AddBtnQi(const Vec2 &ref);
     float _AddBtnHu(const Vec2 &ref);
     float _AddBtnMing(const Vec2 &ref);
