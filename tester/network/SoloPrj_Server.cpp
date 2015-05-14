@@ -553,6 +553,11 @@ void E15051202_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         }
     } else if(recvBuf[16]==REQ_GAME_SEND_ACTION) {
         SendLine(SERVER,10);
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==0) {
+        handout++;
+    
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
     }
 }
 
