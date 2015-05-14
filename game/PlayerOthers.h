@@ -31,7 +31,7 @@ class PlayerOthers:public Player
         Logger      *_logger;
         Context_t    _ctx;
 	private:
-        bool IsJustInSequences(Card_t kind,int seqIdx) const;
+        bool IsInStrictSequences(Card_t kind,int seqIdx) const;
         bool IsInSequences(Card_t kind) const;
         bool IsStable(Card_t kind) const;
 
