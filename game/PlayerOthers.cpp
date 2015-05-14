@@ -66,7 +66,7 @@ bool PlayerOthers::IsInStrictSequences(Card_t kind,int seqIdx) const {
 
     if(num0==num1 && num0==num2) {
         return true;
-    } else if(num0==num1 || num0==num2) {
+    } else if(num0==num1 || num0==num2) {/*BUG HERE??? Robot_check_card_stable 4th if*/
         return true;
     } else {
         return false;
