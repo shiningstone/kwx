@@ -20,6 +20,10 @@ PlayerOthers::~PlayerOthers() {
 
 bool PlayerOthers::OthersCanHu(Card_t kind) const {
     for(int i=0;i<2;i++) {
+        if(_ctx.OthersTing[i]==NULL) {
+            continue;
+        }
+        
         for(int j=0;j<_ctx.OthersTing[i]->cardNum;j++) {
             if(kind==(_ctx.OthersTing[i]->cards+j)->kind) {
                 return true;
@@ -162,6 +166,157 @@ int PlayerOthers::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 	else if(card_array->list[card].same_times==3||card_array->list[card].same_times==4)
 		return 0;
 	return -1;
+}
+
+int PlayerOthers::PickupForSameColor(int reserveColor) {
+    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
+    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
+    const KindPosition &Card1 = _ctx.cards[RiverLast];
+    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+
+    const int Hu1 = _ctx.OthersTing[0]->cardNum;
+    const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    
+	Card_t HeadKind = (Card_t)((1-reserveColor)*9);
+	Card_t TailKind = (Card_t)(HeadKind+8);
+
+	int chose_place = INVALID;
+
+    if(Hu1==0&&Hu2==0&&_ctx.remain>38) {
+        for(int i=HeadKind;i<=TailKind;i++) {
+            if(_ctx.cards[i].num>0 && !IsStable((Card_t)i)) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    }
+
+    /*跟别人出*/
+    if(!OthersCanHu(RiverLast) || !OthersCanHu(River2ndLast)) {
+        if(River2ndLast/9==(1-reserveColor)) {
+            if(Card1.num>0 && !IsStable(RiverLast)) {
+                return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+            } else if(Card2.num>0 && !IsStable(River2ndLast)) {
+                return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+            }
+        }
+    }
+
+    /*从中发白里选*/
+    for(int i=ZHONG;i<ZHONG+3;i++) {
+        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        }
+    }
+
+    if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
+        /*从1/9中选*/
+        if(_ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind+1].num==0) {
+            return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+        }
+        if(_ctx.cards[TailKind].num==1 && _ctx.cards[TailKind-1].num==0) {
+            return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+        }
+    } else {
+        for(int i=HeadKind+1;i<TailKind;i++) {
+            if(!OthersCanHu((Card_t)i)) {
+                if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
+                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                }
+            }
+        }
+    }
+
+    if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
+        if(_ctx.cards[HeadKind].num==1 && !IsStable(HeadKind)) {
+            return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+        }
+        if(_ctx.cards[TailKind].num==1 && !IsStable(TailKind)) {
+            return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+        }
+    }
+
+    for(int i=HeadKind;i<TailKind;i++) {
+        if(!OthersCanHu((Card_t)i)) {
+            if(_ctx.cards[i].num==1 && !IsStable((Card_t)i)) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    }
+
+    for(int i=HeadKind;i<=TailKind;i++) {
+        if(!OthersCanHu((Card_t)i)) {
+            if(_ctx.cards[i].num>0 && !IsStable((Card_t)i)) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    }
+    
+    for(int i=ZHONG;i<ZHONG+3;i++) {
+        if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        }
+    }
+
+    for(int i=HeadKind;i<=TailKind;i++) {
+        if(_ctx.cards[i].num>0 && !OthersCanHu((Card_t)i)) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        }
+    }
+
+    for(int i=ZHONG;i<ZHONG+3;i++) {
+        if(_ctx.cards[i].num>0 && !OthersCanHu((Card_t)i)) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        }
+    }
+
+    /*同一种花色中选*/
+    HeadKind = (Card_t)(reserveColor*9);
+    TailKind = (Card_t)(HeadKind+8);
+
+    if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind].num==0) {
+        return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+    } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1 && _ctx.cards[TailKind].num==0) {
+        return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+    } else {
+        for(int i=HeadKind+1;i<TailKind;i++) {
+            if(!OthersCanHu((Card_t)i)) {
+                if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
+                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                }
+            }
+        }
+    }
+
+    if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1) {
+        return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+    } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1) {
+        return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+    }
+
+    
+    for(int i=HeadKind;i<=TailKind;i++) {
+        if(!OthersCanHu((Card_t)i)) {
+            if(_ctx.cards[i].num>0 && !IsStable((Card_t)i)) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    }
+
+    for(int i=HeadKind+1;i<TailKind;i++) {
+        if(!OthersCanHu((Card_t)i)) {
+            if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    }
+
+    for(int i=HeadKind;i<=TailKind;i++) {
+        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num<3) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        }
+    }
+
+	return chose_place;
 }
 
 int PlayerOthers::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)

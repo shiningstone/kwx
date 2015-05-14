@@ -34,6 +34,7 @@ class PlayerOthers:public Player
         bool IsInStrictSequences(Card_t kind,int seqIdx) const;
         bool IsInSequences(Card_t kind) const;
         bool IsStable(Card_t kind) const;
+        int  PickupForSameColor(int color);
 
         void _CollectPosition(KindPosition *info);
         void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);
