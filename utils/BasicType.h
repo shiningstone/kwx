@@ -36,7 +36,7 @@ typedef enum {
     aTING      = 0xfe,
 
     aLIU_JU    = 0x80000
-}ActionId_t;/*ARRAY_ACTION???*/
+}ActionId_t;
 
 typedef INT32U ActionMask_t;
 

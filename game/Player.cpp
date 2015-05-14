@@ -68,7 +68,7 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     }
 }
 
-long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
     _cards->update_statistics(kind);
     _fan = _cards->statHuFanMask;
     
@@ -81,10 +81,10 @@ long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId
 	}
 
 	if((continue_gang_times!=0)
-        &&(last_action_WithGold==aMING_GANG
-            ||last_action_WithGold==aAN_GANG
-            ||last_action_WithGold==aQIANG_GANG)) {
-		if(isNewDistributed&&last_action_WithGold==aQIANG_GANG)
+        &&(lastActionWithGold==aMING_GANG
+            ||lastActionWithGold==aAN_GANG
+            ||lastActionWithGold==aQIANG_GANG)) {
+		if(isNewDistributed&&lastActionWithGold==aQIANG_GANG)
 			_fan |= RH_QIANGGANG;
 		else if(isNewDistributed&&isGangHua)
 			_fan |= RH_GANGHUA;
@@ -120,11 +120,11 @@ ActionMask_t Player::ActiontodoCheckAgain() {
 	return res;
 }
 
-ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua) {
+ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
 	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
 	if(_cards->can_hu((Card_t)newCard)) {
-		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,last_action_WithGold,continue_gang_times,isGangHua);
+		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,lastActionWithGold,continue_gang_times,isGangHua);
 
 		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
 			actions |= aHU;

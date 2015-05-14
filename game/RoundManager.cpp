@@ -284,34 +284,21 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvGang(PlayerDir_t dir) {
-    if(_isGangAsking)//is this judgement neccessary?
-        _isGangAsking = false;
-    
     if(_isWaitDecision) {
         _isWaitDecision=false;
         _actionToDo = _tempActionToDo;
         _tempActionToDo = a_JUMP;
     }
 
-	_continue_gang_times++;
-
-    CardInHand *cards = _players[dir]->_cards;
-
-	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
-		_lastActionSource = dir;
-        
-		if(_actionToDo&a_AN_GANG) {
-			_actionToDo=a_AN_GANG;
-			_lastAction=a_AN_GANG;
-			_lastActionWithGold = aAN_GANG;
-		} else if(_actionToDo&a_SHOU_GANG) {
-			_actionToDo=a_SHOU_GANG;
-			_lastAction=a_SHOU_GANG;
-			_lastActionWithGold = aSHOU_GANG;
+	if( _actionToDo & aAN_GANG || _actionToDo & aSHOU_GANG ) {
+		if(_actionToDo&aAN_GANG) {
+            SetDecision(dir,aAN_GANG);
+		} else {
+            SetDecision(dir,aSHOU_GANG);
 		}
         
         int*   gangIdx = new int[4];
-        Card_t card = cards->find_an_gang_cards(gangIdx);
+        Card_t card = _players[dir]->_cards->find_an_gang_cards(gangIdx);
         
 		if( !IsTing(dir) ) {
 			SetEffectCard(card,c_AN_GANG);
@@ -320,14 +307,13 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
         _uiManager->GangEffect(dir,card,gangIdx);
 	}
 	else if( _actionToDo & a_MING_GANG ) {
-		_lastActionSource=dir;
-		_actionToDo=a_MING_GANG;
-		_lastAction=a_MING_GANG;
-		_lastActionWithGold = aMING_GANG;
+        SetDecision(dir,aMING_GANG);
 
 		PlayerDir_t prevPlayer = dir;
-        
+
+        CardInHand *cards = _players[dir]->_cards;
         Card_t card;
+        
 		if(!_isNewDistributed) {
             card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
             _players[_curPlayer]->_river->pop_back();
@@ -882,6 +868,23 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
         _players[dir]->action(_isNewDistributed,aSHOU_GANG);
     } else {
         _players[dir]->action(_isNewDistributed,(ActionId_t)action);
+    }
+}
+
+void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
+    if(_isGangAsking)//is this judgement neccessary?
+        _isGangAsking = false;
+    
+    _lastActionSource = dir;
+
+    _actionToDo = act;
+    _lastAction = act;
+
+    if(act==aAN_GANG||act==aSHOU_GANG||act==aMING_GANG) {
+        _continue_gang_times++;
+        _lastActionWithGold = act;
+    } else {
+        _lastActionWithGold = aQi;
     }
 }
 

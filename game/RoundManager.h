@@ -54,6 +54,8 @@ public:
 
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
 
+    void SetDecision(PlayerDir_t dir,ActionId_t act);
+
     void QiangGangHuJudge(PlayerDir_t dir);
     CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
     
