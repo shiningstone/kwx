@@ -631,60 +631,11 @@ void RoundManager::WaitForMyChoose() {
 void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actionToDo);
 
-    CardInHand *cards = _players[dir]->_cards;
-
     if(_actionToDo&a_HU) {
         RecvHu(dir);
-    } else if(_actionToDo&a_AN_GANG||_actionToDo&a_SHOU_GANG) {
-        _continue_gang_times++;
-        _lastActionSource = dir;
-        
-        if(_actionToDo&a_AN_GANG) {
-            _actionToDo=a_AN_GANG;
-            _lastAction=a_AN_GANG;
-            _lastActionWithGold = aAN_GANG;
-        } else if(_actionToDo&a_SHOU_GANG) {
-            _actionToDo=a_SHOU_GANG;
-            _lastAction=a_SHOU_GANG;
-            _lastActionWithGold = aSHOU_GANG;
-        }
-
-        int* gangIdx=new int[4];
-        Card_t card = cards->find_an_gang_cards(gangIdx);
-
-        if( !IsTing(dir) ) {
-            SetEffectCard(card,c_AN_GANG);
-        }
-
-        _uiManager->_AnGangEffect(dir,card,gangIdx);
-    } else if(_actionToDo&a_MING_GANG) {
-        _lastActionSource=dir;
-        _actionToDo=a_MING_GANG;
-        _lastAction=a_MING_GANG;
-        _lastActionWithGold = aMING_GANG;
-
-        Card_t GangCard;
-        PlayerDir_t prevPlayer = (PlayerDir_t)dir;
-        if(!_isNewDistributed) {
-            CardNode_t * last = _players[_curPlayer]->_river->back();
-            GangCard = last->kind;
-            _players[_curPlayer]->_river->pop_back();
-
-            RecordOutCard(GangCard);
-            RecordOutCard(GangCard);
-            RecordOutCard(GangCard);
-            
-            _curPlayer=dir;
-        }else {
-            GangCard = cards->get_kind(cards->last());/*BUG : what if I have gang cards but do not act gang*/
-            RecordOutCard(GangCard);
-        }
-
-        int* gangIdx=new int[4];
-        GangCard = cards->find_ming_gang_cards(gangIdx,GangCard);
-        _uiManager->_MingGangEffect(dir,prevPlayer,GangCard,gangIdx);
-    }
-    else if(_actionToDo&a_MING) {
+    } else if(_actionToDo&a_AN_GANG||_actionToDo&a_SHOU_GANG||_actionToDo&a_MING_GANG) {
+        RecvGang(dir);
+    } else if(_actionToDo&a_MING) {
         RecvMing();
     } else if(_actionToDo&a_PENG) {
         RecvPeng(dir);
