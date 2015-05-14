@@ -295,9 +295,6 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 
 	_continue_gang_times++;
 
-    int* gangCardIdx=new int[4];
-    Card_t card;
-    
     CardInHand *cards = _players[dir]->_cards;
 
 	if( _actionToDo & a_AN_GANG || _actionToDo & a_SHOU_GANG ) {
@@ -313,13 +310,14 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 			_lastActionWithGold = aSHOU_GANG;
 		}
         
-        card = cards->find_an_gang_cards(gangCardIdx);
+        int*   gangIdx = new int[4];
+        Card_t card = cards->find_an_gang_cards(gangIdx);
         
-		if( !IsTing(_curPlayer) ) {
+		if( !IsTing(dir) ) {
 			SetEffectCard(card,c_AN_GANG);
 		}
 
-        _uiManager->GangEffect(dir,card,gangCardIdx);
+        _uiManager->GangEffect(dir,card,gangIdx);
 	}
 	else if( _actionToDo & a_MING_GANG ) {
 		_lastActionSource=dir;
@@ -327,8 +325,9 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		_lastAction=a_MING_GANG;
 		_lastActionWithGold = aMING_GANG;
 
-		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+		PlayerDir_t prevPlayer = dir;
         
+        Card_t card;
 		if(!_isNewDistributed) {
             card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
             _players[_curPlayer]->_river->pop_back();
@@ -339,12 +338,14 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
             
 			_curPlayer=dir;
 		}else {
-		    card = cards->get_kind(cards->last());
+		    card = cards->get_kind(cards->last());/*BUG??? 如果我有之前没杠的*/
 			RecordOutCard(card);
 		}
 
-        card = cards->find_ming_gang_cards(gangCardIdx,card);
-        _uiManager->GangEffect(dir,card,gangCardIdx,false,prevPlayer);
+        int* gangIdx = new int[4];
+        card = cards->find_ming_gang_cards(gangIdx,card);
+
+        _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
 	}
 }
 
