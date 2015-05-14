@@ -2,8 +2,6 @@
 #ifndef __UTIL_BASIC__
 #define __UTIL_BASIC__
 
-#include "DebugCtrl.h"
-
 #ifndef NULL
 #define NULL 0
 #endif

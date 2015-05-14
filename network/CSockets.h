@@ -20,7 +20,6 @@
 #define INVALID_SOCKET -1   
 #endif   
 
-#include "./../utils/DebugCtrl.h"
 #include "./../utils/LogManager.h"
 
 #define DEF_SERVER_IP    "127.0.0.1"

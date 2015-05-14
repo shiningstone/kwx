@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include "CSockets.h"
 
+#include "./../utils/DebugCtrl.h"
 /*
 	windows下调用socket需要启动Windows Sockets Asynchronous
 */
