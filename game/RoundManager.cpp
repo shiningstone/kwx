@@ -234,7 +234,7 @@ void RoundManager::StartGame() {
 	}
 }
 
-void RoundManager::RecvPeng(PlayerDir_t dir) {
+Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
     SetDecision(dir,aPENG);
     
     Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
@@ -247,6 +247,8 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     _curPlayer = dir;
 
     _uiManager->PengEffect(dir,prevPlayer,pengCard);
+
+	return pengCard;
 }
 
 void RoundManager::RecvHu(PlayerDir_t dir) {

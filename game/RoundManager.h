@@ -44,7 +44,7 @@ public:
     RoundManager(RaceLayer *uiManager);
     ~RoundManager();
 
-    virtual void RecvPeng(PlayerDir_t dir);
+    virtual Card_t RecvPeng(PlayerDir_t dir);
     virtual void RecvHu(PlayerDir_t dir);
     virtual Card_t RecvGang(PlayerDir_t dir);
     virtual void RecvQi();

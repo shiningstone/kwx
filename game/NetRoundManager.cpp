@@ -580,28 +580,7 @@ void NetRoundManager::StartGame() {
     _messenger->Send(aReq);
 }
 
-void NetRoundManager::RecvPeng(PlayerDir_t dir) {
-    PlayerDir_t prevPlayer;
-    
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision = false;
-        _actionToDo = _tempActionToDo;
-        _tempActionToDo = a_JUMP;
-    }
-    
-    _continue_gang_times = 0;
-    _lastAction=a_PENG;
-
-
-    Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
-    _players[_curPlayer]->_river->pop_back();
-    
-    RecordOutCard(pengCard);
-    RecordOutCard(pengCard);
-
-    prevPlayer = (PlayerDir_t)_curPlayer;
-    _curPlayer = dir;
-
+Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     _players[dir]->hand_in(
         LastHandout(),
         _isNewDistributed,
@@ -610,16 +589,18 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
         _lastActionWithGold,
         _continue_gang_times,
         _isGangHua
-    );
+    );    
 
+    PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+    Card_t      kind = RoundManager::RecvPeng(dir);
+    
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(aPENG,pengCard);
+        aReq.Set(aPENG,kind);
         _messenger->Send(aReq);
     }
 
-    LOGGER_WRITE("NOTE: maybe this action should be taken later\n");
-    _uiManager->PengEffect(dir,prevPlayer,pengCard);
+	return kind;
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
