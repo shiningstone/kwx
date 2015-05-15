@@ -323,7 +323,6 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
         _isNewDistributed = true;
     }
 
-    _isMyShowTime = true;
     ServerWaitForMyAction();
 }
 
@@ -850,8 +849,7 @@ void NetRoundManager::WaitForMyAction() {
 
 void NetRoundManager::WaitForMyChoose() {
 	if(_isNewDistributed) {/* is this judgement neccessary??? */
-		if( _isTuoGuan ||
-                (IsMing(_curPlayer) && !_isGangAsking) ) {
+		if( (_isTuoGuan) || (IsMing(_curPlayer) && !_isGangAsking) ) {
             int last = _players[MIDDLE]->_cards->last();
             
             Vec2 location = _uiManager->GetCardPositionInHand(last);

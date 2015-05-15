@@ -111,7 +111,9 @@ protected:
 
     int  _curPlayer;
 
+    bool _isMyShowTime;
     bool _isWaitForMyDecision;
+    
     bool _isNewDistributed;
 
     bool _isGangAsking;
@@ -139,7 +141,6 @@ protected:
     ActionId_t  _lastActionWithGold;
     int  _lastActionSource;
 
-    bool _isMyShowTime;
     bool _isTuoGuan;
     
     Logger *_logger;
