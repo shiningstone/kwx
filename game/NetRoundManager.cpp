@@ -476,6 +476,10 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {
     _uiManager->UpdateClock(info->count,info->seat);
+
+    if(info->seat==MIDDLE) {
+        _actCtrl.handoutAllow = true;
+    }
 }
 
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
@@ -658,11 +662,13 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
             _actionToDo = a_JUMP;
         }
     }
-    
+
 	if(_tempActionToDo!=0) {
         RequestSendAction aReq;
         aReq.Set(aQi);
         _messenger->Send(aReq);
+
+        _messenger->Wait(REQ_GAME_DIST_DAOJISHI);
 	}
 
 	if(_isWaitForMyDecision) {
@@ -672,7 +678,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     _players[MIDDLE]->hand_out(chosen);
-
+    
     RequestShowCard aReq;
     aReq.Set(LastHandout());
     _messenger->Send(aReq);
