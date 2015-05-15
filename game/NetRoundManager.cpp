@@ -646,6 +646,7 @@ void NetRoundManager::RecvQi() {
 }
 
 void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
+    _actCtrl.handoutAllow = false;
 
     if(_isGangAsking) {
         _isGangAsking = false;

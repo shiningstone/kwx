@@ -236,6 +236,7 @@ void RoundManager::StartGame() {
 
 Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
     SetDecision(dir,aPENG);
+    _actCtrl.handoutAllow = true;
     
     Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
     _players[_curPlayer]->_river->pop_back();
