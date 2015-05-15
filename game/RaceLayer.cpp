@@ -157,7 +157,7 @@ void RaceLayer::OthersHandoutEffect(PlayerDir_t dir,bool canKou) {
     myframe->_ID = dir;
     
 	myframe->runAction(Sequence::create(
-        _OthersShowCardEffect(dir,_roundManager->_lastHandedOutCard,canKou),CCCallFunc::create([=]() {
+        _OthersShowCardEffect(dir,_roundManager->LastHandout(),canKou),CCCallFunc::create([=]() {
 		_CardRiverUpdateEffect(dir);}), CCCallFunc::create([=]() {
         _roundManager->UpdateCards(dir,a_JUMP);}),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=]() {
@@ -257,7 +257,7 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
     _roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
     _roundManager->_players[MIDDLE]->_cards->pop_back();
 
-	_MyHandoutEffect(_roundManager->_lastHandedOutCard,touch,time,turnToMing);
+	_MyHandoutEffect(_roundManager->LastHandout(),touch,time,turnToMing);
 }
 
 void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)

@@ -292,7 +292,6 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     delete info;
 
     RecordOutCard(card);
-	_lastHandedOutCard = card;
     _actionToDo = a_JUMP;
     
     _curPlayer = dir;
@@ -605,7 +604,7 @@ void NetRoundManager::RecvPeng(PlayerDir_t dir) {
     _curPlayer = dir;
 
     _players[dir]->hand_in(
-        _lastHandedOutCard,
+        LastHandout(),
         _isNewDistributed,
         false,
         (_distributedNum==TOTAL_CARD_NUM),
@@ -690,7 +689,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
 			RecordOutCard(gangCard);
             
             _players[dir]->hand_in(
-                _lastHandedOutCard,
+                LastHandout(),
                 true,
                 false,
                 (_distributedNum==TOTAL_CARD_NUM),
@@ -768,10 +767,10 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	}
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
-    _lastHandedOutCard = _players[MIDDLE]->hand_out(chosen);
+    _players[MIDDLE]->hand_out(chosen);
 
     RequestShowCard aReq;
-    aReq.Set(_lastHandedOutCard);
+    aReq.Set(LastHandout());
     _messenger->Send(aReq);
 
     bool turnToMing = false;

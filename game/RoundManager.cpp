@@ -372,7 +372,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 	}
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
-    _lastHandedOutCard = _players[_curPlayer]->hand_out(idx);
+    _players[_curPlayer]->hand_out(idx);
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
@@ -394,7 +394,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 
 	int no1=(_curPlayer+1)%3;
     unsigned char action1=_players[no1]->hand_in(
-        _lastHandedOutCard,
+        LastHandout(),
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
         false,
@@ -405,7 +405,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 
 	int no2=(_curPlayer+2)%3;
 	unsigned char action2=_players[no2]->hand_in(
-        _lastHandedOutCard,
+        LastHandout(),
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
         false,
@@ -644,7 +644,7 @@ void RoundManager::WaitForOthersChoose() {
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
-	_lastHandedOutCard = _players[_curPlayer]->hand_out(index);
+	_players[_curPlayer]->hand_out(index);
 
     if(true) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
@@ -667,7 +667,7 @@ void RoundManager::WaitForOthersChoose() {
 unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
     ActionMask_t actions = 
         _players[dir]->hand_in(
-            _lastHandedOutCard,
+            LastHandout(),
             _isNewDistributed,
             prevTingStatus,
             (_distributedNum==TOTAL_CARD_NUM),
@@ -683,7 +683,7 @@ unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatu
             actions=a_JUMP;
         }
     } else if(dir!=MIDDLE) {
-        if(_players[dir]->_cards->is_aim_limit(actions,_lastHandedOutCard)) {
+        if(_players[dir]->_cards->is_aim_limit(actions,LastHandout())) {
             actions = a_JUMP;
         }
     }
@@ -705,7 +705,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
     
     _actionToDo = 
         _players[dir]->hand_in(
-            _lastHandedOutCard,
+            LastHandout(),
             _isNewDistributed,
             _players[dir]->_cards->IsMing,
             (_distributedNum==TOTAL_CARD_NUM),
@@ -724,7 +724,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
             WaitForMyAction();
         }
     }else{
-        if(_players[dir]->_cards->is_aim_limit(_actionToDo,_lastHandedOutCard)) {
+        if(_players[dir]->_cards->is_aim_limit(_actionToDo,LastHandout())) {
             _actionToDo = a_JUMP;
         }
         WaitForOthersAction(dir);
@@ -905,6 +905,13 @@ void RoundManager::_LoadRandomCardSequence() {
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
         _unDistributedCards[i] = cards[i]/4;
     }
+}
+
+/*****************************
+    context
+*****************************/
+Card_t RoundManager::LastHandout() const {
+    return _gRiver->get_kind(_gRiver->last());
 }
 
 /*************************************

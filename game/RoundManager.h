@@ -26,6 +26,12 @@ private:
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFrom(PlayerDir_t dir);
 public:
+    /*****************************
+        context
+    *****************************/
+    Card_t LastHandout() const;
+
+    
     static RoundManager *getInstance();
     static void  destroyInstance();
 
@@ -104,7 +110,6 @@ protected:
     bool _isGameStart;
 
     int  _curPlayer;
-    Card_t  _lastHandedOutCard;
 
     bool _isWaitForMyDecision;
     bool _isNewDistributed;
