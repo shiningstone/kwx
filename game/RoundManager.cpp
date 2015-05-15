@@ -353,9 +353,6 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_tempActionToDo=a_JUMP;
 	}
 
-    RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
-    _players[_curPlayer]->hand_out(idx);
-
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
         !IsMing(_curPlayer) ) {
@@ -363,6 +360,9 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
         turnToMing = true;
     }
+
+    RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
+    _players[_curPlayer]->hand_out(idx);
 
     _uiManager->MyHandoutEffect(idx,touch,mode,turnToMing);
 }
