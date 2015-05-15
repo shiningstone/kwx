@@ -166,7 +166,7 @@ public:
     void get_hu_cards(CARD_KIND cards[],int *len);
     bool can_handout(int idx) const;
     bool get_ming_info(MRES *res) const;
-    TingInfo_t &get_ting_info(int idx);
+    TingInfo_t *get_ting_info(int idx);
 
     INT32U      _mingChoicesMask;             /* NOTE : this mask starts with FreeStart, not 0 */
 

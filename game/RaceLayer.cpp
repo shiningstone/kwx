@@ -2495,7 +2495,7 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
     _Remove(myframe,CHOOSE_CARD_TAG_ID);
     
 	int chosen = _FindCard(cards->FreeStart, cards->last(), touch);
-    if(chosen!=INVALID) {
+    if(chosen!=INVALID && cards->canPlay(chosen)) {
         _UpdateNonChosenCards(cards,chosen);
 
 		float x = _layout->_playerPosi[MIDDLE].basePoint.x+10;
@@ -3844,20 +3844,22 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
     int    choiceIdx = CardPlace - cards->FreeStart - cards->kou_cards_num();
-    TingInfo_t &ting = cards->get_ting_info(CardPlace);
+    TingInfo_t *ting = cards->get_ting_info(CardPlace);
 
-    Card_t huCards[9];
-    int    times[9];
-    int    remains[9];
-    for(int i=0;i<ting.cardNum;i++) {
-        huCards[i] = (ting.cards+i)->kind;
-        times[i]   = (ting.cards+i)->fan;
-        remains[i] = (ting.cards+i)->remain;
+    if(ting!=NULL) {
+        Card_t huCards[9];
+        int    times[9];
+        int    remains[9];
+        for(int i=0;i<ting->cardNum;i++) {
+            huCards[i] = (ting->cards+i)->kind;
+            times[i]   = (ting->cards+i)->fan;
+            remains[i] = (ting->cards+i)->remain;
+        }
+        
+        auto tingSignBar = _object->CreateTingInfoBar(
+            curPos,huCards,ting->cardNum,times,remains);
+        myframe->addChild(tingSignBar, 30, TING_SING_BAR);
     }
-
-    auto tingSignBar = _object->CreateTingInfoBar(
-        curPos,huCards,ting.cardNum,times,remains);
-	myframe->addChild(tingSignBar, 30, TING_SING_BAR);
 }
 
 /****************************************
