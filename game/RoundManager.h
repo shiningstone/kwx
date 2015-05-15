@@ -46,7 +46,7 @@ public:
 
     virtual void RecvPeng(PlayerDir_t dir);
     virtual void RecvHu(PlayerDir_t dir);
-    virtual void RecvGang(PlayerDir_t dir);
+    virtual Card_t RecvGang(PlayerDir_t dir);
     virtual void RecvQi();
     virtual void RecvHandout(int idx,Vec2 touch,int mode);
     /*internal action*/

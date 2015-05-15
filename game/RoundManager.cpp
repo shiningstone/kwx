@@ -235,14 +235,6 @@ void RoundManager::StartGame() {
 }
 
 void RoundManager::RecvPeng(PlayerDir_t dir) {
-    PlayerDir_t prevPlayer;
-    
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision = false;
-        _actionToDo = _tempActionToDo;
-        _tempActionToDo = a_JUMP;
-    }
-
     SetDecision(dir,aPENG);
     
     Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
@@ -251,7 +243,7 @@ void RoundManager::RecvPeng(PlayerDir_t dir) {
     RecordOutCard(pengCard);
     RecordOutCard(pengCard);
 
-    prevPlayer = (PlayerDir_t)_curPlayer;
+    PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
     _curPlayer = dir;
 
     _uiManager->PengEffect(dir,prevPlayer,pengCard);
@@ -277,20 +269,10 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
-void RoundManager::RecvGang(PlayerDir_t dir) {
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision=false;
-        _actionToDo = _tempActionToDo;
-        _tempActionToDo = a_JUMP;
-    }
+Card_t RoundManager::RecvGang(PlayerDir_t dir) {
+    SetDecision(dir,aGANG);
 
-	if( _actionToDo & aAN_GANG || _actionToDo & aSHOU_GANG ) {
-		if(_actionToDo&aAN_GANG) {
-            SetDecision(dir,aAN_GANG);
-		} else {
-            SetDecision(dir,aSHOU_GANG);
-		}
-        
+	if(_actionToDo==aAN_GANG || _actionToDo==aSHOU_GANG) {
         int*   gangIdx = new int[4];
         Card_t card = _players[dir]->_cards->find_an_gang_cards(gangIdx);
         
@@ -299,10 +281,8 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
 		}
 
         _uiManager->GangEffect(dir,card,gangIdx);
-	}
-	else if( _actionToDo & a_MING_GANG ) {
-        SetDecision(dir,aMING_GANG);
-
+        return card;
+	} else {
 		PlayerDir_t prevPlayer = dir;
 
         CardInHand *cards = _players[dir]->_cards;
@@ -326,6 +306,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
         card = cards->find_ming_gang_cards(gangIdx,card);
 
         _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
+        return card;
 	}
 }
 
@@ -865,22 +846,36 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
 }
 
 void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision = false;
+        _actionToDo = _tempActionToDo;
+        _tempActionToDo = a_JUMP;
+    }
+
     if(_isGangAsking) {//is this judgement neccessary?
         _isGangAsking = false;
     }
     
-    _lastActionSource = dir;
+    if(act==aGANG) {
+        if(_actionToDo & aAN_GANG) {
+            _actionToDo = aAN_GANG;
+        } else if(_actionToDo & aSHOU_GANG) {
+            _actionToDo = aSHOU_GANG;
+        } else {
+            _actionToDo = aMING_GANG;
+        }
 
-    _actionToDo = act;
-    _lastAction = act;
-
-    if(act==aAN_GANG||act==aSHOU_GANG||act==aMING_GANG) {
         _continue_gang_times++;
-        _lastActionWithGold = act;
+        _lastActionWithGold = (ActionId_t)_actionToDo;
     } else {
+        _actionToDo = act;
+
         _continue_gang_times = 0;
         _lastActionWithGold = aQi;
     }
+    
+    _lastActionSource = dir;
+    _lastAction = act;
 }
 
 void RoundManager::_LoadRandomCardSequence() {

@@ -32,6 +32,7 @@ typedef enum {
     aKOU       = 0x40,
     aKOU_CANCEL= 0x80,
 
+    aGANG      = aMING_GANG|aAN_GANG|aSHOU_GANG,
     aQIANG_GANG= 0xfd,
     aTING      = 0xfe,
 
