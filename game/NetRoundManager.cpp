@@ -581,17 +581,8 @@ void NetRoundManager::StartGame() {
 }
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
-    _players[dir]->hand_in(
-        LastHandout(),
-        _isNewDistributed,
-        false,
-        (_distributedNum==TOTAL_CARD_NUM),
-        _lastActionWithGold,
-        _continue_gang_times,
-        _isGangHua
-    );    
+    _players[dir]->_cards->push_back(LastHandout());
 
-    PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
     Card_t      kind = RoundManager::RecvPeng(dir);
     
     if(dir==MIDDLE) {
@@ -612,6 +603,10 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
+    if(_actionToDo & aMING_GANG) {
+        _players[dir]->_cards->push_back(LastHandout());
+    }
+
     Card_t kind = RoundManager::RecvGang(dir);
     
     if(dir==MIDDLE) {
