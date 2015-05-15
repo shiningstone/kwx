@@ -558,7 +558,7 @@ void RaceLayer::_DistributeCard(const DistributeInfo_t &distribute) {
     PlayerDir_t     dir = distribute.target;
     int     lenOfInHand = distribute.cardsLen - 1;
     
-    const Vec2 &lastCardPosition = _GetLastCardPosition(dir,distribute.cardsLen);
+    const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
 
     Sprite *lastCard = _object->CreateDistributeCard(dir,distribute.newCard);
 	lastCard->setPosition(lastCardPosition);
