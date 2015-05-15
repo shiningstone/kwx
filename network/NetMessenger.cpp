@@ -1,6 +1,10 @@
 
+#include <thread>
+
 #include "CSockets.h"
 #include "NetMessenger.h"
+
+Logger *NetMessenger::_logger = 0;
 
 NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
@@ -8,6 +12,8 @@ NetMessenger::NetMessenger() {
     _handle_msg = 0;
 
 	ClearRecvBuf();
+    
+    _logger = LOGGER_REGISTER("NetMessenger");
 }
 
 NetMessenger::~NetMessenger() {
@@ -17,13 +23,14 @@ NetMessenger::~NetMessenger() {
 
     _keepListen = false;
     _handle_msg = 0;
+    
+    LOGGER_DEREGISTER(_logger);
 }
 
 void NetMessenger::SetHandler(MsgHandler_t func) {
     _handle_msg = func;
 }
 
-#include <thread>
 void NetMessenger::Start() {
 	_socket->Start();
 
@@ -200,6 +207,8 @@ void NetMessenger::_collect_packages() {
         int   msgLen = 0;
 
         while( Recv(msg, msgLen) ) {
+            LOGGER_WRITE("recv #%d\n",++_recvCnt);
+            
             if(_handle_msg!=0) {
                 _handle_msg(msg,msgLen);
             }

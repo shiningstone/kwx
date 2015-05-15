@@ -13,6 +13,7 @@
 
 
 #include "./../utils/UtilBasic.h"
+#include "./../utils/LogManager.h"
 
 class CSocket;
 #define SOCKET_BUFF_SIZE 128
@@ -38,6 +39,9 @@ protected:
 	static bool         _keepListen;
     static MsgHandler_t _handle_msg;
 private:
+    int    _sendCnt;
+    int    _recvCnt;
+    
     /*** 报文自动接收   ***/
     bool _is_kwx_exist();
     void _collect_packages();
@@ -57,6 +61,8 @@ private:
 	int   _outStart;            /* 数据存储起始偏移  */
 	int   _usedLen();           /* 已有数据长度      */
 	void  _get_pkg_from_buffer(INT8U *start,int len);
+
+    static Logger *_logger;
 };
 
 #endif
