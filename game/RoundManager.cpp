@@ -152,7 +152,7 @@ int RoundManager::Shuffle() {
     _otherOneForDouble = INVALID;
     _isWaitForMyDecision = false;
     _isGangHua = false;
-    _isMyShowTime = false;
+    _actCtrl.handoutAllow = false;
     _isTuoGuan = false;
     
     CancelEffectCard();
@@ -354,6 +354,8 @@ void RoundManager::RecvQi() {
 }
 
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
+    _actCtrl.handoutAllow = false;
+
     if(_isGangAsking) {
         _isGangAsking = false;
     }
@@ -626,7 +628,7 @@ void RoundManager::WaitForMyChoose() {
             Vec2 location = _uiManager->GetCardPositionInHand(last);
             RecvHandout(last,location,2);
 		} else {
-			_isMyShowTime = true;
+			_actCtrl.handoutAllow = true;
         }
 	}
 }

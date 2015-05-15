@@ -31,6 +31,12 @@ public:
     *****************************/
     Card_t LastHandout() const;
 
+    typedef struct _ActCtrl_t {
+        bool handoutAllow;
+        bool actionAllow;
+    }ActCtrl_t;
+
+    ActCtrl_t   _actCtrl;
     
     static RoundManager *getInstance();
     static void  destroyInstance();
@@ -111,7 +117,6 @@ protected:
 
     int  _curPlayer;
 
-    bool _isMyShowTime;
     bool _isWaitForMyDecision;
     
     bool _isNewDistributed;

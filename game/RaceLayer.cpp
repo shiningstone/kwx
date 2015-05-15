@@ -2476,11 +2476,8 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
     
 	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL 
         && (touch->getLocation().y>visibleSize.height*0.2)) {
-		if(_roundManager->_isMyShowTime) {
-			_roundManager->_isMyShowTime=false;
-            
-			_myChosenCard=INVALID;
-
+		if(_roundManager->_actCtrl.handoutAllow) {
+			_myChosenCard = INVALID;
             _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),1);
 		} else {
 			_myChosenCard=_myTouchedCard;
@@ -2552,12 +2549,9 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
             }
         }
         
-		if(ChooseConfirm && _roundManager->_isMyShowTime) {
-			_roundManager->_isMyShowTime=false;
-            
+		if(ChooseConfirm && _roundManager->_actCtrl.handoutAllow) {
 			_myChosenCard=INVALID;
 			_myTouchedCard = chosen;
-
             _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
 		}
     }
@@ -5967,8 +5961,7 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 					_roundManager->WaitForMyChoose();
                 }
 			} else {
-				if(_roundManager->_isMyShowTime) {
-					_roundManager->_isMyShowTime=false;
+				if(_roundManager->_actCtrl.handoutAllow) {
 					_roundManager->_actionToDo=a_JUMP;
 
 					if(_roundManager->_lastAction==a_JUMP)
