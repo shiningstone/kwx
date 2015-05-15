@@ -3826,14 +3826,15 @@ void RaceLayer::_UpdateTingNum(PlayerDir_t dir) {
 
 void RaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
     TingInfo_t *ting = _roundManager->_players[curNo]->_cards->_ting;
+    if(ting!=NULL) {
+        Card_t huCards[9];
+        for(int i=0;i<ting->cardNum;i++) {
+            huCards[i] = (ting->cards+i)->kind;
+        }
 
-    Card_t huCards[9];
-    for(int i=0;i<ting->cardNum;i++) {
-        huCards[i] = (ting->cards+i)->kind;
+        auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,huCards,ting->cardNum);
+        myframe->addChild(tingSignBar,30,TING_SING_LEFTBAR+curNo/2);
     }
-
-    auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,huCards,ting->cardNum);
-    myframe->addChild(tingSignBar,30,TING_SING_LEFTBAR+curNo/2);
 }
 
 void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
