@@ -30,6 +30,7 @@ public:
         context
     *****************************/
     Card_t LastHandout() const;
+    Card_t NewDistribute() const;
 
     typedef struct _ActCtrl_t {
         bool handoutAllow;

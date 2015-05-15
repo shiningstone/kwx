@@ -286,7 +286,7 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
         _uiManager->GangEffect(dir,card,gangIdx);
         return card;
 	} else {
-		PlayerDir_t prevPlayer = dir;
+		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
 
         CardInHand *cards = _players[dir]->_cards;
         Card_t card;
@@ -686,7 +686,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
     
     _actionToDo = 
         _players[dir]->hand_in(
-            LastHandout(),
+            NewDistribute(),
             _isNewDistributed,
             _players[dir]->_cards->IsMing,
             (_distributedNum==TOTAL_CARD_NUM),
@@ -909,6 +909,9 @@ Card_t RoundManager::LastHandout() const {
     return _gRiver->get_kind(_gRiver->last());
 }
 
+Card_t RoundManager::NewDistribute() const {
+    return (Card_t)_unDistributedCards[_distributedNum-1];
+}
 /*************************************
         singleton
 *************************************/
