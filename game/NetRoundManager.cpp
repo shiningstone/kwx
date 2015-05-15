@@ -317,10 +317,10 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
 
     delete info;
 
-    if(dir!=whoGive) {
-        _isNewDistributed = false;
-    } else {
+    if(whoGive==SERVER || whoGive==dir) {
         _isNewDistributed = true;
+    } else {
+        _isNewDistributed = false;
     }
 
     ServerWaitForMyAction();
