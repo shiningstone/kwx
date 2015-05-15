@@ -770,7 +770,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     _lastHandedOutCard = _players[MIDDLE]->hand_out(chosen);
-    _players[MIDDLE]->_river->push_back(_lastHandedOutCard);
 
     RequestShowCard aReq;
     aReq.Set(_lastHandedOutCard);

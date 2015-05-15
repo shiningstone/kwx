@@ -153,6 +153,7 @@ Card_t Player::hand_out(unsigned int place) {
 
 	Card_t kind = _cards->get_kind(place);
     _cards->delete_card(place,1);
+    _river->push_back(kind);
 
     return kind;
 }

@@ -373,7 +373,6 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
     _lastHandedOutCard = _players[_curPlayer]->hand_out(idx);
-    _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
@@ -646,7 +645,6 @@ void RoundManager::WaitForOthersChoose() {
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
 	_lastHandedOutCard = _players[_curPlayer]->hand_out(index);
-    _players[_curPlayer]->_river->push_back(_lastHandedOutCard);
 
     if(true) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
