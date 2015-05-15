@@ -2846,7 +2846,6 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
 				if(ifUpdateDuringEffect) {
 					ifUpdateDuringEffect=false;
 					_roundManager->CancelEffectCard();
-                    _roundManager->UpdateCards(dir,a_PENG);
 					_CardInHandUpdateEffect(dir);
 				} else  {
                     int sameCardNum = 0;
@@ -2889,6 +2888,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
             it is unneccessary for net-game???
         ***************************************/
 		myframe->runAction( Sequence::create(CCCallFunc::create([=](){
+        		_roundManager->UpdateCards(dir,a_PENG,card);
     			_roundManager->_actionToDo = _roundManager->_players[dir]->ActiontodoCheckAgain();
     			_roundManager->WaitForMyAction();}),NULL));
 	}
