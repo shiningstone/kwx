@@ -145,6 +145,8 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_DAOJISHI:
             _DiRecv((CounterNotif *)di);
             break;
+        case REQ_GAME_SEND_CALSCORE:
+            _DiRecv((ScoreNotif *)di);
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -227,7 +229,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     _players[target]->hand_in(
         card,
         false,
-        IsTing(target),
+        IsMing(target),
         (_distributedNum==TOTAL_CARD_NUM),
         _lastActionWithGold,
         _continue_gang_times,
@@ -242,6 +244,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     INT8U timer        = info->timer;
     _distributedNum    = info->remain;
 
+    PlayerDir_t prev  = (PlayerDir_t)_curPlayer;
     _curPlayer        = MIDDLE;
     _isNewDistributed = true;
     _actionToDo     = info->remind.actions;
@@ -256,7 +259,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _players[MIDDLE]->hand_in(
         card,
         false,
-        IsTing(MIDDLE),
+        IsMing(prev),
         (_distributedNum==TOTAL_CARD_NUM),
         _lastActionWithGold,
         _continue_gang_times,
@@ -477,6 +480,12 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
     _uiManager->UpdateClock(info->count,info->seat);
 }
 
+void NetRoundManager::_DiRecv(ScoreNotif *info) {
+    for(int i=0;i<PLAYER_NUM;i++) {
+        _uiManager->GuiJinBiShow((PlayerDir_t)i,info->val[i]);
+    }
+}
+
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(dir==MIDDLE) {
         RoundManager::UpdateCards(dir,action);
@@ -657,7 +666,7 @@ void NetRoundManager::RecvGang(PlayerDir_t dir) {
         
         gangCard = cards->find_an_gang_cards(gangCardIdx);
         
-		if( !IsTing(_curPlayer) ) {
+		if( !IsMing(_curPlayer) ) {
 			SetEffectCard(gangCard,sAN_GANG);
 		}
 
@@ -767,7 +776,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _messenger->Send(aReq);
 
     bool turnToMing = false;
-	if(_actionToDo==a_MING && !IsTing(_curPlayer) ) {
+	if(_actionToDo==a_MING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(chosen);
 
         turnToMing = true;
@@ -844,7 +853,7 @@ void NetRoundManager::WaitForMyAction() {
 void NetRoundManager::WaitForMyChoose() {
 	if(_isNewDistributed) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
-                (IsTing(_curPlayer) && !_isGangAsking) ) {
+                (IsMing(_curPlayer) && !_isGangAsking) ) {
             int last = _players[MIDDLE]->_cards->last();
             
             Vec2 location = _uiManager->GetCardPositionInHand(last);

@@ -210,7 +210,7 @@ void RaceLayer::DoubleWin(const WinInfo_t &win) {
     HideClock();
 
     if(win.giver!=MIDDLE) {
-        if(_roundManager->IsTing(MIDDLE)) {
+        if(_roundManager->IsMing(MIDDLE)) {
             _HuEffect(win);
             _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
         } else {
@@ -223,7 +223,7 @@ void RaceLayer::SingleWin(const WinInfo_t &win) {
     HideClock();
 
     if(win.winner==MIDDLE) {
-        if(_roundManager->IsTing(MIDDLE)) {
+        if(_roundManager->IsMing(MIDDLE)) {
             _HuEffect(win);
         } else {
             _roundManager->WaitForMyAction();
@@ -262,7 +262,7 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
 
 void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 {
-	if(_roundManager->IsTing(dir)) {
+	if(_roundManager->IsMing(dir)) {
         _Show(this,MING_STATUS_PNG_0+dir,true);
 	}
     
@@ -275,7 +275,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
     CardInHand *cards = _roundManager->_players[dir]->_cards;
 
-	if( _roundManager->IsTing(dir) && _roundManager->_firstMingNo==INVALID )
+	if( _roundManager->IsMing(dir) && _roundManager->_firstMingNo==INVALID )
 		_roundManager->_firstMingNo=dir;
 
 	bool isMing = _roundManager->_players[dir]->_cards->IsMing;
@@ -541,7 +541,7 @@ Vec2 RaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     switch(dir) {
         case MIDDLE:
             x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
-            y += 60 + 13*(_roundManager->IsTing(dir));
+            y += 60 + 13*(_roundManager->IsMing(dir));
             break;
         case LEFT:
             y = _GetCardInHand(LEFT,cardLen-1)->getPosition().y-20;//+5;
@@ -1830,7 +1830,7 @@ void RaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToM
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
     		else {
-                _Show(this,MING_STATUS_PNG_1,_roundManager->IsTing(MIDDLE));
+                _Show(this,MING_STATUS_PNG_1,_roundManager->IsMing(MIDDLE));
     			_CardInHandUpdateEffect(MIDDLE);
     		}}),NULL),CCCallFunc::create([=]() {
 		_roundManager->_isNewDistributed = false;
@@ -2065,7 +2065,7 @@ void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
         }
 
         /* provide hint bar when ming choose */
-        if(_roundManager->_actionToDo==a_MING && _roundManager->_isMingTime && (!_roundManager->IsTing(MIDDLE))) {
+        if(_roundManager->_actionToDo==a_MING && _roundManager->_isMingTime && (!_roundManager->IsMing(MIDDLE))) {
             if( loopCard->getScaleX()==1 ) {
                 loopCard->setScale(1.2);
                 loopCard->runAction(_voice->Speak("select"));
@@ -2354,7 +2354,7 @@ void RaceLayer::ListenToTingButton() {
         choose card
 *********************************************/
 void RaceLayer::ListenToCardTouch() {
-    if( !_roundManager->IsTing(MIDDLE) && !_roundManager->_isTuoGuan ) {
+    if( !_roundManager->IsMing(MIDDLE) && !_roundManager->_isTuoGuan ) {
         auto listener = EventListenerTouchOneByOne::create();
         listener->setSwallowTouches(true);
         
@@ -2393,7 +2393,7 @@ bool RaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
     
     if( touch->getLocation().y > visibleSize.height*0.173 ) {
         /* why is there TING_SING_BAR if non-ting??? from others??? */
-        while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(1)))
+        while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(1)))
             myframe->removeChildByTag(TING_SING_BAR);
         
         float x1,y1;
@@ -2461,7 +2461,7 @@ void RaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 			myframe->addChild(freeCard,35,CHOOSE_CARD_TAG_ID);
 			_GetCardInHand(MIDDLE,_myTouchedCard)->setOpacity(150);
 
-			while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)))
+			while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(MIDDLE)))
 				myframe->removeChildByTag(TING_SING_BAR,true);
             
 			_myChosenCard = _myTouchedCard;
@@ -2540,9 +2540,9 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
         }
 
         if(chosen!=cards->last()) {/* why??? */
-            if(_roundManager->_actionToDo==a_MING && !_roundManager->IsTing(MIDDLE)
+            if(_roundManager->_actionToDo==a_MING && !_roundManager->IsMing(MIDDLE)
                 && _roundManager->_isMingTime ) {
-                while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsTing(MIDDLE)) )
+                while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(MIDDLE)) )
                     myframe->removeChildByTag(TING_SING_BAR);
                 
                 Point curPos=loopCard->getPosition();
@@ -3647,7 +3647,7 @@ void RaceLayer::_HuEffect(const WinInfo_t &win)
 				GoldNumInsert(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
                 RaceLayer::showall)),NULL));
 		} else {
-            Sequence *backgroundEffect = _roundManager->IsTing(MIDDLE) 
+            Sequence *backgroundEffect = _roundManager->IsMing(MIDDLE) 
                 ? Sequence::create(
                         _CreateHuBackgroundEffect(winner),NULL)
                 : Sequence::create(
@@ -3733,7 +3733,7 @@ Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
                 
                 if(isTing) {
                     card = _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
-                } else if(!isTing&&_roundManager->IsTing(MIDDLE)) {
+                } else if(!isTing&&_roundManager->IsMing(MIDDLE)) {
                     card = _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
                 } else {
                     TextureId_t texture = (dir==LEFT)?L_IN_CARD:R_IN_CARD;
@@ -3744,7 +3744,7 @@ Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
                 return card;
             }
         case c_AN_GANG:
-            if(cards->get_idx_in_group(idx)==3 && !isTing&&_roundManager->IsTing(MIDDLE))
+            if(cards->get_idx_in_group(idx)==3 && !isTing&&_roundManager->IsMing(MIDDLE))
                 return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
             else
                 return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
@@ -3762,7 +3762,7 @@ float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTin
     
     switch(cards->get_status(idx)) {
         case c_FREE:
-            if(isTing||_roundManager->IsTing(MIDDLE)) {
+            if(isTing||_roundManager->IsMing(MIDDLE)) {
                 return up*(refY*0.65);
             } else {
                 return up*(refY*0.5);
@@ -3770,7 +3770,7 @@ float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTin
         case c_MING_KOU:
             return up*(refY*0.65);
         case c_PENG:
-            if(isTing||_roundManager->IsTing(MIDDLE)) {
+            if(isTing||_roundManager->IsMing(MIDDLE)) {
                 if(cards->get_status(idx+1)==c_FREE||cards->get_status(idx+1)==c_MING_KOU)
                     return up*refY;
                 else if(cards->get_kind(idx+1)!=cards->get_kind(idx))
@@ -3796,7 +3796,7 @@ float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTin
             } else if( (dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==1)) {
                 return up*(refY*0.65+13);
             } else {
-                if(_roundManager->IsTing(MIDDLE)||isTing==1) {
+                if(_roundManager->IsMing(MIDDLE)||isTing==1) {
                     if(cards->get_status(idx+1)==c_FREE||cards->get_status(idx+1)==c_MING_KOU)
                         return up*refY;
                     else
@@ -4447,15 +4447,15 @@ void RaceLayer::_CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive) 
         goldOfPlayer[whoGive] = -goldOfPlayer[winner];
     }
     
-    goldOfPlayer[(winner+1)%3] = goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+1)%3]*_roundManager->IsTing((winner+1)%3);
-    goldOfPlayer[(winner+2)%3] = goldOfPlayer[(winner+2)%3] + goldOfPlayer[(winner+2)%3]*_roundManager->IsTing((winner+2)%3);
+    goldOfPlayer[(winner+1)%3] = goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+1)%3]*_roundManager->IsMing((winner+1)%3);
+    goldOfPlayer[(winner+2)%3] = goldOfPlayer[(winner+2)%3] + goldOfPlayer[(winner+2)%3]*_roundManager->IsMing((winner+2)%3);
     goldOfPlayer[winner] = - (goldOfPlayer[(winner+1)%3] + goldOfPlayer[(winner+2)%3]);
 }
 
 void RaceLayer::_CalcDoubleWinGold(int goldOfPlayer[3], int giver) {
     for(int i=1;i<3;i++) {
         auto score = _roundManager->_players[(giver+i)%3]->get_score();
-        int  ting  = _roundManager->IsTing((giver+i)%3);
+        int  ting  = _roundManager->IsMing((giver+i)%3);
 
         goldOfPlayer[(giver+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
     }
@@ -4827,7 +4827,7 @@ void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
     _ExposeCards((PlayerDir_t)no,win,BarOfPlayer);
     
 	int tagNum = BarOfPlayer->getTag();
-	if(_roundManager->IsTing(tagNum)&&
+	if(_roundManager->IsMing(tagNum)&&
             ((win.kind==SINGLE_WIN && 
                 ((win.winner==win.giver && tagNum!=win.winner)  /* others zimo */
                 ||(win.winner!=win.giver && tagNum==win.giver)))/* tagNum dianpao */
@@ -5883,7 +5883,7 @@ void RaceLayer::BtnTuoGuanCancelHandler(Ref* pSender,ui::Widget::TouchEventType 
 			curButton->setScale(0);
 			_roundManager->_isTuoGuan=false;
 			auto StartSelfGame=CallFunc::create([=](){
-				if( !_roundManager->IsTing(1) )
+				if( !_roundManager->IsMing(1) )
 					ListenToCardTouch();
 				else
 					ListenToTingButton();
@@ -6032,7 +6032,7 @@ void RaceLayer::BtnBackCancelHandler(Ref* pSender,ui::Widget::TouchEventType typ
 			auto StartSelfGame=CallFunc::create([=](){
 				if(_roundManager->_isGameStart)
 				{
-					if(!_roundManager->IsTing(1))
+					if(!_roundManager->IsMing(1))
 						ListenToCardTouch();
 					else
 						ListenToTingButton();

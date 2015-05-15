@@ -78,7 +78,7 @@ bool RoundManager::IsWinner(int no) {
 /***********************************************
         general operations
 ***********************************************/
-bool RoundManager::IsTing(int id) const{
+bool RoundManager::IsMing(int id) const{
     return _players[id]->_cards->IsMing;
 }
 
@@ -299,7 +299,7 @@ void RoundManager::RecvGang(PlayerDir_t dir) {
         int*   gangIdx = new int[4];
         Card_t card = _players[dir]->_cards->find_an_gang_cards(gangIdx);
         
-		if( !IsTing(dir) ) {
+		if( !IsMing(dir) ) {
 			SetEffectCard(card,c_AN_GANG);
 		}
 
@@ -378,7 +378,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && 
-        !IsTing(_curPlayer) ) {
+        !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(idx);
 
         turnToMing = true;
@@ -469,8 +469,8 @@ int RoundManager::_GroupIdx(int idx,CARD_ARRAY *cards) {
 CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
     CardStatus_t status = _players[dir]->_cards->get_status(idx);
 
-    bool isTing       = IsTing(dir);
-    bool isMiddleTing = IsTing(MIDDLE);
+    bool isTing       = IsMing(dir);
+    bool isMiddleTing = IsMing(MIDDLE);
     
     if(status==sFREE) {
         if(isTing) {
@@ -623,7 +623,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 void RoundManager::WaitForMyChoose() {
 	if(_isNewDistributed) {/* is this judgement neccessary??? */
 		if( _isTuoGuan ||
-                (IsTing(_curPlayer) && !_isGangAsking) ) {
+                (IsMing(_curPlayer) && !_isGangAsking) ) {
             int last = _players[MIDDLE]->_cards->last();
             
             Vec2 location = _uiManager->GetCardPositionInHand(last);
@@ -680,7 +680,7 @@ unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatu
         );
     
     if(dir==MIDDLE&&_isTuoGuan) {
-        if(IsTing(MIDDLE)&&(actions&a_HU)) {
+        if(IsMing(MIDDLE)&&(actions&a_HU)) {
             actions=a_HU;
         } else {
             actions=a_JUMP;
@@ -718,7 +718,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
         );
     
     if((PlayerDir_t)dir==MIDDLE) {
-        if(IsTing(MIDDLE)&&(_actionToDo&a_HU)){
+        if(IsMing(MIDDLE)&&(_actionToDo&a_HU)){
             RecvHu(MIDDLE);
         }else{
             if(_isTuoGuan)
@@ -735,7 +735,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
 }
 
 void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
-    bool prevTingStatus = IsTing(dir);
+    bool prevTingStatus = IsMing(dir);
     
     int no1=((PlayerDir_t)dir+1)%3;
     unsigned char action1 = _GetPlayerReaction((PlayerDir_t)no1,prevTingStatus);
@@ -747,11 +747,11 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
     {
         _uiManager->HideClock();
         
-        if((no1!=MIDDLE&&no2!=MIDDLE) || (no1==MIDDLE||no2==MIDDLE&&IsTing(MIDDLE))){ 
+        if((no1!=MIDDLE&&no2!=MIDDLE) || (no1==MIDDLE||no2==MIDDLE&&IsMing(MIDDLE))){ 
             SetWin(DOUBLE_WIN,(PlayerDir_t)_curPlayer);
             _uiManager->_HuEffect(_lastWin);
             _uiManager->_DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
-        } else if((no1==MIDDLE||no2==MIDDLE) && !IsTing(MIDDLE)) {
+        } else if((no1==MIDDLE||no2==MIDDLE) && !IsMing(MIDDLE)) {
             _isDoubleHuAsking = true;
             if(no1==1) {
                 _otherOneForDouble = no2;
@@ -871,8 +871,9 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
 }
 
 void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
-    if(_isGangAsking)//is this judgement neccessary?
+    if(_isGangAsking) {//is this judgement neccessary?
         _isGangAsking = false;
+    }
     
     _lastActionSource = dir;
 

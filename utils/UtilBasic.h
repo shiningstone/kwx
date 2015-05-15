@@ -8,7 +8,8 @@
 
 typedef unsigned char  INT8U;
 typedef unsigned short INT16U;
-typedef int            INT32U;
+typedef unsigned int   INT32U;
+typedef int            INT32S;
 
 extern INT32U _ntohl(INT32U n);
 extern INT32U _htonl(INT32U n);

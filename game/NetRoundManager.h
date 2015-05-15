@@ -50,6 +50,7 @@ public:
     void _DiRecv(EnterRoomResponse *info);
     void _DiRecv(EnterRoomNotif *info);
     void _DiRecv(CounterNotif *info);
+    void _DiRecv(ScoreNotif *info);
 
     void ServerWaitForMyAction();
     void ServerDistributeTo(PlayerDir_t dir,Card_t card);

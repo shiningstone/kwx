@@ -100,7 +100,6 @@ private:
     Sprite *_CreateEffectCard(int i,CARD_KIND value );
     void _UpdateGouldAccount(int id,int gold);
     void UpdateGoldAccounts(int goldOfPlayer[3]);
-    void GuiJinBiShow(PlayerDir_t dir, int gold);
     void GoldNumInsert(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
     void _GuiUpdateScore(LayerColor *layer,int score);
 
@@ -137,6 +136,8 @@ private:
     void _CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND kind);
 
 public:
+    void GuiJinBiShow(PlayerDir_t dir, int gold);
+
 	void UpdateClock(int time,int direction);
     void HideClock();
     void ListenToCardTouch();

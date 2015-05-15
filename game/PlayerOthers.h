@@ -6,20 +6,6 @@
 
 #include "Player.h"
 
-typedef struct _KindPosition {
-    int           num;
-    int           position[4];
-}KindPosition;
-
-typedef struct _Context_t {
-    CardList     *river;
-    int           remain;
-    KindPosition  cards[TOTAL_CARD_KIND];
-    TingInfo_t   *OthersTing[2];
-    int           huNum;
-    ROBOT_TARGET  aim;
-}Context_t;
-
 class Logger;
 class PlayerOthers:public Player
 {
@@ -29,6 +15,21 @@ class PlayerOthers:public Player
 		virtual ~PlayerOthers();
     private:
         Logger      *_logger;
+        
+        typedef struct _KindPosition {
+            int           num;
+            int           position[4];
+        }KindPosition;
+        
+        typedef struct _Context_t {
+            CardList     *river;
+            int           remain;
+            KindPosition  cards[TOTAL_CARD_KIND];
+            TingInfo_t   *OthersTing[2];
+            int           huNum;
+            ROBOT_TARGET  aim;
+        }Context_t;
+
         Context_t    _ctx;
 	private:
         bool IsInStrictSequences(Card_t kind,int seqIdx) const;

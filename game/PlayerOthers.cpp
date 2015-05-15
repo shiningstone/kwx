@@ -959,7 +959,7 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
 	}
 
 	/*init hu target*/
-	if( !context.IsTing(curPlayer) ) {
+	if( !context.IsMing(curPlayer) ) {
 		res->target = context._players[curPlayer]->_cards->assess_aim();
     }
 }
@@ -981,7 +981,7 @@ int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
 		_SetContext(s_res,list1,list2,&len1,&len2,context);
 	}
 
-    if( !context.IsTing(curPlayer) ) {
+    if( !context.IsMing(curPlayer) ) {
 		index = context._players[curPlayer]->chose_card(
             s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
 
@@ -991,7 +991,7 @@ int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
         
 		if(s_res->hu_nums>=6 
             && context._actionToDo==a_MING 
-            && !context.IsTing(curPlayer) ) {
+            && !context.IsMing(curPlayer) ) {
 			canKou = true;
 		}
 	} else {

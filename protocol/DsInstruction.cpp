@@ -237,9 +237,10 @@ int ScoreNotif::Construct(const DsMsg &msg) {
     seat[1] = _GetPlayer(msg._body->_items[0]->_buf[1]);
     seat[2] = _GetPlayer(msg._body->_items[0]->_buf[2]);
 
-    val[0] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf)) );
-    val[1] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf+4)) );
-    val[2] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf+8)) );
+    val[seat[0]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*0)) );
+    val[seat[1]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*1)) );
+    val[seat[2]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*2)) );
+    
     return 0;
 }
 

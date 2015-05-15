@@ -71,7 +71,7 @@ public:
     void RecordOutCard( Card_t kind );
 
     virtual void InitPlayers();
-    bool IsTing(int player) const;
+    bool IsMing(int player) const;
 
     
     int  Shuffle();
