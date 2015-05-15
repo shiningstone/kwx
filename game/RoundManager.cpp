@@ -154,7 +154,6 @@ int RoundManager::Shuffle() {
     _isGangHua = false;
     _isMyShowTime = false;
     _isTuoGuan = false;
-    _otherHandedOut = CARD_UNKNOWN;
     
     CancelEffectCard();
     _isMingTime = false;
@@ -641,8 +640,8 @@ void RoundManager::WaitForOthersChoose() {
 	int index = player->choose_worst(*this,canKou);
     
     if ( true ) {
-        _otherHandedOut = _players[_curPlayer]->_cards->get_kind(index);
-        _players[_curPlayer]->_cards->choose_all_kou_cards(_otherHandedOut);
+        Card_t handingout = _players[_curPlayer]->_cards->get_kind(index);
+        _players[_curPlayer]->_cards->choose_all_kou_cards(handingout);
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));

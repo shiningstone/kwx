@@ -82,6 +82,11 @@ public:
     virtual void CreateRace(Scene *scene);
     virtual void StartGame();
 protected:
+    typedef struct _Context_t {
+    }Context_t;
+
+    Context_t  _ctx;
+    
     GameMode_t _MODE;
     
     RaceLayer *_uiManager;
@@ -107,6 +112,7 @@ protected:
     bool _isGangAsking;
     bool _isQiangGangAsking;
     bool _isDoubleHuAsking;
+    
     int  _firstMingNo;
     int  _continue_gang_times;
 
@@ -130,7 +136,6 @@ protected:
 
     bool _isMyShowTime;
     bool _isTuoGuan;
-    Card_t _otherHandedOut;
     
     Logger *_logger;
 private:
