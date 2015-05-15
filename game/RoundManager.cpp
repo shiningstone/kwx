@@ -841,9 +841,10 @@ void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
 
         DistributeInfo_t distInfo;
         
-        distInfo.target = dir;
-        distInfo.card   = card;
-        distInfo.distNum = _distributedNum;
+        distInfo.target   = dir;
+        distInfo.cardsLen = _players[dir]->_cards->size();
+        distInfo.newCard  = card;
+        distInfo.remain   = TOTAL_CARD_NUM - _distributedNum;
         
         _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
     } else {

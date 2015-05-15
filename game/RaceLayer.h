@@ -15,10 +15,12 @@ using namespace CocosDenshion;
 #include "./../multimedia/GraphicEffect.h"
 #include "DataBase.h"
 #include "CardCollection.h"
+
 typedef struct {
     PlayerDir_t target;
-    Card_t      card;
-    int         distNum;
+    int         cardsLen;
+    Card_t      newCard;
+    int         remain;
 }DistributeInfo_t;
 
 class RoundManager;
@@ -234,7 +236,7 @@ public:
 	void _DistributeEvent(const std::string event_type,void* val);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(const WinInfo_t &win);
-	void _DistributeCard(PlayerDir_t dir, int lenOfInHand);
+	void _DistributeCard(const DistributeInfo_t &distribute);
 	void MyHandoutEffect(int cardInList,Vec2 touch,int time,bool turnToMing);
 	int GoldAccountImmediate[3];
 

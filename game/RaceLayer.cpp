@@ -554,13 +554,16 @@ Vec2 RaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
     return Vec2(x,y);
 }
 
-void RaceLayer::_DistributeCard(PlayerDir_t dir,int lenOfInHand) {
-    const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
+void RaceLayer::_DistributeCard(const DistributeInfo_t &distribute) {
+    PlayerDir_t     dir = distribute.target;
+    int     lenOfInHand = distribute.cardsLen - 1;
+    
+    const Vec2 &lastCardPosition = _GetLastCardPosition(dir,distribute.cardsLen);
 
-    Sprite *lastCard = _object->CreateDistributeCard(dir,_roundManager->_lastHandedOutCard);
+    Sprite *lastCard = _object->CreateDistributeCard(dir,distribute.newCard);
 	lastCard->setPosition(lastCardPosition);
     
-	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+	_UpdateResidueCards(distribute.remain);
 
     switch(dir) {
         case LEFT:
@@ -591,9 +594,8 @@ void RaceLayer::_DistributeCard(PlayerDir_t dir,int lenOfInHand) {
 
 void RaceLayer::ListenToDistributeCard() {
 	auto _distributedoneListener = EventListenerCustom::create(DISTRIBUTE_DONE_EVENT_TYPE, [this](EventCustom * event){
-		auto userData = static_cast<DistributeInfo_t *>(event->getUserData());
-        auto target = userData->target;
-		_DistributeCard(target,_roundManager->_players[target]->_cards->last());
+		DistributeInfo_t *userData = static_cast<DistributeInfo_t *>(event->getUserData());
+        _DistributeCard(*userData);
 	});
 	_eventDispatcher->addEventListenerWithFixedPriority(_distributedoneListener,2);
 
