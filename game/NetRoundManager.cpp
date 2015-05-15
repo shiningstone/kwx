@@ -844,33 +844,15 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
 
 
 void NetRoundManager::WaitForMyAction() {
-    LOGGER_WRITE("%s (%d) wait",__FUNCTION__,1);
-}
-
-void NetRoundManager::WaitForMyChoose() {
-	if(_isNewDistributed) {/* is this judgement neccessary??? */
-		if( (_isTuoGuan) || (IsMing(_curPlayer) && !_isGangAsking) ) {
-            int last = _players[MIDDLE]->_cards->last();
-            
-            Vec2 location = _uiManager->GetCardPositionInHand(last);
-            RecvHandout(last,location,2);
-            
-		} else {
-			_isMyShowTime = true;
-        }
-	}
 }
 
 void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
-    LOGGER_WRITE("%s (%d) wait",__FUNCTION__,dir);
 }
 
 void NetRoundManager::WaitForOthersChoose() {
-    LOGGER_WRITE("%s (%d) waiting\n",__FUNCTION__,_curPlayer);
 }
 
 void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
-    LOGGER_WRITE("%s (%d) waiting\n",__FUNCTION__,dir);
 }
 
 void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {

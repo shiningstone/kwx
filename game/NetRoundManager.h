@@ -75,7 +75,6 @@ public:
 
     virtual void WaitForFirstAction(PlayerDir_t zhuang);
     virtual void WaitForMyAction();
-    virtual void WaitForMyChoose();
     virtual void WaitForOthersAction(PlayerDir_t dir);
     virtual void WaitForOthersChoose();
     virtual void WaitForResponse(PlayerDir_t dir);
