@@ -834,7 +834,6 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 
 void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
     if(_distributedNum<TOTAL_CARD_NUM+1) {
-		_lastHandedOutCard = card;
         _isNewDistributed  = true;
 
         DistributeInfo_t distInfo;
