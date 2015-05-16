@@ -445,7 +445,7 @@ int GameLayout::_lineIdx(int i) {
     } else if (i<RIVER_CARD_IN_LINE_1+RIVER_CARD_IN_LINE_2) {
         return i-RIVER_CARD_IN_LINE_1;
     } else {
-        return i-RIVER_CARD_IN_LINE_1+RIVER_CARD_IN_LINE_2;
+        return i-(RIVER_CARD_IN_LINE_1+RIVER_CARD_IN_LINE_2);
     }
 }
 
