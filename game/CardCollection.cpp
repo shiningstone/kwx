@@ -429,8 +429,13 @@ void CardInHand::_CancelKou() {
 void CardInHand::_AcceptNewCard() {
     CardNode_t node;
     node.kind    = get_kind(last());
-    node.canPlay = false;
     node.status  = sFREE;
+
+    if(IsMing) {
+        node.canPlay = false;
+    } else {
+        node.canPlay = true;
+    }
     
     pop_back();
     insert_card(node,1);
