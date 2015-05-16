@@ -758,7 +758,7 @@ bool CardInHand::has_shou_gang() const {/*BUG??? : should compare with current g
 }
 
 bool CardInHand::can_hu(Card_t newCard) const {
-    SmartList cards(*this);
+    SmartList cards(*this,ONLY_FREE);
     cards.len--;                    /*the last should not be included*/
     cards.insert(newCard);          /*the last inserted in order*/
 
@@ -766,7 +766,7 @@ bool CardInHand::can_hu(Card_t newCard) const {
 }
 
 bool CardInHand::can_hu(int position, int newKind) const {
-    SmartList cards(*this,true);
+    SmartList cards(*this,ONLY_FREE);
     cards.displace(position-FreeStart,(Card_t)newKind);
 
     return cards.can_hu();
@@ -1394,11 +1394,11 @@ void SmartList::remove(int deleteNum,int deletes[]) {
 }
 
 void SmartList::insert(Card_t newCard) {
-    for(int i=len;i>=0;i--) {
+    for(int i=len-1;i>=0;i--) {
         if(newCard<kind[i]) {
-            kind[i] = kind[i-1];
+            kind[i+1] = kind[i];
         } else {
-            kind[i] = (Card_t)newCard;
+            kind[i+1] = (Card_t)newCard;
             break;
         }
     }
@@ -1406,6 +1406,7 @@ void SmartList::insert(Card_t newCard) {
     len++;
 }
 
+/*BUG HERE!!! 不能判断包含四个一样的牌型*/
 bool SmartList::_PatternMatch() const {
     if(_IsCharDismatched()) {
         return false;

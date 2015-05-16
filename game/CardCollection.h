@@ -171,6 +171,8 @@ public:
     INT32U      _mingChoicesMask;             /* NOTE : this mask starts with FreeStart, not 0 */
 
 private:
+    static const bool ONLY_FREE = true;
+    
     int    _FindInsertPoint(CardNode_t data) const;
 
     typedef struct {

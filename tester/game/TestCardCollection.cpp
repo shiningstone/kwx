@@ -141,6 +141,12 @@ void test_pattern_match() {
     assert( !cards.Match() );
 }
 
+void test_can_hu() {
+    TestSmartList cards;
+    cards.Load(TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_3,TIAO_3,TIAO_3,TIAO_3,
+        TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.insert(TIAO_5);
+    assert(cards.can_hu());
 }
 
 class son {
@@ -206,4 +212,5 @@ void test_card_list() {
 
 	test_remove();
     test_pattern_match();
+    test_can_hu();
 }
