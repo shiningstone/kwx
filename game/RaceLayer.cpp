@@ -2025,7 +2025,7 @@ void RaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
     float y1 = _layout->_playerPosi[MIDDLE].basePoint.y+10;
     auto startPos = _GetCardInHand(MIDDLE,cards->FreeStart)->getPosition();
     
-    for(int i=cards->FreeStart; i<=cards->last(); i++) {
+    for(int i=cards->FreeStart; i<=cards->real_last(); i++) {
         auto loopCard=_GetCardInHand(MIDDLE,i);
 
         if(i==chosen) {
@@ -2035,7 +2035,7 @@ void RaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
             loopCard->setScale(1);
             loopCard->_ID = 1;
         } else if(i>chosen) {
-            if( i==cards->last() && cards->is_wait_handout() ) {
+            if( i==cards->real_last() && cards->is_wait_handout() ) {
                 loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+30+14,y1));
             } else {
                 loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+14,y1));
