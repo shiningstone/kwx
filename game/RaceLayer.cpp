@@ -2538,15 +2538,13 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
             }
         }
 
-        if(chosen!=cards->last()) {/* why??? */
-            if(_roundManager->_actionToDo==a_MING && !_roundManager->IsMing(MIDDLE)
-                && _roundManager->_isMingTime ) {
-                while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(MIDDLE)) )
-                    myframe->removeChildByTag(TING_SING_BAR);
+        if(_roundManager->_actionToDo==a_MING && !_roundManager->IsMing(MIDDLE)
+            && _roundManager->_isMingTime ) {
+            while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(MIDDLE)) )
+                myframe->removeChildByTag(TING_SING_BAR);
                 
-                Point curPos=loopCard->getPosition();
-                _TingHintCreate(curPos,chosen);
-            }
+            Point curPos=loopCard->getPosition();
+            _TingHintCreate(curPos,chosen);
         }
         
 		if(ChooseConfirm && _roundManager->_actCtrl.handoutAllow) {
