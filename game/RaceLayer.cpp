@@ -1535,7 +1535,7 @@ Sprite *RaceLayer::_GetCardInHand(PlayerDir_t dir,int idx) {
 
 void RaceLayer::_ReOrderCardsInHand(int droppedCard,CardInHand *cards) {
     /*NOTE : this function is called after handout ,so the position is 1 bigger than length */
-    const int  LAST      = cards->last();
+    const int  LAST      = cards->real_last();
 
     if(droppedCard==LAST) {
 		_GetCardInHand(MIDDLE,droppedCard)->setScale(0);
@@ -1676,7 +1676,7 @@ TargetedAction *RaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,
 
 	auto cardInHand = _roundManager->_players[dir]->_cards;
 
-    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->last()-1)->getPosition();
+    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->real_last()-1)->getPosition();
     Vec2 curOutPos;/* here must be something I have not known */
     if(dir==RIGHT) {
 		curOutPos = Vec2(
@@ -2035,7 +2035,7 @@ void RaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
             loopCard->setScale(1);
             loopCard->_ID = 1;
         } else if(i>chosen) {
-            if( i==cards->real_last() && cards->is_wait_handout() ) {
+            if( i==cards->last() && cards->is_wait_handout() ) {
                 loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+30+14,y1));
             } else {
                 loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+14,y1));
@@ -2413,7 +2413,7 @@ bool RaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
             card->setScale(1);
             card->setAnchorPoint(Vec2(0,0));
 
-            if(i==cards->real_last() && cards->is_wait_handout()) {
+            if(i==cards->last() && cards->is_wait_handout()) {
                 card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart)+30,y1));
             } else {
                 card->setPosition(Vec2(startPos.x + cardSize.width*(i-cards->FreeStart),y1));
@@ -2435,7 +2435,7 @@ void RaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 		return;
 	} 
     
-    for(int i=cards->FreeStart; i<=cards->last(); i++) {
+    for(int i=cards->FreeStart; i<=cards->real_last(); i++) {
         _GetCardInHand(MIDDLE,i)->setOpacity(255);
 	}
     
@@ -2443,7 +2443,7 @@ void RaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 		myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
     }
     
-    int chosen = _FindCard(cards->FreeStart, cards->last(), touch);
+    int chosen = _FindCard(cards->FreeStart, cards->real_last(), touch);
     if(chosen!=INVALID) {
         _UpdateCardsInHand(cards,chosen);
     } else if(touch->getLocation().y>visibleSize.height*0.173) {
@@ -2494,7 +2494,7 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 
     _Remove(myframe,CHOOSE_CARD_TAG_ID);
     
-	int chosen = _FindCard(cards->FreeStart, cards->last(), touch);
+	int chosen = _FindCard(cards->FreeStart, cards->real_last(), touch);
     if(chosen!=INVALID && cards->canPlay(chosen)) {
         _UpdateNonChosenCards(cards,chosen);
 
@@ -2714,7 +2714,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
         
 		Vector<FiniteTimeAction *> hide2CardsInhand;
 
-		for(int i=cards->FreeStart;i<cards->last();i++) {/* ??? why last not size*/
+		for(int i=cards->FreeStart;i<cards->real_last();i++) {/* ??? why real_last not size*/
 			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
             Sequence *seq;
 
@@ -2746,7 +2746,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
         /****************
             tag update 
         ****************/
-		for(int a=cards->last(); a>=cards->FreeStart; a--) {
+		for(int a=cards->real_last(); a>=cards->FreeStart; a--) {
 			int curTag = HAND_IN_CARDS_TAG_ID + 1*20 + a;
             
 			if(!myframe->getChildByTag(curTag))
@@ -2946,7 +2946,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             int oldChosen = _myChosenCard;
             _myChosenCard = cards->rechoose_after_gang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
 
-            if(_myChosenCard==INVALID && oldChosen!=cards->last()) {
+            if(_myChosenCard==INVALID && oldChosen!=cards->real_last()) {
                 isChosenCanceled=1;
             }
 		}
@@ -2986,7 +2986,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 		Vector<FiniteTimeAction *>gang_list_seq;
 		Spawn* moveFreeCards;
         
-		if( card==cards->get_kind(cards->last()) ) {
+		if( card==cards->get_kind(cards->real_last()) ) {
             int i;
             for(i=actionStartPlace;i<cards->size()-1;i++)
 			{
@@ -3050,7 +3050,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                             ScaleTo::create(0,0),NULL));
                 } else if(i>GangCardsPlace[3]) {
                     MoveTo* actionMove;
-                    if( (i==cards->size()-1) && (card!=cards->get_kind(cards->last()))) {
+                    if( (i==cards->size()-1) && (card!=cards->get_kind(cards->real_last()))) {
 						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i-1)->getPosition();
 						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
                         
@@ -3241,7 +3241,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
         CardInHand *cards = _roundManager->_players[MIDDLE]->_cards; 
         
 		if( _roundManager->_isNewDistributed ) {
-			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20 + cards->last());//gang1
+			auto lastInHand = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20 + cards->real_last());//gang1
 			lastInHand->runAction(ScaleTo::create(0,0));
 			
 			s_curOutCard=_object->Create(FREE_CARD);
@@ -3350,7 +3350,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 				    origin.y+visibleSize.height*0.255)),
 				MoveTo::create(0.12,Vec2(
 				    origin.x+visibleSize.width*0.5+cardPengSize.width*0.98,
-				    origin.y+visibleSize.height*0.255)),NULL)),NULL;/* the last NULL is non effect, BUG HERE???*/
+				    origin.y+visibleSize.height*0.255)),NULL)),NULL;/* the real_last NULL is non effect, BUG HERE???*/
             gangCard0Motion = Sequence::create(gangCardsMotion[0],NULL);
 		} else {
 			gangCardsMotion[0] = TargetedAction::create(s_curOutCard,Sequence::create(
@@ -3486,16 +3486,16 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
         /**********************
             update tag
         **********************/
-		for(int a=cards->last();a>=0;a--) {
+		for(int a=cards->real_last();a>=0;a--) {
 			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
 			if(!myframe->getChildByTag(curTag))
 				continue;
             
 			auto EveryCard=(Sprite*)myframe->getChildByTag(curTag);
 			if(_roundManager->_isNewDistributed) {
-				if(a==cards->last())
+				if(a==cards->real_last())
 					EveryCard->setTag(EFFECT_TEMP_CARD_TAG_FOUR);
-				else if(a<cards->last()&&a>gang[2])
+				else if(a<cards->real_last()&&a>gang[2])
 					EveryCard->setTag(curTag+1);
                 
 				if(a==(gang[2]+1)) {
@@ -3677,9 +3677,9 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
                     hideQiReminder,CallFunc::create([=](){
     					_roundManager->_isGangAsking = false;
 
-                        int last = _roundManager->_players[MIDDLE]->_cards->last();
-                        Vec2 location = _GetCardInHand(MIDDLE,last)->getPosition();
-                        _roundManager->RecvHandout(last,location,2);/*bug??? forced to handout last card*/
+                        int real_last = _roundManager->_players[MIDDLE]->_cards->real_last();
+                        Vec2 location = _GetCardInHand(MIDDLE,real_last)->getPosition();
+                        _roundManager->RecvHandout(real_last,location,2);/*bug??? forced to handout real_last card*/
                     }),NULL));
 			} else
 				myframe->runAction(hideQiReminder);
@@ -4797,7 +4797,7 @@ void RaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *pa
             auto winCard=_object->Create(PENG_CARD);
             winCard->setAnchorPoint(Vec2(0,0.5));
             winCard->setPosition(Vec2(x+30,y));
-            auto s_card=_object->CreateKind(cards->get_kind(cards->last()),MIDDLE_SIZE);/*!!! the last card should be the one from others*/
+            auto s_card=_object->CreateKind(cards->get_kind(cards->real_last()),MIDDLE_SIZE);/*!!! the real_last card should be the one from others*/
             s_card->setAnchorPoint(Vec2(0.5,0.5));
             s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
             winCard->addChild(s_card,1);
@@ -6523,7 +6523,7 @@ BezierTo* RaceLayer::OthersBizerMove(int no,CardList* outCard)
     
 	if(no==2)
 	{
-		int secondLast = _roundManager->_players[no]->_cards->last()-1;
+		int secondLast = _roundManager->_players[no]->_cards->real_last()-1;
 		auto BizerPosForPlayerTwoTemp=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+secondLast)->getPosition();
 		auto BizerPosForPlayerTwo=Vec2(BizerPosForPlayerTwoTemp.x,BizerPosForPlayerTwoTemp.y);
 		if((outCard->size()-1)<6)
@@ -6547,7 +6547,7 @@ BezierTo* RaceLayer::OthersBizerMove(int no,CardList* outCard)
 	}
 	else if(no==0)
 	{
-		int secondLast = _roundManager->_players[no]->_cards->last()-1;
+		int secondLast = _roundManager->_players[no]->_cards->real_last()-1;
 		auto l_card=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+no*20+secondLast);
 		if((outCard->size()-1)<6)
 		{

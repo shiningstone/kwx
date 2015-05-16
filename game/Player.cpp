@@ -66,7 +66,7 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     if(len<14) {/*NON-ZHUANG*/
         return a_JUMP;
     } else {
-        return hand_in(cards[13],0,0,false,aQi,0,false);
+        return hand_in(cards[13],true,0,false,aQi,0,false);
     }
 }
 
