@@ -5932,6 +5932,9 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 				_DeleteActionTip();
 
 				_roundManager->_isWaitForMyDecision=false;
+                if(_roundManager->_tempActionToDo) {
+                    _roundManager->_players[MIDDLE]->_cards->pop_back();
+                }
 				_roundManager->_tempActionToDo=a_JUMP;
                 
 				if(!_roundManager->_isNewDistributed) {
