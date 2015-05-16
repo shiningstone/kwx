@@ -2340,13 +2340,13 @@ void RaceLayer::ListenToTingButton() {
 	TingListener->onTouchEnded=[=](Touch* touch, Event* event) {
 		auto button = (Sprite*)myframe->getChildByTag(TING_SING_BUTTON);
 
-        if( !_IsClickedOn(button,touch) ) {
-            ifTingSignBarVisible=false;
-		} else {
-			ifTingSignBarVisible = !ifTingSignBarVisible;
-		}
+            if( !_IsClickedOn(button,touch) ) {
+                ifTingSignBarVisible=false;
+		    } else {
+			    ifTingSignBarVisible = !ifTingSignBarVisible;
+		    }
 
-        _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
+            _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
 	};
     
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(TingListener,myframe);
@@ -2488,7 +2488,7 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		return;
 	}
     
-    for(int i=cards->FreeStart; i<=cards->last(); i++) {
+    for(int i=cards->FreeStart; i<=cards->real_last(); i++) {
 		_GetCardInHand(MIDDLE,i)->setOpacity(255);
     }
 
@@ -6239,6 +6239,10 @@ void RaceLayer::_Show(Node *parent, int childTag, bool flag) {
 }
 
 bool RaceLayer::_IsClickedOn(Node* button,Touch* touch) {
+    if(button==NULL) {
+        return false;
+    }
+    
     float x      = button->getPosition().x;
     float y      = button->getPosition().y;
     Size size    = button->getContentSize();
