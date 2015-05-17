@@ -41,7 +41,8 @@ public:
 	void QueryKouCards();
 	void QueryMingOutCard();
     void _SwitchCancelBtn(int tag);
-    
+
+    void HideActionButtons();
     void ShowActionButtons(int mask);
     Vec2 GetCardPositionInHand(int idx);
     void OthersHandoutEffect(PlayerDir_t dir,bool canKou);

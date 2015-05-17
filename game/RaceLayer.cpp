@@ -2137,6 +2137,12 @@ LabelAtlas * RaceLayer::_CreateNumberSign(int number) {
 /***********************************************
         action button show
 ***********************************************/
+void RaceLayer::HideActionButtons() {
+    for(int i=0;i<17;i++){
+        _Remove(myframe,REMIND_ACT_TAG_ID+i);
+    }
+}
+
 void RaceLayer::ShowActionButtons(int actionsMask) {
     _Show(myframe,TING_SING_BAR,false);
 
