@@ -26,7 +26,7 @@
 #define DEF_SOCKET_PORT  60905
 
 #define BLOCKSECONDS  30              // INITº¯Êý×èÈûÊ±¼ä   
-#define SOCKET_BUFF_SIZE 128
+#define SOCKET_BUFF_SIZE 1024
 
 class CSocket {
 public:

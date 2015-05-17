@@ -16,7 +16,7 @@
 #include "./../utils/LogManager.h"
 
 class CSocket;
-#define SOCKET_BUFF_SIZE 128
+#define SOCKET_BUFF_SIZE 1024
 
 class NetMessenger {
 public:
