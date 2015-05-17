@@ -280,6 +280,8 @@ void NetRoundManager::_DiRecv(ShowCardResponse *info) {
     }
     
     delete info;
+
+    _actCtrl.choices = 0;
 }
 
 void NetRoundManager::_DiRecv(ShowCardNotif *info) {
