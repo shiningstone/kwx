@@ -488,12 +488,9 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
     _uiManager->UpdateClock(info->count,info->seat);
 
     if(info->seat==MIDDLE) {
-        _actCtrl.handoutAllow = true;
-    } else {
-        _actCtrl.handoutAllow = false;
+        WaitForMyChoose();
+        _messenger->Resume();
     }
-
-    _messenger->Resume();
 }
 
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
@@ -542,8 +539,6 @@ void NetRoundManager::ServerWaitForMyAction() {
 
 		_lastAction=a_JUMP;
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
-		WaitForMyChoose();
-        _actCtrl.handoutAllow = false;
 	}
 }
 
