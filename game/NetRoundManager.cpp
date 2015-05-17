@@ -267,6 +267,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
         _isGangHua
     );
     ServerWaitForMyAction();
+    _actCtrl.handoutAllow = true;
 
     _uiManager->UpdateClock(timer,target);
     _uiManager->ListenToCardTouch();
@@ -542,6 +543,7 @@ void NetRoundManager::ServerWaitForMyAction() {
 		_lastAction=a_JUMP;
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
 		WaitForMyChoose();
+        _actCtrl.handoutAllow = false;
 	}
 }
 
