@@ -15,6 +15,8 @@ USING_NS_CC;
 #include "RoundManager.h"
 #include "NetRoundManager.h"
 
+#include "./../protocol/DbgRequestDesc.h"
+
 NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 :RoundManager(uiManager) {
     _MODE = NETWORK_GAME;
@@ -87,7 +89,7 @@ void NetRoundManager::HandleMsg(void * aMsg) {
     auto di = static_cast<DsInstruction *>(aMsg);
 
     #ifdef WIN32
-    LOGGER_WRITE("get ds instruction %s\n",di->Desc(di->request));
+    LOGGER_WRITE("get ds instruction %s\n",Desc(di->request));
     #else
     LOGGER_WRITE("get ds instruction %d\n",di->request);
     #endif
