@@ -14,8 +14,9 @@ class NetRoundManager;
 ****************************************************/
 class DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
-    virtual int Dispatch();
+    virtual int  Construct(const DsMsg &msg);
+    virtual int  Dispatch();
+    virtual void Show() const;
 
     RequestId_t      request;
 protected:
@@ -24,6 +25,7 @@ protected:
 
     PlayerDir_t      _GetPlayer(INT8U seat);
 
+    static int       _recvCnt;
 #ifndef __UNIT_TEST__
     NetRoundManager   *_roundManager;
 #endif
@@ -32,14 +34,14 @@ protected:
 
 class GameStartResponse : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
 
     INT32U           score;
 };
 
 class GameStartNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT32U           score;
@@ -49,7 +51,7 @@ class ShowCardResponse : public DsInstruction {
 public:
     ~ShowCardResponse();
     
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     Status_t        status;
     TingInfo_t      ting;
@@ -59,7 +61,8 @@ class ShowCardNotif : public DsInstruction {
 public:
     ~ShowCardNotif();
     
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
+    virtual void Show() const;
     
     INT8U            seat;
     Card_t           kind;
@@ -68,7 +71,7 @@ public:
 
 class ActionResponse : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT8U            waitSeat;
@@ -76,7 +79,8 @@ public:
 
 class ActionNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
+    virtual void Show() const;
     
     INT8U            seat;
     INT8U            whoGive;
@@ -92,7 +96,7 @@ class DistCardInfo : public DsInstruction {
 public:
     ~DistCardInfo();
     
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT8U            timer;
@@ -105,7 +109,7 @@ class FirstDistZhuang : public DsInstruction {
 public:
     ~FirstDistZhuang();
     
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT8U            timer;
@@ -116,7 +120,7 @@ public:
 
 class FirstDistNonZhuang : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT8U            remain;
@@ -129,7 +133,7 @@ class RemindInfo : public DsInstruction {
 public:
     ~RemindInfo();
     
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT8U            timer;
@@ -141,7 +145,7 @@ public:
 
 class DistCardNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat;
     INT8U            remain;
@@ -151,7 +155,7 @@ public:
 
 class ScoreNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat[3];
     INT32U           val[3];
@@ -159,7 +163,7 @@ public:
 
 class TingInfoResponse : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
     
     TingInfo_t       info;
 };
@@ -183,7 +187,7 @@ typedef struct {
 
 class HuInfoNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
 
     INT8U            seat;
     INT8U            zhuang;
@@ -192,7 +196,7 @@ public:
 
 class EndInfoNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
 
     INT8U            seat;
     INT8U            cardNum[3];
@@ -201,7 +205,7 @@ public:
 
 class EnterRoomResponse : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
 private:    
     RoomPath_t       roomPath;
     RoomId_t         roomId;
@@ -221,7 +225,7 @@ public:
 
 class EnterRoomNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
 
     int              seat;
     INT32U           baseScore;
@@ -233,7 +237,7 @@ public:
 
 class CounterNotif : public DsInstruction {
 public:
-    virtual int Construct(const DsMsg &msg);
+    virtual int  Construct(const DsMsg &msg);
 
     int              count;
     INT32U           seat;

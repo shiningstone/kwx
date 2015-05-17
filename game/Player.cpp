@@ -161,7 +161,7 @@ Card_t Player::hand_out(unsigned int place) {
 }
 
 ACT_RES Player::others_action(bool isNewDistributed,ActionId_t act,Card_t kind) {
-    LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
+    LOGGER_WRITE("%x %s : %d %d(isNewDistributed=%d)",this,__FUNCTION__,act,kind,isNewDistributed);
     _cards->others_perform(isNewDistributed,act,kind);
 	return ar_DONE;
 }

@@ -14,6 +14,7 @@
 
 #include "DbgRequestDesc.h"
 
+int DsInstruction::_recvCnt = 0;
 SeatInfo *DsInstruction::_seatInfo = 0;
 Logger *DsInstruction::_logger = 0;
 
@@ -32,10 +33,16 @@ int DsInstruction::Construct(const DsMsg &msg) {
 }
 
 int DsInstruction::Dispatch() {
+    Show();
+    
     #ifndef __UNIT_TEST__
     _roundManager->RecvMsg(this);
     #endif
     return 0;
+}
+
+void DsInstruction::Show() const {
+    LOGGER_WRITE("#%d (%s):\n",++_recvCnt,DescReq(request));
 }
 
 PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
@@ -121,6 +128,11 @@ int ShowCardNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+void ShowCardNotif::Show() const {
+     DsInstruction::Show();
+     LOGGER_WRITE("%s handout %s\n",DescPlayer((PlayerDir_t)seat),DescCard(kind));
+}
+
 ShowCardNotif::~ShowCardNotif() {
     DsMsgParser::_unload(ting);
 }
@@ -142,6 +154,12 @@ int ActionNotif::Construct(const DsMsg &msg) {
     actions = msg.GetItemValue(3);
     DsMsgParser::_load(card, cardNum, msg, 4);
     return 0;
+}
+
+void ActionNotif::Show() const {
+     DsInstruction::Show();
+     LOGGER_WRITE("%s act %s %s from %s\n",DescPlayer((PlayerDir_t)seat),DescAct((ActionId_t)actions),
+        DescCard(card[0].kind),DescPlayer((PlayerDir_t)whoGive));
 }
 
 DistCardInfo::~DistCardInfo() {

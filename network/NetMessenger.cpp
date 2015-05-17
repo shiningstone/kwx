@@ -209,8 +209,6 @@ void NetMessenger::_collect_packages() {
         int   msgLen = 0;
 
         while( Recv(msg, msgLen) ) {
-            LOGGER_WRITE("recv #%d\n",++_recvCnt);
-            
             if(_handle_msg!=0) {
                 _handle_msg(msg,msgLen);
             }
