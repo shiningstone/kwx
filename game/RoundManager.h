@@ -33,8 +33,11 @@ public:
     Card_t NewDistribute() const;
 
     typedef struct _ActCtrl_t {
-        bool handoutAllow;
-        bool actionAllow;
+        bool         handoutAllow;
+        
+        ActionMask_t choices;
+        Card_t       target;
+        ActionId_t   decision;
     }ActCtrl_t;
 
     ActCtrl_t   _actCtrl;
