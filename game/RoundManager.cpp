@@ -878,7 +878,7 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
     }
     
     _lastActionSource = dir;
-    _lastAction = act;
+    _lastAction = _actionToDo;
 }
 
 void RoundManager::_LoadRandomCardSequence() {
