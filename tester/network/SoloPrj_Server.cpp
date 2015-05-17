@@ -151,7 +151,7 @@ void test_basic() {
     发送消息实现
     消息格式 : lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00
 ****************************************************/
-#define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
+#define WORKING_PATH "E:\\VisualProject\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
 
 #include <stdio.h>
 
@@ -561,6 +561,64 @@ void E15051202_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void E15051701_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        for(int i=1;i<6;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        for(int i=6;i<9;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_ACTION && handout==0) {
+        handout++;
+    
+        for(int i=9;i<13;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_ACTION && handout==1) {
+        handout++;
+    
+        for(int i=13;i<17;i++) {
+            SendLine(SERVER,i);
+        }
+    }
+}
+
+void E15051704_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        for(int i=1;i<6;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        for(int i=6;i<9;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_ACTION && handout==0) {
+        handout++;
+    
+        for(int i=9;i<11;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(recvBuf[16]==REQ_GAME_SEND_SHOWCARD && handout==1) {
+        handout++;
+    
+        for(int i=11;i<34;i++) {
+            SendLine(SERVER,i);
+        }
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -611,13 +669,19 @@ void test_server_console() {
     SetFile("Round3");
     gHandle = round3_handle_requests;
 
-    SetFile("Round1");
-    gHandle = round1_handle_requests;
-
     #endif
     /*没有杠提示*/
     SetFile("E15051202");
     gHandle = E15051202_handle_requests;
+
+    SetFile("E15051701");
+    gHandle = E15051701_handle_requests;
+
+    SetFile("Round1");
+    gHandle = round1_handle_requests;
+
+    SetFile("E15051704");
+    gHandle = E15051704_handle_requests;
 
     test_smart_game_round_x();
 #endif

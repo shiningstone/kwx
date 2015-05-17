@@ -1,0 +1,510 @@
+杠提示没有清除？
+
+
+'kwx-refactor.exe' (Win32): Loaded 'E:\VisualProject\kwx\kwx\proj.win32\Debug.win32\kwx-refactor.exe'. Symbols loaded.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ntdll.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'E:\VisualProject\kwx\kwx\proj.win32\Debug\TestServer.exe'. Symbols loaded.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ntdll.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\kernel32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\KernelBase.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sysfer.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\DgApi.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\psapi.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ws2_32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcrt.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\rpcrt4.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sspicli.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\cryptbase.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sechost.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\nsi.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\mpr.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\version.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\user32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\gdi32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\lpk.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\usp10.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\advapi32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shell32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shlwapi.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ole32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\oleaut32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\userenv.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\profapi.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\wininet.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\urlmon.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\crypt32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msasn1.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\iertutil.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\ProgramData\Symantec\Symantec Endpoint Protection\12.1.4100.4126.105\Data\Definitions\BASHDefs\20150504.013\UMEngx86.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcp110d.dll'. Symbols loaded.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcr110d.dll'. Symbols loaded.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\imm32.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msctf.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\09D849B6-32D3-4a40-85EE-6B84BA29E35B\AE_MailSensor_Plugin.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\09D849B6-32D3-4a40-85EE-6B84BA29E35B\AME_OutlookSensor.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\09D849B6-32D3-4a40-85EE-6B84BA29E35B\AME_SmtpSensor.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\8e4ea70a-6128-4b57-bd3f-8e9e0f0da6bb\OS_Plugin.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\8e4ea70a-6128-4b57-bd3f-8e9e0f0da6bb\COM_Sensor.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\kernel32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\KernelBase.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sysfer.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\DgApi.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\psapi.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ws2_32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcrt.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\rpcrt4.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sspicli.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\cryptbase.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\sechost.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\nsi.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\mpr.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\version.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\user32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\gdi32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\lpk.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\usp10.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\advapi32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shell32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shlwapi.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ole32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\oleaut32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\userenv.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\profapi.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\wininet.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\urlmon.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\crypt32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msasn1.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\iertutil.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\ProgramData\Symantec\Symantec Endpoint Protection\12.1.4100.4126.105\Data\Definitions\BASHDefs\20150504.013\UMEngx86.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcp110d.dll'. Symbols loaded.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcr110d.dll'. Symbols loaded.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\opengl32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\glu32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ddraw.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\dciman32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\setupapi.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\cfgmgr32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\devobj.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\dwmapi.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'E:\VisualProject\kwx\kwx\proj.win32\Debug.win32\glew32.dll'. Module was built without symbols.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'E:\VisualProject\kwx\kwx\proj.win32\Debug.win32\zlib1.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\winmm.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msvcr110.dll'. Symbols loaded.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\imm32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msctf.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\09D849B6-32D3-4a40-85EE-6B84BA29E35B\AE_MailSensor_Plugin.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\09D849B6-32D3-4a40-85EE-6B84BA29E35B\AME_OutlookSensor.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\09D849B6-32D3-4a40-85EE-6B84BA29E35B\AME_SmtpSensor.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\8e4ea70a-6128-4b57-bd3f-8e9e0f0da6bb\OS_Plugin.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\DGAgent\plugins\8e4ea70a-6128-4b57-bd3f-8e9e0f0da6bb\COM_Sensor.dll'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+First-chance exception at 0x765FB9BC in TestServer.exe: Microsoft C++ exception: SysferException at memory location 0x004DE09C.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\mswsock.dll'. Cannot find or open the PDB file.
+'TestServer.exe' (Win32): Loaded 'C:\Windows\SysWOW64\WSHTCPIP.DLL'. Cannot find or open the PDB file.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+First-chance exception at 0x765FB9BC in kwx-refactor.exe: Microsoft C++ exception: SysferException at memory location 0x00C7E72C.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\uxtheme.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\kingsoft\kingsoft antivirus\kwsui.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\wtsapi32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\apphelp.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\SogouPY.ime'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msimg32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\oleacc.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ntmarta.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\Wldap32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\nvoglv32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\wintrust.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\powrprof.dll'. Cannot find or open the PDB file.
+The thread 0x2094 has exited with code 0 (0x0).
+'kwx-refactor.exe' (Win32): Unloaded 'C:\Windows\SysWOW64\powrprof.dll'
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\kingsoft\kingsoft antivirus\lblocker.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\SogouInput\Components\AddressSearch\1.0.0.1255\AddressSearch.dll'. Cannot find or open the PDB file.
+The thread 0x13b0 has exited with code 0 (0x0).
+The thread 0xf9c has exited with code 0 (0x0).
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\SogouInput\Components\PicFace\1.0.0.1068\PicFace.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\SogouInput\Components\SgAppender\1.0.0.207\SgAppender_Dll.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\SogouInput\Components\SGImeGuard\1.0.0.27\SGImeGuard.dll'. Cannot find or open the PDB file.
+The thread 0x1ffc has exited with code 0 (0x0).
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ole32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Unloaded 'C:\Windows\SysWOW64\ole32.dll'
+Run MemDll'kwx-refactor.exe' (Win32): Loaded 'C:\Program Files (x86)\SogouInput\7.2.0.2893\Resource.dll'. Module was built without symbols.
+Ready for GLSL
+Ready for OpenGL 2.0
+
+{
+	gl.version: 4.2.0
+	gl.supports_NPOT: true
+	cocos2d.x.version: cocos2d-x 3.1.1
+	cocos2d.x.compiled_with_profiler: false
+	cocos2d.x.build_type: DEBUG
+	cocos2d.x.compiled_with_gl_state_cache: true
+	gl.max_texture_size: 16384
+	gl.vendor: NVIDIA Corporation
+	gl.renderer: NVS 5200M/PCIe/SSE2
+	gl.max_texture_units: 160
+	gl.supports_ETC1: false
+	gl.supports_S3TC: true
+	gl.supports_ATITC: false
+	gl.supports_PVRTC: false
+	gl.supports_BGRA8888: false
+	gl.supports_discard_framebuffer: false
+	gl.supports_vertex_array_object: true
+}
+
+
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\MMDevAPI.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\propsys.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\wdmaud.drv'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\ksuser.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\avrt.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\AudioSes.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msacm32.drv'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\msacm32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\midimap.dll'. Cannot find or open the PDB file.
+cocos2d: fullPathForFilename: No file found at /cc_2x2_white_image. Possible missing file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\shell32.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Unloaded 'C:\Windows\SysWOW64\shell32.dll'
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\mswsock.dll'. Cannot find or open the PDB file.
+'kwx-refactor.exe' (Win32): Loaded 'C:\Windows\SysWOW64\WSHTCPIP.DLL'. Cannot find or open the PDB file.
+[CSocket]: SEND (045): 
+
+	0x4b 0x57 0x58 0x10 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x00 0x2c 0x00 0x2d 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x84 0x00 0x04 0x01 0x02 0x03 0x04 0x83 0x00 0x04 0x00 0x00 0x00 0x0b 
+
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+cocos2d: fullPathForFilename: No file found at /cc_2x2_white_image. Possible missing file.
+[CSocket]: RECV (098): 
+
+	0x4b 0x57 0x58 0x00 0x2c 0x00 0x00 0x62 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x09 0x83 0x00 0x04 0x00 0x00 0x00 0x0b 0x84 0x00 0x04 0x00 0x0f 0x46 0x29 0x85 0x00 0x04 0x00 0x00 0x00 0x01 0x3c 0x01 0x86 0x00 0x04 0x00 0x00 0x00 0x64 0x87 0x00 0x03 0x01 0x00 0x00 0x88 0x00 0x0c 0x00 0x03 0x0d 0x40 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x89 0x00 0x10 0xfe 0xff 0x00 0x6a 0x00 0x69 0x00 0x61 0x00 0x6e 0x00 0x67 0x00 0x62 0x00 0x6f 0x8a 0x00 0x04 0xfe 0xff 0x00 0x31 
+
+[NetMessenger]: recv #1
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_ENTER
+
+[NetRoundManager]: NOTE: profile of players should be updated here
+
+[NetRoundManager]: Start heartbeats
+
+The thread 0x1f40 has exited with code 0 (0x0).
+The thread 0x17d4 has exited with code 0 (0x0).
+[CSocket]: RECV (030): 
+
+	0x4b 0x57 0x58 0x00 0x47 0x00 0x00 0x39 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x06 0x3d 0x02 0x83 0x00 0x04 0x00 0x00 0x00 0x64 
+
+[CSocket]: RECV (027): 
+
+	0x3e 0x01 0x84 0x00 0x04 0x00 0x00 0x00 0x00 0x85 0x00 0x08 0xfe 0xff 0x73 0x8b 0x5c 0x0f 0x4e 0x8c 0x86 0x00 0x04 0xfe 0xff 0x00 0x32 
+
+[NetMessenger]: recv #2
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_ENTER
+
+[NetRoundManager]: NOTE: profile of players should be updated here
+
+[CSocket]: RECV (057): 
+
+	0x4b 0x57 0x58 0x00 0x47 0x00 0x00 0x39 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x06 0x3d 0x03 0x83 0x00 0x04 0x00 0x00 0x00 0x64 0x3e 0x01 0x84 0x00 0x04 0x00 0x00 0x00 0x00 0x85 0x00 0x08 0xfe 0xff 0x73 0x8b 0x5c 0x0f 0x4e 0x8c 0x86 0x00 0x04 0xfe 0xff 0x00 0x32 
+
+[NetMessenger]: recv #3
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_ENTER
+
+[NetRoundManager]: NOTE: profile of players should be updated here
+
+[CSocket]: RECV (030): 
+
+	0x4b 0x57 0x58 0x00 0x4d 0x00 0x00 0x1e 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x3c 0x02 0x82 0x00 0x04 0xff 0xff 0xff 0x9c 
+
+[NetMessenger]: recv #4
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_START
+
+[NetRoundManager]: NOTE: Player2's score should set to -100
+
+[CSocket]: RECV (014): 
+
+	0x4b 0x57 0x58 0x00 0x4d 0x00 0x00 0x1e 0x00 0x00 0x00 0x00 0x00 0x00 
+
+[CSocket]: RECV (016): 
+
+	0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x3c 0x03 0x82 0x00 0x04 0xff 0xff 0xff 0x9c 
+
+[NetMessenger]: recv #5
+
+[NetRoundManager]: get ds instruction REQ_GAME_RECV_START
+
+[NetRoundManager]: NOTE: Player0's score should set to -100
+
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+unsupport convert for format 8 to format 2
+[NetRoundManager]: NETWORK: Request(last winner) not defined
+[CSocket]: SEND (054): 
+
+	0x4b 0x57 0x58 0x10 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x00 0x2b 0x00 0x36 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x04 0x83 0x00 0x04 0x00 0x00 0x00 0x0b 0x84 0x00 0x04 0x00 0x0f 0x46 0x29 0x85 0x00 0x04 0x00 0x00 0x00 0x01 0x3c 0x01 
+
+[CSocket]: RECV (028): 
+
+	0x4b 0x57 0x58 0x00 0x2b 0x00 0x00 0x1c 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01 0x83 0x00 0x04 0xff 0xff 0xff 0x9c 
+
+[NetMessenger]: recv #6
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_START
+
+[NetRoundManager]: NOTE: Player1's score should set to -100
+
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????????????????????????????\??????????. Possible missing file.
+[CSocket]: RECV (068): 
+
+	0x4b 0x57 0x58 0x00 0x38 0x00 0x00 0x44 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x08 0x3c 0x01 0x3d 0x28 0x3e 0x14 0x80 0x00 0x0e 0x00 0x00 0x00 0x00 0x01 0x01 0x01 0x01 0x02 0x02 0x02 0x02 0x03 0x03 0x81 0x00 0x04 0x00 0x00 0x00 0x38 0x82 0x00 0x03 0x00 0x00 0x00 0x83 0x00 0x01 0xff 0x84 0x00 0x04 0xff 0xff 0xff 0xff 
+
+[NetMessenger]: recv #7
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_BEGINCARDS
+
+[NetRoundManager]: new card sequence:
+
+	0x00 0x00 0x00 0x02 0x02 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x09 0x09 0x09 0x09 0x0a 0x0a 0x0b 0x0b 0x0c 0x0e 0x0f 0x10 0x10 0x11 0x12 0x12 0x12 0x0a 0x0a 0x0b 0x0b 0x0c 0x0e 0x0f 0x10 0x11 0x11 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x14 0x14 0x14 0x14 0x14 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 
+
+[Player]: NETWORK : cd67818 Player::hand_in actions 56: newCard 3,isNewDistributed 1,tingStatus 0,isLastOne 0
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????????????????????? ??. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????????????????????? ??. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????????????????????? ??. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????????????????????? ??. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+[CSocket]: RECV (016): 
+
+	0x4b 0x57 0x58 0x00 0x37 0x00 0x00 0x37 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 
+
+[CSocket]: RECV (039): 
+
+	0x00 0x00 0x00 0x00 0x09 0x3c 0x01 0x3d 0x03 0x3e 0x03 0x3f 0x00 0x81 0x00 0x04 0x00 0x00 0x00 0x38 0x82 0x00 0x03 0x00 0x01 0x02 0x83 0x00 0x01 0xff 0x84 0x00 0x04 0xff 0xff 0xff 0xff 0x40 0x00 
+
+[NetMessenger]: recv #8
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_REMIND
+
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ?????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????. Possible missing file.
+cocos2d: fullPathForFilename: No file found at ???????????????????????????????????. Possible missing file.
+[CSocket]: SEND (065): 
+
+	0x4b 0x57 0x58 0x10 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x00 0x31 0x00 0x41 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x06 0x83 0x00 0x04 0x00 0x00 0x00 0x0b 0x84 0x00 0x04 0x00 0x0f 0x46 0x29 0x85 0x00 0x04 0x00 0x00 0x00 0x01 0x3c 0x01 0x86 0x00 0x04 0x00 0x00 0x00 0x20 0x87 0x00 0x01 0x00 
+
+[Player]: cd67818 Player::action : 32 (isNewDistributed=1)
+[CSocket]: RECV (042): 
+
+	0x4b 0x57 0x58 0x00 0x35 0x00 0x00 0x2a 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x83 0x00 0x03 0x01 0x02 0x03 0x87 0x00 0x0c 0x00 0x00 0x00 0xc8 0xff 0xff 0xff 0x9c 0xff 0xff 0xff 0x9c 
+
+[NetMessenger]: recv #9
+
+[CSocket]: RECV (025): 
+
+	0x4b 0x57 0x58 0x00 0x31 0x00 0x00 0x19 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x3c 0x00 0x3f 0x00 
+
+[NetMessenger]: recv #10
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_CALSCORE
+
+[NetRoundManager]: NetRoundManager::HandleMsg undefined request code 53
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_ACTION
+
+[NetRoundManager]: NOTE: something should happen here
+
+[CSocket]: RECV (022): 
+
+	0x4b 0x57 0x58 0x00 0x33 0x00 0x00 0x34 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x08 0x3c 
+
+[CSocket]: RECV (030): 
+
+	0x01 0x3d 0x14 0x3e 0x29 0x3f 0x0a 0x81 0x00 0x04 0x00 0x00 0x00 0x20 0x82 0x00 0x02 0x01 0x02 0x83 0x00 0x01 0xff 0x84 0x00 0x04 0xff 0xff 0xff 0xff 
+
+[NetMessenger]: recv #11
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????. Possible missing file.
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD
+
+[Player]: NETWORK : cd67818 Player::hand_in actions 0: newCard 10,isNewDistributed 0,tingStatus 0,isLastOne 0
+[CSocket]: RECV (054): 
+
+	0x4b 0x57 0x58 0x00 0x37 0x00 0x00 0x36 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x09 0x3c 0x01 0x3d 0x03 0x3e 0x0a 0x3f 0x00 0x81 0x00 0x04 0x00 0x00 0x00 0x20 0x82 0x00 0x02 0x01 0x02 0x83 0x00 0x01 0xff 0x84 0x00 0x04 0xff 0xff 0xff 0xff 0x40 0x00 
+
+[NetMessenger]: recv #12
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_REMIND
+
+[CSocket]: SEND (065): 
+
+	0x4b 0x57 0x58 0x10 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x00 0x31 0x00 0x41 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x06 0x83 0x00 0x04 0x00 0x00 0x00 0x0b 0x84 0x00 0x04 0x00 0x0f 0x46 0x29 0x85 0x00 0x04 0x00 0x00 0x00 0x01 0x3c 0x01 0x86 0x00 0x04 0x00 0x00 0x00 0x20 0x87 0x00 0x01 0x01 
+
+[Player]: cd67818 Player::action : 32 (isNewDistributed=1)
+[CSocket]: RECV (042): 
+
+	0x4b 0x57 0x58 0x00 0x35 0x00 0x00 0x2a 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x83 0x00 0x03 0x01 0x02 0x03 0x87 0x00 0x0c 0x00 0x00 0x00 0xc8 0xff 0xff 0xff 0x9c 0xff 0xff 0xff 0x9c 
+
+[NetMessenger]: recv #13
+
+[CSocket]: RECV (002): 
+
+	0x4b 0x57 
+
+[CSocket]: RECV (023): 
+
+	0x58 0x00 0x31 0x00 0x00 0x19 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x02 0x3c 0x00 0x3f 0x00 
+
+[NetMessenger]: recv #14
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_CALSCORE
+
+[NetRoundManager]: NetRoundManager::HandleMsg undefined request code 53
+
+[NetRoundManager]: get ds instruction REQ_GAME_SEND_ACTION
+
+[NetRoundManager]: NOTE: something should happen here
+
+cocos2d: fullPathForFilename: No file found at ????????????????????????????????????????????????. Possible missing file.
+[CSocket]: RECV (051): 
+
+	0x4b 0x57 0x58 0x00 0x33 0x00 0x00 0x33 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x08 0x3c 0x01 0x3d 0x14 0x3e 0x2a 0x3f 0x0a 0x81 0x00 0x04 0x00 0x00 0x00 0x20 0x82 0x00 0x01 0x02 0x83 0x00 0x01 0xff 0x84 0x00 0x04 0xff 0xff 0xff 0xff 
+
+[NetMessenger]: recv #15
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_CARD
+
+[Player]: NETWORK : cd67818 Player::hand_in actions 0: newCard 10,isNewDistributed 0,tingStatus 0,isLastOne 0
+[CSocket]: RECV (053): 
+
+	0x4b 0x57 0x58 0x00 0x37 0x00 0x00 0x35 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x09 0x3c 0x01 0x3d 0x03 0x3e 0x0a 0x3f 0x00 0x81 0x00 0x04 0x00 0x00 0x00 0x20 0x82 0x00 0x01 0x02 0x83 0x00 0x01 0xff 0x84 0x00 0x04 0xff 0xff 0xff 0xff 0x40 0x00 
+
+[NetMessenger]: recv #16
+
+[NetRoundManager]: get ds instruction REQ_GAME_DIST_REMIND
+
+The thread 0x153c has exited with code 0 (0x0).
+The thread 0x221c has exited with code 0 (0x0).
+The thread 0x236c has exited with code 0 (0x0).
+The thread 0x1c50 has exited with code 0 (0x0).
+[CSocket]: SEND (065): 
+
+	0x4b 0x57 0x58 0x10 0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x00 0x31 0x00 0x41 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x06 0x83 0x00 0x04 0x00 0x00 0x00 0x0b 0x84 0x00 0x04 0x00 0x0f 0x46 0x29 0x85 0x00 0x04 0x00 0x00 0x00 0x01 0x3c 0x01 0x86 0x00 0x04 0x00 0x00 0x00 0x00 0x87 0x00 0x01 0xff 
+
+[CSocket]: SEND (-01): 
+
+	
+
+[CSocket]: SEND (-01): 
+
+	
+
