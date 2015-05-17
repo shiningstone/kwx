@@ -210,7 +210,6 @@ void CSocket::_log(int dir,char *buf,int len) {
 #else
 	{
 #endif
-        sprintf(temp+usedBytes,"\n");
         LOGGER_WRITE( temp );
         _logger->WriteArray( buf, len );
     }

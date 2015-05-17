@@ -42,7 +42,7 @@ int DsInstruction::Dispatch() {
 }
 
 void DsInstruction::Show() const {
-    LOGGER_WRITE("#%d (%s):\n",++_recvCnt,DescReq(request));
+    LOGGER_WRITE("%d:%s:",++_recvCnt,DescReq(request));
 }
 
 PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {

@@ -82,8 +82,6 @@ int Logger::WriteArray(const char *pkg,int len) {
         #endif
 	}
 	
-    sprintf(buf+usedBytes, "\n");
-
     log("%s",buf);
 
     return RET_OK;
