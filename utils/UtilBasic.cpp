@@ -133,10 +133,10 @@ int _bytes(char *buf,const char *str) {
 #ifdef WIN32
 #include <windows.h>
 #endif
-void _delay(int seconds) {
+void _delay(int ms) {
     #ifdef WIN32
-    Sleep(seconds*1000);
+    Sleep(ms);
     #else
-    Sleep(seconds*1000);
+    Sleep(ms);
     #endif
 }

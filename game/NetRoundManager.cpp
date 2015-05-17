@@ -34,6 +34,8 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
         _players[i] = NULL;
     }
 
+    _HandoutNotify = false;
+
     _messenger = new KwxMessenger();
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
@@ -656,9 +658,28 @@ void NetRoundManager::RecvQi() {
     _uiManager->QiEffect();
 }
 
+void NetRoundManager::_NotifyHandout() {
+    if(_HandoutNotify) {
+        _HandoutNotify = false;
+        
+        if(_actCtrl.choices) {
+            RequestSendAction aReq;
+            aReq.Set(aQi);
+            _messenger->Send(aReq);
+            _messenger->Wait(REQ_GAME_DIST_DAOJISHI);
+        }
+        
+        RequestShowCard aReq;
+        aReq.Set(LastHandout());
+        _messenger->Send(aReq);
+    }
+}
+
 void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
 
+    _HandoutNotify = true;
+    
     if(_isGangAsking) {
         _isGangAsking = false;
     }
@@ -677,14 +698,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         }
     }
 
-	if(_tempActionToDo!=0) {
-        RequestSendAction aReq;
-        aReq.Set(aQi);
-        _messenger->Send(aReq);
-
-        _messenger->Wait(REQ_GAME_DIST_DAOJISHI);
-	}
-
 	if(_isWaitForMyDecision) {
 		_isWaitForMyDecision=false;
 		_tempActionToDo=a_JUMP;
@@ -692,10 +705,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     _players[MIDDLE]->hand_out(chosen);
-    
-    RequestShowCard aReq;
-    aReq.Set(LastHandout());
-    _messenger->Send(aReq);
 
     bool turnToMing = false;
 	if(_actionToDo==a_MING && !IsMing(_curPlayer) ) {
@@ -782,6 +791,7 @@ void NetRoundManager::WaitForOthersChoose() {
 }
 
 void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
+	_NotifyHandout();
 }
 
 void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {

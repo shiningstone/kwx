@@ -22,7 +22,7 @@ public:
 
     int Send(UsMsg &aMsg);/* why cannot declare as const UsMsg??? */
     bool Wait(RequestId_t rsp);
-    void Resume();
+    void Resume(RequestId_t req = REQ_INVALID);
 
 private:
     friend class TestKwxAutoRecv;

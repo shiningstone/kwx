@@ -81,7 +81,7 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     return 0;
 }
 
-void KwxMessenger::Resume() {
+void KwxMessenger::Resume(RequestId_t req) {
     _waitReq = REQ_INVALID;
 }
 
@@ -90,7 +90,7 @@ bool KwxMessenger::Wait(RequestId_t rsp) {
     _waitReq = rsp;
     
     while(_waitReq!=REQ_INVALID) {
-        _delay(1);
+        _delay(100);
     }
     #endif
     
@@ -189,7 +189,7 @@ KwxHeart::KwxHeart(int second) {
 
 KwxHeart::~KwxHeart() {
     _running = false;
-    _delay(_rate*2);/* to make sure the last send executed successfully */
+    _delay(_rate*2*100);/* to make sure the last send executed successfully */
     
     _socket->Stop();
     delete _socket;
@@ -216,7 +216,7 @@ void KwxHeart::_Beats() {
 
     while(_running) {
         _socket->Send((char *)buf,len);
-        _delay(_rate);
+        _delay(_rate*100);
     }
     #endif
 }

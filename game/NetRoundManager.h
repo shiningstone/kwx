@@ -56,6 +56,9 @@ public:
     void ServerDistributeTo(PlayerDir_t dir,Card_t card);
     
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
+
+    bool _HandoutNotify;
+    void _NotifyHandout();
 /* networks end   */
 /******************/
 

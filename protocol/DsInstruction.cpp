@@ -37,6 +37,7 @@ int DsInstruction::Dispatch() {
     Show();
     
     #ifndef __UNIT_TEST__
+    _delay(1);/*防止接收的包在等待函数之前就处理了*/
     _roundManager->_messenger->Resume();
     _roundManager->RecvMsg(this);
     #endif
