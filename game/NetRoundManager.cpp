@@ -147,6 +147,7 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             break;
         case REQ_GAME_SEND_CALSCORE:
             _DiRecv((ScoreNotif *)di);
+            break;
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;

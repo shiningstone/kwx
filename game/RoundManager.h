@@ -42,6 +42,9 @@ public:
 
     ActCtrl_t   _actCtrl;
     
+    int  _tempActionToDo;
+    int  _actionToDo;
+    
     static RoundManager *getInstance();
     static void  destroyInstance();
 
@@ -143,9 +146,6 @@ protected:
     bool IsCurEffectCard(const CardNode_t *card);
 
     bool _isMingTime;
-    int  _tempActionToDo;
-    int  _actionToDo;
-    
     int  _lastAction;
     ActionId_t  _lastActionWithGold;
     int  _lastActionSource;

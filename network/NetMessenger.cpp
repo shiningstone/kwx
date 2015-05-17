@@ -54,6 +54,8 @@ void NetMessenger::ClearRecvBuf() {
 	_outStart  = 0;
     _inStart   = 0;
     _isEmpty   = true;
+
+    _recvCnt = 0;
 }
 
 bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
