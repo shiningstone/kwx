@@ -339,7 +339,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 					    _object->LayDownWithFace(p_list[i], cards->get_kind(i), 0.4);
 					}
                     
-					if(isMing||(_roundManager->_actionToDo==a_MING&&!isMing))
+					if(isMing||(_roundManager->_actCtrl.decision==aMING&&!isMing))
 					{
 						if(cards->canPlay(i))
 						{
@@ -463,7 +463,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
             }
             
 			if(dir==MIDDLE
-                &&_roundManager->_actionToDo==a_MING
+                &&_roundManager->_actCtrl.decision==aMING
                 &&!_roundManager->_players[MIDDLE]->_cards->IsMing
                 &&cards->canPlay(i)) {
 				p_list[i]->setZOrder(30);
@@ -2067,7 +2067,10 @@ void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
         }
 
         /* provide hint bar when ming choose */
-        if(_roundManager->_actionToDo==a_MING && _roundManager->_isMingTime && (!_roundManager->IsMing(MIDDLE))) {
+        if(_roundManager->_actCtrl.decision==aMING 
+            && _roundManager->_isMingTime 
+            && (!_roundManager->IsMing(MIDDLE))) {
+            
             if( loopCard->getScaleX()==1 ) {
                 loopCard->setScale(1.2);
                 loopCard->runAction(_voice->Speak("select"));
@@ -2272,7 +2275,7 @@ void RaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 
 void RaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-	_roundManager->_actionToDo = a_HU;
+	_roundManager->_actCtrl.decision = aHU;
     
 	auto curButton=(Button*)pSender;
     curButton->_ID = pSender->_ID;
@@ -2544,7 +2547,7 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
             }
         }
 
-        if(_roundManager->_actionToDo==a_MING && !_roundManager->IsMing(MIDDLE)
+        if(_roundManager->_actCtrl.decision==aMING && !_roundManager->IsMing(MIDDLE)
             && _roundManager->_isMingTime ) {
             while( myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(MIDDLE)) )
                 myframe->removeChildByTag(TING_SING_BAR);
@@ -2586,7 +2589,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
                                 RaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
                                 _roundManager->UpdateCards(dir,a_PENG,card);
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
-                    			_roundManager->_actionToDo = _roundManager->_players[dir]->ActiontodoCheckAgain();
+                    			_roundManager->_actCtrl.choices = _roundManager->_players[dir]->ActiontodoCheckAgain();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
 		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
@@ -2893,7 +2896,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
         ***************************************/
 		myframe->runAction( Sequence::create(CCCallFunc::create([=](){
         		_roundManager->UpdateCards(dir,a_PENG,card);
-    			_roundManager->_actionToDo = _roundManager->_players[dir]->ActiontodoCheckAgain();
+    			_roundManager->_actCtrl.choices = _roundManager->_players[dir]->ActiontodoCheckAgain();
     			_roundManager->WaitForMyAction();}),NULL));
 	}
 }
@@ -3904,7 +3907,7 @@ void RaceLayer::MingCancelEffect() {
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->_actionToDo=_roundManager->_players[MIDDLE]->ActiontodoCheckAgain();
+        _roundManager->_actCtrl.choices = _roundManager->_players[MIDDLE]->ActiontodoCheckAgain();
         _roundManager->WaitForMyAction();}),NULL));
 }
 
@@ -4165,7 +4168,7 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		{
             if(_roundManager->_isWaitForMyDecision) {
 				_roundManager->_isWaitForMyDecision = false;
-				_roundManager->_actionToDo =_roundManager->_tempActionToDo;
+				_roundManager->_actCtrl.decision = (ActionId_t)_roundManager->_tempActionToDo;
 				_roundManager->_tempActionToDo = a_JUMP;
 			}
             
@@ -5972,7 +5975,7 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
                 }
 			} else {
 				if(_roundManager->_actCtrl.handoutAllow) {
-					_roundManager->_actionToDo=a_JUMP;
+					_roundManager->_actCtrl.decision = aQi;
 
 					if(_roundManager->_lastAction==a_JUMP)
 						_roundManager->_continue_gang_times=0;

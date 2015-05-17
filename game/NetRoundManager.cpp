@@ -176,6 +176,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     }
     PlayerDir_t dir = (PlayerDir_t)info->seat;
     INT8U timer     = info->timer;
+    
     _actionToDo     = info->remind.actions;
     _actCtrl.choices = info->remind.actions;
     
@@ -245,8 +246,8 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     PlayerDir_t prev  = (PlayerDir_t)_curPlayer;
     _curPlayer        = MIDDLE;
     _isNewDistributed = true;
-    _actionToDo     = info->remind.actions;
     
+    _actionToDo     = info->remind.actions;
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
     
@@ -296,6 +297,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     delete info;
 
     RecordOutCard(card);
+    
     _actionToDo = a_JUMP;
     _actCtrl.decision = aQi;
     
@@ -314,8 +316,8 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
     INT8U timer     = info->timer;
     Card_t kind     = info->kind;
-    _actionToDo     = info->remind.actions;
     
+    _actionToDo     = info->remind.actions;
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
     
@@ -348,11 +350,11 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     PlayerDir_t dir     = (PlayerDir_t)info->seat;
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
     Card_t card         = info->card[0].kind;
+    
     _actionToDo         = info->actions;
-
     _actCtrl.decision   = (ActionId_t)info->actions;
 
-    if(_actionToDo==aMING) {
+    if(_actCtrl.decision==aMING) {
         CardInHand *cards = _players[_curPlayer]->_cards;
         cards->clear();
         
@@ -370,7 +372,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     delete info;
 
     _curPlayer = whoGive;
-    switch(_actionToDo) {
+    switch(_actCtrl.decision) {
         case aPENG:
             RecvPeng(dir);
             break;
@@ -411,11 +413,11 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
             {
                 _lastActionSource = dir;
                 
-                if(_actionToDo&a_AN_GANG) {
+                if(_actCtrl.decision==aAN_GANG) {
                     _actionToDo=a_AN_GANG;
                     _lastAction=a_AN_GANG;
                     _lastActionWithGold=aAN_GANG;
-                } else if(_actionToDo&a_SHOU_GANG) {
+                } else {
                     _actionToDo=a_SHOU_GANG;
                     _lastAction=a_SHOU_GANG;
                     _lastActionWithGold = aSHOU_GANG;
@@ -463,7 +465,10 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     
     if(_isWaitForMyDecision) {
         _isWaitForMyDecision = false;
+
         _actionToDo = _tempActionToDo;
+        _actCtrl.decision = (ActionId_t)_tempActionToDo;
+        
         _tempActionToDo = a_JUMP;
     }
 
@@ -507,9 +512,9 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
             _isNewDistributed = false;
         }
         
-        if(_actionToDo&aAN_GANG) {
+        if(_actCtrl.decision==aAN_GANG) {
             _players[dir]->others_action(_isNewDistributed,aAN_GANG,actKind);
-        } else if(_actionToDo&aSHOU_GANG) {
+        } else if(_actCtrl.decision==aSHOU_GANG) {
             _players[dir]->others_action(_isNewDistributed,aSHOU_GANG,actKind);
         } else {
             _players[dir]->others_action(_isNewDistributed,(ActionId_t)action,actKind);
@@ -518,26 +523,24 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
 }
 
 void NetRoundManager::ServerWaitForMyAction() {
-    _uiManager->ShowActionButtons(_actionToDo);
+    _uiManager->ShowActionButtons(_actCtrl.choices);
 
-	if(_actionToDo&a_AN_GANG
-        || _actionToDo&a_MING_GANG
-        ||_actionToDo&a_SHOU_GANG) {
+	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
         _isGangAsking = true;
 	}
 
-	if(_actionToDo!=a_JUMP) {
+	if(_actCtrl.choices!=0) {
 		_isWaitForMyDecision = true;
-		_tempActionToDo=_actionToDo;
-		_actionToDo=a_JUMP;
+		_tempActionToDo      = _actionToDo;
+		_actionToDo          = aQi;
 	}
 
 	if(_isNewDistributed) {
-		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
+		if(_lastAction==aQi&&!(_lastActionSource==MIDDLE&&_continue_gang_times!=0)) {
 			_continue_gang_times=0;
         }
 
-		_lastAction=a_JUMP;
+		_lastAction = aQi;
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
 	}
 }
@@ -639,8 +642,8 @@ void NetRoundManager::RecvQi() {
     }
 
 	_lastAction=a_JUMP;
-	_actionToDo=a_JUMP;
 
+    _actionToDo=a_JUMP;
     _actCtrl.decision = aQi;
 
 	if(_isWaitForMyDecision) {
@@ -690,9 +693,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         aReq.Set(aMING);
         _messenger->Send(aReq);
 	} else {
-        if(_actionToDo&a_MING) {
+        if(_actCtrl.decision==aMING) {
             _actionToDo = a_JUMP;
-
             _actCtrl.decision = aQi;
         }
     }
@@ -706,7 +708,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _players[MIDDLE]->hand_out(chosen);
 
     bool turnToMing = false;
-	if(_actionToDo==a_MING && !IsMing(_curPlayer) ) {
+	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(chosen);
 
         turnToMing = true;
@@ -744,9 +746,9 @@ void NetRoundManager::RecvKouConfirm() {
 void NetRoundManager::RecvMingCancel() {
     _isMingTime=false;
     
-    UpdateCards(MIDDLE,a_KOU_CANCEL);
+    UpdateCards(MIDDLE,a_KOU_CANCEL);/*BUG HERE???*/
+    
     _actionToDo=a_JUMP;
-
     _actCtrl.decision = aQi;
     
     _players[MIDDLE]->_cards->cancel_ming();
@@ -756,8 +758,7 @@ void NetRoundManager::RecvMingCancel() {
 }
 
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
-	_actionToDo=a_MING;
-
+	_actionToDo=aMING;
     _actCtrl.decision = aMING;
     
     RequestSendAction aAction;
