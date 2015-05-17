@@ -76,8 +76,9 @@ private:
     void   _Kou();
     void   _CancelKou();
 
-    bool   _IncludingOthersCard;
 public:
+    bool   _IncludingOthersCard;
+
     /* statistics , only used for calculating score */
     int statFreeCards;
     int statCouples;

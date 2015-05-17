@@ -532,6 +532,7 @@ void NetRoundManager::ServerWaitForMyAction() {
         }
 
 		_lastAction=a_JUMP;
+        _players[MIDDLE]->_cards->_IncludingOthersCard = false;
 		WaitForMyChoose();
 	}
 }
