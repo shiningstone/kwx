@@ -484,7 +484,11 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
 
     if(info->seat==MIDDLE) {
         _actCtrl.handoutAllow = true;
+    } else {
+        _actCtrl.handoutAllow = false;
     }
+
+    _messenger->Resume();
 }
 
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
@@ -514,16 +518,16 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
 void NetRoundManager::ServerWaitForMyAction() {
     _uiManager->ShowActionButtons(_actionToDo);
 
+	if(_actionToDo&a_AN_GANG
+        || _actionToDo&a_MING_GANG
+        ||_actionToDo&a_SHOU_GANG) {
+        _isGangAsking = true;
+	}
+
 	if(_actionToDo!=a_JUMP) {
 		_isWaitForMyDecision = true;
 		_tempActionToDo=_actionToDo;
 		_actionToDo=a_JUMP;
-	}
-
-	if(_actionToDo&a_AN_GANG /*BUG HERE: _actionToDo has been cleared*/
-        || _actionToDo&a_MING_GANG
-        ||_actionToDo&a_SHOU_GANG) {
-        _isGangAsking = true;
 	}
 
 	if(_isNewDistributed) {
@@ -792,6 +796,7 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _curPlayer = zhuang;
     if(zhuang==MIDDLE) {
         ServerWaitForMyAction();
+        _actCtrl.handoutAllow = true;
     } else {
         WaitForOthersAction((PlayerDir_t)zhuang);
     }

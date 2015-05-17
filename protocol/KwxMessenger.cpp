@@ -1,5 +1,6 @@
 
 #include "./../network/NetMessenger.h"
+#include "./../utils/DebugCtrl.h"
 
 #include "MsgFormats.h"
 #include "CommonMsg.h"
@@ -17,7 +18,7 @@ Logger       *KwxMessenger::_logger = 0;
 KwxMessenger::KwxMessenger() {
     _messenger = NetMessenger::getInstance();
     
-   #if 0/*如果要用StartReceiving，不能调用Start*/
+    #if 0/*如果要用StartReceiving，不能调用Start*/
     _messenger->Start();
     #endif
 
@@ -85,10 +86,14 @@ void KwxMessenger::Resume() {
 }
 
 bool KwxMessenger::Wait(RequestId_t rsp) {
+    #ifdef USE_REMOTE_SERVER
+    _waitReq = rsp;
+    
     while(_waitReq!=REQ_INVALID) {
         _delay(1);
     }
-
+    #endif
+    
     return true;
 }
 /**********************************************************

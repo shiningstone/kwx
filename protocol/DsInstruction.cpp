@@ -8,6 +8,7 @@
 
 #ifndef __UNIT_TEST__
 #include "./../game/RaceLayer.h"
+#include "./../protocol/KwxMessenger.h"
 #include "./../game/RoundManager.h"
 #include "./../game/NetRoundManager.h"
 #endif
@@ -36,8 +37,10 @@ int DsInstruction::Dispatch() {
     Show();
     
     #ifndef __UNIT_TEST__
+    _roundManager->_messenger->Resume();
     _roundManager->RecvMsg(this);
     #endif
+    
     return 0;
 }
 
