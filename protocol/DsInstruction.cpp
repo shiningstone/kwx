@@ -192,14 +192,18 @@ int DistCardNotif::Construct(const DsMsg &msg) {
 
 int ScoreNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
-        
-    seat[0] = _GetPlayer(msg._body->_items[0]->_buf[0]);
-    seat[1] = _GetPlayer(msg._body->_items[0]->_buf[1]);
-    seat[2] = _GetPlayer(msg._body->_items[0]->_buf[2]);
 
-    val[seat[0]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*0)) );
-    val[seat[1]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*1)) );
-    val[seat[2]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*2)) );
+    for(int i=0;i<3;i++) {
+        val[i] = 0;
+    }
+
+    for(int i=0;i<msg._body->_items[0]->_bufLen;i++) {
+        seat[i] = _GetPlayer(msg._body->_items[0]->_buf[i]);
+    }
+
+    for(int i=0;i<msg._body->_items[0]->_bufLen;i++) {
+        val[seat[i]] = _ntohl( *((INT32U *)(msg._body->_items[1]->_buf + sizeof(INT32S)*i)) );
+    }
     
     return 0;
 }
