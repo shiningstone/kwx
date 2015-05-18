@@ -91,19 +91,9 @@ private:
     void _CreateResidueCards();
     void _InitResidueCards();
     std::string _NumToString( int number );
-    void _CalcAnGangGold(int winner,int goldOfPlayer[3]);
-    void _CalcMingGangGold(int winner,int giver,int goldOfPlayer[3]);
-    void _CalcSingleWinGold(int goldOfPlayer[3], int winner,int whoGive);
-    void _CalcDoubleWinGold(int goldOfPlayer[3], int giver);
-    void _CalcNoneWinGold(int goldOfPlayer[3], int giver);
-    void _CalcHuGold(int goldOfPlayer[3]);
-    void CalculateGoldNum(int goldOfPlayer[3],PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t who_give);
 
     void DispatchAction(Node *psender,ARRAY_ACTION action);
     Sprite *_CreateEffectCard(int i,CARD_KIND value );
-    void _UpdateGouldAccount(int id,int gold);
-    void UpdateGoldAccounts(int goldOfPlayer[3]);
-    void GoldNumInsert(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
     void _GuiUpdateScore(LayerColor *layer,int score);
 
     void _ClockAddTime( Sprite *clock, int time );
@@ -221,7 +211,6 @@ private:
 				1 middle(me)
 				2 right
 	#######################*/
-	void GuiUpdateScore(int direction,int score);//更新分数
 	void _UpdateNickName(int direction,std::string str_Nick);//更新昵称
 	void _UpdateHeadImage(int direction,std::string head_photo);//更新头像
     /*###################################*/
@@ -234,6 +223,7 @@ private:
 	void WaitForFirstAction(PlayerDir_t zhuang);
 	void _MyHandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
+	void GuiUpdateScore(int direction,int score);//更新分数
 	void _DistributeEvent(const std::string event_type,void* val);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);
 	void _HuEffect(const WinInfo_t &win);

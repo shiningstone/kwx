@@ -104,6 +104,8 @@ public:
     /* main process */
     virtual void CreateRace(Scene *scene);
     virtual void StartGame();
+
+    RmStrategy *_strategy;
 protected:
     typedef struct _Context_t {
     }Context_t;
@@ -113,8 +115,8 @@ protected:
     GameMode_t _MODE;
     
     RaceLayer  *_uiManager;
-    RmStrategy *_strategy;
-	int         aim[PLAYER_NUM];
+
+    int         aim[PLAYER_NUM];
 
     WinInfo_t   _lastWin;
     Player     *_players[PLAYER_NUM];
