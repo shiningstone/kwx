@@ -641,6 +641,7 @@ void NetRoundManager::_NotifyHandout() {
 
 void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
+    _actCtrl.choices &= ~_actCtrl.decision;
 
     _HandoutNotify = true;
     
