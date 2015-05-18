@@ -14,12 +14,15 @@ USING_NS_CC;
 #include "RaceLayer.h"
 #include "RoundManager.h"
 #include "NetRoundManager.h"
+#include "RmStrategy.h"
+
 
 NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 :RoundManager(uiManager) {
     _MODE = NETWORK_GAME;
 
     _uiManager = uiManager;
+    _strategy  = RmStrategy::getInstance(this);
 
     _lastWin.winner = INVALID_DIR;
     _lastWin.giver  = INVALID_DIR;
@@ -494,7 +497,7 @@ void NetRoundManager::ServerWaitForMyAction() {
 		_isWaitForMyDecision = true;
 		_actCtrl.decision    = aQi;
 
-    	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
+    	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&aMING_GANG || _actCtrl.choices&aSHOU_GANG) {
             _isGangAsking = true;
     	}
 	}

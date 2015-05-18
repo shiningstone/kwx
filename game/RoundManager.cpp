@@ -7,11 +7,14 @@
 #include "Player.h"
 #include "RaceLayer.h"
 #include "RoundManager.h"
+#include "RmStrategy.h"
+
 
 RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
 
     _uiManager = uiManager;
+    _strategy  = RmStrategy::getInstance(this);
 
     _lastWin.winner = INVALID_DIR;
     _lastWin.giver  = INVALID_DIR;

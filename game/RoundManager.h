@@ -21,6 +21,7 @@ class Player;
 class RoundManager {
     friend class RaceLayer;
 	friend class PlayerOthers;
+    friend class RmStrategy;
 private:
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
@@ -111,7 +112,8 @@ protected:
     
     GameMode_t _MODE;
     
-    RaceLayer *_uiManager;
+    RaceLayer  *_uiManager;
+    RmStrategy *_strategy;
 	int         aim[PLAYER_NUM];
 
     WinInfo_t   _lastWin;
