@@ -619,6 +619,50 @@ void E15051704_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void E15051801_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(handout==0) {
+        handout++;
+        for(int i=1;i<6;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==1) {
+        handout++;
+        for(int i=6;i<10;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==2) {
+        handout++;
+        for(int i=10;i<13;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==3) {
+        handout++;
+        for(int i=13;i<16;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==4) {
+        handout++;
+        for(int i=16;i<19;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==5) {
+        handout++;
+        for(int i=19;i<21;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==6) {
+        handout++;
+        for(int i=21;i<32;i++) {
+            SendLine(SERVER,i);
+        }
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -682,6 +726,9 @@ void test_server_console() {
 
     SetFile("E15051704");
     gHandle = E15051704_handle_requests;
+
+    SetFile("E15051801");
+    gHandle = E15051801_handle_requests;
 
     test_smart_game_round_x();
 #endif
