@@ -1028,12 +1028,9 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
 
     _ctx.river  = context._gRiver;
     _ctx.remain = TOTAL_CARD_NUM - context._distributedNum;
+    _ctx.aim    = _cards->assess_aim();
 
     _CollectPosition(_ctx.cards);
-
-    if( !_cards->IsMing ) {
-        _ctx.aim = _cards->assess_aim();
-    }
 
     int curPlayer = context._curPlayer;
     _ctx.OthersTing[0] = context._players[(curPlayer+1)%3]->_cards->_ting;
@@ -1051,56 +1048,41 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
 		res->card_in_river[res->river_len++] = (CARD_KIND)context._gRiver->get_kind(i);
     }
 
-    CardInHand *cards = context._players[curPlayer]->_cards;
-
 	context._players[(curPlayer+1)%3]->_cards->get_hu_cards(target1,len1);
 	context._players[(curPlayer+2)%3]->_cards->get_hu_cards(target2,len2);
 
-    for(int i=cards->FreeStart;i<cards->size();i++) {
-		int time = res->list[cards->get_kind(i)].same_times++;
-		res->list[cards->get_kind(i)].place[time]=i;
+    for(int i=_cards->FreeStart;i<_cards->size();i++) {
+		int time = res->list[_cards->get_kind(i)].same_times++;
+		res->list[_cards->get_kind(i)].place[time]=i;
 	}
 
-	/*init hu target*/
-	if( !context.IsMing(curPlayer) ) {
-		res->target = context._players[curPlayer]->_cards->assess_aim();
-    }
+	res->target = _cards->assess_aim();
 }
 
 int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
-    HAH *s_res = new HAH;
-	int index;
-    
-	CARD_KIND list1[9];
-	CARD_KIND list2[9];
-	int len1;
-	int len2;
-
-    canKou = false;
-
-    int curPlayer = context._curPlayer;
-    
-	if(curPlayer!=MIDDLE) {
-		_SetContext(s_res,list1,list2,&len1,&len2,context);
-	}
-
-    if( !context.IsMing(curPlayer) ) {
-		index = context._players[curPlayer]->chose_card(
-            s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
-
-		if( index==INVALID || index>context._players[curPlayer]->_cards->last() ) {
-			index=context._players[curPlayer]->_cards->last();
+    if(_cards->IsMing) {
+        return _cards->last();
+    } else {
+        HAH *s_res = new HAH;
+        
+        CARD_KIND list1[9];
+        CARD_KIND list2[9];
+        int len1;
+        int len2;
+        
+        canKou = false;
+        _SetContext(s_res,list1,list2,&len1,&len2,context);
+        
+		int index = chose_card(s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
+		if( index==INVALID ) {
+			index = _cards->last();
 		}
         
-		if(s_res->hu_nums>=6 
-            && context._actCtrl.decision==aMING 
-            && !context.IsMing(curPlayer) ) {
+		if(context._actCtrl.decision==aMING && s_res->hu_nums>=6 ) {
 			canKou = true;
 		}
-	} else {
-		index = context._players[curPlayer]->_cards->last();
-    }
 
-    return index;
+        return index;
+    }
 }
 
