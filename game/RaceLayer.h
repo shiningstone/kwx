@@ -278,8 +278,8 @@ public:
 	void _DeleteActionEffect();
 
     TargetedAction* _MingAnimation();
-	void _AnGangEffect(PlayerDir_t dir,Card_t card,int gang[]);//me--暗杠效果
-	void _MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card,int gang[]);//me--明杠效果
+	void _AnGangEffect(PlayerDir_t dir,Card_t card,int gang[]=NULL);//me--暗杠效果
+	void _MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card,int gang[]=NULL);//me--明杠效果
 	void _QiEffect(PlayerDir_t dir);//me--弃牌效果
 	void _CardInHandUpdateEffect(PlayerDir_t dir);
 	void _CardRiverUpdateEffect(PlayerDir_t dir);

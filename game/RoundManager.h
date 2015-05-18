@@ -38,11 +38,16 @@ public:
         ActionMask_t choices;
         Card_t       target;
         ActionId_t   decision;
+
+        ActionId_t   lastAction;
     }ActCtrl_t;
 
     ActCtrl_t   _actCtrl;
     
     int  _curPlayer;
+    int  _lastAction;
+    ActionId_t  _lastActionWithGold;
+    int  _lastActionSource;
     
     static RoundManager *getInstance();
     static void  destroyInstance();
@@ -143,9 +148,6 @@ protected:
     bool IsCurEffectCard(const CardNode_t *card);
 
     bool _isMingTime;
-    int  _lastAction;
-    ActionId_t  _lastActionWithGold;
-    int  _lastActionSource;
 
     bool _isTuoGuan;
     

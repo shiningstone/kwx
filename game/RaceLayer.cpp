@@ -2901,9 +2901,6 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
 
 void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 {
-	int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
-	delete gang;
-
     if(dir!=MIDDLE) {
 		myframe->runAction(Sequence::create(
             Spawn::create(
@@ -2918,6 +2915,12 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                 ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL),NULL));
 	}
 	else {
+        int GangCardsPlace[4] = {0};
+        if(gang!=NULL) {
+            int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
+            delete gang;
+        }
+        
 		for(int NodeNum=0;NodeNum<3;NodeNum++) {
             _Remove(myframe,PENG_EFFECT_NODE_ID+NodeNum);
             
