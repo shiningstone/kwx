@@ -467,9 +467,7 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
         _isWaitForMyDecision = false;
 
         _actionToDo = _tempActionToDo;
-        _actCtrl.decision = (ActionId_t)_tempActionToDo;
-        
-        _tempActionToDo = a_JUMP;
+         _tempActionToDo = a_JUMP;
     }
 
     if(_isQiangGangAsking) {
@@ -533,6 +531,7 @@ void NetRoundManager::ServerWaitForMyAction() {
 		_isWaitForMyDecision = true;
 		_tempActionToDo      = _actionToDo;
 		_actionToDo          = aQi;
+		_actCtrl.decision    = aQi;
 	}
 
 	if(_isNewDistributed) {
@@ -702,6 +701,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	if(_isWaitForMyDecision) {
 		_isWaitForMyDecision=false;
 		_tempActionToDo=a_JUMP;
+		_actCtrl.decision = aQi;
 	}
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));

@@ -256,8 +256,8 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
     if(_isWaitForMyDecision) {
         _isWaitForMyDecision = false;
         _actionToDo = _tempActionToDo;
-        _actCtrl.decision = (ActionId_t)_tempActionToDo;
         _tempActionToDo = a_JUMP;
+        _actCtrl.decision = aHU;
     }
 
     if(_isQiangGangAsking) {

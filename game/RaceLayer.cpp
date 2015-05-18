@@ -2275,8 +2275,6 @@ void RaceLayer::BtnPengHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 
 void RaceLayer::BtnHuHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-	_roundManager->_actCtrl.decision = aHU;
-    
 	auto curButton=(Button*)pSender;
     curButton->_ID = pSender->_ID;
 	int no = pSender->_ID;
@@ -4168,8 +4166,10 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		{
             if(_roundManager->_isWaitForMyDecision) {
 				_roundManager->_isWaitForMyDecision = false;
-				_roundManager->_actCtrl.decision = (ActionId_t)_roundManager->_tempActionToDo;
+				_roundManager->_actionToDo =_roundManager->_tempActionToDo;
 				_roundManager->_tempActionToDo = a_JUMP;
+				
+				_roundManager->_actCtrl.decision = aMING;
 			}
             
 			for(int dir=0;dir<3;dir++) {//only once is enough?
