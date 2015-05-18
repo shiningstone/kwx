@@ -351,9 +351,9 @@ int PlayerOthers::PickupForSevenCouples() {
         }
     }
 
-    for(int expect=0;expect<=4;expect--) {
+    for(int avail=0;avail<=4;avail--) {
         for(int i=0;i<TOTAL_CARD_KIND;i++) {
-            if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==1 && AvailNum((Card_t)i)==expect) {
+            if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==1 && AvailNum((Card_t)i)==avail) {
                 return _ctx.cards[i].position[_ctx.cards[i].num-1];
             }
         }
@@ -371,8 +371,6 @@ int PlayerOthers::PickupForFourPeng() {
     const int Hu1 = _ctx.OthersTing[0]->cardNum;
     const int Hu2 = _ctx.OthersTing[1]->cardNum;
     
-    int chose_place = INVALID;
-
     if(_ctx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
         return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
     } else if(_ctx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
@@ -381,11 +379,13 @@ int PlayerOthers::PickupForFourPeng() {
 
     RETURN_IF_VALID(_PickSingleChar());
 
-    for(int expect=0;expect<=4;expect++) {
-        for(int i=0;i<TOTAL_CARD_KIND;i++) {/*LOGIC CHANGED!!!*/
-            if(!OthersCanHu((Card_t)i)) {
-                if(_ctx.cards[i].num>0 && AvailNum((Card_t)i)==expect) {
-                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
+    for(int cardInHand=1;cardInHand<3;cardInHand++) {
+        for(int avail=0;avail<=4;avail++) {
+            for(int i=0;i<TOTAL_CARD_KIND;i++) {/*LOGIC CHANGED!!!*/
+                if(!OthersCanHu((Card_t)i)) {
+                    if(_ctx.cards[i].num==cardInHand && AvailNum((Card_t)i)==avail) {
+                        return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                    }
                 }
             }
         }
@@ -395,6 +395,32 @@ int PlayerOthers::PickupForFourPeng() {
 }
 
 int PlayerOthers::PickupForPiHu() {
+    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
+    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
+    const KindPosition &Card1 = _ctx.cards[RiverLast];
+    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+
+    const int Hu1 = _ctx.OthersTing[0]->cardNum;
+    const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    
+    if(_ctx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+    } else if(_ctx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+    }
+
+    RETURN_IF_VALID(_PickSingleChar());
+
+    for(int cardInHand=1;cardInHand<3;cardInHand++) {
+        for(int avail=0;avail<4;avail++) {
+                for(int i=0;i<TOTAL_CARD_KIND;i++) {
+                    if(_ctx.cards[i].num==cardInHand && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i) && AvailNum((Card_t)i)==avail) {
+                        return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                    }
+            }
+        }
+    }
+
     return INVALID;
 }
 
