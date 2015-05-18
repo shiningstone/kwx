@@ -5976,9 +5976,9 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 			} else {
 				if(_roundManager->_actCtrl.handoutAllow) {
 					_roundManager->_actCtrl.decision = aQi;
-					if(_roundManager->_actCtrl.lastAction==aQi)
+					if(_roundManager->_actCtrl.lastDecision==aQi)
 						_roundManager->_continue_gang_times=0;
-					_roundManager->_actCtrl.lastAction=aQi;
+					_roundManager->_actCtrl.lastDecision=aQi;
 
 					_roundManager->WaitForMyChoose();
 				}

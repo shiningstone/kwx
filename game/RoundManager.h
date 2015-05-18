@@ -39,7 +39,7 @@ public:
         Card_t       target;
         ActionId_t   decision;
 
-        ActionId_t   lastAction;
+        ActionId_t   lastDecision;
     }ActCtrl_t;
 
     ActCtrl_t   _actCtrl;
