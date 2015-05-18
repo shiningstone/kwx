@@ -468,9 +468,7 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
-    for(int i=0;i<PLAYER_NUM;i++) {
-        _uiManager->GuiJinBiShow((PlayerDir_t)i,info->val[i]);
-    }
+    UpdateGold((int *)info->val);
 }
 
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {

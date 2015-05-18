@@ -17,12 +17,26 @@ using namespace ui;
 extern void load_test_round(int idx,int *output);
 
 class Player;
+class RmStrategy;
 
 class RoundManager {
     friend class RaceLayer;
 	friend class PlayerOthers;
-    friend class RmStrategy;
+public:
+    void show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+protected:
+    void UpdateGold(int gold[3]);
 private:
+    void CalcAnGangGold(int winner,int gold[3]);
+    void CalcMingGangGold(int winner,int giver,int gold[3]);
+    void CalcSingleWinGold(int gold[3], int winner,int whoGive);
+    void CalcDoubleWinGold(int gold[3], int giver);
+    void CalcNoneWinGold(int gold[3], int giver);
+    void CalcHuGold(int gold[3]);
+    void CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive);
+
+    int PREMIUM_LEAST;
+
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFrom(PlayerDir_t dir);
@@ -102,6 +116,8 @@ public:
 	void set_aims_sequence(const int p_aim[]);
 
     /* main process */
+    GameMode_t _MODE;
+
     virtual void CreateRace(Scene *scene);
     virtual void StartGame();
 
@@ -111,8 +127,6 @@ protected:
     }Context_t;
 
     Context_t  _ctx;
-    
-    GameMode_t _MODE;
     
     RaceLayer  *_uiManager;
 
