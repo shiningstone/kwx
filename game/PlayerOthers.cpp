@@ -38,7 +38,8 @@ int PlayerOthers::AvailNum(Card_t kind) const {
     int num = _ctx.river->find_cards(kind);
 
     if(_ctx.remain<10 && num==0) {
-        return 3;
+        return 4;
+        return 3;/*WHY???*/
     } else {
         return (4-num);
     }
@@ -124,8 +125,10 @@ int PlayerOthers::river_reserved_card(HAH *hash_table,int card)
 		{
 			num++;			
 		}
+        
 	if(hash_table->reserved_card_num<10&&num==0)
 		num=3;
+    
 	return (4-num);
 }
 
@@ -169,7 +172,7 @@ int PlayerOthers::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 }
 
 int PlayerOthers::_PickSingleChar() {
-    for(int i=ZHONG;i<ZHONG+3;i++) {
+    for(int i=ZHONG;i<=BAI;i++) {
         if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
             return _ctx.cards[i].position[_ctx.cards[i].num-1];
         }
@@ -236,8 +239,6 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
     
 	Card_t HeadKind = (Card_t)((1-reserveColor)*9);
 	Card_t TailKind = (Card_t)(HeadKind+8);
-
-	int chose_place = INVALID;
 
     if(Hu1==0&&Hu2==0&&_ctx.remain>38) {
         for(int i=HeadKind;i<=TailKind;i++) {
@@ -313,55 +314,89 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
     }
 
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num<3) {
+        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num>0 && _ctx.cards[i].num<3) {
             return _ctx.cards[i].position[_ctx.cards[i].num-1];
         }
     }
 
-	return chose_place;
+	return INVALID;
 }
     
-    int PlayerOthers::PickupForSevenCouples() {
-        const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
-        const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
-        const KindPosition &Card1 = _ctx.cards[RiverLast];
-        const KindPosition &Card2 = _ctx.cards[River2ndLast];
+int PlayerOthers::PickupForSevenCouples() {
+    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
+    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
+    const KindPosition &Card1 = _ctx.cards[RiverLast];
+    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+
+    const int Hu1 = _ctx.OthersTing[0]->cardNum;
+    const int Hu2 = _ctx.OthersTing[1]->cardNum;
     
-        const int Hu1 = _ctx.OthersTing[0]->cardNum;
-        const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    if(_ctx.cards[RiverLast].num!=2 && _ctx.cards[RiverLast].num!=4
+        && !OthersCanHu(RiverLast)) {
         
-        int chose_place = INVALID;
-    
-        if(_ctx.cards[RiverLast].num!=2 && _ctx.cards[RiverLast].num!=4
-            && !OthersCanHu(RiverLast)) {
-            return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
-        } else if(_ctx.cards[River2ndLast].num!=2 && _ctx.cards[River2ndLast].num!=4
-            && !IsStable(River2ndLast)) {/*BUG HERE??? 没有判断是否会点炮*/
-            return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+        return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+        
+    } else if(_ctx.cards[River2ndLast].num!=2 && _ctx.cards[River2ndLast].num!=4
+        && !IsStable(River2ndLast)) {/*BUG HERE??? 没有判断是否会点炮*/
+        
+        return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+        
+    }
+
+    RETURN_IF_VALID(_PickSingleChar());
+
+    for(int i=0;i<TOTAL_CARD_KIND;i++) {
+        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==3) {
+            return _ctx.cards[i].position[_ctx.cards[i].num-1];
         }
-    
-        for(int i=ZHONG;i<=BAI;i++) {
-            if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
-            }
-        }
-    
+    }
+
+    for(int expect=0;expect<=4;expect--) {
         for(int i=0;i<TOTAL_CARD_KIND;i++) {
-            if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==3) {
+            if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==1 && AvailNum((Card_t)i)==expect) {
                 return _ctx.cards[i].position[_ctx.cards[i].num-1];
             }
         }
+    }
+
+    return INVALID;
+}
+
+int PlayerOthers::PickupForFourPeng() {
+    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
+    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
+    const KindPosition &Card1 = _ctx.cards[RiverLast];
+    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+
+    const int Hu1 = _ctx.OthersTing[0]->cardNum;
+    const int Hu2 = _ctx.OthersTing[1]->cardNum;
     
-        for(int expect=3;expect>0;expect--) {
-            for(int i=0;i<TOTAL_CARD_KIND;i++) {
-                if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==1 && AvailNum((Card_t)i)==expect) {
+    int chose_place = INVALID;
+
+    if(_ctx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+    } else if(_ctx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+    }
+
+    RETURN_IF_VALID(_PickSingleChar());
+
+    for(int expect=0;expect<=4;expect++) {
+        for(int i=0;i<TOTAL_CARD_KIND;i++) {/*LOGIC CHANGED!!!*/
+            if(!OthersCanHu((Card_t)i)) {
+                if(_ctx.cards[i].num>0 && AvailNum((Card_t)i)==expect) {
                     return _ctx.cards[i].position[_ctx.cards[i].num-1];
                 }
             }
         }
-    
-        return chose_place;
     }
+
+    return INVALID;
+}
+
+int PlayerOthers::PickupForPiHu() {
+    return INVALID;
+}
 
 int PlayerOthers::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {

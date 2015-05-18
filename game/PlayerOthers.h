@@ -37,6 +37,8 @@ class PlayerOthers:public Player
         bool IsStable(Card_t kind) const;
         int  PickupForSameColor(int reservedColor);
         int  PickupForSevenCouples();
+        int  PickupForFourPeng();
+        int  PickupForPiHu();
 
         int  _PickSingleChar();
         int  _PickSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);
