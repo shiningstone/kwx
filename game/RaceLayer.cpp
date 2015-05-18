@@ -2587,7 +2587,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
                                 RaceLayer::_DeleteActionTip)),   CallFunc::create([=](){
                                 _roundManager->UpdateCards(dir,a_PENG,card);
                                 _CardInHandUpdateEffect(dir);}), CCCallFunc::create([=](){
-                    			_roundManager->_actCtrl.choices = _roundManager->_players[dir]->ActiontodoCheckAgain();
+                    			_roundManager->_actCtrl.choices = _roundManager->_players[dir]->judge_action_again();
                 				_roundManager->WaitForOthersAction(dir);}),NULL),NULL));
 	} else {
 		if(myframe->getChildByTag(PENG_EFFECT_NODE_ID)) {
@@ -2894,7 +2894,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
         ***************************************/
 		myframe->runAction( Sequence::create(CCCallFunc::create([=](){
         		_roundManager->UpdateCards(dir,a_PENG,card);
-    			_roundManager->_actCtrl.choices = _roundManager->_players[dir]->ActiontodoCheckAgain();
+    			_roundManager->_actCtrl.choices = _roundManager->_players[dir]->judge_action_again();
     			_roundManager->WaitForMyAction();}),NULL));
 	}
 }
@@ -3905,7 +3905,7 @@ void RaceLayer::MingCancelEffect() {
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->_actCtrl.choices = _roundManager->_players[MIDDLE]->ActiontodoCheckAgain();
+        _roundManager->_actCtrl.choices = _roundManager->_players[MIDDLE]->judge_action_again();
         _roundManager->WaitForMyAction();}),NULL));
 }
 

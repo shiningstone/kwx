@@ -545,7 +545,7 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 
     _curPlayer = zhuang;
     if(_MODE==LOCAL_GAME) {
-        _actCtrl.choices = _players[_curPlayer]->ActiontodoCheckAgain();
+        _actCtrl.choices = _players[_curPlayer]->judge_action_again();
     }
 
     _isNewDistributed = true;

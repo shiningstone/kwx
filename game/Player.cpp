@@ -106,7 +106,7 @@ void Player::taskCheck(unsigned int flag) {
     }
 }
 
-ActionMask_t Player::ActiontodoCheckAgain() {
+ActionMask_t Player::judge_action_again() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
 	unsigned char res = 0x0;
@@ -134,7 +134,7 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatu
 	}
 
     /* BUG ??? ming can implemented after some actions take place, such as PENG/GANG */
-    /*     !!! maybe done by ActiontodoCheckAgain                                   */
+    /*     !!! maybe done by judge_action_again                                   */
 	if(isNewDistributed) {
 		if(!_cards->IsMing && !isLastOne) {
 			if(_cards->collect_ming_info())
