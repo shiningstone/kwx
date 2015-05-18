@@ -36,6 +36,7 @@ class PlayerOthers:public Player
         bool IsInSequences(Card_t kind) const;
         bool IsStable(Card_t kind) const;
         int  PickupForSameColor(int reservedColor);
+        int  PickupForSevenCouples();
 
         int  _PickSingleChar();
         int  _PickSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);

@@ -18,7 +18,7 @@ PlayerOthers::~PlayerOthers() {
     LOGGER_DEREGISTER(_logger);
 }
 
-bool PlayerOthers::OthersCanHu(Card_t kind) const {
+bool PlayerOthers::OthersCanHu(Card_t kind) const {/*the efficiency could be optimized*/
     for(int i=0;i<2;i++) {
         if(_ctx.OthersTing[i]==NULL) {
             continue;
@@ -320,6 +320,48 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
 
 	return chose_place;
 }
+    
+    int PlayerOthers::PickupForSevenCouples() {
+        const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
+        const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
+        const KindPosition &Card1 = _ctx.cards[RiverLast];
+        const KindPosition &Card2 = _ctx.cards[River2ndLast];
+    
+        const int Hu1 = _ctx.OthersTing[0]->cardNum;
+        const int Hu2 = _ctx.OthersTing[1]->cardNum;
+        
+        int chose_place = INVALID;
+    
+        if(_ctx.cards[RiverLast].num!=2 && _ctx.cards[RiverLast].num!=4
+            && !OthersCanHu(RiverLast)) {
+            return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+        } else if(_ctx.cards[River2ndLast].num!=2 && _ctx.cards[River2ndLast].num!=4
+            && !IsStable(River2ndLast)) {/*BUG HERE??? 没有判断是否会点炮*/
+            return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+        }
+    
+        for(int i=ZHONG;i<=BAI;i++) {
+            if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    
+        for(int i=0;i<TOTAL_CARD_KIND;i++) {
+            if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==3) {
+                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            }
+        }
+    
+        for(int expect=3;expect>0;expect--) {
+            for(int i=0;i<TOTAL_CARD_KIND;i++) {
+                if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==1 && AvailNum((Card_t)i)==expect) {
+                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                }
+            }
+        }
+    
+        return chose_place;
+    }
 
 int PlayerOthers::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
