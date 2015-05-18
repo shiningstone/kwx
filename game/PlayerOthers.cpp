@@ -990,7 +990,7 @@ int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
 		}
         
 		if(s_res->hu_nums>=6 
-            && context._actionToDo==a_MING 
+            && context._actCtrl.decision==aMING 
             && !context.IsMing(curPlayer) ) {
 			canKou = true;
 		}

@@ -4166,9 +4166,6 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		{
             if(_roundManager->_isWaitForMyDecision) {
 				_roundManager->_isWaitForMyDecision = false;
-				_roundManager->_actionToDo =_roundManager->_tempActionToDo;
-				_roundManager->_tempActionToDo = a_JUMP;
-				
 				_roundManager->_actCtrl.decision = aMING;
 			}
             
@@ -5941,10 +5938,10 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 				_DeleteActionTip();
 
 				_roundManager->_isWaitForMyDecision=false;
-                if(_roundManager->_tempActionToDo) {
+                
+                if(_roundManager->_actCtrl.choices!=0) {
                     _roundManager->_players[MIDDLE]->_cards->pop_back();
                 }
-				_roundManager->_tempActionToDo=a_JUMP;
                 
 				if(!_roundManager->_isNewDistributed) {
 					if(_roundManager->_isQiangGangAsking) {

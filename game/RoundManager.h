@@ -42,8 +42,7 @@ public:
 
     ActCtrl_t   _actCtrl;
     
-    int  _tempActionToDo;
-    int  _actionToDo;
+    int  _curPlayer;
     
     static RoundManager *getInstance();
     static void  destroyInstance();
@@ -121,8 +120,6 @@ protected:
     void        _GenerateIds(int ids[]);
 
     bool _isGameStart;
-
-    int  _curPlayer;
 
     bool _isWaitForMyDecision;
     

@@ -158,7 +158,6 @@ int RoundManager::Shuffle() {
     CancelEffectCard();
     _isMingTime = false;
 
-	_actionToDo=a_JUMP;
 	_continue_gang_times=0;
     _lastAction = INVALID;
     _lastActionWithGold = aQi;
@@ -227,7 +226,7 @@ void RoundManager::StartGame() {
 
     int lastWinner = GetLastWinner();
     _actCtrl.choices = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
-	if(_actionToDo!=a_TIMEOUT) {
+	if(_actCtrl.choices!=a_TIMEOUT) {
 		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
 		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
 		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
@@ -255,8 +254,6 @@ Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
 void RoundManager::RecvHu(PlayerDir_t dir) {
     if(_isWaitForMyDecision) {
         _isWaitForMyDecision = false;
-        _actionToDo = _tempActionToDo;
-        _tempActionToDo = a_JUMP;
         _actCtrl.decision = aHU;
     }
 
@@ -320,12 +317,10 @@ void RoundManager::RecvQi() {
     }
 
 	_lastAction=a_JUMP;
-	_actionToDo=a_JUMP;
     _actCtrl.decision = aQi;
 
 	if(_isWaitForMyDecision) {
 		_isWaitForMyDecision=false;
-		_tempActionToDo=a_JUMP;
 	}
 
     if(!_isNewDistributed) {
@@ -346,14 +341,12 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 		_isMingTime=false;
 	} else {
         if(_actCtrl.decision==aMING) {
-            _actionToDo = a_JUMP;
             _actCtrl.decision = aQi;
         }
     }
     
 	if(_isWaitForMyDecision) {
 		_isWaitForMyDecision=false;
-		_tempActionToDo=a_JUMP;
 	}
 
     bool turnToMing = false;
@@ -561,12 +554,10 @@ void RoundManager::WaitForMyAction() {
 
 	if(_actCtrl.choices!=a_JUMP) {
 		_isWaitForMyDecision = true;
-		_tempActionToDo = _actionToDo;
-		_actionToDo=a_JUMP;
-	}
-
-	if(_actCtrl.choices&a_AN_GANG  || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
-        _isGangAsking = true;
+        
+        if(_actCtrl.choices&a_AN_GANG  || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
+            _isGangAsking = true;
+        }
 	}
 
 	if(_isNewDistributed) {
@@ -852,8 +843,6 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
 void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
     if(_isWaitForMyDecision) {
         _isWaitForMyDecision = false;
-        _actCtrl.decision = (ActionId_t)_tempActionToDo;
-        _tempActionToDo = a_JUMP;
     }
 
     if(_isGangAsking) {//is this judgement neccessary?
@@ -863,7 +852,7 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
     if(act==aGANG) {
         if(_actCtrl.choices & aAN_GANG) {
             _actCtrl.decision = aAN_GANG;
-        } else if(_actionToDo & aSHOU_GANG) {
+        } else if(_actCtrl.choices & aSHOU_GANG) {
             _actCtrl.decision = aSHOU_GANG;
         } else {
             _actCtrl.decision = aMING_GANG;
