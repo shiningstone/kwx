@@ -22,6 +22,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     _MODE = NETWORK_GAME;
 
     _uiManager = uiManager;
+    RmStrategy::destroyInstance();
     _strategy  = RmStrategy::getInstance(this);
 
     _lastWin.winner = INVALID_DIR;
