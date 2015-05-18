@@ -45,7 +45,6 @@ public:
     ActCtrl_t   _actCtrl;
     
     int  _curPlayer;
-    int  _lastAction;
     ActionId_t  _lastActionWithGold;
     int  _lastActionSource;
     

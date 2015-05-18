@@ -159,7 +159,6 @@ int RoundManager::Shuffle() {
     _isMingTime = false;
 
 	_continue_gang_times=0;
-    _lastAction = INVALID;
     _lastActionWithGold = aQi;
     _lastActionSource = INVALID;
 
@@ -312,11 +311,10 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvQi() {
-	if(_lastAction==a_JUMP) {
+	if(_actCtrl.lastAction==aQi) {
 		_continue_gang_times=0;
     }
-
-	_lastAction=a_JUMP;
+	_actCtrl.lastAction=aQi;
     _actCtrl.decision = aQi;
 
 	if(_isWaitForMyDecision) {
@@ -561,11 +559,11 @@ void RoundManager::WaitForMyAction() {
 	}
 
 	if(_isNewDistributed) {
-		if(_lastAction==a_JUMP&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
+		if(_actCtrl.lastAction==aQi&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
 			_continue_gang_times=0;
         }
+		_actCtrl.lastAction=aQi;
 
-		_lastAction=a_JUMP;
 		WaitForMyChoose();
 	}
 }
@@ -582,10 +580,10 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     } else if(_actCtrl.choices&aPENG) {
         RecvPeng(dir);
     } else {
-        if(_lastAction==a_JUMP) {
+        if(_actCtrl.lastAction==aQi) {
             _continue_gang_times=0;
         }
-        _lastAction=a_JUMP;
+		_actCtrl.lastAction=aQi;
         
         WaitForOthersChoose();
     }
@@ -868,7 +866,7 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
     }
     
     _lastActionSource = dir;
-    _lastAction = _actCtrl.decision;
+    _actCtrl.lastAction = _actCtrl.decision;
 }
 
 void RoundManager::_LoadRandomCardSequence() {
