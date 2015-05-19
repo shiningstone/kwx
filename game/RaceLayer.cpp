@@ -5830,53 +5830,11 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 			layer_color->setOpacity(150);
 			this->addChild(layer_color,10,ROBOT_TUO_GUAN);
             
-			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID) && _roundManager->_isWaitForMyDecision) {
-
+			if(myframe->getChildByTag(QI_REMIND_ACT_TAG_ID)) {
 				_DeleteActionTip();
-
-				_roundManager->_isWaitForMyDecision=false;
-                
-                if(_roundManager->_actCtrl.choices!=0) {
-                    _roundManager->_players[MIDDLE]->_cards->pop_back();
-                }
-                
-				if(!_roundManager->_isNewDistributed) {
-					if(_roundManager->_isQiangGangAsking) {
-						_roundManager->_isQiangGangAsking=false;
-                        
-						myframe->runAction(Sequence::create(CallFunc::create([=](){
-							_roundManager->_strategy->show_gold((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
-							_roundManager->_qiangGangTargetNo=INVALID;}),CallFunc::create([=](){
-                            _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer
-                                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
-					} else if(_roundManager->_isDoubleHuAsking) {
-						_roundManager->_isDoubleHuAsking = false;
-
-						myframe->runAction(CallFunc::create([=](){
-                            PlayerDir_t giver = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
-                            _roundManager->SetWin(DOUBLE_WIN,giver);
-                            
-                            WinInfo_t win;
-                            _roundManager->GetWin(win);
-                            _HuEffect(win);}));
-					} else {
-						myframe->runAction(CallFunc::create([=](){
-                            _roundManager->DistributeTo(_roundManager->TurnToNext()
-                                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}));
-					}
-				} else {
-					_roundManager->WaitForMyChoose();
-                }
-			} else {
-				if(_roundManager->_actCtrl.handoutAllow) {
-					_roundManager->_actCtrl.decision = aQi;
-					if(_roundManager->_actCtrl.lastDecision==aQi)
-						_roundManager->_continue_gang_times=0;
-					_roundManager->_actCtrl.lastDecision=aQi;
-
-					_roundManager->WaitForMyChoose();
-				}
 			}
+            
+            _roundManager->WaitForTuoGuanHandle();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

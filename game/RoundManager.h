@@ -86,6 +86,7 @@ public:
     virtual void WaitForOthersAction(PlayerDir_t dir);
     virtual void WaitForOthersChoose();
     virtual void WaitForResponse(PlayerDir_t dir);
+    virtual void WaitForTuoGuanHandle();
     virtual void DistributeTo(PlayerDir_t dir,Card_t card);
     virtual void ActionAfterGang(PlayerDir_t dir);
 

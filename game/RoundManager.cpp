@@ -646,6 +646,37 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
     }
 }
 
+void RoundManager::WaitForTuoGuanHandle() {
+    if(_isWaitForMyDecision) {
+        _isWaitForMyDecision=false;
+        
+        if(_actCtrl.choices!=0) {
+            _players[MIDDLE]->_cards->pop_back();
+        }
+        
+        if(!_isNewDistributed) {
+            if(_isQiangGangAsking) {
+                _isQiangGangAsking=false;
+                _strategy->show_gold((PlayerDir_t)_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_curPlayer);
+                _qiangGangTargetNo=INVALID;
+                DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
+            } else if(_isDoubleHuAsking) {
+                _isDoubleHuAsking = false;
+                RecvHu(MIDDLE);
+            } else {
+                DistributeTo(TurnToNext(),(Card_t)(_unDistributedCards[_distributedNum++]/4));
+            }
+        } else {
+            WaitForMyChoose();
+        }
+    } else {
+        if(_actCtrl.handoutAllow) {
+            SetDecision(MIDDLE,aQi);
+            WaitForMyChoose();
+        }
+    }
+}
+
 unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
     ActionMask_t actions = 
         _players[dir]->hand_in(
