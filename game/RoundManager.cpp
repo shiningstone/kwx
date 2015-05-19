@@ -572,6 +572,19 @@ void RoundManager::WaitForMyAction() {
 	}
 }
 
+void RoundManager::WaitForMyChoose() {
+	if(_isNewDistributed) {/* is this judgement neccessary??? */
+		if( (_isTuoGuan) || (IsMing(_curPlayer) && !_isGangAsking) ) {
+            int last = _players[MIDDLE]->_cards->last();
+            
+            Vec2 location = _uiManager->GetCardPositionInHand(last);
+            RecvHandout(last,location,2);
+		} else {
+			_actCtrl.handoutAllow = true;
+        }
+	}
+}
+
 void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actCtrl.choices);
 
@@ -591,19 +604,6 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
         
         WaitForOthersChoose();
     }
-}
-
-void RoundManager::WaitForMyChoose() {
-	if(_isNewDistributed) {/* is this judgement neccessary??? */
-		if( (_isTuoGuan) || (IsMing(_curPlayer) && !_isGangAsking) ) {
-            int last = _players[MIDDLE]->_cards->last();
-            
-            Vec2 location = _uiManager->GetCardPositionInHand(last);
-            RecvHandout(last,location,2);
-		} else {
-			_actCtrl.handoutAllow = true;
-        }
-	}
 }
 
 void RoundManager::WaitForOthersChoose() {
@@ -636,6 +636,14 @@ void RoundManager::WaitForOthersChoose() {
 	_isNewDistributed = false;
 
     _uiManager->OthersHandoutEffect((PlayerDir_t)_curPlayer,canKou);
+}
+
+void RoundManager::WaitForResponse(PlayerDir_t dir) {
+    if(_isNewDistributed) {
+        _HandleCardNewDistributed(dir);
+    } else {
+        _HandleCardFrom(dir);
+    }
 }
 
 unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
@@ -796,14 +804,6 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _curPlayer=(_curPlayer+1)%3;
         _uiManager->UpdateClock(0,_curPlayer);
         DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]));
-    }
-}
-
-void RoundManager::WaitForResponse(PlayerDir_t dir) {
-    if(_isNewDistributed) {
-        _HandleCardNewDistributed(dir);
-    } else {
-        _HandleCardFrom(dir);
     }
 }
 

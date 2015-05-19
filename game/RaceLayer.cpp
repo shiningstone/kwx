@@ -5811,6 +5811,7 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 			_eventDispatcher->removeEventListenersForTarget(myframe,true);//???????
 
 			_roundManager->_isTuoGuan=true;
+            
 			curButton->setTouchEnabled(false);
 			curButton->setHighlighted(true);
 
@@ -5876,7 +5877,6 @@ void RaceLayer::BtnTuoGuanHandler(Ref* pSender,ui::Widget::TouchEventType type)
 					_roundManager->WaitForMyChoose();
 				}
 			}
-			//else if(ifMyTime)
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
