@@ -59,8 +59,8 @@ class PlayerOthers:public Player
 		int Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 		int Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 	public:
-        int  choose_worst(RoundManager &context,bool &canKou);
-		int  chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
+        int  choose_card(RoundManager &context,bool &canKou);
+		int  ChooseCard(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 };
 
 #endif 

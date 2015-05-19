@@ -530,9 +530,7 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
     _curPlayer = zhuang;
-    if(_MODE==LOCAL_GAME) {
-        _actCtrl.choices = _players[_curPlayer]->judge_action_again();
-    }
+    _actCtrl.choices = _players[_curPlayer]->judge_action_again();
 
     _isNewDistributed = true;
     if(zhuang==MIDDLE) {
@@ -591,7 +589,7 @@ void RoundManager::WaitForOthersChoose() {
     bool canKou = false;
 
 	PlayerOthers *player = static_cast<PlayerOthers *>(_players[_curPlayer]);
-	int index = player->choose_worst(*this,canKou);
+	int index = player->choose_card(*this,canKou);
     
     if ( true ) {
         Card_t handingout = _players[_curPlayer]->_cards->get_kind(index);

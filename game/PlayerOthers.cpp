@@ -941,7 +941,7 @@ int PlayerOthers::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIN
 	return chose_place;
 }
 
-int PlayerOthers::chose_card(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
+int PlayerOthers::ChooseCard(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	//unsigned char ting_flag;
     int show_place = -1;
@@ -1059,7 +1059,7 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
 	res->target = _cards->assess_aim();
 }
 
-int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
+int PlayerOthers::choose_card(RoundManager &context,bool &canKou) {
     if(_cards->IsMing) {
         return _cards->last();
     } else {
@@ -1073,7 +1073,7 @@ int PlayerOthers::choose_worst(RoundManager &context,bool &canKou) {
         canKou = false;
         _SetContext(s_res,list1,list2,&len1,&len2,context);
         
-		int index = chose_card(s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
+		int index = ChooseCard(s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
 		if( index==INVALID ) {
 			index = _cards->last();
 		}
