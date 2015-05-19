@@ -22,10 +22,13 @@ class PlayerOthers:public Player
         }KindPosition;
         
         typedef struct _Context_t {
+            /* global */
             CardList     *river;
             int           remain;
-            KindPosition  cards[TOTAL_CARD_KIND];
+            /* others */
             TingInfo_t   *OthersTing[2];
+            /* self */
+            KindPosition  cards[TOTAL_CARD_KIND];
             int           huNum;
             ROBOT_TARGET  aim;
         }Context_t;
@@ -39,6 +42,7 @@ class PlayerOthers:public Player
         int  PickupForSevenCouples();
         int  PickupForFourPeng();
         int  PickupForPiHu();
+        int  PickupForMing();
 
         int  _FindSingleChar();
         int  _FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);

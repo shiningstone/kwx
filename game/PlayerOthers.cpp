@@ -424,6 +424,13 @@ int PlayerOthers::PickupForPiHu() {
     return INVALID;
 }
 
+int PlayerOthers::PickupForMing() {
+    if(_cards->_ming.choiceNum>0) {
+    }
+
+    return INVALID;
+}
+
 int PlayerOthers::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
@@ -1030,12 +1037,12 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
     _ctx.remain = TOTAL_CARD_NUM - context._distributedNum;
     _ctx.aim    = _cards->assess_aim();
 
-    _CollectPosition(_ctx.cards);
-
     int curPlayer = context._curPlayer;
     _ctx.OthersTing[0] = context._players[(curPlayer+1)%3]->_cards->_ting;
     _ctx.OthersTing[1] = context._players[(curPlayer+2)%3]->_cards->_ting;
 
+    _CollectPosition(_ctx.cards);
+    _ctx.huNum = _cards->_ting->cardNum;
     /*******************************************/
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
