@@ -40,9 +40,9 @@ class PlayerOthers:public Player
         int  PickupForFourPeng();
         int  PickupForPiHu();
 
-        int  _PickSingleChar();
-        int  _PickSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);
-        int  _PickSingleAndUnstable(Card_t HeadKind,Card_t TailKind);
+        int  _FindSingleChar();
+        int  _FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);
+        int  _FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind);
 
         void _CollectPosition(KindPosition *info);
         void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);

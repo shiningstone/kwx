@@ -171,7 +171,7 @@ int PlayerOthers::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 	return -1;
 }
 
-int PlayerOthers::_PickSingleChar() {
+int PlayerOthers::_FindSingleChar() {
     for(int i=ZHONG;i<=BAI;i++) {
         if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
             return _ctx.cards[i].position[_ctx.cards[i].num-1];
@@ -182,7 +182,7 @@ int PlayerOthers::_PickSingleChar() {
 }
 
 /* 只有一个，而且不连续 */
-int PlayerOthers::_PickSingleAndNonSequence(Card_t HeadKind,Card_t TailKind) {
+int PlayerOthers::_FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind) {
     if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind].num==0) {
         return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
     } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1 && _ctx.cards[TailKind].num==0) {
@@ -200,7 +200,7 @@ int PlayerOthers::_PickSingleAndNonSequence(Card_t HeadKind,Card_t TailKind) {
     return INVALID;
 }
 
-int PlayerOthers::_PickSingleAndUnstable(Card_t HeadKind,Card_t TailKind) {
+int PlayerOthers::_FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind) {
     if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
         if(_ctx.cards[HeadKind].num==1 && !IsStable(HeadKind)) {
             return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
@@ -259,9 +259,9 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
         }
     }
 
-    RETURN_IF_VALID(_PickSingleChar());
-    RETURN_IF_VALID(_PickSingleAndNonSequence(HeadKind,TailKind));
-    RETURN_IF_VALID(_PickSingleAndUnstable(HeadKind,TailKind));
+    RETURN_IF_VALID(_FindSingleChar());
+    RETURN_IF_VALID(_FindSingleAndNonSequence(HeadKind,TailKind));
+    RETURN_IF_VALID(_FindSingleAndUnstable(HeadKind,TailKind));
 
     for(int i=HeadKind;i<=TailKind;i++) {
         if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
@@ -291,7 +291,7 @@ int PlayerOthers::PickupForSameColor(int reserveColor) {
     HeadKind = (Card_t)(reserveColor*9);
     TailKind = (Card_t)(HeadKind+8);
 
-    RETURN_IF_VALID(_PickSingleAndNonSequence(HeadKind,TailKind));
+    RETURN_IF_VALID(_FindSingleAndNonSequence(HeadKind,TailKind));
 
     if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1) {
         return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
@@ -343,7 +343,7 @@ int PlayerOthers::PickupForSevenCouples() {
         
     }
 
-    RETURN_IF_VALID(_PickSingleChar());
+    RETURN_IF_VALID(_FindSingleChar());
 
     for(int i=0;i<TOTAL_CARD_KIND;i++) {
         if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==3) {
@@ -377,7 +377,7 @@ int PlayerOthers::PickupForFourPeng() {
         return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
     }
 
-    RETURN_IF_VALID(_PickSingleChar());
+    RETURN_IF_VALID(_FindSingleChar());
 
     for(int cardInHand=1;cardInHand<3;cardInHand++) {
         for(int avail=0;avail<=4;avail++) {
@@ -409,7 +409,7 @@ int PlayerOthers::PickupForPiHu() {
         return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
     }
 
-    RETURN_IF_VALID(_PickSingleChar());
+    RETURN_IF_VALID(_FindSingleChar());
 
     for(int cardInHand=1;cardInHand<3;cardInHand++) {
         for(int avail=0;avail<4;avail++) {
