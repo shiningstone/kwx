@@ -692,10 +692,13 @@ unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatu
 void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
     _isGangHua=false;
     
-    if(_lastActionSource==dir&&_continue_gang_times!=0)
+    if(_lastActionSource==dir&&_continue_gang_times!=0) {
         _isGangHua=true;
-    else
+    } else {
+        _actCtrl.choices  = 0;
+        _actCtrl.decision = aQi;
         _continue_gang_times=0;
+    }
     
     _actCtrl.choices = 
         _players[dir]->hand_in(
@@ -712,9 +715,6 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
         if(IsMing(MIDDLE)&&(_actCtrl.choices&a_HU)){
             RecvHu(MIDDLE);
         }else{
-            if(_isTuoGuan)
-                _actCtrl.decision = aQi;
-    
             WaitForMyAction();
         }
     } else {
