@@ -638,13 +638,13 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
     Card_t card         = info->card[0].kind;
     
-    _curPlayer = dir;
-    
     _actCtrl.choices  = _actCtrl.decision;
     _actCtrl.target   = card;
     _actCtrl.decision = (ActionId_t)info->actions;
 
     if(_actCtrl.decision==aMING) {
+        _curPlayer = dir;
+        
         CardInHand *cards = _players[dir]->_cards;
         cards->clear();
         
@@ -663,17 +663,22 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
 
     switch(_actCtrl.decision) {
         case aPENG:
+            _curPlayer = whoGive;
             RecvPeng(dir);
             break;
         case aMING_GANG:
             {
                 if(!_isNewDistributed) {
+                    _curPlayer = whoGive;
+                    
                     _players[whoGive]->_river->pop_back();
 			        RecordOutCard(card);
 			        RecordOutCard(card);
 			        RecordOutCard(card);
 
                     _players[dir]->_cards->push_back(LastHandout());
+                } else {
+                    _curPlayer = dir;
                 }
 
                 SetDecision(dir,aGANG);

@@ -151,7 +151,7 @@ void test_basic() {
     发送消息实现
     消息格式 : lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00
 ****************************************************/
-#define WORKING_PATH "E:\\VisualProject\\kwx\\kwx\\Classes\\tester\\network\\DATA\\"
+#define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\\\"
 
 #include <stdio.h>
 
@@ -663,6 +663,65 @@ void E15051801_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void E15051901_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(handout==0) {
+        handout++;
+        for(int i=1;i<6;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==1) {
+        handout++;
+        for(int i=6;i<10;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==2) {
+        handout++;
+        for(int i=10;i<13;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==3) {
+        handout++;
+        for(int i=13;i<16;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==4) {
+        handout++;
+        for(int i=16;i<19;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==5) {
+        handout++;
+        for(int i=19;i<21;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==6) {
+        handout++;
+        for(int i=21;i<32;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==7) {
+        handout++;
+        for(int i=32;i<34;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==8) {
+        handout++;
+        for(int i=34;i<36;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==9) {
+        handout++;
+        for(int i=36;i<54;i++) {
+            SendLine(SERVER,i);
+        }
+    }
+}
+
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
 REQUEST_HANDLER gHandle = NULL;
 
@@ -729,6 +788,9 @@ void test_server_console() {
 
     SetFile("E15051801");
     gHandle = E15051801_handle_requests;
+
+    SetFile("E15051901");
+    gHandle = E15051901_handle_requests;
 
     test_smart_game_round_x();
 #endif
