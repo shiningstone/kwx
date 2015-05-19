@@ -81,9 +81,9 @@ int KwxMessenger::Send(UsMsg &aMsg) {
         Wait(req);
     }
 
-    char desc[128] = {0};
+    char desc[512] = {0};
     aMsg.Desc(desc);
-    LOGGER_WRITE("#%d: %s",++_sendCnt,desc);
+    LOGGER_WRITE("----------------> #%d: %s",++_sendCnt,desc);
     
     return 0;
 }
@@ -125,13 +125,10 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
     return 0;
 }
 
-void RequestSendAction::Desc(char *buf) const {
-    UsMsg::Desc(buf);
-    sprintf(buf+strlen(buf),"%s %s",DescAct(_act),DescCard(_card));
-}
-
 int RequestSendAction::Set(ActionId_t action,int kindNum,Card_t card[]) {
     SetRequestCode(REQ_GAME_SEND_ACTION);
+
+    _act  = action;
     
     INT32U actionId = _htonl(action);
     INT8U  cardKind[4] = {0};
@@ -149,6 +146,11 @@ int RequestSendAction::Set(ActionId_t action,int kindNum,Card_t card[]) {
     _add_item( new Item((Item_t)135,kindNum,(INT8U *)cardKind) );
 
     return 0;
+}
+
+void RequestSendAction::Desc(char *buf) const {
+    UsMsg::Desc(buf);
+    sprintf(buf+strlen(buf),"%s %s",DescAct(_act),DescCard(_card));
 }
 
 int RequestGameStart::Set() {
