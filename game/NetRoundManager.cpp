@@ -154,6 +154,309 @@ void NetRoundManager::HandleMsg(void * aMsg) {
     }
 }
 
+void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
+    if(dir==MIDDLE) {
+        RoundManager::UpdateCards(dir,action);
+    } else {
+        if(action==aPENG) {
+            _isNewDistributed = false;
+        }
+        
+        if(_actCtrl.decision==aAN_GANG) {
+            _players[dir]->others_action(_isNewDistributed,aAN_GANG,actKind);
+        } else if(_actCtrl.decision==aSHOU_GANG) {
+            _players[dir]->others_action(_isNewDistributed,aSHOU_GANG,actKind);
+        } else {
+            _players[dir]->others_action(_isNewDistributed,(ActionId_t)action,actKind);
+        }
+    }
+}
+
+void NetRoundManager::ServerWaitForMyAction() {
+    _uiManager->ShowActionButtons(_actCtrl.choices);
+
+	if(_actCtrl.choices!=0) {
+		_isWaitForMyDecision = true;
+		_actCtrl.decision    = aQi;
+
+    	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&aMING_GANG || _actCtrl.choices&aSHOU_GANG) {
+            _isGangAsking = true;
+    	}
+	}
+
+	if(_isNewDistributed) {
+		if(_actCtrl.lastDecision==aQi&&!(_lastActionSource==MIDDLE&&_continue_gang_times!=0)) {
+			_continue_gang_times=0;
+        }
+		_actCtrl.lastDecision = aQi;
+
+        _players[MIDDLE]->_cards->_IncludingOthersCard = false;
+	}
+}
+
+void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
+    if(_distributedNum<TOTAL_CARD_NUM+1) {
+        _isNewDistributed  = true;
+
+        DistributeInfo_t distInfo;
+        
+        distInfo.target   = dir;
+        distInfo.cardsLen = _players[dir]->_cards->size();
+        distInfo.newCard  = card;
+        distInfo.remain   = TOTAL_CARD_NUM - _distributedNum;
+        
+        _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
+    } else {
+		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
+    }
+}
+
+/****************************************
+       main interface
+****************************************/
+void NetRoundManager::CreateRace(Scene *scene) {
+    _uiManager = RaceLayer::create();
+    scene->addChild(_uiManager);
+
+    _uiManager->Assign(this);
+
+    InitPlayers();
+	_isGameStart=false;
+
+    SeatInfo *seat = SeatInfo::getInstance();
+    seat->Set(1,0x10010000,1,1);
+
+    ListenToMessenger();
+    _messenger->StartReceiving();
+    
+    /**********************************************/
+    /* enter room should be called somewhere else */
+    RequestEnterRoom aReq;
+    aReq.Set();
+    _messenger->Send(aReq);
+    /**********************************************/
+    
+    _uiManager->CreateRace();
+}
+
+void NetRoundManager::StartGame() {
+	_isGameStart=false;
+    
+    RequestGameStart aReq;
+    aReq.Set();
+    _messenger->Send(aReq);
+}
+
+Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
+    _players[dir]->_cards->push_back(LastHandout());
+
+    Card_t      kind = RoundManager::RecvPeng(dir);
+    
+    if(dir==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(aPENG,kind);
+        _messenger->Send(aReq);
+    }
+
+	return kind;
+}
+
+void NetRoundManager::RecvHu(PlayerDir_t dir) {
+    if(dir==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(aHU);
+        _messenger->Send(aReq);
+    }
+}
+
+Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
+    if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
+        _players[dir]->_cards->push_back(LastHandout());
+    }
+
+    Card_t kind = RoundManager::RecvGang(dir);
+    
+    if(dir==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(_actCtrl.lastDecision,kind);
+        _messenger->Send(aReq);
+    }
+
+	return kind;
+}
+
+void NetRoundManager::RecvQi() {
+	if(_actCtrl.lastDecision==aQi) {
+		_continue_gang_times=0;
+    }
+	_actCtrl.lastDecision = aQi;
+    _actCtrl.decision = aQi;
+
+	if(_isWaitForMyDecision) {
+		_isWaitForMyDecision=false;
+	}
+
+    if(_curPlayer==MIDDLE) {
+        RequestSendAction aReq;
+        aReq.Set(_actCtrl.decision);
+        _messenger->Send(aReq);
+    }
+    
+    _uiManager->QiEffect();
+}
+
+void NetRoundManager::_NotifyHandout() {
+    if(_HandoutNotify) {
+        _HandoutNotify = false;
+        
+        if(_actCtrl.choices && _actCtrl.decision==aQi) {
+            RequestSendAction aReq;
+            aReq.Set(aQi);
+            _messenger->Send(aReq);
+            _messenger->Wait(REQ_GAME_DIST_DAOJISHI);
+        }
+        
+        RequestShowCard aReq;
+        aReq.Set(LastHandout());
+        _messenger->Send(aReq);
+    }
+}
+
+void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
+    _actCtrl.handoutAllow = false;
+
+    _HandoutNotify = true;
+    
+    if(_isGangAsking) {
+        _isGangAsking = false;
+    }
+    
+	if(_isMingTime) {
+		_isMingTime=false;
+        
+        RequestSendAction aReq;
+        aReq.Set(aMING);
+        _messenger->Send(aReq);
+	} else {
+        if(_actCtrl.decision==aMING) {
+            _actCtrl.decision = aQi;
+        }
+    }
+
+	if(_isWaitForMyDecision) {
+		_isWaitForMyDecision=false;
+		_actCtrl.decision = aQi;
+	}
+
+    RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
+    _players[MIDDLE]->hand_out(chosen);
+
+    bool turnToMing = false;
+	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
+        _players[_curPlayer]->_cards->set_ming(chosen);
+
+        turnToMing = true;
+    }
+
+    _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
+}
+
+void NetRoundManager::RecvKouCancel() {
+    _players[MIDDLE]->_cards->clear_kou_choices();
+    _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
+}
+
+void NetRoundManager::RecvKouConfirm() {
+    CardInHand *cards = _players[MIDDLE]->_cards;
+
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        if(cards->get_status(i)==c_KOU_ENABLE)
+            cards->set_status(i,sFREE);
+    }   
+    
+    UpdateCards(MIDDLE,a_KOU);
+    cards->collect_ming_info(_gRiver);
+
+    Card_t kinds[4];
+    int    kindNum = _players[MIDDLE]->_cards->get_kou_kinds(kinds);
+    
+    RequestSendAction aReq;
+    aReq.Set(aKOU,kindNum,kinds);
+    _messenger->Send(aReq);
+
+    _uiManager->KouConfirmEffect();
+}
+
+void NetRoundManager::RecvMingCancel() {
+    _isMingTime=false;
+    
+    UpdateCards(MIDDLE,a_KOU_CANCEL);/*BUG HERE???*/
+    
+    _actCtrl.decision = aQi;
+    
+    _players[MIDDLE]->_cards->cancel_ming();
+    /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
+
+    _uiManager->MingCancelEffect();
+}
+
+void NetRoundManager::RecvMing(bool isFromKouStatus) {
+    _actCtrl.decision = aMING;
+    
+    RequestSendAction aAction;
+    aAction.Set(aMING);
+    _messenger->Send(aAction);
+
+    if(!isFromKouStatus) {
+        _players[MIDDLE]->_cards->scan_kou_cards();
+        if(_players[MIDDLE]->_cards->kou_group_num()>0) {
+            _uiManager->QueryKouCards();
+        } else {
+            _uiManager->QueryMingOutCard();
+        }
+    } else {
+        _isMingTime=true;
+        
+        UpdateCards(MIDDLE,a_MING);
+        _uiManager->QueryMingOutCard();
+    }
+}
+
+
+void NetRoundManager::WaitForMyAction() {
+}
+
+void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
+}
+
+void NetRoundManager::WaitForOthersChoose() {
+}
+
+void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
+	_NotifyHandout();
+}
+
+void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
+}
+
+void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
+}
+
+void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
+    _isGameStart = true;
+
+    _curPlayer = zhuang;
+    if(zhuang==MIDDLE) {
+        ServerWaitForMyAction();
+        _actCtrl.handoutAllow = true;
+    } else {
+        WaitForOthersAction((PlayerDir_t)zhuang);
+    }
+}
+
+/*************************************
+        server requests handlers
+*************************************/
 void NetRoundManager::_DiRecv(GameStartResponse *info) {
     _players[MIDDLE]->_isReady = true;
     _uiManager->GuiShowReady(MIDDLE);
@@ -470,307 +773,6 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
     UpdateGold((int *)info->val);
 }
-
-void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
-    if(dir==MIDDLE) {
-        RoundManager::UpdateCards(dir,action);
-    } else {
-        if(action==aPENG) {
-            _isNewDistributed = false;
-        }
-        
-        if(_actCtrl.decision==aAN_GANG) {
-            _players[dir]->others_action(_isNewDistributed,aAN_GANG,actKind);
-        } else if(_actCtrl.decision==aSHOU_GANG) {
-            _players[dir]->others_action(_isNewDistributed,aSHOU_GANG,actKind);
-        } else {
-            _players[dir]->others_action(_isNewDistributed,(ActionId_t)action,actKind);
-        }
-    }
-}
-
-void NetRoundManager::ServerWaitForMyAction() {
-    _uiManager->ShowActionButtons(_actCtrl.choices);
-
-	if(_actCtrl.choices!=0) {
-		_isWaitForMyDecision = true;
-		_actCtrl.decision    = aQi;
-
-    	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&aMING_GANG || _actCtrl.choices&aSHOU_GANG) {
-            _isGangAsking = true;
-    	}
-	}
-
-	if(_isNewDistributed) {
-		if(_actCtrl.lastDecision==aQi&&!(_lastActionSource==MIDDLE&&_continue_gang_times!=0)) {
-			_continue_gang_times=0;
-        }
-		_actCtrl.lastDecision = aQi;
-
-        _players[MIDDLE]->_cards->_IncludingOthersCard = false;
-	}
-}
-
-void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
-    if(_distributedNum<TOTAL_CARD_NUM+1) {
-        _isNewDistributed  = true;
-
-        DistributeInfo_t distInfo;
-        
-        distInfo.target   = dir;
-        distInfo.cardsLen = _players[dir]->_cards->size();
-        distInfo.newCard  = card;
-        distInfo.remain   = TOTAL_CARD_NUM - _distributedNum;
-        
-        _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
-    } else {
-		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
-    }
-}
-
-/****************************************
-       main interface
-****************************************/
-void NetRoundManager::CreateRace(Scene *scene) {
-    _uiManager = RaceLayer::create();
-    scene->addChild(_uiManager);
-
-    _uiManager->Assign(this);
-
-    InitPlayers();
-	_isGameStart=false;
-
-    SeatInfo *seat = SeatInfo::getInstance();
-    seat->Set(1,0x10010000,1,1);
-
-    ListenToMessenger();
-    _messenger->StartReceiving();
-    
-    /**********************************************/
-    /* enter room should be called somewhere else */
-    RequestEnterRoom aReq;
-    aReq.Set();
-    _messenger->Send(aReq);
-    /**********************************************/
-    
-    _uiManager->CreateRace();
-}
-
-void NetRoundManager::StartGame() {
-	_isGameStart=false;
-    
-    RequestGameStart aReq;
-    aReq.Set();
-    _messenger->Send(aReq);
-}
-
-Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
-    _players[dir]->_cards->push_back(LastHandout());
-
-    Card_t      kind = RoundManager::RecvPeng(dir);
-    
-    if(dir==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(aPENG,kind);
-        _messenger->Send(aReq);
-    }
-
-	return kind;
-}
-
-void NetRoundManager::RecvHu(PlayerDir_t dir) {
-    if(dir==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(aHU);
-        _messenger->Send(aReq);
-    }
-}
-
-Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
-    if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
-        _players[dir]->_cards->push_back(LastHandout());
-    }
-
-    Card_t kind = RoundManager::RecvGang(dir);
-    
-    if(dir==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(_actCtrl.lastDecision,kind);
-        _messenger->Send(aReq);
-    }
-
-	return kind;
-}
-
-void NetRoundManager::RecvQi() {
-	if(_actCtrl.lastDecision==aQi) {
-		_continue_gang_times=0;
-    }
-	_actCtrl.lastDecision = aQi;
-    _actCtrl.decision = aQi;
-
-	if(_isWaitForMyDecision) {
-		_isWaitForMyDecision=false;
-	}
-
-    if(_curPlayer==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(_actCtrl.decision);
-        _messenger->Send(aReq);
-    }
-    
-    _uiManager->QiEffect();
-}
-
-void NetRoundManager::_NotifyHandout() {
-    if(_HandoutNotify) {
-        _HandoutNotify = false;
-        
-        if(_actCtrl.choices && _actCtrl.decision==aQi) {
-            RequestSendAction aReq;
-            aReq.Set(aQi);
-            _messenger->Send(aReq);
-            _messenger->Wait(REQ_GAME_DIST_DAOJISHI);
-        }
-        
-        RequestShowCard aReq;
-        aReq.Set(LastHandout());
-        _messenger->Send(aReq);
-    }
-}
-
-void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
-    _actCtrl.handoutAllow = false;
-
-    _HandoutNotify = true;
-    
-    if(_isGangAsking) {
-        _isGangAsking = false;
-    }
-    
-	if(_isMingTime) {
-		_isMingTime=false;
-        
-        RequestSendAction aReq;
-        aReq.Set(aMING);
-        _messenger->Send(aReq);
-	} else {
-        if(_actCtrl.decision==aMING) {
-            _actCtrl.decision = aQi;
-        }
-    }
-
-	if(_isWaitForMyDecision) {
-		_isWaitForMyDecision=false;
-		_actCtrl.decision = aQi;
-	}
-
-    RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
-    _players[MIDDLE]->hand_out(chosen);
-
-    bool turnToMing = false;
-	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
-        _players[_curPlayer]->_cards->set_ming(chosen);
-
-        turnToMing = true;
-    }
-
-    _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
-}
-
-void NetRoundManager::RecvKouCancel() {
-    _players[MIDDLE]->_cards->clear_kou_choices();
-    _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
-}
-
-void NetRoundManager::RecvKouConfirm() {
-    CardInHand *cards = _players[MIDDLE]->_cards;
-
-    for(int i=cards->FreeStart;i<cards->size();i++) {
-        if(cards->get_status(i)==c_KOU_ENABLE)
-            cards->set_status(i,sFREE);
-    }   
-    
-    UpdateCards(MIDDLE,a_KOU);
-    cards->collect_ming_info(_gRiver);
-
-    Card_t kinds[4];
-    int    kindNum = _players[MIDDLE]->_cards->get_kou_kinds(kinds);
-    
-    RequestSendAction aReq;
-    aReq.Set(aKOU,kindNum,kinds);
-    _messenger->Send(aReq);
-
-    _uiManager->KouConfirmEffect();
-}
-
-void NetRoundManager::RecvMingCancel() {
-    _isMingTime=false;
-    
-    UpdateCards(MIDDLE,a_KOU_CANCEL);/*BUG HERE???*/
-    
-    _actCtrl.decision = aQi;
-    
-    _players[MIDDLE]->_cards->cancel_ming();
-    /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
-
-    _uiManager->MingCancelEffect();
-}
-
-void NetRoundManager::RecvMing(bool isFromKouStatus) {
-    _actCtrl.decision = aMING;
-    
-    RequestSendAction aAction;
-    aAction.Set(aMING);
-    _messenger->Send(aAction);
-
-    if(!isFromKouStatus) {
-        _players[MIDDLE]->_cards->scan_kou_cards();
-        if(_players[MIDDLE]->_cards->kou_group_num()>0) {
-            _uiManager->QueryKouCards();
-        } else {
-            _uiManager->QueryMingOutCard();
-        }
-    } else {
-        _isMingTime=true;
-        
-        UpdateCards(MIDDLE,a_MING);
-        _uiManager->QueryMingOutCard();
-    }
-}
-
-
-void NetRoundManager::WaitForMyAction() {
-}
-
-void NetRoundManager::WaitForOthersAction(PlayerDir_t dir) {
-}
-
-void NetRoundManager::WaitForOthersChoose() {
-}
-
-void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
-	_NotifyHandout();
-}
-
-void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
-}
-
-void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
-}
-
-void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
-    _isGameStart = true;
-
-    _curPlayer = zhuang;
-    if(zhuang==MIDDLE) {
-        ServerWaitForMyAction();
-        _actCtrl.handoutAllow = true;
-    } else {
-        WaitForOthersAction((PlayerDir_t)zhuang);
-    }
-}
-
 
 /*************************************
         singleton
