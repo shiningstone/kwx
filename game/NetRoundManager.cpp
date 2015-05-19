@@ -286,22 +286,11 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
 }
 
 void NetRoundManager::RecvQi() {
-	if(_actCtrl.lastDecision==aQi) {
-		_continue_gang_times=0;
-    }
-	_actCtrl.lastDecision = aQi;
-    _actCtrl.decision = aQi;
-
-	if(_isWaitForMyDecision) {
-		_isWaitForMyDecision=false;
-	}
-
-    if(_curPlayer==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(_actCtrl.decision);
-        _messenger->Send(aReq);
-    }
+    RequestSendAction aReq;
+    aReq.Set(aQi);
+    _messenger->Send(aReq);
     
+    SetDecision(MIDDLE,aQi);
     _uiManager->QiEffect();
 }
 

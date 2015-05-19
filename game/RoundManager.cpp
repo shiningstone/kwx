@@ -315,20 +315,11 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvQi() {
-	if(_actCtrl.lastDecision==aQi) {
-		_continue_gang_times=0;
-    }
-	_actCtrl.lastDecision=aQi;
-    _actCtrl.decision = aQi;
-
-	if(_isWaitForMyDecision) {
-		_isWaitForMyDecision=false;
-	}
-
     if(!_isNewDistributed) {
         _players[MIDDLE]->_cards->pop_back();
     }
 
+    SetDecision(MIDDLE,aQi);
     _uiManager->QiEffect();
 }
 
