@@ -554,11 +554,6 @@ void RoundManager::WaitForMyAction() {
 	}
 
 	if(_isNewDistributed) {
-		if(_actCtrl.lastDecision==aQi&&!(_lastActionSource==1&&_continue_gang_times!=0)) {
-			_continue_gang_times=0;
-        }
-		_actCtrl.lastDecision=aQi;
-
 		WaitForMyChoose();
 	}
 }
@@ -588,11 +583,6 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
     } else if(_actCtrl.choices&aPENG) {
         RecvPeng(dir);
     } else {
-        if(_actCtrl.lastDecision==aQi) {
-            _continue_gang_times=0;
-        }
-		_actCtrl.lastDecision=aQi;
-        
         WaitForOthersChoose();
     }
 }
@@ -892,7 +882,6 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
     }
     
     _lastActionSource = dir;
-    _actCtrl.lastDecision = _actCtrl.decision;
 }
 
 void RoundManager::_LoadRandomCardSequence() {

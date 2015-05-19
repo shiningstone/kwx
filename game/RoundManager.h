@@ -53,8 +53,6 @@ public:
         ActionMask_t choices;
         Card_t       target;
         ActionId_t   decision;
-
-        ActionId_t   lastDecision;
     }ActCtrl_t;
 
     ActCtrl_t   _actCtrl;

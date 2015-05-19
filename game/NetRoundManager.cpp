@@ -185,11 +185,6 @@ void NetRoundManager::ServerWaitForMyAction() {
 	}
 
 	if(_isNewDistributed) {
-		if(_actCtrl.lastDecision==aQi&&!(_lastActionSource==MIDDLE&&_continue_gang_times!=0)) {
-			_continue_gang_times=0;
-        }
-		_actCtrl.lastDecision = aQi;
-
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
 	}
 }
@@ -278,7 +273,7 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
     
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(_actCtrl.lastDecision,kind);
+        aReq.Set(_actCtrl.decision,kind);
         _messenger->Send(aReq);
     }
 
