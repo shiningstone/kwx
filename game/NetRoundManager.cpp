@@ -449,8 +449,10 @@ void NetRoundManager::_DiRecv(GameStartResponse *info) {
 }
 
 void NetRoundManager::_DiRecv(GameStartNotif *info) {
-    _players[info->seat]->_isReady = true;
-    _uiManager->GuiShowReady(info->seat);
+    if(_players[info->seat]->_isReady==false) {
+        _players[info->seat]->_isReady = true;
+        _uiManager->GuiShowReady(info->seat);
+    }
     LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->seat,info->score);
     delete info;
 }
