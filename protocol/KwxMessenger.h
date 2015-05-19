@@ -29,6 +29,7 @@ private:
     static void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
 
     RequestId_t _waitReq;
+    int         _sendCnt;
 
 	static NetMessenger *_messenger;/*it makes more sense to let KwxMessenger derived from NetMessenger*/
     static Logger       *_logger;
@@ -58,16 +59,23 @@ class RequestSendAction : public UsMsg {
 public:
     int Set(ActionId_t action,Card_t card);
     int Set(ActionId_t code,int kindNum=1,Card_t cards[]=NULL);
+    virtual void Desc(char *buf) const;
+
+    ActionId_t _act;
+    Card_t     _card;
+};
+
+class RequestShowCard : public UsMsg {
+public:
+    virtual void Desc(char *buf) const;
+    int Set(Card_t card);
+
+    Card_t _card;
 };
 
 class RequestGameStart : public UsMsg {
 public:
     int Set();
-};
-
-class RequestShowCard : public UsMsg {
-public:
-    int Set(Card_t card);
 };
 
 class RequestTingInfo : public UsMsg {

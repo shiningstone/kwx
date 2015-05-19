@@ -6,6 +6,8 @@
 #include "CommonMsg.h"
 #include "KwxMessenger.h"
 
+#include "DbgRequestDesc.h"
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -23,6 +25,7 @@ KwxMessenger::KwxMessenger() {
     #endif
 
     _waitReq = REQ_INVALID;
+    _sendCnt = 0;
     
     _logger = LOGGER_REGISTER("KwxMessenger");
 }
@@ -78,6 +81,10 @@ int KwxMessenger::Send(UsMsg &aMsg) {
         Wait(req);
     }
 
+    char desc[128] = {0};
+    aMsg.Desc(desc);
+    LOGGER_WRITE("#%d: %s",++_sendCnt,desc);
+    
     return 0;
 }
 
@@ -99,8 +106,14 @@ bool KwxMessenger::Wait(RequestId_t rsp) {
 /**********************************************************
 	Interfaces
 ***********************************************************/
+#include <stdio.h>
+#include <string.h>
+
 int RequestSendAction::Set(ActionId_t action,Card_t card) {
     SetRequestCode(REQ_GAME_SEND_ACTION);
+
+    _act  = action;
+    _card = card;
     
     INT32U actionId = _htonl(action);
     INT8U  cardKind = card;
@@ -110,6 +123,11 @@ int RequestSendAction::Set(ActionId_t action,Card_t card) {
     _add_item( new Item((Item_t)135,1,(INT8U *)&cardKind) );
 
     return 0;
+}
+
+void RequestSendAction::Desc(char *buf) const {
+    UsMsg::Desc(buf);
+    sprintf(buf+strlen(buf),"%s %s",DescAct(_act),DescCard(_card));
 }
 
 int RequestSendAction::Set(ActionId_t action,int kindNum,Card_t card[]) {
@@ -145,7 +163,14 @@ int RequestShowCard::Set(Card_t card) {
     AddSeatInfo();
     _add_item( new Item((Item_t)65,card) );
 
+    _card = card;
+    
     return 0;
+}
+
+void RequestShowCard::Desc(char *buf) const {
+    UsMsg::Desc(buf);
+    sprintf(buf+strlen(buf),"handout %s",DescCard(_card));
 }
 
 int RequestTingInfo::Set() {

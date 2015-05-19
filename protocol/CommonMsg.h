@@ -57,6 +57,7 @@ private:
 class UsMsg : public CommonMsg, public UsMsgIntf {
 public:
     virtual int Serialize(INT8U *outMsg);
+    virtual void Desc(char *buf) const;
     
 protected:
     UsMsg();

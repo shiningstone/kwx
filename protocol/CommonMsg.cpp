@@ -9,6 +9,8 @@
 #include "CommonMsg.h"
 #include "DsInstruction.h"
 
+#include "DbgRequestDesc.h"
+
 Logger *CommonMsg::_logger = 0;
 SeatInfo *CommonMsg::_seatInfo = 0;
 
@@ -203,6 +205,11 @@ int UsMsg::Serialize(INT8U *outMsg) {
 	_set_size(outMsg,len);
 
     return len;
+}
+
+#include <stdio.h>
+void UsMsg::Desc(char *buf) const{
+    sprintf(buf,"%s:",DescReq((RequestId_t)_header->_requestCode));
 }
 
 void UsMsg::_set_size(INT8U *buf,INT16U len) {
