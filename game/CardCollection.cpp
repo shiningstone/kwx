@@ -219,16 +219,15 @@ void CardInHand::delete_card(int from,int len) {
 void CardInHand::insert_card(CardNode_t data,int times) {
     int insertPlace = _FindInsertPoint(data);
 
+    CardNode_t *card = new CardNode_t;
+    memcpy(card,&data,sizeof(CardNode_t));
+
     if(insertPlace==size()) {
         for(INT8U i=0;i<times;i++) {
-            CardNode_t *card = new CardNode_t;
-            memcpy(card,&data,sizeof(CardNode_t));
             push_back(card);
         }
     } else {
         for(INT8U i=0;i<times;i++) {
-            CardNode_t *card = new CardNode_t;
-            memcpy(card,&data,sizeof(CardNode_t));
             insert(begin()+insertPlace+i,card);
         }
     }
@@ -414,14 +413,20 @@ void CardInHand::_CancelKou() {
     CardNode_t node;
     node.status  = sFREE;
     node.canPlay = true;
+
+    Card_t prevKou = CARD_UNKNOWN;
     
     for(int i=FreeStart-1;i>=0;i--) {
-        if(get_status(i)==sMING_KOU) {
+        if(get_status(i)==sMING_KOU && get_kind(i)!=prevKou) {
             node.kind = get_kind(i);
             
-            delete_card(i,1);
+            delete_card(i-2,3);
+            FreeStart -= 3;
             insert_card(node,1);
-            FreeStart-=1;
+            insert_card(node,1);
+            insert_card(node,1);
+
+            prevKou = node.kind;
         }
     }
 }
@@ -505,7 +510,7 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
         for(int i=FreeStart;i>0;i--) {
             if(get_status(i-1)!=sMING_KOU) {
                 return i;
-            } else if(data.kind>=get_kind(i-1)) {
+            } else if(data.kind>get_kind(i-1)) {
                 return i;
             }
         }

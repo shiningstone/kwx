@@ -44,7 +44,6 @@ public:
     
     void   init(Card_t *cards,int len);
     void   delete_card(int from,int len);
-    void   insert_card(CardNode_t data);
     void   insert_card(CardNode_t data,int times=1);
     void   lock_all_cards(bool lock);
     int    real_last()const;

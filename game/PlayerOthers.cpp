@@ -1042,7 +1042,11 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
     _ctx.OthersTing[1] = context._players[(curPlayer+2)%3]->_cards->_ting;
 
     _CollectPosition(_ctx.cards);
-    _ctx.huNum = _cards->_ting->cardNum;
+    if(_cards->_ting) {
+        _ctx.huNum = _cards->_ting->cardNum;
+    } else {
+        _ctx.huNum = 0;
+    }
     /*******************************************/
 	memset(res,0,sizeof(HAH));
 	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
