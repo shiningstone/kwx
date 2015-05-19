@@ -626,7 +626,7 @@ void NetRoundManager::_NotifyHandout() {
     if(_HandoutNotify) {
         _HandoutNotify = false;
         
-        if(_actCtrl.choices) {
+        if(_actCtrl.choices && _actCtrl.decision==aQi) {
             RequestSendAction aReq;
             aReq.Set(aQi);
             _messenger->Send(aReq);
@@ -641,7 +641,6 @@ void NetRoundManager::_NotifyHandout() {
 
 void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
-    _actCtrl.choices &= ~_actCtrl.decision;
 
     _HandoutNotify = true;
     
