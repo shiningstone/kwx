@@ -9,7 +9,30 @@
 /*************************************
         local strategy
 *************************************/
-void RmStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
+class LocalStrategy : public RmStrategy {
+public:
+    virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+
+    LocalStrategy(RoundManager *rm);
+    ~LocalStrategy();
+private:
+    int      PREMIUM_LEAST;
+
+    void CalcAnGangGold(int winner,int gold[3],int continueGang = 1);
+    void CalcMingGangGold(int winner,int giver,int gold[3],int continueGang = 1);
+    void CalcSingleWinGold(int gold[3], int winner,int whoGive);
+    void CalcDoubleWinGold(int gold[3], int giver);
+    void CalcNoneWinGold(int gold[3], int giver);
+    void CalcHuGold(int gold[3],const WinInfo_t &win);
+    void CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive);
+};
+
+LocalStrategy::LocalStrategy(RoundManager *rm)
+    :RmStrategy(rm) {
+    PREMIUM_LEAST = 200;
+}
+
+void LocalStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
     _rm->update_gold(GoldWinner,Gold_kind,whoGive);
 }
 
@@ -18,7 +41,7 @@ void RmStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerD
 *************************************/
 class NetworkStrategy : public RmStrategy {
 public:
-    virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+    virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {}
 
     NetworkStrategy(RoundManager *rm);
     ~NetworkStrategy();
@@ -26,12 +49,7 @@ public:
 
 NetworkStrategy::NetworkStrategy(RoundManager *rm)
     :RmStrategy(rm)
-{
-
-}
-
-void NetworkStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
-}
+{}
 
 /*************************************
         singleton
@@ -48,7 +66,7 @@ RmStrategy::~RmStrategy() {
 RmStrategy *RmStrategy::getInstance(RoundManager *rm) {
     if (_instance==NULL) {
         if(rm->_MODE==LOCAL_GAME) {
-            _instance = new RmStrategy(rm);
+            _instance = new LocalStrategy(rm);
         } else {
             _instance = new NetworkStrategy(rm);
         }
@@ -62,4 +80,81 @@ void RmStrategy::destroyInstance() {
     _instance = NULL;
 }
 
+/*************************************
+        support
+*************************************/
+void LocalStrategy::CalcAnGangGold(int winner,int gold[3],int continueGang) {
+    gold[winner]       = 4*PREMIUM_LEAST*(continueGang);
+    gold[(winner+1)%3] = -2*PREMIUM_LEAST*(continueGang);
+    gold[(winner+2)%3] = -2*PREMIUM_LEAST*(continueGang);
+}
+
+void LocalStrategy::CalcMingGangGold(int winner,int giver,int gold[3],int continueGang) {
+    if (winner==giver) {
+        gold[winner]       = 2*PREMIUM_LEAST*(continueGang);
+        gold[(winner+1)%3] = -1*PREMIUM_LEAST*(continueGang);
+        gold[(winner+2)%3] = -1*PREMIUM_LEAST*(continueGang);
+    } else {
+        gold[winner]       =2*PREMIUM_LEAST*(continueGang);
+        gold[giver]        =-2*PREMIUM_LEAST*(continueGang);
+    }
+}
+
+void LocalStrategy::CalcSingleWinGold(int gold[3], int winner,int whoGive) {
+    auto score = _rm->_players[winner]->get_score();
+    gold[winner] = score*PREMIUM_LEAST;
+    
+    if(whoGive==winner) {
+        gold[(winner+1)%3] = -(gold[winner]/2);
+        gold[(winner+2)%3] = -(gold[winner]/2);
+    } else {
+        gold[whoGive] = -gold[winner];
+    }
+    
+    gold[(winner+1)%3] = gold[(winner+1)%3] + gold[(winner+1)%3]*_rm->IsMing((winner+1)%3);
+    gold[(winner+2)%3] = gold[(winner+2)%3] + gold[(winner+2)%3]*_rm->IsMing((winner+2)%3);
+    gold[winner] = - (gold[(winner+1)%3] + gold[(winner+2)%3]);
+}
+
+void LocalStrategy::CalcDoubleWinGold(int gold[3], int giver) {
+    for(int i=1;i<3;i++) {
+        auto score = _rm->_players[(giver+i)%3]->get_score();
+        int  ting  = _rm->IsMing((giver+i)%3);
+
+        gold[(giver+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
+    }
+
+    gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
+}
+
+void LocalStrategy::CalcNoneWinGold(int gold[3], int giver) {
+    gold[(giver+1)%3] = PREMIUM_LEAST;
+    gold[(giver+2)%3] = PREMIUM_LEAST;
+    gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
+}
+
+void LocalStrategy::CalcHuGold(int gold[3],const WinInfo_t &win) {
+    switch(win.kind) {
+        case SINGLE_WIN:
+            CalcSingleWinGold(gold,win.winner,win.giver);
+            break;
+        case DOUBLE_WIN:
+            CalcDoubleWinGold(gold,win.giver);
+            break;
+        case NONE_WIN:
+            CalcNoneWinGold(gold,win.winner);
+            break;
+    }
+}
+
+void LocalStrategy::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
+    switch(goldKind) {
+        case AN_GANG:
+            return CalcAnGangGold(GoldWinner,gold,_rm->_continue_gang_times);
+        case MING_GANG:
+            return CalcMingGangGold(GoldWinner,whoGive,gold,_rm->_continue_gang_times);
+        case HU_WIN:
+            return CalcHuGold(gold,_rm->GetWin());
+    }
+}
 

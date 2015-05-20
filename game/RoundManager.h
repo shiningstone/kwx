@@ -22,6 +22,7 @@ class RmStrategy;
 class RoundManager {
     friend class RaceLayer;
 	friend class PlayerOthers;
+    friend class LocalStrategy;
 public:
     void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
 protected:
@@ -99,7 +100,7 @@ public:
 
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
-    void GetWin(WinInfo_t &info);
+    const WinInfo_t &GetWin();
     bool IsWinner(int no);
 
     PlayerDir_t TurnToNext();

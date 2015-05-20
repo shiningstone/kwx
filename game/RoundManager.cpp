@@ -62,10 +62,8 @@ void RoundManager::SetWin(WinKind_t kind,int player) {
     }
 }
 
-void RoundManager::GetWin(WinInfo_t &info) {
-    info.kind   = _lastWin.kind;
-    info.winner = _lastWin.winner;
-    info.giver  = _lastWin.giver;
+const WinInfo_t &RoundManager::GetWin() {
+    return _lastWin;
 }
 
 bool RoundManager::IsWinner(int no) {
@@ -977,9 +975,7 @@ void RoundManager::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t g
         case MING_GANG:
             return CalcMingGangGold(GoldWinner,whoGive,gold,_continue_gang_times);
         case HU_WIN:
-            WinInfo_t win;
-            GetWin(win);
-            return CalcHuGold(gold,win);
+            return CalcHuGold(gold,GetWin());
     }
 }
 

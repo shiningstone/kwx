@@ -3711,10 +3711,8 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
                     hideQiReminder,CallFunc::create([=](){
                     PlayerDir_t giver = (_roundManager->_otherOneForDouble==LEFT)?RIGHT:LEFT;
                     _roundManager->SetWin(DOUBLE_WIN,giver);
-                    
-                    WinInfo_t win;
-                    _roundManager->GetWin(win);
-                    _HuEffect(win);}),NULL));
+
+                    _HuEffect(_roundManager->GetWin());}),NULL));
 			} else {
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
@@ -4712,8 +4710,7 @@ void RaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *pa
 void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
 	_CreateAccountPanel(_roundManager->_players[no]->_profile,BarOfPlayer);
 
-    WinInfo_t win;
-    _roundManager->GetWin(win);
+    const WinInfo_t &win = _roundManager->GetWin();
 
 	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
         auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
@@ -4750,9 +4747,8 @@ void RaceLayer::AccountHuKind(LayerColor* BarOfPlayer,int num)
 	int tagNum    = BarOfPlayer->getTag();
 	auto curScore = _roundManager->_players[tagNum]->get_score();
 
-    WinInfo_t win;
-    _roundManager->GetWin(win);
-    
+    const WinInfo_t &win = _roundManager->GetWin();
+
 	if((win.kind==SINGLE_WIN
             &&(win.winner==win.giver && curScore==2)
             ||(win.winner!=win.giver && tagNum==win.winner && curScore==1))
@@ -5303,8 +5299,7 @@ void RaceLayer::raceAccount(float delta)
 	unsigned int num;
 	unsigned int numDoubule;
     
-    WinInfo_t win;
-    _roundManager->GetWin(win);
+    const WinInfo_t &win = _roundManager->GetWin();
 
     switch(win.kind) {
         case SINGLE_WIN:
