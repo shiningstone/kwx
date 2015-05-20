@@ -157,7 +157,7 @@ public:
     MingInfo_t  _ming;
     TingInfo_t *_ting;
     long CalcTimes(Card_t kind);
-    int  CollectTingItem(int idx,Card_t kind,const CardList *river);
+    int  CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList *river);
     bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
 
     bool collect_ming_info(const CardList *river = NULL/*if don't care about remain number*/);

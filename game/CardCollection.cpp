@@ -1034,9 +1034,7 @@ long CardInHand::CalcTimes(Card_t kind) {
     return sum_up_score(statHuFanMask);
 }
 
-int CardInHand::CollectTingItem(int idx,Card_t kind,const CardList *river) {
-    TingItem_t *tingCard = _ting->cards+ idx;
-    
+int CardInHand::CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList *river) {
     tingCard->kind = kind;
     
     tingCard->fan  = CalcTimes(kind);
@@ -1063,7 +1061,7 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
 
     for(INT8U k=0;k<CARD_KIND_MAX;k++) {
         if( can_hu(position,k) ) {
-            ting.huNum = CollectTingItem(ting.cardNum,(Card_t)k,river);
+            ting.huNum = CollectTingItem(ting.cards+ting.cardNum,(Card_t)k,river);
             ting.cardNum++;
         }
     }
@@ -1184,7 +1182,7 @@ void CardInHand::update_ting_num(const CardList *river) {
         _ting->huNum = 0;
         
         for(int i=0;i<_ting->cardNum;i++) {
-            _ting->huNum += CollectTingItem(i,(_ting->cards+i)->kind,river);
+            _ting->huNum += CollectTingItem(_ting->cards+i,(_ting->cards+i)->kind,river);
         }
     }
 }
