@@ -14,8 +14,8 @@ RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
 
     _uiManager = uiManager;
+	RmStrategy::destroyInstance();
     _strategy  = RmStrategy::getInstance(this);
-    PREMIUM_LEAST = 200;
 
     _lastWin.winner = INVALID_DIR;
     _lastWin.giver  = INVALID_DIR;
@@ -901,85 +901,7 @@ void RoundManager::_LoadRandomCardSequence() {
     }
 }
 
-/*****************************
-    strategy support
-*****************************/
-void RoundManager::CalcAnGangGold(int winner,int gold[3],int continueGang) {
-    gold[winner]       = 4*PREMIUM_LEAST*(continueGang);
-    gold[(winner+1)%3] = -2*PREMIUM_LEAST*(continueGang);
-    gold[(winner+2)%3] = -2*PREMIUM_LEAST*(continueGang);
-}
-
-void RoundManager::CalcMingGangGold(int winner,int giver,int gold[3],int continueGang) {
-    if (winner==giver) {
-        gold[winner]       = 2*PREMIUM_LEAST*(continueGang);
-        gold[(winner+1)%3] = -1*PREMIUM_LEAST*(continueGang);
-        gold[(winner+2)%3] = -1*PREMIUM_LEAST*(continueGang);
-    } else {
-        gold[winner]       =2*PREMIUM_LEAST*(continueGang);
-        gold[giver]        =-2*PREMIUM_LEAST*(continueGang);
-    }
-}
-
-void RoundManager::CalcSingleWinGold(int gold[3], int winner,int whoGive) {
-    auto score = _players[winner]->get_score();
-    gold[winner] = score*PREMIUM_LEAST;
-    
-    if(whoGive==winner) {
-        gold[(winner+1)%3] = -(gold[winner]/2);
-        gold[(winner+2)%3] = -(gold[winner]/2);
-    } else {
-        gold[whoGive] = -gold[winner];
-    }
-    
-    gold[(winner+1)%3] = gold[(winner+1)%3] + gold[(winner+1)%3]*IsMing((winner+1)%3);
-    gold[(winner+2)%3] = gold[(winner+2)%3] + gold[(winner+2)%3]*IsMing((winner+2)%3);
-    gold[winner] = - (gold[(winner+1)%3] + gold[(winner+2)%3]);
-}
-
-void RoundManager::CalcDoubleWinGold(int gold[3], int giver) {
-    for(int i=1;i<3;i++) {
-        auto score = _players[(giver+i)%3]->get_score();
-        int  ting  = IsMing((giver+i)%3);
-
-        gold[(giver+i)%3] = score*PREMIUM_LEAST + score*PREMIUM_LEAST*ting;
-    }
-
-    gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
-}
-
-void RoundManager::CalcNoneWinGold(int gold[3], int giver) {
-    gold[(giver+1)%3] = PREMIUM_LEAST;
-    gold[(giver+2)%3] = PREMIUM_LEAST;
-    gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
-}
-
-void RoundManager::CalcHuGold(int gold[3],const WinInfo_t &win) {
-    switch(win.kind) {
-        case SINGLE_WIN:
-            CalcSingleWinGold(gold,win.winner,win.giver);
-            break;
-        case DOUBLE_WIN:
-            CalcDoubleWinGold(gold,win.giver);
-            break;
-        case NONE_WIN:
-            CalcNoneWinGold(gold,win.winner);
-            break;
-    }
-}
-
-void RoundManager::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
-    switch(goldKind) {
-        case AN_GANG:
-            return CalcAnGangGold(GoldWinner,gold,_continue_gang_times);
-        case MING_GANG:
-            return CalcMingGangGold(GoldWinner,whoGive,gold,_continue_gang_times);
-        case HU_WIN:
-            return CalcHuGold(gold,GetWin());
-    }
-}
-
-void RoundManager::UpdateGold(int gold[3]) {
+void RoundManager::update_gold(int gold[3]) {
     for(int i=0;i<PLAYER_NUM;i++) {
         Database *database = Database::getInstance();
         int total = _players[i]->UpdateProperty(gold[i]);
@@ -990,13 +912,6 @@ void RoundManager::UpdateGold(int gold[3]) {
         _uiManager->GuiUpdateScore(id,_players[id]->_profile.property);
         _uiManager->GuiJinBiShow((PlayerDir_t)id,gold[id]);        
     }
-}
-
-void RoundManager::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
-    int gold[3] = {0};
-
-    CalculateGold(gold,GoldWinner,Gold_kind,whoGive);
-    UpdateGold(gold);
 }
 
 /*****************************

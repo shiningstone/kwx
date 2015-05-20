@@ -23,21 +23,9 @@ class RoundManager {
     friend class RaceLayer;
 	friend class PlayerOthers;
     friend class LocalStrategy;
-public:
-    void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
 protected:
-    void UpdateGold(int gold[3]);
+    void update_gold(int gold[3]);
 private:
-    void CalcAnGangGold(int winner,int gold[3],int continueGang = 1);
-    void CalcMingGangGold(int winner,int giver,int gold[3],int continueGang = 1);
-    void CalcSingleWinGold(int gold[3], int winner,int whoGive);
-    void CalcDoubleWinGold(int gold[3], int giver);
-    void CalcNoneWinGold(int gold[3], int giver);
-    void CalcHuGold(int gold[3],const WinInfo_t &win);
-    void CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive);
-
-    int PREMIUM_LEAST;
-
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFrom(PlayerDir_t dir);

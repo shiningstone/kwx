@@ -33,7 +33,9 @@ LocalStrategy::LocalStrategy(RoundManager *rm)
 }
 
 void LocalStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
-    _rm->update_gold(GoldWinner,Gold_kind,whoGive);
+    int gold[3] = {0};
+    CalculateGold(gold,GoldWinner,Gold_kind,whoGive);
+    _rm->update_gold(gold);
 }
 
 /*************************************
@@ -50,35 +52,6 @@ public:
 NetworkStrategy::NetworkStrategy(RoundManager *rm)
     :RmStrategy(rm)
 {}
-
-/*************************************
-        singleton
-*************************************/
-RmStrategy* RmStrategy::_instance = NULL;
-
-RmStrategy::RmStrategy(RoundManager *rm) {
-    _rm = rm;
-}
-
-RmStrategy::~RmStrategy() {
-}
-
-RmStrategy *RmStrategy::getInstance(RoundManager *rm) {
-    if (_instance==NULL) {
-        if(rm->_MODE==LOCAL_GAME) {
-            _instance = new LocalStrategy(rm);
-        } else {
-            _instance = new NetworkStrategy(rm);
-        }
-    }
-
-    return _instance;
-}
-
-void RmStrategy::destroyInstance() {
-    delete _instance;
-    _instance = NULL;
-}
 
 /*************************************
         support
@@ -156,5 +129,34 @@ void LocalStrategy::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t 
         case HU_WIN:
             return CalcHuGold(gold,_rm->GetWin());
     }
+}
+
+/*************************************
+        singleton
+*************************************/
+RmStrategy* RmStrategy::_instance = NULL;
+
+RmStrategy::RmStrategy(RoundManager *rm) {
+    _rm = rm;
+}
+
+RmStrategy::~RmStrategy() {
+}
+
+RmStrategy *RmStrategy::getInstance(RoundManager *rm) {
+    if (_instance==NULL) {
+        if(rm->_MODE==LOCAL_GAME) {
+            _instance = new LocalStrategy(rm);
+        } else {
+            _instance = new NetworkStrategy(rm);
+        }
+    }
+
+    return _instance;
+}
+
+void RmStrategy::destroyInstance() {
+    delete _instance;
+    _instance = NULL;
 }
 

@@ -753,7 +753,7 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
-    UpdateGold((int *)info->val);
+    update_gold((int *)info->val);
 }
 
 /*************************************
