@@ -18,7 +18,7 @@ class Player;
 class RoundManager;
 class KwxMessenger;
 
-class NetRoundManager : public RoundManager {
+class NetRoundManager : public RoundManager, public MsgHandle {
     friend class RaceLayer;
 public:
     static NetRoundManager *getInstance();
@@ -26,12 +26,9 @@ public:
 
 /******************/
 /* networks start */
-    KwxMessenger   *_messenger;
-    MsgQueue       *_msgQueue;
+    virtual void HandleMsg(void * aMsg);
 
-    void HandleMsg(void * aMsg);
-    void ListenToMessenger();
-    void RecvMsg(void* val);
+    KwxMessenger   *_messenger;
 
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);

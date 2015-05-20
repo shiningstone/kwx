@@ -1,11 +1,7 @@
 
-#include "./../game/RaceLayer.h"
-#include "./../game/RoundManager.h"
-#include "./../game/NetRoundManager.h"
-
 #include "MsgQueue.h"
 
-MsgQueue::MsgQueue(NetRoundManager *employer){
+MsgQueue::MsgQueue(MsgHandle *employer){
     _queue    = new std::queue<void *>();
     _listener = employer;
 
@@ -57,7 +53,7 @@ void MsgQueue::push(void * netPackage){
 *************************************/
 MsgQueue* MsgQueue::_instance = NULL;
 
-MsgQueue *MsgQueue::getInstance(NetRoundManager *employer) {
+MsgQueue *MsgQueue::getInstance(MsgHandle *employer) {
     if (_instance==NULL) {
         _instance = new MsgQueue(employer);
     }
@@ -68,5 +64,16 @@ MsgQueue *MsgQueue::getInstance(NetRoundManager *employer) {
 void MsgQueue::destroyInstance() {
     delete _instance;
     _instance = NULL;
+}
+
+/*************************************
+        message handle
+*************************************/
+MsgHandle::MsgHandle() {
+    _msgQueue = MsgQueue::getInstance(this);
+}
+
+void MsgHandle::RecvMsg(void *val) {
+    _msgQueue->push(val);
 }
 

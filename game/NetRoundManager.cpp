@@ -81,14 +81,6 @@ void NetRoundManager::InitPlayers() {
 /****************************************
        networks
 ****************************************/
-void NetRoundManager::ListenToMessenger() {
-    _msgQueue = MsgQueue::getInstance(this);
-}
-
-void NetRoundManager::RecvMsg(void* val) {
-    _msgQueue->push(val);
-}
-
 void NetRoundManager::HandleMsg(void * aMsg) {
     auto di = static_cast<DsInstruction *>(aMsg);
 
@@ -221,7 +213,6 @@ void NetRoundManager::CreateRace(Scene *scene) {
     SeatInfo *seat = SeatInfo::getInstance();
     seat->Set(1,0x10010000,1,1);
 
-    ListenToMessenger();
     _messenger->StartReceiving();
     
     /**********************************************/
