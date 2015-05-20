@@ -250,11 +250,21 @@ bool CardInHand::is_wait_handout() const {
 }
 
 Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first group*/
-    for(INT8U i=FreeStart; i<size(); i++) {
-        int matchNum = find_cards(get_kind(i),cardIdx,i);
-
-        if(matchNum==4) {
-            return get_kind(i);
+    if(IsMing) {
+        for(INT8U i=0; i<size(); i++) {
+            int matchNum = find_cards(get_kind(i),cardIdx,i);
+        
+            if(matchNum==4) {
+                return get_kind(i);
+            }
+        }
+    } else {
+        for(INT8U i=FreeStart; i<size(); i++) {
+            int matchNum = find_cards(get_kind(i),cardIdx,i);
+        
+            if(matchNum==4) {
+                return get_kind(i);
+            }
         }
     }
     
@@ -276,14 +286,16 @@ int CardInHand::find_free_cards(int idx[],Card_t kind) const {
 void CardInHand::_AnGang(Card_t card) {
     int cardIdx[4] = {0};
 
-    Card_t kind = (card==CARD_UNKNOWN) ? find_an_gang_cards(cardIdx) : card;
+    Card_t kind = find_an_gang_cards(cardIdx);
     
     CardNode_t gangCard;
     gangCard.kind    = kind;
     gangCard.status  = sAN_GANG;
     gangCard.canPlay = false;
-    
-    delete_card(cardIdx[0],4);
+
+    for(int i=0;i<4;i++) {
+        delete_card(cardIdx[i]);
+    }
     insert_card(gangCard,4);
     
     FreeStart += 4;
