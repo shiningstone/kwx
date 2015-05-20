@@ -293,7 +293,11 @@ void CardInHand::_AnGang(Card_t card) {
     gangCard.status  = sAN_GANG;
     gangCard.canPlay = false;
 
-    for(int i=0;i<4;i++) {
+    for(int i=3;i>=0;i--) {
+        if(get_status(cardIdx[i])!=sFREE) {
+            FreeStart--;
+        }
+        
         delete_card(cardIdx[i]);
     }
     insert_card(gangCard,4);
@@ -519,6 +523,10 @@ void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind
 
 int CardInHand::_FindInsertPoint(CardNode_t data) const {
     if(data.status!=sFREE) {
+        if(FreeStart==0) {
+            return 0;
+        }
+        
         for(int i=FreeStart;i>0;i--) {
             if(get_status(i-1)!=sMING_KOU) {
                 return i;
