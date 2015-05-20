@@ -636,7 +636,7 @@ void RoundManager::WaitForTuoGuanHandle() {
         if(!_isNewDistributed) {
             if(_isQiangGangAsking) {
                 _isQiangGangAsking=false;
-                _strategy->show_gold((PlayerDir_t)_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_curPlayer);
+                _strategy->update_gold((PlayerDir_t)_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_curPlayer);
                 _qiangGangTargetNo=INVALID;
                 DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
             } else if(_isDoubleHuAsking) {
@@ -906,20 +906,20 @@ void RoundManager::_LoadRandomCardSequence() {
 /*****************************
     strategy support
 *****************************/
-void RoundManager::CalcAnGangGold(int winner,int gold[3]) {
-    gold[winner]       = 4*PREMIUM_LEAST*(_continue_gang_times);
-    gold[(winner+1)%3] = -2*PREMIUM_LEAST*(_continue_gang_times);
-    gold[(winner+2)%3] = -2*PREMIUM_LEAST*(_continue_gang_times);
+void RoundManager::CalcAnGangGold(int winner,int gold[3],int continueGang) {
+    gold[winner]       = 4*PREMIUM_LEAST*(continueGang);
+    gold[(winner+1)%3] = -2*PREMIUM_LEAST*(continueGang);
+    gold[(winner+2)%3] = -2*PREMIUM_LEAST*(continueGang);
 }
 
-void RoundManager::CalcMingGangGold(int winner,int giver,int gold[3]) {
+void RoundManager::CalcMingGangGold(int winner,int giver,int gold[3],int continueGang) {
     if (winner==giver) {
-        gold[winner]       = 2*PREMIUM_LEAST*(_continue_gang_times);
-        gold[(winner+1)%3] = -1*PREMIUM_LEAST*(_continue_gang_times);
-        gold[(winner+2)%3] = -1*PREMIUM_LEAST*(_continue_gang_times);
+        gold[winner]       = 2*PREMIUM_LEAST*(continueGang);
+        gold[(winner+1)%3] = -1*PREMIUM_LEAST*(continueGang);
+        gold[(winner+2)%3] = -1*PREMIUM_LEAST*(continueGang);
     } else {
-        gold[winner]       =2*PREMIUM_LEAST*(_continue_gang_times);
-        gold[giver]        =-2*PREMIUM_LEAST*(_continue_gang_times);
+        gold[winner]       =2*PREMIUM_LEAST*(continueGang);
+        gold[giver]        =-2*PREMIUM_LEAST*(continueGang);
     }
 }
 
@@ -956,10 +956,7 @@ void RoundManager::CalcNoneWinGold(int gold[3], int giver) {
     gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
 }
 
-void RoundManager::CalcHuGold(int gold[3]) {
-    WinInfo_t win;
-    GetWin(win);
-    
+void RoundManager::CalcHuGold(int gold[3],const WinInfo_t &win) {
     switch(win.kind) {
         case SINGLE_WIN:
             CalcSingleWinGold(gold,win.winner,win.giver);
@@ -976,11 +973,13 @@ void RoundManager::CalcHuGold(int gold[3]) {
 void RoundManager::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
     switch(goldKind) {
         case AN_GANG:
-            return CalcAnGangGold(GoldWinner,gold);
+            return CalcAnGangGold(GoldWinner,gold,_continue_gang_times);
         case MING_GANG:
-            return CalcMingGangGold(GoldWinner,whoGive,gold);
+            return CalcMingGangGold(GoldWinner,whoGive,gold,_continue_gang_times);
         case HU_WIN:
-            return CalcHuGold(gold);
+            WinInfo_t win;
+            GetWin(win);
+            return CalcHuGold(gold,win);
     }
 }
 
@@ -997,7 +996,7 @@ void RoundManager::UpdateGold(int gold[3]) {
     }
 }
 
-void RoundManager::show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
+void RoundManager::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
     int gold[3] = {0};
 
     CalculateGold(gold,GoldWinner,Gold_kind,whoGive);

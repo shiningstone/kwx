@@ -8,7 +8,7 @@ class RoundManager;
 class RmStrategy {
 
 public:
-    virtual void show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+    virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
     
 /***************************************
         singleton

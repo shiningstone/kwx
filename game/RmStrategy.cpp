@@ -9,8 +9,8 @@
 /*************************************
         local strategy
 *************************************/
-void RmStrategy::show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
-    _rm->show_gold(GoldWinner,Gold_kind,whoGive);
+void RmStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
+    _rm->update_gold(GoldWinner,Gold_kind,whoGive);
 }
 
 /*************************************
@@ -18,7 +18,7 @@ void RmStrategy::show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir
 *************************************/
 class NetworkStrategy : public RmStrategy {
 public:
-    virtual void show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+    virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
 
     NetworkStrategy(RoundManager *rm);
     ~NetworkStrategy();
@@ -30,7 +30,7 @@ NetworkStrategy::NetworkStrategy(RoundManager *rm)
 
 }
 
-void NetworkStrategy::show_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
+void NetworkStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
 }
 
 /*************************************

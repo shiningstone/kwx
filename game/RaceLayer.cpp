@@ -237,7 +237,7 @@ void RaceLayer::SingleWin(const WinInfo_t &win) {
 
 void RaceLayer::GangGoldEffect(int winner,int whoGive) {
     myframe->runAction(Sequence::create(CallFunc::create([=](){
-        _roundManager->_strategy->show_gold((PlayerDir_t)winner,MING_GANG,(PlayerDir_t)whoGive);}),CallFunc::create([=](){
+        _roundManager->_strategy->update_gold((PlayerDir_t)winner,MING_GANG,(PlayerDir_t)whoGive);}),CallFunc::create([=](){
         _roundManager->DistributeTo((PlayerDir_t)winner
             ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 }
@@ -615,7 +615,7 @@ void RaceLayer::ListenToDistributeCard() {
             Sequence::create(
                 DelayTime::create(0.5),CallFunc::create([=](){
     			if(_roundManager->_firstMingNo!=-1)
-    				_roundManager->_strategy->show_gold(INVALID_DIR,HU_WIN,(PlayerDir_t)_roundManager->_firstMingNo);}),
+    				_roundManager->_strategy->update_gold(INVALID_DIR,HU_WIN,(PlayerDir_t)_roundManager->_firstMingNo);}),
     			DelayTime::create(1),
     			Spawn::create(CallFunc::create([=](){
         			this->addChild(_object->CreateHuangZhuangBkg(),10,HUANG_ZHUANG_LAYER);
@@ -1049,7 +1049,7 @@ void RaceLayer::ListenToDoubleHu() {
                 RaceLayer::showall)),
                 simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+1)%3)),"dahu.png"),
                 simple_tip_effect( _layout->PositionOfActSign((PlayerDir_t)((_roundManager->_curPlayer+2)%3)),"dahu.png"),NULL),CallFunc::create([=](){
-            _roundManager->_strategy->show_gold(INVALID_DIR,HU_WIN,(PlayerDir_t)_roundManager->_curPlayer);}),NULL));
+            _roundManager->_strategy->update_gold(INVALID_DIR,HU_WIN,(PlayerDir_t)_roundManager->_curPlayer);}),NULL));
     });
     
     _eventDispatcher->addEventListenerWithFixedPriority(_doublehucallListener,2);
@@ -1760,7 +1760,7 @@ void RaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool i
                 ScaleTo::create(0,0),NULL)),NULL);
 
         goldEffect = CallFunc::create([=](){
-            _roundManager->_strategy->show_gold(dir,MING_GANG,prevDir);});
+            _roundManager->_strategy->update_gold(dir,MING_GANG,prevDir);});
     }
     
     myframe->runAction(Sequence::create(
@@ -2907,7 +2907,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             Spawn::create(
                 _voice->SpeakAction(aAN_GANG,_roundManager->_players[dir]->GetSex()),
                 simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),NULL), CallFunc::create([=](){
-			_roundManager->_strategy->show_gold(dir,AN_GANG,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
+			_roundManager->_strategy->update_gold(dir,AN_GANG,dir);}), Sequence::create(CCCallFunc::create(this,callfunc_selector(
             RaceLayer::_DeleteActionTip)), CallFunc::create([=](){
             _roundManager->UpdateCards(dir,a_AN_GANG,card);}), CCCallFunc::create([=]() {
             _CardInHandUpdateEffect(dir);}),
@@ -3202,7 +3202,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {
             _ReOrderCardsInHand(0,_roundManager->_players[MIDDLE]->_cards);}),
             DelayTime::create(0.48), CallFunc::create([=](){
-			_roundManager->_strategy->show_gold(dir,AN_GANG,dir);}),CallFunc::create([=](){
+			_roundManager->_strategy->update_gold(dir,AN_GANG,dir);}),CallFunc::create([=](){
             _roundManager->DistributeTo(dir
                 ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 	}
@@ -3625,7 +3625,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
             _roundManager->UpdateCards(dir,a_MING_GANG);}),
             DelayTime::create(0.48),CallFunc::create([=](){
 			if(!_roundManager->_isNewDistributed)
-				_roundManager->_strategy->show_gold(dir,MING_GANG,prevDir);}),CallFunc::create([=](){
+				_roundManager->_strategy->update_gold(dir,MING_GANG,prevDir);}),CallFunc::create([=](){
             _roundManager->ActionAfterGang(dir);}),NULL));
 	}
 }
@@ -3649,7 +3649,7 @@ void RaceLayer::_HuEffect(const WinInfo_t &win)
                 Spawn::create(
                     _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),NULL),CallFunc::create([=](){
-				_roundManager->_strategy->show_gold(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
+				_roundManager->_strategy->update_gold(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
                 RaceLayer::showall)),NULL));
 		} else {
             Sequence *backgroundEffect = _roundManager->IsMing(MIDDLE) 
@@ -3662,7 +3662,7 @@ void RaceLayer::_HuEffect(const WinInfo_t &win)
 			myframe->runAction(Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
                     _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),CallFunc::create([=](){
-    				_roundManager->_strategy->show_gold(winner,HU_WIN,giver);}),
+    				_roundManager->_strategy->update_gold(winner,HU_WIN,giver);}),
                     backgroundEffect,NULL));
 		}
 	} else {
@@ -3700,7 +3700,7 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
 
 				myframe->runAction(Sequence::create(
                     hideQiReminder,Spawn::create(CallFunc::create([=](){
-    					_roundManager->_strategy->show_gold((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
+    					_roundManager->_strategy->update_gold((PlayerDir_t)_roundManager->_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_roundManager->_curPlayer);
     					_roundManager->_qiangGangTargetNo = INVALID;/*!!! could this be called before runAction */}),CallFunc::create([=](){
                         _roundManager->DistributeTo((PlayerDir_t)_roundManager->_curPlayer
                             ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL),NULL));
