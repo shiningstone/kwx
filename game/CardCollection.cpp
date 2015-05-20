@@ -1034,28 +1034,36 @@ long CardInHand::CalcTimes(Card_t kind) {
     return sum_up_score(statHuFanMask);
 }
 
+int CardInHand::CollectTingItem(int idx,Card_t kind,const CardList *river) {
+    TingItem_t *tingCard = _ting->cards+ idx;
+    
+    tingCard->kind = kind;
+    
+    tingCard->fan  = CalcTimes(kind);
+    for(INT8U i=0;i<FreeStart;i++) {
+        if( get_kind(i)==kind && get_status(i)==sPENG) {
+            tingCard->fan *= 2;      /*BUG why ? MingSiGui???*/
+            break;
+        }
+    }
+    
+    if(river!=NULL) {
+        tingCard->remain = 4 - get_num(kind) - river->get_num(kind);
+    } else {
+        tingCard->remain = 0;
+    }
+
+    return tingCard->remain;
+}
+
 bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *river) {
     ting.cardNum = 0;
+    ting.huNum   = 0;
     ting.cards   = new TingItem_t[9];
 
     for(INT8U k=0;k<CARD_KIND_MAX;k++) {
         if( can_hu(position,k) ) {
-            TingItem_t *tingCard = ting.cards + ting.cardNum;
-            
-            tingCard->kind = (Card_t)k;
-            
-            tingCard->fan  = CalcTimes((Card_t)k);
-            for(INT8U i=0;i<FreeStart;i++) {
-                if( get_kind(i)==k && get_status(i)==sPENG) {
-                    tingCard->fan *= 2;      /*BUG why ? MingSiGui???*/
-                    break;
-                }
-            }
-
-            if(river!=NULL) {
-                tingCard->remain = 4 - get_num((Card_t)k) - river->get_num((Card_t)k);
-            }
-            
+            ting.huNum = CollectTingItem(ting.cardNum,(Card_t)k,river);
             ting.cardNum++;
         }
     }
@@ -1169,6 +1177,26 @@ bool CardInHand::get_ming_info(MRES *res) const {
 	} else {
         return false;
     }
+}
+
+void CardInHand::update_ting_num(const CardList *river) {
+    if(river!=NULL && _ting!=NULL) {
+        _ting->huNum = 0;
+        
+        for(int i=0;i<_ting->cardNum;i++) {
+            _ting->huNum += CollectTingItem(i,(_ting->cards+i)->kind,river);
+        }
+    }
+}
+
+int CardInHand::get_ting_num(Card_t choice) {
+    for(int i=0;i<_ming.choiceNum;i++) {
+        if(choice==(_ming.handouts+i)->kind) {
+            return (_ming.handouts+i)->ting.huNum;
+        }
+    }
+    
+    return INVALID;
 }
 
 TingInfo_t *CardInHand::get_ting_info(int idx) {
