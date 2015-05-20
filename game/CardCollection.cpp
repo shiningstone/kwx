@@ -1428,8 +1428,11 @@ void SmartList::insert(Card_t newCard) {
     for(int i=len-1;i>=0;i--) {
         if(newCard<kind[i]) {
             kind[i+1] = kind[i];
+            if(i==0) {
+                kind[0] = newCard;
+            }
         } else {
-            kind[i+1] = (Card_t)newCard;
+            kind[i+1] = newCard;
             break;
         }
     }

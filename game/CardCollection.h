@@ -218,6 +218,7 @@ protected:
 
     friend class CardInHand;
     friend class TestSmartList;
+    friend void test_can_hu();
 };
 
 #endif

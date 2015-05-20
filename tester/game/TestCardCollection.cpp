@@ -87,6 +87,20 @@ void test_remove() {
     cards.remove(3,deletes);
     assert( cards.Equals(exp) );
 
+    cards.Load(TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.insert(TIAO_3);
+    exp.Load(TIAO_3,TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    assert( cards.Equals(exp) );
+
+    cards.Load(TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.insert(TIAO_5);
+    exp.Load(TIAO_4,TIAO_5,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    assert( cards.Equals(exp) );
+
+    cards.Load(TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.insert(TIAO_6);
+    exp.Load(TIAO_4,TIAO_6,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    assert( cards.Equals(exp) );
 }
 
 void test_pattern_match() {
@@ -143,10 +157,18 @@ void test_pattern_match() {
 
 void test_can_hu() {
     TestSmartList cards;
-    cards.Load(TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_3,TIAO_3,TIAO_3,TIAO_3,
-        TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.Load(TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
     cards.insert(TIAO_5);
     assert(cards.can_hu());
+
+    cards.Load(TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.insert(TIAO_1);
+    assert(!cards.can_hu());
+
+    cards.Load(TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
+    cards.len--;                    
+    cards.insert(TIAO_1);       
+    assert(!cards.can_hu());
 }
 
 class son {
