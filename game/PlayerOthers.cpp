@@ -425,9 +425,30 @@ int PlayerOthers::PickupForPiHu() {
 }
 
 int PlayerOthers::PickupForMing() {
-    if(_cards->_ming.choiceNum>0) {
+    Card_t target = CARD_UNKNOWN;
+    int    minum  = 0;
+    
+    if(_cards->collect_ming_info(_ctx.river)) {
+        for(int i=0;i<_cards->_ming.choiceNum;i++) {
+            MingChoice_t  *choice = _cards->_ming.handouts+i;
+
+            if(!OthersCanHu(choice->kind)) {
+                int num = _cards->get_ting_num(target);
+
+                if(minum > num) {
+                    target = choice->kind;
+                    minum = num;
+                }
+            }
+        }
     }
 
+    for(int i=0;i<_cards->size();i++) {
+        if(_cards->get_kind(i)==target) {
+            return i;
+        }
+    }
+    
     return INVALID;
 }
 
