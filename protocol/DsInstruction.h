@@ -159,7 +159,7 @@ public:
     virtual int  Construct(const DsMsg &msg);
     
     INT8U            seat[3];
-    INT32U           val[3];
+    INT32S           val[3];
 };
 
 class TingInfoResponse : public DsInstruction {

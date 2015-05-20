@@ -773,9 +773,6 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } else if(recvBuf[16]==REQ_GAME_SEND_START) {
         SendLine(SERVER,6);
         SendLine(SERVER,7);
-        handout++;
-    
-        SendLine(SERVER,i);
     } else if(handout==1) {
         handout++;
         for(int i=8;i<10;i++) {
