@@ -146,6 +146,7 @@ public:
 class DistCardNotif : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
+    virtual void Show() const;
     
     INT8U            seat;
     INT8U            remain;

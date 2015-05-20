@@ -212,6 +212,11 @@ int DistCardNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+void DistCardNotif::Show() const {
+     DsInstruction::Show();
+     LOGGER_WRITE("%s\n",DescPlayer((PlayerDir_t)seat));
+}
+
 int ScoreNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
 
