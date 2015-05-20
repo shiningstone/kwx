@@ -8,6 +8,8 @@ Player::Player() {
     _cards = NULL;
     _river = NULL;
 
+    _isReady = false;
+
     memset(&_profile,0,sizeof(UserProfile_t));
 
     _logger = LOGGER_REGISTER("Player");
@@ -16,6 +18,8 @@ Player::Player() {
 Player::Player(int id) {//this is for default settings ( robot ) 
     _cards = NULL;
     _river = NULL;
+
+    _isReady = false;
 
     memset(&_profile,0,sizeof(UserProfile_t));
 
@@ -49,7 +53,6 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     _fan     = 0;
 	_score   = 0;
 
-    _isReady = false;
     _cards = new CardInHand();
     _river = new CardList();
 
