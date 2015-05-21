@@ -2,7 +2,7 @@
 #ifndef __STRATEGY_PLAYER__
 #define __STRATEGY_PLAYER__
 
-#include "utils/BasicType.h"
+#include "game/GameType.h"
 
 class Player;
 class RoundManager;

@@ -10,7 +10,7 @@ using namespace ui;
 
 #include "GameLayout.h"
 
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 #include "./../utils/LogManager.h"
 
 typedef enum {

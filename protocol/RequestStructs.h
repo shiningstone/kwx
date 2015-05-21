@@ -3,7 +3,7 @@
 #define _REQUEST_STRUCTS_
 
 #include "./../utils/UtilBasic.h"
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 
 #include "KwxMsgBasic.h"
 

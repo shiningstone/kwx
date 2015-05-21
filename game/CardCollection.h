@@ -7,7 +7,8 @@ using namespace std;
 
 #include "./../RaceType.h"
 
-#include "./../utils/BasicType.h"
+#include "GameType.h"
+
 #include "./../utils/LogManager.h"
 
 class CardList : public vector<CardNode_t *> {

@@ -2,7 +2,7 @@
 #ifndef __RM_STRATEGY__
 #define __RM_STRATEGY__
 
-#include "./../utils/BasicType.h"
+#include "GameType.h"
 
 class RoundManager;
 class StrategyRm {

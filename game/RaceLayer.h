@@ -7,7 +7,8 @@ using namespace CocosDenshion;
 #include "account.h"
 #include "Resources.h"
 
-#include "./../utils/BasicType.h"
+#include "GameType.h"
+
 #include "./../utils/LogManager.h"
 #include "./../multimedia/VoiceEffect.h"
 #include "./../multimedia/GameLayout.h"

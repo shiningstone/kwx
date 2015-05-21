@@ -37,7 +37,7 @@ private:
         if a player is allowed to join more than one table in the meantime,
         getInstance should be called with the param "threadInfo"
 ********************************************************************************/
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 class SeatInfo {
 public:
     friend class UsMsg;

@@ -3,7 +3,7 @@
 
 #include "./../RaceType.h"
 
-#include "./../utils/BasicType.h"
+#include "GameType.h"
 
 #include "StrategyPlayer.h"
 #include "DataBase.h"

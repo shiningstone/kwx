@@ -5,7 +5,7 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 #include "./../utils/LogManager.h"
 
 typedef struct {

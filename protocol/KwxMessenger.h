@@ -3,7 +3,7 @@
 #define __KWX_MESSENGER_H__
 
 #include "./../utils/UtilBasic.h"
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 #include "./../utils/LogManager.h"
 
 class NetMessenger;

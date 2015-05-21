@@ -10,7 +10,7 @@ USING_NS_CC;
 USING_NS_CC;
 using namespace ui;
 
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 
 typedef enum {
     PENG,

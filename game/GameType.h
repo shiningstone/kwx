@@ -1,8 +1,8 @@
 
-#ifndef __BASIC_TYPE__
-#define __BASIC_TYPE__
+#ifndef __GAME_TYPE__
+#define __GAME_TYPE__
 
-#include "UtilBasic.h"
+#include "./../utils/UtilBasic.h"
 
 #define INVALID -1
 #define PLAYER_NUM  3

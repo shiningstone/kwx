@@ -3,7 +3,7 @@
 #define _DS_MSG_PARSER_
 
 #include "./../utils/UtilBasic.h"
-#include "./../utils/BasicType.h"
+#include "./../game/GameType.h"
 #include "./../utils/LogManager.h"
 #include "./../game/CardCollection.h"
 

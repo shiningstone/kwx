@@ -10,7 +10,8 @@ using namespace ui;
 
 #include "RaceType.h"
 
-#include "./../utils/BasicType.h"
+#include "GameType.h"
+
 #include "./../utils/LogManager.h"
 #include "CardCollection.h"
 

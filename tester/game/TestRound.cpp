@@ -1,5 +1,5 @@
 
-#include "./../../utils/BasicType.h"
+#include "./../../game/GameType.h"
 
 typedef struct CardSeq {
     int player1[14];

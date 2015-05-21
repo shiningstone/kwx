@@ -1,5 +1,5 @@
 
-#include "./../../utils/BasicType.h"
+#include "./../../game/GameType.h"
 
 #include "./../../protocol/RequestStructs.h"
 #include "./../../protocol/CommonMsg.h"
