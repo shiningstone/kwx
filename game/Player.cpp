@@ -100,8 +100,8 @@ ActionMask_t Player::judge_action_again() {
 ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
 	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
-	if(_cards->can_hu((Card_t)newCard)) {
-		_score = _strategy->calc_score((Card_t)newCard,isNewDistributed,isLastOne,lastActionWithGold,continue_gang_times,isGangHua);
+	if(_cards->can_hu(newCard)) {
+		_score = _strategy->calc_score(newCard);
 
 		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
 			actions |= aHU;

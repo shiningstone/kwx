@@ -12,7 +12,7 @@ public:
     StrategyPlayer(Player *aPlayer);
     void assign(RoundManager *context);
 
-    long calc_score(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//·ÖÊý¼ÆËã
+    long calc_score(Card_t kind);
     void check_task(unsigned int flag);
 
 protected:

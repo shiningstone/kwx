@@ -22,6 +22,7 @@ class RoundManager {
     friend class RaceLayer;
 	friend class PlayerOthers;
     friend class StrategyLocalRM;
+	friend class StrategyPlayer;
 protected:
     void update_gold(int gold[3]);
 private:
