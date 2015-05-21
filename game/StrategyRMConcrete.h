@@ -5,12 +5,12 @@
 /*************************************
         local strategy
 *************************************/
-class LocalStrategy : public RmStrategy {
+class StrategyLocalRM : public StrategyRm {
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
 
-    LocalStrategy(RoundManager *rm);
-    ~LocalStrategy();
+    StrategyLocalRM(RoundManager *rm);
+    ~StrategyLocalRM();
 private:
     int  PREMIUM_LEAST;
 
@@ -26,12 +26,12 @@ private:
 /*************************************
         network strategy
 *************************************/
-class NetworkStrategy : public RmStrategy {
+class StrategyNetworkRM : public StrategyRm {
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {}
 
-    NetworkStrategy(RoundManager *rm);
-    ~NetworkStrategy();
+    StrategyNetworkRM(RoundManager *rm);
+    ~StrategyNetworkRM();
 };
 
 #endif

@@ -2,7 +2,7 @@
 #include "RaceLayer.h"
 #include "HelloWorldScene.h"
 #include "RoundManager.h"
-#include "RmStrategy.h"
+#include "StrategyRm.h"
 
 #include "PlayerOthers.h"
 

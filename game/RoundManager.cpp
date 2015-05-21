@@ -7,15 +7,17 @@
 #include "Player.h"
 #include "RaceLayer.h"
 #include "RoundManager.h"
-#include "RmStrategy.h"
+#include "StrategyRm.h"
 
+#include "Player.h"
+#include "PlayerOthers.h"
 
 RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
 
     _uiManager = uiManager;
-	RmStrategy::destroyInstance();
-    _strategy  = RmStrategy::getInstance(this);
+	StrategyRm::destroyInstance();
+    _strategy  = StrategyRm::getInstance(this);
 
     _lastWin.winner = INVALID_DIR;
     _lastWin.giver  = INVALID_DIR;
@@ -40,69 +42,8 @@ RoundManager::~RoundManager() {
 }
 
 /***********************************************
-        winner information
-***********************************************/
-PlayerDir_t RoundManager::GetLastWinner() {
-    if( _lastWin.winner==INVALID_DIR ) {
-        LOGGER_WRITE("NETWORK: Request(last winner) not defined");
-        _lastWin.winner = MIDDLE;
-    }
-    return _lastWin.winner;
-}
-
-void RoundManager::SetWin(WinKind_t kind,int player) {
-    _lastWin.kind       = kind;
-
-    if(kind==DOUBLE_WIN) {
-        _lastWin.winner = INVALID_DIR;
-        _lastWin.giver  = (PlayerDir_t)player;
-    } else {
-        _lastWin.winner = (PlayerDir_t)player;
-        _lastWin.giver  = (PlayerDir_t)_curPlayer;
-    }
-}
-
-const WinInfo_t &RoundManager::GetWin() {
-    return _lastWin;
-}
-
-bool RoundManager::IsWinner(int no) {
-	if((_lastWin.kind==SINGLE_WIN&&
-                ((_lastWin.winner==_curPlayer && _lastWin.winner!=no)
-                ||(_lastWin.winner!=_curPlayer && no!=_lastWin.winner && no!=_curPlayer)))
-        ||(_lastWin.kind==NONE_WIN && _firstMingNo!=INVALID && no!=_firstMingNo)) {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-/***********************************************
-        general operations
-***********************************************/
-bool RoundManager::IsMing(int id) const{
-    return _players[id]->_cards->IsMing;
-}
-
-PlayerDir_t RoundManager::TurnToNext() {
-    _curPlayer = (_curPlayer+1)%PLAYER_NUM;
-    return (PlayerDir_t)_curPlayer;
-}
-
-/***********************************************
-        river information
-***********************************************/
-void RoundManager::RecordOutCard( Card_t kind ) {
-    _gRiver->push_back(kind);
-    _gRiver->show();
-}
-
-/***********************************************
         player information
 ***********************************************/
-#include "Player.h"
-#include "PlayerOthers.h"
-
 void RoundManager::InitPlayers() {
 	_players[0] = new PlayerOthers();
 	_players[1] = new Player();
@@ -113,8 +54,7 @@ void RoundManager::InitPlayers() {
     int  ids[3] = {0};
     _GenerateIds(ids);
 
-    for(int dir=0;dir<3;dir++)
-    {   
+    for(int dir=0;dir<3;dir++) {   
         UserProfile_t profile = {0};
         database->GetUserProfile(ids[dir],profile);
         _players[dir]->Set(&profile);
@@ -122,8 +62,8 @@ void RoundManager::InitPlayers() {
 }
 
 void RoundManager::_GenerateIds(int ids[]) {
-    ids[0]=rand()%16;
-    ids[1]=17;
+    ids[0] = rand()%16;
+    ids[1] = 17;
     
     do {
         ids[2]=rand()%16;
@@ -169,36 +109,6 @@ int RoundManager::Shuffle() {
     return 0;
 }
 
-
-/****************************************
-        before start
-****************************************/
-void RoundManager::set_aims_sequence(const int p_aim[]) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-	for(int i=0;i<3;i++)
-		aim[i]=p_aim[i];
-}
-
-/****************************************
-        effect card
-****************************************/
-void RoundManager::CancelEffectCard() {
-    _curEffectCard.kind = ck_NOT_DEFINED;
-    _curEffectCard.status = c_NOT_DEFINDED;
-}
-
-void RoundManager::SetEffectCard(int kind,int status) {
-    _curEffectCard.kind = (CARD_KIND)kind;
-    _curEffectCard.status = (CARD_STATUS)status;
-}
-
-bool RoundManager::IsCurEffectCard(const CardNode_t *card) {
-    if(card->kind==_curEffectCard.kind && card->status==_curEffectCard.status) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 /****************************************
        main interface
@@ -882,6 +792,95 @@ Card_t RoundManager::LastHandout() const {
 Card_t RoundManager::NewDistribute() const {
     return (Card_t)_unDistributedCards[_distributedNum-1];
 }
+
+/***********************************************
+        winner information
+***********************************************/
+PlayerDir_t RoundManager::GetLastWinner() {
+    if( _lastWin.winner==INVALID_DIR ) {
+        LOGGER_WRITE("NETWORK: Request(last winner) not defined");
+        _lastWin.winner = MIDDLE;
+    }
+    return _lastWin.winner;
+}
+
+void RoundManager::SetWin(WinKind_t kind,int player) {
+    _lastWin.kind       = kind;
+
+    if(kind==DOUBLE_WIN) {
+        _lastWin.winner = INVALID_DIR;
+        _lastWin.giver  = (PlayerDir_t)player;
+    } else {
+        _lastWin.winner = (PlayerDir_t)player;
+        _lastWin.giver  = (PlayerDir_t)_curPlayer;
+    }
+}
+
+const WinInfo_t &RoundManager::GetWin() {
+    return _lastWin;
+}
+
+bool RoundManager::IsWinner(int no) {
+	if((_lastWin.kind==SINGLE_WIN&&
+                ((_lastWin.winner==_curPlayer && _lastWin.winner!=no)
+                ||(_lastWin.winner!=_curPlayer && no!=_lastWin.winner && no!=_curPlayer)))
+        ||(_lastWin.kind==NONE_WIN && _firstMingNo!=INVALID && no!=_firstMingNo)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/***********************************************
+        general operations
+***********************************************/
+bool RoundManager::IsMing(int id) const{
+    return _players[id]->_cards->IsMing;
+}
+
+PlayerDir_t RoundManager::TurnToNext() {
+    _curPlayer = (_curPlayer+1)%PLAYER_NUM;
+    return (PlayerDir_t)_curPlayer;
+}
+
+/***********************************************
+        river information
+***********************************************/
+void RoundManager::RecordOutCard( Card_t kind ) {
+    _gRiver->push_back(kind);
+    _gRiver->show();
+}
+
+/****************************************
+        before start
+****************************************/
+void RoundManager::set_aims_sequence(const int p_aim[]) {
+    LOGGER_WRITE("%s",__FUNCTION__);
+	for(int i=0;i<3;i++)
+		aim[i]=p_aim[i];
+}
+
+/****************************************
+        effect card
+****************************************/
+void RoundManager::CancelEffectCard() {
+    _curEffectCard.kind = ck_NOT_DEFINED;
+    _curEffectCard.status = c_NOT_DEFINDED;
+}
+
+void RoundManager::SetEffectCard(int kind,int status) {
+    _curEffectCard.kind = (CARD_KIND)kind;
+    _curEffectCard.status = (CARD_STATUS)status;
+}
+
+bool RoundManager::IsCurEffectCard(const CardNode_t *card) {
+    if(card->kind==_curEffectCard.kind && card->status==_curEffectCard.status) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 /*************************************
         singleton
 *************************************/

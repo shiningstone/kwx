@@ -5,7 +5,7 @@
 #include "./../utils/BasicType.h"
 
 class RoundManager;
-class RmStrategy {
+class StrategyRm {
 
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) = 0;
@@ -14,15 +14,15 @@ public:
         singleton
 ***************************************/
 public:
-    static RmStrategy *getInstance(RoundManager *rm);
+    static StrategyRm *getInstance(RoundManager *rm);
     static void  destroyInstance();
 protected:
     RoundManager *_rm;
 
-    RmStrategy(RoundManager *rm);
-    ~RmStrategy();
+    StrategyRm(RoundManager *rm);
+    ~StrategyRm();
 
-    static RmStrategy *_instance;
+    static StrategyRm *_instance;
 };
 
 #endif

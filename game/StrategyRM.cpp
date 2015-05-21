@@ -4,17 +4,17 @@
 #include "RoundManager.h"
 #include "RaceLayer.h"
 
-#include "RmStrategy.h"
-#include "RmStrategyConcrete.h"
+#include "StrategyRm.h"
+#include "StrategyRmConcrete.h"
 /*************************************
         local strategy
 *************************************/
-LocalStrategy::LocalStrategy(RoundManager *rm)
-    :RmStrategy(rm) {
+StrategyLocalRM::StrategyLocalRM(RoundManager *rm)
+    :StrategyRm(rm) {
     PREMIUM_LEAST = 200;
 }
 
-void LocalStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
+void StrategyLocalRM::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
     int gold[3] = {0};
     CalculateGold(gold,GoldWinner,Gold_kind,whoGive);
     _rm->update_gold(gold);
@@ -23,20 +23,20 @@ void LocalStrategy::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,Play
 /*************************************
         network strategy
 *************************************/
-NetworkStrategy::NetworkStrategy(RoundManager *rm)
-    :RmStrategy(rm)
+StrategyNetworkRM::StrategyNetworkRM(RoundManager *rm)
+    :StrategyRm(rm)
 {}
 
 /*************************************
         support
 *************************************/
-void LocalStrategy::CalcAnGangGold(int winner,int gold[3],int continueGang) {
+void StrategyLocalRM::CalcAnGangGold(int winner,int gold[3],int continueGang) {
     gold[winner]       = 4*PREMIUM_LEAST*(continueGang);
     gold[(winner+1)%3] = -2*PREMIUM_LEAST*(continueGang);
     gold[(winner+2)%3] = -2*PREMIUM_LEAST*(continueGang);
 }
 
-void LocalStrategy::CalcMingGangGold(int winner,int giver,int gold[3],int continueGang) {
+void StrategyLocalRM::CalcMingGangGold(int winner,int giver,int gold[3],int continueGang) {
     if (winner==giver) {
         gold[winner]       = 2*PREMIUM_LEAST*(continueGang);
         gold[(winner+1)%3] = -1*PREMIUM_LEAST*(continueGang);
@@ -47,7 +47,7 @@ void LocalStrategy::CalcMingGangGold(int winner,int giver,int gold[3],int contin
     }
 }
 
-void LocalStrategy::CalcSingleWinGold(int gold[3], int winner,int whoGive) {
+void StrategyLocalRM::CalcSingleWinGold(int gold[3], int winner,int whoGive) {
     auto score = _rm->_players[winner]->get_score();
     gold[winner] = score*PREMIUM_LEAST;
     
@@ -63,7 +63,7 @@ void LocalStrategy::CalcSingleWinGold(int gold[3], int winner,int whoGive) {
     gold[winner] = - (gold[(winner+1)%3] + gold[(winner+2)%3]);
 }
 
-void LocalStrategy::CalcDoubleWinGold(int gold[3], int giver) {
+void StrategyLocalRM::CalcDoubleWinGold(int gold[3], int giver) {
     for(int i=1;i<3;i++) {
         auto score = _rm->_players[(giver+i)%3]->get_score();
         int  ting  = _rm->IsMing((giver+i)%3);
@@ -74,13 +74,13 @@ void LocalStrategy::CalcDoubleWinGold(int gold[3], int giver) {
     gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
 }
 
-void LocalStrategy::CalcNoneWinGold(int gold[3], int giver) {
+void StrategyLocalRM::CalcNoneWinGold(int gold[3], int giver) {
     gold[(giver+1)%3] = PREMIUM_LEAST;
     gold[(giver+2)%3] = PREMIUM_LEAST;
     gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
 }
 
-void LocalStrategy::CalcHuGold(int gold[3],const WinInfo_t &win) {
+void StrategyLocalRM::CalcHuGold(int gold[3],const WinInfo_t &win) {
     switch(win.kind) {
         case SINGLE_WIN:
             CalcSingleWinGold(gold,win.winner,win.giver);
@@ -94,7 +94,7 @@ void LocalStrategy::CalcHuGold(int gold[3],const WinInfo_t &win) {
     }
 }
 
-void LocalStrategy::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
+void StrategyLocalRM::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
     switch(goldKind) {
         case AN_GANG:
             return CalcAnGangGold(GoldWinner,gold,_rm->_continue_gang_times);
@@ -108,28 +108,28 @@ void LocalStrategy::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t 
 /*************************************
         singleton
 *************************************/
-RmStrategy* RmStrategy::_instance = NULL;
+StrategyRm* StrategyRm::_instance = NULL;
 
-RmStrategy::RmStrategy(RoundManager *rm) {
+StrategyRm::StrategyRm(RoundManager *rm) {
     _rm = rm;
 }
 
-RmStrategy::~RmStrategy() {
+StrategyRm::~StrategyRm() {
 }
 
-RmStrategy *RmStrategy::getInstance(RoundManager *rm) {
+StrategyRm *StrategyRm::getInstance(RoundManager *rm) {
     if (_instance==NULL) {
         if(rm->_MODE==LOCAL_GAME) {
-            _instance = new LocalStrategy(rm);
+            _instance = new StrategyLocalRM(rm);
         } else {
-            _instance = new NetworkStrategy(rm);
+            _instance = new StrategyNetworkRM(rm);
         }
     }
 
     return _instance;
 }
 
-void RmStrategy::destroyInstance() {
+void StrategyRm::destroyInstance() {
     delete _instance;
     _instance = NULL;
 }

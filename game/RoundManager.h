@@ -17,12 +17,12 @@ using namespace ui;
 extern void load_test_round(int idx,int *output);
 
 class Player;
-class RmStrategy;
+class StrategyRm;
 
 class RoundManager {
     friend class RaceLayer;
 	friend class PlayerOthers;
-    friend class LocalStrategy;
+    friend class StrategyLocalRM;
 protected:
     void update_gold(int gold[3]);
 private:
@@ -106,7 +106,7 @@ public:
     virtual void CreateRace(Scene *scene);
     virtual void StartGame();
 
-    RmStrategy *_strategy;
+    StrategyRm *_strategy;
 protected:
     typedef struct _Context_t {
     }Context_t;
