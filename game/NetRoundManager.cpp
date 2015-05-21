@@ -757,9 +757,7 @@ void NetRoundManager::_DiRecv(ScoreNotif *info) {
 /*************************************
         singleton
 *************************************/
-NetRoundManager* NetRoundManager::_instance = NULL;
-
-NetRoundManager *NetRoundManager::getInstance() {
+RoundManager *NetRoundManager::getInstance() {
     if (_instance==NULL) {
         _instance = new NetRoundManager(NULL);
     }

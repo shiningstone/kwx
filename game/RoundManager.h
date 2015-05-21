@@ -156,7 +156,7 @@ protected:
     Logger *_logger;
 private:
     void _LoadRandomCardSequence();
-
+protected:
     static RoundManager *_instance;
 };
 

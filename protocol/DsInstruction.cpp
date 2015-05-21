@@ -23,7 +23,7 @@ DsInstruction::DsInstruction() {
     _seatInfo = SeatInfo::getInstance();
     
     #ifndef __UNIT_TEST__
-    _roundManager = NetRoundManager::getInstance();
+    _roundManager = static_cast<NetRoundManager *>(NetRoundManager::getInstance());
     #endif
     _logger = LOGGER_REGISTER("DsInstruction");
 }

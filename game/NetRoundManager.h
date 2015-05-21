@@ -19,7 +19,7 @@ class KwxMessenger;
 class NetRoundManager : public RoundManager, public MsgHandle {
     friend class RaceLayer;
 public:
-    static NetRoundManager *getInstance();
+    static RoundManager *getInstance();
     static void  destroyInstance();
 
 /******************/
@@ -84,8 +84,6 @@ public:
 private:
     NetRoundManager(RaceLayer *uiManager);
     ~NetRoundManager();
-
-    static NetRoundManager *_instance;
 };
 
 #endif
