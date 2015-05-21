@@ -51,6 +51,8 @@ public:
     bool   is_wait_handout() const;
     int    find_free_cards(int cardIdx[],Card_t card) const;
 
+    CartApperance_t get_appearance(int idx,PlayerDir_t dir,bool isMiddleMing) const;
+
     void   perform(ActionId_t act,bool isZimo=false);
     void   others_perform(bool isNewDistributed,ActionId_t act,Card_t kind);
 

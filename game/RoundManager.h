@@ -82,10 +82,7 @@ public:
     void SetDecision(PlayerDir_t dir,ActionId_t act);
 
     void QiangGangHuJudge(PlayerDir_t dir);
-    CartApperance_t GetCardApperance(PlayerDir_t dir,int idx);
     
-    int _GroupIdx(int idx,CARD_ARRAY *cards);
-
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     const WinInfo_t &GetWin();

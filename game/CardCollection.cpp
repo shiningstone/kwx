@@ -462,6 +462,34 @@ void CardInHand::_AcceptNewCard() {
     insert_card(node,1);
 }
 
+CartApperance_t CardInHand::get_appearance(int idx,PlayerDir_t dir,bool isMiddleMing) const{
+    CardStatus_t status = get_status(idx);
+
+    if(status==sFREE) {
+        if(IsMing) {
+            return LAYDOWN_SHOW ;
+        } else if (isMiddleMing) {
+            return LAYDOWN_HIDE ;
+        }
+    } else if(status==sPENG || status==sMING_GANG) {
+        return LAYDOWN_SHOW ;
+    } else if(status==sAN_GANG) {
+        int groupIdx = get_idx_in_group(idx);
+        
+        if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
+            if(!IsMing && isMiddleMing) {/* here must be a bug */
+                if(IsMing) {
+                    return LAYDOWN_SHOW;
+                } else if(!IsMing&&isMiddleMing) {
+                    return LAYDOWN_HIDE;
+                }
+            }
+        }
+    }
+
+    return NORMAL_APPERANCE;
+}
+
 void CardInHand::perform(ActionId_t act,bool isZimo) {
     if(act==aAN_GANG) {
         _AnGang();

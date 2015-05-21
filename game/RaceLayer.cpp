@@ -289,7 +289,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 			if(dir==LEFT || dir==RIGHT) {
 				p_list[i] = _CreateCardInHand(dir,i,cards,isMing,Vec2(x,y));
                 
-				CartApperance_t apperance = _roundManager->GetCardApperance(dir,i);
+				CartApperance_t apperance = cards->get_appearance(i,dir,_roundManager->IsMing(MIDDLE));
                 if(apperance!=NORMAL_APPERANCE) {
                     _object->LayDownWithFace((PlayerDir_t)dir, p_list[i], cards->get_kind(i),apperance);
                 }

@@ -421,48 +421,6 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
 	}
 }
 
-int RoundManager::_GroupIdx(int idx,CARD_ARRAY *cards) {
-    if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind==cards->data[idx+3].kind)&&(cards->data[idx].kind!=cards->data[idx+4].kind))
-        return 1;
-    else if((cards->data[idx].kind==cards->data[idx+1].kind)&&(cards->data[idx].kind==cards->data[idx+2].kind)&&(cards->data[idx].kind!=cards->data[idx+3].kind))
-        return 2;
-    else if(cards->data[idx].kind==cards->data[idx+1].kind&&cards->data[idx].kind!=cards->data[idx+2].kind)
-        return 3;
-    else if(cards->data[idx].kind!=cards->data[idx+1].kind)
-        return 4;
-}
-
-CartApperance_t RoundManager::GetCardApperance(PlayerDir_t dir,int idx) {
-    CardStatus_t status = _players[dir]->_cards->get_status(idx);
-
-    bool isTing       = IsMing(dir);
-    bool isMiddleTing = IsMing(MIDDLE);
-    
-    if(status==sFREE) {
-        if(isTing) {
-            return LAYDOWN_SHOW ;
-        } else if (isMiddleTing) {
-            return LAYDOWN_HIDE ;
-        }
-    } else if(status==sPENG || status==sMING_GANG) {
-        return LAYDOWN_SHOW ;
-    } else if(status==sAN_GANG) {
-        int groupIdx = _players[dir]->_cards->get_idx_in_group(idx);
-        
-        if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
-            if(!isTing && isMiddleTing) {/* here must be a bug */
-                if(isTing) {
-                    return LAYDOWN_SHOW;
-                } else if(!isTing&&isMiddleTing) {
-                    return LAYDOWN_HIDE;
-                }
-            }
-        }
-    }
-
-    return NORMAL_APPERANCE;
-}
-
 void RoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->clear_kou_choices();
     _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
