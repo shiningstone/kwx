@@ -57,9 +57,6 @@ public:
 /* networks end   */
 /******************/
 
-    NetRoundManager(RaceLayer *uiManager);
-    ~NetRoundManager();
-
     virtual Card_t RecvPeng(PlayerDir_t dir);
     virtual void RecvHu(PlayerDir_t dir);
     virtual Card_t RecvGang(PlayerDir_t dir);
@@ -85,6 +82,9 @@ public:
     virtual void CreateRace(Scene *scene);
     virtual void StartGame();
 private:
+    NetRoundManager(RaceLayer *uiManager);
+    ~NetRoundManager();
+
     static NetRoundManager *_instance;
 };
 

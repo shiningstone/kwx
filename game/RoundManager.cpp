@@ -14,7 +14,6 @@ RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
 
     _uiManager = uiManager;
-	StrategyRm::destroyInstance();
     _strategy  = StrategyRm::getInstance(this);
 
     _lastWin.winner = INVALID_DIR;
