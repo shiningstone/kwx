@@ -7,6 +7,7 @@
 
 StrategyPlayer::StrategyPlayer(Player *aPlayer) {
     _employer = aPlayer;
+	_ctx = RoundManager::getInstance();
 }
 
 void StrategyPlayer::assign(RoundManager *context) {
