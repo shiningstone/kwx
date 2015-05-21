@@ -2,8 +2,6 @@
 #ifndef __PLAYER_OTHERS__
 #define __PLAYER_OTHERS__
 
-#include "RaceType.h"
-
 #include "Player.h"
 
 class Logger;
@@ -30,7 +28,7 @@ class PlayerOthers:public Player
             /* self */
             KindPosition  cards[TOTAL_CARD_KIND];
             int           huNum;
-            ROBOT_TARGET  aim;
+            RobotTarget_t aim;
         }Context_t;
 
         Context_t    _ctx;

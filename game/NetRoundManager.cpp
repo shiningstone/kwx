@@ -7,8 +7,6 @@ USING_NS_CC;
 #include "./../protocol/CommonMsg.h"
 #include "./../protocol/KwxMessenger.h"
 
-#include "RaceType.h"
-
 #include "CardCollection.h"
 #include "Player.h"
 #include "RaceLayer.h"

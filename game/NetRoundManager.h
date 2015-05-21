@@ -12,8 +12,6 @@ using namespace ui;
 #include "./../utils/MsgQueue.h"
 #include "./../protocol/DsInstruction.h"
 
-#include "RaceType.h"
-
 class Player;
 class RoundManager;
 class KwxMessenger;

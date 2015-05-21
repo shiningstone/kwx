@@ -6,7 +6,6 @@
 using namespace std;
 
 #include "./../RaceType.h"
-
 #include "GameType.h"
 
 #include "./../utils/LogManager.h"
@@ -59,7 +58,7 @@ public:
 
     int          FreeStart;
     bool         IsMing;
-    ROBOT_TARGET aim;
+    RobotTarget_t aim;
 
     Card_t find_an_gang_cards(int cardIdx[]) const;
     Card_t find_ming_gang_cards(int idx[],Card_t kind) const;
@@ -148,7 +147,7 @@ public:
     bool can_hu(int position, int newKind) const;
     bool can_kou(Card_t kouKind,Card_t handingout=CARD_UNKNOWN) const;
     
-    ROBOT_TARGET assess_aim();
+    RobotTarget_t assess_aim();
     bool is_aim_limit(unsigned int act, Card_t kind) const;
     bool PreferQingYiSe(int &targetColor) const;
     int GetCoupleNum() const;

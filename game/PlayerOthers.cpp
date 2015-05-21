@@ -952,16 +952,16 @@ int PlayerOthers::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIN
 	
 	switch(card_array->target)
 	{
-		case SAME_TIAO_TARGET:
+		case SAME_TIAO:
 			chose_place=Robot_picup_single_for_samecolor(1,card_array,list1,list2,len1,len2);
 			break;
-		case SAME_TONG_TARGET:
+		case SAME_TONG:
 			chose_place=Robot_picup_single_for_samecolor(0,card_array,list1,list2,len1,len2);
 			break;
-		case SEVEN_COUPLES_TARGET:
+		case SEVEN_COUPLES:
 			chose_place=Robot_pickup_for_sevencouples(card_array,list1,list2,len1,len2);
 			break;
-		case FOUR_PENG_TARGET:
+		case FOUR_PENG:
 			chose_place=Robot_pickup_for_fourpeng(card_array,list1,list2,len1,len2);
 			break;
 		default:
@@ -1090,7 +1090,7 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
 		res->list[_cards->get_kind(i)].place[time]=i;
 	}
 
-	res->target = _cards->assess_aim();
+	res->target = (ROBOT_TARGET)_cards->assess_aim();
 }
 
 int PlayerOthers::choose_card(RoundManager &context,bool &canKou) {

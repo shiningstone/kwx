@@ -8,8 +8,6 @@ USING_NS_CC;
 USING_NS_CC;
 using namespace ui;
 
-#include "RaceType.h"
-
 #include "GameType.h"
 
 #include "./../utils/LogManager.h"

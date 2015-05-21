@@ -4,8 +4,69 @@
 
 #include "./../utils/UtilBasic.h"
 
-#define INVALID -1
-#define PLAYER_NUM  3
+#define     INVALID             -1
+
+#define     PLAYER_NUM          3
+#define 	TOTAL_CARD_NUM 		84
+#define 	TOTAL_CARD_KIND		21
+#define 	MAX_HANDIN_NUM      18
+
+#define 	TOTAL_AIM_KIND      24
+
+#define 	RH_MING 	 			0x01
+#define		RH_ZIMO 	 			0x02
+#define		RH_QINYISE 				0x04
+#define		RH_SIPENG  				0x08
+#define		RH_HAIDILAO				0x40000
+/**/
+#define 	RH_QIANGGANG			0x10
+#define 	RH_GANGHUA   			0x20
+#define 	RH_GANGPAO				0x40
+/////////////////////////////////////////
+#define		RA_ANGANGHU				0x10
+#define		RA_GANGHU				0x20
+/**/
+#define		RH_SHOUYIZHUA			0x80
+#define 	RH_DASANYUAN			0x100
+#define 	RH_XIAOSANYUAN 			0x200
+#define 	RH_MINGSIGUI			0x400
+#define 	RH_ANSIGUI				0x800
+#define		RH_QIDUI				0x1000
+#define 	RH_SANYUANQIDUI 		0x2000
+#define 	RH_KAWUXIN				0x4000
+#define		RH_HAOHUAQIDUI			0x8000//ÁúÆß¶Ô
+#define		RH_CHAOHAOHUAQIDUI		0x10000//Ë«ÁúÆß¶Ô
+#define		RH_CHAOCHAOHAOHUAQIDUI 	0x20000//3
+#define 	RH_ZHONG				0x20000000
+#define 	RH_FA					0x40000000
+#define 	RH_BAI					0x80000000
+
+/*aim prize have not defined*/
+#define		RA_NOTASK				0
+#define		RA_SHENG				RH_KAWUXIN|RH_ZIMO
+#define		RA_XING					RH_QINYISE
+#define		RA_BAI					RA_ANGANGHU
+#define		RA_BIAN					RH_SIPENG|RH_ZHONG
+#define		RA_DOU					RH_SIPENG|RH_FA
+#define		RA_ZHUAN				RH_SIPENG|RH_BAI
+#define		RA_XINGX				RH_MINGSIGUI|RH_KAWUXIN
+#define 	RA_YI					RA_GANGHU|RH_BAI
+#define		RA_XIAO					RA_GANGHU|RH_FA
+#define		RA_WU					RA_GANGHU|RH_ZHONG
+#define		RA_XIANG				RH_DASANYUAN
+#define		RA_GONG					RH_HAOHUAQIDUI
+#define		RA_DA					RH_XIAOSANYUAN
+#define  	RA_GOU					RH_ANSIGUI|RH_KAWUXIN
+#define		RA_BANG					RH_MING|RH_QINYISE
+#define		RA_FA					RH_ANSIGUI
+#define		RA_JIU					RA_GANGHU|RH_KAWUXIN
+#define		RA_YIN					RH_MING|RH_ZIMO
+#define		RA_ZHEN					RH_MINGSIGUI|RH_QINYISE
+#define		RA_JING					RH_ANSIGUI|RH_QINYISE
+#define		RA_KUI					RH_QIDUI
+#define		RA_HUA					RH_SHOUYIZHUA
+#define		RA_BAO					RH_MING|RH_SHOUYIZHUA
+#define		RA_DIAN					RH_MINGSIGUI
 
 typedef enum {
     LOCAL_GAME,
@@ -140,6 +201,15 @@ typedef struct _MingInfo_t {
 
 typedef unsigned int HuTarget_t;
 typedef unsigned int HuFan_t;
+
+
+typedef enum _RobotTarget_t {
+	SAME_TIAO,
+	SAME_TONG,
+	SEVEN_COUPLES,
+	FOUR_PENG,
+	PI_HU
+}RobotTarget_t;
 
 #endif
 

@@ -1,8 +1,6 @@
 
 #include <stdlib.h>
 
-#include "RaceType.h"
-
 #include "CardCollection.h"
 #include "Player.h"
 #include "RaceLayer.h"

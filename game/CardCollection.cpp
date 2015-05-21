@@ -996,24 +996,24 @@ void CardInHand::update_statistics(Card_t huKind) {
 /***************************************************
         ÅÆÐÍÅÐ¶Ï
 ***************************************************/
-ROBOT_TARGET CardInHand::assess_aim() {
+RobotTarget_t CardInHand::assess_aim() {
     int color = 0;
     if(PreferQingYiSe(color)) {
         if(color==0) {
-            aim = SAME_TIAO_TARGET;
+            aim = SAME_TIAO;
         } else if (color==1) {
-            aim = SAME_TONG_TARGET;
+            aim = SAME_TONG;
         }
     }
 
     int coupleNum = GetCoupleNum();
     if(FreeStart==0 && coupleNum>=5) {
-        aim = SEVEN_COUPLES_TARGET;
+        aim = SEVEN_COUPLES;
     } else if (coupleNum>=3) {
-        aim = FOUR_PENG_TARGET;
+        aim = FOUR_PENG;
     }
 
-    aim = PI_HU_TARGET;
+    aim = PI_HU;
 
     return aim;
 }
@@ -1061,13 +1061,13 @@ int CardInHand::GetCoupleNum() const {
 }
 
 bool CardInHand::is_aim_limit(unsigned int act, Card_t kind) const {
-    if(aim==SAME_TIAO_TARGET) {
+    if(aim==SAME_TIAO) {
         if(kind/9!=0&&!(act&a_HU)&&!(act&a_AN_GANG)&&!(act&a_SHOU_GANG)&&!(act&a_MING_GANG))
             return true;
-    } else if(aim==SAME_TONG_TARGET) {
+    } else if(aim==SAME_TONG) {
         if(kind/9!=1&&!(act&a_HU)&&!(act&a_AN_GANG)&&!(act&a_SHOU_GANG)&&!(act&a_MING_GANG))
             return true;
-    } else if(aim==SEVEN_COUPLES_TARGET)
+    } else if(aim==SEVEN_COUPLES)
         if(!(act&a_HU)&&!(act&a_AN_GANG)&&!(act&a_SHOU_GANG)&&!(act&a_MING_GANG))
             return true;
 

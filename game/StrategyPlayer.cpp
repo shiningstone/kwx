@@ -1,6 +1,4 @@
 
-#include "RaceType.h"
-
 #include "CardCollection.h"
 #include "Player.h"
 #include "RoundManager.h"
