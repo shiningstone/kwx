@@ -10,15 +10,15 @@
 
 class Player {
 public:
-	Player();
-    Player(int id);
+	Player(PlayerDir_t dir);
+    Player(int id,PlayerDir_t dir);
     ~Player();
 
     virtual unsigned char init(int cards[],int len,int aim);
     virtual unsigned char init(Card_t cards[],int len,int aim);
 
     StrategyPlayer *_strategy;
-    
+
     bool          _isReady;
     UserProfile_t _profile;    
 
@@ -55,6 +55,8 @@ public:
 
     void Set(const UserProfile_t *profile);
 protected:
+    PlayerDir_t   _dir;
+
     Logger    *_logger;
 };
 

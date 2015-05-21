@@ -61,9 +61,9 @@ NetRoundManager::~NetRoundManager() {
 #include "PlayerOthers.h"
 
 void NetRoundManager::InitPlayers() {
-	_players[0] = new PlayerOthers();
-	_players[1] = new Player();
-	_players[2] = new PlayerOthers();
+	_players[0] = new PlayerOthers(LEFT);
+	_players[1] = new Player(MIDDLE);
+	_players[2] = new PlayerOthers(RIGHT);
 
     Database *database = Database::getInstance();
 

@@ -10,8 +10,8 @@ class Logger;
 class PlayerOthers:public Player
 {
 	public:
-		PlayerOthers();
-        PlayerOthers(int id);
+		PlayerOthers(PlayerDir_t dir);
+        PlayerOthers(int id,PlayerDir_t dir);
 		virtual ~PlayerOthers();
     private:
         Logger      *_logger;

@@ -4,9 +4,10 @@
 #include "CardCollection.h"
 #include "Player.h"
 
-Player::Player() {
+Player::Player(PlayerDir_t dir) {
 	_strategy = new StrategyPlayer(this);
 
+    _dir = dir;
     _cards = NULL;
     _river = NULL;
 
@@ -17,9 +18,10 @@ Player::Player() {
     _logger = LOGGER_REGISTER("Player");
 }
 
-Player::Player(int id) {//this is for default settings ( robot ) 
+Player::Player(int id,PlayerDir_t dir) {//this is for default settings ( robot ) 
 	_strategy = new StrategyPlayer(this);
 
+    _dir = dir;
 	_cards = NULL;
     _river = NULL;
 
@@ -106,8 +108,6 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatu
         }
 	}
 
-    /* BUG ??? ming can implemented after some actions take place, such as PENG/GANG */
-    /*     !!! maybe done by judge_action_again                                   */
 	if(isNewDistributed) {
 		if(!_cards->IsMing && !isLastOne) {
 			if(_cards->collect_ming_info())

@@ -6,11 +6,13 @@
 
 USING_NS_CC;
 
-PlayerOthers::PlayerOthers() {
+PlayerOthers::PlayerOthers(PlayerDir_t dir)
+    :Player(dir){
     _logger = LOGGER_REGISTER("PlayerOthers");
 }
 
-PlayerOthers::PlayerOthers(int id) {//this is for default settings ( robot ) 
+PlayerOthers::PlayerOthers(int id,PlayerDir_t dir)
+    :Player(dir){//this is for default settings ( robot ) 
     _logger = LOGGER_REGISTER("NetPlayer_%d");
 }
 
