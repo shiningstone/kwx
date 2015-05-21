@@ -5,6 +5,7 @@
 
 #include "./../utils/BasicType.h"
 
+#include "StrategyPlayer.h"
 #include "DataBase.h"
 
 class Player {
@@ -15,6 +16,8 @@ public:
 
     virtual unsigned char init(int cards[],int len,int aim);
     virtual unsigned char init(Card_t cards[],int len,int aim);
+
+    StrategyPlayer *_strategy;
     
     bool          _isReady;
     UserProfile_t _profile;    
@@ -22,9 +25,6 @@ public:
     /**************************************************
             user's action
     **************************************************/
-    long calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua);//·ÖÊý¼ÆËã
-    void taskCheck(unsigned int flag);
-
     ActionMask_t hand_in(Card_t kind,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     Card_t       hand_out(unsigned int place);
 	ActionMask_t judge_action_again();

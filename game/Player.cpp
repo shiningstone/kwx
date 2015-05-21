@@ -5,6 +5,8 @@
 #include "Player.h"
 
 Player::Player() {
+	_strategy = new StrategyPlayer(this);
+
     _cards = NULL;
     _river = NULL;
 
@@ -16,7 +18,9 @@ Player::Player() {
 }
 
 Player::Player(int id) {//this is for default settings ( robot ) 
-    _cards = NULL;
+	_strategy = new StrategyPlayer(this);
+
+	_cards = NULL;
     _river = NULL;
 
     _isReady = false;
@@ -31,6 +35,8 @@ Player::~Player() {
         delete _river;
         delete _cards;
     }
+
+	delete _strategy;
     
     LOGGER_DEREGISTER(_logger);
 }
@@ -73,42 +79,6 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     }
 }
 
-long Player::calcScore(Card_t kind,bool isNewDistributed,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
-    _cards->update_statistics(kind);
-    _fan = _cards->statHuFanMask;
-    
-    if(isLastOne) {
-		_fan |= RH_HAIDILAO;
-    }
-
-	if(isNewDistributed) {
-		_fan |= RH_ZIMO;
-	}
-
-	if((continue_gang_times!=0)
-        &&(lastActionWithGold==aMING_GANG
-            ||lastActionWithGold==aAN_GANG
-            ||lastActionWithGold==aQIANG_GANG)) {
-		if(isNewDistributed&&lastActionWithGold==aQIANG_GANG)
-			_fan |= RH_QIANGGANG;
-		else if(isNewDistributed&&isGangHua)
-			_fan |= RH_GANGHUA;
-		else if(!isNewDistributed)
-			_fan |= RH_GANGPAO;
-	}
-
-	if(_AIM!=RA_NOTASK)
-		taskCheck(_fan);
-    
-	return _cards->sum_up_score(_fan);
-}
-
-void Player::taskCheck(unsigned int flag) {
-	if( !(flag&_AIM) ) {
-		_aimDone=0;
-    }
-}
-
 ActionMask_t Player::judge_action_again() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
@@ -129,7 +99,7 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatu
 	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
 	if(_cards->can_hu((Card_t)newCard)) {
-		_score = calcScore((Card_t)newCard,isNewDistributed,isLastOne,lastActionWithGold,continue_gang_times,isGangHua);
+		_score = _strategy->calc_score((Card_t)newCard,isNewDistributed,isLastOne,lastActionWithGold,continue_gang_times,isGangHua);
 
 		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
 			actions |= aHU;
