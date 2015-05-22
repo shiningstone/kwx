@@ -388,6 +388,8 @@ void CardInHand::_Peng(Card_t card) {
     insert_card(node,3);
     
     FreeStart += 3;
+
+    _IncludingOthersCard = false;
 }
 
 void CardInHand::_Ming() {
