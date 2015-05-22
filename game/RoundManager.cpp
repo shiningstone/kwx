@@ -219,11 +219,10 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvQi() {
-    if(!_isNewDistributed) {
+    if(!_isNewDistributed && _lastActionSource!=MIDDLE) {
         _players[MIDDLE]->_cards->pop_back();
     }
 
-    SetDecision(MIDDLE,aQi);
     _uiManager->QiEffect();
 }
 
@@ -736,7 +735,6 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
         _lastActionWithGold = _actCtrl.decision;
     } else {
         _actCtrl.decision = act;
-
         _continue_gang_times = 0;
         _lastActionWithGold = aQi;
     }

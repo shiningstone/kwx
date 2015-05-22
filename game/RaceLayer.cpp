@@ -3682,7 +3682,8 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
         
     ********************************/
 	if(myframe->getChildByTag(QI_REMIND_ACT_BKG_TAG_ID)!=NULL && dir==MIDDLE) {/*??? is this judgement neccessary */
-		if(_roundManager->_isNewDistributed) {
+		if(_roundManager->_isNewDistributed ||
+            _roundManager->_lastActionSource==MIDDLE) {
 			if(_roundManager->_isGangAsking) {
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
@@ -3692,8 +3693,9 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
                         Vec2 location = _GetCardInHand(MIDDLE,real_last)->getPosition();
                         _roundManager->RecvHandout(real_last,location,2);/*bug??? forced to handout real_last card*/
                     }),NULL));
-			} else
+			} else {
 				myframe->runAction(hideQiReminder);
+            }
 		} else {
 			if(_roundManager->_isQiangGangAsking) {
 				_roundManager->_isQiangGangAsking=false;
