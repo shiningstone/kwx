@@ -28,7 +28,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 
 	_gRiver = new CardList;
 	for(int i=0;i<TOTAL_CARD_NUM;i++) {
-		_unDistributedCards[i]=i;
+		_unDistributedCards[i] = CARD_UNKNOWN;
 	}
     _distributedNum = 0;
 

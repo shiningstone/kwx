@@ -500,12 +500,12 @@ void RoundManager::WaitForTuoGuanHandle() {
                 _isQiangGangAsking=false;
                 _strategy->update_gold((PlayerDir_t)_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_curPlayer);
                 _qiangGangTargetNo=INVALID;
-                DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]/4));
+                DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]));
             } else if(_isDoubleHuAsking) {
                 _isDoubleHuAsking = false;
                 RecvHu(MIDDLE);
             } else {
-                DistributeTo(TurnTo(NEXT),(Card_t)(_unDistributedCards[_distributedNum++]/4));
+                DistributeTo(TurnTo(NEXT),(Card_t)(_unDistributedCards[_distributedNum++]));
             }
         } else {
             WaitForMyChoose();
