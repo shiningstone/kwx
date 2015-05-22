@@ -151,10 +151,9 @@ Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
     RecordOutCard(pengCard);
     RecordOutCard(pengCard);
 
-    PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
-    _curPlayer = dir;
+    TurnTo(dir);
 
-    _uiManager->PengEffect(dir,prevPlayer,pengCard);
+    _uiManager->PengEffect((PlayerDir_t)_curPlayer,_prevPlayer,pengCard);
 
 	return pengCard;
 }
@@ -506,7 +505,7 @@ void RoundManager::WaitForTuoGuanHandle() {
                 _isDoubleHuAsking = false;
                 RecvHu(MIDDLE);
             } else {
-                DistributeTo(TurnToNext(),(Card_t)(_unDistributedCards[_distributedNum++]/4));
+                DistributeTo(TurnTo(NEXT),(Card_t)(_unDistributedCards[_distributedNum++]/4));
             }
         } else {
             WaitForMyChoose();
@@ -674,7 +673,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
     {
         _actCtrl.decision = aQi;
 
-        _curPlayer=(_curPlayer+1)%3;
+        _curPlayer = TurnTo(NEXT);
         _uiManager->UpdateClock(0,_curPlayer);
         DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]));
     }
@@ -835,8 +834,15 @@ bool RoundManager::IsMing(int id) const{
     return _players[id]->_cards->IsMing;
 }
 
-PlayerDir_t RoundManager::TurnToNext() {
-    _curPlayer = (_curPlayer+1)%PLAYER_NUM;
+PlayerDir_t RoundManager::TurnTo(PlayerDir_t dir) {
+    _prevPlayer = (PlayerDir_t)_curPlayer;
+
+    if(dir==INVALID_DIR) {
+        _curPlayer  = (PlayerDir_t)(_prevPlayer+1)%PLAYER_NUM;
+    } else {
+        _curPlayer  = dir;
+    }
+
     return (PlayerDir_t)_curPlayer;
 }
 

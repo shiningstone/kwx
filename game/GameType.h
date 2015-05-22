@@ -78,6 +78,7 @@ typedef enum {
     MIDDLE,
     RIGHT,
     INVALID_DIR,
+    NEXT          = 3,
     DOUBLE_PLAYER = 3,
     SERVER        = 4,
 }PlayerDir_t;

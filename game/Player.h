@@ -14,6 +14,7 @@ public:
 
     virtual unsigned char init(int cards[],int len,int aim);
     virtual unsigned char init(Card_t cards[],int len,int aim);
+    virtual unsigned char refresh(CardNode_t cards[],int len,int aim);
 
     StrategyPlayer *_strategy;
 

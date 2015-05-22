@@ -3716,7 +3716,7 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
 			} else {
 				myframe->runAction(Sequence::create(
                     hideQiReminder,CallFunc::create([=](){
-                    _roundManager->DistributeTo(_roundManager->TurnToNext()
+                    _roundManager->DistributeTo(_roundManager->TurnTo(NEXT)
                         ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]/4));}),NULL));
 			}
 		}

@@ -45,7 +45,8 @@ public:
     }ActCtrl_t;
 
     ActCtrl_t   _actCtrl;
-    
+
+    PlayerDir_t _prevPlayer;
     int  _curPlayer;
     ActionId_t  _lastActionWithGold;
     int  _lastActionSource;
@@ -88,7 +89,7 @@ public:
     const WinInfo_t &GetWin();
     bool IsWinner(int no);
 
-    PlayerDir_t TurnToNext();
+    PlayerDir_t TurnTo(PlayerDir_t dir = NEXT);
 
     void RecordOutCard( Card_t kind );
 

@@ -81,6 +81,18 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     }
 }
 
+unsigned char Player::refresh(CardNode_t cards[],int len,int aim) {
+    _cards->clear();
+
+    for(int i=0;i<len;i++) {
+        CardNode_t *node = new CardNode_t;
+        memcpy(node,&cards[i],sizeof(CardNode_t));
+        _cards->push_back(node);
+    }
+
+	return 0;
+}
+
 ActionMask_t Player::judge_action_again() {
     LOGGER_WRITE("%s",__FUNCTION__);
 
