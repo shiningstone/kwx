@@ -565,9 +565,9 @@ public:
         assert( score.seat[0]==MIDDLE );
         assert( score.seat[1]==RIGHT );
         assert( score.seat[2]==LEFT );
-        assert( score.val[0]==1 );
-        assert( score.val[1]==2 );
-        assert( score.val[2]==3 );
+        assert( score.val[MIDDLE]==1 );
+        assert( score.val[RIGHT]==2 );
+        assert( score.val[LEFT]==3 );
 
         return 0;
     }
@@ -741,7 +741,7 @@ public:
         assert( decision.whoGive==1 );
         assert( decision.next==2 );
         assert( decision.actions==a_PENG );
-		assert( decision.card==TIAO_1);
+		assert( decision.card[0].kind==TIAO_1);
  
         return 0;
     }
