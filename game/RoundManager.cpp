@@ -453,7 +453,7 @@ void RoundManager::WaitForOthersChoose() {
 	PlayerOthers *player = static_cast<PlayerOthers *>(_players[_curPlayer]);
 	int index = player->choose_card(*this,canKou);
     
-    if ( true ) {
+    if ( canKou ) {
         Card_t handingout = _players[_curPlayer]->_cards->get_kind(index);
         _players[_curPlayer]->_cards->choose_all_kou_cards(handingout);
     }
