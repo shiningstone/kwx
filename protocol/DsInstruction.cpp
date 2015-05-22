@@ -244,52 +244,38 @@ int TingInfoResponse::Construct(const DsMsg &msg) {
 }
 
 int HuInfoNotif::Construct(const DsMsg &msg) {
+    INT8U       NUM = 3;
+    INT32U      fan[3];
+    INT8U       status[3];
+    INT32U      score[3];
+    INT8U       cardNum[3];
+    CardNode_t  card[3][18];
+
     DsInstruction::Construct(msg);
 
-    seat      = _GetPlayer(msg.GetItemValue(0));
-    zhuang    = _GetPlayer(msg.GetItemValue(1));
-
-    INT8U   playerNum = 0;
-    INT8U   winType[3];
-    INT32U  fan[3];
-    INT32U  score[3];
-    INT32U  bet[3];
-    INT8U   name[3][128];
-    INT8U   image[3][128];
-    INT8U   cardNum[3];
-    Card_t  card[3][18];
-
-    DsMsgParser::_load(winType,playerNum,msg,3);
+    zhuang    = _GetPlayer(msg.GetItemValue(0));
     
-    bool    status[3];
-    for(int i=0;i<3;i++) {
-        if(winType[i]==HU_PAI || winType[i]==ZI_MO) {
-            status[i] = true;
-        } else {
-            status[i] = false;
-        }
-    }
-    DsMsgParser::_load(fan,status,msg,2);
-    DsMsgParser::_load(score,playerNum,msg,4);
-    DsMsgParser::_load(bet,playerNum,msg,5);
-    DsMsgParser::_load(card,cardNum,msg,8);
-
+    DsMsgParser::_load(fan,msg,1);
+    DsMsgParser::_load(status,msg,2);
+    DsMsgParser::_load(score,msg,3);
+    DsMsgParser::_load(card,cardNum,msg,4);
+    
     for(int i=0;i<PLAYER_NUM;i++) {
-        hu[i].winType= winType[(i+2)%3];
-        hu[i].fan    = fan[(i+2)%3];
-        hu[i].score  = score[(i+2)%3];
-        hu[i].bet    = bet[(i+2)%3];
-        hu[i].cardNum= cardNum[(i+2)%3];
-        for(int k=0;k<hu[i].cardNum;k++) {
-            memcpy(hu[i].card, card[(i+2)%3], sizeof(Card_t)*18);
-        }
+        PlayerDir_t dir = PlayerDir_t((zhuang+i)%3);
+        
+        hu[dir].fan    = fan[i];
+        hu[dir].winType= (HuKind_t)status[i];
+        hu[dir].score  = score[i];
+        hu[dir].cardNum= cardNum[i];
+        memcpy(hu[dir].card, card[i], sizeof(CardNode_t)*18);
     }
     
     return 0;
 }
 
 int EndInfoNotif::Construct(const DsMsg &msg) {
-    DsInstruction::Construct(msg);
+#if 0
+	DsInstruction::Construct(msg);
     
     seat      = _GetPlayer(msg.GetItemValue(0));
 
@@ -301,7 +287,7 @@ int EndInfoNotif::Construct(const DsMsg &msg) {
         cardNum[i] = num[(i+2)%3];
         memcpy(card[i], cards[(i+2)%3], sizeof(Card_t)*18);
     }
-
+#endif
     return 0;
 }
 

@@ -13,12 +13,11 @@ class DsMsg;
 
 class DsMsgParser {
 public:
-    static int _load(INT8U *status,INT8U &num,const DsMsg &msg,int itemIdx);
-    static int _load(INT32U *fan, const bool *status,const DsMsg &msg,int itemIdx);
-    static int _load(INT32U *score, INT8U &num, const DsMsg &msg,int itemIdx);
-    static int _load(Card_t cards[3][18],INT8U num[3],const DsMsg &msg,int itemIdx);
+    static int _load(INT8U *values,const DsMsg &msg,int itemIdx);
+    static int _load(INT32U *values, const DsMsg &msg,int itemIdx);
     static int _load(Card_t *cards,INT8U &num,const DsMsg &msg,int itemIdx);
     static int _load(CardNode_t cards[18],INT8U &num,const DsMsg &msg,int itemIdx);
+    static int _load(CardNode_t cards[3][18],INT8U num[3],const DsMsg &msg,int itemIdx);
     static int _load(TingInfo_t    &info,const INT8U *inMsg);
     static int _load(MingInfo_t &info,const DsMsg &msg,int itemIdx);
     static int _load(Reminds_t &remind,const DsMsg &msg,int itemIdx);

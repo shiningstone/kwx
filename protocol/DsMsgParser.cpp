@@ -5,63 +5,22 @@
 #include "CommonMsg.h"
 #include "DsMsgParser.h"
 
-int DsMsgParser::_load(INT8U *status,INT8U &num,const DsMsg &msg,int itemIdx) {
-    num = (INT8U)msg.GetItemBufLen(itemIdx);
+int DsMsgParser::_load(INT8U *values,const DsMsg &msg,int itemIdx) {
+    INT8U num = (INT8U)msg.GetItemBufLen(itemIdx);
     
     for(int i=0;i<num;i++) {
-        status[i] = msg._body->_items[itemIdx]->_buf[i];
+        values[i] = msg._body->_items[itemIdx]->_buf[i];
     }
 
     return 0;
 }
 
-int DsMsgParser::_load(INT32U *fan, const bool *status,const DsMsg &msg,int itemIdx) {
-    int idx      = 0;
+int DsMsgParser::_load(INT32U *values, const DsMsg &msg,int itemIdx) {
+    INT8U num = (INT8U)msg.GetItemBufLen(itemIdx)/4;
     
     for(int i=0;i<PLAYER_NUM;i++) {
-        if(status[i]) {
-            *(fan+i) = _ntohl(*((INT32U *)(msg._body->_items[itemIdx]->_buf+idx)));
-            idx += 4;
-        } else {
-            *(fan+i) = 0;
-        }
+        values[i] = _ntohl(*((INT32U *)(msg._body->_items[itemIdx]->_buf+4*i)));
     }
-
-    return 0;
-}
-
-int DsMsgParser::_load(INT32U *score, INT8U &num, const DsMsg &msg,int itemIdx) {
-    num = (INT8U)msg.GetItemBufLen(itemIdx)/4;
-    
-    for(int i=0;i<PLAYER_NUM;i++) {
-        score[i] = _ntohl(*((INT32U *)(msg._body->_items[itemIdx]->_buf+4*i)));
-    }
-
-    return 0;
-}
-
-int DsMsgParser::_load(Card_t cards[3][18],INT8U cardNum[3],const DsMsg &msg,int itemIdx) {
-    int totalNum = (INT8U)msg.GetItemBufLen(itemIdx);
-
-    int player = 0;
-    int idx    = 0;
-    int i      = 0;
-    
-    while(i<totalNum) {
-        Card_t kind = (Card_t)msg._body->_items[itemIdx]->_buf[i];
-        
-        if(kind!=CARD_UNKNOWN) {
-            cards[player][idx] = kind;
-            idx++;
-        } else {
-            cardNum[player++] = idx;
-            idx = 0;
-        }
-
-        i++;
-    }
-
-    cardNum[player++] = idx;
 
     return 0;
 }
@@ -94,6 +53,35 @@ int DsMsgParser::_load(CardNode_t cards[18],INT8U &num,const DsMsg &msg,int item
     if(num==1 && (cards[0]).kind==CARD_UNKNOWN) {
         num = 0;
     }
+
+    return 0;
+}
+
+int DsMsgParser::_load(CardNode_t cards[3][18],INT8U cardNum[3],const DsMsg &msg,int itemIdx) {
+    int totalNum = (INT8U)msg.GetItemBufLen(itemIdx);
+
+    int player = 0;
+    int idx    = 0;
+    int i      = 0;
+    
+    while(i<totalNum) {
+        INT8U byte = msg._body->_items[itemIdx]->_buf[i];
+
+        if(byte!=CARD_UNKNOWN) {
+            cards[player][idx].kind = (Card_t)(byte&0x1f);
+            cards[player][idx].status = (CardStatus_t)((byte&0xe0) >> 5);
+            cards[player][idx].canPlay = false;
+            
+            idx++;
+        } else {
+            cardNum[player++] = idx;
+            idx = 0;
+        }
+
+        i++;
+    }
+
+    cardNum[player++] = idx;
 
     return 0;
 }

@@ -176,21 +176,17 @@ typedef enum {
 }HuKind_t;
 
 typedef struct {
-    INT8U   winType;
-    INT32U  fan;
-    INT32U  score;
-    INT32U  bet;
-    INT8U   name[128];
-    INT8U   image[128];
-    int     cardNum;
-    Card_t  card[18];
+    HuKind_t   winType;
+    INT32U     fan;
+    INT32U     score;
+    int        cardNum;
+    CardNode_t card[18];
 }HuInfo_t;
 
 class HuInfoNotif : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
 
-    INT8U            seat;
     INT8U            zhuang;
     HuInfo_t         hu[3];
 };
