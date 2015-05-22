@@ -715,7 +715,7 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     _UpdateWin(info->hu);
 
     for(int i=0;i<PLAYER_NUM;i++) {
-        _players[i]->refresh(info->hu[i].card, info->hu[i].cardNum, aim[i]);
+        _players[i]->refresh(info->hu[i].card, info->hu[i].cardNum, info->hu[i].fan);
     }
 
     delete info;

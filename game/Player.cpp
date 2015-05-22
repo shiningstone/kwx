@@ -81,7 +81,7 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     }
 }
 
-unsigned char Player::refresh(CardNode_t cards[],int len,int aim) {
+unsigned char Player::refresh(CardNode_t cards[],int len,HuFan_t fan) {
     _cards->clear();
 
     for(int i=0;i<len;i++) {
@@ -90,6 +90,8 @@ unsigned char Player::refresh(CardNode_t cards[],int len,int aim) {
         
         _cards->push_back(node);
     }
+
+    _fan = fan;
 
 	return 0;
 }
