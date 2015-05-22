@@ -260,7 +260,7 @@ Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first 
         for(INT8U i=0; i<size(); i++) {
             int matchNum = find_cards(get_kind(i),cardIdx,i);
         
-            if(matchNum==4) {
+            if(matchNum==4 && get_status(i)==sMING_KOU) {
                 return get_kind(i);
             }
         }
