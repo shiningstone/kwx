@@ -926,53 +926,6 @@ public:
     }
 };
 
-class TestRecvEndInfoNotif : public CTestCase {
-public:
-    virtual int Execute() {
-        INT8U msgInNetwork[] = {
-            'K','W','X',
-            0x00,0x3d,            //request code  REQ_GAME_DIST_HU_CALCULATE2 61
-            0x01,
-            0x00,66,              //package size
-            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-            
-            0x02,
-            0x3c,0x01,
-            0x83,0x00,41,
-                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x09,0x09,0x0a,0x0a,0xff,     /*MIDDLE 13*/
-                0x02,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x01,0x02,0x04,0xff,     /*RIGHT  13*/
-                0x03,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x01,0x02,0x04,          /*LEFT   13*/
-        };
-        INT8U buf[MSG_MAX_LEN] = {0};
-        int   len = 0;
-
-        DsMsg *aMsg = DsMsg::getInstance();
-        EndInfoNotif info;
-
-        len = aMsg->Deserialize(msgInNetwork);
-        info.Construct(*aMsg);
-
-        assert(len==sizeof(msgInNetwork));
-        assert( aMsg->GetRequestCode()==REQ_GAME_DIST_HU_CALCULATE2 );
-        assert( aMsg->GetLevel()==1 );
-        
-        assert( info.cardNum[MIDDLE]==13 );
-        assert( info.card[MIDDLE][0]==TIAO_2 );
-        assert( info.card[MIDDLE][1]==TIAO_3 );
-        assert( info.card[MIDDLE][2]==TIAO_4 );
-        assert( info.card[MIDDLE][3]==TIAO_5 );
-        assert( info.card[MIDDLE][12]==TONG_2 );
-
-        assert( info.cardNum[RIGHT]==13 );
-        assert( info.card[RIGHT][0]==TIAO_3 );
-        
-        assert( info.cardNum[LEFT]==13 );
-        assert( info.card[LEFT][0]==TIAO_4 );
-        
-        return 0;
-    }
-};
-
 void testGameActions() {
 	CTestCase *aCase;
     
@@ -1034,9 +987,6 @@ void testGameActions() {
     aCase->Execute();
 
     aCase = new TestRecvHuInfoNotif_MeWin();
-    aCase->Execute();
-
-    aCase = new TestRecvEndInfoNotif();
     aCase->Execute();
 }
 
