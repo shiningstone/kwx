@@ -134,6 +134,12 @@ void CardList::pop_back() {
     DBG_SHOW();
 }
 
+void CardList::clear() {
+    while(size()>0) {
+        pop_back();
+    }
+}
+
 void CardList::show() {
 	CardList::iterator it;
 	char   kinds[84];

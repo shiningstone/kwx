@@ -18,6 +18,7 @@ public:
     virtual void push_back(CardNode_t *node);
 	virtual void push_back(Card_t kind);
 	virtual void pop_back();/*NOTE: this operation will DESTROY the memory*/
+    virtual void clear();
 
     int  last() const;
     int  get_num(Card_t kind) const;

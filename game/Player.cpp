@@ -87,6 +87,7 @@ unsigned char Player::refresh(CardNode_t cards[],int len,int aim) {
     for(int i=0;i<len;i++) {
         CardNode_t *node = new CardNode_t;
         memcpy(node,&cards[i],sizeof(CardNode_t));
+        
         _cards->push_back(node);
     }
 
