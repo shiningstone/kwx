@@ -541,7 +541,8 @@ Vec2 RaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
 
     switch(dir) {
         case MIDDLE:
-            if(_roundManager->_actCtrl.decision==MING_GANG) {
+            if(_roundManager->_actCtrl.decision==aMING_GANG || _roundManager->_actCtrl.decision==aSHOU_GANG
+                || _roundManager->_actCtrl.decision==aAN_GANG) {
                 x += distributeCardPos.x;
             } else {
                 x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
@@ -2946,27 +2947,6 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         auto hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.3);
 
         /**********************
-            logical
-        **********************/
-        auto cards = _roundManager->_players[dir]->_cards; 
-        Card outCard;
-
-		int isChosenCanceled=0;
-		int ifLeft=0;
-        
-		if(_myChosenCard!=INVALID) {
-			if(_myChosenCard<cards->size()-5)
-				ifLeft=1;
-
-            int oldChosen = _myChosenCard;
-            _myChosenCard = cards->rechoose_after_gang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
-
-            if(_myChosenCard==INVALID && oldChosen!=cards->real_last()) {
-                isChosenCanceled=1;
-            }
-		}
-
-        /**********************
             move 4 cards
         **********************/
         TargetedAction *moveGangCardEffect[4];
@@ -2976,7 +2956,45 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
             move 4 cards in hand
         **********************/
         Size FreeCardSize = _object->RectSize(FREE_CARD);
+        auto cards = _roundManager->_players[dir]->_cards; 
 		auto curKindOfGang = cards->get_kind(GangCardsPlace[0]);
+        
+        /**********************
+            restore position of new distributed card
+        **********************/
+        int isChosenCanceled = 0;
+        int ifLeft           = 0;
+        
+		Sprite* baseCard;
+		Vec2    basePos;
+        
+        if(_myChosenCard!=INVALID) {
+            if(_myChosenCard<cards->size()-5)
+                ifLeft=1;
+        
+            int oldChosen = _myChosenCard;
+            _myChosenCard = cards->rechoose_after_gang(_myChosenCard,GangCardsPlace,false,GangCardsPlace[3]);
+        
+            if(_myChosenCard==INVALID && oldChosen!=cards->real_last()) {
+                isChosenCanceled=1;
+            }
+        }
+            
+        auto Pengsize = _object->RectSize(PENG_CARD);
+        
+		baseCard = _GetCardInHand(MIDDLE,cards->last()-4-1);
+		basePos  = baseCard->getPosition();
+
+        if( cards->FreeStart>0 )
+			distributeCardPos = Vec2(
+			    basePos.x + Pengsize.width*3.5 + 30
+			        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
+			    basePos.y);
+		else
+			distributeCardPos = Vec2(
+			    basePos.x + Pengsize.width*4 + 30
+			        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
+			    basePos.y);
 
         TargetedAction *moveGangCardInHand[4];
         _CreateGangCardInHandMotion(moveGangCardInHand, GangCardsPlace, (CARD_KIND)curKindOfGang);
