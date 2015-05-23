@@ -541,7 +541,11 @@ Vec2 RaceLayer::_GetLastCardPosition(PlayerDir_t dir,int cardLen) {
 
     switch(dir) {
         case MIDDLE:
-            x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
+            if(_roundManager->_actCtrl.decision==MING_GANG) {
+                x += distributeCardPos.x;
+            } else {
+                x += _GetCardInHand(MIDDLE,cardLen)->getPosition().x+30;
+            }
             y += 60 + 13*(_roundManager->IsMing(dir));
             break;
         case LEFT:
@@ -3285,10 +3289,10 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 		}
         
         /**********************
-            
+            restore position of new distributed card
         **********************/
         int isChosenCanceled = 0;
-        int ifLeft=0;
+        int ifLeft           = 0;
         
         if(_myChosenCard!=INVALID) {
             if(_myChosenCard < cards->size()-4) {
@@ -3305,26 +3309,26 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 		Vec2    basePos;
         
 		if(_roundManager->_isNewDistributed) {
-			baseCard = _GetCardInHand(MIDDLE,cards->size()-2);
+			baseCard = _GetCardInHand(MIDDLE,cards->last()-1);
 			basePos  = baseCard->getPosition();
             
 			distributeCardPos=Vec2(
-                basePos.x + baseCard->getBoundingBox().size.width + 30 - FreeCardSize.width*isChosenCanceled*0.2,
+                basePos.x + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2,
                 basePos.y);
 		} else {
             auto Pengsize = _object->RectSize(PENG_CARD);
             
-			baseCard = _GetCardInHand(MIDDLE,cards->size()-4);
+			baseCard = _GetCardInHand(MIDDLE,cards->last()-4-1);/*include others' card*/
 			basePos  = baseCard->getPosition();
 
             if( cards->FreeStart>0 )
 				distributeCardPos = Vec2(
-				    basePos.x + Pengsize.width*3.5 + 30 
+				    basePos.x + Pengsize.width*3.5 + 30
 				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
 				    basePos.y);
 			else
 				distributeCardPos = Vec2(
-				    basePos.x + Pengsize.width*4 + 30 
+				    basePos.x + Pengsize.width*4 + 30
 				        + baseCard->getBoundingBox().size.width - FreeCardSize.width*isChosenCanceled*0.2*ifLeft,
 				    basePos.y);
 		}
