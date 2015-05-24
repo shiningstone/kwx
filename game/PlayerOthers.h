@@ -10,6 +10,9 @@ class PlayerOthers:public Player
 	public:
 		PlayerOthers(PlayerDir_t dir);
         PlayerOthers(int id,PlayerDir_t dir);
+
+        int  PickupForMing(ActionId_t &ming,bool &canKou);
+
 		virtual ~PlayerOthers();
     private:
         Logger      *_logger;
@@ -40,14 +43,13 @@ class PlayerOthers:public Player
         int  PickupForSevenCouples();
         int  PickupForFourPeng();
         int  PickupForPiHu();
-        int  PickupForMing();
 
         int  _FindSingleChar();
         int  _FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);
         int  _FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind);
 
         void _CollectPosition(KindPosition *info);
-        void _SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context);
+        void _SetContext(RoundManager &context);
         
         bool OthersCanHu(Card_t kind) const;
         int  AvailNum(Card_t kind) const;
@@ -61,8 +63,7 @@ class PlayerOthers:public Player
 		int Robot_pickup_for_lowwin(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 		int Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
 	public:
-        int  choose_card(RoundManager &context,bool &canKou);
-		int  ChooseCard(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2);//
+        int  choose_card(RoundManager &context,ActionId_t &ming,bool &canKou);
 };
 
 #endif 

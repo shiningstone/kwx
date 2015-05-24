@@ -158,6 +158,9 @@ void CardList::show() {
 ***********************************************/
 CardInHand::CardInHand() {
     IsMing    = false;
+    memset(&_ming,0,sizeof(MingInfo_t));
+    _ting = NULL;
+
 	FreeStart = 0;
     
     statFreeCards      = 0;

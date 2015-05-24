@@ -426,34 +426,6 @@ int PlayerOthers::PickupForPiHu() {
     return INVALID;
 }
 
-int PlayerOthers::PickupForMing() {
-    Card_t target = CARD_UNKNOWN;
-    int    minum  = 0;
-    
-    if(_cards->collect_ming_info(_ctx.river)) {
-        for(int i=0;i<_cards->_ming.choiceNum;i++) {
-            MingChoice_t  *choice = _cards->_ming.handouts+i;
-
-            if(!OthersCanHu(choice->kind)) {
-                int num = _cards->get_ting_num(target);
-
-                if(minum > num) {
-                    target = choice->kind;
-                    minum = num;
-                }
-            }
-        }
-    }
-
-    for(int i=0;i<_cards->size();i++) {
-        if(_cards->get_kind(i)==target) {
-            return i;
-        }
-    }
-    
-    return INVALID;
-}
-
 int PlayerOthers::Robot_picup_single_for_samecolor(int color,HAH *card_array,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
 {
 	int chose_place=-1;
@@ -971,65 +943,6 @@ int PlayerOthers::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_KIN
 	return chose_place;
 }
 
-int PlayerOthers::ChooseCard(HAH *pres,int reseved,CARD_KIND list1[],CARD_KIND list2[],int len1,int len2)
-{
-	//unsigned char ting_flag;
-    int show_place = -1;
-	int hu_num     = -1;
-    
-	MRES *res      = new MRES;
-	
-	for(int i=0;i<MAX_HANDIN_NUM;i++) {
-		memset(res->hu_cards[i],ck_NOT_DEFINED,sizeof(CARD_KIND)*9);
-    }
-
-	if( _cards->get_ming_info(res) ) {
-		for(int k=0;k<MAX_HANDIN_NUM;k++) {
-			if(_cards->can_handout(k)) {
-			    Card_t s_kind = _cards->get_kind(k);
-				if(Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)!=0) {
-					res->hu_cards_num[k]=0;
-					continue;
-				}
-                
-				int s_num=0;
-				for(int j=0;j<9;j++)
-					if(res->hu_cards[k][j]>=0)
-					{
-						s_num += river_reserved_card(pres,res->hu_cards[k][j]);
-						s_num -= pres->list[res->hu_cards[k][j]].same_times;
-					}
-				res->hu_cards_num[k]=s_num;
-			} else {
-				res->hu_cards_num[k]=0;
-            }
-		}
-		hu_num=res->hu_cards_num[0];
-        
-		int l_place    = -1;
-
-		for(int i=0;i<MAX_HANDIN_NUM;i++) {
-			if(_cards->can_handout(i)) {
-				Card_t s_kind = _cards->get_kind(i);
-				if(res->hu_cards_num[i]>=hu_num&&Robot_check_pickup_card((CARD_KIND)s_kind,list1,list2,len1,len2)==0)
-					l_place=i;
-			}
-        }
-
-		show_place = l_place;
-		pres->hu_nums=res->hu_cards_num[l_place];
-	}
-
-	if(show_place==-1) {
-		show_place=Robot_pickup_single(pres,list1,list2,len1,len2);
-	}
-    
-	if(res)
-		delete res;
-
-	return show_place;
-}
-
 #include "RoundManager.h"
 
 void PlayerOthers::_CollectPosition(KindPosition *cards) {
@@ -1052,7 +965,7 @@ void PlayerOthers::_CollectPosition(KindPosition *cards) {
     }
 }
 
-void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],int *len1,int *len2,RoundManager &context)
+void PlayerOthers::_SetContext(RoundManager &context)
 {
     memset(&_ctx,0,sizeof(Context_t));
 
@@ -1065,38 +978,64 @@ void PlayerOthers::_SetContext(HAH *res,CARD_KIND target1[],CARD_KIND target2[],
     _ctx.OthersTing[1] = context._players[(curPlayer+2)%3]->_cards->_ting;
 
     _CollectPosition(_ctx.cards);
+    
     if(_cards->_ting) {
         _ctx.huNum = _cards->_ting->cardNum;
     } else {
         _ctx.huNum = 0;
     }
-    /*******************************************/
-	memset(res,0,sizeof(HAH));
-	memset(res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
-
-    res->reserved_card_num = TOTAL_CARD_NUM - context._distributedNum;
-    
-	CARD s_card;
-
-    for(int i=0;i<context._gRiver->size();i++) {
-		res->card_in_river[res->river_len++] = (CARD_KIND)context._gRiver->get_kind(i);
-    }
-
-	context._players[(curPlayer+1)%3]->_cards->get_hu_cards(target1,len1);
-	context._players[(curPlayer+2)%3]->_cards->get_hu_cards(target2,len2);
-
-    for(int i=_cards->FreeStart;i<_cards->size();i++) {
-		int time = res->list[_cards->get_kind(i)].same_times++;
-		res->list[_cards->get_kind(i)].place[time]=i;
-	}
-
-	res->target = (ROBOT_TARGET)_cards->assess_aim();
 }
 
-int PlayerOthers::choose_card(RoundManager &context,bool &canKou) {
+int PlayerOthers::PickupForMing(ActionId_t &ming,bool &canKou) {
+    Card_t target = CARD_UNKNOWN;
+    int    minum  = 0;
+
+    if(_cards->collect_ming_info(_ctx.river)) {
+        for(int i=0;i<_cards->_ming.choiceNum;i++) {
+            MingChoice_t  *choice = _cards->_ming.handouts+i;
+
+            if(!OthersCanHu(choice->kind)) {
+                int num = _cards->get_ting_num(target);
+
+                if(minum > num) {
+                    target = choice->kind;
+                    minum = num;
+                }
+            }
+        }
+    }
+
+    for(int i=0;i<_cards->size();i++) {
+        if(_cards->get_kind(i)==target) {
+            _cards->set_ming(i);
+            _ctx.huNum = _cards->_ting->cardNum;
+            if(_ctx.huNum>=6) {
+                canKou = true;
+            }            
+
+            return i;
+        }
+    }
+    
+    return INVALID;
+}
+
+int PlayerOthers::choose_card(RoundManager &context,ActionId_t &ming,bool &canKou) {
     if(_cards->IsMing) {
         return _cards->last();
     } else {
+        _SetContext(context);
+        
+        if(ming==aMING) {
+            int index = PickupForMing(ming,canKou);
+            if(index!=INVALID) {
+                return index;
+            } else {
+                ming=aQi;
+            }
+        }
+
+        /*******************************************/
         HAH *s_res = new HAH;
         
         CARD_KIND list1[9];
@@ -1104,18 +1043,33 @@ int PlayerOthers::choose_card(RoundManager &context,bool &canKou) {
         int len1;
         int len2;
         
-        canKou = false;
-        _SetContext(s_res,list1,list2,&len1,&len2,context);
+        memset(s_res,0,sizeof(HAH));
+        memset(s_res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
         
-		int index = ChooseCard(s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
-		if( index==INVALID ) {
-			index = _cards->last();
-		}
+        s_res->reserved_card_num = TOTAL_CARD_NUM - context._distributedNum;
         
-		if(context._actCtrl.decision==aMING && s_res->hu_nums>=6 ) {
-			canKou = true;
-		}
-
+        CARD s_card;
+        
+        for(int i=0;i<context._gRiver->size();i++) {
+            s_res->card_in_river[s_res->river_len++] = (CARD_KIND)context._gRiver->get_kind(i);
+        }
+        
+        int curPlayer = context._curPlayer;
+        context._players[(curPlayer+1)%3]->_cards->get_hu_cards(list1,&len1);
+        context._players[(curPlayer+2)%3]->_cards->get_hu_cards(list2,&len2);
+        
+        for(int i=_cards->FreeStart;i<_cards->size();i++) {
+            int time = s_res->list[_cards->get_kind(i)].same_times++;
+            s_res->list[_cards->get_kind(i)].place[time]=i;
+        }
+        
+        s_res->target = (ROBOT_TARGET)_cards->assess_aim();
+        
+        int index = Robot_pickup_single(s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
+        if( index==INVALID ) {
+            index = _cards->last();
+        }
+        
         return index;
     }
 }

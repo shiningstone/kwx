@@ -447,10 +447,15 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 }
 
 void RoundManager::WaitForOthersChoose() {
-    bool canKou = false;
+    int index    = INVALID;
+    bool canKou  = false;
 
 	PlayerOthers *player = static_cast<PlayerOthers *>(_players[_curPlayer]);
-	int index = player->choose_card(*this,canKou);
+    index = player->choose_card(*this,_actCtrl.decision,canKou);
+
+    if(_actCtrl.decision==aMING) {
+        UpdateCards((PlayerDir_t)_curPlayer,(ARRAY_ACTION)aMING);
+    }
     
     if ( canKou ) {
         Card_t handingout = _players[_curPlayer]->_cards->get_kind(index);
@@ -460,17 +465,12 @@ void RoundManager::WaitForOthersChoose() {
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
 	_players[_curPlayer]->hand_out(index);
 
-    if(true) {
+    if( canKou ) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
         if(_players[_curPlayer]->_cards->kou_group_num()>0)
             UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
     }
 
-    if(_actCtrl.decision==aMING) {
-        UpdateCards((PlayerDir_t)_curPlayer,a_MING);
-        _players[_curPlayer]->_cards->set_ming(index);
-    }
-    
     _uiManager->TingHintBarOfOthers(_curPlayer,index);
 
 	_isNewDistributed = false;
