@@ -4737,10 +4737,14 @@ void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
     const WinInfo_t &win = _roundManager->GetWin();
 
 	if( !(win.kind==NONE_WIN && _roundManager->_firstMingNo==INVALID) ) {
-        auto sign = _CreateSymbol((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        int gold[3] = {0};
+
+        _roundManager->_strategy->get_ending_gold(gold);
+        
+        auto sign = _CreateSymbol((PlayerDir_t)no,gold[no],BarOfPlayer);
         BarOfPlayer->addChild(sign,2,ACCOUNT_DIANPAO_FONT);
 
-        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,GoldAccountImmediate[no],BarOfPlayer);
+        auto goldChange = _CreatePropertyChange((PlayerDir_t)no,gold[no],BarOfPlayer);
         BarOfPlayer->addChild(goldChange,2,ACCOUNT_WINGOLD_NUM);
 	}
 

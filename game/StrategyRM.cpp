@@ -6,6 +6,11 @@
 
 #include "StrategyRm.h"
 #include "StrategyRmConcrete.h"
+
+void StrategyRm::get_ending_gold(int gold[PLAYER_NUM]) {
+    memcpy(gold,_roundEndingGold,sizeof(int)*PLAYER_NUM);
+}
+
 /*************************************
         local strategy
 *************************************/
@@ -80,7 +85,7 @@ void StrategyLocalRM::CalcNoneWinGold(int gold[3], int giver) {
     gold[giver] = - ((gold[(giver+1)%3] + gold[(giver+2)%3]));
 }
 
-void StrategyLocalRM::CalcHuGold(int gold[3],const WinInfo_t &win) {
+void StrategyLocalRM::CalcHuGold(int gold[PLAYER_NUM],const WinInfo_t &win) {
     switch(win.kind) {
         case SINGLE_WIN:
             CalcSingleWinGold(gold,win.winner,win.giver);
@@ -92,9 +97,13 @@ void StrategyLocalRM::CalcHuGold(int gold[3],const WinInfo_t &win) {
             CalcNoneWinGold(gold,win.winner);
             break;
     }
+
+    for(int i=0;i<PLAYER_NUM;i++) {
+        _roundEndingGold[i] = gold[i];
+    }
 }
 
-void StrategyLocalRM::CalculateGold(int gold[3],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
+void StrategyLocalRM::CalculateGold(int gold[PLAYER_NUM],PlayerDir_t GoldWinner,GoldKind_t goldKind,PlayerDir_t whoGive) {
     switch(goldKind) {
         case AN_GANG:
             return CalcAnGangGold(GoldWinner,gold,_rm->_continue_gang_times);
@@ -112,6 +121,8 @@ StrategyRm* StrategyRm::_instance = NULL;
 
 StrategyRm::StrategyRm(RoundManager *rm) {
     _rm = rm;
+
+    memset(_roundEndingGold,0,PLAYER_NUM*sizeof(int));
 }
 
 StrategyRm::~StrategyRm() {
