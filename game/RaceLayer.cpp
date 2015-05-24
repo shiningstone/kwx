@@ -2053,6 +2053,23 @@ void RaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
     }
 }
 
+void RaceLayer::_CancelChosenCardInHand() {
+    auto card = _GetCardInHand(MIDDLE,_myChosenCard);
+
+    card->setPosition(card->getPosition() - Vec2(0,10));
+    card->setScale(1);
+
+    auto cardSize = _object->RectSize(FREE_CARD);
+    auto cards    = _roundManager->_players[MIDDLE]->_cards;
+
+    for(int i=_myChosenCard+1;i<=cards->real_last();i++) {
+        auto behinds = _GetCardInHand(MIDDLE,i);
+        behinds->setPosition(behinds->getPosition() - Vec2(cardSize.width*0.2,0));
+    }
+
+    _myChosenCard = INVALID;
+}
+
 void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
     if(cards->canPlay(chosen)) {/* I think the cards behind start all can play ???*/                 
 
@@ -2311,6 +2328,7 @@ void RaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
+            _CancelChosenCardInHand();
             _roundManager->RecvGang(MIDDLE);
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -4227,6 +4245,7 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
                         FadeOut::create(0.3),
                         ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
                 RaceLayer::_DeleteActionTip)),CCCallFunc::create([=](){
+                _CancelChosenCardInHand();
                 _roundManager->RecvMing();}),NULL));
 		}
 		break;

@@ -77,6 +77,7 @@ private:
     
     void _OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isNewDistributed,Card_t card = CARD_UNKNOWN);
     void _UpdateNonChosenCards(const CardInHand *cards, int chosen);
+    void _CancelChosenCardInHand();
     void _UpdateCardsInHand(const CardInHand *cards, int chosen);
     void _ShowMenuButtons();
     void _CreateMeneButtons();
