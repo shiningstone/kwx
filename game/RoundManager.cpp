@@ -424,6 +424,8 @@ void RoundManager::WaitForMyChoose() {
             
             Vec2 location = _uiManager->GetCardPositionInHand(last);
             RecvHandout(last,location,2);
+
+            _prevPlayer = MIDDLE;
 		} else {
 			_actCtrl.handoutAllow = true;
         }
@@ -490,7 +492,7 @@ void RoundManager::WaitForTuoGuanHandle() {
     if(_isWaitForMyDecision) {
         _isWaitForMyDecision=false;
         
-        if(_actCtrl.choices!=0) {
+        if(_actCtrl.choices!=0 && !_isNewDistributed) {
             _players[MIDDLE]->_cards->pop_back();
         }
         
