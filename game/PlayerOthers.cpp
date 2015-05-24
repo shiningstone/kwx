@@ -1065,7 +1065,7 @@ int PlayerOthers::choose_card(RoundManager &context,ActionId_t &ming,bool &canKo
         
         s_res->target = (ROBOT_TARGET)_cards->assess_aim();
         
-        int index = Robot_pickup_single(s_res,TOTAL_CARD_NUM - context._distributedNum,list1,list2,len1,len2);
+        int index = Robot_pickup_single(s_res,list1,list2,len1,len2);
         if( index==INVALID ) {
             index = _cards->last();
         }
