@@ -112,13 +112,13 @@ ActionMask_t Player::judge_action_again() {
 	return res;
 }
 
-ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
+ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
 	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
 	if(_cards->can_hu(newCard)) {
 		_score = _strategy->calc_score(newCard);
 
-		if(isNewDistributed || (tingStatus==1||_score!=1)) {/* BUG only ming can hu dianpao ??? */
+		if(isNewDistributed || pervMing || _score>1) {
 			actions |= aHU;
         }
 	}
@@ -131,7 +131,7 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool tingStatu
 	}
 
     LOGGER_WRITE("NETWORK : %x %s actions %d: newCard %d,isNewDistributed %d,tingStatus %d,isLastOne %d",
-        (int)this,__FUNCTION__,actions,newCard,isNewDistributed,tingStatus,isLastOne);
+        (int)this,__FUNCTION__,actions,newCard,isNewDistributed,pervMing,isLastOne);
     
 	return actions;
 }

@@ -24,7 +24,7 @@ public:
     /**************************************************
             user's action
     **************************************************/
-    ActionMask_t hand_in(Card_t kind,bool isNewDistributed,bool tingStatus,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
+    ActionMask_t hand_in(Card_t kind,bool isNewDistributed,bool pervMing,bool isLastOne,ActionId_t last_action_WithGold,unsigned int continue_gang_times,bool isGangHua); //0:sever, 1:player
     Card_t       hand_out(unsigned int place);
 	ActionMask_t judge_action_again();
 

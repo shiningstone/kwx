@@ -517,12 +517,12 @@ void RoundManager::WaitForTuoGuanHandle() {
     }
 }
 
-unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus) {
+unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevMing) {
     ActionMask_t actions = 
         _players[dir]->hand_in(
             LastHandout(),
             _isNewDistributed,
-            prevTingStatus,
+            prevMing,
             (_distributedNum==TOTAL_CARD_NUM),
             _lastActionWithGold,
             _continue_gang_times,
@@ -563,7 +563,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
         _players[dir]->hand_in(
             NewDistribute(),
             _isNewDistributed,
-            _players[dir]->_cards->IsMing,
+            _players[_prevPlayer]->_cards->IsMing,
             (_distributedNum==TOTAL_CARD_NUM),
             _lastActionWithGold,
             _continue_gang_times,
@@ -585,13 +585,13 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
 }
 
 void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
-    bool prevTingStatus = IsMing(dir);
+    bool prevMingStatus = IsMing(dir);
     
     int no1=((PlayerDir_t)dir+1)%3;
-    unsigned char action1 = _GetPlayerReaction((PlayerDir_t)no1,prevTingStatus);
+    unsigned char action1 = _GetPlayerReaction((PlayerDir_t)no1,prevMingStatus);
     
     int no2=((PlayerDir_t)dir+2)%3;
-    unsigned char action2 = _GetPlayerReaction((PlayerDir_t)no2,prevTingStatus);
+    unsigned char action2 = _GetPlayerReaction((PlayerDir_t)no2,prevMingStatus);
     
     if((action1&a_HU)&&(action2&a_HU))
     {
