@@ -260,8 +260,7 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
         kind = LastHandout();
         _players[dir]->_cards->push_back(kind);
     } else {
-        int *gangIdx = new int[4];
-        kind = _players[dir]->_cards->find_an_gang_cards(gangIdx);
+        kind = _players[dir]->_cards->find_an_gang_cards();
     }
     
     if(dir==MIDDLE) {
