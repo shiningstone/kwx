@@ -232,17 +232,17 @@ void NetRoundManager::StartGame() {
 }
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
-    _players[dir]->_cards->push_back(LastHandout());
-
-    Card_t      kind = RoundManager::RecvPeng(dir);
+    Card_t kind = LastHandout();
     
+    _players[dir]->_cards->push_back(kind);
+
     if(dir==MIDDLE) {
         RequestSendAction aReq;
         aReq.Set(aPENG,kind);
         _messenger->Send(aReq);
     }
 
-	return kind;
+    return RoundManager::RecvPeng(dir);
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
@@ -254,11 +254,15 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
+    Card_t kind = CARD_UNKNOWN;
+    
     if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
-        _players[dir]->_cards->push_back(LastHandout());
+        kind = LastHandout();
+        _players[dir]->_cards->push_back(kind);
+    } else {
+        int *gangIdx = new int[4];
+        kind = _players[dir]->_cards->find_an_gang_cards(gangIdx);
     }
-
-    Card_t kind = RoundManager::RecvGang(dir);
     
     if(dir==MIDDLE) {
         RequestSendAction aReq;
@@ -266,7 +270,7 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
         _messenger->Send(aReq);
     }
 
-	return kind;
+    return RoundManager::RecvGang(dir);
 }
 
 void NetRoundManager::RecvQi() {
