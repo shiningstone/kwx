@@ -234,14 +234,13 @@ void NetRoundManager::StartGame() {
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     Card_t kind = LastHandout();
     
-    _players[dir]->_cards->push_back(kind);
-
     if(dir==MIDDLE) {
         RequestSendAction aReq;
         aReq.Set(aPENG,kind);
         _messenger->Send(aReq);
     }
 
+    _players[dir]->_cards->push_back(kind);
     return RoundManager::RecvPeng(dir);
 }
 
@@ -258,7 +257,6 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
     
     if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
         kind = LastHandout();
-        _players[dir]->_cards->push_back(kind);
     } else {
         kind = _players[dir]->_cards->find_an_gang_cards();
     }
@@ -269,6 +267,9 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
         _messenger->Send(aReq);
     }
 
+    if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
+        _players[dir]->_cards->push_back(kind);
+    }
     return RoundManager::RecvGang(dir);
 }
 
