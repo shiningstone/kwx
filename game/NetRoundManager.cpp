@@ -693,13 +693,13 @@ void NetRoundManager::_UpdateWin(HuInfo_t *player) {
     int loser = 0;
     
     for(int i=0;i<PLAYER_NUM;i++) {
-        if( player[i].winType==ZI_MO ) {
+        if( player[i].status==ZI_MO ) {
             SetWin(SINGLE_WIN,i);
             break;
-        } else if( player[i].winType==HU_PAI ) {
+        } else if( player[i].status==HU_PAI ) {
             winner = i;
             winnerNum++;
-        } else if( player[i].winType==DIAN_PAO ) {
+        } else if( player[i].status==DIAN_PAO ) {
             loser = i;
         }
     }

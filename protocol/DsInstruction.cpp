@@ -264,7 +264,7 @@ int HuInfoNotif::Construct(const DsMsg &msg) {
         PlayerDir_t dir = PlayerDir_t((zhuang+i)%3);
         
         hu[dir].fan    = fan[i];
-        hu[dir].winType= (HuKind_t)status[i];
+        hu[dir].status = (HuKind_t)status[i];
         hu[dir].score  = score[i];
         hu[dir].cardNum= cardNum[i];
         memcpy(hu[dir].card, card[i], sizeof(CardNode_t)*18);

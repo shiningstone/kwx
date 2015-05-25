@@ -176,7 +176,7 @@ typedef enum {
 }HuKind_t;
 
 typedef struct {
-    HuKind_t   winType;
+    HuKind_t   status;
     INT32U     fan;
     INT32U     score;
     int        cardNum;
