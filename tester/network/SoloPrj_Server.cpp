@@ -758,6 +758,38 @@ void E15051902_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     }
 }
 
+void round5_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 1;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+    } else if(handout==1) {
+        handout++;
+        for(int i=8;i<10;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==2) {
+        handout++;
+        for(int i=10;i<14;i++) {
+            SendLine(SERVER,i);
+        }
+    } else if(handout==3) {
+        SendLine(SERVER,14);
+        SendLine(SERVER,15);
+        SendLine(SERVER,16);
+    }
+}
+
 void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
@@ -850,9 +882,6 @@ void test_server_console() {
     SetFile("E15051801");
     gHandle = E15051801_handle_requests;
 
-    SetFile("Round1");
-    gHandle = round1_handle_requests;
-
     SetFile("E15051901");
     gHandle = E15051901_handle_requests;
 
@@ -861,6 +890,12 @@ void test_server_console() {
 
     SetFile("temp");
     gHandle = temp_handle_requests;
+
+    SetFile("Round1");
+    gHandle = round1_handle_requests;
+
+    SetFile("Round5");
+    gHandle = round5_handle_requests;
 
     test_smart_game_round_x();
 #endif
