@@ -4,8 +4,8 @@
 #include "ui/CocosGUI.h"
 using namespace CocosDenshion;
 
-#include "account.h"
-#include "Resources.h"
+#include "./../account.h"
+#include "./../Resources.h"
 
 #include "GameType.h"
 

@@ -1,6 +1,6 @@
 ﻿
 #include "RaceLayer.h"
-#include "HelloWorldScene.h"
+#include "./../HelloWorldScene.h"
 #include "RoundManager.h"
 #include "StrategyRm.h"
 
@@ -141,7 +141,7 @@ void RaceLayer::StartGame()
 	ifEffectTime=false;
     _myChosenCard = -1;
     
-	_RaceBeginPrepare();                  //牌局开始效果
+	_RaceBeginPrepare();//测试_yusi                  //牌局开始效果
 
     _roundManager->StartGame();
 }
@@ -638,7 +638,7 @@ void RaceLayer::_LeftBatchDistribute(int batchIdx, float delayRef, int cardLen) 
     float x = _layout->_playerPosi[LEFT].basePoint.x+10;
     float y = _layout->_playerPosi[LEFT].basePoint.y+10;
 
-    y -= (cardHeight*0.5)*(batchIdx);
+    y -= (cardHeight*0.5)*4*(batchIdx);
     for(int i=0;i<DIST_BATCH_CARDS;i++) {
         int cardIdx = i+4*batchIdx;
         if(cardIdx==cardLen) {
@@ -691,23 +691,20 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 	auto VoiceEffect=_voice->Speak("sort.ogg");	
 
 	float timeXH[PLAYER_NUM];
-    timeXH[zhuang] = 0.7;
-    timeXH[(zhuang+1)%PLAYER_NUM] = 0.7+0.2;
-    timeXH[(zhuang+2)%PLAYER_NUM] = 0.7+0.2+0.2;
-
-	Sprite* lastTwo[2];
-
-    auto cards = _roundManager->_players[MIDDLE]->_cards;
-    auto cardWidth = _object->RectSize(FREE_CARD).width;
+	timeXH[zhuang] = 0.7;
+	timeXH[(zhuang+1)%PLAYER_NUM] = 0.9;
+	timeXH[(zhuang+2)%PLAYER_NUM] = 1.1;
 
 	int a,b;
-	//自己
-    /************************************
-        one batch from center to hand
-    ************************************/
+	/************************************
+	 自己 middle -> one batch from center to hand
+	************************************/
+	auto cards=_roundManager->_players[MIDDLE]->_cards;
+	auto cardWidth = _object->RectSize(FREE_CARD).width;
+	auto disCardWidth = _object->RectSize(IN_CARD).width;
+
 	Sprite* meHandCard[DIST_BATCH_CARDS];
 	Vec2 meHandPosition[DIST_BATCH_CARDS];
-	auto disCardWidth = _object->RectSize(IN_CARD).width;
 
 	for (a=0;a<DIST_BATCH_CARDS;a++) {
 		meHandPosition[a] = _layout->PositionOfNewDistributeCard(a,disCardWidth);
@@ -721,8 +718,8 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 
 	float changingPosition[DIST_BATCH_CARDS];
 	Point HandoutEnd=Vec2(
-        _layout->_playerPosi[MIDDLE].basePoint.x+10,
-        _layout->_playerPosi[MIDDLE].basePoint.y+110);
+		_layout->_playerPosi[MIDDLE].basePoint.x+10,
+		_layout->_playerPosi[MIDDLE].basePoint.y+110);
 
 	for(a=0;a<DIST_BATCHES;a++) {
 		for (b=0;b<DIST_BATCH_CARDS;b++) {
@@ -730,41 +727,40 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		}
 		float y=HandoutEnd.y;
 
-        changingPosition[0]+=cardWidth*a;
-		changingPosition[1]+=cardWidth*(a*2)+cardWidth;
-		changingPosition[2]+=cardWidth*(a*3)+cardWidth*2;
+		changingPosition[0]+=cardWidth*a;
+		changingPosition[1]+=(cardWidth*(a*2)+cardWidth);
+		changingPosition[2]+=(cardWidth*(a*3)+cardWidth*2);
 		changingPosition[3]+=(cardWidth*13+a*cardWidth+30);
-        
+
 		auto outTime1=Sequence::create(
-            DelayTime::create(timeXH[1]-0.3),
-            _effect->MoveDistributeCard(Vec2(changingPosition[0],y),
-                Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL);
+			DelayTime::create(timeXH[1]-0.4),
+			_effect->MoveDistributeCard(Vec2(changingPosition[0],y),
+			Vec2(meHandPosition[a].x,meHandPosition[a].y)),NULL);
 
 		auto outTime2 = _effect->MoveDistributeCard(Vec2(changingPosition[1],y),
-            Vec2(meHandPosition[a].x,meHandPosition[a].y));
+			Vec2(meHandPosition[a].x,meHandPosition[a].y));
 		auto outTime3 = _effect->MoveDistributeCard(Vec2(changingPosition[2],y),
-            Vec2(meHandPosition[a].x,meHandPosition[a].y));
+			Vec2(meHandPosition[a].x,meHandPosition[a].y));
 
 		Sequence* outTime4;
 
 		if( (zhuang==1&&a<2)||(zhuang!=1&&a<1) )
 			outTime4 = _effect->MoveDistributeCard(Vec2(changingPosition[3],y),
-                Vec2(meHandPosition[a].x,meHandPosition[a].y));
+			Vec2(meHandPosition[a].x,meHandPosition[a].y));
 		else
 			outTime4=Sequence::create(
-    			DelayTime::create(0.4),NULL);
+			DelayTime::create(0.4),NULL);
 
 		meHandCard[a]->runAction(Sequence::create(outTime1,outTime2,outTime3,outTime4,NULL));
 	}
-
-
-    /************************************
-        distribute to middle player
-    ************************************/
-    Sprite* p_list[4];
-    float x,y;
-    const Vec2 &REF = Vec2(_layout->_playerPosi[1].basePoint.x+10,
-                            _layout->_playerPosi[1].basePoint.y+10);
+	/************************************
+	 自己 middle -> distribute to middle player
+	************************************/
+	Sprite* p_list[4];
+	Sprite* lastTwo[2];
+	float x,y;
+	const Vec2 &REF = Vec2(_layout->_playerPosi[1].basePoint.x+10,
+		_layout->_playerPosi[1].basePoint.y+10);
 
 	for(a=0;a<DIST_BATCHES;a++)
 	{
@@ -772,24 +768,23 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		{
 			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{				
-                auto s_card=_object->CreateKind(cards->get_kind(0+3*i),NORMAL);
+				auto s_card=_object->CreateKind(cards->get_kind(0+3*i),NORMAL);
 
 				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
-                
 				p_list[i]->setPosition(Vec2(REF.x+cardWidth*i, REF.y));
 				p_list[i]->setScale(0);
+				myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+1*20+i);
 
-                myframe->addChild(p_list[i],i+1,HAND_IN_CARDS_TAG_ID+1*20+i);
+				auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.2),ScaleTo::create(0,1),NULL);
 
-                auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.2),ScaleTo::create(0,1),NULL);
 				auto mv1=MoveTo::create(0.2,Vec2(
-                    REF.x+cardWidth*i*2, 
-                    REF.y));
+					REF.x+cardWidth*i*2, 
+					REF.y));
 				auto delay1=DelayTime::create(0.4);
 				auto mv2=MoveTo::create(0.2,Vec2(
-                    REF.x+cardWidth*i*3, 
-                    REF.y));
+					REF.x+cardWidth*i*3, 
+					REF.y));
 				auto delay2=DelayTime::create(0.4);
 				auto list_seq1=Sequence::create(DelayTime::create(timeXH[1]+0.2),delay1,mv1,delay2,mv2,NULL);
 				auto list_spa=Spawn::create(list_seq0,list_seq1,NULL);
@@ -801,17 +796,16 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{
 				auto s_card=_object->CreateKind(cards->get_kind(1+3*i),NORMAL);
-                p_list[i]=_object->Create(FREE_CARD,s_card);
+				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
 				p_list[i]->setPosition(Vec2(REF.x+cardWidth*1.0*i*2+cardWidth, REF.y));
 				p_list[i]->setScale(0);
-
 				myframe->addChild(p_list[i],i+5,HAND_IN_CARDS_TAG_ID+1*20+4+i);
 
 				auto list_seq0=Sequence::create(DelayTime::create(timeXH[1]+0.8),ScaleTo::create(0,1),NULL);
 				auto mv1=MoveTo::create(0.2,Vec2(
-                    REF.x+cardWidth*i*3+cardWidth, 
-                    REF.y));
+					REF.x+cardWidth*i*3+cardWidth, 
+					REF.y));
 				auto delay1=DelayTime::create(0.4);
 				auto list_seq1=Sequence::create(DelayTime::create(timeXH[1]+0.8),delay1,mv1,NULL);
 				auto list_spa=Spawn::create(list_seq0,list_seq1,NULL);
@@ -823,19 +817,16 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 			for(int i=0;i<DIST_BATCH_CARDS;i++)
 			{
 				auto s_card=_object->CreateKind(cards->get_kind(2+3*i),NORMAL);
-
 				p_list[i]=_object->Create(FREE_CARD,s_card);
 				p_list[i]->setAnchorPoint(Point(0.0f,0.0f));
 				p_list[i]->setPosition(Vec2(
-                    REF.x + cardWidth*(i*3) + cardWidth*1.0*2, 
-                    REF.y));
+					REF.x + cardWidth*(i*3) + cardWidth*1.0*2, 
+					REF.y));
 				p_list[i]->setScale(0);
-
 				myframe->addChild(p_list[i],i+9,HAND_IN_CARDS_TAG_ID+1*20+8+i);
 
 				p_list[i]->runAction(Sequence::create(DelayTime::create(timeXH[1]+1.4),ScaleTo::create(0,1),NULL));
 			}
-
 		}
 		else if(a==3)//DelayTime(2.7)
 		{
@@ -843,38 +834,36 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 			lastTwo[0]=_object->Create(FREE_CARD,s_card);
 			lastTwo[0]->setAnchorPoint(Vec2(0.0f,0.0f));
 			lastTwo[0]->setPosition(Vec2(
-                REF.x + cardWidth*1.0*12, 
-                REF.y));
+				REF.x + cardWidth*1.0*12, 
+				REF.y));
 			lastTwo[0]->setScale(0);
 			myframe->addChild(lastTwo[0],0+13,HAND_IN_CARDS_TAG_ID+1*20+12);
 
 			lastTwo[0]->runAction(Sequence::create(DelayTime::create(timeXH[1]+2),ScaleTo::create(0,1),NULL));	
-            
+
 			if(zhuang==MIDDLE) {
 				auto s_card=_object->CreateKind(cards->get_kind(13),NORMAL);
 				lastTwo[1]=_object->Create(FREE_CARD,s_card);
 				lastTwo[1]->setAnchorPoint(Vec2(0.0f,0.0f));
 				lastTwo[1]->setPosition(Vec2(
-                    REF.x + cardWidth*1.0*13 + 30,
-                    REF.y));
+					REF.x + cardWidth*1.0*13 + 30,
+					REF.y));
 				lastTwo[1]->setScale(0);
 				myframe->addChild(lastTwo[1],0+18,HAND_IN_CARDS_TAG_ID+1*20+13);
-                
+
 				lastTwo[1]->runAction(Sequence::create(DelayTime::create(timeXH[1]+2),ScaleTo::create(0,1),NULL));
 			}
 		}
 	}
-    
 	/**********************************************************
-        distribute to right player
-    **********************************************************/
-    auto cardHeight=_object->RectSize(LR_IN_CARD).height;
-
+	distribute to right player
+	**********************************************************/
+	auto cardHeight=_object->RectSize(LR_IN_CARD).height;
 	auto rHandinHeight=_object->RectSize(R_IN_CARD).height;
 
 	Point RinghtHandoutEnd=Vec2(
-        _layout->_playerPosi[2].basePoint.x+10,
-        _layout->_playerPosi[2].basePoint.y+10);
+		_layout->_playerPosi[2].basePoint.x+10,
+		_layout->_playerPosi[2].basePoint.y+10);
 
 	Sprite* RobotHandCard[4];
 	Vec2 RightHandPosition[4];
@@ -883,14 +872,14 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		RobotHandCard[a]=_object->Create(LR_IN_CARD);
 		RobotHandCard[a]->setAnchorPoint(Vec2(0.5,0));
 		RobotHandCard[a]->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5,
-            origin.y+visibleSize.height*0.5-cardHeight*1.65+cardHeight*a*0.65));
+			origin.x+visibleSize.width*0.5,
+			origin.y+visibleSize.height*0.5-cardHeight*1.65+cardHeight*a*0.65));
 		RobotHandCard[a]->setScale(0);
 		myframe->addChild(RobotHandCard[a],6-a,START_CARDS_IN_TAG_ID+2*a);
 		RightHandPosition[a]=RobotHandCard[a]->getPosition();
 	}
-    
-    for(a=0;a<4;a++)
+
+	for(a=0;a<4;a++)
 	{
 		for (b=0;b<4;b++)
 		{
@@ -914,19 +903,19 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		RobotHandCard[a]->runAction(Sequence::create(outTime1,outTime2,outTime3,outTime4,NULL));
 	}
 
-    for(a=0;a<4;a++) {
-        _RightBatchDistribute(a,timeXH[2],(zhuang==2)?14:13);
-    }
-    
+	for(a=0;a<4;a++) {
+		_RightBatchDistribute(a,timeXH[2],(zhuang==2)?14:13);
+	}
+
 	/**********************************************************
-        distribute to left player
-    **********************************************************/
-    auto lHandinHeight=_object->RectSize(L_IN_CARD).height;
+	distribute to left player
+	**********************************************************/
+	auto lHandinHeight=_object->RectSize(L_IN_CARD).height;
 
 	Point LeftHandoutEnd=Vec2(
-        _layout->_playerPosi[0].basePoint.x+10,
-        _layout->_playerPosi[0].basePoint.y+10);
-    
+		_layout->_playerPosi[0].basePoint.x+10,
+		_layout->_playerPosi[0].basePoint.y+10);
+
 	Sprite* LeftRobotHandCard[4];
 	Vec2 LeftHandPosition[4];
 	for (a=0;a<4;a++)
@@ -934,8 +923,8 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 		LeftRobotHandCard[a]=_object->Create(LR_IN_CARD);
 		LeftRobotHandCard[a]->setAnchorPoint(Vec2(0.5f,0.5f));
 		LeftRobotHandCard[a]->setPosition(Vec2(
-            origin.x+visibleSize.width*0.5,
-            origin.y+visibleSize.height*0.5+cardHeight*1.2-cardHeight*a*0.6));
+			origin.x+visibleSize.width*0.5,
+			origin.y+visibleSize.height*0.5+cardHeight*1.2-cardHeight*a*0.6));
 		LeftRobotHandCard[a]->setScale(0);
 		myframe->addChild(LeftRobotHandCard[a],3,START_CARDS_IN_TAG_ID+3*a);
 		LeftHandPosition[a]=LeftRobotHandCard[a]->getPosition();
@@ -967,24 +956,23 @@ void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
 	}
 
 	for(a=0;a<4;a++) {
-	    _LeftBatchDistribute(a,timeXH[0],(zhuang==0)?14:13);
-    }
+		_LeftBatchDistribute(a,timeXH[0],(zhuang==0)?14:13);
+	}
 	/**********************************************************
-        
-    **********************************************************/
+
+	**********************************************************/
 	ListenToDistributeCard();
 
 	myframe->_ID = zhuang;
 	myframe->runAction(Sequence::create(
-        _FisrtRoundResidueUpdate(),Spawn::create(CallFunc::create([=](){
-		_CardInHandUpdateEffect(LEFT);}),CallFunc::create([=](){
-		_CardInHandUpdateEffect(MIDDLE);}),CallFunc::create([=](){
-		_CardInHandUpdateEffect(RIGHT);}),NULL),CallFunc::create([=](){
-        _DeleteStartDealCards();}),CCCallFunc::create([=](){
-		WaitForFirstAction(zhuang);
-	}),NULL));
+		_FisrtRoundResidueUpdate(),Spawn::create(CallFunc::create([=](){
+			_CardInHandUpdateEffect(LEFT);}),CallFunc::create([=](){
+				_CardInHandUpdateEffect(MIDDLE);}),CallFunc::create([=](){
+					_CardInHandUpdateEffect(RIGHT);}),NULL),CallFunc::create([=](){
+						_DeleteStartDealCards();}),CCCallFunc::create([=](){
+							WaitForFirstAction(zhuang);
+						}),NULL));
 }
-
 Sequence *RaceLayer::_FisrtRoundResidueUpdate() {
 	auto updateFourCards=CallFunc::create([=](){
 		_roundManager->_distributedNum += 4;
@@ -2107,10 +2095,16 @@ void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
                 auto appearPoint=loopCard->getPosition();
                 _TingHintCreate(appearPoint,chosen);
             }
-             
-            ifChosed = true;
-            _myTouchedCard  = chosen;
-        } 
+        }
+		else
+		{
+			if( loopCard->getScaleX()==1 ) {
+				loopCard->setScale(1.2);
+				loopCard->runAction(_voice->Speak("select"));
+			}
+		}
+		ifChosed = true;
+		_myTouchedCard  = chosen;
     }
 }
 
@@ -2426,6 +2420,7 @@ bool RaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
     
     if( touch->getLocation().y > visibleSize.height*0.173 ) {
         /* why is there TING_SING_BAR if non-ting??? from others??? */
+		/*当时写这里的时候不能确认TING_SING_BAR是否完全清除，明牌动作执行并不代表状态为明，明牌动作可取消*/
         while(myframe->getChildByTag(TING_SING_BAR) && (!_roundManager->IsMing(1)))
             myframe->removeChildByTag(TING_SING_BAR);
         
