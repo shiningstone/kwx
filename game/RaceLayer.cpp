@@ -2042,20 +2042,22 @@ void RaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
 }
 
 void RaceLayer::_CancelChosenCardInHand() {
-    auto card = _GetCardInHand(MIDDLE,_myChosenCard);
-
-    card->setPosition(card->getPosition() - Vec2(0,10));
-    card->setScale(1);
-
-    auto cardSize = _object->RectSize(FREE_CARD);
-    auto cards    = _roundManager->_players[MIDDLE]->_cards;
-
-    for(int i=_myChosenCard+1;i<=cards->real_last();i++) {
-        auto behinds = _GetCardInHand(MIDDLE,i);
-        behinds->setPosition(behinds->getPosition() - Vec2(cardSize.width*0.2,0));
+    if(_myChosenCard!=INVALID) {
+        auto card = _GetCardInHand(MIDDLE,_myChosenCard);
+        
+        card->setPosition(card->getPosition() - Vec2(0,10));
+        card->setScale(1);
+        
+        auto cardSize = _object->RectSize(FREE_CARD);
+        auto cards    = _roundManager->_players[MIDDLE]->_cards;
+        
+        for(int i=_myChosenCard+1;i<=cards->real_last();i++) {
+            auto behinds = _GetCardInHand(MIDDLE,i);
+            behinds->setPosition(behinds->getPosition() - Vec2(cardSize.width*0.2,0));
+        }
+        
+        _myChosenCard = INVALID;
     }
-
-    _myChosenCard = INVALID;
 }
 
 void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
