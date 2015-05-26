@@ -159,7 +159,7 @@ public:
     *********************************/
     MingInfo_t  _ming;
     TingInfo_t *_ting;
-    long CalcTimes(Card_t kind);
+    long CalcTimes(Card_t kind);//∑¨–Õº∆À„
     int  CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList *river);
     bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
 

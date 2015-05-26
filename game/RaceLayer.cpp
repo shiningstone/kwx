@@ -141,7 +141,7 @@ void RaceLayer::StartGame()
 	ifEffectTime=false;
     _myChosenCard = -1;
     
-	_RaceBeginPrepare();//测试_yusi                  //牌局开始效果
+	_RaceBeginPrepare();
 
     _roundManager->StartGame();
 }
@@ -247,16 +247,17 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
     if(time==2) {
         if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
             myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
-        }
-    } else {
-        _roundManager->_players[MIDDLE]->_cards->add_effect_card();
-        _ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
-        _roundManager->_players[MIDDLE]->_cards->del_effect_card();
+		}
+	} else {
+		//_roundManager->_players[MIDDLE]->_cards->add_effect_card();
+		_ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
+        //_roundManager->_players[MIDDLE]->_cards->del_effect_card();
     }
-    
-    CardNode_t *node = _roundManager->_players[MIDDLE]->_cards->back();
-    _roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
-    _roundManager->_players[MIDDLE]->_cards->pop_back();
+    _roundManager->_players[MIDDLE]->hand_out(_myTouchedCard);
+
+    //CardNode_t *node = _roundManager->_players[MIDDLE]->_cards->back();
+    //_roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
+    //_roundManager->_players[MIDDLE]->_cards->pop_back();
 
 	_MyHandoutEffect(_roundManager->LastHandout(),touch,time,turnToMing);
 }
@@ -632,7 +633,7 @@ void RaceLayer::ListenToDistributeCard() {
 	_eventDispatcher->addEventListenerWithFixedPriority(_noonewinListener,3);
 }
 
-void RaceLayer::_LeftBatchDistribute(int batchIdx, float delayRef, int cardLen) {
+void RaceLayer::_LeftBatchDistribute(int batchIdx, float delayRef, int cardLen) {//第一轮发牌
 	auto cardHeight = _object->RectSize(L_IN_CARD).height;
 
     float x = _layout->_playerPosi[LEFT].basePoint.x+10;
@@ -1548,39 +1549,51 @@ void RaceLayer::_ReOrderCardsInHand(int droppedCard,CardInHand *cards) {
         
         auto RightMove = MoveTo::create(0.3,Vec2(curPos.x+SIZE.width,curPos.y));
         auto LeftMove  = MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*1.2,curPos.y));
-    
-        auto RightInsertSeq   = Sequence::create(
-            MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
-            MoveTo::create(0.24,Vec2(curPos.x,LAST_POS.y+100)),
-            MoveTo::create(0.06,Vec2(curPos)),NULL);
-        auto LeftInsertSeq   = Sequence::create(
-            MoveTo::create(0.06,Vec2(LAST_POS.x,LAST_POS.y+100)),
-            MoveTo::create(0.24,Vec2(curPos.x-SIZE.width*0.2,LAST_POS.y+100)),
-            MoveTo::create(0.06,Vec2(curPos.x-SIZE.width*0.2,curPos.y)),NULL);
                     
         if(i < droppedCard) {
             if(cards->get_kind(i) <= cards->get_kind(LAST))
                 continue;
             else {
-                if( i==cards->FreeStart || cards->get_kind(i-1)<=cards->get_kind(LAST) ) {
-                    LAST_CARD->runAction(RightInsertSeq);
+				if( i==cards->FreeStart || cards->get_kind(i-1)<=cards->get_kind(LAST) ) {
+					float curScale=(float)(LAST-i)/13;
+					float curDelayTime=curScale*0.35+0.15;
+					auto LeftMoveAction1=MoveTo::create(0.15,Vec2(LAST_POS.x,LAST_POS.y+100));
+					auto LeftMoveAction2=MoveTo::create(curDelayTime,Vec2(curPos.x,LAST_POS.y+100));
+					auto LeftMoveAction3=MoveTo::create(0.15,Vec2(curPos.x,LAST_POS.y));
+					auto LeftInsertSeq=Sequence::create(LeftMoveAction1,LeftMoveAction2,LeftMoveAction3,NULL);
+                    LAST_CARD->runAction(LeftInsertSeq);
                 }
-                
                 card->runAction(RightMove);
             }
         } else if(i==droppedCard) {
-            if(i==cards->FreeStart) {
-                if(cards->get_kind(i+1)>cards->get_kind(LAST))
-                    LAST_CARD->runAction(RightInsertSeq);
+			if(i==cards->FreeStart) {
+				if(i==LAST-1)
+					LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x,LAST_POS.y)));
+				else if(cards->get_kind(i+1)>cards->get_kind(LAST))
+				{
+					float curScale=(float)(LAST-i)/13;
+					float curDelayTime=curScale*0.35+0.15;
+					auto LeftMoveAction1=MoveTo::create(0.15,Vec2(LAST_POS.x,LAST_POS.y+100));
+					auto LeftMoveAction2=MoveTo::create(curDelayTime,Vec2(curPos.x,LAST_POS.y+100));
+					auto LeftMoveAction3=MoveTo::create(0.15,Vec2(curPos.x,LAST_POS.y));
+					auto LeftInsertSeq=Sequence::create(LeftMoveAction1,LeftMoveAction2,LeftMoveAction3,NULL);
+					LAST_CARD->runAction(LeftInsertSeq);
+				}
             } else if(i==LAST-1) {
                 if(cards->get_kind(i-1)<=cards->get_kind(LAST))
                     LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x,LAST_POS.y)));
-            } else {
-                if(cards->get_kind(i-1)<=cards->get_kind(LAST)
-                    &&cards->get_kind(i+1)>cards->get_kind(LAST))
-                    LAST_CARD->runAction(RightInsertSeq);
+			} else {
+				if(cards->get_kind(i-1)<=cards->get_kind(LAST)&&cards->get_kind(i+1)>cards->get_kind(LAST))
+				{
+					float curScale=(float)(LAST-i)/13;
+					float curDelayTime=curScale*0.35+0.15;
+					auto LeftMoveAction1=MoveTo::create(0.15,Vec2(LAST_POS.x,LAST_POS.y+100));
+					auto LeftMoveAction2=MoveTo::create(curDelayTime,Vec2(curPos.x,LAST_POS.y+100));
+					auto LeftMoveAction3=MoveTo::create(0.15,Vec2(curPos.x,LAST_POS.y));
+					auto LeftInsertSeq=Sequence::create(LeftMoveAction1,LeftMoveAction2,LeftMoveAction3,NULL);
+					LAST_CARD->runAction(LeftInsertSeq);
+				}
             }
-            
             card->setScale(0);
         } else {/* i>chosenCard */
             if(cards->get_kind(i)>cards->get_kind(LAST))
@@ -1589,7 +1602,15 @@ void RaceLayer::_ReOrderCardsInHand(int droppedCard,CardInHand *cards) {
                 if(i==LAST-1)
                     LAST_CARD->runAction(MoveTo::create(0.3,Vec2(curPos.x-SIZE.width*0.2,curPos.y)));
                 else if(cards->get_kind(i+1)>cards->get_kind(LAST))
-                    LAST_CARD->runAction(LeftInsertSeq);                    
+				{
+					float curScale=(float)(LAST-i)/13;
+					float curDelayTime=curScale*0.35+0.15;
+					auto LeftMoveAction1=MoveTo::create(0.15,Vec2(LAST_POS.x,LAST_POS.y+100));
+					auto LeftMoveAction2=MoveTo::create(curDelayTime,Vec2(curPos.x-SIZE.width*0.2,LAST_POS.y+100));
+					auto LeftMoveAction3=MoveTo::create(0.15,Vec2(curPos.x-SIZE.width*0.2,curPos.y));
+					auto LeftInsertSeq=Sequence::create(LeftMoveAction1,LeftMoveAction2,LeftMoveAction3,NULL);
+					LAST_CARD->runAction(LeftInsertSeq);
+				}
                 card->runAction(LeftMove);
             }
         }
@@ -1818,7 +1839,7 @@ void RaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToM
     
 	myframe->runAction(Sequence::create(
         allEffect,
-        DelayTime::create(0.12),CallFunc::create([=](){
+        DelayTime::create(0.5),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
             _roundManager->UpdateCards(MIDDLE,a_JUMP);
@@ -2030,9 +2051,9 @@ void RaceLayer::_UpdateNonChosenCards(const CardInHand *cards, int chosen) {
             loopCard->_ID = 1;
         } else if(i>chosen) {
             if( i==cards->last() && cards->is_wait_handout() ) {
-                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+30+14,y1));
+                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart+0.2)+30,y1));
             } else {
-                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart)+14,y1));
+                loopCard->setPosition(Vec2(startPos.x+cardSize.width*(i-cards->FreeStart+0.2),y1));
             }
             
             loopCard->setScale(1);
@@ -3236,7 +3257,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         
 		myframe->_ID=MIDDLE;
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
-            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {
+            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {//ERROR_YUSI
             _ReOrderCardsInHand(0,_roundManager->_players[MIDDLE]->_cards);}),
             DelayTime::create(0.48), CallFunc::create([=](){
 			_roundManager->_strategy->update_gold(dir,AN_GANG,dir);}),CallFunc::create([=](){
@@ -3798,7 +3819,7 @@ Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
     }
 }
 
-float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTing,float refY) {
+float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTing,float refY) {//更新手牌
     float up = (dir==LEFT)?(-1):1;
     float groupGap = (dir==LEFT)?0.4:0.8;
     

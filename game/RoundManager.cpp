@@ -68,7 +68,7 @@ void RoundManager::_GenerateIds(int ids[]) {
 }
 
 int RoundManager::Shuffle() {
-#if 0
+#if 1
     _LoadRandomCardSequence();
 #else
     load_test_round(1,_unDistributedCards);
@@ -253,7 +253,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
-    _players[_curPlayer]->hand_out(idx);
+    //_players[_curPlayer]->hand_out(idx);
 
     _uiManager->MyHandoutEffect(idx,touch,mode,turnToMing);
 }

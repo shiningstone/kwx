@@ -46,7 +46,7 @@ public:
     void HideActionButtons();
     void ShowActionButtons(int mask);
     Vec2 GetCardPositionInHand(int idx);
-    void OthersHandoutEffect(PlayerDir_t dir,bool canKou);
+    void OthersHandoutEffect(PlayerDir_t dir,bool canKou);//其它玩家出牌效果
 protected:
     RoundManager   *_roundManager;
     VoiceEffect    *_voice;
@@ -54,8 +54,6 @@ protected:
     GraphicEffect  *_effect;
     GObjectFactory *_object;
 private:
-    
-
     float _AddBtnQi(const Vec2 &ref);
     float _AddBtnHu(const Vec2 &ref);
     float _AddBtnMing(const Vec2 &ref);
@@ -72,7 +70,7 @@ private:
     Sprite *_GetCardInHand(PlayerDir_t dir,int idx);
     void    _ReOrderCardsInHand(int droppedCard,CardInHand *cards);
     int     _FindCard(int start,int end,Touch *touch);
-    TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);
+    TargetedAction *_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,bool canKou);//其它玩家出牌的效果
     Spawn *_CreateHuBackgroundEffect(PlayerDir_t dir);
     
     void _OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isNewDistributed,Card_t card = CARD_UNKNOWN);
