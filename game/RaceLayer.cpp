@@ -36,13 +36,13 @@ void RaceLayer::Assign(RoundManager *rm) {
 RaceLayer::~RaceLayer()
 {
 	_eventDispatcher->removeAllEventListeners();
-
-    delete _roundManager;
+#if 0
     _voice->destroyInstance();
     _layout->destroyInstance();
     _object->destroyInstance();
     _effect->destroyInstance();
-    
+    _roundManager->destroyInstance();
+#endif
     LOGGER_DEREGISTER(_logger);
 }
 
