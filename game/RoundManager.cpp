@@ -701,7 +701,7 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     if(_isNewDistributed) {
         QiangGangHuJudge(dir);
     } else {
-        DistributeTo(dir,(Card_t)(_unDistributedCards[_distributedNum++]));
+        DistributeTo(TurnTo(dir),(Card_t)(_unDistributedCards[_distributedNum++]));
     }
 }
 
