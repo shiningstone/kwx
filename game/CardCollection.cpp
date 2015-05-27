@@ -228,16 +228,19 @@ void CardInHand::delete_card(int from,int len) {
 void CardInHand::insert_card(CardNode_t data,int times) {
     int insertPlace = _FindInsertPoint(data);
 
-    CardNode_t *card = new CardNode_t;
-    memcpy(card,&data,sizeof(CardNode_t));
+    CardNode_t *card[4] = {0};
+    for(int i=0;i<times;i++) {
+        card[i] = new CardNode_t;
+        memcpy(card[i],&data,sizeof(CardNode_t));
+    }
 
     if(insertPlace==size()) {
         for(INT8U i=0;i<times;i++) {
-            push_back(card);
+            push_back(card[i]);
         }
     } else {
         for(INT8U i=0;i<times;i++) {
-            insert(begin()+insertPlace+i,card);
+            insert(begin()+insertPlace+i,card[i]);
         }
     }
 
