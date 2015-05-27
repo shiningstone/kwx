@@ -326,7 +326,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	}
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
-    _players[MIDDLE]->hand_out(chosen);
+    //_players[MIDDLE]->hand_out(chosen);
 
     bool turnToMing = false;
 	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
