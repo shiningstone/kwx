@@ -241,6 +241,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     }
 
     _players[dir]->_cards->push_back(kind);
+    _players[dir]->_cards->_IncludingOthersCard = true;
     return RoundManager::RecvPeng(dir);
 }
 
