@@ -8,8 +8,8 @@ USING_NS_CC;
 class MsgHandle;
 class MsgQueue:public cocos2d::CCNode {
 public:
-    static MsgQueue *getInstance(MsgHandle *employer);
-    static void  destroyInstance();
+    MsgQueue(MsgHandle *employer);
+    ~MsgQueue();
 
     void pop();
     void push(void *netPackage);
@@ -23,15 +23,6 @@ private:
     
     void _waitMutex()  { _mutex.lock(); /*_owner = getpid();*/ }
     void _clearMutex() { _mutex.unlock(); }
-    
-    /***************************************
-            singleton
-    ***************************************/
-protected:
-    MsgQueue(MsgHandle *employer);
-    ~MsgQueue();
-
-    static MsgQueue *_instance;
 };
 
 class MsgHandle {
@@ -41,7 +32,7 @@ public:
 protected:
     MsgHandle();
     
-    MsgQueue     *_msgQueue;
+    MsgQueue     _msgQueue;
 };
 
 #endif

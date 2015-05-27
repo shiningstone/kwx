@@ -49,31 +49,13 @@ void MsgQueue::push(void * netPackage){
 }
 
 /*************************************
-        singleton
-*************************************/
-MsgQueue* MsgQueue::_instance = NULL;
-
-MsgQueue *MsgQueue::getInstance(MsgHandle *employer) {
-    if (_instance==NULL) {
-        _instance = new MsgQueue(employer);
-    }
-
-    return _instance;
-}
-
-void MsgQueue::destroyInstance() {
-    delete _instance;
-    _instance = NULL;
-}
-
-/*************************************
         message handle
 *************************************/
-MsgHandle::MsgHandle() {
-    _msgQueue = MsgQueue::getInstance(this);
+MsgHandle::MsgHandle():
+_msgQueue(this) {
 }
 
 void MsgHandle::RecvMsg(void *val) {
-    _msgQueue->push(val);
+    _msgQueue.push(val);
 }
 
