@@ -13,7 +13,7 @@ using namespace ui;
 #include "./../utils/LogManager.h"
 #include "CardCollection.h"
 
-extern void load_test_round(int idx,int *output);
+extern void load_test_round(int idx,Card_t *output);
 
 class Player;
 class StrategyRm;

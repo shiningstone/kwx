@@ -2,10 +2,10 @@
 #include "./../../game/GameType.h"
 
 typedef struct CardSeq {
-    int player1[14];
-    int player2[13];
-    int player3[13];
-    int remains[44];
+    Card_t player1[14];
+    Card_t player2[13];
+    Card_t player3[13];
+    Card_t remains[44];
 }CardSeq_t;
 
 CardSeq_t CardRoundx[] = {
@@ -25,20 +25,20 @@ CardSeq_t CardRoundx[] = {
     },
 };
 
-void load_test_round(int roundNo,int *output) {
+void load_test_round(int roundNo,Card_t *output) {
     CardSeq_t *cardSeq = &CardRoundx[roundNo-1];
     
 	int idx = 0;
 	for(int i=0;i<14;i++) {
-		output[idx++]=cardSeq->player1[i];
+		output[idx++] = cardSeq->player1[i];
 	}
     
 	for(int i=0;i<13;i++) {
-		output[idx++]=cardSeq->player2[i];
+		output[idx++] = cardSeq->player2[i];
 	}
     
 	for(int i=0;i<13;i++) {
-		output[idx++]=cardSeq->player3[i];
+		output[idx++] = cardSeq->player3[i];
 	}
 
     for(int i=0;i<84-40;i++) {
