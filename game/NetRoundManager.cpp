@@ -456,7 +456,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     
     Shuffle();
 
-    int cards[14];
+    Card_t cards[14];
     for(int i=0;i<14;i++) {
         cards[i] = info->cards[i];
     }
@@ -482,7 +482,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
 void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
     _uiManager->GuiHideReady();
 
-    int cards[13];
+    Card_t cards[13];
     for(int i=0;i<13;i++) {
         cards[i] = info->cards[i];
     }

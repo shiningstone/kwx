@@ -674,9 +674,8 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
     {
         _actCtrl.decision = aQi;
 
-        _curPlayer = TurnTo(NEXT);
+        DistributeTo(TurnTo(NEXT),(Card_t)(_unDistributedCards[_distributedNum++]));
         _uiManager->UpdateClock(0,_curPlayer);
-        DistributeTo((PlayerDir_t)_curPlayer,(Card_t)(_unDistributedCards[_distributedNum++]));
     }
 }
 
@@ -761,7 +760,7 @@ void RoundManager::_LoadRandomCardSequence() {
 	}
 
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        _unDistributedCards[i] = cards[i]/4;
+        _unDistributedCards[i] = (Card_t)(cards[i]/4);
     }
 }
 

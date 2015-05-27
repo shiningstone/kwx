@@ -46,15 +46,6 @@ Player::~Player() {
 /**************************************************
         user's action
 **************************************************/
-unsigned char Player::init(int cards[],int len,int aim) {
-    Card_t kinds[14];
-    for(int i=0;i<len;i++) {
-        kinds[i] = (Card_t)cards[i];
-    }
-
-    return init(kinds,len,aim);
-}
-
 unsigned char Player::init(Card_t cards[],int len,int aim) {
     _AIM     = aim;
     _aimDone = 0;

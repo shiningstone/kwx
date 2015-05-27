@@ -122,7 +122,7 @@ protected:
     Player     *_players[PLAYER_NUM];
 
     CardList   *_gRiver;
-    int         _unDistributedCards[TOTAL_CARD_NUM];
+    Card_t      _unDistributedCards[TOTAL_CARD_NUM];
     int         _distributedNum;
 
     void        _GenerateIds(int ids[]);
