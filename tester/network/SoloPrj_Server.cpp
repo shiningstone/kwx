@@ -320,6 +320,7 @@ static void SendLine(ServerSocket SERVER,int lineNo) {
     
     Sleep(DELAY);
     sendLen = GetSendData(sendBuf,lineNo);
+    printf("\n%d---->",lineNo);
     SERVER.Send(sendBuf,sendLen);
     SaveLog(fmonitor,"SEND",sendBuf,sendLen);
 }
