@@ -54,6 +54,11 @@ public:
 
     bool _HandoutNotify;
     void _NotifyHandout();
+
+    RequestId_t _waiting;
+    bool        _permited;
+    void Resume(DsInstruction *di);
+    bool Wait(RequestId_t req);
 /* networks end   */
 /******************/
 

@@ -24,7 +24,6 @@ KwxMessenger::KwxMessenger() {
     _messenger->Start();
     #endif
 
-    _waitReq = REQ_INVALID;
     _sendCnt = 0;
     
     _logger = LOGGER_REGISTER("KwxMessenger");
@@ -76,11 +75,6 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     len = aMsg.Serialize(buf);
     _messenger->Send(buf,len);
 
-    RequestId_t req = (RequestId_t)aMsg._header->_requestCode;
-    if(req==REQ_GAME_SEND_ACTION) {
-        Wait(req);
-    }
-
     char desc[512] = {0};
     aMsg.Desc(desc);
     LOGGER_WRITE("----------------> #%d: %s",++_sendCnt,desc);
@@ -88,21 +82,6 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     return 0;
 }
 
-void KwxMessenger::Resume(RequestId_t req) {
-    _waitReq = REQ_INVALID;
-}
-
-bool KwxMessenger::Wait(RequestId_t rsp) {
-    #ifdef USE_REMOTE_SERVER
-    _waitReq = rsp;
-    
-    while(_waitReq!=REQ_INVALID) {
-        _delay(100);
-    }
-    #endif
-    
-    return true;
-}
 /**********************************************************
 	Interfaces
 ***********************************************************/

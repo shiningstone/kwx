@@ -37,6 +37,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     }
 
     _HandoutNotify = false;
+    _waiting = REQ_INVALID;
 
     _messenger = new KwxMessenger();
     _logger = LOGGER_REGISTER("NetRoundManager");
@@ -233,16 +234,26 @@ void NetRoundManager::StartGame() {
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     Card_t kind = LastHandout();
+    bool actionPermit = false;
     
     if(dir==MIDDLE) {
         RequestSendAction aReq;
         aReq.Set(aPENG,kind);
         _messenger->Send(aReq);
+        actionPermit = Wait(REQ_GAME_SEND_ACTION);
     }
 
-    _players[dir]->_cards->push_back(kind);
-    _players[dir]->_cards->_IncludingOthersCard = true;
-    return RoundManager::RecvPeng(dir);
+    if(actionPermit) {
+        _players[dir]->_cards->push_back(kind);
+        _players[dir]->_cards->_IncludingOthersCard = true;
+        return RoundManager::RecvPeng(dir);
+    } else {
+        LOGGER_WRITE("the action are not permiteed right now\n");
+
+        _players[dir]->_cards->push_back(kind);
+        _players[dir]->_cards->_IncludingOthersCard = true;
+        return RoundManager::RecvPeng(dir);
+    }
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
@@ -291,7 +302,7 @@ void NetRoundManager::_NotifyHandout() {
             RequestSendAction aReq;
             aReq.Set(aQi);
             _messenger->Send(aReq);
-            _messenger->Wait(REQ_GAME_DIST_DAOJISHI);
+            Wait(REQ_GAME_DIST_DAOJISHI);
         }
         
         RequestShowCard aReq;
@@ -430,6 +441,28 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     } else {
         WaitForOthersAction((PlayerDir_t)zhuang);
     }
+}
+
+
+/*************************************
+        response wait
+*************************************/
+void NetRoundManager::Resume(DsInstruction *di) {
+    if(_waiting==di->request) {
+        HandleMsg(di);
+        _waiting  = REQ_INVALID;
+    }
+}
+
+bool NetRoundManager::Wait(RequestId_t req) {
+    _waiting      = req;
+    _permited     = false;
+    
+    while(_waiting!=REQ_INVALID) {
+        _delay(100);
+    }
+    
+    return _permited;
 }
 
 /*************************************
@@ -624,8 +657,11 @@ void NetRoundManager::_DiRecv(ActionResponse *info) {
     PlayerDir_t wait = (PlayerDir_t)info->waitSeat;
     delete info;
 
-    LOGGER_WRITE("NOTE: something should happen here\n");
-    _messenger->Resume();
+    if(wait!=RIGHT && wait!=LEFT) {
+        _permited = true;
+    } else {
+        _permited = false;
+    }
 }
 
 void NetRoundManager::_DiRecv(ActionNotif *info) {
@@ -687,6 +723,8 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 SetDecision(dir,aGANG);
                 _uiManager->_AnGangEffect(dir,card);
             }
+            break;
+        case aHU:
             break;
     }
 }
@@ -750,7 +788,7 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
 
     if(info->seat==MIDDLE) {
         WaitForMyChoose();
-        _messenger->Resume();
+        _permited = true;
     }
 }
 
