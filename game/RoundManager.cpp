@@ -68,7 +68,7 @@ void RoundManager::_GenerateIds(int ids[]) {
 }
 
 int RoundManager::Shuffle() {
-#if 1
+#if 0
     _LoadRandomCardSequence();
 #else
     load_test_round(1,_unDistributedCards);

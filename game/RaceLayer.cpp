@@ -141,6 +141,9 @@ void RaceLayer::StartGame()
 	ifEffectTime=false;
     _myChosenCard = -1;
     
+	ifPengAction=false;
+	ifGangAction=false;
+
 	_RaceBeginPrepare();
 
     _roundManager->StartGame();
@@ -568,7 +571,19 @@ void RaceLayer::_DistributeCard(const DistributeInfo_t &distribute) {
     const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
 
     Sprite *lastCard = _object->CreateDistributeCard(dir,distribute.newCard);
+
+	if(1)
+	{
+		if(distribute.newCard<=8)//测试_yusi
+			CCLOG("DistributeCard [%d] : %d Tiao",dir,distribute.newCard+1);
+		else if(distribute.newCard<=17)
+			CCLOG("DistributeCard [%d] : %d Bing",dir,distribute.newCard-8);
+		else
+			CCLOG("DistributeCard [%d] : %d Feng",dir,distribute.newCard-17);
+	}
+
 	lastCard->setPosition(lastCardPosition);
+
     
 	_UpdateResidueCards(distribute.remain);
 
@@ -1691,7 +1706,7 @@ TargetedAction *RaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,
 
 	auto cardInHand = _roundManager->_players[dir]->_cards;
 
-    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->real_last()-1)->getPosition();
+    auto curOutPosTemp = _GetCardInHand(dir,cardInHand->real_last())->getPosition();
     Vec2 curOutPos;/* here must be something I have not known */
     if(dir==RIGHT) {
 		curOutPos = Vec2(
@@ -1708,7 +1723,11 @@ TargetedAction *RaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,
     cardOut->setVisible(false);
 
     _Remove(myframe,OUT_CARD_FRAME_TAG_ID);
-    myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);/* !!! player2 is 20 in the old source, but it seems ok to set it as 0*/
+	if(dir==RIGHT)
+		myframe->addChild(cardOut,0,OUT_CARD_FRAME_TAG_ID);/* !!! player2 is 20 in the old source, but it seems ok to set it as 0*/
+	else{
+		myframe->addChild(cardOut,20,OUT_CARD_FRAME_TAG_ID);
+	}
 
 	auto LastCard   = _GetCardInHand(dir,cardInHand->size());
     
@@ -2763,7 +2782,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
         
 		Vector<FiniteTimeAction *> hide2CardsInhand;
 
-		for(int i=cards->FreeStart;i<cards->real_last();i++) {/* ??? why real_last not size*/
+		for(int i=cards->FreeStart;i<=cards->real_last();i++) {/* ??? why real_last not size*/
 			auto s_card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID + 1*20 + i);
             Sequence *seq;
 

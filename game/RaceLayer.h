@@ -164,6 +164,8 @@ private:
 	bool ifEndGameChoose;//ÊÇ·ñÍË³öÓÎÏ·
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
+	bool ifPengAction;
+	bool ifGangAction;
 	//bool ifMyTime;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;
