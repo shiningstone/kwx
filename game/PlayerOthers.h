@@ -11,8 +11,6 @@ class PlayerOthers:public Player
 		PlayerOthers(PlayerDir_t dir);
         PlayerOthers(int id,PlayerDir_t dir);
 
-        int  PickupForMing(ActionId_t &ming,bool &canKou);
-
 		virtual ~PlayerOthers();
     private:
         Logger      *_logger;
@@ -43,6 +41,8 @@ class PlayerOthers:public Player
         int  PickupForSevenCouples();
         int  PickupForFourPeng();
         int  PickupForPiHu();
+        int  PickupForMing(ActionId_t &ming,bool &canKou);
+
 
         int  _FindSingleChar();
         int  _FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);
