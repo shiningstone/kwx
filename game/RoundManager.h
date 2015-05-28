@@ -108,6 +108,9 @@ public:
 
     StrategyRm *_strategy;
 protected:
+    void ForceHandout();
+
+    
     RaceLayer  *_uiManager;
 
     int         aim[PLAYER_NUM];

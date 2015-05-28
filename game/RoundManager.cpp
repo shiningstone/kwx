@@ -409,15 +409,19 @@ void RoundManager::WaitForMyAction() {
 	}
 }
 
+void RoundManager::ForceHandout() {
+    int last = _players[MIDDLE]->_cards->last();
+    
+    Vec2 location = _uiManager->GetCardPositionInHand(last);
+    RecvHandout(last,location,2);
+    
+    _prevPlayer = MIDDLE;
+}
+
 void RoundManager::WaitForMyChoose() {
 	if(_isNewDistributed) {/* is this judgement neccessary??? */
 		if( (_isTuoGuan) || (IsMing(_curPlayer) && !_isGangAsking) ) {
-            int last = _players[MIDDLE]->_cards->last();
-            
-            Vec2 location = _uiManager->GetCardPositionInHand(last);
-            RecvHandout(last,location,2);
-
-            _prevPlayer = MIDDLE;
+            ForceHandout();
 		} else {
 			_actCtrl.handoutAllow = true;
         }
