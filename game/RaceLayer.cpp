@@ -2979,9 +2979,13 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                 ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]));}),NULL),NULL));
 	}
 	else {
-        int GangCardsPlace[4] = {0};
+        int GangCardsPlace[4] = {0};//delete gang make GangCardsPlace zero
         if(gang!=NULL) {
-            int GangCardsPlace[4]={gang[0],gang[1],gang[2],gang[3]};
+			for(int num=0;num<4;num++)
+			{
+				int temp=gang[num];
+				GangCardsPlace[num]=temp;
+			}
             delete gang;
         }
         
@@ -3076,15 +3080,14 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         
 		Vector<FiniteTimeAction *>gang_list_seq;
 		Spawn* moveFreeCards;
-        
+
 		if( card==cards->get_kind(cards->real_last()) ) {
-            int i;
-            for(i=actionStartPlace;i<cards->size()-1;i++)
+            for(int i=actionStartPlace;i<cards->size();i++)
 			{
                 auto curPos = _GetCardInHand(dir,i)->getPosition();
-                TargetedAction *motion;
+                TargetedAction *motion=NULL;
                 
-				if(i<GangCardsPlace[0]&&(cards->get_status(i)==c_MING_KOU||cards->get_status(i)==c_FREE))
+				if(i<GangCardsPlace[0])
 				{
 					motion=TargetedAction::create( _GetCardInHand(dir,i),
                         Sequence::create(
@@ -3093,13 +3096,13 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                                 curPos.x+GangCardSize.width*(3.5+GAP),
                                 curPos.y)),NULL));
 				}
-				else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2])
+				else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2]||i==GangCardsPlace[3])
 				{
 					motion=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
-                        Sequence::create(
+                        Sequence::create(DelayTime::create(0.18),
                             ScaleTo::create(0,0),NULL));
 				}
-				else if(i>GangCardsPlace[2])
+				else if(i>GangCardsPlace[2]&&i<GangCardsPlace[3])
 				{
 					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
@@ -3111,56 +3114,82 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 
                 gang_list_seq.insert(i-actionStartPlace,motion);
 			}
-            
-			TargetedAction *motion = TargetedAction::create( myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+cards->size()-1),
-                Sequence::create(
-                    DelayTime::create(0.18),
-                    ScaleTo::create(0,0),NULL));
-            
-            gang_list_seq.insert(i-actionStartPlace,motion);
 		} else {
-			for(int i=actionStartPlace;i<=cards->size()-1;i++)
+			int i=0;
+			int insertPlace=0;
+			auto lastCard=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+cards->size()-1);
+			auto lastCardPos=lastCard->getPosition();
+			auto lastCardSize=lastCard->getContentSize();
+			for(int num=actionStartPlace;num<cards->size()-1;num++)
+			{
+				if(cards->get_kind(num)<=cards->get_kind(cards->size()-1)&&cards->get_kind(num+1)>cards->get_kind(cards->size()-1))
+				{
+					insertPlace=num+1;
+					break;
+				}
+			}
+			if(insertPlace==GangCardsPlace[3]+1)
+				insertPlace=GangCardsPlace[0];
+			for(i=actionStartPlace;i<cards->size()-1;i++)
 			{
                 auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
-                TargetedAction *motion;
-                
-				if(i<GangCardsPlace[0]&&(cards->get_status(i)==c_MING_KOU||cards->get_status(i)==c_FREE)) {
+				auto RightMoveWith=(i<insertPlace)?(0.0):(lastCardSize.width);
+                TargetedAction *motion=NULL;
+				if(i<GangCardsPlace[0]) {
 					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
                         Sequence::create(
                             DelayTime::create(0.18),
                             MoveTo::create(0.3,Vec2(
-                                curPos.x + GangCardSize.width*(3.5+GAP),
+                                curPos.x + GangCardSize.width*(3.5+GAP)+RightMoveWith,
                                 curPos.y)),NULL));
-				} else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2]) {
+				} else if(i==GangCardsPlace[0]||i==GangCardsPlace[1]||i==GangCardsPlace[2]||i==GangCardsPlace[3]) {
 					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
-                        Sequence::create(
+                        Sequence::create(DelayTime::create(0.18),
                             ScaleTo::create(0,0),NULL));
-				} else if(i==GangCardsPlace[3]) {
+				} else if(i>GangCardsPlace[3]) {
 					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
-                        Sequence::create(
-                            ScaleTo::create(0,0),NULL));
-                } else if(i>GangCardsPlace[3]) {
-                    MoveTo* actionMove;
-                    if( (i==cards->size()-1) && (card!=cards->get_kind(cards->real_last()))) {
-						auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i-1)->getPosition();
-						int instanceBetween = curPos.x-curLeftPos.x-FreeCardSize.width;
-                        
-						actionMove = MoveTo::create(0.3,Vec2(
-                            curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+isChosenCanceled*0.2))-instanceBetween,
-                            curPos.y));
-					}
-					else
-						actionMove = MoveTo::create(0.3,Vec2(
-						    curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+isChosenCanceled*0.2)),
-						    curPos.y));
-                    
-					motion = TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
-                        Sequence::create(
-                            DelayTime::create(0.18),
-                            actionMove,NULL));
+						Sequence::create(
+						DelayTime::create(0.18),
+						MoveTo::create(0.3,Vec2(
+						curPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+isChosenCanceled*0.2)+RightMoveWith),
+						curPos.y)),NULL));
 				}
-
                 gang_list_seq.insert(i-actionStartPlace,motion);
+			}
+			auto curLeftPos = myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+insertPlace-1)->getPosition();
+			if(insertPlace==cards->size()-1)
+			{
+				int instanceBetween = lastCardPos.x-curLeftPos.x-FreeCardSize.width;
+				auto actionMove = MoveTo::create(0.3,Vec2(
+					lastCardPos.x+(GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(4+isChosenCanceled*0.2))-instanceBetween,
+					lastCardPos.y));
+				TargetedAction *motion = TargetedAction::create(lastCard,
+					Sequence::create(
+					DelayTime::create(0.18),
+					actionMove,NULL));
+				gang_list_seq.insert(i-actionStartPlace,motion);
+			}
+			else
+			{
+				auto actionMoveUp=MoveTo::create(0.1,Vec2(lastCardPos.x,lastCardPos.y+100));
+				MoveTo* actionMoveInsert=NULL;
+				MoveTo* actionMoveDown=NULL;
+				if(insertPlace>GangCardsPlace[0])
+				{
+					actionMoveInsert=MoveTo::create(0.2,Vec2(curLeftPos.x+GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(3+isChosenCanceled*0.2),lastCardPos.y+100));
+					actionMoveDown=MoveTo::create(0.1,Vec2(curLeftPos.x+GangCardSize.width*(3.5+GAP)-FreeCardSize.width*(3+isChosenCanceled*0.2),lastCardPos.y));
+				}
+				else
+				{
+					actionMoveInsert=MoveTo::create(0.2,Vec2(curLeftPos.x + GangCardSize.width*(3.5+GAP)+FreeCardSize.width,lastCardPos.y+100));
+					actionMoveDown=MoveTo::create(0.1,Vec2(curLeftPos.x + GangCardSize.width*(3.5+GAP)+FreeCardSize.width,lastCardPos.y));
+				}
+				auto actionMove=Sequence::create(actionMoveUp,actionMoveInsert,actionMoveDown,NULL);
+				TargetedAction *motion = TargetedAction::create(lastCard,
+					Sequence::create(
+					DelayTime::create(0.18),
+					actionMove,NULL));
+				gang_list_seq.insert(i-actionStartPlace,motion);
 			}
 		}
         
@@ -3279,12 +3308,19 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         
 		myframe->_ID=MIDDLE;
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
-            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {//ERROR_YUSI
-            _ReOrderCardsInHand(0,_roundManager->_players[MIDDLE]->_cards);}),
-            DelayTime::create(0.48), CallFunc::create([=](){
+            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),DelayTime::create(0.48),CallFunc::create([=](){
 			_roundManager->_strategy->update_gold(dir,AN_GANG,dir);}),CallFunc::create([=](){
-            _roundManager->DistributeTo(dir
-                ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]));}),NULL));
+            _roundManager->DistributeTo(dir,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]));}),NULL));
+		
+			
+			
+			//myframe->runAction(Sequence::create(CallFunc::create([=](){
+  //          _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),CCCallFunc::create([=]() {//ERROR_YUSI
+  //          _ReOrderCardsInHand(0,_roundManager->_players[MIDDLE]->_cards);}),
+  //          DelayTime::create(0.48), CallFunc::create([=](){
+		//	_roundManager->_strategy->update_gold(dir,AN_GANG,dir);}),CallFunc::create([=](){
+  //          _roundManager->DistributeTo(dir
+  //              ,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]));}),NULL));
 	}
 }
 
