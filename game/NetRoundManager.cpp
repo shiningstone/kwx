@@ -239,6 +239,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
         RequestSendAction aReq;
         aReq.Set(aPENG,kind);
         _messenger->Send(aReq);
+        
         actionPermit = Wait(REQ_GAME_SEND_ACTION);
     }
 
@@ -247,11 +248,8 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
         _players[dir]->_cards->_IncludingOthersCard = true;
         return RoundManager::RecvPeng(dir);
     } else {
-        LOGGER_WRITE("the action are not permiteed right now\n");
-
-        _players[dir]->_cards->push_back(kind);
-        _players[dir]->_cards->_IncludingOthersCard = true;
-        return RoundManager::RecvPeng(dir);
+        _uiManager->hide_action_tip(aPENG);
+        return CARD_UNKNOWN;
     }
 }
 

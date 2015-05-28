@@ -268,6 +268,7 @@ public:
 	void _DeleteActionTip();//删除效果残留
 	void _DeleteActionReminder();
 	void _DeleteActionEffect();
+    void hide_action_tip(ActionId_t action);
 
     TargetedAction* _MingAnimation();
 	void _AnGangEffect(PlayerDir_t dir,Card_t card,int gang[]=NULL);//me--暗杠效果

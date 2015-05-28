@@ -6158,6 +6158,17 @@ void RaceLayer::_DeleteActionTip()
     _DeleteActionEffect();    
 }
 
+void RaceLayer::hide_action_tip(ActionId_t action) {
+    _effect->Hide(myframe,PENG_REMIND_ACT_TAG_ID);
+
+    auto hideReminder = _HideReminder(PENG_REMIND_ACT_BKG_TAG_ID, 0.18, 1.2);
+
+    myframe->runAction( Sequence::create(
+        hideReminder,
+        _voice->SpeakAction(action,_roundManager->_players[MIDDLE]->GetSex()),CCCallFunc::create(this,callfunc_selector(
+        RaceLayer::_DeleteActionEffect)),NULL));
+}
+
 void RaceLayer::_Remove(Node *parent, int childTag) {
     if(parent->getChildByTag(childTag)) {// this judgement is not necessary becaust the interface will do the same thing!!!
         parent->removeChildByTag(childTag,true);
