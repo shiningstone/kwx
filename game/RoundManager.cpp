@@ -9,6 +9,9 @@
 
 #include "Player.h"
 
+/***********************************************
+        initialization
+***********************************************/
 RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
 
@@ -37,9 +40,6 @@ RoundManager::~RoundManager() {
     LOGGER_DEREGISTER(_logger);
 }
 
-/***********************************************
-        player information
-***********************************************/
 void RoundManager::InitPlayers() {
 	_players[LEFT]   = new Player(LEFT);
 	_players[MIDDLE] = new Player(MIDDLE);
@@ -72,6 +72,7 @@ int RoundManager::Shuffle() {
 #else
     load_test_round(1,_unDistributedCards);
 #endif
+    _gRiver->clear();
     _distributedNum = 0;
 
     char p[TOTAL_CARD_NUM] = {0};
@@ -110,14 +111,13 @@ int RoundManager::Shuffle() {
        main interface
 ****************************************/
 void RoundManager::CreateRace(Scene *scene) {
-    _uiManager = RaceLayer::create();
-    scene->addChild(_uiManager);
-
-    _uiManager->Assign(this);
+	_isGameStart=false;
 
     InitPlayers();
-	_isGameStart=false;
-    
+
+    _uiManager = RaceLayer::create();
+    scene->addChild(_uiManager);
+    _uiManager->Assign(this);
     _uiManager->CreateRace();
 }
 
@@ -127,8 +127,6 @@ void RoundManager::StartGame() {
     _players[MIDDLE]->_isReady = true;
 	_uiManager->GuiShowReady(MIDDLE);
 
-    _gRiver->clear();
-    
     Shuffle();
 
     int lastWinner = GetLastWinner();

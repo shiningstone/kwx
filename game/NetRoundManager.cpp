@@ -491,7 +491,6 @@ void NetRoundManager::_DiRecv(GameStartNotif *info) {
 
 void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _uiManager->GuiHideReady();
-    _gRiver->clear();
     
     Shuffle();
 
