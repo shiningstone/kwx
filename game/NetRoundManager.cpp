@@ -199,12 +199,8 @@ void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
 /****************************************
        main interface
 ****************************************/
-void NetRoundManager::CreateRace(Scene *scene) {
-    _uiManager = RaceLayer::create();
-    scene->addChild(_uiManager);
-
-    _uiManager->Assign(this);
-
+void NetRoundManager::CreateRace(RaceLayer *uiManager) {
+    _uiManager = uiManager;
     InitPlayers();
 	_isGameStart=false;
 
@@ -219,8 +215,6 @@ void NetRoundManager::CreateRace(Scene *scene) {
     aReq.Set();
     _messenger->Send(aReq);
     /**********************************************/
-    
-    _uiManager->CreateRace();
 }
 
 void NetRoundManager::StartGame() {

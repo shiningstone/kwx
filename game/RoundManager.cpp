@@ -110,15 +110,10 @@ int RoundManager::Shuffle() {
 /****************************************
        main interface
 ****************************************/
-void RoundManager::CreateRace(Scene *scene) {
+void RoundManager::CreateRace(RaceLayer *uiManager) {
 	_isGameStart=false;
-
+    _uiManager = uiManager;
     InitPlayers();
-
-    _uiManager = RaceLayer::create();
-    scene->addChild(_uiManager);
-    _uiManager->Assign(this);
-    _uiManager->CreateRace();
 }
 
 void RoundManager::StartGame() {

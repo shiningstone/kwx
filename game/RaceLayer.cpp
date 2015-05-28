@@ -2,6 +2,7 @@
 #include "RaceLayer.h"
 #include "./../HelloWorldScene.h"
 #include "RoundManager.h"
+#include "NetRoundManager.h"
 #include "StrategyRm.h"
 #include "Player.h"
 
@@ -26,10 +27,6 @@ RaceLayer::RaceLayer()
     _effect = GraphicEffect::getInstance();
     
     _logger = LOGGER_REGISTER("RaceLayer");
-}
-
-void RaceLayer::Assign(RoundManager *rm) {
-    _roundManager = rm;
 }
 
 RaceLayer::~RaceLayer()
@@ -57,8 +54,15 @@ bool RaceLayer::init() {
 /************************************************
             main process
 ************************************************/
-void RaceLayer::CreateRace()
+void RaceLayer::CreateRace(GameMode_t mode)
 {
+    if(mode==LOCAL_GAME) {
+        _roundManager = RoundManager::getInstance();
+    } else {
+        _roundManager = NetRoundManager::getInstance();
+    }
+    _roundManager->CreateRace(this);
+
 	_isResoucePrepared=false;
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");

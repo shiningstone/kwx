@@ -20,7 +20,6 @@ class StrategyRm;
 
 class RoundManager {
     friend class RaceLayer;
-	friend class PlayerOthers;
     friend class StrategyLocalRM;
 	friend class StrategyPlayer;
 protected:
@@ -104,7 +103,7 @@ public:
     /* main process */
     GameMode_t _MODE;
 
-    virtual void CreateRace(Scene *scene);
+    virtual void CreateRace(RaceLayer *uiManager);
     virtual void StartGame();
 
     StrategyRm *_strategy;

@@ -31,8 +31,6 @@ public:
 	RaceLayer();
 	virtual ~RaceLayer();
     
-    void Assign(RoundManager *rm);
-
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void GangGoldEffect(int winner,int whoGive);
@@ -239,7 +237,7 @@ public:
 	   everytime when enter game,first call init_role(player) 
 	   function,then CreateRace();
 	##############################*/
-	void CreateRace();//创建比赛场景
+	void CreateRace(GameMode_t mode);//创建比赛场景
 	void _UpdateResidueCards(int no);//更新剩余牌数
     void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
     void _LeftBatchDistribute(int batchIdx, float delayRef, int cardLen=13);

@@ -84,7 +84,7 @@ public:
     virtual void InitPlayers();
 
     /* main process */
-    virtual void CreateRace(Scene *scene);
+    virtual void CreateRace(RaceLayer *uiManager);
     virtual void StartGame();
 private:
     NetRoundManager(RaceLayer *uiManager);

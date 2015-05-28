@@ -1,8 +1,7 @@
 #include "HelloWorldScene.h"
 #include "IMLoadScene.h"
 #include "EnterRoomScene.h"
-#include "game/RoundManager.h"
-#include "game/NetRoundManager.h"
+#include "game/RaceLayer.h"
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
 
@@ -119,12 +118,16 @@ void HelloWorld::enterRoomStandAlone()
     TextureCache::sharedTextureCache()->removeAllTextures();
 
 #ifdef SINGLE_GAME
-    RoundManager *rm = RoundManager::getInstance();
+    RaceLayer *layer = RaceLayer::create();
+    scene->addChild(layer);
+    layer->CreateRace(LOCAL_GAME);
 #else
-    RoundManager *rm = NetRoundManager::getInstance();
+    RaceLayer *layer = RaceLayer::create();
+    scene->addChild(layer);
+    layer->CreateRace(NETWORK_GAME);
 #endif
-    rm->CreateRace(scene);
-    
+
+
     Director::getInstance()->replaceScene(scene);
 }
 

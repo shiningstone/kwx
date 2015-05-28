@@ -1,8 +1,8 @@
 禁止“开始游戏”
 玩家信息更新
 网络局集成到UI
+动作特效，删除提示独立
 
 MyHandoutEffect
-PengEffectNode   需要删除
+PengEffectNode          需要删除
 包胡、包庄
-退出、进入
