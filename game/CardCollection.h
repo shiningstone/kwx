@@ -87,7 +87,7 @@ public:
     int statzhongFaBai[3];             /*zhong, fa, bai*/
     int statGroupSameNum;
 
-    int statHuFanMask;
+    INT32U statHuFanMask;
 
     /***************************************************
             robot interface

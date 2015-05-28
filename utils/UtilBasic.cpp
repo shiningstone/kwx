@@ -38,11 +38,11 @@ INT16U _htons(INT16U n) {
 /****************************************
     bit operation
 ****************************************/
-void _set(INT32U value,INT32U mask) {
+void _set(INT32U &value,INT32U mask) {
     value |= mask;
 }
 
-void _clr(INT32U value,INT32U mask) {
+void _clr(INT32U &value,INT32U mask) {
     value &= ~mask;
 }
 

@@ -277,7 +277,6 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 	for(int i=0;i<MAX_HANDIN_NUM;i++) {
         _Remove(myframe,HAND_IN_CARDS_TAG_ID+dir*20+i);
 	}
-
 	float x = _layout->_playerPosi[dir].basePoint.x+10; 
 	float y = _layout->_playerPosi[dir].basePoint.y+10;
 
@@ -508,7 +507,20 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
     
 	if(dir==MIDDLE&&myframe->getChildByTag(TING_SING_BUTTON)) {
 		_UpdateTingNum(MIDDLE);
-    }
+	}
+
+	//if(dir==MIDDLE)//测试_yusi
+	//{
+	//	auto cards=_roundManager->_players[MIDDLE]->_cards;
+	//	const int  LAST = cards->real_last();
+	//	for(int i=0; i<=LAST; i++) {
+	//		auto card = _GetCardInHand(MIDDLE,i);
+	//		auto x= card->getPosition().x;
+	//		auto y= card->getPosition().y;
+	//		CCLOG("card[%d].position(%f,%f)",i,x,y);
+	//	}
+	//	system("pause");
+	//}
 }
 
 void RaceLayer::_CardRiverUpdateEffect(PlayerDir_t dir) {
@@ -2150,7 +2162,7 @@ void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
 		}
 		ifChosed = true;
 		_myTouchedCard  = chosen;
-    }
+	}
 }
 
 Sprite *RaceLayer::_CreateEffectCard(int i,CARD_KIND kindId ) {
