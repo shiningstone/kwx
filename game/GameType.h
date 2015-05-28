@@ -7,6 +7,7 @@
 #define     INVALID             -1
 
 #define     PLAYER_NUM          3
+#define     ROBOT_MAX_NUM       16
 #define 	TOTAL_CARD_NUM 		84
 #define 	TOTAL_CARD_KIND		21
 #define 	MAX_HANDIN_NUM      18

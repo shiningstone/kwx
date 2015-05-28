@@ -41,16 +41,16 @@ RoundManager::~RoundManager() {
         player information
 ***********************************************/
 void RoundManager::InitPlayers() {
-	_players[0] = new Player(LEFT);
-	_players[1] = new Player(MIDDLE);
-	_players[2] = new Player(RIGHT);
+	_players[LEFT]   = new Player(LEFT);
+	_players[MIDDLE] = new Player(MIDDLE);
+	_players[RIGHT]  = new Player(RIGHT);
 
     Database *database = Database::getInstance();
 
-    int  ids[3] = {0};
+    int  ids[PLAYER_NUM] = {0};
     _GenerateIds(ids);
 
-    for(int dir=0;dir<3;dir++) {   
+    for(int dir=0;dir<PLAYER_NUM;dir++) {   
         UserProfile_t profile = {0};
         database->GetUserProfile(ids[dir],profile);
         _players[dir]->Set(&profile);
@@ -58,12 +58,12 @@ void RoundManager::InitPlayers() {
 }
 
 void RoundManager::_GenerateIds(int ids[]) {
-    ids[0] = rand()%16;
-    ids[1] = 17;
+    ids[LEFT] = rand()%ROBOT_MAX_NUM;
+    ids[MIDDLE] = ROBOT_MAX_NUM+1;
     
     do {
-        ids[2]=rand()%16;
-    } while( ids[2]==ids[0] );
+        ids[RIGHT]=rand()%ROBOT_MAX_NUM;
+    } while( ids[RIGHT]==ids[LEFT] );
 }
 
 int RoundManager::Shuffle() {
