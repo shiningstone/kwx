@@ -3,8 +3,7 @@
 #include "./../HelloWorldScene.h"
 #include "RoundManager.h"
 #include "StrategyRm.h"
-
-#include "PlayerOthers.h"
+#include "Player.h"
 
 using namespace cocos2d::ui;
 USING_NS_CC;

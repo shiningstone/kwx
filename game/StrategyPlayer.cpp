@@ -5,6 +5,13 @@
 
 #include "StrategyPlayer.h"
 
+#define RETURN_IF_VALID(x) do { \
+    int chosen = x;             \
+                                \
+    if(chosen!=INVALID)         \
+        return chosen;          \
+}while(0)
+
 StrategyPlayer::StrategyPlayer(Player *aPlayer) {
     _employer = aPlayer;
 	_rm = RoundManager::getInstance();
@@ -262,13 +269,6 @@ int StrategyPlayer::_FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind) {
 
     return INVALID;
 }
-
-#define RETURN_IF_VALID(x) do { \
-    int chosen = x;             \
-                                \
-    if(chosen!=INVALID)         \
-        return chosen;          \
-}while(0)
 
 int StrategyPlayer::PickupForSameColor(int reserveColor) {
     const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());

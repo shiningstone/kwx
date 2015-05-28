@@ -8,7 +8,6 @@
 #include "StrategyRm.h"
 
 #include "Player.h"
-#include "PlayerOthers.h"
 
 RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
@@ -42,9 +41,9 @@ RoundManager::~RoundManager() {
         player information
 ***********************************************/
 void RoundManager::InitPlayers() {
-	_players[0] = new PlayerOthers(LEFT);
+	_players[0] = new Player(LEFT);
 	_players[1] = new Player(MIDDLE);
-	_players[2] = new PlayerOthers(RIGHT);
+	_players[2] = new Player(RIGHT);
 
     Database *database = Database::getInstance();
 
@@ -452,8 +451,7 @@ void RoundManager::WaitForOthersChoose() {
     int index    = INVALID;
     bool canKou  = false;
 
-	PlayerOthers *player = static_cast<PlayerOthers *>(_players[_curPlayer]);
-    index = player->choose_card(*this,_actCtrl.decision,canKou);
+    index = _players[_curPlayer]->_strategy->choose_card(_actCtrl.decision,canKou);
 
     if(_actCtrl.decision==aMING) {
         UpdateCards((PlayerDir_t)_curPlayer,(ARRAY_ACTION)aMING);
