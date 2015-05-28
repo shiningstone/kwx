@@ -2,9 +2,6 @@
 #ifndef __DATABASE__
 #define __DATABASE__
 
-#include "cocos2d.h"
-USING_NS_CC;
-
 typedef struct {
     int  id;
     char name[32];
@@ -29,7 +26,6 @@ protected:
     static Database *_instance;
 private:
     static char  *ROBOTS_NAME[16];
-    UserDefault *_userDefault;
 
     void _getRobotProfile(int id,UserProfile_t &profile);
     void _getMyProfile(int id,UserProfile_t &profile);

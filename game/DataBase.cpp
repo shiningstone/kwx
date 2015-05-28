@@ -1,5 +1,11 @@
 ﻿
+
+#include "cocos2d.h"
+USING_NS_CC;
+
 #include "DataBase.h"
+
+static UserDefault *sCocos2dUserDefault = NULL;
 
 char *Database::ROBOTS_NAME[16] = {
     "十堰冰冰",
@@ -21,15 +27,15 @@ char *Database::ROBOTS_NAME[16] = {
 };
 
 Database::Database() {
-    _userDefault = UserDefault::getInstance();
+    sCocos2dUserDefault = UserDefault::getInstance();
     
-    if( _userDefault->getBoolForKey("userDefault")==false ) {
+    if( sCocos2dUserDefault->getBoolForKey("userDefault")==false ) {
         _setDefaults();
     }
 }
 
 Database::~Database() {
-
+    sCocos2dUserDefault = NULL;
 }
 
 void Database::SetProperty(int id,int property) {
@@ -41,7 +47,7 @@ void Database::SetProperty(int id,int property) {
         sprintf(title,"MyProperty");
     }
     
-    _userDefault->setIntegerForKey(title,property);
+    sCocos2dUserDefault->setIntegerForKey(title,property);
 }
 
 void Database::GetUserProfile(int id,UserProfile_t &profile) {
@@ -66,12 +72,12 @@ void Database::_getRobotProfile(int id,UserProfile_t &profile) {
     sprintf(photo,"PhotoOfRobot%d",id);
     sprintf(sex,"SexOfRobot%d",id);
 
-    strcpy(profile.name, _userDefault->getStringForKey(name).c_str());
-    profile.property = _userDefault->getIntegerForKey(property);
-    strcpy(profile.level, _userDefault->getStringForKey(level).c_str());
-    strcpy(profile.photo, _userDefault->getStringForKey(photo).c_str());
-    strcpy(profile.sex, _userDefault->getStringForKey(sex).c_str());
-    strcpy(profile.language, _userDefault->getStringForKey(language).c_str());
+    strcpy(profile.name, sCocos2dUserDefault->getStringForKey(name).c_str());
+    profile.property = sCocos2dUserDefault->getIntegerForKey(property);
+    strcpy(profile.level, sCocos2dUserDefault->getStringForKey(level).c_str());
+    strcpy(profile.photo, sCocos2dUserDefault->getStringForKey(photo).c_str());
+    strcpy(profile.sex, sCocos2dUserDefault->getStringForKey(sex).c_str());
+    strcpy(profile.language, sCocos2dUserDefault->getStringForKey(language).c_str());
 }
 
 void Database::_getMyProfile(int id,UserProfile_t &profile) {
@@ -82,25 +88,25 @@ void Database::_getMyProfile(int id,UserProfile_t &profile) {
     char sex[32]      = "MySex";
     char language[32] = "Language0";
 
-    strcpy(profile.name, _userDefault->getStringForKey(name).c_str());
-    profile.property = _userDefault->getIntegerForKey(property);
-    strcpy(profile.level, _userDefault->getStringForKey(level).c_str());
-    strcpy(profile.photo, _userDefault->getStringForKey(photo).c_str());
-    strcpy(profile.sex, _userDefault->getStringForKey(sex).c_str());
-    strcpy(profile.language, _userDefault->getStringForKey(language).c_str());
+    strcpy(profile.name, sCocos2dUserDefault->getStringForKey(name).c_str());
+    profile.property = sCocos2dUserDefault->getIntegerForKey(property);
+    strcpy(profile.level, sCocos2dUserDefault->getStringForKey(level).c_str());
+    strcpy(profile.photo, sCocos2dUserDefault->getStringForKey(photo).c_str());
+    strcpy(profile.sex, sCocos2dUserDefault->getStringForKey(sex).c_str());
+    strcpy(profile.language, sCocos2dUserDefault->getStringForKey(language).c_str());
 }
 
 void Database::_setDefaults() {
-	_userDefault->setBoolForKey(   "userDefault",true);
-	_userDefault->setIntegerForKey("load_days",0);
-	_userDefault->setIntegerForKey("cur_sta",  1);
-	_userDefault->setIntegerForKey("load_time",7352);
+	sCocos2dUserDefault->setBoolForKey(   "userDefault",true);
+	sCocos2dUserDefault->setIntegerForKey("load_days",0);
+	sCocos2dUserDefault->setIntegerForKey("cur_sta",  1);
+	sCocos2dUserDefault->setIntegerForKey("load_time",7352);
 
-	_userDefault->setStringForKey("MyNickName","雀友");
-	_userDefault->setIntegerForKey("MyProperty",50000);
-	_userDefault->setStringForKey( "MyLevel",   "菜鸟");
-	_userDefault->setStringForKey( "MyPhoto",   "Head17.png");
-	_userDefault->setStringForKey( "MySex",     "Boy");
+	sCocos2dUserDefault->setStringForKey("MyNickName","雀友");
+	sCocos2dUserDefault->setIntegerForKey("MyProperty",50000);
+	sCocos2dUserDefault->setStringForKey( "MyLevel",   "菜鸟");
+	sCocos2dUserDefault->setStringForKey( "MyPhoto",   "Head17.png");
+	sCocos2dUserDefault->setStringForKey( "MySex",     "Boy");
     
     for(int i=0;i<16;i++)
 	{
@@ -120,20 +126,20 @@ void Database::_setDefaults() {
         
 		sprintf(photoPath,"Head%d.png",i+1);
 
-		_userDefault->setStringForKey(name,ROBOTS_NAME[i]);
-		_userDefault->setIntegerForKey(property,50000);
-		_userDefault->setStringForKey(level,"菜鸟");
-		_userDefault->setStringForKey(photo,photoPath);
+		sCocos2dUserDefault->setStringForKey(name,ROBOTS_NAME[i]);
+		sCocos2dUserDefault->setIntegerForKey(property,50000);
+		sCocos2dUserDefault->setStringForKey(level,"菜鸟");
+		sCocos2dUserDefault->setStringForKey(photo,photoPath);
 		if(i<9) {
-			_userDefault->setStringForKey(sex,"Girl");
+			sCocos2dUserDefault->setStringForKey(sex,"Girl");
         }
 		else{
-			_userDefault->setStringForKey(sex,"Boy");
+			sCocos2dUserDefault->setStringForKey(sex,"Boy");
         }
 	}
 
     char language[32] = "Language0";
-    _userDefault->setStringForKey(language,"PuTongBan");
+    sCocos2dUserDefault->setStringForKey(language,"PuTongBan");
 }
 
 /******************************************
