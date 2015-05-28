@@ -109,11 +109,6 @@ public:
 
     StrategyRm *_strategy;
 protected:
-    typedef struct _Context_t {
-    }Context_t;
-
-    Context_t  _ctx;
-    
     RaceLayer  *_uiManager;
 
     int         aim[PLAYER_NUM];

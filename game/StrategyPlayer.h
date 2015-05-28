@@ -12,7 +12,7 @@ typedef struct _KindPosition {
     int           position[4];
 }KindPosition;
 
-typedef struct _Context_t {
+typedef struct _ChooseContext_t {
     /* global */
     CardList     *river;
     int           remain;
@@ -22,7 +22,15 @@ typedef struct _Context_t {
     KindPosition  cards[TOTAL_CARD_KIND];
     int           huNum;
     RobotTarget_t aim;
-}Context_t;
+}ChooseContext_t;
+
+typedef struct _ScoreContext_t {
+    bool          isNewDistributed;
+    bool          isLastOne;
+    ActionId_t    action;
+    int           continueGang;
+    bool          isGangHua;
+}ScoreContext_t;
 
 class StrategyPlayer {
 public:
@@ -34,12 +42,19 @@ public:
     int  choose_card(ActionId_t &ming,bool &canKou);
 
 protected:
-    Player       *_employer;
-    RoundManager *_rm;
-    
-    Context_t    _ctx;
+    Player            *_employer;
+    RoundManager      *_rm;
+    ChooseContext_t    _chooseCtx;
+    ScoreContext_t     _scoreCtx;
 
 private:
+    void SetScoreContext();
+    long CalcScore(Card_t kind,const ScoreContext_t &ctx);
+
+    void SetChooseContext();
+    int  ChooseForMing(ActionId_t &ming,bool &canKou);
+    int  ChooseCard();
+    
     bool IsInStrictSequences(Card_t kind,int seqIdx) const;
     bool IsInSequences(Card_t kind) const;
     bool IsStable(Card_t kind) const;
@@ -47,14 +62,12 @@ private:
     int  PickupForSevenCouples();
     int  PickupForFourPeng();
     int  PickupForPiHu();
-    int  PickupForMing(ActionId_t &ming,bool &canKou);
 
     int  _FindSingleChar();
     int  _FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind);
     int  _FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind);
 
     void _CollectPosition(KindPosition *info);
-    void _SetContext();
     
     bool OthersCanHu(Card_t kind) const;
     int  AvailNum(Card_t kind) const;

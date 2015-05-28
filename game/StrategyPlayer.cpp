@@ -1,9 +1,8 @@
 
 #include "CardCollection.h"
 #include "Player.h"
-#include "RoundManager.h"
-
 #include "StrategyPlayer.h"
+#include "RoundManager.h"
 
 #define RETURN_IF_VALID(x) do { \
     int chosen = x;             \
@@ -24,31 +23,33 @@ void StrategyPlayer::assign(RoundManager *rm) {
 /******************************************************************
     算分
 ******************************************************************/
-long StrategyPlayer::calc_score(Card_t kind) {
-    bool isNewDistributed = _rm->_isNewDistributed;
-    bool isLastOne        = (_rm->_distributedNum==TOTAL_CARD_NUM);
-    ActionId_t action     = _rm->_lastActionWithGold;
-    int continueGang      = _rm->_continue_gang_times;
-    bool isGangHua        = _rm->_isGangHua;
+void StrategyPlayer::SetScoreContext() {
+    _scoreCtx.isNewDistributed = _rm->_isNewDistributed;
+    _scoreCtx.isLastOne        = (_rm->_distributedNum==TOTAL_CARD_NUM);
+    _scoreCtx.action           = _rm->_lastActionWithGold;
+    _scoreCtx.continueGang     = _rm->_continue_gang_times;
+    _scoreCtx.isGangHua        = _rm->_isGangHua;
+}
 
+long StrategyPlayer::CalcScore(Card_t kind,const ScoreContext_t &ctx) {
     _employer->_cards->update_statistics(kind);
     _employer->_fan = _employer->_cards->statHuFanMask;
     
-    if(isLastOne) {
+    if(ctx.isLastOne) {
 		_employer->_fan |= RH_HAIDILAO;
     }
 
-	if(isNewDistributed) {
+	if(ctx.isNewDistributed) {
 		_employer->_fan |= RH_ZIMO;
 	}
 
-	if((continueGang!=0)
-        &&(action==aMING_GANG||action==aAN_GANG||action==aQIANG_GANG)) {
-		if(isNewDistributed&&action==aQIANG_GANG)
+	if((ctx.continueGang!=0)
+        &&(ctx.action==aMING_GANG||ctx.action==aAN_GANG||ctx.action==aQIANG_GANG)) {
+		if(ctx.isNewDistributed&&ctx.action==aQIANG_GANG)
 			_employer->_fan |= RH_QIANGGANG;
-		else if(isNewDistributed&&isGangHua)
+		else if(ctx.isNewDistributed&&ctx.isGangHua)
 			_employer->_fan |= RH_GANGHUA;
-		else if(!isNewDistributed)
+		else if(!ctx.isNewDistributed)
 			_employer->_fan |= RH_GANGPAO;
 	}
 
@@ -56,6 +57,11 @@ long StrategyPlayer::calc_score(Card_t kind) {
 		check_task(_employer->_fan);
     
 	return _employer->_cards->sum_up_score(_employer->_fan);
+}
+
+long StrategyPlayer::calc_score(Card_t kind) {
+    SetScoreContext();
+    return CalcScore(kind,_scoreCtx);
 }
 
 void StrategyPlayer::check_task(unsigned int flag) {
@@ -67,14 +73,127 @@ void StrategyPlayer::check_task(unsigned int flag) {
 /******************************************************************
     选牌
 ******************************************************************/
+void StrategyPlayer::SetChooseContext() {
+    memset(&_chooseCtx,0,sizeof(ChooseContext_t));
+
+    _chooseCtx.river  = _rm->_gRiver;
+    _chooseCtx.remain = TOTAL_CARD_NUM - _rm->_distributedNum;
+    _chooseCtx.aim    = _employer->_cards->assess_aim();
+
+    int curPlayer = _rm->_curPlayer;
+    _chooseCtx.OthersTing[0] = _rm->_players[(curPlayer+1)%3]->_cards->_ting;
+    _chooseCtx.OthersTing[1] = _rm->_players[(curPlayer+2)%3]->_cards->_ting;
+
+    _CollectPosition(_chooseCtx.cards);
+    
+    if(_employer->_cards->_ting) {
+        _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
+    } else {
+        _chooseCtx.huNum = 0;
+    }
+}
+
+int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
+    Card_t target = CARD_UNKNOWN;
+    int    minum  = 0;
+
+    if(_employer->_cards->collect_ming_info(_chooseCtx.river)) {
+        for(int i=0;i<_employer->_cards->_ming.choiceNum;i++) {
+            MingChoice_t  *choice = _employer->_cards->_ming.handouts+i;
+
+            if(!OthersCanHu(choice->kind)) {
+                int num = _employer->_cards->get_ting_num(target);
+
+                if(minum > num) {
+                    target = choice->kind;
+                    minum = num;
+                }
+            }
+        }
+    }
+
+    for(int i=0;i<_employer->_cards->size();i++) {
+        if(_employer->_cards->get_kind(i)==target) {
+            _employer->_cards->set_ming(i);
+            _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
+            if(_chooseCtx.huNum>=6) {
+                canKou = true;
+            }            
+
+            return i;
+        }
+    }
+    
+    return INVALID;
+}
+
+int StrategyPlayer::ChooseCard() {
+    /*******************************************/
+    HAH *s_res = new HAH;
+    
+    CARD_KIND list1[9];
+    CARD_KIND list2[9];
+    int len1;
+    int len2;
+    
+    memset(s_res,0,sizeof(HAH));
+    memset(s_res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
+    
+    s_res->reserved_card_num = TOTAL_CARD_NUM - _rm->_distributedNum;
+    
+    CARD s_card;
+    
+    for(int i=0;i<_rm->_gRiver->size();i++) {
+        s_res->card_in_river[s_res->river_len++] = (CARD_KIND)_rm->_gRiver->get_kind(i);
+    }
+    
+    int curPlayer = _rm->_curPlayer;
+    _rm->_players[(curPlayer+1)%3]->_cards->get_hu_cards(list1,&len1);
+    _rm->_players[(curPlayer+2)%3]->_cards->get_hu_cards(list2,&len2);
+    
+    for(int i=_employer->_cards->FreeStart;i<_employer->_cards->size();i++) {
+        int time = s_res->list[_employer->_cards->get_kind(i)].same_times++;
+        s_res->list[_employer->_cards->get_kind(i)].place[time]=i;
+    }
+    
+    s_res->target = (ROBOT_TARGET)_employer->_cards->assess_aim();
+    
+    int index = Robot_pickup_single(s_res,list1,list2,len1,len2);
+    if( index==INVALID ) {
+        index = _employer->_cards->last();
+    }
+    
+    return index;
+}
+
+int StrategyPlayer::choose_card(ActionId_t &ming,bool &canKou) {
+    if(_employer->_cards->IsMing) {
+        return _employer->_cards->last();
+    } else {
+        SetChooseContext();
+
+        int index = INVALID;
+        if(ming==aMING) {
+            index = ChooseForMing(ming,canKou);
+        }
+
+        if(index!=INVALID) {
+            return index;
+        } else {
+            ming=aQi;
+            return ChooseCard();
+        }
+    }
+}
+
 bool StrategyPlayer::OthersCanHu(Card_t kind) const {/*the efficiency could be optimized*/
     for(int i=0;i<2;i++) {
-        if(_ctx.OthersTing[i]==NULL) {
+        if(_chooseCtx.OthersTing[i]==NULL) {
             continue;
         }
         
-        for(int j=0;j<_ctx.OthersTing[i]->cardNum;j++) {
-            if(kind==(_ctx.OthersTing[i]->cards+j)->kind) {
+        for(int j=0;j<_chooseCtx.OthersTing[i]->cardNum;j++) {
+            if(kind==(_chooseCtx.OthersTing[i]->cards+j)->kind) {
                 return true;
             }
         }
@@ -84,9 +203,9 @@ bool StrategyPlayer::OthersCanHu(Card_t kind) const {/*the efficiency could be o
 }
 
 int StrategyPlayer::AvailNum(Card_t kind) const {
-    int num = _ctx.river->find_cards(kind);
+    int num = _chooseCtx.river->find_cards(kind);
 
-    if(_ctx.remain<10 && num==0) {
+    if(_chooseCtx.remain<10 && num==0) {
         return 4;
         return 3;/*WHY???*/
     } else {
@@ -95,22 +214,22 @@ int StrategyPlayer::AvailNum(Card_t kind) const {
 }
 
 bool StrategyPlayer::IsInStrictSequences(Card_t kind,int seqIdx) const {
-    int num0 = _ctx.cards[kind].num;
+    int num0 = _chooseCtx.cards[kind].num;
     int num1 = 0;
     int num2 = 0;
 
     switch(seqIdx) {
         case 0:
-            num1 = _ctx.cards[kind+1].num;
-            num2 = _ctx.cards[kind+2].num;
+            num1 = _chooseCtx.cards[kind+1].num;
+            num2 = _chooseCtx.cards[kind+2].num;
             break;
         case 1:
-            num1 = _ctx.cards[kind-1].num;
-            num2 = _ctx.cards[kind+1].num;
+            num1 = _chooseCtx.cards[kind-1].num;
+            num2 = _chooseCtx.cards[kind+1].num;
             break;
         case 2:
-            num1 = _ctx.cards[kind-2].num;
-            num2 = _ctx.cards[kind-1].num;
+            num1 = _chooseCtx.cards[kind-2].num;
+            num2 = _chooseCtx.cards[kind-1].num;
             break;
     }
 
@@ -140,7 +259,7 @@ bool StrategyPlayer::IsInSequences(Card_t kind) const {
 }
 
 bool StrategyPlayer::IsStable(Card_t kind) const {
-    int num = _ctx.cards[kind].num;
+    int num = _chooseCtx.cards[kind].num;
     
     if( num>=3 ) {
         return true;
@@ -222,8 +341,8 @@ int StrategyPlayer::Robot_check_card_stable(HAH *card_array,CARD_KIND card)
 
 int StrategyPlayer::_FindSingleChar() {
     for(int i=ZHONG;i<=BAI;i++) {
-        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==1) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(!OthersCanHu((Card_t)i) && _chooseCtx.cards[i].num==1) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
@@ -232,15 +351,15 @@ int StrategyPlayer::_FindSingleChar() {
 
 /* 只有一个，而且不连续 */
 int StrategyPlayer::_FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind) {
-    if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1 && _ctx.cards[HeadKind].num==0) {
-        return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
-    } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1 && _ctx.cards[TailKind].num==0) {
-        return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+    if(!OthersCanHu(HeadKind) && _chooseCtx.cards[HeadKind].num==1 && _chooseCtx.cards[HeadKind].num==0) {
+        return _chooseCtx.cards[HeadKind].position[_chooseCtx.cards[HeadKind].num-1];
+    } else if(!OthersCanHu(TailKind) && _chooseCtx.cards[TailKind].num==1 && _chooseCtx.cards[TailKind].num==0) {
+        return _chooseCtx.cards[TailKind].position[_chooseCtx.cards[TailKind].num-1];
     } else {
         for(int i=HeadKind+1;i<TailKind;i++) {
             if(!OthersCanHu((Card_t)i)) {
-                if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
-                    return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                if(_chooseCtx.cards[i].num==1 && _chooseCtx.cards[i-1].num==0 && _chooseCtx.cards[i+1].num==0) {
+                    return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
                 }
             }
         }
@@ -251,18 +370,18 @@ int StrategyPlayer::_FindSingleAndNonSequence(Card_t HeadKind,Card_t TailKind) {
 
 int StrategyPlayer::_FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind) {
     if(!OthersCanHu(HeadKind) || !OthersCanHu(TailKind)) {
-        if(_ctx.cards[HeadKind].num==1 && !IsStable(HeadKind)) {
-            return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
+        if(_chooseCtx.cards[HeadKind].num==1 && !IsStable(HeadKind)) {
+            return _chooseCtx.cards[HeadKind].position[_chooseCtx.cards[HeadKind].num-1];
         }
-        if(_ctx.cards[TailKind].num==1 && !IsStable(TailKind)) {
-            return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+        if(_chooseCtx.cards[TailKind].num==1 && !IsStable(TailKind)) {
+            return _chooseCtx.cards[TailKind].position[_chooseCtx.cards[TailKind].num-1];
         }
     }
 
     for(int i=HeadKind;i<TailKind;i++) {
         if(!OthersCanHu((Card_t)i)) {
-            if(_ctx.cards[i].num==1 && !IsStable((Card_t)i)) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            if(_chooseCtx.cards[i].num==1 && !IsStable((Card_t)i)) {
+                return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
             }
         }
     }
@@ -271,21 +390,21 @@ int StrategyPlayer::_FindSingleAndUnstable(Card_t HeadKind,Card_t TailKind) {
 }
 
 int StrategyPlayer::PickupForSameColor(int reserveColor) {
-    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
-    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
-    const KindPosition &Card1 = _ctx.cards[RiverLast];
-    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+    const Card_t RiverLast    = _chooseCtx.river->get_kind(_chooseCtx.river->last());
+    const Card_t River2ndLast = _chooseCtx.river->get_kind(_chooseCtx.river->last()-1);
+    const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
+    const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _ctx.OthersTing[0]->cardNum;
-    const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
     
     Card_t HeadKind = (Card_t)((1-reserveColor)*9);
     Card_t TailKind = (Card_t)(HeadKind+8);
 
-    if(Hu1==0&&Hu2==0&&_ctx.remain>38) {
+    if(Hu1==0&&Hu2==0&&_chooseCtx.remain>38) {
         for(int i=HeadKind;i<=TailKind;i++) {
-            if(_ctx.cards[i].num>0 && !IsStable((Card_t)i)) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            if(_chooseCtx.cards[i].num>0 && !IsStable((Card_t)i)) {
+                return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
             }
         }
     }
@@ -294,9 +413,9 @@ int StrategyPlayer::PickupForSameColor(int reserveColor) {
     if(!OthersCanHu(RiverLast) || !OthersCanHu(River2ndLast)) {
         if(River2ndLast/9==(1-reserveColor)) {
             if(Card1.num>0 && !IsStable(RiverLast)) {
-                return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+                return _chooseCtx.cards[RiverLast].position[_chooseCtx.cards[RiverLast].num-1];
             } else if(Card2.num>0 && !IsStable(River2ndLast)) {
-                return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+                return _chooseCtx.cards[River2ndLast].position[_chooseCtx.cards[River2ndLast].num-1];
             }
         }
     }
@@ -306,26 +425,26 @@ int StrategyPlayer::PickupForSameColor(int reserveColor) {
     RETURN_IF_VALID(_FindSingleAndUnstable(HeadKind,TailKind));
 
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(_chooseCtx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
     
     for(int i=ZHONG;i<ZHONG+3;i++) {
-        if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(_chooseCtx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(_ctx.cards[i].num>0 && !OthersCanHu((Card_t)i)) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(_chooseCtx.cards[i].num>0 && !OthersCanHu((Card_t)i)) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
     for(int i=ZHONG;i<ZHONG+3;i++) {
-        if(_ctx.cards[i].num>0 && !OthersCanHu((Card_t)i)) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(_chooseCtx.cards[i].num>0 && !OthersCanHu((Card_t)i)) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
@@ -335,29 +454,29 @@ int StrategyPlayer::PickupForSameColor(int reserveColor) {
 
     RETURN_IF_VALID(_FindSingleAndNonSequence(HeadKind,TailKind));
 
-    if(!OthersCanHu(HeadKind) && _ctx.cards[HeadKind].num==1) {
-        return _ctx.cards[HeadKind].position[_ctx.cards[HeadKind].num-1];
-    } else if(!OthersCanHu(TailKind) && _ctx.cards[TailKind].num==1) {
-        return _ctx.cards[TailKind].position[_ctx.cards[TailKind].num-1];
+    if(!OthersCanHu(HeadKind) && _chooseCtx.cards[HeadKind].num==1) {
+        return _chooseCtx.cards[HeadKind].position[_chooseCtx.cards[HeadKind].num-1];
+    } else if(!OthersCanHu(TailKind) && _chooseCtx.cards[TailKind].num==1) {
+        return _chooseCtx.cards[TailKind].position[_chooseCtx.cards[TailKind].num-1];
     }
     
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(_ctx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(_chooseCtx.cards[i].num>0 && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i)) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
     for(int i=HeadKind+1;i<TailKind;i++) {
         if(!OthersCanHu((Card_t)i)) {
-            if(_ctx.cards[i].num==1 && _ctx.cards[i-1].num==0 && _ctx.cards[i+1].num==0) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            if(_chooseCtx.cards[i].num==1 && _chooseCtx.cards[i-1].num==0 && _chooseCtx.cards[i+1].num==0) {
+                return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
             }
         }
     }
 
     for(int i=HeadKind;i<=TailKind;i++) {
-        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num>0 && _ctx.cards[i].num<3) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(!OthersCanHu((Card_t)i) && _chooseCtx.cards[i].num>0 && _chooseCtx.cards[i].num<3) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
@@ -365,38 +484,38 @@ int StrategyPlayer::PickupForSameColor(int reserveColor) {
 }
     
 int StrategyPlayer::PickupForSevenCouples() {
-    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
-    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
-    const KindPosition &Card1 = _ctx.cards[RiverLast];
-    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+    const Card_t RiverLast    = _chooseCtx.river->get_kind(_chooseCtx.river->last());
+    const Card_t River2ndLast = _chooseCtx.river->get_kind(_chooseCtx.river->last()-1);
+    const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
+    const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _ctx.OthersTing[0]->cardNum;
-    const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
     
-    if(_ctx.cards[RiverLast].num!=2 && _ctx.cards[RiverLast].num!=4
+    if(_chooseCtx.cards[RiverLast].num!=2 && _chooseCtx.cards[RiverLast].num!=4
         && !OthersCanHu(RiverLast)) {
         
-        return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
+        return _chooseCtx.cards[RiverLast].position[_chooseCtx.cards[RiverLast].num-1];
         
-    } else if(_ctx.cards[River2ndLast].num!=2 && _ctx.cards[River2ndLast].num!=4
+    } else if(_chooseCtx.cards[River2ndLast].num!=2 && _chooseCtx.cards[River2ndLast].num!=4
         && !IsStable(River2ndLast)) {/*BUG HERE??? 没有判断是否会点炮*/
         
-        return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+        return _chooseCtx.cards[River2ndLast].position[_chooseCtx.cards[River2ndLast].num-1];
         
     }
 
     RETURN_IF_VALID(_FindSingleChar());
 
     for(int i=0;i<TOTAL_CARD_KIND;i++) {
-        if(!OthersCanHu((Card_t)i) && _ctx.cards[i].num==3) {
-            return _ctx.cards[i].position[_ctx.cards[i].num-1];
+        if(!OthersCanHu((Card_t)i) && _chooseCtx.cards[i].num==3) {
+            return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
         }
     }
 
     for(int avail=0;avail<=4;avail--) {
         for(int i=0;i<TOTAL_CARD_KIND;i++) {
-            if(!OthersCanHu((Card_t)i)  && _ctx.cards[i].num==1 && AvailNum((Card_t)i)==avail) {
-                return _ctx.cards[i].position[_ctx.cards[i].num-1];
+            if(!OthersCanHu((Card_t)i)  && _chooseCtx.cards[i].num==1 && AvailNum((Card_t)i)==avail) {
+                return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
             }
         }
     }
@@ -405,18 +524,18 @@ int StrategyPlayer::PickupForSevenCouples() {
 }
 
 int StrategyPlayer::PickupForFourPeng() {
-    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
-    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
-    const KindPosition &Card1 = _ctx.cards[RiverLast];
-    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+    const Card_t RiverLast    = _chooseCtx.river->get_kind(_chooseCtx.river->last());
+    const Card_t River2ndLast = _chooseCtx.river->get_kind(_chooseCtx.river->last()-1);
+    const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
+    const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _ctx.OthersTing[0]->cardNum;
-    const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
     
-    if(_ctx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
-        return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
-    } else if(_ctx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
-        return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+    if(_chooseCtx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _chooseCtx.cards[RiverLast].position[_chooseCtx.cards[RiverLast].num-1];
+    } else if(_chooseCtx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _chooseCtx.cards[River2ndLast].position[_chooseCtx.cards[River2ndLast].num-1];
     }
 
     RETURN_IF_VALID(_FindSingleChar());
@@ -425,8 +544,8 @@ int StrategyPlayer::PickupForFourPeng() {
         for(int avail=0;avail<=4;avail++) {
             for(int i=0;i<TOTAL_CARD_KIND;i++) {/*LOGIC CHANGED!!!*/
                 if(!OthersCanHu((Card_t)i)) {
-                    if(_ctx.cards[i].num==cardInHand && AvailNum((Card_t)i)==avail) {
-                        return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                    if(_chooseCtx.cards[i].num==cardInHand && AvailNum((Card_t)i)==avail) {
+                        return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
                     }
                 }
             }
@@ -437,18 +556,18 @@ int StrategyPlayer::PickupForFourPeng() {
 }
 
 int StrategyPlayer::PickupForPiHu() {
-    const Card_t RiverLast    = _ctx.river->get_kind(_ctx.river->last());
-    const Card_t River2ndLast = _ctx.river->get_kind(_ctx.river->last()-1);
-    const KindPosition &Card1 = _ctx.cards[RiverLast];
-    const KindPosition &Card2 = _ctx.cards[River2ndLast];
+    const Card_t RiverLast    = _chooseCtx.river->get_kind(_chooseCtx.river->last());
+    const Card_t River2ndLast = _chooseCtx.river->get_kind(_chooseCtx.river->last()-1);
+    const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
+    const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _ctx.OthersTing[0]->cardNum;
-    const int Hu2 = _ctx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
     
-    if(_ctx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
-        return _ctx.cards[RiverLast].position[_ctx.cards[RiverLast].num-1];
-    } else if(_ctx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
-        return _ctx.cards[River2ndLast].position[_ctx.cards[River2ndLast].num-1];
+    if(_chooseCtx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _chooseCtx.cards[RiverLast].position[_chooseCtx.cards[RiverLast].num-1];
+    } else if(_chooseCtx.cards[River2ndLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
+        return _chooseCtx.cards[River2ndLast].position[_chooseCtx.cards[River2ndLast].num-1];
     }
 
     RETURN_IF_VALID(_FindSingleChar());
@@ -456,8 +575,8 @@ int StrategyPlayer::PickupForPiHu() {
     for(int cardInHand=1;cardInHand<3;cardInHand++) {
         for(int avail=0;avail<4;avail++) {
                 for(int i=0;i<TOTAL_CARD_KIND;i++) {
-                    if(_ctx.cards[i].num==cardInHand && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i) && AvailNum((Card_t)i)==avail) {
-                        return _ctx.cards[i].position[_ctx.cards[i].num-1];
+                    if(_chooseCtx.cards[i].num==cardInHand && !IsStable((Card_t)i) && !OthersCanHu((Card_t)i) && AvailNum((Card_t)i)==avail) {
+                        return _chooseCtx.cards[i].position[_chooseCtx.cards[i].num-1];
                     }
             }
         }
@@ -983,8 +1102,6 @@ int StrategyPlayer::Robot_pickup_single(HAH *card_array,CARD_KIND list1[],CARD_K
     return chose_place;
 }
 
-#include "RoundManager.h"
-
 void StrategyPlayer::_CollectPosition(KindPosition *cards) {
     Card_t prev = CARD_UNKNOWN;
 
@@ -1004,114 +1121,3 @@ void StrategyPlayer::_CollectPosition(KindPosition *cards) {
         }
     }
 }
-
-void StrategyPlayer::_SetContext()
-{
-    memset(&_ctx,0,sizeof(Context_t));
-
-    _ctx.river  = _rm->_gRiver;
-    _ctx.remain = TOTAL_CARD_NUM - _rm->_distributedNum;
-    _ctx.aim    = _employer->_cards->assess_aim();
-
-    int curPlayer = _rm->_curPlayer;
-    _ctx.OthersTing[0] = _rm->_players[(curPlayer+1)%3]->_cards->_ting;
-    _ctx.OthersTing[1] = _rm->_players[(curPlayer+2)%3]->_cards->_ting;
-
-    _CollectPosition(_ctx.cards);
-    
-    if(_employer->_cards->_ting) {
-        _ctx.huNum = _employer->_cards->_ting->cardNum;
-    } else {
-        _ctx.huNum = 0;
-    }
-}
-
-int StrategyPlayer::PickupForMing(ActionId_t &ming,bool &canKou) {
-    Card_t target = CARD_UNKNOWN;
-    int    minum  = 0;
-
-    if(_employer->_cards->collect_ming_info(_ctx.river)) {
-        for(int i=0;i<_employer->_cards->_ming.choiceNum;i++) {
-            MingChoice_t  *choice = _employer->_cards->_ming.handouts+i;
-
-            if(!OthersCanHu(choice->kind)) {
-                int num = _employer->_cards->get_ting_num(target);
-
-                if(minum > num) {
-                    target = choice->kind;
-                    minum = num;
-                }
-            }
-        }
-    }
-
-    for(int i=0;i<_employer->_cards->size();i++) {
-        if(_employer->_cards->get_kind(i)==target) {
-            _employer->_cards->set_ming(i);
-            _ctx.huNum = _employer->_cards->_ting->cardNum;
-            if(_ctx.huNum>=6) {
-                canKou = true;
-            }            
-
-            return i;
-        }
-    }
-    
-    return INVALID;
-}
-
-int StrategyPlayer::choose_card(ActionId_t &ming,bool &canKou) {
-    if(_employer->_cards->IsMing) {
-        return _employer->_cards->last();
-    } else {
-        _SetContext();
-        
-        if(ming==aMING) {
-            int index = PickupForMing(ming,canKou);
-            if(index!=INVALID) {
-                return index;
-            } else {
-                ming=aQi;
-            }
-        }
-
-        /*******************************************/
-        HAH *s_res = new HAH;
-        
-        CARD_KIND list1[9];
-        CARD_KIND list2[9];
-        int len1;
-        int len2;
-        
-        memset(s_res,0,sizeof(HAH));
-        memset(s_res->card_in_river,ck_NOT_DEFINED,sizeof(CARD_KIND)*TOTAL_CARD_NUM);
-        
-        s_res->reserved_card_num = TOTAL_CARD_NUM - _rm->_distributedNum;
-        
-        CARD s_card;
-        
-        for(int i=0;i<_rm->_gRiver->size();i++) {
-            s_res->card_in_river[s_res->river_len++] = (CARD_KIND)_rm->_gRiver->get_kind(i);
-        }
-        
-        int curPlayer = _rm->_curPlayer;
-        _rm->_players[(curPlayer+1)%3]->_cards->get_hu_cards(list1,&len1);
-        _rm->_players[(curPlayer+2)%3]->_cards->get_hu_cards(list2,&len2);
-        
-        for(int i=_employer->_cards->FreeStart;i<_employer->_cards->size();i++) {
-            int time = s_res->list[_employer->_cards->get_kind(i)].same_times++;
-            s_res->list[_employer->_cards->get_kind(i)].place[time]=i;
-        }
-        
-        s_res->target = (ROBOT_TARGET)_employer->_cards->assess_aim();
-        
-        int index = Robot_pickup_single(s_res,list1,list2,len1,len2);
-        if( index==INVALID ) {
-            index = _employer->_cards->last();
-        }
-        
-        return index;
-    }
-}
-
-
