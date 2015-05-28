@@ -263,6 +263,7 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
 
 Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
     Card_t kind = CARD_UNKNOWN;
+    bool actionPermit = false;
     
     if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
         kind = LastHandout();
@@ -274,12 +275,19 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
         RequestSendAction aReq;
         aReq.Set(_actCtrl.decision,kind);
         _messenger->Send(aReq);
+        
+        actionPermit = Wait(REQ_GAME_SEND_ACTION);
     }
 
-    if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
-        _players[dir]->_cards->push_back(kind);
+    if( dir==MIDDLE && !actionPermit ) {
+        _uiManager->hide_action_tip(aGANG);
+        return CARD_UNKNOWN;
+    } else {
+        if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
+            _players[dir]->_cards->push_back(kind);
+        }
+        return RoundManager::RecvGang(dir);
     }
-    return RoundManager::RecvGang(dir);
 }
 
 void NetRoundManager::RecvQi() {

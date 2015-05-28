@@ -6159,9 +6159,15 @@ void RaceLayer::_DeleteActionTip()
 }
 
 void RaceLayer::hide_action_tip(ActionId_t action) {
-    _effect->Hide(myframe,PENG_REMIND_ACT_TAG_ID);
-
-    auto hideReminder = _HideReminder(PENG_REMIND_ACT_BKG_TAG_ID, 0.18, 1.2);
+    Sequence *hideReminder ;
+    
+    if(action==aPENG) {
+        _effect->Hide(myframe,PENG_REMIND_ACT_TAG_ID);
+        hideReminder = _HideReminder(PENG_REMIND_ACT_BKG_TAG_ID, 0.18, 1.2);
+    } else if(action==aGANG) {
+        _effect->Hide(myframe,GANG_REMING_ACT_TAG_ID);
+        hideReminder = _HideReminder(GANG_REMING_ACT_BKG_TAG_ID, 0.18, 1.2);
+    }
 
     myframe->runAction( Sequence::create(
         hideReminder,

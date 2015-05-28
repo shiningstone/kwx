@@ -24,7 +24,7 @@ const char * VoiceCards[SEX_MAX][CARD_KIND_MAX] = {
 Action_t VoiceEffect::_actionIdx(ActionId_t action) {
     if(action==aPENG) {
         return PENG;
-    } else if(action==aAN_GANG||action==aMING_GANG) {
+    } else if((action&aAN_GANG)||(action&aMING_GANG)) {
         return GANG;
     } else if (action==aMING){
         return TING;
