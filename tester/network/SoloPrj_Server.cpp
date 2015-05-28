@@ -421,6 +421,8 @@ void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,38);
         SendLine(SERVER,39);
     } else if(handout==9) {
+        handout++;
+    
         SendLine(SERVER,40);
         SendLine(SERVER,41);
         SendLine(SERVER,42);

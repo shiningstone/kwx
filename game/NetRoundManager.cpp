@@ -243,13 +243,13 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
         actionPermit = Wait(REQ_GAME_SEND_ACTION);
     }
 
-    if(actionPermit) {
+    if( dir==MIDDLE && !actionPermit ) {
+        _uiManager->hide_action_tip(aPENG);
+        return CARD_UNKNOWN;
+    } else {
         _players[dir]->_cards->push_back(kind);
         _players[dir]->_cards->_IncludingOthersCard = true;
         return RoundManager::RecvPeng(dir);
-    } else {
-        _uiManager->hide_action_tip(aPENG);
-        return CARD_UNKNOWN;
     }
 }
 
@@ -666,9 +666,9 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
     Card_t card         = info->card[0].kind;
     
-    _actCtrl.choices  = _actCtrl.decision;
     _actCtrl.target   = card;
     _actCtrl.decision = (ActionId_t)info->actions;
+    _actCtrl.choices  = _actCtrl.decision;
 
     if(_actCtrl.decision==aMING) {
         _curPlayer = dir;
