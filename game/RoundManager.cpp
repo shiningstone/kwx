@@ -835,6 +835,7 @@ PlayerDir_t RoundManager::TurnTo(PlayerDir_t dir) {
     _prevPlayer = (PlayerDir_t)_curPlayer;
 
     if(dir==INVALID_DIR) {
+        _lastActionSource = INVALID;
         _curPlayer  = (PlayerDir_t)(_prevPlayer+1)%PLAYER_NUM;
     } else {
         _curPlayer  = dir;
