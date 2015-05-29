@@ -279,7 +279,7 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 
 void RoundManager::ForceHandout() {
     if(_players[MIDDLE]->_cards->_IncludingOthersCard) {
-        _players[MIDDLE]->_cards->pop_back();
+        RecvQi();
     } else {
         int last = _players[MIDDLE]->_cards->last();
         
