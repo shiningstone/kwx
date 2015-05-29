@@ -759,7 +759,7 @@ void RoundManager::_LoadRandomCardSequence() {
     }
 }
 
-void RoundManager::update_gold(int gold[3]) {
+void RoundManager::UpdateGold(int gold[PLAYER_NUM]) {
     for(int i=0;i<PLAYER_NUM;i++) {
         Database *database = Database::getInstance();
         int total = _players[i]->UpdateProperty(gold[i]);
@@ -770,6 +770,14 @@ void RoundManager::update_gold(int gold[3]) {
         _uiManager->GuiUpdateScore(id,_players[id]->_profile.property);
         _uiManager->GuiJinBiShow((PlayerDir_t)id,gold[id]);        
     }
+}
+
+void RoundManager::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
+    _strategy->update_gold(GoldWinner,Gold_kind,whoGive);
+}
+
+void RoundManager::get_ending_gold(int gold[PLAYER_NUM]) {
+    _strategy->get_ending_gold(gold);
 }
 
 /*****************************

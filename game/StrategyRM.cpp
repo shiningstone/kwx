@@ -22,7 +22,7 @@ StrategyLocalRM::StrategyLocalRM(RoundManager *rm)
 void StrategyLocalRM::update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {
     int gold[3] = {0};
     CalculateGold(gold,GoldWinner,Gold_kind,whoGive);
-    _rm->update_gold(gold);
+    _rm->UpdateGold(gold);
 }
 
 /*************************************

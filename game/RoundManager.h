@@ -22,12 +22,17 @@ class RoundManager {
     friend class RaceLayer;
     friend class StrategyLocalRM;
 	friend class StrategyPlayer;
+public:
+    void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+    void get_ending_gold(int gold[PLAYER_NUM]);
 protected:
-    void update_gold(int gold[3]);
+    void UpdateGold(int gold[PLAYER_NUM]);
+    
 private:
     unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFrom(PlayerDir_t dir);
+
 public:
     /*****************************
         context
