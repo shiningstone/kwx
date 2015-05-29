@@ -225,36 +225,28 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
 	ActionMask_t action2 = _players[no2]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
 
 	if((action1&a_HU)&&(action2&a_HU)) {
+        if(target!=MIDDLE) {
+            _actCtrl.choices   = aHU;
+            _otherOneForDouble = (no1==MIDDLE) ? no2 : no1;
+        }
+
+        _isDoubleHuAsking  = true;
+        _lastActionWithGold = aQIANG_GANG;
+
         WinInfo_t win;
         win.kind  = DOUBLE_WIN;
         win.giver = target;
-        
-        if(no1==1) {
-            _actCtrl.decision = (ActionId_t)action1;
-            _otherOneForDouble = no2;
-        } else {
-            _actCtrl.decision = (ActionId_t)action2;
-            _otherOneForDouble = no1;
-        }
-
-        _isDoubleHuAsking = true;
-        _lastActionWithGold = aQIANG_GANG;
-
         _uiManager->DoubleWin(win);
 	} else if(action1&a_HU||action2&a_HU) {
-        WinInfo_t win;
-        win.kind = SINGLE_WIN;
-        win.winner = (action1&a_HU) ? no1 : no2;
-        win.giver = target;
+        _actCtrl.choices   = aHU;
 
-        if(no1==1)
-            _actCtrl.decision = (ActionId_t)action1;
-        else
-            _actCtrl.decision = (ActionId_t)action2;
-
-        _isQiangGangAsking=true;
+        _isQiangGangAsking = true;
         _lastActionWithGold = aQIANG_GANG;
         
+        WinInfo_t win;
+        win.kind   = SINGLE_WIN;
+        win.winner = (action1&a_HU) ? no1 : no2;
+        win.giver  = target;
         _uiManager->SingleWin(win);
 	} else {
         _uiManager->GangGoldEffect(target,target);
