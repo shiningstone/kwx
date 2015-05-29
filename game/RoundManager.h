@@ -85,7 +85,7 @@ public:
 
     void SetDecision(PlayerDir_t dir,ActionId_t act);
 
-    void QiangGangHuJudge(PlayerDir_t dir);
+    void QiangGangHuJudge(PlayerDir_t target,Card_t kind);
     
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);

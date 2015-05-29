@@ -246,19 +246,19 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 /*****************************************************
     对当前玩家的杠牌，其他玩家可以判断是否抢杠胡
 *****************************************************/
-void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
-    _qiangGangTargetNo = dir;
+void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
+    _qiangGangTargetNo = target;
 
-	int no1=(_curPlayer+1)%3;
-    unsigned char action1=_players[no1]->hand_in(LastHandout(),false,_players[_curPlayer]->_cards->IsMing,false);
+	int no1=(target+1)%3;
+    unsigned char action1=_players[no1]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
 
-	int no2=(_curPlayer+2)%3;
-	unsigned char action2=_players[no2]->hand_in(LastHandout(),false,_players[_curPlayer]->_cards->IsMing,false);
+	int no2=(target+2)%3;
+	unsigned char action2=_players[no2]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
 
 	if((action1&a_HU)&&(action2&a_HU)) {
         WinInfo_t win;
         win.kind  = DOUBLE_WIN;
-        win.giver = (PlayerDir_t)_curPlayer;
+        win.giver = target;
         
         if(no1==1) {
             _actCtrl.decision = (ActionId_t)action1;
@@ -276,7 +276,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         WinInfo_t win;
         win.kind = SINGLE_WIN;
         win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
-        win.giver = (PlayerDir_t)_curPlayer;
+        win.giver = target;
 
         if(no1==1)
             _actCtrl.decision = (ActionId_t)action1;
@@ -288,7 +288,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         
         _uiManager->SingleWin(win);
 	} else {
-        _uiManager->GangGoldEffect(_qiangGangTargetNo,_curPlayer);
+        _uiManager->GangGoldEffect(target,target);
 	}
 }
 
@@ -661,9 +661,9 @@ void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
 
 void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     if(_isNewDistributed) {
-        QiangGangHuJudge(dir);
+        QiangGangHuJudge(dir,LastHandout());
     } else {
-        DistributeTo(TurnTo(dir),(Card_t)(_unDistributedCards[_distributedNum++]));
+        DistributeTo(TurnTo(dir),_unDistributedCards[_distributedNum++]);
     }
 }
 
