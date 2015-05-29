@@ -14,6 +14,7 @@
 ***********************************************/
 RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
+    TIME_LIMIT = 5;
 
     _uiManager = uiManager;
     _strategy  = StrategyRm::getInstance(this);
@@ -568,13 +569,13 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actCtrl.choices=action1;
         if(no1==1)
         {
-            _uiManager->UpdateClock(0,no1);
+            _uiManager->start_timer(TIME_LIMIT,no1);
             WaitForMyAction();
             return;
         }
         else
         {
-            _uiManager->UpdateClock(0,no1);
+            _uiManager->start_timer(TIME_LIMIT,no1);
             WaitForOthersAction(no1);
             return;
         }
@@ -584,13 +585,13 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actCtrl.choices=action2;
         if(no2==1)
         {
-            _uiManager->UpdateClock(0,no2);
+            _uiManager->start_timer(TIME_LIMIT,no2);
             WaitForMyAction();
             return;
         }
         else
         {
-            _uiManager->UpdateClock(0,no2);
+            _uiManager->start_timer(TIME_LIMIT,no2);
             WaitForOthersAction(no2);
             return;
         }
@@ -600,7 +601,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actCtrl.decision = aQi;
 
         DistributeTo(TurnTo(NEXT),(Card_t)(_unDistributedCards[_distributedNum++]));
-        _uiManager->UpdateClock(0,_curPlayer);
+        _uiManager->start_timer(TIME_LIMIT,(PlayerDir_t)_curPlayer);
     }
 }
 

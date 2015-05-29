@@ -34,6 +34,7 @@ private:
     ActionMask_t GetPlayerChoices(PlayerDir_t dir,bool prevMingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFrom(PlayerDir_t dir);
+    int TIME_LIMIT;
 
 public:
     /*****************************

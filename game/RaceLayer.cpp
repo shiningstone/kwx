@@ -6,6 +6,8 @@
 #include "StrategyRm.h"
 #include "Player.h"
 
+#include "./../utils/DebugCtrl.h"
+
 using namespace cocos2d::ui;
 USING_NS_CC;
 
@@ -1266,10 +1268,10 @@ void RaceLayer::_ClockAddTime( Sprite *clock, int time ) {
 void RaceLayer::HideClock() {
     Node* indicator[4] = {0};
     
-    indicator[0]  = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
-    indicator[1]  = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
-    indicator[2]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
-    indicator[3]  = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
+    indicator[LEFT]   = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
+    indicator[MIDDLE] = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+    indicator[RIGHT]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+    indicator[3]      = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
     
     for(int i=0;i<4;i++) {
         if( indicator[i] ) {
@@ -1278,13 +1280,13 @@ void RaceLayer::HideClock() {
     }
 }
 
-void RaceLayer::UpdateClock(int time,int dir){		
+void RaceLayer::UpdateClock(float dt) {
     Node* indicator[4] = {0};
     
-    indicator[0]  = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
-    indicator[1]  = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
-    indicator[2]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
-    indicator[3]  = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
+    indicator[LEFT]   = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
+    indicator[MIDDLE] = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+    indicator[RIGHT]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+    indicator[3]      = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
     
     for(int i=0;i<4;i++) {
         if( !indicator[i] ) {
@@ -1294,13 +1296,29 @@ void RaceLayer::UpdateClock(int time,int dir){
 
     indicator[3]->setVisible(true);
     _Remove(indicator[3],ALARM_CLOCK_CHILD_NUM_TAG_ID);
-    _ClockAddTime((Sprite *)indicator[3],time);
+    _ClockAddTime((Sprite *)indicator[3],_timer.count--);
 
-    indicator[dir]->setVisible(true);
-    indicator[(dir+1)%3]->setVisible(false);
-    indicator[(dir+2)%3]->setVisible(false);
+    indicator[_timer.curPlayer]->setVisible(true);
+    indicator[(_timer.curPlayer+1)%3]->setVisible(false);
+    indicator[(_timer.curPlayer+2)%3]->setVisible(false);
+
+    if(_timer.count<0) {
+        unschedule(schedule_selector(RaceLayer::UpdateClock));
+
+        if(_timer.curPlayer==MIDDLE) {
+            #ifndef TIMER_FREE
+            _roundManager->ForceHandout();
+            #endif
+        }
+    }
 }
 
+void RaceLayer::start_timer(int time,PlayerDir_t dir){
+    _timer.curPlayer = dir;
+    _timer.count     = time;
+
+    schedule(schedule_selector(RaceLayer::UpdateClock), 1.0f, kRepeatForever, 0);
+}
 /****************************************************
     effect position
 ****************************************************/

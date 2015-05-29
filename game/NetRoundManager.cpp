@@ -491,7 +491,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
 	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
-    _uiManager->UpdateClock(timer,MIDDLE);
+    _uiManager->start_timer(timer,MIDDLE);
 }
 
 void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
@@ -514,7 +514,7 @@ void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
     _players[other]->init(&(_unDistributedCards[27]),13,aim[other]);
 
 	_uiManager->FirstRoundDistributeEffect(zhuang);//牌局开始发牌效果�?
-    _uiManager->UpdateClock(timer,_curPlayer);
+    _uiManager->start_timer(timer,(PlayerDir_t)_curPlayer);
 }
 
 void NetRoundManager::_DiRecv(DistCardNotif *info) {
@@ -526,7 +526,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
 
     ServerDistributeTo(target,card);
     _players[target]->hand_in(card,false,IsMing(target),(_distributedNum==TOTAL_CARD_NUM));
-    _uiManager->UpdateClock(timer,target);
+    _uiManager->start_timer(timer,target);
 }
 
 void NetRoundManager::_DiRecv(DistCardInfo *info) {
@@ -553,7 +553,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     ServerWaitForMyAction();
     _actCtrl.handoutAllow = true;
 
-    _uiManager->UpdateClock(timer,target);
+    _uiManager->start_timer(timer,target);
     _uiManager->ListenToCardTouch();
 }
 
@@ -741,7 +741,7 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {
-    _uiManager->UpdateClock(info->count,info->seat);
+    _uiManager->start_timer(info->count,(PlayerDir_t)info->seat);
 
     if(info->seat==MIDDLE) {
         WaitForMyChoose();

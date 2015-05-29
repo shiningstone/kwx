@@ -52,6 +52,14 @@ protected:
     GraphicEffect  *_effect;
     GObjectFactory *_object;
 private:
+    
+    typedef struct {
+        PlayerDir_t curPlayer;
+        int         count;
+    }TimerInfo_t;
+
+    TimerInfo_t    _timer;
+
     float _AddBtnQi(const Vec2 &ref);
     float _AddBtnHu(const Vec2 &ref);
     float _AddBtnMing(const Vec2 &ref);
@@ -129,10 +137,10 @@ private:
 public:
     void GuiJinBiShow(PlayerDir_t dir, int gold);
 
-	void UpdateClock(int time,int direction);
+	void start_timer(int time,PlayerDir_t direction);
+    void UpdateClock(float dt);
     void HideClock();
     void ListenToCardTouch();
-
     
 private:
 	float s_scale;
