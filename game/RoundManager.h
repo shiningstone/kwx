@@ -85,6 +85,7 @@ public:
 
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
     void SetDecision(PlayerDir_t dir,ActionId_t act);
+    PlayerDir_t RightOf(PlayerDir_t dir)const;
     PlayerDir_t TurnTo(PlayerDir_t dir = NEXT);
     void RecordOutCard( Card_t kind );
     bool IsMing(int player) const;

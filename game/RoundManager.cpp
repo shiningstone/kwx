@@ -203,7 +203,6 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     bool turnToMing = false;
 	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(idx);
-
         turnToMing = true;
     }
 
@@ -219,11 +218,11 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
     _qiangGangTargetNo = target;
 
-	int no1=(target+1)%3;
-    unsigned char action1=_players[no1]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
+	PlayerDir_t  no1 = RightOf(target);
+    ActionMask_t action1 = _players[no1]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
 
-	int no2=(target+2)%3;
-	unsigned char action2=_players[no2]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
+	PlayerDir_t  no2 = RightOf(no1);
+	ActionMask_t action2 = _players[no2]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
 
 	if((action1&a_HU)&&(action2&a_HU)) {
         WinInfo_t win;
@@ -245,7 +244,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
 	} else if(action1&a_HU||action2&a_HU) {
         WinInfo_t win;
         win.kind = SINGLE_WIN;
-        win.winner = (PlayerDir_t)((action1&a_HU) ? no1 : no2);
+        win.winner = (action1&a_HU) ? no1 : no2;
         win.giver = target;
 
         if(no1==1)
@@ -522,11 +521,11 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
 void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
     bool prevMingStatus = IsMing(dir);
     
-    int no1=((PlayerDir_t)dir+1)%3;
-    unsigned char action1 = GetPlayerChoices((PlayerDir_t)no1,prevMingStatus);
+    PlayerDir_t  no1 = RightOf(dir);
+    ActionMask_t action1 = GetPlayerChoices(no1,prevMingStatus);
     
-    int no2=((PlayerDir_t)dir+2)%3;
-    unsigned char action2 = GetPlayerChoices((PlayerDir_t)no2,prevMingStatus);
+    PlayerDir_t  no2 = RightOf(no1);
+    ActionMask_t action2 = GetPlayerChoices(no2,prevMingStatus);
     
     if((action1&a_HU)&&(action2&a_HU))
     {
@@ -583,7 +582,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         else
         {
             _uiManager->UpdateClock(0,no1);
-            WaitForOthersAction((PlayerDir_t)no1);
+            WaitForOthersAction(no1);
             return;
         }
     }
@@ -599,7 +598,7 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         else
         {
             _uiManager->UpdateClock(0,no2);
-            WaitForOthersAction((PlayerDir_t)no2);
+            WaitForOthersAction(no2);
             return;
         }
     }
@@ -751,12 +750,16 @@ bool RoundManager::IsMing(int id) const{
     return _players[id]->_cards->IsMing;
 }
 
+PlayerDir_t RoundManager::RightOf(PlayerDir_t dir) const {
+    return (PlayerDir_t)((dir+1)%PLAYER_NUM);
+}
+
 PlayerDir_t RoundManager::TurnTo(PlayerDir_t dir) {
     _prevPlayer = (PlayerDir_t)_curPlayer;
 
     if(dir==INVALID_DIR) {
         _lastActionSource = INVALID;
-        _curPlayer  = (PlayerDir_t)(_prevPlayer+1)%PLAYER_NUM;
+        _curPlayer  = RightOf(_prevPlayer);
     } else {
         _curPlayer  = dir;
     }
