@@ -748,10 +748,6 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
         _isWaitForMyDecision = false;
     }
 
-    if(_isQiangGangAsking) {
-        _lastActionWithGold = aQIANG_GANG;
-    }
-
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
