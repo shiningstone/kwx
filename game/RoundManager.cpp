@@ -45,25 +45,12 @@ void RoundManager::InitPlayers() {
 	_players[MIDDLE] = new Player(MIDDLE);
 	_players[RIGHT]  = new Player(RIGHT);
 
-    Database *database = Database::getInstance();
-
-    int  ids[PLAYER_NUM] = {0};
-    _GenerateIds(ids);
+    UserProfile_t profile[PLAYER_NUM] = {{0}};
+    _strategy->load_profiles(profile);
 
     for(int dir=0;dir<PLAYER_NUM;dir++) {   
-        UserProfile_t profile = {0};
-        database->GetUserProfile(ids[dir],profile);
-        _players[dir]->Set(&profile);
+        _players[dir]->Set(&profile[dir]);
     }
-}
-
-void RoundManager::_GenerateIds(int ids[]) {
-    ids[LEFT] = rand()%ROBOT_MAX_NUM;
-    ids[MIDDLE] = ROBOT_MAX_NUM+1;
-    
-    do {
-        ids[RIGHT]=rand()%ROBOT_MAX_NUM;
-    } while( ids[RIGHT]==ids[LEFT] );
 }
 
 int RoundManager::Shuffle() {
@@ -668,10 +655,6 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
 }
 
 void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
-    if(_isGangAsking) {//is this judgement neccessary?
-        _isGangAsking = false;
-    }
-    
     if(act==aGANG) {
         if(_actCtrl.choices & aAN_GANG) {
             _actCtrl.decision = aAN_GANG;

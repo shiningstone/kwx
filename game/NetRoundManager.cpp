@@ -63,16 +63,11 @@ void NetRoundManager::InitPlayers() {
 	_players[1] = new Player(MIDDLE);
 	_players[2] = new Player(RIGHT);
 
-    Database *database = Database::getInstance();
+    UserProfile_t profile[PLAYER_NUM] = {{0}};
+    _strategy->load_profiles(profile);
 
-    int  ids[3] = {0};
-    _GenerateIds(ids);
-
-    for(int dir=0;dir<3;dir++)
-    {   
-        UserProfile_t profile = {0};
-        database->GetUserProfile(ids[dir],profile);
-        _players[dir]->Set(&profile);
+    for(int dir=0;dir<PLAYER_NUM;dir++) {   
+        _players[dir]->Set(&profile[dir]);
     }
 }
 

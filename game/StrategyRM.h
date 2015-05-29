@@ -3,12 +3,14 @@
 #define __RM_STRATEGY__
 
 #include "GameType.h"
+#include "DataBase.h"
 
 class RoundManager;
 class StrategyRm {
 
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) = 0;
+    virtual void load_profiles(UserProfile_t profile[PLAYER_NUM]) = 0;
 
     void get_ending_gold(int gold[PLAYER_NUM]);
 /***************************************

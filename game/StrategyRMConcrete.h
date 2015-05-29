@@ -8,11 +8,14 @@
 class StrategyLocalRM : public StrategyRm {
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+    virtual void load_profiles(UserProfile_t profiles[PLAYER_NUM]);
 
     StrategyLocalRM(RoundManager *rm);
     ~StrategyLocalRM();
 private:
     int  PREMIUM_LEAST;
+
+    void GenerateId(int IDs[PLAYER_NUM]);
 
     void CalcAnGangGold(int winner,int gold[3],int continueGang = 1);
     void CalcMingGangGold(int winner,int giver,int gold[3],int continueGang = 1);
@@ -29,6 +32,7 @@ private:
 class StrategyNetworkRM : public StrategyRm {
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {}
+    virtual void load_profiles(UserProfile_t profiles[PLAYER_NUM]);
 
     StrategyNetworkRM(RoundManager *rm);
     ~StrategyNetworkRM();

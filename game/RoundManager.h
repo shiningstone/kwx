@@ -104,11 +104,11 @@ public:
 	void set_aims_sequence(const int p_aim[]);
 
     GameMode_t _MODE;
+protected:
 
     StrategyRm *_strategy;
-protected:
-    void ForceHandout();
 
+    void ForceHandout();
     
     RaceLayer  *_uiManager;
 
@@ -121,13 +121,10 @@ protected:
     Card_t      _unDistributedCards[TOTAL_CARD_NUM];
     int         _distributedNum;
 
-    void        _GenerateIds(int ids[]);
-
     bool _isGameStart;
 
     bool _isNewDistributed;
 
-    bool _isGangAsking;
     bool _isQiangGangAsking;
     bool _isDoubleHuAsking;
     
