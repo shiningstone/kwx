@@ -1317,6 +1317,9 @@ void RaceLayer::start_timer(int time,PlayerDir_t dir){
     _timer.curPlayer = dir;
     _timer.count     = time;
 
+    unschedule(schedule_selector(RaceLayer::UpdateClock));
+
+    UpdateClock(0);
     schedule(schedule_selector(RaceLayer::UpdateClock), 1.0f, kRepeatForever, 0);
 }
 /****************************************************

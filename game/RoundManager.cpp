@@ -342,6 +342,8 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 }
 
 void RoundManager::WaitForMyAction() {
+    _uiManager->start_timer(TIME_LIMIT,MIDDLE);
+
 	if(_actCtrl.choices!=0) {
         _uiManager->ShowActionButtons(_actCtrl.choices);
 	}
@@ -362,7 +364,7 @@ void RoundManager::WaitForMyChoose() {
 }
 
 void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
-    LOGGER_WRITE("%s (%d) perform action %d",__FUNCTION__,dir,_actCtrl.choices);
+    _uiManager->start_timer(TIME_LIMIT,dir);
 
     if(_actCtrl.choices&aHU) {
         RecvHu(dir);
@@ -569,13 +571,11 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actCtrl.choices=action1;
         if(no1==1)
         {
-            _uiManager->start_timer(TIME_LIMIT,no1);
             WaitForMyAction();
             return;
         }
         else
         {
-            _uiManager->start_timer(TIME_LIMIT,no1);
             WaitForOthersAction(no1);
             return;
         }
@@ -585,13 +585,11 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actCtrl.choices=action2;
         if(no2==1)
         {
-            _uiManager->start_timer(TIME_LIMIT,no2);
             WaitForMyAction();
             return;
         }
         else
         {
-            _uiManager->start_timer(TIME_LIMIT,no2);
             WaitForOthersAction(no2);
             return;
         }
@@ -601,12 +599,13 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
         _actCtrl.decision = aQi;
 
         DistributeTo(TurnTo(NEXT),(Card_t)(_unDistributedCards[_distributedNum++]));
-        _uiManager->start_timer(TIME_LIMIT,(PlayerDir_t)_curPlayer);
     }
 }
 
 void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
     if(_distributedNum<TOTAL_CARD_NUM+1) {
+        _uiManager->start_timer(TIME_LIMIT,dir);
+
         _isNewDistributed  = true;
 
         DistributeInfo_t distInfo;
@@ -615,7 +614,7 @@ void RoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
         distInfo.cardsLen = _players[dir]->_cards->size();
         distInfo.newCard  = card;
         distInfo.remain   = TOTAL_CARD_NUM - _distributedNum;
-        
+
         _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
     } else {
 		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
