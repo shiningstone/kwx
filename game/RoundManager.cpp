@@ -111,6 +111,9 @@ void RoundManager::StartGame() {
 	_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//鐗屽眬寮�濮嬪彂鐗屾晥鏋溿�?
 }
 
+/***********************************************************
+    玩家动作处理
+***********************************************************/
 Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
     SetDecision(dir,aPENG);
     _actCtrl.handoutAllow = true;
@@ -212,47 +215,6 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _uiManager->MyHandoutEffect(idx,touch,mode,turnToMing);
 }
 
-/*****************************************************
-    对当前玩家的杠牌，其他玩家可以判断是否抢杠胡
-*****************************************************/
-void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
-    _qiangGangTargetNo = target;
-
-	PlayerDir_t  no1 = RightOf(target);
-    ActionMask_t action1 = _players[no1]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
-
-	PlayerDir_t  no2 = RightOf(no1);
-	ActionMask_t action2 = _players[no2]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
-
-	if((action1&a_HU)&&(action2&a_HU)) {
-        if(target!=MIDDLE) {
-            _actCtrl.choices   = aHU;
-            _otherOneForDouble = (no1==MIDDLE) ? no2 : no1;
-        }
-
-        _isDoubleHuAsking  = true;
-        _lastActionWithGold = aQIANG_GANG;
-
-        WinInfo_t win;
-        win.kind  = DOUBLE_WIN;
-        win.giver = target;
-        _uiManager->DoubleWin(win);
-	} else if(action1&a_HU||action2&a_HU) {
-        _actCtrl.choices   = aHU;
-
-        _isQiangGangAsking = true;
-        _lastActionWithGold = aQIANG_GANG;
-        
-        WinInfo_t win;
-        win.kind   = SINGLE_WIN;
-        win.winner = (action1&a_HU) ? no1 : no2;
-        win.giver  = target;
-        _uiManager->SingleWin(win);
-	} else {
-        _uiManager->GangGoldEffect(target,target);
-	}
-}
-
 void RoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->clear_kou_choices();
     _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
@@ -314,6 +276,56 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
     }
 }
 
+void RoundManager::ForceHandout() {
+    int last = _players[MIDDLE]->_cards->last();
+    
+    Vec2 location = _uiManager->GetCardPositionInHand(last);
+    RecvHandout(last,location,2);
+    
+    _prevPlayer = MIDDLE;
+}
+
+/*****************************************************
+    对当前玩家的杠牌，其他玩家可以判断是否抢杠胡
+*****************************************************/
+void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
+    _qiangGangTargetNo = target;
+
+	PlayerDir_t  no1 = RightOf(target);
+    ActionMask_t action1 = _players[no1]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
+
+	PlayerDir_t  no2 = RightOf(no1);
+	ActionMask_t action2 = _players[no2]->hand_in(kind,false,_players[target]->_cards->IsMing,false);
+
+	if((action1&a_HU)&&(action2&a_HU)) {
+        if(target!=MIDDLE) {
+            _actCtrl.choices   = aHU;
+            _otherOneForDouble = (no1==MIDDLE) ? no2 : no1;
+        }
+
+        _isDoubleHuAsking  = true;
+        _lastActionWithGold = aQIANG_GANG;
+
+        WinInfo_t win;
+        win.kind  = DOUBLE_WIN;
+        win.giver = target;
+        _uiManager->DoubleWin(win);
+	} else if(action1&a_HU||action2&a_HU) {
+        _actCtrl.choices   = aHU;
+
+        _isQiangGangAsking = true;
+        _lastActionWithGold = aQIANG_GANG;
+        
+        WinInfo_t win;
+        win.kind   = SINGLE_WIN;
+        win.winner = (action1&a_HU) ? no1 : no2;
+        win.giver  = target;
+        _uiManager->SingleWin(win);
+	} else {
+        _uiManager->GangGoldEffect(target,target);
+	}
+}
+
 void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
@@ -336,15 +348,6 @@ void RoundManager::WaitForMyAction() {
 	if(_isNewDistributed) {
 		WaitForMyChoose();
 	}
-}
-
-void RoundManager::ForceHandout() {
-    int last = _players[MIDDLE]->_cards->last();
-    
-    Vec2 location = _uiManager->GetCardPositionInHand(last);
-    RecvHandout(last,location,2);
-    
-    _prevPlayer = MIDDLE;
 }
 
 void RoundManager::WaitForMyChoose() {
