@@ -130,8 +130,6 @@ protected:
 
     bool _isGameStart;
 
-    bool _isWaitForMyDecision;
-    
     bool _isNewDistributed;
 
     bool _isGangAsking;

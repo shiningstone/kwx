@@ -4303,10 +4303,7 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            if(_roundManager->_isWaitForMyDecision) {
-				_roundManager->_isWaitForMyDecision = false;
-				_roundManager->_actCtrl.decision = aMING;
-			}
+			_roundManager->_actCtrl.decision = aMING;
             
 			for(int dir=0;dir<3;dir++) {//only once is enough?
 			    _Remove(myframe,PENG_EFFECT_NODE_ID+dir);

@@ -166,7 +166,6 @@ void NetRoundManager::ServerWaitForMyAction() {
     _uiManager->ShowActionButtons(_actCtrl.choices);
 
 	if(_actCtrl.choices!=0) {
-		_isWaitForMyDecision = true;
 		_actCtrl.decision    = aQi;
 
     	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&aMING_GANG || _actCtrl.choices&aSHOU_GANG) {
@@ -331,10 +330,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         }
     }
 
-	if(_isWaitForMyDecision) {
-		_isWaitForMyDecision=false;
-		_actCtrl.decision = aQi;
-	}
+	_actCtrl.decision = aQi;
 
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     //_players[MIDDLE]->hand_out(chosen);
@@ -743,10 +739,6 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     }
 
     delete info;
-    
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision = false;
-    }
 
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }

@@ -89,7 +89,6 @@ int RoundManager::Shuffle() {
     _firstMingNo = INVALID;
     _qiangGangTargetNo = INVALID;
     _otherOneForDouble = INVALID;
-    _isWaitForMyDecision = false;
     _isGangHua = false;
     _actCtrl.handoutAllow = false;
     _isTuoGuan = false;
@@ -226,10 +225,6 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
         }
     }
     
-	if(_isWaitForMyDecision) {
-		_isWaitForMyDecision=false;
-	}
-
     bool turnToMing = false;
 	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(idx);
@@ -374,8 +369,6 @@ void RoundManager::WaitForMyAction() {
         if(_actCtrl.choices&a_AN_GANG  || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
             _isGangAsking = true;
         }
-        
-		_isWaitForMyDecision = true;
 	}
 
 	if(_isNewDistributed) {
@@ -458,9 +451,7 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 }
 
 void RoundManager::WaitForTuoGuanHandle() {
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision=false;
-        
+    if(_actCtrl.choices!=0) {
         if(_actCtrl.choices!=0 && !_isNewDistributed) {
             _players[MIDDLE]->_cards->pop_back();
         }
@@ -678,10 +669,6 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
 }
 
 void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision = false;
-    }
-
     if(_isGangAsking) {//is this judgement neccessary?
         _isGangAsking = false;
     }
