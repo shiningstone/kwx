@@ -243,28 +243,17 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _uiManager->MyHandoutEffect(idx,touch,mode,turnToMing);
 }
 
+/*****************************************************
+    对当前玩家的杠牌，其他玩家可以判断是否抢杠胡
+*****************************************************/
 void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
     _qiangGangTargetNo = dir;
 
-	_isNewDistributed=false;
-
 	int no1=(_curPlayer+1)%3;
-    unsigned char action1=_players[no1]->hand_in(
-        LastHandout(),
-        _isNewDistributed,
-        _players[_curPlayer]->_cards->IsMing,
-        false
-    );
+    unsigned char action1=_players[no1]->hand_in(LastHandout(),false,_players[_curPlayer]->_cards->IsMing,false);
 
 	int no2=(_curPlayer+2)%3;
-	unsigned char action2=_players[no2]->hand_in(
-        LastHandout(),
-        _isNewDistributed,
-        _players[_curPlayer]->_cards->IsMing,
-        false
-    );
+	unsigned char action2=_players[no2]->hand_in(LastHandout(),false,_players[_curPlayer]->_cards->IsMing,false);
 
 	if((action1&a_HU)&&(action2&a_HU)) {
         WinInfo_t win;
@@ -299,8 +288,6 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         
         _uiManager->SingleWin(win);
 	} else {
-		_isNewDistributed=true;
-
         _uiManager->GangGoldEffect(_qiangGangTargetNo,_curPlayer);
 	}
 }
