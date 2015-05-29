@@ -8,7 +8,7 @@
 #include "StrategyRmConcrete.h"
 
 void StrategyRm::get_ending_gold(int gold[PLAYER_NUM]) {
-    memcpy(gold,_roundEndingGold,sizeof(int)*PLAYER_NUM);
+    memcpy(gold,_roundHuGold,sizeof(int)*PLAYER_NUM);
 }
 
 /*************************************
@@ -99,7 +99,7 @@ void StrategyLocalRM::CalcHuGold(int gold[PLAYER_NUM],const WinInfo_t &win) {
     }
 
     for(int i=0;i<PLAYER_NUM;i++) {
-        _roundEndingGold[i] = gold[i];
+        _roundHuGold[i] = gold[i];
     }
 }
 
@@ -122,7 +122,7 @@ StrategyRm* StrategyRm::_instance = NULL;
 StrategyRm::StrategyRm(RoundManager *rm) {
     _rm = rm;
 
-    memset(_roundEndingGold,0,PLAYER_NUM*sizeof(int));
+    memset(_roundHuGold,0,PLAYER_NUM*sizeof(int));
 }
 
 StrategyRm::~StrategyRm() {

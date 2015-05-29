@@ -84,33 +84,26 @@ public:
     virtual void ActionAfterGang(PlayerDir_t dir);
 
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
-
     void SetDecision(PlayerDir_t dir,ActionId_t act);
+    PlayerDir_t TurnTo(PlayerDir_t dir = NEXT);
+    void RecordOutCard( Card_t kind );
+    bool IsMing(int player) const;
 
-    void QiangGangHuJudge(PlayerDir_t target,Card_t kind);
-    
     PlayerDir_t GetLastWinner();
     void SetWin(WinKind_t kind,int player);
     const WinInfo_t &GetWin();
     bool IsWinner(int no);
 
-    PlayerDir_t TurnTo(PlayerDir_t dir = NEXT);
-
-    void RecordOutCard( Card_t kind );
-
+    virtual void CreateRace(RaceLayer *uiManager);
+    virtual void StartGame();
     virtual void InitPlayers();
-    bool IsMing(int player) const;
 
-    
+    void QiangGangHuJudge(PlayerDir_t target,Card_t kind);
     int  Shuffle();
 
 	void set_aims_sequence(const int p_aim[]);
 
-    /* main process */
     GameMode_t _MODE;
-
-    virtual void CreateRace(RaceLayer *uiManager);
-    virtual void StartGame();
 
     StrategyRm *_strategy;
 protected:

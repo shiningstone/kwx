@@ -19,7 +19,7 @@ public:
     static void  destroyInstance();
 
 protected:
-    int  _roundEndingGold[3];
+    int  _roundHuGold[3];
     
     RoundManager *_rm;
 
