@@ -105,11 +105,10 @@ void RoundManager::StartGame() {
 
     int lastWinner = GetLastWinner();
     _actCtrl.choices = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
-	if(_actCtrl.choices!=a_TIMEOUT) {
-		_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
-		_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
-		_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
-	}
+	_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
+	_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
+
+	_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//牌局开始发牌效果�?
 }
 
 Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
@@ -183,7 +182,7 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvQi() {
-    if(!_isNewDistributed && _lastActionSource!=MIDDLE) {
+    if(_players[MIDDLE]->_cards->_IncludingOthersCard) {
         _players[MIDDLE]->_cards->pop_back();
     }
 
