@@ -18,20 +18,6 @@ Player::Player(PlayerDir_t dir) {
     _logger = LOGGER_REGISTER("Player");
 }
 
-Player::Player(int id,PlayerDir_t dir) {//this is for default settings ( robot ) 
-	_strategy = new StrategyPlayer(this);
-
-    _dir = dir;
-	_cards = NULL;
-    _river = NULL;
-
-    _isReady = false;
-
-    memset(&_profile,0,sizeof(UserProfile_t));
-
-    _logger = LOGGER_REGISTER("Player");
-}
-
 Player::~Player() {
     if(_cards!=NULL) {
         delete _river;

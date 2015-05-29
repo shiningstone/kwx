@@ -9,7 +9,6 @@
 class Player {
 public:
 	Player(PlayerDir_t dir);
-    Player(int id,PlayerDir_t dir);
     ~Player();
 
     virtual unsigned char init(Card_t cards[],int len,int aim);

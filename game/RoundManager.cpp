@@ -417,11 +417,9 @@ void RoundManager::WaitForResponse(PlayerDir_t dir) {
 
 void RoundManager::WaitForTuoGuanHandle() {
     if(_actCtrl.choices!=0) {
-        if(_actCtrl.choices!=0 && !_isNewDistributed) {
-            _players[MIDDLE]->_cards->pop_back();
-        }
-        
         if(!_isNewDistributed) {
+            _players[MIDDLE]->_cards->pop_back();
+
             if(_isQiangGangAsking) {
                 _isQiangGangAsking=false;
                 _strategy->update_gold((PlayerDir_t)_qiangGangTargetNo,MING_GANG,(PlayerDir_t)_curPlayer);
