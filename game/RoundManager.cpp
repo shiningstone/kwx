@@ -151,15 +151,8 @@ Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
 }
 
 void RoundManager::RecvHu(PlayerDir_t dir) {
-    if(_isWaitForMyDecision) {
-        _isWaitForMyDecision = false;
-        _actCtrl.decision = aHU;
-    }
-
-    if(_isQiangGangAsking) {
-        _lastActionWithGold = aQIANG_GANG;
-    }
-
+    SetDecision(dir,aHU);
+    
     if(_isDoubleHuAsking) {
         SetWin(DOUBLE_WIN,_curPlayer);
     } else {
@@ -717,6 +710,12 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
 
         _continue_gang_times++;
         _lastActionWithGold = _actCtrl.decision;
+    } else if(act==aHU) {
+        _actCtrl.decision = act;
+
+        if(_isQiangGangAsking) {
+            _lastActionWithGold = aQIANG_GANG;
+        }
     } else {
         _actCtrl.decision = act;
         _continue_gang_times = 0;
