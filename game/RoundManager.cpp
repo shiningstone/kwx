@@ -262,10 +262,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         LastHandout(),
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
-        false,
-        aQIANG_GANG,
-        _continue_gang_times,
-        _isGangHua
+        false
     );
 
 	int no2=(_curPlayer+2)%3;
@@ -273,10 +270,7 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t dir) {
         LastHandout(),
         _isNewDistributed,
         _players[_curPlayer]->_cards->IsMing,
-        false,
-        aQIANG_GANG,
-        _continue_gang_times,
-        _isGangHua
+        false
     );
 
 	if((action1&a_HU)&&(action2&a_HU)) {
@@ -520,10 +514,7 @@ ActionMask_t RoundManager::GetPlayerChoices(PlayerDir_t dir,bool prevMing) {
             LastHandout(),
             _isNewDistributed,
             prevMing,
-            (_distributedNum==TOTAL_CARD_NUM),
-            _lastActionWithGold,
-            _continue_gang_times,
-            _isGangHua
+            (_distributedNum==TOTAL_CARD_NUM)
         );
     
     if(dir==MIDDLE&&_isTuoGuan) {
@@ -561,10 +552,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
             NewDistribute(),
             _isNewDistributed,
             _players[_prevPlayer]->_cards->IsMing,
-            (_distributedNum==TOTAL_CARD_NUM),
-            _lastActionWithGold,
-            _continue_gang_times,
-            _isGangHua
+            (_distributedNum==TOTAL_CARD_NUM)
         );
     
     if((PlayerDir_t)dir==MIDDLE) {

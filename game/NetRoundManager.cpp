@@ -542,15 +542,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     delete info;
 
     ServerDistributeTo(target,card);
-    _players[target]->hand_in(
-        card,
-        false,
-        IsMing(target),
-        (_distributedNum==TOTAL_CARD_NUM),
-        _lastActionWithGold,
-        _continue_gang_times,
-        _isGangHua
-    );
+    _players[target]->hand_in(card,false,IsMing(target),(_distributedNum==TOTAL_CARD_NUM));
     _uiManager->UpdateClock(timer,target);
 }
 
@@ -574,15 +566,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     delete info;
 
     ServerDistributeTo(target,card);
-    _players[MIDDLE]->hand_in(
-        card,
-        false,
-        IsMing(prev),
-        (_distributedNum==TOTAL_CARD_NUM),
-        _lastActionWithGold,
-        _continue_gang_times,
-        _isGangHua
-    );
+    _players[MIDDLE]->hand_in(card,false,IsMing(prev),(_distributedNum==TOTAL_CARD_NUM));
     ServerWaitForMyAction();
     _actCtrl.handoutAllow = true;
 

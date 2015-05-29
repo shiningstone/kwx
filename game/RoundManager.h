@@ -49,11 +49,10 @@ public:
     }ActCtrl_t;
 
     ActCtrl_t   _actCtrl;
-
     PlayerDir_t _prevPlayer;
-    int  _curPlayer;
+    int         _curPlayer;
     ActionId_t  _lastActionWithGold;
-    int  _lastActionSource;
+    int         _lastActionSource;
     
     static RoundManager *getInstance();
     static void  destroyInstance();

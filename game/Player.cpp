@@ -68,7 +68,7 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     if(len<14) {/*NON-ZHUANG*/
         return a_JUMP;
     } else {
-        return hand_in(cards[13],true,0,false,aQi,0,false);
+        return hand_in(cards[13],true,0,false);
     }
 }
 
@@ -103,7 +103,7 @@ ActionMask_t Player::judge_action_again() {
 	return res;
 }
 
-ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,bool isLastOne,ActionId_t lastActionWithGold,unsigned int continue_gang_times,bool isGangHua) {
+ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,bool isLastOne) {
 	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
 	if(_cards->can_hu(newCard)) {
