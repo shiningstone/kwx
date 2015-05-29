@@ -278,12 +278,16 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 }
 
 void RoundManager::ForceHandout() {
-    int last = _players[MIDDLE]->_cards->last();
-    
-    Vec2 location = _uiManager->GetCardPositionInHand(last);
-    RecvHandout(last,location,2);
-    
-    _prevPlayer = MIDDLE;
+    if(_players[MIDDLE]->_cards->_IncludingOthersCard) {
+        _players[MIDDLE]->_cards->pop_back();
+    } else {
+        int last = _players[MIDDLE]->_cards->last();
+        
+        Vec2 location = _uiManager->GetCardPositionInHand(last);
+        RecvHandout(last,location,2);
+        
+        _prevPlayer = MIDDLE;
+    }
 }
 
 /*****************************************************
