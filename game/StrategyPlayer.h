@@ -55,6 +55,7 @@ private:
     int  ChooseForMing(ActionId_t &ming,bool &canKou);
     int  ChooseCard();
     
+private:/*选择要出的牌*/
     bool IsInStrictSequences(Card_t kind,int seqIdx) const;
     bool IsInSequences(Card_t kind) const;
     bool IsStable(Card_t kind) const;

@@ -514,7 +514,7 @@ void RoundManager::WaitForTuoGuanHandle() {
     }
 }
 
-unsigned int RoundManager::_GetPlayerReaction(PlayerDir_t dir,bool prevMing) {
+ActionMask_t RoundManager::GetPlayerChoices(PlayerDir_t dir,bool prevMing) {
     ActionMask_t actions = 
         _players[dir]->hand_in(
             LastHandout(),
@@ -585,10 +585,10 @@ void RoundManager::_HandleCardFrom(PlayerDir_t dir) {
     bool prevMingStatus = IsMing(dir);
     
     int no1=((PlayerDir_t)dir+1)%3;
-    unsigned char action1 = _GetPlayerReaction((PlayerDir_t)no1,prevMingStatus);
+    unsigned char action1 = GetPlayerChoices((PlayerDir_t)no1,prevMingStatus);
     
     int no2=((PlayerDir_t)dir+2)%3;
-    unsigned char action2 = _GetPlayerReaction((PlayerDir_t)no2,prevMingStatus);
+    unsigned char action2 = GetPlayerChoices((PlayerDir_t)no2,prevMingStatus);
     
     if((action1&a_HU)&&(action2&a_HU))
     {

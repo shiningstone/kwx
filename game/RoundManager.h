@@ -29,7 +29,7 @@ protected:
     void UpdateGold(int gold[PLAYER_NUM]);
     
 private:
-    unsigned int _GetPlayerReaction(PlayerDir_t dir,bool prevTingStatus);
+    ActionMask_t GetPlayerChoices(PlayerDir_t dir,bool prevMingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);
     void _HandleCardFrom(PlayerDir_t dir);
 

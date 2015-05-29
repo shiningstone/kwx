@@ -71,7 +71,7 @@ void StrategyPlayer::check_task(unsigned int flag) {
 }
 
 /******************************************************************
-    选牌
+    选择要出的牌                       
 ******************************************************************/
 void StrategyPlayer::SetChooseContext() {
     memset(&_chooseCtx,0,sizeof(ChooseContext_t));
