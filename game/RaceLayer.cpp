@@ -224,6 +224,9 @@ void RaceLayer::DoubleWin(const WinInfo_t &win) {
         } else {
             _roundManager->WaitForMyAction();
         }
+    } else {
+        _HuEffect(win);
+        _DistributeEvent(DOUBLE_HU_WITH_ME,NULL);
     }
 }
 
