@@ -271,6 +271,7 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
         int last = _roundManager->_players[MIDDLE]->_cards->last();
         _roundManager->_players[MIDDLE]->hand_out(last);
     }
+	_roundManager->UpdateCards(MIDDLE,a_JUMP);
 
     //CardNode_t *node = _roundManager->_players[MIDDLE]->_cards->back();
     //_roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
@@ -1887,7 +1888,7 @@ void RaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToM
         DelayTime::create(0.5),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
-            _roundManager->UpdateCards(MIDDLE,a_JUMP);
+            //_roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
