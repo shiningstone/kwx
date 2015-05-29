@@ -368,14 +368,14 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 }
 
 void RoundManager::WaitForMyAction() {
-    _uiManager->ShowActionButtons(_actCtrl.choices);
-
-	if(_actCtrl.choices!=a_JUMP) {
-		_isWaitForMyDecision = true;
+	if(_actCtrl.choices!=0) {
+        _uiManager->ShowActionButtons(_actCtrl.choices);
         
         if(_actCtrl.choices&a_AN_GANG  || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
             _isGangAsking = true;
         }
+        
+		_isWaitForMyDecision = true;
 	}
 
 	if(_isNewDistributed) {

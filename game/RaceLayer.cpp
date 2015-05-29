@@ -142,7 +142,8 @@ void RaceLayer::StartGame()
 	_isCardInHandUpdated=false;
 	ifInsertCardsTime=false;
 	ifEffectTime=false;
-    _myChosenCard = -1;
+    _myChosenCard = INVALID;
+    _myTouchedCard = INVALID;
     
 	ifPengAction=false;
 	ifGangAction=false;
@@ -259,7 +260,13 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
 		_ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
         //_roundManager->_players[MIDDLE]->_cards->del_effect_card();
     }
-    _roundManager->_players[MIDDLE]->hand_out(_myTouchedCard);
+
+    if(_myTouchedCard!=INVALID) {
+        _roundManager->_players[MIDDLE]->hand_out(_myTouchedCard);
+    } else {
+        int last = _roundManager->_players[MIDDLE]->_cards->last();
+        _roundManager->_players[MIDDLE]->hand_out(last);
+    }
 
     //CardNode_t *node = _roundManager->_players[MIDDLE]->_cards->back();
     //_roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
