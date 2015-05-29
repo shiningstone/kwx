@@ -889,43 +889,56 @@ ActionMask_t CardInHand::judge_action(Card_t newCard,bool isNewDistributed, bool
         act |= aSHOU_GANG;
 	}
 
-    int num = 0;
-	for(INT8U i=0;i<last();i++) {
-		if(get_kind(i)==newCard) {
-            CardStatus_t status = get_status(i);
-            
-			if(status==sPENG) {
-				if(isNewDistributed&&!isLastOne) {
-					act |= aMING_GANG;
-                    break;
-				}
-			} else if(status==sMING_KOU) {
-                if(!isLastOne) {
-                    act |= aMING_GANG;
+    if(!IsMing) {
+        int num = 0;
 
-                    if(isNewDistributed) {
-                        act |= aAN_GANG;
-                    }
-                }
+        for(INT8U i=0;i<last();i++) {
+            if(get_kind(i)==newCard) {
+                CardStatus_t status = get_status(i);
                 
-                break;
-            } else if(status==sFREE && canPlay(i)) {
-				num++;
-			}
-		}
-	}
-
-    if(num==3) {
-        if(!isLastOne) {
-            act |= aMING_GANG | aPENG;
+                if(status==sPENG) {
+                    if(isNewDistributed&&!isLastOne) {
+                        act |= aMING_GANG;
+                        break;
+                    }
+                } else if(status==sMING_KOU) {
+                    if(!isLastOne) {
+                        act |= aMING_GANG;
+        
+                        if(isNewDistributed) {
+                            act |= aAN_GANG;
+                        }
+                    }
+                    
+                    break;
+                } else if(status==sFREE && canPlay(i)) {
+                    num++;
+                }
+            }
         }
-
-        if(isNewDistributed) {
-            act &= ~aPENG;
-            act |= aAN_GANG;
+        
+        if(num==3) {
+            if(!isLastOne) {
+                act |= aMING_GANG | aPENG;
+            }
+        
+            if(isNewDistributed) {
+                act &= ~aPENG;
+                act |= aAN_GANG;
+            }
+        } else if(num==2 && !isNewDistributed) {
+            act |= aPENG;
         }
-    } else if(num==2 && !isNewDistributed) {
-    	act |= aPENG;
+    } else {
+        for(INT8U i=0;i<FreeStart;i++) {
+            if(get_kind(i)==newCard && get_status(i)==sMING_KOU) {
+                if(isNewDistributed) {
+                    act |= aAN_GANG;
+                } else {
+                    act |= aMING_GANG;
+                }
+            }
+        }
     }
 
 	return act;
