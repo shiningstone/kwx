@@ -147,7 +147,7 @@ protected:
     
     Logger *_logger;
 private:
-    void _LoadRandomCardSequence();
+    void _LogRoundCards();
 protected:
     static RoundManager *_instance;
 };

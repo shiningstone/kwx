@@ -35,6 +35,28 @@ void StrategyLocalRM::load_profiles(UserProfile_t profiles[PLAYER_NUM]) {
         database->GetUserProfile(ids[dir],profiles[dir]);
     }
 }
+
+void StrategyLocalRM::load_card_sequence(Card_t cards[TOTAL_CARD_NUM]) {
+    int seq[TOTAL_CARD_NUM]; 
+
+	for(int i=0;i<TOTAL_CARD_NUM;i++) {
+		seq[i]=i;
+	}
+
+	for(int j=0;j<2;j++) {//伪随机数列生成
+		for(int i=0;i<TOTAL_CARD_NUM;i++) {
+			int tmp = seq[i];
+			int cur = rand()%TOTAL_CARD_NUM;
+			seq[i] = seq[cur];
+			seq[cur] = tmp;
+		}
+	}
+
+    for(int i=0;i<TOTAL_CARD_NUM;i++) {
+        cards[i] = (Card_t)(seq[i]/4);
+    }
+}
+
 /*************************************
         network strategy
 *************************************/
@@ -50,6 +72,12 @@ void StrategyNetworkRM::load_profiles(UserProfile_t profiles[PLAYER_NUM]) {
 
     for(int dir=0;dir<PLAYER_NUM;dir++) {   
         database->GetUserProfile(ids[dir],profiles[dir]);
+    }
+}
+
+void StrategyNetworkRM::load_card_sequence(Card_t cards[TOTAL_CARD_NUM]) {
+    for(int i=0;i<TOTAL_CARD_NUM;i++) {
+        cards[i] = CARD_UNKNOWN;
     }
 }
 

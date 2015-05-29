@@ -10,7 +10,9 @@ class StrategyRm {
 
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) = 0;
+
     virtual void load_profiles(UserProfile_t profile[PLAYER_NUM]) = 0;
+    virtual void load_card_sequence(Card_t cards[84]) = 0;
 
     void get_ending_gold(int gold[PLAYER_NUM]);
 /***************************************

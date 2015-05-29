@@ -55,19 +55,13 @@ void RoundManager::InitPlayers() {
 
 int RoundManager::Shuffle() {
 #if 0
-    _LoadRandomCardSequence();
+    _strategy->load_card_sequence(_unDistributedCards);
 #else
     load_test_round(1,_unDistributedCards);
 #endif
     _gRiver->clear();
     _distributedNum = 0;
-
-    char p[TOTAL_CARD_NUM] = {0};
-    for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        p[i] = (_unDistributedCards[i]);
-    }
-    LOGGER_WRITE("new card sequence:\n");
-    LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
+    _LogRoundCards();
     
     _isQiangGangAsking = false;
     _isDoubleHuAsking = false;
@@ -681,27 +675,6 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
     _lastActionSource = dir;
 }
 
-void RoundManager::_LoadRandomCardSequence() {
-    int cards[TOTAL_CARD_NUM]; 
-
-	for(int i=0;i<TOTAL_CARD_NUM;i++) {
-		cards[i]=i;
-	}
-
-	for(int j=0;j<2;j++) {//伪随机数列生成
-		for(int i=0;i<TOTAL_CARD_NUM;i++) {
-			int tmp = cards[i];
-			int cur = rand()%TOTAL_CARD_NUM;
-			cards[i] = cards[cur];
-			cards[cur] = tmp;
-		}
-	}
-
-    for(int i=0;i<TOTAL_CARD_NUM;i++) {
-        _unDistributedCards[i] = (Card_t)(cards[i]/4);
-    }
-}
-
 void RoundManager::UpdateGold(int gold[PLAYER_NUM]) {
     for(int i=0;i<PLAYER_NUM;i++) {
         Database *database = Database::getInstance();
@@ -847,4 +820,19 @@ void RoundManager::destroyInstance() {
     delete _instance;
     _instance = NULL;
 }
+
+/*************************************
+        support
+*************************************/
+void RoundManager::_LogRoundCards() {
+    char p[TOTAL_CARD_NUM] = {0};
+
+    for(int i=0;i<TOTAL_CARD_NUM;i++) {
+        p[i] = (_unDistributedCards[i]);
+    }
+
+    LOGGER_WRITE("new card sequence:\n");
+    LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
+}
+
 

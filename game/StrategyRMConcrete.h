@@ -8,7 +8,9 @@
 class StrategyLocalRM : public StrategyRm {
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
+
     virtual void load_profiles(UserProfile_t profiles[PLAYER_NUM]);
+    virtual void load_card_sequence(Card_t cards[TOTAL_CARD_NUM]);
 
     StrategyLocalRM(RoundManager *rm);
     ~StrategyLocalRM();
@@ -32,7 +34,9 @@ private:
 class StrategyNetworkRM : public StrategyRm {
 public:
     virtual void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive) {}
+
     virtual void load_profiles(UserProfile_t profiles[PLAYER_NUM]);
+    virtual void load_card_sequence(Card_t cards[TOTAL_CARD_NUM]);
 
     StrategyNetworkRM(RoundManager *rm);
     ~StrategyNetworkRM();
