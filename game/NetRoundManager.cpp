@@ -166,11 +166,7 @@ void NetRoundManager::ServerWaitForMyAction() {
     _uiManager->ShowActionButtons(_actCtrl.choices);
 
 	if(_actCtrl.choices!=0) {
-		_actCtrl.decision    = aQi;
-
-    	if(_actCtrl.choices&aAN_GANG || _actCtrl.choices&aMING_GANG || _actCtrl.choices&aSHOU_GANG) {
-            _isGangAsking = true;
-    	}
+		_actCtrl.decision = aNULL;
 	}
 
 	if(_isNewDistributed) {
@@ -313,10 +309,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
 
     _HandoutNotify = true;
-    
-    if(_isGangAsking) {
-        _isGangAsking = false;
-    }
     
 	if(_isMingTime) {
 		_isMingTime=false;

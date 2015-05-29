@@ -85,6 +85,7 @@ typedef enum {
 }PlayerDir_t;
 
 typedef enum {
+    aNULL      = 0,
     aQi        = 0,
     aPENG      = 0x1,
     aMING_GANG = 0x2,

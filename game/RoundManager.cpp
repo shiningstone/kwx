@@ -82,7 +82,6 @@ int RoundManager::Shuffle() {
     LOGGER_WRITE("new card sequence:\n");
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
     
-    _isGangAsking = false;
     _isQiangGangAsking = false;
     _isDoubleHuAsking = false;
     _isNewDistributed = true;
@@ -213,10 +212,6 @@ void RoundManager::RecvQi() {
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
 
-    if(_isGangAsking) {
-        _isGangAsking = false;
-    }
-    
 	if(_isMingTime) {
 		_isMingTime=false;
 	} else {
@@ -365,10 +360,6 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 void RoundManager::WaitForMyAction() {
 	if(_actCtrl.choices!=0) {
         _uiManager->ShowActionButtons(_actCtrl.choices);
-        
-        if(_actCtrl.choices&a_AN_GANG  || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
-            _isGangAsking = true;
-        }
 	}
 
 	if(_isNewDistributed) {
@@ -387,7 +378,7 @@ void RoundManager::ForceHandout() {
 
 void RoundManager::WaitForMyChoose() {
 	if(_isNewDistributed) {/* is this judgement neccessary??? */
-		if( (_isTuoGuan) || (IsMing(_curPlayer) && !_isGangAsking) ) {
+		if( (_isTuoGuan) || (IsMing(MIDDLE) && !player_can_gang()) ) {
             ForceHandout();
 		} else {
 			_actCtrl.handoutAllow = true;
@@ -400,7 +391,7 @@ void RoundManager::WaitForOthersAction(PlayerDir_t dir) {
 
     if(_actCtrl.choices&aHU) {
         RecvHu(dir);
-    } else if(_actCtrl.choices&aAN_GANG||_actCtrl.choices&aSHOU_GANG||_actCtrl.choices&aMING_GANG) {
+    } else if(player_can_gang()) {
         RecvGang(dir);
     } else if(_actCtrl.choices&aMING) {
         RecvMing();
@@ -505,6 +496,14 @@ ActionMask_t RoundManager::GetPlayerChoices(PlayerDir_t dir,bool prevMing) {
     }
 
     return actions;
+}
+
+bool RoundManager::player_can_gang() {
+    if(_actCtrl.choices&a_AN_GANG  || _actCtrl.choices&a_MING_GANG || _actCtrl.choices&a_SHOU_GANG) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {

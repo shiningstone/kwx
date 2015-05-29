@@ -25,6 +25,8 @@ class RoundManager {
 public:
     void update_gold(PlayerDir_t GoldWinner,GoldKind_t Gold_kind,PlayerDir_t whoGive);
     void get_ending_gold(int gold[PLAYER_NUM]);
+    
+    bool player_can_gang();
 protected:
     void UpdateGold(int gold[PLAYER_NUM]);
     
