@@ -263,6 +263,7 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
 
     if(_myTouchedCard!=INVALID) {
         _roundManager->_players[MIDDLE]->hand_out(_myTouchedCard);
+		_myTouchedCard = INVALID;
     } else {
         int last = _roundManager->_players[MIDDLE]->_cards->last();
         _roundManager->_players[MIDDLE]->hand_out(last);
