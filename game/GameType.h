@@ -130,6 +130,7 @@ typedef enum {
     CARD_KIND_MAX,
     CARD_HIDE = 0xfe,
     CARD_UNKNOWN = 0xff,
+    CARD_IGNORE = 0xff,
 }Card_t;
 
 typedef enum {

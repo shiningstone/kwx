@@ -41,6 +41,8 @@ public:
 	void QueryMingOutCard();
     void _SwitchCancelBtn(int tag);
 
+    void QueryGangCards();
+
     void HideActionButtons();
     void ShowActionButtons(int mask);
     Vec2 GetCardPositionInHand(int idx);

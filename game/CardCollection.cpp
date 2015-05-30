@@ -157,6 +157,8 @@ void CardList::show() {
 
 ***********************************************/
 CardInHand::CardInHand() {
+    _alter = new Alternatives(this);
+
     IsMing    = false;
     memset(&_ming,0,sizeof(MingInfo_t));
     _ting = NULL;
@@ -174,7 +176,8 @@ CardInHand::CardInHand() {
 
 CardInHand::~CardInHand() {
     /* memory release */
-    
+
+    delete _alter;    
 }
 
 void CardInHand::init(Card_t *cards,int len) {
@@ -259,6 +262,10 @@ bool CardInHand::is_wait_handout() const {
     } else {
         return false;
     }
+}
+
+void CardInHand::ScanGangCards() {
+
 }
 
 Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first group*/
@@ -682,10 +689,6 @@ void CardInHand::ScanKouCards(Card_t handingout) {
             }
         }
     }
-}
-
-void CardInHand::ScanGangCards() {
-
 }
 
 void CardInHand::scan_alter_cards(ActionId_t action, Card_t handingout) {
@@ -1616,5 +1619,167 @@ bool SmartList::can_hu() const {
 	}
     
 	return false;
+}
+
+/***************************************************
+        Alternatives : 
+            used to support choose card in some speicail situation
+***************************************************/
+Alternatives::Alternatives(CardInHand * cards) {
+    _cards = cards;
+}
+
+void Alternatives::Init(ActionId_t action) {
+    _action = action;
+    
+    memset(_group,0,sizeof(_group));
+
+    for(int i=0;i<4;i++) {
+        if(_action==aKOU) {
+            _group[i].ACTIVE_STATUS = sMING_KOU;
+            _group[i].FREE_STATUS   = sKOU_ENABLE;
+            _group[i].cardNum = 3;
+        } else {
+            _group[i].ACTIVE_STATUS = sUNDEFINDED;
+            _group[i].FREE_STATUS   = sUNDEFINDED;
+            _group[i].cardNum = 0;
+        }
+
+        memset(_group[i].idx,INVALID,4);
+    }
+}
+
+void Alternatives::ScanKouCards(Card_t handingout) {
+    for(INT8U i=_cards->FreeStart; i<_cards->size(); i++){
+        auto kind = _cards->get_kind(i);
+        
+        if( !IsInclude(kind) ) {
+            int cardIdx[4] = {-1,-1,-1,-1};
+            
+            if(_cards->find_free_cards(cardIdx, kind)==3  && _cards->can_kou(kind,handingout)) {
+                AddGroup(kind,cardIdx,sMING_KOU,sKOU_ENABLE);
+            }
+        }
+    }
+}
+
+void Alternatives::ScanGangCards(Card_t newHandIn) {
+
+}
+
+void Alternatives::scan(ActionId_t action, Card_t reference) {
+    Init(action);
+
+    if(action==aKOU) {
+        ScanKouCards(reference);
+    } else {
+        ScanGangCards(reference);
+    }
+}
+
+int Alternatives::activated_cards_num() const {/*only used in KOU*/
+    int num = 0;
+
+    for(INT8U i=0;i<_groupNum;i++) {
+        if(get_status(i)==_group[i].ACTIVE_STATUS) {
+            num += 3;
+        }
+    }
+
+    return num;
+}
+
+int  Alternatives::group_num() const {
+    return _groupNum;
+}
+
+int  Alternatives::get_card_idx(int gIdx,int cIdx) const {
+    return _group[gIdx].idx[cIdx];
+}
+
+CardStatus_t Alternatives::get_status(int gIdx) const {
+    return _cards->get_status(get_card_idx(gIdx,0));
+}
+
+Card_t Alternatives::GetKind(int gIdx) const {
+    return _cards->get_kind(get_card_idx(gIdx,0));
+}
+
+void Alternatives::SetStatus(int gIdx,CardStatus_t status) const {
+    for(int i=0;i<_group[gIdx].cardNum;i++) {
+        _cards->set_status(get_card_idx(gIdx,i),status);
+    }
+}
+
+void Alternatives::AddGroup(int num,int *idx,CardStatus_t activeStatus,CardStatus_t freeStatus) {
+    _group[_groupNum].ACTIVE_STATUS = activeStatus;
+    _group[_groupNum].FREE_STATUS   = freeStatus;
+    _group[_groupNum].cardNum = num;
+
+    for(int i=0;i<num;i++) {
+        _group[_groupNum].idx[i] = idx[i];
+    }
+
+    SetStatus(_groupNum,_group[_groupNum].FREE_STATUS);
+    _groupNum++;
+}
+
+
+bool Alternatives::IsInclude(Card_t kind) const {
+    for(INT8U i=0;i<_groupNum;i++) {
+        if(GetKind(i)==kind) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Alternatives::switch_status(int gIdx) {
+    if(get_status((gIdx))==_group[gIdx].ACTIVE_STATUS) {
+        SetStatus(gIdx,_group[gIdx].FREE_STATUS);
+    } else {
+        SetStatus(gIdx,_group[gIdx].ACTIVE_STATUS);
+    }
+}
+
+void Alternatives::refresh() {/* ONLY USED IN aKOU */
+    for( int i=0; i<group_num(); i++ ) {
+        if(get_status(i)!=_group[i].ACTIVE_STATUS) {
+            if( _cards->can_kou(GetKind(i)) ) {
+                SetStatus(i,_group[i].FREE_STATUS);
+            } else {
+                SetStatus(i,sFREE);
+            }
+        }
+    }
+}
+
+void Alternatives::active_all(Card_t handingout) {
+    scan(aKOU,handingout);
+
+    for(INT8U i=0;i<group_num();i++) {
+        if(_cards->can_kou(GetKind(i),handingout)) {
+            SetStatus(i,_group[i].ACTIVE_STATUS);
+        }
+    }
+}
+
+void Alternatives::clear_activated() {
+    for(INT8U i=0;i<_groupNum;i++) {
+        SetStatus(i,sFREE);
+    }
+}
+
+int Alternatives::get_activated_kinds(Card_t kinds[]) const {
+    int num = 0;
+    
+    for(INT8U i=0;i<_groupNum;i++) {
+        if(get_status(i)==_group[i].ACTIVE_STATUS) {
+            kinds[num++] = GetKind(i);    
+        }
+    }
+
+    return num;
 }
 

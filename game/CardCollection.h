@@ -67,6 +67,10 @@ public:
             action
     ***************************************************/
 private:
+    friend class Alternatives;
+
+    Alternatives *_alter;
+
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind);
     void   _ShouGang();
@@ -199,6 +203,56 @@ private:
 
     AlternativeCards_t _alternatives;
 };
+
+/***************************************************
+        Alternatives : 
+            used to support choose card in some speicail situation
+***************************************************/
+class Alternatives {
+public:
+    Alternatives(CardInHand *cards);
+
+    void scan(ActionId_t action,Card_t reference = CARD_IGNORE);
+
+    void switch_status(int gIdx);
+    void refresh();
+    void clear_activated();
+    void active_all(Card_t handingout=CARD_IGNORE);
+
+    int  get_activated_kinds(Card_t kinds[]) const;
+
+    int  activated_cards_num() const;
+    int  group_num() const;
+    int  get_card_idx(int gIdx,int cIdx) const;
+    CardStatus_t get_status(int gIdx) const;
+
+private:
+    ActionId_t   _action;
+
+    void   Init(ActionId_t action);
+    void   ScanKouCards(Card_t handingout);
+    void   ScanGangCards(Card_t newHandIn);
+    void   AddGroup(int num,int *idx,CardStatus_t activeStatus,CardStatus_t freeStatus);
+
+    Card_t GetKind(int gIdx) const;
+    void   SetStatus(int gIdx,CardStatus_t status) const;
+    bool   IsInclude(Card_t kind) const;
+
+    
+    typedef struct {
+        CardStatus_t ACTIVE_STATUS;
+        CardStatus_t FREE_STATUS;        
+
+        int          cardNum;
+        int          idx[4];
+    }AlterGroup_t;
+
+    int          _groupNum;
+    AlterGroup_t _group[4];
+
+    CardInHand   *_cards;
+};
+
 
 /***************************************************
         SmartList: for card kind judge

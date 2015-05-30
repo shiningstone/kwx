@@ -145,44 +145,50 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
-    SetDecision(dir,aGANG);
-
-	if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
-        int*   gangIdx = new int[4];
-        Card_t card = _players[dir]->_cards->find_an_gang_cards(gangIdx);
-        
-		if( !IsMing(dir) ) {
-			SetEffectCard(card,c_AN_GANG);
-		}
-
-        _uiManager->GangEffect(dir,card,gangIdx);
-        return card;
-	} else {
-		PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
-
-        CardInHand *cards = _players[dir]->_cards;
-        Card_t card;
-        
-		if(!_isNewDistributed) {
-            card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
-            _players[_curPlayer]->_river->pop_back();
+    _players[MIDDLE]->_cards->scan_alter_cards(aGANG);
     
-			RecordOutCard(card);
-			RecordOutCard(card);
-			RecordOutCard(card);
+    if(_players[MIDDLE]->_cards->alter_group_num()>1) {
+        _uiManager->QueryGangCards();
+    } else {
+        SetDecision(dir,aGANG);
+        
+        if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
+            int*   gangIdx = new int[4];
+            Card_t card = _players[dir]->_cards->find_an_gang_cards(gangIdx);
             
-			_curPlayer=dir;
-		}else {
-		    card = cards->get_kind(cards->last());/*BUG??? 如果我有之前没杠的*/
-			RecordOutCard(card);
-		}
-
-        int* gangIdx = new int[4];
-        card = cards->find_ming_gang_cards(gangIdx,card);
-
-        _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
-        return card;
-	}
+            if( !IsMing(dir) ) {
+                SetEffectCard(card,c_AN_GANG);
+            }
+        
+            _uiManager->GangEffect(dir,card,gangIdx);
+            return card;
+        } else {
+            PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+        
+            CardInHand *cards = _players[dir]->_cards;
+            Card_t card;
+            
+            if(!_isNewDistributed) {
+                card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
+                _players[_curPlayer]->_river->pop_back();
+        
+                RecordOutCard(card);
+                RecordOutCard(card);
+                RecordOutCard(card);
+                
+                _curPlayer=dir;
+            }else {
+                card = cards->get_kind(cards->last());/*BUG??? 如果我有之前没杠的*/
+                RecordOutCard(card);
+            }
+        
+            int* gangIdx = new int[4];
+            card = cards->find_ming_gang_cards(gangIdx,card);
+        
+            _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
+            return card;
+        }
+    }
 }
 
 void RoundManager::RecvQi() {

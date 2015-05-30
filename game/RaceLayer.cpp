@@ -4270,6 +4270,19 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
     myframe->addChild(btn,20,tag);
 }
 
+void RaceLayer::QueryGangCards() {
+    myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
+    
+    auto ChooseEnsure = _object->CreateButton(BTN_OK);
+    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnKouConfirmHandler,this));
+    ChooseEnsure->setVisible(false);
+    myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
+    
+    _SwitchCancelBtn(MING_KOU_CANCEL);
+    MaskNon(sGANG_ENABLE);
+    ListenToKou(MIDDLE);
+}
+
 void RaceLayer::QueryKouCards() {
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
