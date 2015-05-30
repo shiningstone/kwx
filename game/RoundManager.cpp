@@ -145,9 +145,9 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
-    _players[MIDDLE]->_cards->scan_alter_cards(aGANG);
+    _players[MIDDLE]->_cards->_alter->scan(aGANG);
     
-    if(_players[MIDDLE]->_cards->alter_group_num()>1) {
+    if(_players[MIDDLE]->_cards->_alter->group_num()>1) {
         _uiManager->QueryGangCards();
     } else {
         SetDecision(dir,aGANG);
@@ -223,7 +223,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 }
 
 void RoundManager::RecvKouCancel() {
-    _players[MIDDLE]->_cards->clear_alter_choices();
+    _players[MIDDLE]->_cards->_alter->clear();
     _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
 }
 
@@ -262,9 +262,9 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 
     if(_curPlayer==MIDDLE) {
         if(!isFromKouStatus) {
-            _players[MIDDLE]->_cards->scan_alter_cards(aKOU);
+            _players[MIDDLE]->_cards->_alter->scan(aKOU);
 
-            if(_players[MIDDLE]->_cards->alter_group_num()>0) {
+            if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
                 _uiManager->QueryKouCards();
             } else {
                 _isMingTime=true;
@@ -401,7 +401,7 @@ void RoundManager::WaitForOthersChoose() {
     
     if ( canKou ) {
         Card_t handingout = _players[_curPlayer]->_cards->get_kind(index);
-        _players[_curPlayer]->_cards->choose_all_alter_cards(handingout);
+        _players[_curPlayer]->_cards->_alter->active_all(handingout);
     }
 
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(index));
@@ -409,7 +409,7 @@ void RoundManager::WaitForOthersChoose() {
 
     if( canKou ) {
         /* it is dangerous to raise these lines to upper, since the following will change the card list*/
-        if(_players[_curPlayer]->_cards->alter_group_num()>0)
+        if(_players[_curPlayer]->_cards->_alter->group_num()>0)
             UpdateCards((PlayerDir_t)_curPlayer,a_KOU);
     }
 

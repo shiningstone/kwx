@@ -4011,7 +4011,7 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
 
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
-    int    choiceIdx = CardPlace - cards->FreeStart - cards->activated_cards_num();
+    int    choiceIdx = CardPlace - cards->FreeStart - cards->_alter->activated_cards_num();
     TingInfo_t *ting = cards->get_ting_info(CardPlace);
 
     if(ting!=NULL) {
@@ -4156,9 +4156,9 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
         cardsInHand[i]->_ID = MIDDLE;
     }
     
-    for(int group=0; group<cards->alter_group_num(); group++) {
+    for(int group=0; group<cards->_alter->group_num(); group++) {
         for(int i=0; i<3; i++) {
-            if ( _IsClickedOn(cardsInHand[cards->alter_card_index(group,i)], touch) ) {
+            if ( _IsClickedOn(cardsInHand[cards->_alter->get_card_idx(group,i)], touch) ) {
                 groupChosen = group;
                 break;
             }
@@ -4167,7 +4167,7 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
     
     if(groupChosen!=-1) {
         for(int i=0; i<3; i++) {
-            cardsInHand[cards->alter_card_index(groupChosen,i)]->_ID++;/*==2???*/
+            cardsInHand[cards->_alter->get_card_idx(groupChosen,i)]->_ID++;/*==2???*/
         }
     }
     
@@ -4177,10 +4177,10 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
 int RaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
 
-    for(int group=0; group<cards->alter_group_num(); group++) {
+    for(int group=0; group<cards->_alter->group_num(); group++) {
         for(int i=0;i<3;i++) {
-            if ( _IsClickedOn(cardsInHand[cards->alter_card_index(group,i)],touch) ) {
-                int idx = cards->alter_card_index(group,i);
+            if ( _IsClickedOn(cardsInHand[cards->_alter->get_card_idx(group,i)],touch) ) {
+                int idx = cards->_alter->get_card_idx(group,i);
                 if(cardsInHand[idx]->_ID!=1) {
                     return group;
                 }
@@ -4202,33 +4202,33 @@ void RaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
     int groupChosen = _FindChosenGroup(touch,cardsInHand);
     
     if(groupChosen!=INVALID) {
-        cards->switch_group_status(groupChosen);
+        cards->_alter->switch_status(groupChosen);
     }
 
-    cards->refresh_alter_cards();
+    cards->_alter->refresh();
     
-    for(int group=0;group<cards->alter_group_num();group++) {
+    for(int group=0;group<cards->_alter->group_num();group++) {
         for(int i=0;i<3;i++) {
-            _Remove(cardsInHand[cards->alter_card_index(group,i)],MING_KOU);
-            _Remove(cardsInHand[cards->alter_card_index(group,i)],MING_KOU_MASK);
+            _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU);
+            _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU_MASK);
 
-            if(cards->alter_group_status(group)==sMING_KOU) {
+            if(cards->_alter->get_status(group)==sMING_KOU) {
                 auto MingKouMark=_object->Create(MING_KOU_CARD);
                 MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
-                MingKouMark->setPosition(Vec2(cardsInHand[cards->alter_card_index(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->alter_card_index(group,i)]->getTextureRect().size.height/2));
-                cardsInHand[cards->alter_card_index(group,i)]->addChild(MingKouMark,2,MING_KOU);
-            } else if(cards->alter_group_status(group)!=sKOU_ENABLE) {
+                MingKouMark->setPosition(Vec2(cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.height/2));
+                cardsInHand[cards->_alter->get_card_idx(group,i)]->addChild(MingKouMark,2,MING_KOU);
+            } else if(cards->_alter->get_status(group)!=sKOU_ENABLE) {
                 auto KouNo=_object->Create(MING_MASK_CARD);
                 KouNo->setAnchorPoint(Vec2(0.5,0.5));
-                KouNo->setPosition(Vec2(cardsInHand[cards->alter_card_index(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->alter_card_index(group,i)]->getTextureRect().size.height/2));
-                cardsInHand[cards->alter_card_index(group,i)]->addChild(KouNo,2,MING_KOU_MASK);
+                KouNo->setPosition(Vec2(cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.height/2));
+                cardsInHand[cards->_alter->get_card_idx(group,i)]->addChild(KouNo,2,MING_KOU_MASK);
             }
         }
     }
     
     bool ifEnsureVisible=false;
     for(int group=0;group<4;group++) {
-        if(cards->alter_group_status(group)==sMING_KOU) {
+        if(cards->_alter->get_status(group)==sMING_KOU) {
             ifEnsureVisible=true;
             break;
         }

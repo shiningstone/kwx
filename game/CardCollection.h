@@ -66,10 +66,9 @@ public:
     /***************************************************
             action
     ***************************************************/
-private:
     friend class Alternatives;
-
     Alternatives *_alter;
+private:
 
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind);
@@ -216,8 +215,8 @@ public:
 
     void switch_status(int gIdx);
     void refresh();
-    void clear_activated();
     void active_all(Card_t handingout=CARD_IGNORE);
+    void clear();
 
     int  get_activated_kinds(Card_t kinds[]) const;
 

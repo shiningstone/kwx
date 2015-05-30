@@ -1632,8 +1632,6 @@ Alternatives::Alternatives(CardInHand * cards) {
 void Alternatives::Init(ActionId_t action) {
     _action = action;
     
-    memset(_group,0,sizeof(_group));
-
     for(int i=0;i<4;i++) {
         if(_action==aKOU) {
             _group[i].ACTIVE_STATUS = sMING_KOU;
@@ -1647,6 +1645,8 @@ void Alternatives::Init(ActionId_t action) {
 
         memset(_group[i].idx,INVALID,4);
     }
+
+    _groupNum = 0;
 }
 
 void Alternatives::ScanKouCards(Card_t handingout) {
@@ -1657,7 +1657,7 @@ void Alternatives::ScanKouCards(Card_t handingout) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
             if(_cards->find_free_cards(cardIdx, kind)==3  && _cards->can_kou(kind,handingout)) {
-                AddGroup(kind,cardIdx,sMING_KOU,sKOU_ENABLE);
+                AddGroup(3,cardIdx,sMING_KOU,sKOU_ENABLE);
             }
         }
     }
@@ -1765,7 +1765,7 @@ void Alternatives::active_all(Card_t handingout) {
     }
 }
 
-void Alternatives::clear_activated() {
+void Alternatives::clear() {
     for(INT8U i=0;i<_groupNum;i++) {
         SetStatus(i,sFREE);
     }
