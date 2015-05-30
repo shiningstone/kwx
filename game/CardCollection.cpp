@@ -592,11 +592,11 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
 /***************************************************
         kou cards info
 ***************************************************/
-void CardInHand::ClearKouCardInfo() {
+void CardInHand::ClearAlterInfo() {
     memset(&_alternatives,0,sizeof(AlternativeCards_t));
 }
 
-int CardInHand::kou_cards_num() const {/*this function could be optimized by recording kou operation*/
+int CardInHand::activated_cards_num() const {/*this function could be optimized by recording kou operation*/
     int num = 0;
 
     for(INT8U i=FreeStart;i<size();i++) {
@@ -608,29 +608,29 @@ int CardInHand::kou_cards_num() const {/*this function could be optimized by rec
     return num;
 }
 
-int  CardInHand::kou_group_num() const {
+int  CardInHand::alter_group_num() const {
     return _alternatives.num;
 }
 
-int  CardInHand::kou_card_index(int gIdx,int cIdx) const {
+int  CardInHand::alter_card_index(int gIdx,int cIdx) const {
     return _alternatives.group[gIdx].idx[cIdx];
 }
 
-Card_t CardInHand::KouGroupKind(int gIdx) const {
-    return get_kind(kou_card_index(gIdx,0));
+Card_t CardInHand::AlterGroupKind(int gIdx) const {
+    return get_kind(alter_card_index(gIdx,0));
 }
 
-CardStatus_t CardInHand::kou_group_status(int gIdx) const {
-    return get_status(kou_card_index(gIdx,0));
+CardStatus_t CardInHand::alter_group_status(int gIdx) const {
+    return get_status(alter_card_index(gIdx,0));
 }
 
 void CardInHand::SetGroupStatus(int gIdx,CardStatus_t status) {
-    set_status(kou_card_index(gIdx,0),status);
-    set_status(kou_card_index(gIdx,1),status);
-    set_status(kou_card_index(gIdx,2),status);
+    set_status(alter_card_index(gIdx,0),status);
+    set_status(alter_card_index(gIdx,1),status);
+    set_status(alter_card_index(gIdx,2),status);
 }
 
-void CardInHand::AddKouGroup(Card_t kind,int *idx) {
+void CardInHand::AddAlterGroup(Card_t kind,int *idx) {
     _alternatives.group[_alternatives.num].idx[0] = idx[0];
     _alternatives.group[_alternatives.num].idx[1] = idx[1];
     _alternatives.group[_alternatives.num].idx[2] = idx[2];
@@ -640,9 +640,9 @@ void CardInHand::AddKouGroup(Card_t kind,int *idx) {
     _alternatives.num++;
 }
 
-bool CardInHand::IsKouInclude(Card_t kind) const {
+bool CardInHand::IsAlterInclude(Card_t kind) const {
     for(INT8U i=0;i<_alternatives.num;i++) {
-        if(KouGroupKind(i)==kind) {
+        if(AlterGroupKind(i)==kind) {
             return true;
         }
     }
@@ -651,17 +651,17 @@ bool CardInHand::IsKouInclude(Card_t kind) const {
 }
 
 void CardInHand::switch_group_status(int gIdx) {
-    if(get_status(kou_card_index(gIdx,0))==sMING_KOU) {
+    if(get_status(alter_card_index(gIdx,0))==sMING_KOU) {
         SetGroupStatus(gIdx,sKOU_ENABLE);
     } else {
         SetGroupStatus(gIdx,sMING_KOU);
     }
 }
 
-void CardInHand::refresh_kou_cards() {
-    for( int group=0; group<kou_group_num(); group++ ) {
-        if(kou_group_status(group)!=sMING_KOU) {
-            if( can_kou(KouGroupKind(group)) ) {
+void CardInHand::refresh_alter_cards() {
+    for( int group=0; group<alter_group_num(); group++ ) {
+        if(alter_group_status(group)!=sMING_KOU) {
+            if( can_kou(AlterGroupKind(group)) ) {
                 SetGroupStatus(group,sKOU_ENABLE);
             } else {
                 SetGroupStatus(group,sFREE);
@@ -670,44 +670,57 @@ void CardInHand::refresh_kou_cards() {
     }
 }
 
-void CardInHand::scan_kou_cards(Card_t handingout) {
-    ClearKouCardInfo();
-        
+void CardInHand::ScanKouCards(Card_t handingout) {
     for(INT8U i=FreeStart; i<size(); i++){
         auto kind = get_kind(i);
         
-        if( !IsKouInclude(kind) ) {
+        if( !IsAlterInclude(kind) ) {
             int cardIdx[4] = {-1,-1,-1,-1};
             
             if(find_free_cards(cardIdx, kind)==3  && can_kou(kind,handingout)) {
-                AddKouGroup(kind,cardIdx);
+                AddAlterGroup(kind,cardIdx);
             }
         }
     }
 }
 
-void CardInHand::choose_all_kou_cards(Card_t handingout) {
-    scan_kou_cards(handingout);
+void CardInHand::ScanGangCards() {
 
-	for(INT8U i=0;i<kou_group_num();i++) {
-		if(can_kou(KouGroupKind(i),handingout)) {
+}
+
+void CardInHand::scan_alter_cards(ActionId_t action, Card_t handingout) {
+    ClearAlterInfo();
+    _alternatives.action = action;
+        
+    if(_alternatives.action==aKOU) {
+        ScanKouCards(handingout);
+    } else {
+        ScanGangCards();
+    }
+}
+
+void CardInHand::choose_all_alter_cards(Card_t handingout) {
+    scan_alter_cards(aKOU,handingout);
+
+	for(INT8U i=0;i<alter_group_num();i++) {
+		if(can_kou(AlterGroupKind(i),handingout)) {
 		    SetGroupStatus(i,sMING_KOU);
 		}
 	}
 }
 
-void CardInHand::clear_kou_choices() {
+void CardInHand::clear_alter_choices() {
     for(INT8U i=0;i<_alternatives.num;i++) {
         SetGroupStatus(i,sFREE);
     }
 }
 
-int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
+int CardInHand::get_active_kinds(Card_t kouKind[]) const {
     int idx = 0;
     
     for(INT8U i=0;i<_alternatives.num;i++) {
-        if(kou_group_status(i)==sMING_KOU) {
-            kouKind[idx++] = KouGroupKind(i);    
+        if(alter_group_status(i)==sMING_KOU) {
+            kouKind[idx++] = AlterGroupKind(i);    
         }
     }
 

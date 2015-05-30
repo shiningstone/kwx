@@ -333,7 +333,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 }
 
 void NetRoundManager::RecvKouCancel() {
-    _players[MIDDLE]->_cards->clear_kou_choices();
+    _players[MIDDLE]->_cards->clear_alter_choices();
     _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
 }
 
@@ -349,7 +349,7 @@ void NetRoundManager::RecvKouConfirm() {
     cards->collect_ming_info(_gRiver);
 
     Card_t kinds[4];
-    int    kindNum = _players[MIDDLE]->_cards->get_kou_kinds(kinds);
+    int    kindNum = _players[MIDDLE]->_cards->get_active_kinds(kinds);
     
     RequestSendAction aReq;
     aReq.Set(aKOU,kindNum,kinds);
@@ -379,8 +379,8 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _messenger->Send(aAction);
 
     if(!isFromKouStatus) {
-        _players[MIDDLE]->_cards->scan_kou_cards();
-        if(_players[MIDDLE]->_cards->kou_group_num()>0) {
+        _players[MIDDLE]->_cards->scan_alter_cards(aKOU);
+        if(_players[MIDDLE]->_cards->alter_group_num()>0) {
             _uiManager->QueryKouCards();
         } else {
             _uiManager->QueryMingOutCard();

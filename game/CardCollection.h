@@ -92,28 +92,31 @@ public:
     /***************************************************
             robot interface
     ***************************************************/
-    void         choose_all_kou_cards(Card_t handingout);
+    void         choose_all_alter_cards(Card_t handingout);
     
     /***************************************************
             kou cards info
     ***************************************************/
-    void         scan_kou_cards(Card_t handingout = CARD_UNKNOWN/* it is not necessary for MIDDLE */);
+    void         scan_alter_cards(ActionId_t action, Card_t handingout = CARD_UNKNOWN/* it is not necessary for MIDDLE */);
     
-    int          kou_cards_num() const;
+    int          activated_cards_num() const;
 
-    int          kou_group_num() const;
-    CardStatus_t kou_group_status(int gIdx) const;
-    int          kou_card_index(int gIdx,int cIdx) const;
+    int          alter_group_num() const;
+    CardStatus_t alter_group_status(int gIdx) const;
+    int          alter_card_index(int gIdx,int cIdx) const;
     void         switch_group_status(int gIdx);
-    void         refresh_kou_cards();
-    void         clear_kou_choices();
-    int          get_kou_kinds(Card_t kouKind[]) const;
-    Card_t       KouGroupKind(int gIdx) const;
+    void         refresh_alter_cards();
+    void         clear_alter_choices();
+    int          get_active_kinds(Card_t kouKind[]) const;
+    Card_t       AlterGroupKind(int gIdx) const;
     
-    bool IsKouInclude(Card_t kind) const;
-    void AddKouGroup(Card_t kind,int *idx);
+    bool IsAlterInclude(Card_t kind) const;
+    void AddAlterGroup(Card_t kind,int *idx);
     void SetGroupStatus(int gIdx,CardStatus_t status);
-    void ClearKouCardInfo();
+    void ClearAlterInfo();
+    
+    void ScanKouCards(Card_t handingout);
+    void ScanGangCards();
 
     SmartList _Exclude(Card_t kouKind) const;
 
