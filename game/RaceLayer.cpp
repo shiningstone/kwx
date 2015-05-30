@@ -17,8 +17,8 @@ USING_NS_CC;
 RaceLayer::RaceLayer()
 :PREMIUM_LEAST(200)
 {
-	s_scale=1.189;
-	s_no=1;
+	s_scale = 1.189;
+	s_no    = 1;
 
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
@@ -26,7 +26,7 @@ RaceLayer::RaceLayer()
     _object = GObjectFactory::getInstance(origin,visibleSize);
     _voice = VoiceEffect::getInstance();
     _layout = GameLayout::getInstance(origin,visibleSize);
-    _effect = GraphicEffect::getInstance();
+    _effect = GraphicEffect::getInstance(_voice,_object);
     
     _logger = LOGGER_REGISTER("RaceLayer");
 }
@@ -4145,20 +4145,10 @@ void RaceLayer::MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	}
 }
 
-Node *RaceLayer::_NonKouMask(Sprite *card) {
-    auto mask = _object->Create(MING_MASK_CARD);
-    mask->setAnchorPoint(Vec2(0.5,0.5));
-    mask->setPosition(card->getTextureRect().size.width/2,card->getTextureRect().size.height/2);
-    card->addChild(mask,2,MING_KOU_MASK);
-
-    return mask;
-}
-
 void RaceLayer::_MaskNonKouCards(CardInHand *cards) {
     for(int i=cards->FreeStart; i<cards->size(); i++) {
         if(cards->get_status(i)!=c_KOU_ENABLE) {
-            Sprite *card = (Sprite*)myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+20+i);
-            _NonKouMask(card);
+            _effect->Mask(_GetCardInHand(MIDDLE,i));
         }
     }
 }

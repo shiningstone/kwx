@@ -112,7 +112,6 @@ private:
     bool _KouTouchBegan(Touch* touch, Event* event);
     int _FindChosenGroup(Touch *touch,Sprite *cardsInHand[]);
     void _KouTouchEnded(Touch* touch, Event* event);
-    Node *_NonKouMask(Sprite *card);
     void    _MaskNonKouCards(CardInHand *cards);
     void    ListenToKou(int no);
     TargetedAction *_ShowBigMing(Node *myframe);

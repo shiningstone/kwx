@@ -1,9 +1,13 @@
 
+#include "./../Resources.h"
+
 #include "VoiceEffect.h"
+#include "GraphicObject.h"
 #include "GraphicEffect.h"
 
-GraphicEffect::GraphicEffect() {
-    _voice = VoiceEffect::getInstance();
+GraphicEffect::GraphicEffect(VoiceEffect *voice,GObjectFactory *object) {
+    _voice  = voice;
+    _object = object;
 }
 
 void GraphicEffect::Hide(Node *parent,TagId_t buttonTag) {
@@ -39,14 +43,24 @@ Sequence *GraphicEffect::MoveDistributeCard(const Vec2 &orig,const Vec2 &dest) {
                 MoveTo::create(0,dest),NULL),NULL);
 }
 
+Node *GraphicEffect::Mask(Sprite *card) {
+    auto mask = _object->Create(MING_MASK_CARD);
+    
+    mask->setAnchorPoint(Vec2(0.5,0.5));
+    mask->setPosition(card->getTextureRect().size.width/2,card->getTextureRect().size.height/2);
+    card->addChild(mask,2,MING_KOU_MASK);
+
+    return mask;
+}
+
 /*************************************
     singleton
 *************************************/
 GraphicEffect *GraphicEffect::_instance = NULL;
 
-GraphicEffect *GraphicEffect::getInstance() {
+GraphicEffect *GraphicEffect::getInstance(VoiceEffect *voice,GObjectFactory *object) {
     if (_instance==NULL) {
-        _instance = new GraphicEffect();
+        _instance = new GraphicEffect(voice,object);
     }
 
     return _instance;
