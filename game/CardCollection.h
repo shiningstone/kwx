@@ -64,12 +64,11 @@ public:
     Card_t find_an_gang_cards(int cardIdx[] = NULL) const;
     Card_t find_ming_gang_cards(int idx[],Card_t kind) const;
     /***************************************************
-            action
+            Alternatives
     ***************************************************/
     friend class Alternatives;
     Alternatives *_alter;
 private:
-
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind);
     void   _ShouGang();
@@ -92,37 +91,7 @@ public:
 
     INT32U statHuFanMask;
 
-    /***************************************************
-            robot interface
-    ***************************************************/
-    void         choose_all_alter_cards(Card_t handingout);
-    
-    /***************************************************
-            kou cards info
-    ***************************************************/
-    void         scan_alter_cards(ActionId_t action, Card_t handingout = CARD_UNKNOWN/* it is not necessary for MIDDLE */);
-    
-    int          activated_cards_num() const;
-
-    int          alter_group_num() const;
-    CardStatus_t alter_group_status(int gIdx) const;
-    int          alter_card_index(int gIdx,int cIdx) const;
-    void         switch_group_status(int gIdx);
-    void         refresh_alter_cards();
-    void         clear_alter_choices();
-    int          get_active_kinds(Card_t kouKind[]) const;
-    Card_t       AlterGroupKind(int gIdx) const;
-    
-    bool IsAlterInclude(Card_t kind) const;
-    void AddAlterGroup(Card_t kind,int *idx);
-    void SetGroupStatus(int gIdx,CardStatus_t status);
-    void ClearAlterInfo();
-    
-    void ScanKouCards(Card_t handingout);
-    void ScanGangCards();
-
     SmartList _Exclude(Card_t kouKind) const;
-
     void set_ming(int handout);
     void cancel_ming();
 
@@ -186,21 +155,6 @@ private:
     static const bool ONLY_FREE = true;
     
     int    _FindInsertPoint(CardNode_t data) const;
-
-    typedef struct {
-        int    idx[4];
-    }AlterGroup_t;
-
-    typedef struct {
-        ActionId_t   action;
-        CardStatus_t activated;
-        CardStatus_t free;        
-
-        int          num;
-        AlterGroup_t group[4];
-    }AlternativeCards_t;
-
-    AlternativeCards_t _alternatives;
 };
 
 /***************************************************
