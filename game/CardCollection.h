@@ -182,15 +182,16 @@ private:
     int    _FindInsertPoint(CardNode_t data) const;
 
     typedef struct {
-        int    idx[3];
-    }KouGroup_t;
+        int    idx[4];
+    }AlterGroup_t;
 
     typedef struct {
-        int        num;
-        KouGroup_t group[4];
-    }KouCards_t;
+        ActionId_t   action;
+        int          num;
+        AlterGroup_t group[4];
+    }AlternativeCards_t;
 
-    KouCards_t _bufKouCards;
+    AlternativeCards_t _alternatives;
 };
 
 /***************************************************

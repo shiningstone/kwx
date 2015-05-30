@@ -4145,14 +4145,6 @@ void RaceLayer::MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	}
 }
 
-void RaceLayer::_MaskNonKouCards(CardInHand *cards) {
-    for(int i=cards->FreeStart; i<cards->size(); i++) {
-        if(cards->get_status(i)!=c_KOU_ENABLE) {
-            _effect->Mask(_GetCardInHand(MIDDLE,i));
-        }
-    }
-}
-
 bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
     auto cards=_roundManager->_players[MIDDLE]->_cards;
 
@@ -4168,7 +4160,7 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
         for(int i=0; i<3; i++) {
             if ( _IsClickedOn(cardsInHand[cards->kou_card_index(group,i)], touch) ) {
                 groupChosen = group;
-                break;/* BUG : only 1 group can be chosen??? */
+                break;
             }
         }
     }
@@ -4182,7 +4174,6 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
     return true;
 }
 
-/* !!! only one group one time */
 int RaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
 
@@ -4288,8 +4279,7 @@ void RaceLayer::QueryKouCards() {
     myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
     
     _SwitchCancelBtn(MING_KOU_CANCEL);
-
-    _MaskNonKouCards(_roundManager->_players[MIDDLE]->_cards);
+    MaskNon(sKOU_ENABLE);
     ListenToKou(MIDDLE);
 }
 
@@ -6137,6 +6127,16 @@ void RaceLayer::Back()
 ***********************************************/
 Vec2 RaceLayer::GetCardPositionInHand(int idx) {
     return _GetCardInHand(MIDDLE,idx)->getPosition();
+}
+
+void RaceLayer::MaskNon(CardStatus_t status) {
+    CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
+    
+    for(int i=0; i<cards->size(); i++) {
+        if(cards->get_status(i)!=status) {
+            _effect->Mask(_GetCardInHand(MIDDLE,i));
+        }
+    }
 }
 
 Spawn* RaceLayer::simple_tip_effect(Vec2 v,std::string act_name)

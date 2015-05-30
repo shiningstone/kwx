@@ -592,6 +592,10 @@ int CardInHand::_FindInsertPoint(CardNode_t data) const {
 /***************************************************
         kou cards info
 ***************************************************/
+void CardInHand::ClearKouCardInfo() {
+    memset(&_alternatives,0,sizeof(AlternativeCards_t));
+}
+
 int CardInHand::kou_cards_num() const {/*this function could be optimized by recording kou operation*/
     int num = 0;
 
@@ -604,16 +608,12 @@ int CardInHand::kou_cards_num() const {/*this function could be optimized by rec
     return num;
 }
 
-void CardInHand::ClearKouCardInfo() {
-    memset(&_bufKouCards,0,sizeof(KouCards_t));
-}
-
 int  CardInHand::kou_group_num() const {
-    return _bufKouCards.num;
+    return _alternatives.num;
 }
 
 int  CardInHand::kou_card_index(int gIdx,int cIdx) const {
-    return _bufKouCards.group[gIdx].idx[cIdx];
+    return _alternatives.group[gIdx].idx[cIdx];
 }
 
 Card_t CardInHand::KouGroupKind(int gIdx) const {
@@ -631,17 +631,17 @@ void CardInHand::SetGroupStatus(int gIdx,CardStatus_t status) {
 }
 
 void CardInHand::AddKouGroup(Card_t kind,int *idx) {
-    _bufKouCards.group[_bufKouCards.num].idx[0] = idx[0];
-    _bufKouCards.group[_bufKouCards.num].idx[1] = idx[1];
-    _bufKouCards.group[_bufKouCards.num].idx[2] = idx[2];
+    _alternatives.group[_alternatives.num].idx[0] = idx[0];
+    _alternatives.group[_alternatives.num].idx[1] = idx[1];
+    _alternatives.group[_alternatives.num].idx[2] = idx[2];
 
-    SetGroupStatus(_bufKouCards.num,sKOU_ENABLE);
+    SetGroupStatus(_alternatives.num,sKOU_ENABLE);
 
-    _bufKouCards.num++;
+    _alternatives.num++;
 }
 
 bool CardInHand::IsKouInclude(Card_t kind) const {
-    for(INT8U i=0;i<_bufKouCards.num;i++) {
+    for(INT8U i=0;i<_alternatives.num;i++) {
         if(KouGroupKind(i)==kind) {
             return true;
         }
@@ -697,7 +697,7 @@ void CardInHand::choose_all_kou_cards(Card_t handingout) {
 }
 
 void CardInHand::clear_kou_choices() {
-    for(INT8U i=0;i<_bufKouCards.num;i++) {
+    for(INT8U i=0;i<_alternatives.num;i++) {
         SetGroupStatus(i,sFREE);
     }
 }
@@ -705,7 +705,7 @@ void CardInHand::clear_kou_choices() {
 int CardInHand::get_kou_kinds(Card_t kouKind[]) const {
     int idx = 0;
     
-    for(INT8U i=0;i<_bufKouCards.num;i++) {
+    for(INT8U i=0;i<_alternatives.num;i++) {
         if(kou_group_status(i)==sMING_KOU) {
             kouKind[idx++] = KouGroupKind(i);    
         }
