@@ -140,6 +140,7 @@ typedef enum {
 	sMING_KOU,
 	sKOU_ENABLE,
     sGANG_ENABLE,
+    sGANG,
 	sUNDEFINDED=0xff,
 }CardStatus_t;
 

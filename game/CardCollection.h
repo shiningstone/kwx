@@ -190,6 +190,9 @@ private:
 
     typedef struct {
         ActionId_t   action;
+        CardStatus_t activated;
+        CardStatus_t free;        
+
         int          num;
         AlterGroup_t group[4];
     }AlternativeCards_t;

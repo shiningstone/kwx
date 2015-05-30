@@ -600,7 +600,7 @@ int CardInHand::activated_cards_num() const {/*this function could be optimized 
     int num = 0;
 
     for(INT8U i=FreeStart;i<size();i++) {
-        if(get_status(i)==sMING_KOU) {
+        if(get_status(i)==_alternatives.activated) {
             num++;
         }
     }
@@ -635,7 +635,7 @@ void CardInHand::AddAlterGroup(Card_t kind,int *idx) {
     _alternatives.group[_alternatives.num].idx[1] = idx[1];
     _alternatives.group[_alternatives.num].idx[2] = idx[2];
 
-    SetGroupStatus(_alternatives.num,sKOU_ENABLE);
+    SetGroupStatus(_alternatives.num,_alternatives.free);
 
     _alternatives.num++;
 }
@@ -651,18 +651,18 @@ bool CardInHand::IsAlterInclude(Card_t kind) const {
 }
 
 void CardInHand::switch_group_status(int gIdx) {
-    if(get_status(alter_card_index(gIdx,0))==sMING_KOU) {
-        SetGroupStatus(gIdx,sKOU_ENABLE);
+    if(get_status(alter_card_index(gIdx,0))==_alternatives.activated) {
+        SetGroupStatus(gIdx,_alternatives.free);
     } else {
-        SetGroupStatus(gIdx,sMING_KOU);
+        SetGroupStatus(gIdx,_alternatives.activated);
     }
 }
 
 void CardInHand::refresh_alter_cards() {
     for( int group=0; group<alter_group_num(); group++ ) {
-        if(alter_group_status(group)!=sMING_KOU) {
+        if(alter_group_status(group)!=_alternatives.activated) {
             if( can_kou(AlterGroupKind(group)) ) {
-                SetGroupStatus(group,sKOU_ENABLE);
+                SetGroupStatus(group,_alternatives.free);
             } else {
                 SetGroupStatus(group,sFREE);
             }
@@ -690,11 +690,18 @@ void CardInHand::ScanGangCards() {
 
 void CardInHand::scan_alter_cards(ActionId_t action, Card_t handingout) {
     ClearAlterInfo();
+
     _alternatives.action = action;
         
     if(_alternatives.action==aKOU) {
+        _alternatives.activated = sMING_KOU;
+        _alternatives.free      = sKOU_ENABLE;
+
         ScanKouCards(handingout);
     } else {
+        _alternatives.activated = sGANG;
+        _alternatives.free      = sGANG_ENABLE;
+
         ScanGangCards();
     }
 }
@@ -704,7 +711,7 @@ void CardInHand::choose_all_alter_cards(Card_t handingout) {
 
 	for(INT8U i=0;i<alter_group_num();i++) {
 		if(can_kou(AlterGroupKind(i),handingout)) {
-		    SetGroupStatus(i,sMING_KOU);
+		    SetGroupStatus(i,_alternatives.activated);
 		}
 	}
 }
@@ -719,7 +726,7 @@ int CardInHand::get_active_kinds(Card_t kouKind[]) const {
     int idx = 0;
     
     for(INT8U i=0;i<_alternatives.num;i++) {
-        if(alter_group_status(i)==sMING_KOU) {
+        if(alter_group_status(i)==_alternatives.activated) {
             kouKind[idx++] = AlterGroupKind(i);    
         }
     }
