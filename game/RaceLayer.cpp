@@ -4099,8 +4099,7 @@ void RaceLayer::KouCancelEffect(CardInHand *cards) {
     myframe->runAction(
         Sequence::create(
             TargetedAction::create(button,ScaleTo::create(0,0)),CallFunc::create([=](){
-            _SwitchCancelBtn(MING_CANCEL);
-            _roundManager->RecvMing(true);}),NULL));
+            _SwitchCancelBtn(MING_CANCEL);}),NULL));
 }
 
 void RaceLayer::KouConfirmEffect() {
@@ -4110,8 +4109,7 @@ void RaceLayer::KouConfirmEffect() {
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
-        RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->RecvMing(true);}),NULL));
+        RaceLayer::_DeleteActionTip)),NULL));
 }
 
 void RaceLayer::MingCancelEffect() {
