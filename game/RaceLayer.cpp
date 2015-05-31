@@ -4087,7 +4087,7 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
 /****************************************
         ming
 ****************************************/
-void RaceLayer::KouCancelEffect(CardInHand *cards) {
+void RaceLayer::BtnCancelEffect(CardInHand *cards) {
     for(int i=cards->FreeStart;i<cards->size();i++) {
         Sprite *card = _GetCardInHand(MIDDLE,i);
         _Remove(card,MING_KOU);
@@ -4102,7 +4102,7 @@ void RaceLayer::KouCancelEffect(CardInHand *cards) {
             _SwitchCancelBtn(MING_CANCEL);}),NULL));
 }
 
-void RaceLayer::KouConfirmEffect() {
+void RaceLayer::BtnConfirmEffect() {
     auto button = myframe->getChildByTag(MING_KOU_ENSURE);
 
     myframe->_ID = MIDDLE;

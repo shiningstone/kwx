@@ -224,7 +224,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
 void RoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
+    _uiManager->BtnCancelEffect(_players[MIDDLE]->_cards);
 
     RecvMing(true);
 }
@@ -240,7 +240,7 @@ void RoundManager::RecvKouConfirm() {
     UpdateCards(MIDDLE,a_KOU);
     cards->collect_ming_info(_gRiver);
 
-    _uiManager->KouConfirmEffect();
+    _uiManager->BtnConfirmEffect();
     
     RecvMing(true);
 }

@@ -334,7 +334,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
 void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->KouCancelEffect(_players[MIDDLE]->_cards);
+    _uiManager->BtnCancelEffect(_players[MIDDLE]->_cards);
+    RecvMing(true);
 }
 
 void NetRoundManager::RecvKouConfirm() {
@@ -355,7 +356,9 @@ void NetRoundManager::RecvKouConfirm() {
     aReq.Set(aKOU,kindNum,kinds);
     _messenger->Send(aReq);
 
-    _uiManager->KouConfirmEffect();
+    _uiManager->BtnConfirmEffect();
+    
+    RecvMing(true);
 }
 
 void NetRoundManager::RecvMingCancel() {
