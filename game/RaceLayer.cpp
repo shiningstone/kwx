@@ -4031,6 +4031,59 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
     }
 }
 
+void RaceLayer::BtnGangCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+
+			_Remove(myframe,MING_KOU_ENSURE);			
+			_Remove(myframe,MING_KOU_SIGN);
+			curButton->setTouchEnabled(false);
+
+            _roundManager->RecvGangCancel();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}	
+}
+
+void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+    auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+            
+            _Remove(myframe,MING_KOU_SIGN);
+			curButton->setTouchEnabled(false);
+
+            _roundManager->RecvGangConfirm();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
 /****************************************
         ming
 ****************************************/
@@ -4098,59 +4151,6 @@ void RaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 	default:
 		break;
 	}	
-}
-
-void RaceLayer::BtnGangCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-	auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-            Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-
-			_Remove(myframe,MING_KOU_ENSURE);			
-			_Remove(myframe,MING_KOU_SIGN);
-			curButton->setTouchEnabled(false);
-
-            _roundManager->RecvGangCancel();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}	
-}
-
-void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
-{
-    auto curButton=(Button*)pSender;
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
-            
-            _Remove(myframe,MING_KOU_SIGN);
-			curButton->setTouchEnabled(false);
-
-            _roundManager->RecvGangConfirm();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
 }
 
 void RaceLayer::BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
@@ -4329,6 +4329,9 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
         case MING_CANCEL:
             btn->addTouchEventListener(CC_CALLBACK_2(RaceLayer::MingCancelHandler,this));
             break;
+        case GANG_CANCEL:
+            btn->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnGangCancelHandler,this));
+            break;
     }
     
     myframe->addChild(btn,20,tag);
@@ -4340,11 +4343,11 @@ void RaceLayer::QueryGangCards() {
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
     auto ChooseEnsure = _object->CreateButton(BTN_OK);
-    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnKouConfirmHandler,this));
+    ChooseEnsure->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnGangConfirmHandler,this));
     ChooseEnsure->setVisible(false);
     myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
     
-    _SwitchCancelBtn(MING_KOU_CANCEL);
+    _SwitchCancelBtn(GANG_CANCEL);
     MaskNon(sGANG_ENABLE);
     ListenToKou(MIDDLE);
 }

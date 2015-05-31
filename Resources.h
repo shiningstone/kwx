@@ -95,6 +95,7 @@
 #define HUANG_ZHUANG_LAYER					515
 #define HUANG_ZHUANG_FONT					516
 
+#define GANG_CANCEL                         518
 
 #define MING_STATUS_PNG_0					519//Ã÷ÅÆÌáÊ¾Í¼Æ¬
 #define MING_STATUS_PNG_1					520

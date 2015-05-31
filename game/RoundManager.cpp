@@ -243,10 +243,12 @@ void RoundManager::RecvKouConfirm() {
 
 void RoundManager::RecvGangCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
+    LOGGER_WRITE("RecvGangCancel");
 }
 
 void RoundManager::RecvGangConfirm() {
     CardInHand *cards = _players[MIDDLE]->_cards;
+    LOGGER_WRITE("RecvGangConfirm");
 }
 
 void RoundManager::RecvMingCancel() {
