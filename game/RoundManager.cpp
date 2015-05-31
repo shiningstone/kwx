@@ -227,10 +227,7 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
 void RoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->BtnCancelEffect(aKOU,_players[MIDDLE]->_cards);
-    _uiManager->_SwitchCancelBtn(MING_CANCEL);
-
-    RecvMing(true);
+    _uiManager->KouCancelEffect(aKOU,_players[MIDDLE]->_cards);
 }
 
 void RoundManager::RecvKouConfirm() {
@@ -244,18 +241,15 @@ void RoundManager::RecvKouConfirm() {
     UpdateCards(MIDDLE,a_KOU);
     cards->collect_ming_info(_gRiver);
 
-    _uiManager->BtnConfirmEffect();
-    
-    RecvMing(true);
+    _uiManager->KouConfirmEffect();
 }
 
 void RoundManager::RecvGangCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->BtnCancelEffect(aGANG,_players[MIDDLE]->_cards);
-    _uiManager->ListenToCardTouch();
+    _uiManager->GangCancelEffect(aGANG,_players[MIDDLE]->_cards);
 }
 
-void RoundManager::RecvGangConfirm() {
+void RoundManager::_RecvGangConfirm() {
     CardInHand *cards   = _players[MIDDLE]->_cards;
     int*        gangIdx = new int[4];
     ActionId_t  action  = aNULL;
@@ -292,6 +286,12 @@ void RoundManager::RecvGangConfirm() {
 
         _uiManager->GangEffect(MIDDLE,card,gangIdx,false,prevPlayer);
     }
+
+    _uiManager->ListenToCardTouch();
+}
+
+void RoundManager::RecvGangConfirm() {
+    _uiManager->GangConfirmEffect();
 }
 
 void RoundManager::RecvMingCancel() {

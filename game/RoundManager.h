@@ -71,6 +71,7 @@ public:
     /*internal action*/
     void  RecvGangCancel();
     void  RecvGangConfirm();
+    void  _RecvGangConfirm();
 
     virtual void RecvKouCancel();
     virtual void RecvKouConfirm();

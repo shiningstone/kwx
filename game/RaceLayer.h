@@ -34,14 +34,16 @@ public:
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void GangGoldEffect(int winner,int whoGive);
-    void BtnCancelEffect(ActionId_t action,CardInHand *cards);
-    void BtnConfirmEffect();
+    void KouCancelEffect(ActionId_t action,CardInHand *cards);
+    void KouConfirmEffect();
     void MingCancelEffect();
 	void QueryKouCards();
 	void QueryMingOutCard();
     void _SwitchCancelBtn(int tag);
 
     void QueryGangCards();
+    void GangCancelEffect(ActionId_t action,CardInHand *cards);
+    void GangConfirmEffect();
 
     void HideActionButtons();
     void ShowActionButtons(int mask);

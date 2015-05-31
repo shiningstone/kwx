@@ -4086,36 +4086,57 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
 	}
 }
 
-/****************************************
-        ming
-****************************************/
-void RaceLayer::BtnCancelEffect(ActionId_t action,CardInHand *cards) {
+void RaceLayer::GangCancelEffect(ActionId_t action,CardInHand *cards) {
     for(int i=cards->FreeStart;i<cards->size();i++) {
         Sprite *card = _GetCardInHand(MIDDLE,i);
         _Remove(card,MING_KOU);
     }
 
-    Node *button;
-    if(action==aKOU) {
-        button = myframe->getChildByTag(MING_KOU_CANCEL);
-    } else {
-        button = myframe->getChildByTag(GANG_CANCEL);
-    }
+    Node *button = myframe->getChildByTag(GANG_CANCEL);
     
     myframe->_ID = MIDDLE;
     myframe->runAction(
         Sequence::create(
-            TargetedAction::create(button,ScaleTo::create(0,0)),NULL));
+            TargetedAction::create(button,ScaleTo::create(0,0)),CallFunc::create([=](){
+            ListenToCardTouch();}),NULL));
 }
 
-void RaceLayer::BtnConfirmEffect() {
+void RaceLayer::GangConfirmEffect() {
     auto button = myframe->getChildByTag(MING_KOU_ENSURE);
 
     myframe->_ID = MIDDLE;
-    myframe->runAction(Sequence::create(TargetedAction::create(
-        button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
+    myframe->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
+        RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
+        _roundManager->_RecvGangConfirm();}),NULL));
+}
+
+/****************************************
+        ming
+****************************************/
+void RaceLayer::KouCancelEffect(ActionId_t action,CardInHand *cards) {
+    for(int i=cards->FreeStart;i<cards->size();i++) {
+        Sprite *card = _GetCardInHand(MIDDLE,i);
+        _Remove(card,MING_KOU);
+    }
+
+    Node *button = myframe->getChildByTag(MING_KOU_CANCEL);
+    
+    myframe->_ID = MIDDLE;
+    myframe->runAction(
+        Sequence::create(
+            TargetedAction::create(button,ScaleTo::create(0,0)),CallFunc::create([=](){
+            _SwitchCancelBtn(MING_CANCEL);
+            _roundManager->RecvMing(true);}),NULL));
+}
+
+void RaceLayer::KouConfirmEffect() {
+    auto button = myframe->getChildByTag(MING_KOU_ENSURE);
+
+    myframe->_ID = MIDDLE;
+    myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
-        RaceLayer::_DeleteActionTip)),NULL));
+        RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
+        _roundManager->RecvMing(true);}),NULL));
 }
 
 void RaceLayer::MingCancelEffect() {
@@ -4323,6 +4344,7 @@ void RaceLayer::ListenToKou(int no) {
 void RaceLayer::_SwitchCancelBtn(int tag) {
     _Remove(myframe,MING_KOU_CANCEL);
     _Remove(myframe,MING_CANCEL);
+    _Remove(myframe,GANG_CANCEL);
 
     auto btn = _object->CreateButton(BTN_CANCEL);
 
