@@ -1683,3 +1683,11 @@ int Alternatives::get_activated_kinds(Card_t kinds[]) const {
     return num;
 }
 
+Card_t Alternatives::get_cards(int idx[]) const {
+    for(int i=0;i<_group[0].cardNum;i++) {
+        idx[i] = _group[0].idx[i];    
+    }
+
+    return GetKind(0);
+}
+

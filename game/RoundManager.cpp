@@ -155,7 +155,8 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
         
         if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
             int*   gangIdx = new int[4];
-            Card_t card = _players[dir]->_cards->find_an_gang_cards(gangIdx);
+            Card_t card = _players[dir]->_cards->_alter->get_cards(gangIdx);
+            _players[dir]->_cards->_alter->clear();
             
             if( !IsMing(dir) ) {
                 SetEffectCard(card,c_AN_GANG);
@@ -184,7 +185,8 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
             }
         
             int* gangIdx = new int[4];
-            card = cards->find_ming_gang_cards(gangIdx,card);
+            card = cards->_alter->get_cards(gangIdx);
+            cards->_alter->clear();
         
             _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
             return card;

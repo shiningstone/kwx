@@ -173,6 +173,7 @@ public:
     void clear();
 
     int  get_activated_kinds(Card_t kinds[]) const;
+    Card_t get_cards(int idx[]) const;
 
     bool is_activated(int gIdx) const;
     int  activated_cards_num() const;
