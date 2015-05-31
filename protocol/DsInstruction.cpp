@@ -159,7 +159,11 @@ int ActionNotif::Construct(const DsMsg &msg) {
     whoGive = _GetPlayer(msg.GetItemValue(1));
     next    = _GetPlayer(msg.GetItemValue(2));
     actions = msg.GetItemValue(3);
-    DsMsgParser::_load(card, cardNum, msg, 4);
+    if(actions==aHU) {
+        DsMsgParser::_load(huCards, huCardsNum, msg, 4);
+    } else {
+        DsMsgParser::_load(card, cardNum, msg, 4);
+    }
     return 0;
 }
 

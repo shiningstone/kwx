@@ -88,6 +88,8 @@ public:
     ActionMask_t     actions;
     INT8U            cardNum;
     CardNode_t       card[18];
+    INT8U            huCardsNum[3];
+    CardNode_t       huCards[3][18];
 };
 
 typedef class ActionNotif DecisionNotif;
