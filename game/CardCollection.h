@@ -197,7 +197,8 @@ private:
     
     typedef struct {
         CardStatus_t ACTIVE_STATUS;
-        CardStatus_t FREE_STATUS;        
+        CardStatus_t FREE_STATUS;
+        CardStatus_t BACK_STATUS;
 
         int          cardNum;
         int          idx[4];

@@ -1610,7 +1610,9 @@ void Alternatives::AddGroup(int num,int *idx,CardStatus_t activeStatus,CardStatu
         _group[_groupNum].idx[i] = idx[i];
     }
 
+    _group[_groupNum].BACK_STATUS   = _cards->get_status(_group[_groupNum].idx[0]);
     SetStatus(_groupNum,_group[_groupNum].FREE_STATUS);
+
     _groupNum++;
 }
 
@@ -1667,7 +1669,7 @@ void Alternatives::active_all(Card_t handingout) {
 
 void Alternatives::clear() {
     for(INT8U i=0;i<_groupNum;i++) {
-        SetStatus(i,sFREE);
+        SetStatus(i,_group[i].BACK_STATUS);
     }
 }
 
