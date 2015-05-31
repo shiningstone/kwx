@@ -3176,6 +3176,9 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 			}
 			if(insertPlace==GangCardsPlace[3]+1)
 				insertPlace=GangCardsPlace[0];
+			else if(insertPlace==0)
+				insertPlace=cards->size()-1;
+
 			for(i=actionStartPlace;i<cards->size()-1;i++)
 			{
                 auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
