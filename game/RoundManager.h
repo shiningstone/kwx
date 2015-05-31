@@ -69,6 +69,9 @@ public:
     virtual void RecvQi();
     virtual void RecvHandout(int idx,Vec2 touch,int mode);
     /*internal action*/
+    void  RecvGangCancel();
+    void  RecvGangConfirm();
+
     virtual void RecvKouCancel();
     virtual void RecvKouConfirm();
     virtual void RecvMingCancel();

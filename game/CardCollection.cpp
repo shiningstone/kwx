@@ -1519,7 +1519,34 @@ void Alternatives::ScanKouCards(Card_t handingout) {
 }
 
 void Alternatives::ScanGangCards(Card_t newHandIn) {
+    int matchNum   = 0;
+    int cardIdx[4] = {-1,-1,-1,-1};
 
+    if(_cards->IsMing) {
+        for(INT8U i=0; i<_cards->FreeStart; i++) {
+            matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+        
+            if(matchNum==4 && _cards->get_status(i)==sMING_KOU) {
+                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            }
+        }
+    } else {
+        for(INT8U i=0; i<_cards->FreeStart; i++) {
+            int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+        
+            if(matchNum==4) {
+                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            }
+        }
+
+        for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
+            matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+        
+            if(matchNum==4) {
+                AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+            }
+        }
+    }
 }
 
 void Alternatives::scan(ActionId_t action, Card_t reference) {
@@ -1532,12 +1559,16 @@ void Alternatives::scan(ActionId_t action, Card_t reference) {
     }
 }
 
+bool Alternatives::is_activated(int gIdx) const {
+    return (get_status(gIdx)==_group[gIdx].ACTIVE_STATUS);
+}
+
 int Alternatives::activated_cards_num() const {/*only used in KOU*/
     int num = 0;
 
     for(INT8U i=0;i<_groupNum;i++) {
-        if(get_status(i)==_group[i].ACTIVE_STATUS) {
-            num += 3;
+        if(is_activated(i)) {
+            num += _group[i].cardNum;
         }
     }
 
@@ -1546,6 +1577,10 @@ int Alternatives::activated_cards_num() const {/*only used in KOU*/
 
 int  Alternatives::group_num() const {
     return _groupNum;
+}
+
+int  Alternatives::cards_num(int gIdx) const {
+    return _group[gIdx].cardNum;
 }
 
 int  Alternatives::get_card_idx(int gIdx,int cIdx) const {
@@ -1594,17 +1629,27 @@ void Alternatives::switch_status(int gIdx) {
     if(get_status((gIdx))==_group[gIdx].ACTIVE_STATUS) {
         SetStatus(gIdx,_group[gIdx].FREE_STATUS);
     } else {
+        if(_action==aGANG) {
+            for(int i=0;i<_groupNum;i++) {
+                if(is_activated(i)) {
+                    SetStatus(i,_group[i].FREE_STATUS);
+                }
+            }
+        }
+
         SetStatus(gIdx,_group[gIdx].ACTIVE_STATUS);
     }
 }
 
 void Alternatives::refresh() {/* ONLY USED IN aKOU */
-    for( int i=0; i<group_num(); i++ ) {
-        if(get_status(i)!=_group[i].ACTIVE_STATUS) {
-            if( _cards->can_kou(GetKind(i)) ) {
-                SetStatus(i,_group[i].FREE_STATUS);
-            } else {
-                SetStatus(i,sFREE);
+    if(_action==aKOU) {
+        for( int i=0; i<group_num(); i++ ) {
+            if(get_status(i)!=_group[i].ACTIVE_STATUS) {
+                if( _cards->can_kou(GetKind(i)) ) {
+                    SetStatus(i,_group[i].FREE_STATUS);
+                } else {
+                    SetStatus(i,sFREE);
+                }
             }
         }
     }

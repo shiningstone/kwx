@@ -174,8 +174,10 @@ public:
 
     int  get_activated_kinds(Card_t kinds[]) const;
 
+    bool is_activated(int gIdx) const;
     int  activated_cards_num() const;
     int  group_num() const;
+    int  cards_num(int gIdx) const;
     int  get_card_idx(int gIdx,int cIdx) const;
     CardStatus_t get_status(int gIdx) const;
 

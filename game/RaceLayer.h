@@ -290,6 +290,9 @@ public:
 	//void set_cur_player_no(int no);
 	void raceAccount(float delta);
 
+    void BtnGangCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+    void BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+
 	void BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);

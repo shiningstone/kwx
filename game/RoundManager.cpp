@@ -241,6 +241,14 @@ void RoundManager::RecvKouConfirm() {
     _uiManager->KouConfirmEffect();
 }
 
+void RoundManager::RecvGangCancel() {
+    _players[MIDDLE]->_cards->_alter->clear();
+}
+
+void RoundManager::RecvGangConfirm() {
+    CardInHand *cards = _players[MIDDLE]->_cards;
+}
+
 void RoundManager::RecvMingCancel() {
     _isMingTime=false;
     

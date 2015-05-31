@@ -2412,6 +2412,7 @@ void RaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
+            _DeleteActionTip();
             _CancelChosenCardInHand();
             _roundManager->RecvGang(MIDDLE);
     		break;
@@ -4099,6 +4100,59 @@ void RaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 	}	
 }
 
+void RaceLayer::BtnGangCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+            Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+
+			_Remove(myframe,MING_KOU_ENSURE);			
+			_Remove(myframe,MING_KOU_SIGN);
+			curButton->setTouchEnabled(false);
+
+            _roundManager->RecvGangCancel();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}	
+}
+
+void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+    auto curButton=(Button*)pSender;
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
+            
+            _Remove(myframe,MING_KOU_SIGN);
+			curButton->setTouchEnabled(false);
+
+            _roundManager->RecvGangConfirm();
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+
 void RaceLayer::BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
     auto curButton=(Button*)pSender;
@@ -4146,10 +4200,10 @@ void RaceLayer::MingCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 }
 
 bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
-    auto cards=_roundManager->_players[MIDDLE]->_cards;
+    CardInHand *cards=_roundManager->_players[MIDDLE]->_cards;
 
     Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
-    int groupChosen=-1;
+    int groupChosen=INVALID;
     
     for(int i=0;i<cards->size();i++) {
         cardsInHand[i]=_GetCardInHand(MIDDLE,i);
@@ -4157,7 +4211,7 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
     }
     
     for(int group=0; group<cards->_alter->group_num(); group++) {
-        for(int i=0; i<3; i++) {
+        for(int i=0; i<cards->_alter->cards_num(group); i++) {
             if ( _IsClickedOn(cardsInHand[cards->_alter->get_card_idx(group,i)], touch) ) {
                 groupChosen = group;
                 break;
@@ -4165,8 +4219,8 @@ bool RaceLayer::_KouTouchBegan(Touch* touch, Event* event) {
         }
     }
     
-    if(groupChosen!=-1) {
-        for(int i=0; i<3; i++) {
+    if(groupChosen!=INVALID) {
+        for(int i=0; i<cards->_alter->cards_num(groupChosen); i++) {
             cardsInHand[cards->_alter->get_card_idx(groupChosen,i)]->_ID++;/*==2???*/
         }
     }
@@ -4178,7 +4232,7 @@ int RaceLayer::_FindChosenGroup(Touch *touch,Sprite *cardsInHand[]) {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
 
     for(int group=0; group<cards->_alter->group_num(); group++) {
-        for(int i=0;i<3;i++) {
+        for(int i=0;i<cards->_alter->cards_num(group);i++) {
             if ( _IsClickedOn(cardsInHand[cards->_alter->get_card_idx(group,i)],touch) ) {
                 int idx = cards->_alter->get_card_idx(group,i);
                 if(cardsInHand[idx]->_ID!=1) {
@@ -4208,27 +4262,37 @@ void RaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
     cards->_alter->refresh();
     
     for(int group=0;group<cards->_alter->group_num();group++) {
-        for(int i=0;i<3;i++) {
-            _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU);
-            _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU_MASK);
-
-            if(cards->_alter->get_status(group)==sMING_KOU) {
+        if(cards->_alter->is_activated(group)) {
+            for(int i=0;i<cards->_alter->cards_num(group);i++) {
+                _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU);
+                _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU_MASK);
+                
                 auto MingKouMark=_object->Create(MING_KOU_CARD);
                 MingKouMark->setAnchorPoint(Vec2(0.5,0.5));
                 MingKouMark->setPosition(Vec2(cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.height/2));
                 cardsInHand[cards->_alter->get_card_idx(group,i)]->addChild(MingKouMark,2,MING_KOU);
-            } else if(cards->_alter->get_status(group)!=sKOU_ENABLE) {
+            }
+        } else if(cards->_alter->get_status(group)==sFREE) {
+            for(int i=0;i<cards->_alter->cards_num(group);i++) {
+                _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU);
+                _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU_MASK);
+                
                 auto KouNo=_object->Create(MING_MASK_CARD);
                 KouNo->setAnchorPoint(Vec2(0.5,0.5));
                 KouNo->setPosition(Vec2(cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.width/2,cardsInHand[cards->_alter->get_card_idx(group,i)]->getTextureRect().size.height/2));
                 cardsInHand[cards->_alter->get_card_idx(group,i)]->addChild(KouNo,2,MING_KOU_MASK);
+            }
+        } else {
+            for(int i=0;i<cards->_alter->cards_num(group);i++) {
+                _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU);
+                _Remove(cardsInHand[cards->_alter->get_card_idx(group,i)],MING_KOU_MASK);
             }
         }
     }
     
     bool ifEnsureVisible=false;
     for(int group=0;group<4;group++) {
-        if(cards->_alter->get_status(group)==sMING_KOU) {
+        if(cards->_alter->is_activated(group)) {
             ifEnsureVisible=true;
             break;
         }
@@ -4271,6 +4335,8 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
 }
 
 void RaceLayer::QueryGangCards() {
+    _eventDispatcher->removeEventListenersForTarget(myframe,true);
+
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
     auto ChooseEnsure = _object->CreateButton(BTN_OK);
