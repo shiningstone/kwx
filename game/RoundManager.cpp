@@ -255,8 +255,42 @@ void RoundManager::RecvGangCancel() {
 }
 
 void RoundManager::RecvGangConfirm() {
-    CardInHand *cards = _players[MIDDLE]->_cards;
-    LOGGER_WRITE("RecvGangConfirm");
+    CardInHand *cards   = _players[MIDDLE]->_cards;
+    int*        gangIdx = new int[4];
+    ActionId_t  action  = aNULL;
+    Card_t      card;
+
+    card = cards->_alter->get_cards(gangIdx,&action);
+    cards->_alter->clear();
+
+    SetDecision(MIDDLE,action);
+
+    if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
+        
+        if( !IsMing(MIDDLE) ) {
+            SetEffectCard(card,c_AN_GANG);
+        }
+
+        _uiManager->GangEffect(MIDDLE,card,gangIdx);
+    } else {
+        PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+
+        if(!_isNewDistributed) {
+            card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
+            _players[_curPlayer]->_river->pop_back();
+
+            RecordOutCard(card);
+            RecordOutCard(card);
+            RecordOutCard(card);
+            
+            _curPlayer=MIDDLE;
+        }else {
+            card = cards->get_kind(cards->last());/*BUG??? 如果我有之前没杠的*/
+            RecordOutCard(card);
+        }
+
+        _uiManager->GangEffect(MIDDLE,card,gangIdx,false,prevPlayer);
+    }
 }
 
 void RoundManager::RecvMingCancel() {
@@ -685,6 +719,10 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
         if(_isQiangGangAsking) {
             _lastActionWithGold = aQIANG_GANG;
         }
+    } else if(act==aMING_GANG || act==aAN_GANG || act==aSHOU_GANG) {
+        _actCtrl.decision = act;
+        _continue_gang_times++;
+        _lastActionWithGold = _actCtrl.decision;
     } else {
         _actCtrl.decision = act;
         _continue_gang_times = 0;

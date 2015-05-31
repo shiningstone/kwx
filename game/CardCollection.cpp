@@ -1683,11 +1683,27 @@ int Alternatives::get_activated_kinds(Card_t kinds[]) const {
     return num;
 }
 
-Card_t Alternatives::get_cards(int idx[]) const {
-    for(int i=0;i<_group[0].cardNum;i++) {
-        idx[i] = _group[0].idx[i];    
+/* this function is used to find gang cards and gang type */
+Card_t Alternatives::get_cards(int idx[],ActionId_t *action) const {
+    if(_groupNum==1) {
+        for(int i=0;i<_group[0].cardNum;i++) {
+            idx[i] = _group[0].idx[i];    
+        }
+        
+        return GetKind(0);
+    } else {
+        for(int gIdx=0;gIdx<_groupNum;gIdx++) {
+            if(is_activated(gIdx)) {
+                for(int j=0;j<_group[gIdx].cardNum;j++) {
+                    idx[j] = _group[gIdx].idx[j];    
+                }
+
+                *action = (_group[gIdx].ACTIVE_STATUS==sMING_GANG) ? aMING_GANG : aAN_GANG;
+                return GetKind(gIdx);
+            }
+        }
     }
 
-    return GetKind(0);
+    return CARD_UNKNOWN;
 }
 
