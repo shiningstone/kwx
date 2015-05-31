@@ -2412,7 +2412,6 @@ void RaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
     		break;
     	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _DeleteActionTip();
             _CancelChosenCardInHand();
             _roundManager->RecvGang(MIDDLE);
     		break;
@@ -4343,6 +4342,7 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
 }
 
 void RaceLayer::QueryGangCards() {
+    _DeleteActionTip();
     _eventDispatcher->removeEventListenersForTarget(myframe,true);
 
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);

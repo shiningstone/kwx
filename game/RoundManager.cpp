@@ -105,6 +105,7 @@ void RoundManager::StartGame() {
     Shuffle();
 
     int lastWinner = GetLastWinner();
+    _prevPlayer = (PlayerDir_t)lastWinner;
     _actCtrl.choices = _players[(lastWinner)%3]->init(&(_unDistributedCards[0]),14,aim[lastWinner]);//玩家手牌初始�?
 	_players[(lastWinner+1)%3]->init(&(_unDistributedCards[14]),13,aim[(lastWinner+1)%3]);
 	_players[(lastWinner+2)%3]->init(&(_unDistributedCards[27]),13,aim[(lastWinner+2)%3]);
