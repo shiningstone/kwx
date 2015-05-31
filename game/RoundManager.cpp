@@ -252,6 +252,7 @@ void RoundManager::RecvKouConfirm() {
 void RoundManager::RecvGangCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
     _uiManager->BtnCancelEffect(aGANG,_players[MIDDLE]->_cards);
+    _uiManager->ListenToCardTouch();
 }
 
 void RoundManager::RecvGangConfirm() {
