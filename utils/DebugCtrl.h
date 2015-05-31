@@ -16,4 +16,10 @@
 **********************************************************************************/
 #define USE_REMOTE_SERVER
 
+/********************************************************************************** 
+    this macro is used to control the timer limitation
+        round manager will ignore the count if this macro is enabled
+**********************************************************************************/
+#define TIMER_FREE
+
 #endif
