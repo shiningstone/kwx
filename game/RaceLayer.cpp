@@ -1554,24 +1554,28 @@ void RaceLayer::_CreateBackgroundElementMotion(TargetedAction *motions[5],int ga
 }
 
 Sequence *RaceLayer::_HideReminder(int reminderTag, double lastingTime, double shadeScale) {
-    auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(reminderTag),
-        Sequence::create(
-            ScaleTo::create(0,1), 
+    if(myframe->getChildByTag(reminderTag)) {
+        auto shadeAction = TargetedAction::create((Sprite*)myframe->getChildByTag(reminderTag),
+            Sequence::create(
+                ScaleTo::create(0,1), 
+                Spawn::create(
+                    FadeOut::create(lastingTime),
+                    ScaleTo::create(lastingTime,shadeScale),NULL),NULL));
+        
+        return Sequence::create( 
             Spawn::create(
-                FadeOut::create(lastingTime),
-                ScaleTo::create(lastingTime,shadeScale),NULL),NULL));
-    
-    return Sequence::create( 
-        Spawn::create(
-            shadeAction, CCCallFunc::create([=]() {/* why devide into 2 parts??? is it ok to execute as _ShadeQiReminder*/
-            for(int i=0; i<11; i++) {
-                if(i==reminderTag) {
-                    continue;
-                } else {
-                    _Remove(myframe,REMIND_ACT_TAG_ID+i);
-                }
-            }}),NULL),CCCallFunc::create([=](){
-        _Remove(myframe,reminderTag);}),NULL);
+                shadeAction, CCCallFunc::create([=]() {/* why devide into 2 parts??? is it ok to execute as _ShadeQiReminder*/
+                for(int i=0; i<11; i++) {
+                    if(i==reminderTag) {
+                        continue;
+                    } else {
+                        _Remove(myframe,REMIND_ACT_TAG_ID+i);
+                    }
+                }}),NULL),CCCallFunc::create([=](){
+            _Remove(myframe,reminderTag);}),NULL);
+    } else {
+        return Sequence::create(CCCallFunc::create([=](){;}),NULL);
+    }
 }
 
 Sequence *RaceLayer::_HideQiReminder() {
@@ -3325,10 +3329,10 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 		auto AnGangEffectNode = Node::create();
 		AnGangEffectNode->_ID=1;
 		myframe->addChild(AnGangEffectNode,1,AN_GANG_EFFECT_NODE);
-        
+
 		AnGangEffectNode->runAction( 
     		Sequence::create(
-                hideReminder,
+                /*hideReminder,*/
                 Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
                     _voice->SpeakAction(aAN_GANG,
@@ -3353,7 +3357,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
                     callFunc_update_list,
                     _voice->Speak("lanpai"),NULL),CallFunc::create([=](){
                 _Remove(myframe,AN_GANG_EFFECT_NODE);}),NULL));
-        
+
 		myframe->_ID=MIDDLE;
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
             _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),DelayTime::create(0.48),CallFunc::create([=](){
@@ -4364,8 +4368,8 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
 }
 
 void RaceLayer::QueryGangCards() {
-    _DeleteActionTip();
     _eventDispatcher->removeEventListenersForTarget(myframe,true);
+    _DeleteActionTip();
 
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
