@@ -34,7 +34,7 @@ public:
     void DoubleWin(const WinInfo_t &win);
     void SingleWin(const WinInfo_t &win);
     void GangGoldEffect(int winner,int whoGive);
-    void BtnCancelEffect(CardInHand *cards);
+    void BtnCancelEffect(ActionId_t action,CardInHand *cards);
     void BtnConfirmEffect();
     void MingCancelEffect();
 	void QueryKouCards();

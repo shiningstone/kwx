@@ -4087,19 +4087,23 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
 /****************************************
         ming
 ****************************************/
-void RaceLayer::BtnCancelEffect(CardInHand *cards) {
+void RaceLayer::BtnCancelEffect(ActionId_t action,CardInHand *cards) {
     for(int i=cards->FreeStart;i<cards->size();i++) {
         Sprite *card = _GetCardInHand(MIDDLE,i);
         _Remove(card,MING_KOU);
     }
 
-    auto button = myframe->getChildByTag(MING_KOU_CANCEL);
+    Node *button;
+    if(action==aKOU) {
+        button = myframe->getChildByTag(MING_KOU_CANCEL);
+    } else {
+        button = myframe->getChildByTag(GANG_CANCEL);
+    }
     
     myframe->_ID = MIDDLE;
     myframe->runAction(
         Sequence::create(
-            TargetedAction::create(button,ScaleTo::create(0,0)),CallFunc::create([=](){
-            _SwitchCancelBtn(MING_CANCEL);}),NULL));
+            TargetedAction::create(button,ScaleTo::create(0,0)),NULL));
 }
 
 void RaceLayer::BtnConfirmEffect() {

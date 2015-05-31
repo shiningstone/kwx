@@ -334,7 +334,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
 void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->BtnCancelEffect(_players[MIDDLE]->_cards);
+    _uiManager->BtnCancelEffect(aKOU,_players[MIDDLE]->_cards);
+    _uiManager->_SwitchCancelBtn(MING_CANCEL);
     RecvMing(true);
 }
 

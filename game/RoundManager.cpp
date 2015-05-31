@@ -224,7 +224,8 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
 
 void RoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->BtnCancelEffect(_players[MIDDLE]->_cards);
+    _uiManager->BtnCancelEffect(aKOU,_players[MIDDLE]->_cards);
+    _uiManager->_SwitchCancelBtn(MING_CANCEL);
 
     RecvMing(true);
 }
@@ -247,7 +248,7 @@ void RoundManager::RecvKouConfirm() {
 
 void RoundManager::RecvGangCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
-    LOGGER_WRITE("RecvGangCancel");
+    _uiManager->BtnCancelEffect(aGANG,_players[MIDDLE]->_cards);
 }
 
 void RoundManager::RecvGangConfirm() {
