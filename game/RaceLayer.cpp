@@ -3812,27 +3812,19 @@ void RaceLayer::_HuEffect(const WinInfo_t &win)
     PlayerDir_t giver  = win.giver;
 
 	if(win.kind!=DOUBLE_WIN) {
-        if(winner!=MIDDLE) {
-			myframe->runAction(Sequence::create(
-                Spawn::create(
-                    _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),
-                    simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),NULL),CallFunc::create([=](){
+        Sequence *backgroundEffect = (!_roundManager->IsMing(MIDDLE)&&(winner==MIDDLE))
+            ? Sequence::create(
+                    _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5),
+                    _CreateHuBackgroundEffect(winner),NULL)
+            : Sequence::create(
+                    _CreateHuBackgroundEffect(winner),NULL);
+        
+		myframe->runAction(Spawn::create(
+                simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
+                _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),CallFunc::create([=](){
 				_roundManager->update_gold(winner,HU_WIN,giver);}),CallFunc::create(this,callfunc_selector(
-                RaceLayer::showall)),NULL));
-		} else {
-            Sequence *backgroundEffect = _roundManager->IsMing(MIDDLE) 
-                ? Sequence::create(
-                        _CreateHuBackgroundEffect(winner),NULL)
-                : Sequence::create(
-                        _HideReminder(HU_REMIND_ACT_TAG_ID, 0.3, 1.5),
-                        _CreateHuBackgroundEffect(winner),NULL);
-            
-			myframe->runAction(Spawn::create(
-                    simple_tip_effect(_layout->PositionOfActSign(winner),"dahu.png"),
-                    _voice->SpeakAction(aHU,_roundManager->_players[winner]->GetSex()),CallFunc::create([=](){
-    				_roundManager->update_gold(winner,HU_WIN,giver);}),
-                    backgroundEffect,NULL));
-		}
+                RaceLayer::showall)),
+                backgroundEffect,NULL));
 	} else {
 		ListenToDoubleHu();
 	}
