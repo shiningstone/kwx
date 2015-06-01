@@ -474,6 +474,8 @@ void RoundManager::WaitForOthersChoose() {
 }
 
 void RoundManager::WaitForResponse(PlayerDir_t dir) {
+    LOGGER_WRITE("curPlayer:%d",dir);
+
     if(_isNewDistributed) {
         _HandleCardNewDistributed(dir);
     } else {
