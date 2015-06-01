@@ -3361,7 +3361,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 
 		myframe->_ID=MIDDLE;
 		myframe->runAction(Sequence::create(CallFunc::create([=](){
-            _roundManager->UpdateCards(MIDDLE,a_AN_GANG);}),DelayTime::create(0.48),CallFunc::create([=](){
+            _roundManager->UpdateCards(MIDDLE,a_AN_GANG,card);}),DelayTime::create(0.48),CallFunc::create([=](){
 			_roundManager->update_gold(dir,AN_GANG,dir);}),CallFunc::create([=](){
             _roundManager->DistributeTo(dir,(Card_t)(_roundManager->_unDistributedCards[_roundManager->_distributedNum++]));}),NULL));
 		

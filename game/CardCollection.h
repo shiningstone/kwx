@@ -54,7 +54,7 @@ public:
 
     CartApperance_t get_appearance(int idx,PlayerDir_t dir,bool isMiddleMing) const;
 
-    void   perform(ActionId_t act,bool isZimo=false);
+    void   perform(ActionId_t act,Card_t kind=CARD_UNKNOWN,bool isZimo=false);
     void   others_perform(bool isNewDistributed,ActionId_t act,Card_t kind);
 
     int          FreeStart;

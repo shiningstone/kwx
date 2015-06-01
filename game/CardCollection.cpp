@@ -300,8 +300,14 @@ int CardInHand::find_free_cards(int idx[],Card_t kind) const {
 
 void CardInHand::_AnGang(Card_t card) {
     int cardIdx[4] = {0};
+    Card_t kind = CARD_UNKNOWN;
 
-    Card_t kind = find_an_gang_cards(cardIdx);
+    if(card==CARD_UNKNOWN) {
+        kind = find_an_gang_cards(cardIdx);
+    } else {
+        kind = card;
+        find_cards(kind,cardIdx);
+    }
     
     CardNode_t gangCard;
     gangCard.kind    = kind;
@@ -507,9 +513,9 @@ CartApperance_t CardInHand::get_appearance(int idx,PlayerDir_t dir,bool isMiddle
     return NORMAL_APPERANCE;
 }
 
-void CardInHand::perform(ActionId_t act,bool isZimo) {
+void CardInHand::perform(ActionId_t act,Card_t kind,bool isZimo) {
     if(act==aAN_GANG) {
-        _AnGang();
+        _AnGang(kind);
     } else if(act==aMING_GANG) {
         _MingGang(get_kind(last()));
     } else if(act==aSHOU_GANG) {

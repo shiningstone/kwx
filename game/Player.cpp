@@ -131,9 +131,9 @@ ACT_RES Player::others_action(bool isNewDistributed,ActionId_t act,Card_t kind) 
 	return ar_DONE;
 }
 
-ACT_RES Player::action(bool isNewDistributed,ActionId_t act) {
+ACT_RES Player::action(bool isNewDistributed,ActionId_t act,Card_t kind) {
     LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
-    _cards->perform((ActionId_t)act,isNewDistributed);
+    _cards->perform((ActionId_t)act,kind,isNewDistributed);
 	return ar_DONE;
 }
 

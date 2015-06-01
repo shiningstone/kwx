@@ -26,7 +26,7 @@ public:
     Card_t       hand_out(unsigned int place);
 	ActionMask_t judge_action_again();
 
-    ACT_RES action(bool isNewDistributed,ActionId_t act);
+    ACT_RES action(bool isNewDistributed,ActionId_t act,Card_t kind = CARD_UNKNOWN);
     ACT_RES others_action(bool isNewDistributed,ActionId_t act,Card_t kind);
 
     HuTarget_t get_aim() const;
