@@ -701,8 +701,8 @@ void NetRoundManager::_UpdateWin(HuInfo_t *player) {
     
     for(int i=0;i<PLAYER_NUM;i++) {
         if( player[i].status==ZI_MO ) {
-            SetWin(SINGLE_WIN,i);
-            break;
+            winner = i;
+            winnerNum = 1;
         } else if( player[i].status==HU_PAI ) {
             winner = i;
             winnerNum++;
