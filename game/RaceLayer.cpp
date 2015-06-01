@@ -3332,7 +3332,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 
 		AnGangEffectNode->runAction( 
     		Sequence::create(
-                /*hideReminder,*/
+                hideReminder,
                 Spawn::create(
                     simple_tip_effect(_layout->PositionOfActSign(dir),"gang.png"),
                     _voice->SpeakAction(aAN_GANG,
