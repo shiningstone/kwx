@@ -4078,6 +4078,7 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
 			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
             
             _Remove(myframe,MING_KOU_SIGN);
+			_Remove(myframe,GANG_CANCEL);
 			curButton->setTouchEnabled(false);
 
             _roundManager->RecvGangConfirm();
@@ -4368,8 +4369,8 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
 }
 
 void RaceLayer::QueryGangCards() {
-    _eventDispatcher->removeEventListenersForTarget(myframe,true);
     _DeleteActionTip();
+    _eventDispatcher->removeEventListenersForTarget(myframe,true);
 
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
