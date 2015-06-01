@@ -146,7 +146,7 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
-    _players[MIDDLE]->_cards->_alter->scan(aGANG);
+    _players[MIDDLE]->_cards->_alter->scan(aGANG,CARD_IGNORE,_isNewDistributed);
     
     if(_players[MIDDLE]->_cards->_alter->group_num()>1) {
         _uiManager->QueryGangCards();

@@ -165,7 +165,7 @@ class Alternatives {
 public:
     Alternatives(CardInHand *cards);
 
-    void scan(ActionId_t action,Card_t reference = CARD_IGNORE);
+    void scan(ActionId_t action,Card_t reference = CARD_IGNORE,bool isNewDistributed = true);
 
     void switch_status(int gIdx);
     void refresh();
@@ -187,7 +187,7 @@ private:
 
     void   Init(ActionId_t action);
     void   ScanKouCards(Card_t handingout);
-    void   ScanGangCards(Card_t newHandIn);
+    void   ScanGangCards(bool isNewDistributed);
     void   AddGroup(int num,int *idx,CardStatus_t activeStatus,CardStatus_t freeStatus);
 
     Card_t GetKind(int gIdx) const;

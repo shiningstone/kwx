@@ -346,7 +346,7 @@ void CardInHand::_MingGang(Card_t kind) {
     
     for(int i=last();i>=0;i--) {
         if(get_kind(i)==kind) {
-            if(get_status(i)==sPENG || get_status(i)==sMING_KOU) {
+            if(get_status(i)==sPENG || (get_status(i)==sMING_KOU && i!=last())) {/*the status of last card will be modified to sMING_KOU after scan/clear*/
                 FreeStart--;
             }
             
@@ -1524,68 +1524,52 @@ void Alternatives::ScanKouCards(Card_t handingout) {
     }
 }
 
-void Alternatives::ScanGangCards(Card_t newHandIn) {
-    int matchNum   = 0;
-    int cardIdx[4] = {-1,-1,-1,-1};
-	auto lastKind=_cards->get_kind(_cards->size()-1);
+void Alternatives::ScanGangCards(bool isNewDistributed) {
 	/*假如底金：100
 	明杠：1.A手上有三张A，B打出A        B给A  100*2            A收200
 		  2.自己碰过A，再次摸起A时杠    B、C各给A  100*1       A收200
 	暗杠：A手上共有四张A                B、C各给A  100*2       A收400
 		  1.手上有三张A再抓起A时杠        anGang
 		  2.手上有连续的四张A             shouGang
-	以前的RRound里面card_list牌的增删都是根据这个来的，不同的牌不同的插法
-	结算时暗杠很明确，明杠需要区分杠牌的来源，明杠的人收钱一定
-	明牌时，杠牌三张在freeStart的左边，最后一张牌根据是否是自己抓的区别明/暗杠
-	之前FreeStart的定义是free状态牌第一张的位置，扣牌在它的左边
-	非明时，需要区分牌的状态，和数量
-	newHandIn我理解的意思是是否是自己抓的牌
-	看过没问题可以删了，有问题再说，以下按我的理解修改的
 	*/
+    int matchNum   = 0;
+    int cardIdx[4] = {-1,-1,-1,-1};
+    CardStatus_t gangType = isNewDistributed?sAN_GANG:sMING_GANG;
+    
     if(_cards->IsMing) {
         for(INT8U i=0; i<_cards->FreeStart; i++) {
             matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-			auto curKind=_cards->get_kind(i);
-
-			if(matchNum==3&&curKind==lastKind)
-			{
-				cardIdx[4]=_cards->size()-1;
-				if(newHandIn)
-					AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-				else
-					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-			}
+        
+            if(matchNum==4 && _cards->get_status(i)==sMING_KOU) {
+                AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
+            }
         }
     } else {
         for(INT8U i=0; i<_cards->FreeStart; i++) {
             int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-			auto curKind=_cards->get_kind(i);
         
-            if(matchNum==3&&lastKind==curKind) {
-                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
+                AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
             }
         }
-
+    
         for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
             matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
         
-            if(matchNum==4) {
-				if(newHandIn)
-					AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-				else
-					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
+                AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
             }
         }
     }
 }
 
-void Alternatives::scan(ActionId_t action, Card_t reference) {
+void Alternatives::scan(ActionId_t action, Card_t reference, bool isNewDistributed) {
     Init(action);
 
     if(action==aKOU) {
         ScanKouCards(reference);
     } else {
-        ScanGangCards(reference);
+        ScanGangCards(isNewDistributed);
     }
 }
 
