@@ -347,7 +347,7 @@ void CardInHand::_MingGang(Card_t kind) {
             delete_card(i,1);
         }
     }
-    FreeStart++;
+    
     insert_card(node,4);
     FreeStart += 4;
 }
