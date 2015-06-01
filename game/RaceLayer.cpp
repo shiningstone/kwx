@@ -3044,7 +3044,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 			if(ifEffectTime) {
 				ifEffectTime=false;
 				ifUpdateDuringEffect=false;
-                _roundManager->CancelEffectCard();
+                //_roundManager->CancelEffectCard();
 				_DeleteActionEffect();
 				_CardInHandUpdateEffect(dir);
 			}
