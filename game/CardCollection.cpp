@@ -1534,7 +1534,7 @@ void Alternatives::ScanGangCards(Card_t newHandIn) {
         for(INT8U i=0; i<_cards->FreeStart; i++) {
             int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
         
-            if(matchNum==4) {
+            if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
                 AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
             }
         }
@@ -1542,7 +1542,7 @@ void Alternatives::ScanGangCards(Card_t newHandIn) {
         for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
             matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
         
-            if(matchNum==4) {
+            if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
                 AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
             }
         }
