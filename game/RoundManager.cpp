@@ -155,7 +155,7 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
         
         if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
             int*   gangIdx = new int[4];
-            Card_t card = _players[dir]->_cards->_alter->get_cards(gangIdx);
+            Card_t card = _players[dir]->_cards->_alter->get_activated_cards(gangIdx);
             _players[dir]->_cards->_alter->clear();
             
             if( !IsMing(dir) ) {
@@ -185,7 +185,7 @@ Card_t RoundManager::RecvGang(PlayerDir_t dir) {
             }
         
             int* gangIdx = new int[4];
-            card = cards->_alter->get_cards(gangIdx);
+            card = cards->_alter->get_activated_cards(gangIdx);
             cards->_alter->clear();
         
             _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
@@ -255,7 +255,7 @@ void RoundManager::_RecvGangConfirm() {
     ActionId_t  action  = aNULL;
     Card_t      card;
 
-    card = cards->_alter->get_cards(gangIdx,&action);
+    card = cards->_alter->get_activated_cards(gangIdx,&action);
     cards->_alter->clear();
 
     SetDecision(MIDDLE,action);
