@@ -1699,8 +1699,11 @@ Card_t Alternatives::get_activated_cards(int idx[],ActionId_t *action) const {
     for(int i=0;i<_group[activated].cardNum;i++) {
         idx[i] = _group[activated].idx[i];    
     }
-    
-    *action = (_group[activated].ACTIVE_STATUS==sMING_GANG) ? aMING_GANG : aAN_GANG;
+
+    if(action!=NULL) {
+        *action = (_group[activated].ACTIVE_STATUS==sMING_GANG) ? aMING_GANG : aAN_GANG;
+    }
+
     return GetKind(activated);
 }
 
