@@ -820,7 +820,7 @@ PlayerDir_t RoundManager::RightOf(PlayerDir_t dir) const {
 PlayerDir_t RoundManager::TurnTo(PlayerDir_t dir) {
     _prevPlayer = (PlayerDir_t)_curPlayer;
 
-    if(dir==INVALID_DIR) {
+    if(dir==NEXT) {
         _lastActionSource = INVALID;
         _curPlayer  = RightOf(_prevPlayer);
     } else {

@@ -3849,7 +3849,7 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
                     hideQiReminder,CallFunc::create([=](){
                         int real_last = _roundManager->_players[MIDDLE]->_cards->real_last();
                         Vec2 location = _GetCardInHand(MIDDLE,real_last)->getPosition();
-                        _roundManager->RecvHandout(real_last,location,2);/*bug??? forced to handout real_last card*/
+                        _roundManager->RecvHandout(real_last,location,2);
                     }),NULL));
 			} else {
 				myframe->runAction(hideQiReminder);
