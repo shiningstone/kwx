@@ -1037,18 +1037,18 @@ int CardInHand::CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList 
 }
 
 bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *river) {
-    ting.cardNum = 0;
+    ting.kindNum = 0;
     ting.huNum   = 0;
     ting.cards   = new TingItem_t[9];
 
     for(INT8U k=0;k<CARD_KIND_MAX;k++) {
         if( can_hu(position,k) ) {
-            ting.huNum = CollectTingItem(ting.cards+ting.cardNum,(Card_t)k,river);
-            ting.cardNum++;
+            ting.huNum = CollectTingItem(ting.cards+ting.kindNum,(Card_t)k,river);
+            ting.kindNum++;
         }
     }
 
-    return (ting.cardNum>0);
+    return (ting.kindNum>0);
 }
 
 bool CardInHand::collect_ming_info(const CardList *river) {
@@ -1098,10 +1098,10 @@ void CardInHand::set_ming_info(const MingInfo_t &ming) {
         MingChoice_t  *choice = _ming.handouts + i;
 
         choice->kind = src->kind;
-        choice->ting.cardNum = src->ting.cardNum;
+        choice->ting.kindNum = src->ting.kindNum;
         choice->ting.cards = new TingItem_t[9];
 
-        for(INT8U j=0;j<choice->ting.cardNum;j++) {
+        for(INT8U j=0;j<choice->ting.kindNum;j++) {
             *(choice->ting.cards+j) = *(src->ting.cards+j);
         }
     }
@@ -1110,10 +1110,10 @@ void CardInHand::set_ming_info(const MingInfo_t &ming) {
 /* NOTE : memory release should be pay more attention, since _ting may refer to _ming in SINGLE_GAME */
 void CardInHand::set_ting_info(const TingInfo_t &ting) {
     _ting = new TingInfo_t;
-    _ting->cardNum = ting.cardNum;
+    _ting->kindNum = ting.kindNum;
     _ting->cards = new TingItem_t[9];
     
-    for(INT8U i=0;i<ting.cardNum;i++) {
+    for(INT8U i=0;i<ting.kindNum;i++) {
         *(_ting->cards+i) = *(ting.cards+i);
     }
 }
@@ -1130,9 +1130,9 @@ void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) {
     collect_ming_info();
     
     if(_ting!=NULL) {
-	    *len = _ting->cardNum;
+	    *len = _ting->kindNum;
 
-        for(INT8U i=0;i<_ting->cardNum;i++) {
+        for(INT8U i=0;i<_ting->kindNum;i++) {
 		    cards[i] = (CARD_KIND)(_ting->cards+i)->kind;
         }
     } else {
@@ -1148,7 +1148,7 @@ bool CardInHand::get_ming_info(MRES *res) const {
         for(INT8U i=0;i<_ming.choiceNum;i++) {
             MingChoice_t *handout = _ming.handouts + i;
             
-			res->hu_cards_num[i] = handout->ting.cardNum;
+			res->hu_cards_num[i] = handout->ting.kindNum;
 			for(INT8U j=0;j<res->hu_cards_num[i];j++)
 				res->hu_cards[i][j] = (CARD_KIND)(handout->ting.cards+j)->kind;
         }
@@ -1163,7 +1163,7 @@ void CardInHand::update_ting_num(const CardList *river) {
     if(river!=NULL && _ting!=NULL) {
         _ting->huNum = 0;
         
-        for(int i=0;i<_ting->cardNum;i++) {
+        for(int i=0;i<_ting->kindNum;i++) {
             _ting->huNum += CollectTingItem(_ting->cards+i,(_ting->cards+i)->kind,river);
         }
     }

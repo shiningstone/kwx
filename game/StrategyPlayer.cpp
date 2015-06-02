@@ -89,7 +89,7 @@ void StrategyPlayer::SetChooseContext() {
     _CollectPosition(_chooseCtx.cards);
     
     if(_employer->_cards->_ting) {
-        _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
+        _chooseCtx.huNum = _employer->_cards->_ting->kindNum;
     } else {
         _chooseCtx.huNum = 0;
     }
@@ -117,7 +117,7 @@ int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
     for(int i=0;i<_employer->_cards->size();i++) {
         if(_employer->_cards->get_kind(i)==target) {
             _employer->_cards->set_ming(i);
-            _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
+            _chooseCtx.huNum = _employer->_cards->_ting->kindNum;
             if(_chooseCtx.huNum>=6) {
                 canKou = true;
             }            
@@ -194,7 +194,7 @@ bool StrategyPlayer::OthersCanHu(Card_t kind) const {/*the efficiency could be o
             continue;
         }
         
-        for(int j=0;j<_chooseCtx.OthersTing[i]->cardNum;j++) {
+        for(int j=0;j<_chooseCtx.OthersTing[i]->kindNum;j++) {
             if(kind==(_chooseCtx.OthersTing[i]->cards+j)->kind) {
                 return true;
             }
@@ -397,8 +397,8 @@ int StrategyPlayer::PickupForSameColor(int reserveColor) {
     const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
     const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
-    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->kindNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->kindNum;
     
     Card_t HeadKind = (Card_t)((1-reserveColor)*9);
     Card_t TailKind = (Card_t)(HeadKind+8);
@@ -491,8 +491,8 @@ int StrategyPlayer::PickupForSevenCouples() {
     const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
     const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
-    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->kindNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->kindNum;
     
     if(_chooseCtx.cards[RiverLast].num!=2 && _chooseCtx.cards[RiverLast].num!=4
         && !OthersCanHu(RiverLast)) {
@@ -531,8 +531,8 @@ int StrategyPlayer::PickupForFourPeng() {
     const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
     const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
-    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->kindNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->kindNum;
     
     if(_chooseCtx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
         return _chooseCtx.cards[RiverLast].position[_chooseCtx.cards[RiverLast].num-1];
@@ -563,8 +563,8 @@ int StrategyPlayer::PickupForPiHu() {
     const KindPosition &Card1 = _chooseCtx.cards[RiverLast];
     const KindPosition &Card2 = _chooseCtx.cards[River2ndLast];
 
-    const int Hu1 = _chooseCtx.OthersTing[0]->cardNum;
-    const int Hu2 = _chooseCtx.OthersTing[1]->cardNum;
+    const int Hu1 = _chooseCtx.OthersTing[0]->kindNum;
+    const int Hu2 = _chooseCtx.OthersTing[1]->kindNum;
     
     if(_chooseCtx.cards[RiverLast].num==1 && !IsStable(RiverLast) && !OthersCanHu(RiverLast)) {
         return _chooseCtx.cards[RiverLast].position[_chooseCtx.cards[RiverLast].num-1];

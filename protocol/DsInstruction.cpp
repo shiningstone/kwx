@@ -116,7 +116,7 @@ int ShowCardResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
     status = (Status_t)msg.GetItemValue(0);
-    ting.cardNum = msg._body->_items[1]->_bufLen/4;
+    ting.kindNum = msg._body->_items[1]->_bufLen/4;
     DsMsgParser::_load(ting,msg._body->_items[1]->_buf);
     return 0;
 }
@@ -130,7 +130,7 @@ int ShowCardNotif::Construct(const DsMsg &msg) {
         
     seat         = _GetPlayer(msg.GetItemValue(0));
     kind         = (Card_t)msg.GetItemValue(1);
-    ting.cardNum = msg._body->_items[2]->_bufLen;
+    ting.kindNum = msg._body->_items[2]->_bufLen;
     DsMsgParser::_load(ting,msg._body->_items[2]->_buf);
     return 0;
 }
@@ -245,7 +245,7 @@ int ScoreNotif::Construct(const DsMsg &msg) {
 int TingInfoResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
-    info.cardNum = msg._body->_items[0]->_bufLen/4;
+    info.kindNum = msg._body->_items[0]->_bufLen/4;
     DsMsgParser::_load(info,msg._body->_items[0]->_buf);
     return 0;
 }

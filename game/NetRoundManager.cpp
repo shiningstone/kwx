@@ -562,7 +562,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
 void NetRoundManager::_DiRecv(ShowCardResponse *info) {
     LOGGER_WRITE("%s handout ret = %d",__FUNCTION__,info->status);
 
-    if(info->ting.cardNum>0) {
+    if(info->ting.kindNum>0) {
 
     }
     
@@ -575,7 +575,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
     PlayerDir_t dir    = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
 
-    if(info->ting.cardNum>0) {
+    if(info->ting.kindNum>0) {
 
     }
     

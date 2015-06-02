@@ -3987,7 +3987,7 @@ void RaceLayer::_UpdateTingNum(PlayerDir_t dir) {
     TingInfo_t *ting = _roundManager->_players[dir]->_cards->_ting;
 
     if(ting!=NULL) {
-        for(int i=0;i<ting->cardNum;i++) {
+        for(int i=0;i<ting->kindNum;i++) {
             Sprite* curCardBar = _GetCardOnTingSignBar(dir,i);
             curCardBar->removeChildByTag(2);
         
@@ -4001,11 +4001,11 @@ void RaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
     TingInfo_t *ting = _roundManager->_players[curNo]->_cards->_ting;
     if(ting!=NULL) {
         Card_t huCards[9];
-        for(int i=0;i<ting->cardNum;i++) {
+        for(int i=0;i<ting->kindNum;i++) {
             huCards[i] = (ting->cards+i)->kind;
         }
 
-        auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,huCards,ting->cardNum);
+        auto tingSignBar = _object->CreateTingSignBar((PlayerDir_t)curNo,huCards,ting->kindNum);
         myframe->addChild(tingSignBar,30,TING_SING_LEFTBAR+curNo/2);
     }
 }
@@ -4023,14 +4023,14 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
         Card_t huCards[9];
         int    times[9];
         int    remains[9];
-        for(int i=0;i<ting->cardNum;i++) {
+        for(int i=0;i<ting->kindNum;i++) {
             huCards[i] = (ting->cards+i)->kind;
             times[i]   = (ting->cards+i)->fan;
             remains[i] = (ting->cards+i)->remain;
         }
         
         auto tingSignBar = _object->CreateTingInfoBar(
-            curPos,huCards,ting->cardNum,times,remains);
+            curPos,huCards,ting->kindNum,times,remains);
         myframe->addChild(tingSignBar, 30, TING_SING_BAR);
     }
 }
