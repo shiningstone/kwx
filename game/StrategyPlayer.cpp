@@ -32,6 +32,8 @@ void StrategyPlayer::SetScoreContext() {
 }
 
 long StrategyPlayer::CalcScore(Card_t kind,const ScoreContext_t &ctx) {
+    _employer->_fan = 0;
+
     _employer->_cards->update_statistics(kind);
     _employer->_fan = _employer->_cards->statHuFanMask;
     

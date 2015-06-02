@@ -862,7 +862,7 @@ void CardInHand::update_statistics(Card_t huKind) {
     _SetHu(RH_QINYISE);
         
     int color = huKind/9;
-    int sameAsHuKind = 1;
+    int sameAsHuKind = 0;
         
 	for(INT8U i=0;i<size();i++) {
 		if(get_status(i)==sFREE ) {
@@ -889,8 +889,8 @@ void CardInHand::update_statistics(Card_t huKind) {
             }
 		}
         
-		int freeSameCard = 1;
-        int sameCard = 1;
+		int freeSameCard = 0;
+        int sameCard = 0;
 		for(INT8U k=i+1;(k<i+4) & (k<size());k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
                 if( get_status(i)==sFREE ) {
