@@ -149,7 +149,7 @@ void CardList::show() {
 		kinds[idx++] = (*it)->kind;
 	}
     
-    LOGGER_WRITE("CardList:\n");
+    LOGGER_WRITE("CardList:");
 	LOGGER_WRITE_ARRAY(kinds,size());	
 }
 

@@ -306,7 +306,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _HandoutNotify = true;
     
 	if(_isMingTime) {
-		_isMingTime=false;
+		_isMingTime      = false;
+        _actCtrl.choices = 0;
         
         RequestSendAction aReq;
         aReq.Set(aMING);

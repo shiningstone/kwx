@@ -4448,7 +4448,7 @@ void RaceLayer::BtnMingHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
                         ScaleTo::create(0.3,1.3),NULL),NULL)),NULL),CCCallFunc::create(this,callfunc_selector(
                 RaceLayer::_DeleteActionTip)),CCCallFunc::create([=](){
                 _CancelChosenCardInHand();
-                _roundManager->RecvMing();}),NULL));
+                _roundManager->RecvMing(true);}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
