@@ -474,8 +474,6 @@ void RoundManager::WaitForOthersChoose() {
 }
 
 void RoundManager::WaitForResponse(PlayerDir_t dir) {
-    LOGGER_WRITE("curPlayer:%d",dir);
-
     if(_isNewDistributed) {
         _HandleCardNewDistributed(dir);
     } else {
@@ -564,6 +562,7 @@ void RoundManager::_HandleCardNewDistributed(PlayerDir_t dir) {
             _players[_prevPlayer]->_cards->IsMing,
             (_distributedNum==TOTAL_CARD_NUM)
         );
+    LOGGER_WRITE("%s handin %s",DescPlayer(dir),DescCard(NewDistribute()));
     
     if((PlayerDir_t)dir==MIDDLE) {
         if(IsMing(MIDDLE)&&(_actCtrl.choices&a_HU)){

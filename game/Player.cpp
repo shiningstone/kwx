@@ -74,8 +74,6 @@ unsigned char Player::refresh(CardNode_t cards[],int len,HuFan_t fan) {
 }
 
 ActionMask_t Player::judge_action_again() {
-    LOGGER_WRITE("%s",__FUNCTION__);
-
 	unsigned char res = 0x0;
 
     if(_cards->has_shou_gang()) {/*BUG HERE??? always shougang*/
@@ -107,9 +105,6 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,
 		}
 	}
 
-    LOGGER_WRITE("NETWORK : %x %s actions %d: newCard %d,isNewDistributed %d,tingStatus %d,isLastOne %d",
-        (int)this,__FUNCTION__,actions,newCard,isNewDistributed,pervMing,isLastOne);
-    
 	return actions;
 }
 
@@ -122,17 +117,22 @@ Card_t Player::hand_out(unsigned int place) {
     _cards->delete_card(place,1);
     _river->push_back(kind);
 
+    LOGGER_WRITE("%s handout %s",DescPlayer(_dir),DescCard(kind));
     return kind;
 }
 
 ACT_RES Player::others_action(bool isNewDistributed,ActionId_t act,Card_t kind) {
-    LOGGER_WRITE("%x %s : %d %d(isNewDistributed=%d)",this,__FUNCTION__,act,kind,isNewDistributed);
+    _cards->show();
+    LOGGER_WRITE("%s act %s (%s)",DescPlayer(_dir),DescAct(act),DescCard(kind));
+
     _cards->others_perform(isNewDistributed,act,kind);
 	return ar_DONE;
 }
 
 ACT_RES Player::action(bool isNewDistributed,ActionId_t act,Card_t kind) {
-    LOGGER_WRITE("%x %s : %d (isNewDistributed=%d)",this,__FUNCTION__,act,isNewDistributed);
+    _cards->show();
+    LOGGER_WRITE("%s act %s (%s)",DescPlayer(_dir),DescAct(act),DescCard(kind));
+    
     _cards->perform((ActionId_t)act,kind,isNewDistributed);
 	return ar_DONE;
 }

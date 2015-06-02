@@ -303,7 +303,6 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
 	Sprite *p_list[MAX_HANDIN_NUM];
     
-    LOGGER_WRITE("dir==%d",dir);
     for(int i=0;i<cards->size();i++) {
 		//if(list->data[i].kind!=ck_NOT_DEFINED )
 		{

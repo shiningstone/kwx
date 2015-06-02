@@ -18,8 +18,8 @@
 *************************************************/
 
 
-//#define DEBUG
-#ifdef DEBUG
+//#define CARD_DEBUG
+#ifdef CARD_DEBUG
 #define DBG_SHOW() show()
 #else
 #define DBG_SHOW()
