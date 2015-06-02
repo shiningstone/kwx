@@ -266,7 +266,7 @@ bool CardInHand::is_wait_handout() const {
 
 Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first group*/
     if(IsMing) {
-        for(INT8U i=0; i<size(); i++) {
+        for(INT8U i=0; i<size()-3; i++) {
             int matchNum = find_cards(get_kind(i),cardIdx,i);
         
             if(matchNum==4 && get_status(i)==sMING_KOU) {
@@ -274,7 +274,7 @@ Card_t CardInHand::find_an_gang_cards(int cardIdx[]) const{/*BUG : always first 
             }
         }
     } else {
-        for(INT8U i=FreeStart; i<size(); i++) {
+        for(INT8U i=FreeStart; i<size()-3; i++) {
             int matchNum = find_cards(get_kind(i),cardIdx,i);
         
             if(matchNum==4) {
@@ -671,7 +671,7 @@ void CardInHand::_JudgePengPengHu() {
     int usedLen  = 0;
     int GroupSameCount = 0;
     
-    for(INT8U i=FreeStart;i<size();i+=usedLen) {
+    for(INT8U i=FreeStart;i<size()-1;i+=usedLen) {
         int sameCount = 1;
         
         for(INT8U j=i+1;j<size();j++) {
@@ -959,7 +959,7 @@ int CardInHand::GetCoupleNum() const {
     int coupleNum = 0;
     
     INT8U i = 0;
-    while(i<size()) {
+    while(i<size()-1) {
         if(get_kind(i)==get_kind(i+1)) {
             coupleNum++;
             i += 2;
@@ -1553,7 +1553,7 @@ void Alternatives::ScanGangCards(bool isNewDistributed) {
             }
         }
     
-        for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
+        for(INT8U i=_cards->FreeStart; i<_cards->size()-3; i++) {
             matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
         
             if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
