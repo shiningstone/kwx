@@ -89,7 +89,7 @@ void StrategyPlayer::SetChooseContext() {
     _CollectPosition(_chooseCtx.cards);
     
     if(_employer->_cards->_ting) {
-        _chooseCtx.huNum = _employer->_cards->_ting->kindNum;
+        _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
     } else {
         _chooseCtx.huNum = 0;
     }
@@ -117,7 +117,7 @@ int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
     for(int i=0;i<_employer->_cards->size();i++) {
         if(_employer->_cards->get_kind(i)==target) {
             _employer->_cards->set_ming(i);
-            _chooseCtx.huNum = _employer->_cards->_ting->kindNum;
+            _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
             if(_chooseCtx.huNum>=6) {
                 canKou = true;
             }            

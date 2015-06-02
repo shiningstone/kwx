@@ -1038,12 +1038,12 @@ int CardInHand::CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList 
 
 bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *river) {
     ting.kindNum = 0;
-    ting.huNum   = 0;
+    ting.cardNum   = 0;
     ting.cards   = new TingItem_t[9];
 
     for(INT8U k=0;k<CARD_KIND_MAX;k++) {
         if( can_hu(position,k) ) {
-            ting.huNum = CollectTingItem(ting.cards+ting.kindNum,(Card_t)k,river);
+            ting.cardNum += CollectTingItem(ting.cards+ting.kindNum,(Card_t)k,river);
             ting.kindNum++;
         }
     }
@@ -1161,10 +1161,10 @@ bool CardInHand::get_ming_info(MRES *res) const {
 
 void CardInHand::update_ting_num(const CardList *river) {
     if(river!=NULL && _ting!=NULL) {
-        _ting->huNum = 0;
+        _ting->cardNum = 0;
         
         for(int i=0;i<_ting->kindNum;i++) {
-            _ting->huNum += CollectTingItem(_ting->cards+i,(_ting->cards+i)->kind,river);
+            _ting->cardNum += CollectTingItem(_ting->cards+i,(_ting->cards+i)->kind,river);
         }
     }
 }
@@ -1172,7 +1172,7 @@ void CardInHand::update_ting_num(const CardList *river) {
 int CardInHand::get_ting_num(Card_t choice) {
     for(int i=0;i<_ming.choiceNum;i++) {
         if(choice==(_ming.handouts+i)->kind) {
-            return (_ming.handouts+i)->ting.huNum;
+            return (_ming.handouts+i)->ting.cardNum;
         }
     }
     

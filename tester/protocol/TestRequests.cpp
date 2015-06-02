@@ -666,7 +666,7 @@ public:
         assert( remind.remind.ming.choiceNum==1 );
         assert( remind.remind.ming.handouts[0].kind==TIAO_4 );
         assert( remind.remind.ming.handouts[0].ting.kindNum==1 );
-        assert( remind.remind.ming.handouts[0].ting.huNum==2 );
+        assert( remind.remind.ming.handouts[0].ting.cardNum==2 );
         assert( remind.remind.ming.handouts[0].ting.cards[0].kind==TIAO_4 );
         assert( remind.remind.ming.handouts[0].ting.cards[0].remain==2 );
         assert( remind.remind.ming.handouts[0].ting.cards[0].fan==0x10 );
