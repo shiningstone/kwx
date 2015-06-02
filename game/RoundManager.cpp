@@ -394,7 +394,7 @@ void RoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
     _curPlayer = zhuang;
-    _actCtrl.choices = _players[_curPlayer]->judge_action_again();
+    //_actCtrl.choices = _players[_curPlayer]->judge_action_again();
 
     _isNewDistributed = true;
     if(zhuang==MIDDLE) {
