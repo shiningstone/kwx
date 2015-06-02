@@ -303,6 +303,10 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
 	Sprite *p_list[MAX_HANDIN_NUM];
     
+	if(dir==MIDDLE)//作用是在此处有条件中断//测试_yusi
+	{
+		CCLOG("");
+	}
     for(int i=0;i<cards->size();i++) {
 		//if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
@@ -470,8 +474,6 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 					}
 				}
 			}
-
-
 
 			if(dir!=RIGHT) {//each one lay above the previous ones
                 if(!_GetCardInHand((PlayerDir_t)dir,i)) {
@@ -3065,8 +3067,12 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
 
         /**********************
             move 4 cards in hand
-        **********************/
-        Size FreeCardSize = _object->RectSize(FREE_CARD);
+			**********************/
+		Size FreeCardSize=Size::ZERO;
+		if(_roundManager->IsMing(MIDDLE))
+			FreeCardSize = _object->RectSize(MING_CARD);
+		else
+			FreeCardSize = _object->RectSize(FREE_CARD);
         auto cards = _roundManager->_players[dir]->_cards; 
 		auto curKindOfGang = cards->get_kind(GangCardsPlace[0]);
         
@@ -4928,28 +4934,29 @@ void RaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *pa
 		}
 		else if(cards->get_status(i)==c_FREE)
 		{
-			if( win.kind==SINGLE_WIN && win.winner==dir && win.giver==dir && i==(cards->size()-2) )
+			//if( win.kind==SINGLE_WIN && win.winner==dir && win.giver==dir && i==(cards->size()-2) )
+			if(((win.kind==SINGLE_WIN&&win.winner==dir)||(win.kind==DOUBLE_WIN&&win.winner!=dir))&&i==(cards->size()-2))
 				x=x+show_card_list[i]->getTextureRect().size.width*0.95+30;
 			else
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 		}
 	}
 
-    if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN && win.giver!=dir))
-    {
-        if(!_roundManager->_isNewDistributed)
-        {
-            auto winCard=_object->Create(PENG_CARD);
-            winCard->setAnchorPoint(Vec2(0,0.5));
-            winCard->setPosition(Vec2(x+30,y));
-            auto s_card=_object->CreateKind(cards->get_kind(cards->real_last()),MIDDLE_SIZE);/*!!! the real_last card should be the one from others*/
-            s_card->setAnchorPoint(Vec2(0.5,0.5));
-            s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
-            winCard->addChild(s_card,1);
+    //if((win.kind==SINGLE_WIN && win.winner==dir) || (win.kind==DOUBLE_WIN && win.giver!=dir))
+    //{
+    //    if(!_roundManager->_isNewDistributed)
+    //    {
+    //        auto winCard=_object->Create(PENG_CARD);
+    //        winCard->setAnchorPoint(Vec2(0,0.5));
+    //        winCard->setPosition(Vec2(x+30,y));
+    //        auto s_card=_object->CreateKind(cards->get_kind(cards->real_last()),MIDDLE_SIZE);/*!!! the real_last card should be the one from others*/
+    //        s_card->setAnchorPoint(Vec2(0.5,0.5));
+    //        s_card->setPosition(Vec2(winCard->getTextureRect().size.width/2,winCard->getTextureRect().size.height*0.6));
+    //        winCard->addChild(s_card,1);
 
-            parent->addChild(winCard,2);
-        }
-    }
+    //        parent->addChild(winCard,2);
+    //    }
+    //}
 }
 
 void RaceLayer::AccountShows(LayerColor* BarOfPlayer,int no) {
@@ -5780,7 +5787,10 @@ void  RaceLayer::showall()
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
 						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 						p_list[i]->addChild(s_card,1);
-						x+=p_list[i]->getTextureRect().size.width*1.0;
+						if(no==winner&&i==cards->size()-2)
+							x+=p_list[i]->getTextureRect().size.width*1.0+30;
+						else
+							x+=p_list[i]->getTextureRect().size.width*1.0;
 					}
 					else if(cards->get_status(i)==c_MING_KOU)
 					{
@@ -5788,7 +5798,10 @@ void  RaceLayer::showall()
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
 						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 						p_list[i]->addChild(s_card,1);
-						x += p_list[i]->getTextureRect().size.width*1;
+						if(cards->get_kind(i+1)!=cards->get_kind(i))
+							x += p_list[i]->getTextureRect().size.width*1.1;
+						else
+							x += p_list[i]->getTextureRect().size.width*1;
 					}
 					else if(cards->get_status(i)==c_PENG)
 					{

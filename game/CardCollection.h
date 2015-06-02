@@ -45,7 +45,7 @@ public:
     
     void   init(Card_t *cards,int len);
     void   delete_card(int from,int len=1);
-    void   insert_card(CardNode_t data,int times=1);
+    void   insert_card(CardNode_t data,int times=1,bool isZimo=true);
     void   lock_all_cards(bool lock);
     int    real_last()const;
 
@@ -70,7 +70,7 @@ public:
     Alternatives *_alter;
 private:
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
-    void   _MingGang(Card_t kind);
+    void   _MingGang(Card_t kind,bool isZimo);
     void   _ShouGang();
     void   _Peng(Card_t kind);
     void   _Ming();
@@ -154,7 +154,7 @@ public:
 private:
     static const bool ONLY_FREE = true;
     
-    int    _FindInsertPoint(CardNode_t data) const;
+    int    _FindInsertPoint(CardNode_t data,bool isZimo) const;
 };
 
 /***************************************************

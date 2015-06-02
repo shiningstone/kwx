@@ -228,8 +228,8 @@ void CardInHand::delete_card(int from,int len) {
     DBG_SHOW();
 }
 
-void CardInHand::insert_card(CardNode_t data,int times) {
-    int insertPlace = _FindInsertPoint(data);
+void CardInHand::insert_card(CardNode_t data,int times,bool isZimo) {
+    int insertPlace = _FindInsertPoint(data,isZimo);
 
     CardNode_t *card[4] = {0};
     for(int i=0;i<times;i++) {
@@ -338,24 +338,39 @@ void CardInHand::_AnGang(Card_t card) {
     }
 }
 
-void CardInHand::_MingGang(Card_t kind) {
+void CardInHand::_MingGang(Card_t kind,bool isZimo) {
     CardNode_t node;
     node.kind    = kind;
     node.status  = sMING_GANG;
     node.canPlay = false;
     
-    for(int i=last();i>=0;i--) {
-        if(get_kind(i)==kind) {
-            if(get_status(i)==sPENG || (get_status(i)==sMING_KOU && i!=last())) {/*the status of last card will be modified to sMING_KOU after scan/clear*/
-                FreeStart--;
-            }
-            
-            delete_card(i,1);
-        }
-    }
-    
-    insert_card(node,4);
-    FreeStart += 4;
+	if(isZimo)
+	{
+		delete_card(last(),1);
+		insert_card(node,1,isZimo);
+		for(int i=0;i<FreeStart;i++)
+			if(get_kind(i)==kind)
+			{
+				set_status(i,sMING_GANG);
+				set_status(i+1,sMING_GANG);
+				set_status(i+2,sMING_GANG);
+				break;
+			}
+		FreeStart++;
+	}
+	else
+	{
+		for(int i=last();i>=0;i--) {
+			if(get_kind(i)==kind) {
+				if(get_status(i)==sPENG || (get_status(i)==sMING_KOU && i!=last())) {/*the status of last card will be modified to sMING_KOU after scan/clear*/
+					FreeStart--;
+				}
+				delete_card(i,1);
+			}
+		}
+		insert_card(node,4,isZimo);
+		FreeStart += 4;
+	}
 }
 
 void CardInHand::_ShouGang() {
@@ -517,7 +532,7 @@ void CardInHand::perform(ActionId_t act,Card_t kind,bool isZimo) {
     if(act==aAN_GANG) {
         _AnGang(kind);
     } else if(act==aMING_GANG) {
-        _MingGang(get_kind(last()));
+        _MingGang(get_kind(last()),isZimo);
     } else if(act==aSHOU_GANG) {
         _ShouGang();
     } else if(act==aPENG) {
@@ -572,18 +587,26 @@ void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind
 	}
 }
 
-int CardInHand::_FindInsertPoint(CardNode_t data) const {
+int CardInHand::_FindInsertPoint(CardNode_t data,bool isZimo) const {
     if(data.status!=sFREE) {
         if(FreeStart==0) {
             return 0;
         }
-        
-        for(int i=FreeStart;i>0;i--) {
-            if(get_status(i-1)!=sMING_KOU) {
-                return i;
-            } else if(data.kind>get_kind(i-1)) {
-                return i;
-            }
+
+		for(int i=FreeStart;i>0;i--) {
+			if(data.status==sMING_GANG&&isZimo)
+			{
+				if(get_kind(i-1)==data.kind)
+					return i;
+			}
+			else
+			{
+				if(get_status(i-1)!=sMING_KOU) {
+					return i;
+				} else if(data.kind>get_kind(i-1)) {
+					return i;
+				}
+			}
         }
 
         return 0;
