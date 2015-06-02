@@ -374,6 +374,7 @@ void NetRoundManager::RecvMingCancel() {
 
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _actCtrl.decision = aMING;
+    _players[MIDDLE]->_cards->collect_ming_info(_gRiver);
     
     RequestSendAction aAction;
     aAction.Set(aMING);
