@@ -620,6 +620,62 @@ public:
     }
 };
 
+class TestRecvRemindNotif_Handout1tiaoTing2tiao : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,55,               //request code/*下发提醒(下行) REQ_GAME_DIST_REMIND*/
+            7,                     //package level
+            0x00,61,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            60,1,                        //seat
+            61,2,                        //timer
+            62,3,                        //kind :        4条
+            63,3,                        //whogive
+            129,0,4,0,0,0,0x38,          //remind :      
+            130,0,1,0xff,                //gang remind : 不可杠
+            131,0,1,0xff,                //kou remind :  不可扣
+            132,0,12,
+                0x00,0x00,0x03,0x02,
+                0x03,0x02,0x10,0x00,
+                0xff,0xff,0xff,0xff,
+            64,2,                        //wait
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        len = aMsg->Deserialize(msgInNetwork);
+
+		RemindInfo remind;
+        remind.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_DIST_REMIND );
+        assert( aMsg->GetLevel()==7 );
+        assert( remind.seat==1 );
+        assert( remind.timer==2 );
+        assert( remind.kind==TIAO_4 );
+        assert( remind.whoGive==LEFT );
+        assert( remind.remind.actions&aMING );
+        assert( remind.remind.gangCard[0]==CARD_UNKNOWN );
+        assert( remind.remind.kouCard[0]==CARD_UNKNOWN );
+        assert( remind.remind.ming.choiceNum==1 );
+        assert( remind.remind.ming.handouts[0].kind==TIAO_4 );
+        assert( remind.remind.ming.handouts[0].ting.cardNum==1 );
+        assert( remind.remind.ming.handouts[0].ting.huNum==2 );
+        assert( remind.remind.ming.handouts[0].ting.cards[0].kind==TIAO_4 );
+        assert( remind.remind.ming.handouts[0].ting.cards[0].remain==2 );
+        assert( remind.remind.ming.handouts[0].ting.cards[0].fan==0x10 );
+        assert( remind.wait==RIGHT );
+
+        return 0;
+    }
+};
+
 class TestRecvFirstDistZhuangNotif : public CTestCase {
 public:
     virtual int Execute() {
@@ -854,7 +910,7 @@ public:
         
         assert( info.zhuang==MIDDLE );
 
-        assert( info.hu[MIDDLE].winType==HU_PAI );
+        assert( info.hu[MIDDLE].status==HU_PAI );
 
         assert( info.hu[MIDDLE].fan==0x4000 );
         assert( info.hu[MIDDLE].score==0x10000000 );
@@ -969,6 +1025,9 @@ void testGameActions() {
     aCase->Execute();
 
     aCase = new TestRecvRemindNotif();
+    aCase->Execute();
+    
+    aCase = new TestRecvRemindNotif_Handout1tiaoTing2tiao();
     aCase->Execute();
     
     aCase = new TestRecvFirstDistZhuangNotif();
