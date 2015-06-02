@@ -730,8 +730,10 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
         _continue_gang_times = 0;
         _lastActionWithGold = aQi;
     }
-    
+
     _lastActionSource = dir;
+
+    _actCtrl.choices = 0;
 }
 
 void RoundManager::UpdateGold(int gold[PLAYER_NUM]) {
