@@ -42,8 +42,6 @@ public:
     void _SwitchCancelBtn(int tag);
 
     void QueryGangCards();
-    void GangCancelEffect(ActionId_t action,CardInHand *cards);
-    void GangConfirmEffect();
 
     void HideActionButtons();
     void ShowActionButtons(int mask);

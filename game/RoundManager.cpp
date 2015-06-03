@@ -244,12 +244,7 @@ void RoundManager::RecvKouConfirm() {
     _uiManager->KouConfirmEffect();
 }
 
-void RoundManager::RecvGangCancel() {
-    _players[MIDDLE]->_cards->_alter->clear();
-    _uiManager->GangCancelEffect(aGANG,_players[MIDDLE]->_cards);
-}
-
-void RoundManager::_RecvGangConfirm() {
+void RoundManager::RecvGangConfirm() {
     CardInHand *cards   = _players[MIDDLE]->_cards;
     int*        gangIdx = new int[4];
     ActionId_t  action  = aNULL;
@@ -288,10 +283,6 @@ void RoundManager::_RecvGangConfirm() {
     }
 
     _uiManager->ListenToCardTouch();
-}
-
-void RoundManager::RecvGangConfirm() {
-    _uiManager->GangConfirmEffect();
 }
 
 void RoundManager::RecvMingCancel() {

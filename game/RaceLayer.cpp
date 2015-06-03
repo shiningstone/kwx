@@ -4048,11 +4048,23 @@ void RaceLayer::BtnGangCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		{
             Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
 
+            CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
+            cards->_alter->clear();
+
+            for(int i=cards->FreeStart;i<cards->size();i++) {
+                Sprite *card = _GetCardInHand(MIDDLE,i);
+                _Remove(card,MING_KOU);
+            }
+            
 			_Remove(myframe,MING_KOU_ENSURE);			
 			_Remove(myframe,MING_KOU_SIGN);
 			curButton->setTouchEnabled(false);
 
-            _roundManager->RecvGangCancel();
+            myframe->_ID = MIDDLE;
+            myframe->runAction(
+                Sequence::create(
+                    TargetedAction::create(curButton,ScaleTo::create(0,0)),CallFunc::create([=](){
+                    ListenToCardTouch();}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -4079,7 +4091,10 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
 			_Remove(myframe,GANG_CANCEL);
 			curButton->setTouchEnabled(false);
 
-            _roundManager->RecvGangConfirm();
+            myframe->_ID = MIDDLE;
+            myframe->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
+                RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
+                _roundManager->RecvGangConfirm();}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -4088,31 +4103,6 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
 		break;
 	}
 }
-
-void RaceLayer::GangCancelEffect(ActionId_t action,CardInHand *cards) {
-    for(int i=cards->FreeStart;i<cards->size();i++) {
-        Sprite *card = _GetCardInHand(MIDDLE,i);
-        _Remove(card,MING_KOU);
-    }
-
-    Node *button = myframe->getChildByTag(GANG_CANCEL);
-    
-    myframe->_ID = MIDDLE;
-    myframe->runAction(
-        Sequence::create(
-            TargetedAction::create(button,ScaleTo::create(0,0)),CallFunc::create([=](){
-            ListenToCardTouch();}),NULL));
-}
-
-void RaceLayer::GangConfirmEffect() {
-    auto button = myframe->getChildByTag(MING_KOU_ENSURE);
-
-    myframe->_ID = MIDDLE;
-    myframe->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
-        RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-        _roundManager->_RecvGangConfirm();}),NULL));
-}
-
 /****************************************
         ming
 ****************************************/
