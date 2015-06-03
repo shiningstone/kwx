@@ -1557,38 +1557,73 @@ void Alternatives::scan_kou(Card_t handingout) {
       2.手上有连续的四张A             shouGang
 */
 void Alternatives::scan_gang(bool isNewDistributed) {
-    int matchNum   = 0;
-    int cardIdx[4] = {-1,-1,-1,-1};
-    
-    CardStatus_t gangType = isNewDistributed?sAN_GANG:sMING_GANG;
-    
     Init(aGANG);
     
-    if(_cards->IsMing) {
-        for(INT8U i=0; i<_cards->FreeStart; i++) {
-            matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-        
-            if(matchNum==4 && _cards->get_status(i)==sMING_KOU) {
-                AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
-            }
-        }
-    } else {
-        for(INT8U i=0; i<_cards->FreeStart; i++) {
-            int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-        
-            if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
-                AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
-            }
-        }
-    
-        for(INT8U i=_cards->FreeStart; i<_cards->size()-3; i++) {
-            matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-        
-            if(matchNum==4 && _cards->get_status(i)!=sMING_GANG && _cards->get_status(i)!=sAN_GANG ) {
-                AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
-            }
-        }
-    }
+    int matchNum   = 0;
+    int cardIdx[4] = {-1,-1,-1,-1};
+	auto lastKind=_cards->get_kind(_cards->size()-1);
+	if(isNewDistributed)
+	{
+		if(_cards->IsMing){
+			for(INT8U i=0; i<_cards->FreeStart; i++) {
+				matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+				auto curKind=_cards->get_kind(i);
+				if(matchNum==3&&curKind==lastKind)
+				{
+					cardIdx[4]=_cards->size()-1;
+					if(_cards->get_status(i)==sPENG)
+						AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+					else if(_cards->get_status(i)==sMING_KOU)
+						AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for(INT8U i=0; i<_cards->FreeStart; i++) {
+				int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+				auto curKind=_cards->get_kind(i);
+				if(matchNum==3&&lastKind==curKind) 
+				{
+					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+					break;
+				}
+			}
+
+			for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
+				matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+				if(matchNum==4)
+					AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+			}
+		}
+	}
+	else
+	{
+		if(_cards->IsMing){
+			for(INT8U i=0; i<_cards->FreeStart; i++) {
+				matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+				auto curKind=_cards->get_kind(i);
+				if(matchNum==3&&curKind==lastKind)//&&_cards->get_status(i)==sMING_KOU)
+				{
+					cardIdx[4]=_cards->size()-1;
+					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
+				int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+				auto curKind=_cards->get_kind(i);
+				if(matchNum==4&&lastKind==curKind) {
+					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+					break;
+				}
+			}
+		}
+	}
 }
 
 bool Alternatives::is_activated(int gIdx) const {

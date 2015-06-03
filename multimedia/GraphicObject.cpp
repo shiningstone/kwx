@@ -297,7 +297,7 @@ Sprite *GObjectFactory::CreateHeadBkg(PlayerDir_t dir) {
 }
 
 Sprite *GObjectFactory::CreateMingKouSign() {
-    auto MingSign=Sprite::createWithSpriteFrameName("gpts.png");
+    auto MingSign=Sprite::create("Gang_choose_remind.png");
     MingSign->setAnchorPoint(Vec2(0.5,0.5));
     MingSign->setPosition(Vec2(
         ORIGIN.x+SIZE.width*0.5,

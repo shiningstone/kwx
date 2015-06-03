@@ -256,28 +256,19 @@ void RaceLayer::GangGoldEffect(int winner,int whoGive) {
 
 void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMing)
 {
-    if(time==2) {
-        if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
-            myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
-		}
-	} else {
-		//_roundManager->_players[MIDDLE]->_cards->add_effect_card();
-		_ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
-        //_roundManager->_players[MIDDLE]->_cards->del_effect_card();
-    }
+	//if(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard)) {
+	//	myframe->removeChildByTag(HAND_IN_CARDS_TAG_ID+MIDDLE*20+chosenCard);
+	//}	
+	_ReOrderCardsInHand(chosenCard,_roundManager->_players[MIDDLE]->_cards);
 
-    if(_myTouchedCard!=INVALID) {
-        _roundManager->_players[MIDDLE]->hand_out(_myTouchedCard);
+	if(_myTouchedCard!=INVALID) {
+		_roundManager->_players[MIDDLE]->hand_out(_myTouchedCard);
 		_myTouchedCard = INVALID;
-    } else {
-        int last = _roundManager->_players[MIDDLE]->_cards->last();
-        _roundManager->_players[MIDDLE]->hand_out(last);
+	} else {
+		int last = _roundManager->_players[MIDDLE]->_cards->last();
+		_roundManager->_players[MIDDLE]->hand_out(last);
     }
 	_roundManager->UpdateCards(MIDDLE,a_JUMP);
-
-    //CardNode_t *node = _roundManager->_players[MIDDLE]->_cards->back();
-    //_roundManager->_players[MIDDLE]->_cards->insert_card(*node,1);
-    //_roundManager->_players[MIDDLE]->_cards->pop_back();
 
 	_MyHandoutEffect(_roundManager->LastHandout(),touch,time,turnToMing);
 }
@@ -2645,7 +2636,7 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
                 }
                 
                 loopCard->setScale(1.2);
-            } else {
+			} else {
                 ChooseConfirm=true;
             }
         } else {
@@ -2672,7 +2663,10 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		if(ChooseConfirm && _roundManager->_actCtrl.handoutAllow) {
 			_myChosenCard=INVALID;
 			_myTouchedCard = chosen;
-            _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
+			if(chosen==cards->last())
+				_roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),2);
+			else
+				_roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),3);
 		}
     }
 }
@@ -3903,7 +3897,8 @@ Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
                 if(isTing) {
                     card = _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
                 } else if(!isTing&&_roundManager->IsMing(MIDDLE)) {
-                    card = _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
+                    //card = _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
+                    card = _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
                 } else {
                     TextureId_t texture = (dir==LEFT)?L_IN_CARD:R_IN_CARD;
                     card = _object->Create(texture,dir,refer.x,refer.y);
@@ -6552,7 +6547,7 @@ BezierTo* RaceLayer::BizerMove1(CardList* outCard,Vec2 location)
 
 	BezierTo *action;
 	if(ccpDistance(location,config.endPosition)<=200){
-		action=BezierTo::create(0.18,config);
+		action=BezierTo::create(0.2,config);
 	} else {
 		action=BezierTo::create(0.3,config);
 	}
@@ -6563,88 +6558,95 @@ BezierTo* RaceLayer::BizerMove1(CardList* outCard,Vec2 location)
 BezierTo* RaceLayer::BizerMove2(CardList* outCard,Vec2 location,int time)
 {
 	ccBezierConfig config;
-	if((outCard->size()-1)<6)
+	if(((int)outCard->size()-1)<6)
 	{
 		if(location.x<visibleSize.width*0.4)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)*36)-100,_layout->_playerPosi[1].riverPoint.y-100);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)*36)-100,_layout->_playerPosi[1].riverPoint.y-100);
 		}
 		else if(location.x>=visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)*36)+100,_layout->_playerPosi[1].riverPoint.y-100);
 		}
 		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)*36),_layout->_playerPosi[1].riverPoint.y);
 		}
 	}
-	else if((outCard->size()-1)<14)
+	else if(((int)outCard->size()-1)<14)
 	{
 		if(location.x<visibleSize.width*0.4)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			if(time==2)
 				config.controlPoint_1=Vec2(location.x,200);
 			else
-				config.controlPoint_1=Vec2(location.x+30,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
+				config.controlPoint_1=Vec2(location.x+27,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-8)*36)-100,_layout->_playerPosi[1].riverPoint.y-141);
 		}
 		else if(location.x>=visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-8)*36)+100,_layout->_playerPosi[1].riverPoint.y-141);
 		}
 		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-8)*36),_layout->_playerPosi[1].riverPoint.y-41);
 		}
 	}
 	else
 	{
 		if(location.x<visibleSize.width*0.4)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 			if(time==2)
 				config.controlPoint_1=Vec2(location.x,200);
 			else
-				config.controlPoint_1=Vec2(location.x+30,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
+				config.controlPoint_1=Vec2(location.x+27,200);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-16)*36)-100,_layout->_playerPosi[1].riverPoint.y-182);
 		}
 		else if(location.x>=visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-16)*36)+100,_layout->_playerPosi[1].riverPoint.y-182);
 		}
 		else if(location.x>visibleSize.width*0.4 && location.x<visibleSize.width*0.6)
 		{
-			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
+			config.endPosition=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-1)-16)*36,_layout->_playerPosi[1].riverPoint.y-82);
 			config.controlPoint_1=Vec2(location.x,200);
-			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+((outCard->size()-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
+			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
 		}
+	}
+	if(1)//ceshi_yusi
+	{
+		CCLOG("curResdiaul : %d ",TOTAL_CARD_NUM - _roundManager->_distributedNum);
+		CCLOG("curHandsout : %d ",(int)outCard->size());
+		CCLOG("endPosition : ( %f , %f )",config.endPosition.x,config.endPosition.y);
+		//system("pause");
 	}
 	BezierTo *action;
 	if(ccpDistance(location,config.endPosition)<=200)
 	{
-		if(time==3)
-			action=BezierTo::create(0.18,config);
-		else
-			action=BezierTo::create(0.18,config);
+		//if(time==3)
+		//	action=BezierTo::create(0.2,config);
+		//else
+			action=BezierTo::create(0.2,config);
 	}
 	else if(ccpDistance(location,config.endPosition)>200)
 	{
-		if(time==3)
-			action=BezierTo::create(0.3,config);
-		else
+		//if(time==3)
+		//	action=BezierTo::create(0.3,config);
+		//else
 			action=BezierTo::create(0.3,config);
 	}
 	return action;
