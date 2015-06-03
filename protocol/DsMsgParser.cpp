@@ -86,7 +86,10 @@ int DsMsgParser::_load(CardNode_t cards[3][18],INT8U cardNum[3],const DsMsg &msg
     return 0;
 }
 
-int DsMsgParser::_load(TingInfo_t &ting,const INT8U *inMsg) {
+/*****************************************
+    input  :  ting.kindNum
+*****************************************/
+int DsMsgParser::_load_ting_info(TingInfo_t &ting,const INT8U *inMsg) {
     const INT8U *p = inMsg;
 
     if(_ntohl(*(INT32U *)(inMsg))==0xffffffff) {
@@ -107,6 +110,37 @@ int DsMsgParser::_load(TingInfo_t &ting,const INT8U *inMsg) {
         }
         
         return i*4;
+    }
+}
+
+/*****************************************
+    input  :  ting.cardNum
+*****************************************/
+int DsMsgParser::_load_ting_remind(TingInfo_t &ting,const INT8U *inMsg) {
+    const INT8U *p = inMsg;
+
+    if(_ntohl(*(INT32U *)(inMsg))==0xffffffff) {
+        ting.kindNum = 0;
+        return 4;
+    } else {
+        _TingItem_t cards[9];
+        
+        int idx = 0;
+        int num = 0;
+        while(num<ting.cardNum) {
+            cards[idx].kind   = (Card_t)p[0+4*idx];
+            cards[idx].remain = p[1+4*idx];
+            cards[idx].fan    = _ntohs( *((INT16U *)(p+2+4*idx)) );
+        
+            num += cards[idx].remain;
+            idx++;
+        }
+        
+        ting.cards = new TingItem_t[idx];
+        ting.kindNum = idx;
+        memcpy(ting.cards,cards,sizeof(_TingItem_t)*idx);            
+
+        return idx*4;
     }
 }
 
@@ -133,16 +167,16 @@ int DsMsgParser::_load(MingInfo_t &ming,const DsMsg &msg,int itemIdx) {
     INT8U *p = item->_buf;
     MingChoice_t choices[13];
 
-    int idx = 0;
+    int idx       = 0;
     int i   = 0;
     while(i<len) {
-        /*0x0000*/
-        i += 2;                 
+        i += 2;                 /*0x0000*/
         choices[idx].kind = (Card_t)(*(p+i));
-        choices[idx].ting.kindNum = *(p+i+1);
+        choices[idx].ting.cardNum = *(p+i+1);
         i += 2;
 
-        i += _load(choices[idx].ting,p+i);
+        i += _load_ting_remind(choices[idx].ting,p+i);
+        i += 4;                 /*0xffffffff*/
 
         idx++;
     }
