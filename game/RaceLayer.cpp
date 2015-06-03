@@ -4094,7 +4094,8 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
             myframe->_ID = MIDDLE;
             myframe->runAction(Sequence::create(CCCallFunc::create(this,callfunc_selector(
                 RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
-                _roundManager->RecvGangConfirm();}),NULL));
+                _roundManager->RecvGangConfirm(MIDDLE);
+                ListenToCardTouch();}),NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

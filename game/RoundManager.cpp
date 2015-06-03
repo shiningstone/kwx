@@ -145,52 +145,54 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
+Card_t RoundManager::RecvGangConfirm(PlayerDir_t dir) {
+    CardInHand *cards   = _players[dir]->_cards;
+    int*        gangIdx = new int[4];
+    ActionId_t  action  = aNULL;
+    Card_t      card;
+
+    card = cards->_alter->get_activated_cards(gangIdx,&action);
+    cards->_alter->clear();
+
+    SetDecision(dir,action);
+
+    if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
+        
+        if( !IsMing(dir) ) {
+            SetEffectCard(card,c_AN_GANG);
+        }
+
+        _uiManager->GangEffect(dir,card,gangIdx);
+    } else {
+        PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+
+        if(!_isNewDistributed) {
+            _players[_curPlayer]->_river->pop_back();
+
+            RecordOutCard(card);
+            RecordOutCard(card);
+            RecordOutCard(card);
+
+            TurnTo(dir);
+        }else {
+            RecordOutCard(card);
+        }
+
+        _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
+    }
+
+    return card;
+}
+
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
     _players[dir]->_cards->_alter->scan_gang(_isNewDistributed);
     
     if(_players[dir]->_cards->_alter->group_num()>1 && dir==MIDDLE) {
         _uiManager->QueryGangCards();
+        return CARD_UNKNOWN;
     } else {
-        SetDecision(dir,aGANG);
-        
-        if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
-            int*   gangIdx = new int[4];
-            Card_t card = _players[dir]->_cards->_alter->get_activated_cards(gangIdx);
-            _players[dir]->_cards->_alter->clear();
-            
-            if( !IsMing(dir) ) {
-                SetEffectCard(card,c_AN_GANG);
-            }
-        
-            _uiManager->GangEffect(dir,card,gangIdx);
-            return card;
-        } else {
-            PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
-        
-            CardInHand *cards = _players[dir]->_cards;
-            Card_t card;
-            
-            if(!_isNewDistributed) {
-                card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
-                _players[_curPlayer]->_river->pop_back();
-        
-                RecordOutCard(card);
-                RecordOutCard(card);
-                RecordOutCard(card);
-                
-                _curPlayer=dir;
-            }else {
-                card = cards->get_kind(cards->last());/*BUG??? 如果我有之前没杠的*/
-                RecordOutCard(card);
-            }
-        
-            int* gangIdx = new int[4];
-            card = cards->_alter->get_activated_cards(gangIdx);
-            cards->_alter->clear();
-        
-            _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
-            return card;
-        }
+        _players[dir]->_cards->_alter->switch_status(0);
+        return RecvGangConfirm(dir);
     }
 }
 
@@ -242,47 +244,6 @@ void RoundManager::RecvKouConfirm() {
     cards->collect_ming_info(_gRiver);
 
     _uiManager->KouConfirmEffect();
-}
-
-void RoundManager::RecvGangConfirm() {
-    CardInHand *cards   = _players[MIDDLE]->_cards;
-    int*        gangIdx = new int[4];
-    ActionId_t  action  = aNULL;
-    Card_t      card;
-
-    card = cards->_alter->get_activated_cards(gangIdx,&action);
-    cards->_alter->clear();
-
-    SetDecision(MIDDLE,action);
-
-    if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
-        
-        if( !IsMing(MIDDLE) ) {
-            SetEffectCard(card,c_AN_GANG);
-        }
-
-        _uiManager->GangEffect(MIDDLE,card,gangIdx);
-    } else {
-        PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
-
-        if(!_isNewDistributed) {
-            card = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
-            _players[_curPlayer]->_river->pop_back();
-
-            RecordOutCard(card);
-            RecordOutCard(card);
-            RecordOutCard(card);
-            
-            _curPlayer=MIDDLE;
-        }else {
-            card = cards->get_kind(cards->last());/*BUG??? 如果我有之前没杠的*/
-            RecordOutCard(card);
-        }
-
-        _uiManager->GangEffect(MIDDLE,card,gangIdx,false,prevPlayer);
-    }
-
-    _uiManager->ListenToCardTouch();
 }
 
 void RoundManager::RecvMingCancel() {
