@@ -245,19 +245,21 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
     }
 }
 
-Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
-    Card_t kind = CARD_UNKNOWN;
-    bool actionPermit = false;
-    
-    if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
-        kind = LastHandout();
-    } else {
-        kind = _players[dir]->_cards->find_an_gang_cards();
-    }
-    
+Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
+    CardInHand *cards   = _players[dir]->_cards;
+    int*        gangIdx = new int[4];
+    ActionId_t  action  = aNULL;
+    Card_t      card;
+    bool        actionPermit = false;
+
+    card = cards->_alter->get_activated_cards(gangIdx,&action);
+    cards->_alter->clear();
+
+    SetDecision(dir,action);
+
     if(dir==MIDDLE) {
         RequestSendAction aReq;
-        aReq.Set(_actCtrl.decision,kind);
+        aReq.Set(_actCtrl.decision,card);
         _messenger->Send(aReq);
         
         actionPermit = Wait(REQ_GAME_SEND_ACTION);
@@ -267,10 +269,32 @@ Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
         _uiManager->hide_action_tip(aGANG);
         return CARD_UNKNOWN;
     } else {
-        if(_actCtrl.choices & aMING_GANG) {/*BUG HERE: && !_isNewDistributed*/
-            _players[dir]->_cards->push_back(kind);
+        if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
+            
+            if( !IsMing(dir) ) {
+                SetEffectCard(card,c_AN_GANG);
+            }
+        
+            _uiManager->GangEffect(dir,card,gangIdx);
+        } else {
+            PlayerDir_t prevPlayer = (PlayerDir_t)_curPlayer;
+        
+            if(!_isNewDistributed) {
+                _players[_curPlayer]->_river->pop_back();
+        
+                RecordOutCard(card);
+                RecordOutCard(card);
+                RecordOutCard(card);
+        
+                TurnTo(dir);
+            }else {
+                RecordOutCard(card);
+            }
+        
+            _uiManager->GangEffect(dir,card,gangIdx,false,prevPlayer);
         }
-        return RoundManager::RecvGang(dir);
+        
+        return card;
     }
 }
 
