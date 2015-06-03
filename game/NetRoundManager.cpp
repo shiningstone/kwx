@@ -381,7 +381,7 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _messenger->Send(aAction);
 
     if(!isFromKouStatus) {
-        _players[MIDDLE]->_cards->_alter->scan(aKOU);
+        _players[MIDDLE]->_cards->_alter->scan_kou();
         if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
             _uiManager->QueryKouCards();
         } else {

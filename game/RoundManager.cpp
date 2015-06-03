@@ -146,7 +146,7 @@ void RoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
-    _players[dir]->_cards->_alter->scan(aGANG,CARD_IGNORE,_isNewDistributed);
+    _players[dir]->_cards->_alter->scan_gang(_isNewDistributed);
     
     if(_players[dir]->_cards->_alter->group_num()>1 && dir==MIDDLE) {
         _uiManager->QueryGangCards();
@@ -315,7 +315,7 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 
     if(_curPlayer==MIDDLE) {
         if(!isFromKouStatus) {
-            _players[MIDDLE]->_cards->_alter->scan(aKOU);
+            _players[MIDDLE]->_cards->_alter->scan_kou();
 
             if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
                 _uiManager->QueryKouCards();

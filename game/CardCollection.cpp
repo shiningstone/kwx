@@ -1533,7 +1533,9 @@ void Alternatives::Init(ActionId_t action) {
     _groupNum = 0;
 }
 
-void Alternatives::ScanKouCards(Card_t handingout) {
+void Alternatives::scan_kou(Card_t handingout) {
+    Init(aKOU);
+    
     for(INT8U i=_cards->FreeStart; i<_cards->size(); i++){
         auto kind = _cards->get_kind(i);
         
@@ -1547,17 +1549,19 @@ void Alternatives::ScanKouCards(Card_t handingout) {
     }
 }
 
-void Alternatives::ScanGangCards(bool isNewDistributed) {
-	/*假如底金：100
-	明杠：1.A手上有三张A，B打出A        B给A  100*2            A收200
-		  2.自己碰过A，再次摸起A时杠    B、C各给A  100*1       A收200
-	暗杠：A手上共有四张A                B、C各给A  100*2       A收400
-		  1.手上有三张A再抓起A时杠        anGang
-		  2.手上有连续的四张A             shouGang
-	*/
+/*假如底金：100
+明杠：1.A手上有三张A，B打出A        B给A  100*2            A收200
+      2.自己碰过A，再次摸起A时杠    B、C各给A  100*1       A收200
+暗杠：A手上共有四张A                B、C各给A  100*2       A收400
+      1.手上有三张A再抓起A时杠        anGang
+      2.手上有连续的四张A             shouGang
+*/
+void Alternatives::scan_gang(bool isNewDistributed) {
     int matchNum   = 0;
     int cardIdx[4] = {-1,-1,-1,-1};
     CardStatus_t gangType = isNewDistributed?sAN_GANG:sMING_GANG;
+    
+    Init(aGANG);
     
     if(_cards->IsMing) {
         for(INT8U i=0; i<_cards->FreeStart; i++) {
@@ -1583,16 +1587,6 @@ void Alternatives::ScanGangCards(bool isNewDistributed) {
                 AddGroup(4,cardIdx,gangType,sGANG_ENABLE);
             }
         }
-    }
-}
-
-void Alternatives::scan(ActionId_t action, Card_t reference, bool isNewDistributed) {
-    Init(action);
-
-    if(action==aKOU) {
-        ScanKouCards(reference);
-    } else {
-        ScanGangCards(isNewDistributed);
     }
 }
 
@@ -1695,7 +1689,7 @@ void Alternatives::refresh() {/* ONLY USED IN aKOU */
 }
 
 void Alternatives::active_all(Card_t handingout) {
-    scan(aKOU,handingout);
+    scan_kou(handingout);
 
     for(INT8U i=0;i<group_num();i++) {
         if(_cards->can_kou(GetKind(i),handingout)) {
