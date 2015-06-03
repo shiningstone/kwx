@@ -1559,6 +1559,7 @@ void Alternatives::scan_kou(Card_t handingout) {
 void Alternatives::scan_gang(bool isNewDistributed) {
     int matchNum   = 0;
     int cardIdx[4] = {-1,-1,-1,-1};
+    
     CardStatus_t gangType = isNewDistributed?sAN_GANG:sMING_GANG;
     
     Init(aGANG);

@@ -272,7 +272,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
         if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
             
             if( !IsMing(dir) ) {
-                SetEffectCard(card,c_AN_GANG);
+                SetEffectCard(card,sAN_GANG);
             }
         
             _uiManager->GangEffect(dir,card,gangIdx);
@@ -704,7 +704,6 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 }
 
                 SetDecision(dir,aGANG);
-
                 _uiManager->_MingGangEffect(dir,whoGive,card);
             }
             break;
@@ -716,6 +715,8 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
             }
             break;
         case aHU:
+
+            
             break;
     }
 }
