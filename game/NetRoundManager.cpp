@@ -404,6 +404,8 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
     aAction.Set(aMING);
     _messenger->Send(aAction);
 
+    _isMingTime=true;
+        
     if(!isFromKouStatus) {
         _players[MIDDLE]->_cards->_alter->scan_kou();
         if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
@@ -412,8 +414,6 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
             _uiManager->QueryMingOutCard();
         }
     } else {
-        _isMingTime=true;
-        
         UpdateCards(MIDDLE,a_MING);
         _uiManager->QueryMingOutCard();
     }
@@ -506,15 +506,15 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     
     _actCtrl.choices = info->remind.actions;
     
-    if(info->remind.ming.choiceNum>0) {
-
-    }
-
-    delete info;
-
     _players[_curPlayer]->init(cards,14,aim[MIDDLE]);//玩家手牌初始�?
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
+
+    if(info->remind.ming.choiceNum>0) {
+        _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
+    }
+
+    delete info;
 
 	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
     _uiManager->start_timer(timer,MIDDLE);
@@ -569,7 +569,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _actCtrl.target  = info->kind;
     
     if(info->remind.ming.choiceNum>0) {
-
+        _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
     }
 
     delete info;
@@ -629,7 +629,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     _actCtrl.target  = info->kind;
     
     if(info->remind.ming.choiceNum>0) {
-
+        _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
     }
 
     delete info;
