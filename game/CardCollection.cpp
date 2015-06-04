@@ -1577,11 +1577,7 @@ void Alternatives::set_gang(ActionMask_t actions,const Card_t kinds[],int num) {
             } else if(actions & aMING_GANG) {
                 AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
             } else {
-                if(_cards->get_status(cardIdx[0])==sFREE) {
-                    AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-                } else {
-                    AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-                }
+                AddGroup(4,cardIdx,sSHOU_GANG,sGANG_ENABLE);
             }
         }
     }
@@ -1770,7 +1766,13 @@ Card_t Alternatives::get_activated_cards(int idx[],ActionId_t *action) const {
     }
 
     if(action!=NULL) {
-        *action = (_group[activated].ACTIVE_STATUS==sMING_GANG) ? aMING_GANG : aAN_GANG;
+        if(_group[activated].ACTIVE_STATUS==sAN_GANG) {
+            *action = aAN_GANG;
+        } else if(_group[activated].ACTIVE_STATUS==sMING_GANG) {
+            *action = aMING_GANG;
+        } else if(_group[activated].ACTIVE_STATUS==sSHOU_GANG){
+            *action = aSHOU_GANG;
+        }
     }
 
     return GetKind(activated);
