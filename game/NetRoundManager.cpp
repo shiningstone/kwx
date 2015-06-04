@@ -476,6 +476,12 @@ bool NetRoundManager::Wait(RequestId_t req) {
 /*************************************
         server requests handlers
 *************************************/
+void NetRoundManager::_loadRemindInfo(const Reminds_t &remind) {
+    _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,remind.gangCard,remind.gangKindNum);
+    _players[_curPlayer]->_cards->_alter->set_kou(remind.kouCard,remind.kouKindNum);
+    _players[_curPlayer]->_cards->set_ming_info(remind.ming);
+}
+
 void NetRoundManager::_DiRecv(GameStartResponse *info) {
     _players[MIDDLE]->_isReady = true;
     _uiManager->GuiShowReady(MIDDLE);
@@ -510,13 +516,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
-    if(info->remind.gangKindNum>0) {
-        _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,info->remind.gangCard,info->remind.gangKindNum);
-    }
-    
-    if(info->remind.ming.choiceNum>0) {
-        _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
-    }
+    _loadRemindInfo(info->remind);
 
     delete info;
 
@@ -572,13 +572,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
 
-    if(info->remind.gangKindNum>0) {
-        _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,info->remind.gangCard,info->remind.gangKindNum);
-    }
-    
-    if(info->remind.ming.choiceNum>0) {
-        _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
-    }
+    _loadRemindInfo(info->remind);
 
     delete info;
 
@@ -636,13 +630,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
     
-    if(info->remind.gangKindNum>0) {
-        _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,info->remind.gangCard,info->remind.gangKindNum);
-    }
-    
-    if(info->remind.ming.choiceNum>0) {
-        _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
-    }
+    _loadRemindInfo(info->remind);
 
     delete info;
 

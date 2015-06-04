@@ -59,6 +59,8 @@ public:
     bool        _permited;
     void Resume(DsInstruction *di);
     bool Wait(RequestId_t req);
+
+    void _loadRemindInfo(const Reminds_t &remind);
 /* networks end   */
 /******************/
 

@@ -1088,21 +1088,23 @@ bool CardInHand::collect_ming_info(const CardList *river) {
 }
 
 void CardInHand::set_ming_info(const MingInfo_t &ming) {
-    _ting = NULL;
-
-    _ming.choiceNum = ming.choiceNum;
-    _ming.handouts  = new MingChoice_t[18];
-
-    for(INT8U i=0;i<ming.choiceNum;i++) {
-        MingChoice_t  *src = ming.handouts + i;
-        MingChoice_t  *choice = _ming.handouts + i;
-
-        choice->kind = src->kind;
-        choice->ting.kindNum = src->ting.kindNum;
-        choice->ting.cards = new TingItem_t[9];
-
-        for(INT8U j=0;j<choice->ting.kindNum;j++) {
-            *(choice->ting.cards+j) = *(src->ting.cards+j);
+    if(ming.choiceNum>0) {
+        _ting = NULL;
+        
+        _ming.choiceNum = ming.choiceNum;
+        _ming.handouts  = new MingChoice_t[18];
+        
+        for(INT8U i=0;i<ming.choiceNum;i++) {
+            MingChoice_t  *src = ming.handouts + i;
+            MingChoice_t  *choice = _ming.handouts + i;
+        
+            choice->kind = src->kind;
+            choice->ting.kindNum = src->ting.kindNum;
+            choice->ting.cards = new TingItem_t[9];
+        
+            for(INT8U j=0;j<choice->ting.kindNum;j++) {
+                *(choice->ting.cards+j) = *(src->ting.cards+j);
+            }
         }
     }
 }
@@ -1533,24 +1535,14 @@ void Alternatives::Init(ActionId_t action) {
     _groupNum = 0;
 }
 
-void Alternatives::set_gang(ActionMask_t actions,Card_t kinds[],int num) {
-    Init(aGANG);
-
-    for(int i=0;i<num;i++) {
-		int cardIdx[4] = {0};
-
-        _cards->find_cards(kinds[i],cardIdx);
-
-        if(actions & aAN_GANG) {
-            AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-        } else if(actions & aMING_GANG) {
-            AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-        } else {
-            if(_cards->get_status(cardIdx[0])==sFREE) {
-                AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-            } else {
-                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-            }
+void Alternatives::set_kou(const Card_t kinds[],int num) {
+    if(num>0) {
+        Init(aKOU);
+        
+        for(int i=0;i<num;i++) {
+            int cardIdx[3] = {0};
+            _cards->find_cards(kinds[i],cardIdx);
+            AddGroup(3,cardIdx,sMING_KOU,sKOU_ENABLE);
         }
     }
 }
@@ -1566,6 +1558,30 @@ void Alternatives::scan_kou(Card_t handingout) {
             
             if(_cards->find_free_cards(cardIdx, kind)==3  && _cards->can_kou(kind,handingout)) {
                 AddGroup(3,cardIdx,sMING_KOU,sKOU_ENABLE);
+            }
+        }
+    }
+}
+
+void Alternatives::set_gang(ActionMask_t actions,const Card_t kinds[],int num) {
+    if(num>0) {
+        Init(aGANG);
+        
+        for(int i=0;i<num;i++) {
+            int cardIdx[4] = {0};
+        
+            _cards->find_cards(kinds[i],cardIdx);
+        
+            if(actions & aAN_GANG) {
+                AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+            } else if(actions & aMING_GANG) {
+                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            } else {
+                if(_cards->get_status(cardIdx[0])==sFREE) {
+                    AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+                } else {
+                    AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+                }
             }
         }
     }
