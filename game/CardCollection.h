@@ -165,6 +165,8 @@ class Alternatives {
 public:
     Alternatives(CardInHand *cards);
 
+    void set_gang(ActionMask_t actions,Card_t kinds[],int num=1);
+
     void scan_kou(Card_t reference = CARD_IGNORE);
     void scan_gang(bool isNewDistributed = true);
 

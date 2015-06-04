@@ -185,7 +185,7 @@ Card_t RoundManager::RecvGangConfirm(PlayerDir_t dir) {
 }
 
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
-    _players[dir]->_cards->_alter->scan_gang(_isNewDistributed);
+    _strategy->scan_gang(dir,_isNewDistributed);
     
     if(_players[dir]->_cards->_alter->group_num()>1 && dir==MIDDLE) {
         _uiManager->QueryGangCards();

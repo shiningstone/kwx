@@ -1533,6 +1533,28 @@ void Alternatives::Init(ActionId_t action) {
     _groupNum = 0;
 }
 
+void Alternatives::set_gang(ActionMask_t actions,Card_t kinds[],int num) {
+    Init(aGANG);
+
+    for(int i=0;i<num;i++) {
+		int cardIdx[4] = {0};
+
+        _cards->find_cards(kinds[i],cardIdx);
+
+        if(actions & aAN_GANG) {
+            AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+        } else if(actions & aMING_GANG) {
+            AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+        } else {
+            if(get_status(cardIdx[0])==sFREE) {
+                AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+            } else {
+                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            }
+        }
+    }
+}
+
 void Alternatives::scan_kou(Card_t handingout) {
     Init(aKOU);
     

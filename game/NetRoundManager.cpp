@@ -510,6 +510,10 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
+    if(info->remind.gangKindNum>0) {
+        _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,info->remind.gangCard,info->remind.gangKindNum);
+    }
+    
     if(info->remind.ming.choiceNum>0) {
         _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
     }
@@ -567,6 +571,10 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
+
+    if(info->remind.gangKindNum>0) {
+        _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,info->remind.gangCard,info->remind.gangKindNum);
+    }
     
     if(info->remind.ming.choiceNum>0) {
         _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);
@@ -627,6 +635,10 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
+    
+    if(info->remind.gangKindNum>0) {
+        _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,info->remind.gangCard,info->remind.gangKindNum);
+    }
     
     if(info->remind.ming.choiceNum>0) {
         _players[_curPlayer]->_cards->set_ming_info(info->remind.ming);

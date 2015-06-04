@@ -11,6 +11,7 @@ public:
 
     virtual void load_profiles(UserProfile_t profiles[PLAYER_NUM]);
     virtual void load_card_sequence(Card_t cards[TOTAL_CARD_NUM]);
+    virtual void scan_gang(PlayerDir_t dir,bool isNewDistributed);
 
     StrategyLocalRM(RoundManager *rm);
     ~StrategyLocalRM();
@@ -37,6 +38,7 @@ public:
 
     virtual void load_profiles(UserProfile_t profiles[PLAYER_NUM]);
     virtual void load_card_sequence(Card_t cards[TOTAL_CARD_NUM]);
+    virtual void scan_gang(PlayerDir_t dir,bool isNewDistributed);
 
     StrategyNetworkRM(RoundManager *rm);
     ~StrategyNetworkRM();

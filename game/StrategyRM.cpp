@@ -57,6 +57,9 @@ void StrategyLocalRM::load_card_sequence(Card_t cards[TOTAL_CARD_NUM]) {
     }
 }
 
+void StrategyLocalRM::scan_gang(PlayerDir_t dir,bool isNewDistributed) {
+    _rm->_players[dir]->_cards->_alter->scan_gang(isNewDistributed);
+}
 /*************************************
         network strategy
 *************************************/
@@ -79,6 +82,9 @@ void StrategyNetworkRM::load_card_sequence(Card_t cards[TOTAL_CARD_NUM]) {
     for(int i=0;i<TOTAL_CARD_NUM;i++) {
         cards[i] = CARD_UNKNOWN;
     }
+}
+
+void StrategyNetworkRM::scan_gang(PlayerDir_t dir,bool isNewDistributed) {
 }
 
 /*************************************
