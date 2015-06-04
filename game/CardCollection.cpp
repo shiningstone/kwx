@@ -1089,8 +1089,10 @@ bool CardInHand::scan_ming(const CardList *river) {
 
 void CardInHand::load_ming_info(const MingInfo_t &ming) {
     if(ming.choiceNum>0) {
-        _ting = NULL;
+        _mingChoicesMask = 0;
         
+        _ting = NULL;
+
         _ming.choiceNum = ming.choiceNum;
         _ming.handouts  = new MingChoice_t[18];
         
@@ -1104,6 +1106,12 @@ void CardInHand::load_ming_info(const MingInfo_t &ming) {
         
             for(INT8U j=0;j<choice->ting.kindNum;j++) {
                 *(choice->ting.cards+j) = *(src->ting.cards+j);
+            }
+
+            int idx[4] = {0};
+            int num = find_cards(src->kind,idx);
+            for(INT8U j=0;j<num;j++) {
+                _mingChoicesMask |= 1<<idx[j];
             }
         }
     }

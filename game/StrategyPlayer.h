@@ -43,6 +43,7 @@ public:
 
     virtual void scan_gang(bool isNewDistributed);
     virtual bool scan_ming(const CardList *river = NULL);
+    virtual void scan_kou(Card_t handingout = CARD_IGNORE);
 
 protected:
     Player            *_employer;

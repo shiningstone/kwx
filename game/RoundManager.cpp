@@ -267,7 +267,7 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 
     if(_curPlayer==MIDDLE) {
         if(!isFromKouStatus) {
-            _players[MIDDLE]->_cards->_alter->scan_kou();
+            _players[MIDDLE]->_strategy->scan_kou();
 
             if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
                 _uiManager->QueryKouCards();

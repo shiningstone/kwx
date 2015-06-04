@@ -407,10 +407,12 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _isMingTime=true;
         
     if(!isFromKouStatus) {
-        _players[MIDDLE]->_cards->_alter->scan_kou();
+        _players[MIDDLE]->_strategy->scan_kou();
+        
         if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
             _uiManager->QueryKouCards();
         } else {
+            UpdateCards(MIDDLE,a_MING);
             _uiManager->QueryMingOutCard();
         }
     } else {
@@ -477,7 +479,7 @@ bool NetRoundManager::Wait(RequestId_t req) {
         server requests handlers
 *************************************/
 void NetRoundManager::_loadRemindInfo(const Reminds_t &remind) {
-    _players[_curPlayer]->_cards->_alter->load_gang_info(_actCtrl.choices,remind.gangCard,remind.gangKindNum);
+    //_players[_curPlayer]->_cards->_alter->load_gang_info(_actCtrl.choices,remind.gangCard,remind.gangKindNum);
     _players[_curPlayer]->_cards->_alter->load_kou_info(remind.kouCard,remind.kouKindNum);
     _players[_curPlayer]->_cards->load_ming_info(remind.ming);
 }

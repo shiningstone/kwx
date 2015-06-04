@@ -72,12 +72,6 @@ void StrategyPlayer::check_task(unsigned int flag) {
     }
 }
 
-void StrategyPlayer::scan_gang(bool isNewDistributed) {
-    if(_rm->_MODE==LOCAL_GAME) {
-        _employer->_cards->_alter->scan_gang(isNewDistributed);
-    }
-}
-
 bool StrategyPlayer::scan_ming(const CardList *river) {
     if(_rm->_MODE==LOCAL_GAME) {
         return _employer->_cards->scan_ming(river);
@@ -86,6 +80,19 @@ bool StrategyPlayer::scan_ming(const CardList *river) {
     }
 }
 
+void StrategyPlayer::scan_gang(bool isNewDistributed) {
+    if(_rm->_MODE==LOCAL_GAME) {
+        _employer->_cards->_alter->scan_gang(isNewDistributed);
+    }
+}
+
+void StrategyPlayer::scan_kou(Card_t handingout) {
+    if(_rm->_MODE==LOCAL_GAME) {
+        _employer->_cards->_alter->scan_kou(handingout);
+    } else {
+
+    }
+}
 /******************************************************************
     选择要出的牌                       
 ******************************************************************/
