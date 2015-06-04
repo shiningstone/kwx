@@ -371,7 +371,7 @@ void NetRoundManager::RecvKouConfirm() {
     }   
     
     UpdateCards(MIDDLE,a_KOU);
-    cards->collect_ming_info(_gRiver);
+    cards->scan_ming(_gRiver);
 
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->_alter->get_activated_kinds(kinds);
@@ -398,7 +398,7 @@ void NetRoundManager::RecvMingCancel() {
 
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _actCtrl.decision = aMING;
-    _players[MIDDLE]->_cards->collect_ming_info(_gRiver);
+    _players[MIDDLE]->_cards->scan_ming(_gRiver);
     
     RequestSendAction aAction;
     aAction.Set(aMING);
@@ -477,9 +477,9 @@ bool NetRoundManager::Wait(RequestId_t req) {
         server requests handlers
 *************************************/
 void NetRoundManager::_loadRemindInfo(const Reminds_t &remind) {
-    _players[_curPlayer]->_cards->_alter->set_gang(_actCtrl.choices,remind.gangCard,remind.gangKindNum);
-    _players[_curPlayer]->_cards->_alter->set_kou(remind.kouCard,remind.kouKindNum);
-    _players[_curPlayer]->_cards->set_ming_info(remind.ming);
+    _players[_curPlayer]->_cards->_alter->load_gang_info(_actCtrl.choices,remind.gangCard,remind.gangKindNum);
+    _players[_curPlayer]->_cards->_alter->load_kou_info(remind.kouCard,remind.kouKindNum);
+    _players[_curPlayer]->_cards->load_ming_info(remind.ming);
 }
 
 void NetRoundManager::_DiRecv(GameStartResponse *info) {

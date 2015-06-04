@@ -138,8 +138,8 @@ public:
     int  CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList *river);
     bool CollectTingInfo(int position,TingInfo_t &ting,const CardList *river);
 
-    bool collect_ming_info(const CardList *river = NULL/*if don't care about remain number*/);
-    void set_ming_info(const MingInfo_t &info);/* for MIDDLE only*/
+    bool scan_ming(const CardList *river = NULL/*if don't care about remain number*/);
+    void load_ming_info(const MingInfo_t &info);/* for MIDDLE only*/
     void set_ting_info(const TingInfo_t &ting);/*for others only*/
     void update_ting_num(const CardList *river);
 
@@ -166,8 +166,8 @@ public:
     Alternatives(CardInHand *cards);
 
     /* set directly by server */
-    void set_gang(ActionMask_t actions,const Card_t kinds[],int num);
-    void set_kou(const Card_t kinds[],int num);
+    void load_gang_info(ActionMask_t actions,const Card_t kinds[],int num);
+    void load_kou_info(const Card_t kinds[],int num);
     /* find locally */
     void scan_kou(Card_t reference = CARD_IGNORE);
     void scan_gang(bool isNewDistributed = true);

@@ -185,7 +185,7 @@ Card_t RoundManager::RecvGangConfirm(PlayerDir_t dir) {
 }
 
 Card_t RoundManager::RecvGang(PlayerDir_t dir) {
-    _strategy->scan_gang(dir,_isNewDistributed);
+    _players[dir]->_strategy->scan_gang();
     
     if(_players[dir]->_cards->_alter->group_num()>1 && dir==MIDDLE) {
         _uiManager->QueryGangCards();
@@ -241,7 +241,7 @@ void RoundManager::RecvKouConfirm() {
     }   
     
     UpdateCards(MIDDLE,a_KOU);
-    cards->collect_ming_info(_gRiver);
+    cards->scan_ming(_gRiver);
 
     _uiManager->KouConfirmEffect();
 }
@@ -262,7 +262,7 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 	_actCtrl.decision = aMING;
 
     if(!isFromKouStatus) {
-        _players[_curPlayer]->_cards->collect_ming_info(_gRiver);
+        _players[_curPlayer]->_cards->scan_ming(_gRiver);
     }
 
     if(_curPlayer==MIDDLE) {

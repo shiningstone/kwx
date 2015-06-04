@@ -72,6 +72,12 @@ void StrategyPlayer::check_task(unsigned int flag) {
     }
 }
 
+void StrategyPlayer::scan_gang() {
+    if(_rm->_MODE==LOCAL_GAME) {
+        _employer->_cards->_alter->scan_gang(_rm->_isNewDistributed);
+    }
+}
+
 /******************************************************************
     选择要出的牌                       
 ******************************************************************/
@@ -99,7 +105,7 @@ int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
     Card_t target = CARD_UNKNOWN;
     int    minum  = 0;
 
-    if(_employer->_cards->collect_ming_info(_chooseCtx.river)) {
+    if(_employer->_cards->scan_ming(_chooseCtx.river)) {
         for(int i=0;i<_employer->_cards->_ming.choiceNum;i++) {
             MingChoice_t  *choice = _employer->_cards->_ming.handouts+i;
 

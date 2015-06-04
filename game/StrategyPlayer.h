@@ -41,6 +41,8 @@ public:
     void check_task(unsigned int flag);
     int  choose_card(ActionId_t &ming,bool &canKou);
 
+    virtual void scan_gang();
+
 protected:
     Player            *_employer;
     RoundManager      *_rm;

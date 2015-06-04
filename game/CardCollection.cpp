@@ -1051,7 +1051,7 @@ bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *r
     return (ting.kindNum>0);
 }
 
-bool CardInHand::collect_ming_info(const CardList *river) {
+bool CardInHand::scan_ming(const CardList *river) {
     if(IsMing) {
         return true;
     } else {
@@ -1087,7 +1087,7 @@ bool CardInHand::collect_ming_info(const CardList *river) {
     }
 }
 
-void CardInHand::set_ming_info(const MingInfo_t &ming) {
+void CardInHand::load_ming_info(const MingInfo_t &ming) {
     if(ming.choiceNum>0) {
         _ting = NULL;
         
@@ -1129,7 +1129,7 @@ bool CardInHand::can_handout(int idx) const {
 }
 
 void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) {
-    collect_ming_info();
+    scan_ming();
     
     if(_ting!=NULL) {
 	    *len = _ting->kindNum;
@@ -1535,7 +1535,7 @@ void Alternatives::Init(ActionId_t action) {
     _groupNum = 0;
 }
 
-void Alternatives::set_kou(const Card_t kinds[],int num) {
+void Alternatives::load_kou_info(const Card_t kinds[],int num) {
     if(num>0) {
         Init(aKOU);
         
@@ -1563,7 +1563,7 @@ void Alternatives::scan_kou(Card_t handingout) {
     }
 }
 
-void Alternatives::set_gang(ActionMask_t actions,const Card_t kinds[],int num) {
+void Alternatives::load_gang_info(ActionMask_t actions,const Card_t kinds[],int num) {
     if(num>0) {
         Init(aGANG);
         

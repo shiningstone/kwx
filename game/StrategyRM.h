@@ -13,7 +13,6 @@ public:
 
     virtual void load_profiles(UserProfile_t profile[PLAYER_NUM]) = 0;
     virtual void load_card_sequence(Card_t cards[84]) = 0;
-    virtual void scan_gang(PlayerDir_t dir,bool isNewDistributed) = 0;
 
     void get_ending_gold(int gold[PLAYER_NUM]);
 /***************************************

@@ -80,7 +80,7 @@ ActionMask_t Player::judge_action_again() {
         res |= aSHOU_GANG;
     }
 
-	if( _cards->collect_ming_info() ) {
+	if( _cards->scan_ming() ) {
 		res |= aMING;
     }
 
@@ -100,7 +100,7 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,
 
 	if(isNewDistributed) {
 		if(!_cards->IsMing && !isLastOne) {
-			if(_cards->collect_ming_info())
+			if(_cards->scan_ming())
 				actions |= aMING;
 		}
 	}
