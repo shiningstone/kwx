@@ -478,11 +478,26 @@ bool NetRoundManager::Wait(RequestId_t req) {
 /*************************************
         server requests handlers
 *************************************/
+void NetRoundManager::_order_small_to_big(Card_t kinds[],int num) {
+    for(int i=0;i<num-1;i++) {
+        for(int j=i+1;j<num;j++) {
+            if(kinds[i]>kinds[j]) {
+                Card_t temp = kinds[i];
+                kinds[i] = kinds[j];
+                kinds[j] = temp;
+            }
+        }
+    }
+}
+
 void NetRoundManager::_restoreRemindInfo(const Reminds_t &remind) {
     _serverReminds = remind;
+
+    _order_small_to_big(_serverReminds.kouCard,_serverReminds.kouKindNum);
+    _order_small_to_big(_serverReminds.gangCard,_serverReminds.gangKindNum);
     
-    _players[_curPlayer]->_cards->_alter->load_gang_info(remind.actions,remind.gangCard,remind.gangKindNum);
     _players[_curPlayer]->_cards->_alter->load_kou_info(remind.kouCard,remind.kouKindNum);
+    _players[_curPlayer]->_cards->_alter->load_gang_info(remind.actions,remind.gangCard,remind.gangKindNum);
     _players[_curPlayer]->_cards->load_ming_info(remind.ming);
 }
 

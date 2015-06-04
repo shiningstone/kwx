@@ -62,6 +62,7 @@ public:
     bool Wait(RequestId_t req);
 
     Reminds_t  _serverReminds;
+    void _order_small_to_big(Card_t kinds[],int num);
     void _restoreRemindInfo(const Reminds_t &remind);
 /* networks end   */
 /******************/
