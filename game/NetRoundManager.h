@@ -18,6 +18,7 @@ class KwxMessenger;
 
 class NetRoundManager : public RoundManager, public MsgHandle {
     friend class RaceLayer;
+    friend class StrategyPlayer;
 public:
     static RoundManager *getInstance();
     static void  destroyInstance();
@@ -60,7 +61,8 @@ public:
     void Resume(DsInstruction *di);
     bool Wait(RequestId_t req);
 
-    void _loadRemindInfo(const Reminds_t &remind);
+    Reminds_t  _serverReminds;
+    void _restoreRemindInfo(const Reminds_t &remind);
 /* networks end   */
 /******************/
 

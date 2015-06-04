@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "StrategyPlayer.h"
 #include "RoundManager.h"
+#include "NetRoundManager.h"
 
 #define RETURN_IF_VALID(x) do { \
     int chosen = x;             \
@@ -83,6 +84,9 @@ bool StrategyPlayer::scan_ming(const CardList *river) {
 void StrategyPlayer::scan_gang(bool isNewDistributed) {
     if(_rm->_MODE==LOCAL_GAME) {
         _employer->_cards->_alter->scan_gang(isNewDistributed);
+    } else {
+        Reminds_t &remind = static_cast<NetRoundManager *>(_rm)->_serverReminds;
+        _employer->_cards->_alter->load_gang_info(remind.actions,remind.gangCard,remind.gangKindNum);
     }
 }
 
@@ -90,7 +94,8 @@ void StrategyPlayer::scan_kou(Card_t handingout) {
     if(_rm->_MODE==LOCAL_GAME) {
         _employer->_cards->_alter->scan_kou(handingout);
     } else {
-
+        Reminds_t &remind = static_cast<NetRoundManager *>(_rm)->_serverReminds;
+        _employer->_cards->_alter->load_kou_info(remind.kouCard,remind.kouKindNum);
     }
 }
 /******************************************************************

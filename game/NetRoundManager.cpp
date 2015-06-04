@@ -478,8 +478,10 @@ bool NetRoundManager::Wait(RequestId_t req) {
 /*************************************
         server requests handlers
 *************************************/
-void NetRoundManager::_loadRemindInfo(const Reminds_t &remind) {
-    //_players[_curPlayer]->_cards->_alter->load_gang_info(_actCtrl.choices,remind.gangCard,remind.gangKindNum);
+void NetRoundManager::_restoreRemindInfo(const Reminds_t &remind) {
+    _serverReminds = remind;
+    
+    _players[_curPlayer]->_cards->_alter->load_gang_info(remind.actions,remind.gangCard,remind.gangKindNum);
     _players[_curPlayer]->_cards->_alter->load_kou_info(remind.kouCard,remind.kouKindNum);
     _players[_curPlayer]->_cards->load_ming_info(remind.ming);
 }
@@ -518,7 +520,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     _players[(_curPlayer+1)%3]->init(&(_unDistributedCards[14]),13,aim[(MIDDLE+1)%3]);
     _players[(_curPlayer+2)%3]->init(&(_unDistributedCards[27]),13,aim[(MIDDLE+2)%3]);
 
-    _loadRemindInfo(info->remind);
+    _restoreRemindInfo(info->remind);
 
     delete info;
 
@@ -574,7 +576,7 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
 
-    _loadRemindInfo(info->remind);
+    _restoreRemindInfo(info->remind);
 
     delete info;
 
@@ -632,7 +634,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     _actCtrl.choices = info->remind.actions;
     _actCtrl.target  = info->kind;
     
-    _loadRemindInfo(info->remind);
+    _restoreRemindInfo(info->remind);
 
     delete info;
 
