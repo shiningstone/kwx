@@ -1597,71 +1597,43 @@ void Alternatives::set_gang(ActionMask_t actions,const Card_t kinds[],int num) {
 void Alternatives::scan_gang(bool isNewDistributed) {
     Init(aGANG);
     
+	auto lastKind = _cards->get_kind(_cards->last());
+
     int matchNum   = 0;
     int cardIdx[4] = {-1,-1,-1,-1};
-	auto lastKind=_cards->get_kind(_cards->size()-1);
-	if(isNewDistributed)
-	{
-		if(_cards->IsMing){
-			for(INT8U i=0; i<_cards->FreeStart; i++) {
-				matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-				auto curKind=_cards->get_kind(i);
-				if(matchNum==3&&curKind==lastKind)
-				{
-					cardIdx[4]=_cards->size()-1;
-					if(_cards->get_status(i)==sPENG)
-						AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-					else if(_cards->get_status(i)==sMING_KOU)
-						AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-					break;
-				}
-			}
-		}
-		else
-		{
-			for(INT8U i=0; i<_cards->FreeStart; i++) {
-				int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-				auto curKind=_cards->get_kind(i);
-				if(matchNum==3&&lastKind==curKind) 
-				{
-					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-					break;
-				}
-			}
+    
+    if(_cards->find_cards(lastKind,cardIdx)==4) {
+        CardStatus_t orig = _cards->get_status(cardIdx[0]);
 
-			for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
-				matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-				if(matchNum==4)
-					AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
-			}
-		}
-	}
-	else
-	{
-		if(_cards->IsMing){
-			for(INT8U i=0; i<_cards->FreeStart; i++) {
-				matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-				auto curKind=_cards->get_kind(i);
-				if(matchNum==3&&curKind==lastKind)//&&_cards->get_status(i)==sMING_KOU)
-				{
-					cardIdx[4]=_cards->size()-1;
-					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-					break;
-				}
-			}
-		}
-		else
-		{
-			for(INT8U i=_cards->FreeStart; i<_cards->size(); i++) {
-				int matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-				auto curKind=_cards->get_kind(i);
-				if(matchNum==4&&lastKind==curKind) {
-					AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
-					break;
-				}
-			}
-		}
-	}
+        if(isNewDistributed) {
+            if(orig==sPENG) {
+                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            } else if(_cards->IsMing && orig==sMING_KOU){
+                AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+            } else {
+                AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
+            }
+        } else {
+            if(orig==sFREE) {
+                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+            }
+        }
+    } else {
+        for(int i=0;i<_cards->last();i++) {
+            matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
+        
+            if(matchNum==4) {
+                CardStatus_t orig = _cards->get_status(cardIdx[0]);
+                
+                if(isNewDistributed) {
+                    if(orig==sPENG)
+                        AddGroup(4,cardIdx,sMING_GANG|sSHOU_GANG,sGANG_ENABLE);
+                    else
+                        AddGroup(4,cardIdx,sAN_GANG|sSHOU_GANG,sGANG_ENABLE);
+                }
+            }
+        }
+    }
 }
 
 bool Alternatives::is_activated(int gIdx) const {
