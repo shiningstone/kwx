@@ -72,9 +72,17 @@ void StrategyPlayer::check_task(unsigned int flag) {
     }
 }
 
-void StrategyPlayer::scan_gang() {
+void StrategyPlayer::scan_gang(bool isNewDistributed) {
     if(_rm->_MODE==LOCAL_GAME) {
-        _employer->_cards->_alter->scan_gang(_rm->_isNewDistributed);
+        _employer->_cards->_alter->scan_gang(isNewDistributed);
+    }
+}
+
+bool StrategyPlayer::scan_ming(const CardList *river) {
+    if(_rm->_MODE==LOCAL_GAME) {
+        return _employer->_cards->scan_ming(river);
+    } else {
+        return (_employer->_cards->_ming.choiceNum>0);
     }
 }
 
@@ -105,7 +113,7 @@ int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
     Card_t target = CARD_UNKNOWN;
     int    minum  = 0;
 
-    if(_employer->_cards->scan_ming(_chooseCtx.river)) {
+    if(_employer->_strategy->scan_ming(_chooseCtx.river)) {
         for(int i=0;i<_employer->_cards->_ming.choiceNum;i++) {
             MingChoice_t  *choice = _employer->_cards->_ming.handouts+i;
 

@@ -41,7 +41,8 @@ public:
     void check_task(unsigned int flag);
     int  choose_card(ActionId_t &ming,bool &canKou);
 
-    virtual void scan_gang();
+    virtual void scan_gang(bool isNewDistributed);
+    virtual bool scan_ming(const CardList *river = NULL);
 
 protected:
     Player            *_employer;

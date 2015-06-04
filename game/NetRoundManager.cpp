@@ -371,7 +371,7 @@ void NetRoundManager::RecvKouConfirm() {
     }   
     
     UpdateCards(MIDDLE,a_KOU);
-    cards->scan_ming(_gRiver);
+    _players[MIDDLE]->_strategy->scan_ming(_gRiver);
 
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->_alter->get_activated_kinds(kinds);
@@ -398,7 +398,7 @@ void NetRoundManager::RecvMingCancel() {
 
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _actCtrl.decision = aMING;
-    _players[MIDDLE]->_cards->scan_ming(_gRiver);
+    _players[MIDDLE]->_strategy->scan_ming();
     
     RequestSendAction aAction;
     aAction.Set(aMING);
