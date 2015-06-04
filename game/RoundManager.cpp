@@ -159,7 +159,7 @@ Card_t RoundManager::RecvGangConfirm(PlayerDir_t dir) {
     if(_actCtrl.decision==aAN_GANG || _actCtrl.decision==aSHOU_GANG) {
         
         if( !IsMing(dir) ) {
-            SetEffectCard(card,c_AN_GANG);
+            SetEffectCard(card,sAN_GANG);
         }
 
         _uiManager->GangEffect(dir,card,gangIdx);
@@ -236,7 +236,7 @@ void RoundManager::RecvKouConfirm() {
     CardInHand *cards = _players[MIDDLE]->_cards;
 
     for(int i=cards->FreeStart;i<cards->size();i++) {
-        if(cards->get_status(i)==c_KOU_ENABLE)
+        if(cards->get_status(i)==sKOU_ENABLE)
             cards->set_status(i,sFREE);
     }   
     

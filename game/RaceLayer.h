@@ -93,6 +93,7 @@ private:
     void ListenToDoubleHu();
     LabelAtlas * _CreateNumberSign(int number);
     Sprite* _GetCardOnTingSignBar(PlayerDir_t dir,int cardIdx);
+    CardStatus_t _GetAppearance(const CardList *cards,int idx);
     Sprite *_CreateCardInHand(PlayerDir_t dir,int idx,CardList *cards,bool isTing,const Vec2 &refer);
     float _YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTing,float refY);
 

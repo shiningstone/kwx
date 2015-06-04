@@ -313,7 +313,8 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 			}
 			else if(dir==MIDDLE)
 			{
-			    CardStatus_t status = cards->get_status(i);
+			    CardStatus_t status     = _GetAppearance(cards,i);
+			    CardStatus_t statusNext = _GetAppearance(cards,i+1);
                 
 				if(status==sFREE||status==sMING_KOU||status==sGANG_ENABLE||status==sKOU_ENABLE)
 				{
@@ -322,11 +323,11 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 					else
 						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)dir,x,y);
 				}
-				else if(cards->get_status(i)==c_PENG||cards->get_status(i)&c_MING_GANG)
+				else if(status==sPENG||status==sMING_GANG)
 				{
 					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)dir,x,y);
 				}
-				else if(cards->get_status(i)&c_AN_GANG)
+				else if(status==sAN_GANG)
 				{
 					if(cards->get_idx_in_group(i)==3)
 						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)dir,x,y);
@@ -380,7 +381,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
                     
 					x+=p_list[i]->getTextureRect().size.width*1.0;
 				}
-				else if(cards->get_status(i)==c_MING_KOU)
+				else if(status==sMING_KOU)
 				{
 					if(!isMing)
 					{
@@ -401,21 +402,21 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
                         x += p_list[i]->getTextureRect().size.width*1;
 					}
 				}
-				else if(cards->get_status(i)==c_PENG)
+				else if(status==sPENG)
 				{
 					auto s_card=_object->CreateKind(cards->get_kind(i),MIDDLE_SIZE);
 					s_card->setAnchorPoint(Vec2(0.5,0.5));
 					s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 					p_list[i]->addChild(s_card,1);
-                    
-					if(cards->get_status(i+1)==c_FREE)
+
+					if(statusNext==sFREE)
 						x += p_list[i]->getTextureRect().size.width*2;
-					else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)))
+					else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(statusNext!=sFREE))
 						x += p_list[i]->getTextureRect().size.width*1.5;
 					else
 						x += p_list[i]->getTextureRect().size.width*1.0;
 				}
-				else if(cards->get_status(i)&sMING_GANG)
+				else if(status==sMING_GANG)
 				{
 					auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),MIDDLE_SIZE);
 					s_card->setAnchorPoint(Vec2(0.5,0.5));
@@ -433,15 +434,15 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 						y-=17;
 					}
 					else {
-						if(cards->get_status(i+1)==c_FREE)
+						if(statusNext==sFREE)
 							x += p_list[i]->getTextureRect().size.width*2;
-						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)!=c_FREE))
+						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(statusNext!=sFREE))
 							x += p_list[i]->getTextureRect().size.width*1.5;
 						else
 							x += p_list[i]->getTextureRect().size.width*1.0;
 					}
 				}
-				else if(cards->get_status(i)&sAN_GANG)
+				else if(status==sAN_GANG)
 				{
                     int idxInGroup = cards->get_idx_in_group(i);
 
@@ -458,9 +459,9 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 						y-=17;
 					}
 					else {
-						if(cards->get_status(i+1)==c_FREE)
+						if(statusNext==sFREE)
 							x += p_list[i]->getTextureRect().size.width*2;
-						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)!=c_FREE))
+						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(statusNext!=sFREE))
 							x += p_list[i]->getTextureRect().size.width*1.5;
 						else
 							x += p_list[i]->getTextureRect().size.width*1.0;
@@ -2714,7 +2715,7 @@ void RaceLayer::_PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card) {
 			}
 		}
         
-        _roundManager->SetEffectCard(card,c_PENG);
+        _roundManager->SetEffectCard(card,sPENG);
         
 		ifEffectTime=true;
 		ifUpdateDuringEffect=true;
@@ -3121,7 +3122,7 @@ void RaceLayer::_AnGangEffect(PlayerDir_t dir,Card_t card,int gang[])
         **********************/
         int actionStartPlace=0;
 		for(int i=0;i<=cards->FreeStart;i++)
-			if(cards->get_status(i)==c_MING_KOU || cards->get_status(i)==c_FREE) {
+			if(cards->get_status(i)==sMING_KOU || cards->get_status(i)==sFREE) {
 				actionStartPlace = i;
 				break;
 			}
@@ -3402,7 +3403,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 			}
 		}
 
-        _roundManager->SetEffectCard(card,c_MING_GANG);
+        _roundManager->SetEffectCard(card,sMING_GANG);
 		ifEffectTime=true;
 		ifUpdateDuringEffect=true;
 
@@ -3606,7 +3607,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
         **********************/
 		int actionStartPlace=0;
 		for(int a=0;a<=cards->FreeStart;a++)
-			if(cards->get_status(a)==c_MING_KOU||cards->get_status(a)==c_FREE)
+			if(cards->get_status(a)==sMING_KOU||cards->get_status(a)==sFREE)
 			{
 				actionStartPlace=a;
 				break;
@@ -3889,10 +3890,24 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
             cards
 ********************************************************/
 /* this function is only for others */
+CardStatus_t RaceLayer::_GetAppearance(const CardList *cards,int idx) {
+    CardStatus_t status = cards->get_status(idx);
+
+    if(status&sAN_GANG) {
+        return sAN_GANG;
+    } else if(status&sMING_GANG) {
+        return sMING_GANG;
+    } else if(status==sKOU_ENABLE || status==sGANG_ENABLE)
+        return sFREE;
+    else {
+        return status;
+    }
+}
+
 Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
                                         CardList *cards,bool isTing,const Vec2 &refer) {
-    switch( cards->get_status(idx) ) {
-        case c_FREE:
+    switch( _GetAppearance(cards,idx) ) {
+        case sFREE:
             {
                 Sprite *card;
                 
@@ -3909,15 +3924,15 @@ Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
 
                 return card;
             }
-        case c_AN_GANG:
+        case sAN_GANG:
             if(cards->get_idx_in_group(idx)==3 && !isTing&&_roundManager->IsMing(MIDDLE))
                 return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
             else
                 return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
-        case c_MING_KOU:
+        case sMING_KOU:
             return _object->Create(LR_AN_GANG_CARD,dir,refer.x,refer.y);
-        case c_PENG:
-        case c_MING_GANG:
+        case sPENG:
+        case sMING_GANG:
             return _object->Create(LR_OUT_CARD,dir,refer.x,refer.y);
     }
 }
@@ -3925,34 +3940,37 @@ Sprite *RaceLayer::_CreateCardInHand(PlayerDir_t dir,int idx,
 float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTing,float refY) {//更新手牌
     float up = (dir==LEFT)?(-1):1;
     float groupGap = (dir==LEFT)?0.4:0.8;
+
+    CardStatus_t status     = _GetAppearance(cards,idx);
+    CardStatus_t statusNext = _GetAppearance(cards,idx+1);
     
-    switch(cards->get_status(idx)) {
-        case c_FREE:
+    switch(status) {
+        case sFREE:
             if(isTing||_roundManager->IsMing(MIDDLE)) {
                 return up*(refY*0.65);
             } else {
                 return up*(refY*0.5);
             }
-        case c_MING_KOU:
+        case sMING_KOU:
             return up*(refY*0.65);
-        case c_PENG:
+        case sPENG:
             if(isTing||_roundManager->IsMing(MIDDLE)) {
-                if(cards->get_status(idx+1)==c_FREE||cards->get_status(idx+1)==c_MING_KOU)
+                if(statusNext==sFREE||statusNext==sMING_KOU)
                     return up*refY;
                 else if(cards->get_kind(idx+1)!=cards->get_kind(idx))
                     return up*(refY*0.65+5);
                 else 
                     return up*(refY*0.65);
             } else {
-                if(cards->get_status(idx+1)==c_FREE)
+                if(statusNext==sFREE)
                     return up*(refY*groupGap);
                 else if(cards->get_kind(idx+1)!=cards->get_kind(idx))
                     return up*(refY*0.65+5);
                 else
                     return up*(refY*0.65);
             }
-        case c_MING_GANG:
-        case c_AN_GANG:
+        case sMING_GANG:
+        case sAN_GANG:
             int groupIdx = cards->get_idx_in_group(idx);
 
             if( (dir==LEFT&&groupIdx==1) || (dir==RIGHT&&groupIdx==3)) {
@@ -3963,12 +3981,12 @@ float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTin
                 return up*(refY*0.65+13);
             } else {
                 if(_roundManager->IsMing(MIDDLE)||isTing==1) {
-                    if(cards->get_status(idx+1)==c_FREE||cards->get_status(idx+1)==c_MING_KOU)
+                    if(statusNext==sFREE||statusNext==sMING_KOU)
                         return up*refY;
                     else
                         return up*(refY*0.65+5);
                 } else {
-                    if(cards->get_status(idx+1)==c_FREE)
+                    if(statusNext==sFREE)
                         return up*(refY*groupGap);
                     else
                         return up*(refY*0.65+5);
@@ -4893,14 +4911,16 @@ void RaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *pa
 		s_card->setPosition(Vec2(show_card_list[i]->getTextureRect().size.width/2,show_card_list[i]->getTextureRect().size.height*0.6));
 		show_card_list[i]->addChild(s_card,1);
 
+        CardStatus_t status     = _GetAppearance(cards,i);
+        CardStatus_t statusNext = _GetAppearance(cards,i+1);
         
-		if(cards->get_status(i)==c_PENG||cards->get_status(i)==c_MING_KOU)
+		if(status==sPENG||status==sMING_KOU)
 		{
 			if(cards->get_kind(i)!=cards->get_kind(i+1))
 			{
 				x+=show_card_list[i]->getTextureRect().size.width*1.1;
 			}
-			else if(cards->get_kind(i)==cards->get_kind(i+1) && cards->get_status(i+1)==c_FREE)
+			else if(cards->get_kind(i)==cards->get_kind(i+1) && statusNext==sFREE)
 			{
 				x+=show_card_list[i]->getTextureRect().size.width*1.1;
 			}
@@ -4909,7 +4929,7 @@ void RaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *pa
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 			}
 		}
-		else if(cards->get_status(i)==c_MING_GANG||cards->get_status(i)==c_AN_GANG)
+		else if(status==sMING_GANG||status==sAN_GANG)
 		{
 			if(cards->get_kind(i)!=cards->get_kind(i+1))
 			{
@@ -4920,7 +4940,7 @@ void RaceLayer::_ExposeCards(PlayerDir_t dir,const WinInfo_t &win,LayerColor *pa
 				x+=show_card_list[i]->getTextureRect().size.width*0.95;
 			}
 		}
-		else if(cards->get_status(i)==c_FREE)
+		else if(status==sFREE)
 		{
 			//if( win.kind==SINGLE_WIN && win.winner==dir && win.giver==dir && i==(cards->size()-2) )
 			if(((win.kind==SINGLE_WIN&&win.winner==dir)||(win.kind==DOUBLE_WIN&&win.winner!=dir))&&i==(cards->size()-2))
@@ -5689,13 +5709,17 @@ void  RaceLayer::showall()
 		}
 		x=_layout->_playerPosi[no].basePoint.x+10; 
 		y=_layout->_playerPosi[no].basePoint.y+10;
+        
 		for(int i=0;i<cards->size();i++)
 		{
+            CardStatus_t status     = _GetAppearance(cards,i);
+            CardStatus_t statusNext = _GetAppearance(cards,i+1);
+        
 			if(cards->get_kind(i)!=ck_NOT_DEFINED )
 			{
 				if(no==0)
 				{
-					if(cards->get_status(i)==c_AN_GANG)
+					if(status==sAN_GANG)
 					{
 						if(cards->get_kind(i)==cards->get_kind(i+1)&&cards->get_kind(i)!=cards->get_kind(i+2))
 						{
@@ -5726,16 +5750,16 @@ void  RaceLayer::showall()
 						s_card->setScale(0.9);
 						p_list[i]->addChild(s_card);
 					}
-					if(cards->get_status(i)==c_FREE||cards->get_status(i)==c_MING_KOU)
+					if(status==sFREE||status==sMING_KOU)
 						y-=((p_list[i]->getTextureRect().size.height)*0.65);
-					else if(cards->get_status(i)==c_PENG)
+					else if(status==sPENG)
 					{
-						if((cards->get_kind(i+1)!=cards->get_kind(i))||((cards->get_kind(i+1)==cards->get_kind(i))&&(cards->get_status(i+1)!=cards->get_status(i))))
+						if((cards->get_kind(i+1)!=cards->get_kind(i))||((cards->get_kind(i+1)==cards->get_kind(i))&&(statusNext!=status)))
 							y-=((p_list[i]->getTextureRect().size.height)*0.65+5);
 						else
 							y-=((p_list[i]->getTextureRect().size.height)*0.65);
 					}
-					else if(cards->get_status(i)==c_MING_GANG||cards->get_status(i)==c_AN_GANG)
+					else if(status==sMING_GANG||status==sAN_GANG)
 					{
 					    int idxInGroup = cards->get_idx_in_group(i);
 
@@ -5756,11 +5780,11 @@ void  RaceLayer::showall()
 				}
 				else if(no==1)
 				{
-					if(cards->get_status(i)==c_FREE||cards->get_status(i)==c_MING_KOU)
+					if(status==sFREE||status==sMING_KOU)
 						p_list[i]=_object->Create(MING_CARD);
-					else if(cards->get_status(i)==c_PENG||cards->get_status(i)==c_MING_GANG)
+					else if(status==sPENG||status==sMING_GANG)
 						p_list[i]=_object->Create(PENG_CARD);
-					else if(cards->get_status(i)==c_AN_GANG)
+					else if(status==sAN_GANG)
 					{
 						if(cards->get_kind(i)==cards->get_kind(i+1) && cards->get_kind(i)!=cards->get_kind(i+2))
 							p_list[i]=_object->Create(PENG_CARD);
@@ -5769,7 +5793,7 @@ void  RaceLayer::showall()
 					}
 					p_list[i]->setAnchorPoint(Vec2(0,0));
 					p_list[i]->setPosition(Vec2(x,y));
-					if(cards->get_status(i)==c_FREE)
+					if(status==sFREE)
 					{
 						auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),NORMAL);
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
@@ -5780,7 +5804,7 @@ void  RaceLayer::showall()
 						else
 							x+=p_list[i]->getTextureRect().size.width*1.0;
 					}
-					else if(cards->get_status(i)==c_MING_KOU)
+					else if(status==sMING_KOU)
 					{
 						auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),NORMAL);
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
@@ -5791,20 +5815,20 @@ void  RaceLayer::showall()
 						else
 							x += p_list[i]->getTextureRect().size.width*1;
 					}
-					else if(cards->get_status(i)==c_PENG)
+					else if(status==sPENG)
 					{
 						auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),MIDDLE_SIZE);
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
 						s_card->setPosition(Vec2(p_list[i]->getTextureRect().size.width/2,p_list[i]->getTextureRect().size.height*0.6));
 						p_list[i]->addChild(s_card,1);
-						if(cards->get_status(i+1)==c_FREE)
+						if(statusNext==sFREE)
 							x += p_list[i]->getTextureRect().size.width*2;
-						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)!=c_FREE))
+						else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(statusNext!=sFREE))
 							x += p_list[i]->getTextureRect().size.width*1.5;
 						else
 							x += p_list[i]->getTextureRect().size.width*1.0;
 					}
-					else if(cards->get_status(i)==c_MING_GANG)
+					else if(status==sMING_GANG)
 					{
 						auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),MIDDLE_SIZE);
 						s_card->setAnchorPoint(Vec2(0.5,0.5));
@@ -5821,15 +5845,15 @@ void  RaceLayer::showall()
 							x+=p_list[i]->getTextureRect().size.width*1.0;
 							y-=17;
                         } else {
-							if(cards->get_status(i+1)==c_FREE)
+							if(statusNext==sFREE)
 								x += p_list[i]->getTextureRect().size.width*2;
-							else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)!=c_FREE))
+							else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(statusNext!=sFREE))
 								x += p_list[i]->getTextureRect().size.width*1.5;
 							else
 								x += p_list[i]->getTextureRect().size.width*1.0;
                         }
 					}
-					else if(cards->get_status(i)==c_AN_GANG)
+					else if(status==sAN_GANG)
 					{
 					    int idxInGroup = cards->get_idx_in_group(i);
 
@@ -5846,9 +5870,9 @@ void  RaceLayer::showall()
 							x+=p_list[i]->getTextureRect().size.width*1.0;
 							y-=17;
                         } else {
-							if(cards->get_status(i+1)==c_FREE)
+							if(statusNext==sFREE)
 								x += p_list[i]->getTextureRect().size.width*2;
-							else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(cards->get_status(i+1)!=c_FREE))
+							else if(cards->get_kind(i)!=cards->get_kind(i+1) &&(statusNext!=sFREE))
 								x += p_list[i]->getTextureRect().size.width*1.5;
 							else
 								x += p_list[i]->getTextureRect().size.width*1.0;
@@ -5857,7 +5881,7 @@ void  RaceLayer::showall()
 				}
 				else if(no==2)
 				{
-					if(cards->get_status(i)==c_AN_GANG)
+					if(status==sAN_GANG)
 					{
 						if((cards->get_kind(i)==cards->get_kind(i+1))&&(cards->get_kind(i)==cards->get_kind(i+2))&&(cards->get_kind(i)!=cards->get_kind(i+3)))//2
 						{
@@ -5888,16 +5912,16 @@ void  RaceLayer::showall()
 						s_card->setScale(0.9);
 						p_list[i]->addChild(s_card);
 					}
-					if(cards->get_status(i)==c_FREE||cards->get_status(i)==c_MING_KOU)
+					if(status==sFREE||status==sMING_KOU)
 						y+=((p_list[i]->getTextureRect().size.height)*0.65);
-					else if(cards->get_status(i)==c_PENG)
+					else if(status==sPENG)
 					{
-						if((cards->get_kind(i+1)!=cards->get_kind(i))||((cards->get_kind(i+1)==cards->get_kind(i))&&(cards->get_status(i+1)!=cards->get_status(i))))
+						if((cards->get_kind(i+1)!=cards->get_kind(i))||((cards->get_kind(i+1)==cards->get_kind(i))&&(statusNext!=status)))
 							y+=((p_list[i]->getTextureRect().size.height)*0.65+5);
 						else
 							y+=((p_list[i]->getTextureRect().size.height)*0.65);
 					}
-					else if(cards->get_status(i)==c_MING_GANG||cards->get_status(i)==c_AN_GANG)
+					else if(status==sMING_GANG||status==sAN_GANG)
 					{
 					    int idxInGroup = cards->get_idx_in_group(i);
 

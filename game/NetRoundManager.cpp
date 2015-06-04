@@ -366,7 +366,7 @@ void NetRoundManager::RecvKouConfirm() {
     CardInHand *cards = _players[MIDDLE]->_cards;
 
     for(int i=cards->FreeStart;i<cards->size();i++) {
-        if(cards->get_status(i)==c_KOU_ENABLE)
+        if(cards->get_status(i)==sKOU_ENABLE)
             cards->set_status(i,sFREE);
     }   
     

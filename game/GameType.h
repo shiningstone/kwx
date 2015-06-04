@@ -134,14 +134,15 @@ typedef enum {
 }Card_t;
 
 typedef enum {
-	sFREE = 0,
-	sPENG,
-	sMING_GANG,
-	sAN_GANG,
+	sFREE       = 0,
+	sPENG       = 1,
+	sMING_GANG  = 2,
+	sAN_GANG    = 4,
+    sSHOU_GANG  = 8,
 	sMING_KOU,
 	sKOU_ENABLE,
     sGANG_ENABLE,
-    sGANG,
+    sGANG       = sMING_GANG|sAN_GANG|sSHOU_GANG,
 	sUNDEFINDED=0xff,
 }CardStatus_t;
 
