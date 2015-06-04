@@ -532,11 +532,7 @@ void CardInHand::perform(ActionId_t act,Card_t kind,bool isZimo) {
     if(act==aAN_GANG) {
         _AnGang(kind);
     } else if(act==aMING_GANG) {
-        if(kind!=CARD_UNKNOWN) {
-            _MingGang(kind,isZimo);
-        } else {
-            _MingGang(get_kind(last()),isZimo);
-        }
+        _MingGang(kind,isZimo);
     } else if(act==aSHOU_GANG) {
         _ShouGang();
     } else if(act==aPENG) {
