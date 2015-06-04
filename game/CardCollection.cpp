@@ -1599,7 +1599,6 @@ void Alternatives::scan_gang(bool isNewDistributed) {
     
 	auto lastKind = _cards->get_kind(_cards->last());
 
-    int matchNum   = 0;
     int cardIdx[4] = {-1,-1,-1,-1};
     
     if(_cards->find_cards(lastKind,cardIdx)==4) {
@@ -1614,23 +1613,14 @@ void Alternatives::scan_gang(bool isNewDistributed) {
                 AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
             }
         } else {
-            if(orig==sFREE) {
+            if(orig==sFREE || orig==sMING_KOU) {
                 AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
             }
         }
-    } else {
-        for(int i=0;i<_cards->last();i++) {
-            matchNum = _cards->find_cards(_cards->get_kind(i),cardIdx,i);
-        
-            if(matchNum==4) {
-                CardStatus_t orig = _cards->get_status(cardIdx[0]);
-                
-                if(isNewDistributed) {
-                    if(orig==sPENG)
-                        AddGroup(4,cardIdx,sMING_GANG|sSHOU_GANG,sGANG_ENABLE);
-                    else
-                        AddGroup(4,cardIdx,sAN_GANG|sSHOU_GANG,sGANG_ENABLE);
-                }
+    } else if(isNewDistributed) {
+        for(int i=_cards->FreeStart;i<_cards->last();i++) {
+            if(_cards->find_cards(_cards->get_kind(i),cardIdx,i)==4) {
+                AddGroup(4,cardIdx,sSHOU_GANG,sGANG_ENABLE);
             }
         }
     }

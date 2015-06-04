@@ -3893,10 +3893,8 @@ void RaceLayer::_QiEffect(PlayerDir_t dir) {
 CardStatus_t RaceLayer::_GetAppearance(const CardList *cards,int idx) {
     CardStatus_t status = cards->get_status(idx);
 
-    if(status&sAN_GANG) {
+    if(status==sSHOU_GANG) {
         return sAN_GANG;
-    } else if(status&sMING_GANG) {
-        return sMING_GANG;
     } else if(status==sKOU_ENABLE || status==sGANG_ENABLE)
         return sFREE;
     else {
