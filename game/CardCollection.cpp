@@ -1544,9 +1544,11 @@ void Alternatives::Init(ActionId_t action) {
 }
 
 void Alternatives::load_kou_info(const Card_t kinds[],int num) {
+    clear();
+
+    Init(aKOU);
+    
     if(num>0) {
-        Init(aKOU);
-        
         for(int i=0;i<num;i++) {
             int cardIdx[3] = {0};
             _cards->find_cards(kinds[i],cardIdx);
@@ -1572,9 +1574,11 @@ void Alternatives::scan_kou(Card_t handingout) {
 }
 
 void Alternatives::load_gang_info(ActionMask_t actions,const Card_t kinds[],int num) {
+    clear();
+
+    Init(aGANG);
+    
     if(num>0) {
-        Init(aGANG);
-        
         for(int i=0;i<num;i++) {
             int cardIdx[4] = {0};
         
