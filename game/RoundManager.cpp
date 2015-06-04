@@ -651,7 +651,7 @@ void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKin
     } else if(action==a_SHOU_GANG) {
         _players[dir]->action(_isNewDistributed,aSHOU_GANG);
     } else {
-        _players[dir]->action(_isNewDistributed,(ActionId_t)action);
+        _players[dir]->action(_isNewDistributed,(ActionId_t)action,actKind);
     }
 }
 

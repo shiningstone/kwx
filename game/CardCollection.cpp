@@ -532,7 +532,11 @@ void CardInHand::perform(ActionId_t act,Card_t kind,bool isZimo) {
     if(act==aAN_GANG) {
         _AnGang(kind);
     } else if(act==aMING_GANG) {
-        _MingGang(get_kind(last()),isZimo);
+        if(kind!=CARD_UNKNOWN) {
+            _MingGang(kind,isZimo);
+        } else {
+            _MingGang(get_kind(last()),isZimo);
+        }
     } else if(act==aSHOU_GANG) {
         _ShouGang();
     } else if(act==aPENG) {
@@ -1546,7 +1550,7 @@ void Alternatives::set_gang(ActionMask_t actions,Card_t kinds[],int num) {
         } else if(actions & aMING_GANG) {
             AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
         } else {
-            if(get_status(cardIdx[0])==sFREE) {
+            if(_cards->get_status(cardIdx[0])==sFREE) {
                 AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
             } else {
                 AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
@@ -1717,18 +1721,20 @@ bool Alternatives::IsInclude(Card_t kind) const {
 }
 
 void Alternatives::switch_status(int gIdx) {
-    if(get_status((gIdx))==_group[gIdx].ACTIVE_STATUS) {
-        SetStatus(gIdx,_group[gIdx].FREE_STATUS);
-    } else {
-        if(_action==aGANG) {
-            for(int i=0;i<_groupNum;i++) {
-                if(is_activated(i)) {
-                    SetStatus(i,_group[i].FREE_STATUS);
-                }
+    if(_action==aGANG) {
+        for(int i=0;i<_groupNum;i++) {
+            if(is_activated(i)) {
+                SetStatus(i,_group[i].FREE_STATUS);
             }
         }
 
         SetStatus(gIdx,_group[gIdx].ACTIVE_STATUS);
+    } else {
+        if(get_status((gIdx))==_group[gIdx].ACTIVE_STATUS) {
+            SetStatus(gIdx,_group[gIdx].FREE_STATUS);
+        } else {
+            SetStatus(gIdx,_group[gIdx].ACTIVE_STATUS);
+        }
     }
 }
 

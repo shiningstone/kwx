@@ -313,18 +313,20 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 			}
 			else if(dir==MIDDLE)
 			{
-				if(cards->get_status(i)==c_FREE||cards->get_status(i)==c_MING_KOU)
+			    CardStatus_t status = cards->get_status(i);
+                
+				if(status==sFREE||status==sMING_KOU||status==sGANG_ENABLE||status==sKOU_ENABLE)
 				{
 					if(isMing)
 						p_list[i]=_object->Create(MING_CARD,(PlayerDir_t)dir,x,y);
 					else
 						p_list[i]=_object->Create(FREE_CARD,(PlayerDir_t)dir,x,y);
 				}
-				else if(cards->get_status(i)==c_PENG||cards->get_status(i)==c_MING_GANG)
+				else if(cards->get_status(i)==c_PENG||cards->get_status(i)&c_MING_GANG)
 				{
 					p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)dir,x,y);
 				}
-				else if(cards->get_status(i)==c_AN_GANG)
+				else if(cards->get_status(i)&c_AN_GANG)
 				{
 					if(cards->get_idx_in_group(i)==3)
 						p_list[i]=_object->Create(PENG_CARD,(PlayerDir_t)dir,x,y);
@@ -348,7 +350,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 					p_list[i]->setVisible(false);
 
 
-                if(cards->get_status(i)==c_FREE) {
+                if(status==sFREE||status==sGANG_ENABLE||status==sKOU_ENABLE) {
 					if(isMing) {
 					    _object->LayDownWithFace(p_list[i], cards->get_kind(i), 0.6);
 					} else {
@@ -413,7 +415,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 					else
 						x += p_list[i]->getTextureRect().size.width*1.0;
 				}
-				else if(cards->get_status(i)==c_MING_GANG)
+				else if(cards->get_status(i)&sMING_GANG)
 				{
 					auto s_card=_object->CreateKind((Card_t)cards->get_kind(i),MIDDLE_SIZE);
 					s_card->setAnchorPoint(Vec2(0.5,0.5));
@@ -439,7 +441,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 							x += p_list[i]->getTextureRect().size.width*1.0;
 					}
 				}
-				else if(cards->get_status(i)==c_AN_GANG)
+				else if(cards->get_status(i)&sAN_GANG)
 				{
                     int idxInGroup = cards->get_idx_in_group(i);
 
@@ -3790,7 +3792,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
                 _Remove(myframe,MING_GANG_EFFECT_NODE);}),NULL),NULL));
 
 		myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
-            _roundManager->UpdateCards(dir,a_MING_GANG);}),
+            _roundManager->UpdateCards(dir,a_MING_GANG,card);}),
             DelayTime::create(0.48),CallFunc::create([=](){
 			if(!_roundManager->_isNewDistributed)
 				_roundManager->update_gold(dir,MING_GANG,prevDir);}),CallFunc::create([=](){
