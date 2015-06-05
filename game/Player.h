@@ -13,6 +13,7 @@ public:
 
     virtual unsigned char init(Card_t cards[],int len,int aim);
     virtual unsigned char refresh(CardNode_t cards[],int len,HuFan_t fan);
+    virtual unsigned char refresh(CardNode_t cards[],int len);
 
     StrategyPlayer *_strategy;
 

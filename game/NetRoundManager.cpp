@@ -325,6 +325,9 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	if(_isMingTime) {
 		_isMingTime      = false;
         _actCtrl.choices = 0;
+
+        _SendAction(aMING_CONFIRM);
+        Wait(REQ_GAME_SEND_ACTION);
 	} else {
         if(_actCtrl.decision==aMING) {
             _actCtrl.decision = aQi;
@@ -687,16 +690,16 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
 
     if(_actCtrl.decision==aMING) {
         _curPlayer = dir;
+
+        if(_curPlayer==MIDDLE) {
+            for(int i=0;i<PLAYER_NUM;i++) {
+                _players[i]->refresh(info->huCards[i], info->huCardsNum[i]);
+            }
+        } else {
+            _players[_curPlayer]->refresh(info->huCards[0], info->huCardsNum[0]);
+        }
         
         CardInHand *cards = _players[dir]->_cards;
-        cards->clear();
-        
-        for(int i=0;i<info->cardNum;i++) {
-            CardNode_t *node = new CardNode_t;
-            *node = info->card[i];
-            cards->push_back( node );
-        }
-
         cards->IsMing = true;
 
         _uiManager->_CardInHandUpdateEffect(dir);
@@ -736,8 +739,6 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
             }
             break;
         case aHU:
-
-            
             break;
     }
 }

@@ -58,6 +58,7 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     }
 }
 
+/* hu */
 unsigned char Player::refresh(CardNode_t cards[],int len,HuFan_t fan) {
     _cards->clear();
 
@@ -69,6 +70,20 @@ unsigned char Player::refresh(CardNode_t cards[],int len,HuFan_t fan) {
     }
 
     _fan = fan;
+
+	return 0;
+}
+
+/* network-game ming */
+unsigned char Player::refresh(CardNode_t cards[],int len) {
+    _cards->clear();
+
+    for(int i=0;i<len;i++) {
+        CardNode_t *node = new CardNode_t;
+        memcpy(node,&cards[i],sizeof(CardNode_t));
+        
+        _cards->push_back(node);
+    }
 
 	return 0;
 }
