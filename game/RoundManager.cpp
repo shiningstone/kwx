@@ -483,6 +483,7 @@ ActionMask_t RoundManager::GetPlayerChoices(PlayerDir_t dir,bool prevMing) {
 
     if(actions==a_JUMP) {
         _players[dir]->_cards->pop_back();
+		_players[dir]->_cards->_IncludingOthersCard = false;
     }
 
     return actions;

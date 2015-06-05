@@ -332,10 +332,15 @@ void CardInHand::_AnGang(Card_t card) {
         cardsAfterGangCard[cardsNum++] = *at(i);
     }
     
-    for(INT8U i=0;i<cardsNum;i++) {
-        delete_card(cardIdx[3]+1+i,1);
-        insert_card(cardsAfterGangCard[i],1);
-    }
+    //for(INT8U i=0;i<cardsNum;i++) {
+    //    delete_card(cardIdx[3]+1+i,1);
+    //    insert_card(cardsAfterGangCard[i],1);
+    //}   
+	if(cardsNum>0)
+	{
+		delete_card(cardIdx[3]+cardsNum,1);
+		insert_card(cardsAfterGangCard[cardsNum-1],1);
+	}
 }
 
 void CardInHand::_MingGang(Card_t kind,bool isZimo) {

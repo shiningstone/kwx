@@ -294,10 +294,6 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 
 	Sprite *p_list[MAX_HANDIN_NUM];
     
-	if(dir==MIDDLE)//作用是在此处有条件中断//测试_yusi
-	{
-		CCLOG("");
-	}
     for(int i=0;i<cards->size();i++) {
 		//if(list->data[i].kind!=ck_NOT_DEFINED )
 		{
@@ -519,18 +515,6 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		_UpdateTingNum(MIDDLE);
 	}
 
-	//if(dir==MIDDLE)//测试_yusi
-	//{
-	//	auto cards=_roundManager->_players[MIDDLE]->_cards;
-	//	const int  LAST = cards->real_last();
-	//	for(int i=0; i<=LAST; i++) {
-	//		auto card = _GetCardInHand(MIDDLE,i);
-	//		auto x= card->getPosition().x;
-	//		auto y= card->getPosition().y;
-	//		CCLOG("card[%d].position(%f,%f)",i,x,y);
-	//	}
-	//	system("pause");
-	//}
 }
 
 void RaceLayer::_CardRiverUpdateEffect(PlayerDir_t dir) {
@@ -596,16 +580,6 @@ void RaceLayer::_DistributeCard(const DistributeInfo_t &distribute) {
     const Vec2 &lastCardPosition = _GetLastCardPosition(dir,lenOfInHand);
 
     Sprite *lastCard = _object->CreateDistributeCard(dir,distribute.newCard);
-
-	if(1)
-	{
-		if(distribute.newCard<=8)//测试_yusi
-			CCLOG("DistributeCard [%d] : %d Tiao",dir,distribute.newCard+1);
-		else if(distribute.newCard<=17)
-			CCLOG("DistributeCard [%d] : %d Bing",dir,distribute.newCard-8);
-		else
-			CCLOG("DistributeCard [%d] : %d Feng",dir,distribute.newCard-17);
-	}
 
 	lastCard->setPosition(lastCardPosition);
 
@@ -2410,10 +2384,16 @@ void RaceLayer::BtnGangHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
     		curButton->setScale(1.2);
     		break;
     	case cocos2d::ui::Widget::TouchEventType::MOVED:
-    		break;
-    	case cocos2d::ui::Widget::TouchEventType::ENDED:
-            _CancelChosenCardInHand();
-            _roundManager->RecvGang(MIDDLE);
+			break;
+		case cocos2d::ui::Widget::TouchEventType::ENDED:
+			{
+				//_CancelChosenCardInHand();
+				//_roundManager->RecvGang(MIDDLE);
+				auto CancelChosenCardInHand=CallFunc::create([=](){_CancelChosenCardInHand();});
+				auto deleteEffect=CallFunc::create([=](){_DeleteActionTip();});
+				auto recevGang=CallFunc::create([=](){_roundManager->RecvGang(MIDDLE);});
+				myframe->runAction(Sequence::create(CancelChosenCardInHand,deleteEffect,recevGang,NULL));
+			}
     		break;
     	case cocos2d::ui::Widget::TouchEventType::CANCELED:
     		curButton->setScale(1);
@@ -2544,7 +2524,7 @@ bool RaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
 
 void RaceLayer::_CardTouchMove(Touch* touch, Event* event) {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
-    
+
 	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL && touch->getLocation().y>visibleSize.height*0.173) {
 		myframe->getChildByTag(CHOOSE_CARD_TAG_ID)->setPosition(touch->getLocation());
 		_myChosenCard = _myTouchedCard;
@@ -2603,7 +2583,6 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		}
 		return;
 	}
-    
     for(int i=cards->FreeStart; i<=cards->real_last(); i++) {
 		_GetCardInHand(MIDDLE,i)->setOpacity(255);
     }
@@ -4330,7 +4309,6 @@ void RaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
         }
     }
 
-    Node *node = myframe->getChildByTag(MING_KOU_ENSURE);
     if(ifEnsureVisible)
         myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
     else
@@ -4371,7 +4349,7 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
 }
 
 void RaceLayer::QueryGangCards() {
-    _DeleteActionTip();
+    //_DeleteActionTip();
     _eventDispatcher->removeEventListenersForTarget(myframe,true);
 
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
@@ -6651,13 +6629,7 @@ BezierTo* RaceLayer::BizerMove2(CardList* outCard,Vec2 location,int time)
 			config.controlPoint_2=Vec2(_layout->_playerPosi[1].riverPoint.x+(((int)outCard->size()-16)*36),_layout->_playerPosi[1].riverPoint.y-82);
 		}
 	}
-	if(1)//ceshi_yusi
-	{
-		CCLOG("curResdiaul : %d ",TOTAL_CARD_NUM - _roundManager->_distributedNum);
-		CCLOG("curHandsout : %d ",(int)outCard->size());
-		CCLOG("endPosition : ( %f , %f )",config.endPosition.x,config.endPosition.y);
-		//system("pause");
-	}
+
 	BezierTo *action;
 	if(ccpDistance(location,config.endPosition)<=200)
 	{
