@@ -104,6 +104,19 @@ typedef enum {
     aLIU_JU    = 0x80000
 }ActionId_t;
 
+typedef enum {
+	sFREE       = 0,
+	sPENG       = 1,
+	sMING_GANG  = 2,
+	sAN_GANG    = 4,
+    sSHOU_GANG  = 0x20,
+	sMING_KOU,
+	sKOU_ENABLE,
+    sGANG_ENABLE,
+    sGANG       = sMING_GANG|sAN_GANG|sSHOU_GANG,
+	sUNDEFINDED=0xff,
+}CardStatus_t;
+
 typedef INT32U ActionMask_t;
 
 typedef enum {
@@ -133,19 +146,6 @@ typedef enum {
     CARD_UNKNOWN = 0xff,
     CARD_IGNORE = 0xff,
 }Card_t;
-
-typedef enum {
-	sFREE       = 0,
-	sPENG       = 1,
-	sMING_GANG  = 2,
-	sAN_GANG    = 4,
-    sSHOU_GANG  = 8,
-	sMING_KOU,
-	sKOU_ENABLE,
-    sGANG_ENABLE,
-    sGANG       = sMING_GANG|sAN_GANG|sSHOU_GANG,
-	sUNDEFINDED=0xff,
-}CardStatus_t;
 
 typedef struct _CardNode_t {
 	Card_t       kind;
