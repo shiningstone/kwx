@@ -368,10 +368,11 @@ void NetRoundManager::RecvKouConfirm() {
 }
 
 void NetRoundManager::RecvMingCancel() {
-    _isMingTime=false;
-    
+    _SendAction(aMING_CANCEL);
+
     UpdateCards(MIDDLE,a_KOU_CANCEL);/*BUG HERE???*/
     
+    _isMingTime=false;
     _actCtrl.decision = aQi;
     
     _players[MIDDLE]->_cards->cancel_ming();
@@ -402,7 +403,6 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
         _uiManager->QueryMingOutCard();
     }
 }
-
 
 void NetRoundManager::WaitForMyAction() {
 }

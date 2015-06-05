@@ -95,6 +95,7 @@ typedef enum {
     aSHOU_GANG = 0x20,
     aKOU       = 0x40,
     aKOU_CANCEL= 0x80,
+    aMING_CANCEL = 0x400,
 
     aGANG      = aMING_GANG|aAN_GANG|aSHOU_GANG,
     aQIANG_GANG= 0xfd,
