@@ -75,6 +75,7 @@ public:
     virtual void RecvQi();
     virtual void RecvHandout(int idx,Vec2 touch,int mode);
     /*internal action*/
+    virtual Card_t RecvGang(PlayerDir_t dir);
     virtual Card_t RecvGangConfirm(PlayerDir_t dir);
     virtual void RecvKouCancel();
     virtual void RecvKouConfirm();

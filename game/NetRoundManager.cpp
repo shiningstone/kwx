@@ -240,6 +240,11 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
     }
 }
 
+Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
+    _players[dir]->_strategy->scan_gang(_isNewDistributed);
+    return RoundManager::RecvGang(dir);
+}
+
 Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     CardInHand *cards   = _players[dir]->_cards;
     int*        gangIdx = new int[4];
@@ -490,8 +495,6 @@ void NetRoundManager::_restoreRemindInfo(const Reminds_t &remind) {
     _order_small_to_big(_serverReminds.kouCard,_serverReminds.kouKindNum);
     _order_small_to_big(_serverReminds.gangCard,_serverReminds.gangKindNum);
     
-    _players[_curPlayer]->_cards->_alter->load_kou_info(remind.kouCard,remind.kouKindNum);
-    _players[_curPlayer]->_cards->_alter->load_gang_info(remind.actions,remind.gangCard,remind.gangKindNum);
     _players[_curPlayer]->_cards->load_ming_info(remind.ming);
 }
 
