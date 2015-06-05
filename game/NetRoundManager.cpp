@@ -326,17 +326,15 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         }
     }
 
-	_actCtrl.decision = aQi;
-
     RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
     //_players[MIDDLE]->hand_out(chosen);
 
     bool turnToMing = false;
 	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(chosen);
-
         turnToMing = true;
     }
+	_actCtrl.decision = aQi;
 
     _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
 }
