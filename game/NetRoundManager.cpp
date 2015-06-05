@@ -383,7 +383,6 @@ void NetRoundManager::RecvMingCancel() {
 
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _actCtrl.decision = aMING;
-    _players[MIDDLE]->_strategy->scan_ming();
 
     _isMingTime=true;
         
@@ -393,14 +392,15 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
         if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
             _uiManager->QueryKouCards();
         } else {
+            _players[MIDDLE]->_strategy->scan_ming();
+
             _SendAction(aMING);
             
             UpdateCards(MIDDLE,a_MING);
             _uiManager->QueryMingOutCard();
         }
     } else {
-        _SendAction(aMING);
-        
+        Wait(REQ_GAME_DIST_REMIND);
         UpdateCards(MIDDLE,a_MING);
         _uiManager->QueryMingOutCard();
     }
