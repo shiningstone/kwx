@@ -332,10 +332,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	if(_isMingTime) {
 		_isMingTime      = false;
         _actCtrl.choices = 0;
-        
-        RequestSendAction aReq;
-        aReq.Set(aMING);
-        _messenger->Send(aReq);
 	} else {
         if(_actCtrl.decision==aMING) {
             _actCtrl.decision = aQi;
@@ -359,6 +355,11 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
 void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
+
+    RequestSendAction aReq;
+    aReq.Set(aKOU_CANCEL);
+    _messenger->Send(aReq);
+
     _uiManager->KouCancelEffect(aKOU,_players[MIDDLE]->_cards);
 }
 
