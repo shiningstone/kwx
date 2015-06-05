@@ -1703,6 +1703,8 @@ void Alternatives::clear() {
     for(INT8U i=0;i<_groupNum;i++) {
         SetStatus(i,_group[i].BACK_STATUS);
     }
+
+    _groupNum = 0;
 }
 
 int Alternatives::get_activated_kinds(Card_t kinds[]) const {

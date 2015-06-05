@@ -591,7 +591,13 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     delete info;
 
     ServerDistributeTo(target,card);
+#if 1
+    _players[MIDDLE]->_cards->push_back(card);
+    _players[MIDDLE]->_cards->_IncludingOthersCard = false;
+    _players[MIDDLE]->_strategy->scan_gang(_isNewDistributed);
+#else
     _players[MIDDLE]->hand_in(card,false,IsMing(prev),(_distributedNum==TOTAL_CARD_NUM));
+#endif
     ServerWaitForMyAction();
     _actCtrl.handoutAllow = true;
 
