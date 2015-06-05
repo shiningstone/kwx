@@ -570,7 +570,8 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     delete info;
 
     ServerDistributeTo(target,card);
-    _players[target]->hand_in(card,false,IsMing(target),(_distributedNum==TOTAL_CARD_NUM));
+    _players[target]->_cards->push_back(card);
+    //_players[target]->hand_in(card,false,IsMing(target),(_distributedNum==TOTAL_CARD_NUM));
     _uiManager->start_timer(timer,target);
 }
 
