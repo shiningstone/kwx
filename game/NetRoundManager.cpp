@@ -220,10 +220,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     bool actionPermit = false;
     
     if(dir==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(aPENG,kind);
-        _messenger->Send(aReq);
-        
+        _SendAction(aPENG,kind);
         actionPermit = Wait(REQ_GAME_SEND_ACTION);
     }
 
@@ -239,9 +236,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
     if(dir==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(aHU);
-        _messenger->Send(aReq);
+        _SendAction(aHU);
     }
 }
 
@@ -258,10 +253,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     SetDecision(dir,action);
 
     if(dir==MIDDLE) {
-        RequestSendAction aReq;
-        aReq.Set(_actCtrl.decision,card);
-        _messenger->Send(aReq);
-        
+        _SendAction(_actCtrl.decision,card);
         actionPermit = Wait(REQ_GAME_SEND_ACTION);
     }
 
@@ -299,9 +291,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 }
 
 void NetRoundManager::RecvQi() {
-    RequestSendAction aReq;
-    aReq.Set(aQi);
-    _messenger->Send(aReq);
+    _SendAction(aQi);
     
     SetDecision(MIDDLE,aQi);
     _uiManager->QiEffect();
@@ -312,9 +302,7 @@ void NetRoundManager::_NotifyHandout() {
         _HandoutNotify = false;
         
         if(_actCtrl.choices && _actCtrl.decision==aQi) {
-            RequestSendAction aReq;
-            aReq.Set(aQi);
-            _messenger->Send(aReq);
+            _SendAction(aQi);
             Wait(REQ_GAME_DIST_DAOJISHI);
         }
         
@@ -356,9 +344,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
 
-    RequestSendAction aReq;
-    aReq.Set(aKOU_CANCEL);
-    _messenger->Send(aReq);
+    _SendAction(aKOU_CANCEL);
 
     _uiManager->KouCancelEffect(aKOU,_players[MIDDLE]->_cards);
 }
@@ -376,10 +362,7 @@ void NetRoundManager::RecvKouConfirm() {
 
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->_alter->get_activated_kinds(kinds);
-    
-    RequestSendAction aReq;
-    aReq.Set(aKOU,kindNum,kinds);
-    _messenger->Send(aReq);
+    _SendAction(aKOU,kindNum,kinds);
 
     _uiManager->KouConfirmEffect();
 }
@@ -400,10 +383,8 @@ void NetRoundManager::RecvMingCancel() {
 void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _actCtrl.decision = aMING;
     _players[MIDDLE]->_strategy->scan_ming();
-    
-    RequestSendAction aAction;
-    aAction.Set(aMING);
-    _messenger->Send(aAction);
+
+    _SendAction(aMING);
 
     _isMingTime=true;
         
@@ -479,6 +460,18 @@ bool NetRoundManager::Wait(RequestId_t req) {
 /*************************************
         server requests handlers
 *************************************/
+int NetRoundManager::_SendAction(ActionId_t action,Card_t card) {
+    RequestSendAction aReq;
+    aReq.Set(action,card);
+    return _messenger->Send(aReq);
+}
+
+int NetRoundManager::_SendAction(ActionId_t code,int kindNum,Card_t kinds[]) {
+    RequestSendAction aReq;
+    aReq.Set(code,kindNum,kinds);
+    return _messenger->Send(aReq);
+}
+
 void NetRoundManager::_order_small_to_big(Card_t kinds[],int num) {
     for(int i=0;i<num-1;i++) {
         for(int j=i+1;j<num;j++) {
