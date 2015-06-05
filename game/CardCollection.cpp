@@ -791,60 +791,15 @@ ActionMask_t CardInHand::judge_action(Card_t newCard,bool isNewDistributed, bool
     }
 
     ActionMask_t act = 0;
-        
-    if( has_shou_gang() && isNewDistributed && !isLastOne ) {
-        act |= aSHOU_GANG;
-	}
 
-    if(!IsMing) {
-        int num = 0;
+    _alter->scan_gang(isNewDistributed);
+    if(!isLastOne) {
+        act |= _alter->get_actions();
+    }
 
-        for(INT8U i=0;i<last();i++) {
-            if(get_kind(i)==newCard) {
-                CardStatus_t status = get_status(i);
-                
-                if(status==sPENG) {
-                    if(isNewDistributed&&!isLastOne) {
-                        act |= aMING_GANG;
-                        break;
-                    }
-                } else if(status==sMING_KOU) {
-                    if(!isLastOne) {
-                        act |= aMING_GANG;
-        
-                        if(isNewDistributed) {
-                            act |= aAN_GANG;
-                        }
-                    }
-                    
-                    break;
-                } else if(status==sFREE && canPlay(i)) {
-                    num++;
-                }
-            }
-        }
-        
-        if(num==3) {
-            if(!isLastOne) {
-                act |= aMING_GANG | aPENG;
-            }
-        
-            if(isNewDistributed) {
-                act &= ~aPENG;
-                act |= aAN_GANG;
-            }
-        } else if(num==2 && !isNewDistributed) {
+    if(!isNewDistributed && !IsMing) {
+        if( find_cards(newCard,NULL,FreeStart)==3 ) {
             act |= aPENG;
-        }
-    } else {
-        for(INT8U i=0;i<FreeStart;i++) {
-            if(get_kind(i)==newCard && get_status(i)==sMING_KOU) {
-                if(isNewDistributed) {
-                    act |= aAN_GANG;
-                } else {
-                    act |= aMING_GANG;
-                }
-            }
         }
     }
 
@@ -1790,3 +1745,12 @@ Card_t Alternatives::get_activated_cards(int idx[],ActionId_t *action) const {
     return GetKind(activated);
 }
 
+ActionMask_t Alternatives::get_actions() const {
+    ActionMask_t actions = 0;
+    
+    for(int i=0;i<group_num();i++) {
+        actions |= _group[i].ACTIVE_STATUS;
+    }
+
+    return actions;
+}

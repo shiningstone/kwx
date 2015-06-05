@@ -179,6 +179,7 @@ public:
 
     int  get_activated_kinds(Card_t kinds[]) const;
     Card_t get_activated_cards(int idx[],ActionId_t *action = NULL) const;
+    ActionMask_t get_actions() const;
 
     bool is_activated(int gIdx) const;
     int  activated_cards_num() const;
