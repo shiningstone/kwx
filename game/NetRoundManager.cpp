@@ -327,7 +327,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
         _actCtrl.choices = 0;
 
         _SendAction(aMING_CONFIRM);
-        Wait(REQ_GAME_SEND_ACTION);
+        Wait(REQ_GAME_DIST_DECISION);
 	} else {
         if(_actCtrl.decision==aMING) {
             _actCtrl.decision = aQi;
