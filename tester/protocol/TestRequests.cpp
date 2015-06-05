@@ -444,7 +444,7 @@ public:
             'K','W','X',           //KWX
             0x00,51,               //request code/*发牌(下行) REQ_GAME_DIST_CARD*/
             7,                     //package level
-            0x00,67,               //package size
+            0x00,75,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             8,
@@ -455,12 +455,14 @@ public:
             129,0,4,0,0,0,8,       //remind:             明
             130,0,1,0xff,          //gang remind:        不可杠
             131,0,1,0xff,          //kou remind:         不可扣
-            132,0,20,
+            132,0,28,
                 0,0,4,3,           //ming remind:        出5条可胡3张
                 5,1,0,2,           //                    胡6条，剩1张，赢2番
                 6,2,0,4,           //                    胡7条，剩2张，赢4番
+                0xff,0xff,0xff,0xff,
                 0,0,7,1,           //ming remind:        出8条可胡1张
                 8,1,0,9,           //                    胡9条，剩1张，赢9番
+                0xff,0xff,0xff,0xff,
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -669,7 +671,7 @@ public:
         assert( remind.remind.ming.handouts[0].ting.cardNum==2 );
         assert( remind.remind.ming.handouts[0].ting.cards[0].kind==TIAO_4 );
         assert( remind.remind.ming.handouts[0].ting.cards[0].remain==2 );
-        assert( remind.remind.ming.handouts[0].ting.cards[0].fan==0x10 );
+        assert( remind.remind.ming.handouts[0].ting.cards[0].fan==0x1000 );
         assert( remind.wait==RIGHT );
 
         return 0;

@@ -801,6 +801,49 @@ void round5_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
 	}
 }
 
+void E0605_gang_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 1;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+    } else if(handout==1) {
+        handout++;
+        
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+        SendLine(SERVER,10);
+    } else if(handout==2) {
+        handout++;
+        
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
+        SendLine(SERVER,13);
+    } else if(handout==3) {
+        handout++;
+        
+        SendLine(SERVER,14);
+        SendLine(SERVER,15);
+        SendLine(SERVER,16);
+    } else if(handout==4) {
+        handout++;
+        
+        SendLine(SERVER,17);
+        SendLine(SERVER,18);
+        SendLine(SERVER,19);
+        SendLine(SERVER,20);
+    } 
+}
+
 void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
@@ -818,14 +861,9 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,7);
     } else if(handout==1) {
         handout++;
-        for(int i=8;i<10;i++) {
-            SendLine(SERVER,i);
-        }
-    } else if(handout==2) {
-        handout++;
-        for(int i=10;i<15;i++) {
-            SendLine(SERVER,i);
-        }
+        
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
     } 
 }
 
@@ -899,14 +937,18 @@ void test_server_console() {
     SetFile("E15051902");
     gHandle = E15051902_handle_requests;
 
-    SetFile("temp");
-    gHandle = temp_handle_requests;
-
     SetFile("Round5");/*竞争动作*/
     gHandle = round5_handle_requests;
 
     SetFile("Round1");/*基本操作*/
     gHandle = round1_handle_requests;
+
+    SetFile("temp");
+    gHandle = temp_handle_requests;
+
+    SetFile("E0605_gang");
+    gHandle = E0605_gang_handle_requests;
+
 
     test_smart_game_round_x();
 #endif
