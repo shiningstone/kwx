@@ -58,6 +58,27 @@ typedef enum {
     REQ_GAME_SEND_ENTER         = 44,
     REQ_GAME_RECV_ENTER         = 71,
 
+    /*********************************************
+        ´ýÊµÏÖREQUEST
+    *********************************************/
+    REQ_GAME_SEND_AGENT         = 47,
+    REQ_GAME_RECV_AGENT         = 78,
+
+    /*  login */
+    REQ_LOGIN                   = 1,
+    REQ_GAME_SEND_RECONNECT     = 42,
+    REQ_GAME_RECV_RECONNECT     = 74,
+    REQ_GAME_SEND_LEAVE_ROOM    = 45,
+    REQ_GAME_RECV_LEAVE_ROOM    = 72,
+    REQ_GAME_DIST_DUALLOGIN     = 57,    
+
+    /* gold */
+    REQ_GAME_SEND_XIA_PIAO      = 41,
+
+    /* chat */
+    REQ_GAME_SEND_MSG           = 46,
+    REQ_GAME_RECV_MSG           = 73,
+    
     REQ_INVALID                 = 0xff,
 }RequestId_t;
 
