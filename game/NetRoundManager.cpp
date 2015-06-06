@@ -158,6 +158,8 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
 }
 
 void NetRoundManager::ServerWaitForMyAction() {
+    _uiManager->start_timer(TIME_LIMIT,MIDDLE);
+    
     _uiManager->ShowActionButtons(_actCtrl.choices);
 
 	if(_actCtrl.choices!=0) {
@@ -171,6 +173,8 @@ void NetRoundManager::ServerWaitForMyAction() {
 
 void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
     if(_distributedNum<TOTAL_CARD_NUM+1) {
+        _uiManager->start_timer(TIME_LIMIT,dir);
+
         _isNewDistributed  = true;
 
         DistributeInfo_t distInfo;
@@ -434,6 +438,8 @@ void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
 void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
+    _uiManager->start_timer(TIME_LIMIT,MIDDLE);
+
     _curPlayer = zhuang;
     if(zhuang==MIDDLE) {
         ServerWaitForMyAction();
@@ -527,7 +533,7 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
         cards[i] = info->cards[i];
     }
     PlayerDir_t dir = (PlayerDir_t)info->seat;
-    INT8U timer     = info->timer;
+    TIME_LIMIT     = info->timer;
     
     _actCtrl.choices = info->remind.actions;
     
@@ -540,7 +546,6 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
     delete info;
 
 	_uiManager->FirstRoundDistributeEffect(MIDDLE);//牌局开始发牌效果�?
-    _uiManager->start_timer(timer,MIDDLE);
 }
 
 void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
@@ -552,7 +557,7 @@ void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
     }
     PlayerDir_t me     = (PlayerDir_t)info->seat;
     PlayerDir_t zhuang = (PlayerDir_t)info->zhuang;
-    INT8U timer        = info->timer;
+    TIME_LIMIT         = info->timer;
     delete info;
 
     _curPlayer = zhuang;
@@ -563,27 +568,24 @@ void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
     _players[other]->init(&(_unDistributedCards[27]),13,aim[other]);
 
 	_uiManager->FirstRoundDistributeEffect(zhuang);//牌局开始发牌效果�?
-    _uiManager->start_timer(timer,(PlayerDir_t)_curPlayer);
 }
 
 void NetRoundManager::_DiRecv(DistCardNotif *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = (Card_t)info->kind;
-    INT8U timer        = info->timer;
+    TIME_LIMIT         = info->timer;
     _distributedNum    = info->remain;
     delete info;
 
     ServerDistributeTo(target,card);
 
     _players[target]->_cards->push_back(card);
-
-    _uiManager->start_timer(timer,target);
 }
 
 void NetRoundManager::_DiRecv(DistCardInfo *info) {
     PlayerDir_t target = (PlayerDir_t)info->seat;
     Card_t card        = info->kind;
-    INT8U timer        = info->timer;
+    TIME_LIMIT         = info->timer;
     _distributedNum    = info->remain;
 
     PlayerDir_t prev  = (PlayerDir_t)_curPlayer;
@@ -605,7 +607,6 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     ServerWaitForMyAction();
     _actCtrl.handoutAllow = true;
 
-    _uiManager->start_timer(timer,target);
     _uiManager->ListenToCardTouch();
 }
 
@@ -648,7 +649,7 @@ void NetRoundManager::_DiRecv(ShowCardNotif *info) {
 void NetRoundManager::_DiRecv(RemindInfo *info) {
     PlayerDir_t dir = (PlayerDir_t)info->seat;
     PlayerDir_t whoGive = (PlayerDir_t)info->whoGive;
-    INT8U timer     = info->timer;
+    TIME_LIMIT      = info->timer;
     Card_t kind     = info->kind;
     
     _actCtrl.choices = info->remind.actions;

@@ -14,7 +14,7 @@
 ***********************************************/
 RoundManager::RoundManager(RaceLayer *uiManager) {
     _MODE = LOCAL_GAME;
-    TIME_LIMIT = 5;
+    TIME_LIMIT = 20;
 
     _uiManager = uiManager;
     _strategy  = StrategyRm::getInstance(this);
