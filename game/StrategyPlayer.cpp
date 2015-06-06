@@ -122,7 +122,7 @@ void StrategyPlayer::SetChooseContext() {
 }
 
 int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
-    Card_t target = CARD_UNKNOWN;
+    Card_t handingout = CARD_UNKNOWN;
     int    minum  = 0;
 
     if(_employer->_strategy->scan_ming(_chooseCtx.river)) {
@@ -130,10 +130,10 @@ int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
             MingChoice_t  *choice = _employer->_cards->_ming.handouts+i;
 
             if(!OthersCanHu(choice->kind)) {
-                int num = _employer->_cards->get_ting_num(target);
+                int num = _employer->_cards->get_ting_num(choice->kind);
 
                 if(minum > num) {
-                    target = choice->kind;
+                    handingout = choice->kind;
                     minum = num;
                 }
             }
@@ -141,7 +141,7 @@ int StrategyPlayer::ChooseForMing(ActionId_t &ming,bool &canKou) {
     }
 
     for(int i=0;i<_employer->_cards->size();i++) {
-        if(_employer->_cards->get_kind(i)==target) {
+        if(_employer->_cards->get_kind(i)==handingout) {
             _employer->_cards->set_ming(i);
             _chooseCtx.huNum = _employer->_cards->_ting->cardNum;
             if(_chooseCtx.huNum>=6) {
