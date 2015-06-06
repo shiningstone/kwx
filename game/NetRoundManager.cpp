@@ -413,7 +413,6 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
         }
     } else {
         Wait(REQ_GAME_DIST_REMIND);
-        _actCtrl.decision = aMING;
         
         UpdateCards(MIDDLE,a_MING);
         _uiManager->QueryMingOutCard();

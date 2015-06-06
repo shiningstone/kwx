@@ -2228,6 +2228,10 @@ void RaceLayer::HideActionButtons() {
 }
 
 void RaceLayer::ShowActionButtons(int actionsMask) {
+    /* these actions are controlled by sub-level buttons  */
+    actionsMask &= ~aMING_CONFIRM;
+    actionsMask &= ~aMING_CANCEL;
+    
     _Show(myframe,TING_SING_BAR,false);
 
 	float y=origin.y+visibleSize.height*0.25;
