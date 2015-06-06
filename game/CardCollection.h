@@ -51,6 +51,7 @@ public:
 
     bool   is_wait_handout() const;
     int    find_free_cards(int cardIdx[],Card_t card) const;
+    void   refresh(CardNode_t cards[],int len);
 
     CartApperance_t get_appearance(int idx,PlayerDir_t dir,bool isMiddleMing) const;
 
@@ -69,6 +70,8 @@ public:
     friend class Alternatives;
     Alternatives *_alter;
 private:
+    void   FindAnGangCards(int *idx) const;
+    
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind,bool isZimo);
     void   _ShouGang();

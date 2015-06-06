@@ -171,6 +171,128 @@ void test_can_hu() {
     assert(!cards.can_hu());
 }
 
+void test_refresh_empty() {
+    CardInHand result;
+    CardInHand realCards;
+    CardNode_t nodes[14];
+
+    Card_t     cards[14] = {
+        TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_2,
+        TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_3,
+        TIAO_4,TIAO_4,TIAO_4,BAI};
+    realCards.init(cards,14);
+
+    for(int i=0;i<realCards.size();i++) {
+        nodes[i] = *(realCards.at(i));
+    }
+    result.refresh(nodes,14);
+
+    for(int i=0;i<result.size();i++) {
+        assert(cards[i]==result.at(i)->kind);
+    }
+}
+
+void test_refresh_different() {
+    CardInHand result;
+    CardInHand realCards;
+    CardNode_t nodes[14];
+
+    Card_t     cards1[14] = {
+        TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_2,
+        TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_3,
+        TIAO_4,TIAO_4,TIAO_4,BAI};
+    realCards.init(cards1,14);
+
+    Card_t     cards2[14] = {
+        TONG_1,TONG_1,TONG_1,TONG_1,TONG_2,
+        TONG_2,TONG_3,TONG_3,TONG_3,TONG_3,
+        TONG_4,TONG_4,TONG_4,ZHONG};
+    result.init(cards2,14);
+
+    for(int i=0;i<realCards.size();i++) {
+        nodes[i] = *(realCards.at(i));
+    }
+    result.refresh(nodes,14);
+
+    for(int i=0;i<result.size();i++) {
+        assert(cards1[i]==result.at(i)->kind);
+    }
+}
+
+void test_refresh_peng() {
+    CardInHand result;
+    CardInHand realCards;
+    CardNode_t nodes[14];
+
+    Card_t     cards[14] = {
+        TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_2,
+        TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_3,
+        TIAO_4,TIAO_4,TIAO_4,TIAO_2};
+    realCards.init(cards,14);
+    realCards.perform(aPENG,TIAO_2);
+
+    CardNode_t pengcard = {
+        TIAO_2,
+        sPENG,
+        false,
+    };
+    result.push_back(&pengcard);
+    result.push_back(&pengcard);
+    result.push_back(&pengcard);
+    result.FreeStart += 3;
+
+    for(int i=0;i<realCards.size();i++) {
+        nodes[i] = *(realCards.at(i));
+    }
+    result.refresh(nodes,14);
+
+    for(int i=0;i<result.size();i++) {
+        assert(realCards.at(i)->kind==result.at(i)->kind);
+        assert(realCards.at(i)->status==result.at(i)->status);
+    }
+}
+
+void test_refresh_an_gang() {
+    CardInHand result;
+    CardInHand realCards;
+    CardNode_t nodes[14];
+
+    Card_t     cards[14] = {
+        TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_2,
+        TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_3,
+        TIAO_4,TIAO_4,TIAO_4,TIAO_2};
+    realCards.init(cards,14);
+    realCards.perform(aAN_GANG,TIAO_1);
+
+    CardNode_t gangcard = {
+        CARD_UNKNOWN,
+        sAN_GANG,
+        false,
+    };
+    result.push_back(&gangcard);
+    result.push_back(&gangcard);
+    result.push_back(&gangcard);
+    result.push_back(&gangcard);
+    result.FreeStart += 4;
+
+    for(int i=0;i<realCards.size();i++) {
+        nodes[i] = *(realCards.at(i));
+    }
+    result.refresh(nodes,14);
+
+    for(int i=0;i<result.size();i++) {
+        assert(realCards.at(i)->kind==result.at(i)->kind);
+        assert(realCards.at(i)->status==result.at(i)->status);
+    }
+}
+
+void test_refresh() {
+    test_refresh_empty();
+    test_refresh_different();
+    test_refresh_peng();
+    test_refresh_an_gang();
+}
+
 class son {
 public:
 	son(int &aim, int score);
@@ -235,4 +357,5 @@ void test_card_list() {
 	test_remove();
     test_pattern_match();
     test_can_hu();
+    test_refresh();
 }

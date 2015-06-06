@@ -35,7 +35,6 @@ CardList::~CardList() {
 
 Card_t CardList::get_kind(unsigned int idx) const {
 	if(idx>=size()) {
-        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
 		return CARD_UNKNOWN;
 	} else {
 		return (at(idx))->kind;
@@ -44,7 +43,6 @@ Card_t CardList::get_kind(unsigned int idx) const {
 
 CardStatus_t CardList::get_status(unsigned int idx) const {
 	if(idx>=size()) {
-        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
 		return sUNDEFINDED;
 	} else {
 		return (at(idx))->status;
@@ -53,7 +51,6 @@ CardStatus_t CardList::get_status(unsigned int idx) const {
 
 bool CardList::canPlay(unsigned int idx) const {
 	if(idx>=size()) {
-        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
 		return false;
 	} else {
 		return (at(idx))->canPlay;
@@ -61,9 +58,7 @@ bool CardList::canPlay(unsigned int idx) const {
 }
 
 void CardList::set_status(unsigned int idx,CardStatus_t status) {
-	if(idx>=size()) {
-        LOGGER_WRITE("%s index %d is too big\n",__FUNCTION__,idx);
-	} else {
+	if(idx<size()) {
 		(at(idx))->status = status;
 	}
 }
@@ -127,11 +122,13 @@ void CardList::push_back(CardNode_t *node) {
 }
 
 void CardList::pop_back() {
-    CardNode_t *last = back();
-    delete last;
-
-	vector::pop_back();
-    DBG_SHOW();
+    if(size()>0) {
+        CardNode_t *last = back();
+        delete last;
+        
+        vector::pop_back();
+        DBG_SHOW();
+    }
 }
 
 void CardList::clear() {
@@ -296,6 +293,39 @@ Card_t CardInHand::find_ming_gang_cards(int idx[],Card_t kind) const{
 
 int CardInHand::find_free_cards(int idx[],Card_t kind) const {
     return find_cards(kind,idx,FreeStart);
+}
+
+void CardInHand::FindAnGangCards(int *idx) const {
+    int num = 0;
+    
+    for(INT8U i=0; i<size(); i++) {   
+        if(get_status(i)==sAN_GANG || get_status(i)==sSHOU_GANG) {
+            idx[num++] = i;
+        }
+    }
+}
+
+void CardInHand::refresh(CardNode_t cards[],int len) {
+    int num = size()-FreeStart;
+
+    for(int i=0;i<num;i++) {
+        pop_back();
+    }
+    
+    for(int i=0;i<len;i++) {
+        if(cards[i].status==sPENG || cards[i].status==sMING_GANG) {
+            continue;
+        } else if(cards[i].status==sAN_GANG || cards[i].status==sSHOU_GANG){
+            int idx[4] = {0};
+
+            FindAnGangCards(idx);
+            for(int k=0;k<4;k++) {
+                (at(idx[k]))->kind = cards[i].kind;
+            }
+        } else {
+            insert_card(cards[i]);
+        }
+    }
 }
 
 void CardInHand::_AnGang(Card_t card) {
