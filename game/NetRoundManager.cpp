@@ -162,9 +162,11 @@ void NetRoundManager::ServerWaitForMyAction() {
     
     _uiManager->ShowActionButtons(_actCtrl.choices);
 
+#if 0
 	if(_actCtrl.choices!=0) {
 		_actCtrl.decision = aNULL;
 	}
+#endif
 
 	if(_isNewDistributed) {
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
@@ -411,6 +413,8 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
         }
     } else {
         Wait(REQ_GAME_DIST_REMIND);
+        _actCtrl.decision = aMING;
+        
         UpdateCards(MIDDLE,a_MING);
         _uiManager->QueryMingOutCard();
     }

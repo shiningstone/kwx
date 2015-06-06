@@ -12,6 +12,8 @@ ActionDesc ActionDescTbl[] = {
     DESC(aSHOU_GANG),
     DESC(aKOU),
     DESC(aKOU_CANCEL),
+    DESC(aMING_CANCEL),
+    DESC(aMING_CONFIRM),
 };
 
 CardDesc CardDescTbl[] = {
