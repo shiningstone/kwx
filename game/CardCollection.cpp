@@ -1699,7 +1699,6 @@ void Alternatives::switch_status(int gIdx) {
                 SetStatus(i,_group[i].FREE_STATUS);
             }
         }
-
         SetStatus(gIdx,_group[gIdx].ACTIVE_STATUS);
     } else {
         if(get_status((gIdx))==_group[gIdx].ACTIVE_STATUS) {

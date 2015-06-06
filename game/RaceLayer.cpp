@@ -4302,7 +4302,7 @@ void RaceLayer::_KouTouchEnded(Touch* touch, Event* event) {
     }
     
     bool ifEnsureVisible=false;
-    for(int group=0;group<4;group++) {
+    for(int group=0;group<cards->_alter->group_num();group++) {
         if(cards->_alter->is_activated(group)) {
             ifEnsureVisible=true;
             break;
@@ -4347,7 +4347,100 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
     
     myframe->addChild(btn,20,tag);
 }
+void RaceLayer::_GangChooseUpdate()
+{
+	CardInHand *cards=_roundManager->_players[MIDDLE]->_cards;
+	float y = _layout->_playerPosi[MIDDLE].basePoint.y+10;
 
+	for(int group=0; group<cards->_alter->group_num(); group++)
+	{
+		auto Position_y=(cards->_alter->is_activated(group))?y+10:y;
+		for(int i=0; i<cards->_alter->cards_num(group); i++)
+		{
+			auto curCard=_GetCardInHand(MIDDLE,cards->_alter->get_card_idx(group,i));
+			auto curPos=curCard->getPosition();
+			curCard->setPosition(curPos.x,Position_y);
+		}
+	}
+}
+void RaceLayer::ListenToGangChoose(int no)
+{
+	auto GangChooseListener = EventListenerTouchOneByOne::create();
+	GangChooseListener->setSwallowTouches(true);
+
+	GangChooseListener->onTouchBegan = CC_CALLBACK_2(RaceLayer::_GangChooseBegan,this);
+	GangChooseListener->onTouchMoved = [=](Touch* touch, Event* event) {};
+	GangChooseListener->onTouchEnded = CC_CALLBACK_2(RaceLayer::_GangChooseEnded,this);
+
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(GangChooseListener, myframe);
+}
+bool RaceLayer::_GangChooseBegan(Touch* touch, Event* event)
+{
+	CardInHand *cards=_roundManager->_players[MIDDLE]->_cards;
+
+	Sprite *cardsInHand[MAX_HANDIN_NUM] = {0};
+	int groupChosen=INVALID;
+
+	for(int i=0;i<cards->size();i++) {
+		cardsInHand[i]=_GetCardInHand(MIDDLE,i);
+		cardsInHand[i]->_ID = MIDDLE;
+	}
+
+	//bool ifUpdateNeed=false;
+	//int preGroupNo=-1;
+	for(int group=0; group<cards->_alter->group_num(); group++)
+	{
+		//if(cards->_alter->is_activated(group))
+		//{
+		//	ifUpdateNeed=true;
+		//	preGroupNo=group;
+		//}
+		for(int i=0; i<cards->_alter->cards_num(group); i++)
+		{
+			if ( _IsClickedOn(cardsInHand[cards->_alter->get_card_idx(group,i)], touch) ) {
+				groupChosen = group;
+				break;
+			}
+		}
+	}
+
+	if(groupChosen!=INVALID) {
+		for(int i=0; i<cards->_alter->cards_num(groupChosen); i++) {
+			cardsInHand[cards->_alter->get_card_idx(groupChosen,i)]->_ID++;
+		}
+	}
+
+	return true;
+}
+void RaceLayer::_GangChooseEnded(Touch* touch, Event* event)
+{
+	CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
+
+	Sprite *cardsInHand[MAX_HANDIN_NUM];
+	for(int i=0; i<cards->size(); i++) {
+		cardsInHand[i]=_GetCardInHand(MIDDLE,i);
+	}
+
+	int groupChosen = _FindChosenGroup(touch,cardsInHand);
+
+	if(groupChosen!=INVALID) {
+		cards->_alter->switch_status(groupChosen);
+		_GangChooseUpdate();
+	}
+
+	bool ifEnsureVisible=false;
+	for(int group=0;group<cards->_alter->group_num();group++) {
+		if(cards->_alter->is_activated(group)) {
+			ifEnsureVisible=true;
+			break;
+		}
+	}
+
+	if(ifEnsureVisible)
+		myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(true);
+	else
+		myframe->getChildByTag(MING_KOU_ENSURE)->setVisible(false);
+}
 void RaceLayer::QueryGangCards() {
     //_DeleteActionTip();
     _eventDispatcher->removeEventListenersForTarget(myframe,true);
@@ -4361,7 +4454,7 @@ void RaceLayer::QueryGangCards() {
     
     _SwitchCancelBtn(GANG_CANCEL);
     MaskNon(sGANG_ENABLE);
-    ListenToKou(MIDDLE);
+    ListenToGangChoose(MIDDLE);
 }
 
 void RaceLayer::QueryKouCards() {
@@ -6238,12 +6331,23 @@ Vec2 RaceLayer::GetCardPositionInHand(int idx) {
 
 void RaceLayer::MaskNon(CardStatus_t status) {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
-    
-    for(int i=0; i<cards->size(); i++) {
-        if(cards->get_status(i)!=status) {
-            _effect->Mask(_GetCardInHand(MIDDLE,i));
-        }
-    }
+
+	if(status==sGANG_ENABLE)
+	{
+		for(int i=cards->FreeStart; i<cards->size(); i++) {
+			if(cards->get_status(i)!=status) {
+				_effect->Mask(_GetCardInHand(MIDDLE,i));
+			}
+		}
+	}
+	else
+	{
+		for(int i=0; i<cards->size(); i++) {
+			if(cards->get_status(i)!=status) {
+				_effect->Mask(_GetCardInHand(MIDDLE,i));
+			}
+		}
+	}
 }
 
 Spawn* RaceLayer::simple_tip_effect(Vec2 v,std::string act_name)

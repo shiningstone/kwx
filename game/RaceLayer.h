@@ -42,6 +42,10 @@ public:
     void _SwitchCancelBtn(int tag);
 
     void QueryGangCards();
+	void ListenToGangChoose(int no);
+	bool _GangChooseBegan(Touch* touch, Event* event);
+	void _GangChooseEnded(Touch* touch, Event* event);
+	void _GangChooseUpdate();
 
     void HideActionButtons();
     void ShowActionButtons(int mask);
