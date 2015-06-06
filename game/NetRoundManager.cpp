@@ -692,8 +692,9 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
         _curPlayer = dir;
 
         if(_curPlayer==MIDDLE) {
+            PlayerDir_t zhuang = GetLastWinner();
             for(int i=0;i<PLAYER_NUM;i++) {
-                _players[i]->refresh(info->huCards[i], info->huCardsNum[i]);
+                _players[(zhuang+i)%3]->refresh(info->huCards[i], info->huCardsNum[i]);
             }
         } else {
             _players[_curPlayer]->refresh(info->huCards[0], info->huCardsNum[0]);
