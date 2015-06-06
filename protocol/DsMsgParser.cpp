@@ -81,6 +81,8 @@ int DsMsgParser::_load(CardNode_t cards[3][18],INT8U cardNum[3],const DsMsg &msg
         i++;
     }
 
+    cardNum[player] = idx;
+
     return 0;
 }
 
