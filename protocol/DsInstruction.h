@@ -202,7 +202,6 @@ private:
     TableId_t        tableId;
     SeatId_t         seat;
     
-    int loadFromUtf16(INT8U *buf,const INT8U *input);
 public:    
     INT32U           baseScore;
 

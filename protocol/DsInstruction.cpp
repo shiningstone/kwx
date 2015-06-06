@@ -296,17 +296,12 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     for(int i=0;i<playerNum;i++) {
         status[i] = (msg._body->_items[5]->_buf[i]!=0);
         score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
-        loadFromUtf16(name[i],msg._body->_items[7]->_buf);
-        loadFromUtf16(image[i],msg._body->_items[8]->_buf);
+        _convert_from_utf16(name[i],msg._body->_items[7]->_buf);
+        _convert_from_utf16(image[i],msg._body->_items[8]->_buf);
     }
     
     return 0;
 }
-
-int EnterRoomResponse::loadFromUtf16(INT8U *buf,const INT8U *input) {
-    return 0;
-}
-
 
 int EnterRoomNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);

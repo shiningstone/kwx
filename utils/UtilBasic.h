@@ -19,6 +19,7 @@ extern INT16U _htons(INT16U n);
 extern void _set(INT32U &value,INT32U mask);
 extern void _clr(INT32U &value,INT32U mask);
 extern bool _is_active(INT32U value,INT32U mask);
+
 /****************************************
 string tranfer to bytes
     seperator should be ','
@@ -29,5 +30,8 @@ extern int _bytes(char *buf,const char *str);
 typedef int (*MsgHandler_t )(const INT8U *msg,int &len);
 
 extern void _delay(int ms);
+
+void _convert_from_utf16(INT8U *buf,const INT8U *utf16);
+void _convert_to_utf16(INT8U *buf,const INT8U *utf16);
 
 #endif

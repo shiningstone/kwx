@@ -126,6 +126,16 @@ int _bytes(char *buf,const char *str) {
     return i;
 }
 
+/****************************************************************
+    code
+****************************************************************/
+void _convert_from_utf16(INT8U *buf,const INT8U *utf16) {
+    strcpy((char *)buf,(char *)utf16);
+}
+
+void _convert_to_utf16(INT8U *utf16,const INT8U *buf) {
+    strcpy((char *)utf16,(char *)buf);
+}
 
 /****************************************************************
     platform dependent
