@@ -502,7 +502,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 				myframe->removeChildByTag(TING_SING_BAR);
 
             _TingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
-			myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
+			//myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
 			ifTingSignBarVisible=false;
 			ListenToTingButton();
 

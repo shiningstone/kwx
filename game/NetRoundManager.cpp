@@ -332,6 +332,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
         _SendAction(aMING_CONFIRM);
         Wait(REQ_GAME_DIST_DECISION);
+
+        _uiManager->_CardInHandUpdateEffect(MIDDLE);
 	} else {
         if(_actCtrl.decision==aMING) {
             _actCtrl.decision = aQi;
@@ -704,8 +706,6 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
         
         CardInHand *cards = _players[dir]->_cards;
         cards->IsMing = true;
-
-        _uiManager->_CardInHandUpdateEffect(dir);
     }
     
     delete info;
