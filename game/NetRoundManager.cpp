@@ -380,7 +380,7 @@ void NetRoundManager::RecvKouConfirm() {
 void NetRoundManager::RecvMingCancel() {
     _SendAction(aMING_CANCEL);
 
-    UpdateCards(MIDDLE,a_KOU_CANCEL);/*BUG HERE???*/
+    UpdateCards(MIDDLE,aMING_CANCEL);/*BUG HERE???*/
     
     _isMingTime=false;
     _actCtrl.decision = aQi;

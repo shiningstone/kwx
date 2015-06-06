@@ -578,7 +578,7 @@ void CardInHand::perform(ActionId_t act,Card_t kind,bool isZimo) {
         _Hu(isZimo);
     } else if(act==aKOU) {
         _Kou();
-    } else if(act==aKOU_CANCEL) {
+    } else if(act==aKOU_CANCEL || act==aMING_CANCEL) {
         _CancelKou();
     } else {
         _AcceptNewCard();
