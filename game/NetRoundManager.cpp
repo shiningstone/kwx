@@ -162,11 +162,9 @@ void NetRoundManager::ServerWaitForMyAction() {
     
     _uiManager->ShowActionButtons(_actCtrl.choices);
 
-#if 0
-	if(_actCtrl.choices!=0) {
+	if(_actCtrl.choices!=0 && !_isMingTime) {
 		_actCtrl.decision = aNULL;
 	}
-#endif
 
 	if(_isNewDistributed) {
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
