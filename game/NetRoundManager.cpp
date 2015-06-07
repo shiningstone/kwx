@@ -211,6 +211,7 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     RequestEnterRoom aReq;
     aReq.Set();
     _messenger->Send(aReq);
+    Wait(REQ_GAME_SEND_ENTER);
     /**********************************************/
 }
 
