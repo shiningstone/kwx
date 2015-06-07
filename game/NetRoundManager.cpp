@@ -38,6 +38,10 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 
     _HandoutNotify = false;
     _waiting = REQ_INVALID;
+    _waitNum = 0;
+    for(int i=0;i<MAX_WAIT_NUM;i++) {
+        _waitQueue[i] = REQ_INVALID;
+    }
 
     _messenger = new KwxMessenger();
     _logger = LOGGER_REGISTER("NetRoundManager");
@@ -326,28 +330,32 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
     _HandoutNotify = true;
     
+    Card_t handingout = _players[MIDDLE]->_cards->get_kind(chosen);
+    RecordOutCard(handingout);
+
 	if(_isMingTime) {
 		_isMingTime      = false;
-        _actCtrl.choices = 0;
 
         _SendAction(aMING_CONFIRM);
-        Wait(REQ_GAME_DIST_DECISION);
+        Wait(REQ_GAME_DIST_DECISION,REQ_GAME_DIST_DAOJISHI);
+
+        _players[LEFT]->refresh(_mingBuf.cards[LEFT], _mingBuf.num[LEFT]);
+        _players[RIGHT]->refresh(_mingBuf.cards[RIGHT], _mingBuf.num[RIGHT]);
+
+        /* handout by ForceHandout */
+        _players[MIDDLE]->_cards->delete_card(chosen);
+        _players[MIDDLE]->_cards->push_back(handingout);
+        _actCtrl.choices = 0;
 
         _uiManager->_CardInHandUpdateEffect(MIDDLE);
-	} else {
-        if(_actCtrl.decision==aMING) {
-            _actCtrl.decision = aQi;
-        }
-    }
-
-    RecordOutCard(_players[MIDDLE]->_cards->get_kind(chosen));
-    //_players[MIDDLE]->hand_out(chosen);
+	}
 
     bool turnToMing = false;
-	if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
+    if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(chosen);
         turnToMing = true;
     }
+
 	_actCtrl.decision = aQi;
 
     _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
@@ -456,18 +464,62 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 /*************************************
         response wait
 *************************************/
+void NetRoundManager::WaitQueueAdd(RequestId_t req) {
+    _waitQueue[_waitNum++] = req;
+}
+
+void NetRoundManager::WaitQueueDel(RequestId_t req) {
+    for(int i=0;i<_waitNum;i++) {
+        if(_waitQueue[i]==req) {
+            for(int j=i;j<_waitNum;j++) {
+                _waitQueue[j] = _waitQueue[j+1];
+            }
+        }
+    }
+
+    _waitNum--;
+}
+
+bool NetRoundManager::IsWaiting(RequestId_t req) const {
+    if(req==REQ_INVALID) {
+        return (_waitNum>0);
+    }
+    
+    for(int i=0;i<_waitNum;i++) {
+        if(_waitQueue[i]==req) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void NetRoundManager::Resume(DsInstruction *di) {
-    if(_waiting==di->request) {
+    RequestId_t req = di->request;
+    
+    if(IsWaiting(req)) {
         HandleMsg(di);
-        _waiting  = REQ_INVALID;
+        WaitQueueDel(req);
     }
 }
 
-bool NetRoundManager::Wait(RequestId_t req) {
-    _waiting      = req;
+bool NetRoundManager::Wait(RequestId_t req1,RequestId_t req2) {
+    WaitQueueAdd(req1);
+    WaitQueueAdd(req2);
     _permited     = false;
     
-    while(_waiting!=REQ_INVALID) {
+    while(_waitNum>0) {/*BUG : resume only all wait req are handled*/
+        _delay(100);
+    }
+    
+    return _permited;
+}
+
+bool NetRoundManager::Wait(RequestId_t req) {
+    WaitQueueAdd(req);
+    _permited     = false;
+    
+    while(_waitNum>0) {/*BUG : resume only all wait req are handled*/
         _delay(100);
     }
     
@@ -692,24 +744,6 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     _actCtrl.decision = (ActionId_t)info->actions;
     _actCtrl.choices  = _actCtrl.decision;
 
-    if(_actCtrl.decision==aMING) {
-        _curPlayer = dir;
-
-        if(_curPlayer==MIDDLE) {
-            PlayerDir_t zhuang = GetLastWinner();
-            for(int i=0;i<PLAYER_NUM;i++) {
-                _players[(zhuang+i)%3]->refresh(info->huCards[i], info->huCardsNum[i]);
-            }
-        } else {
-            _players[_curPlayer]->refresh(info->huCards[0], info->huCardsNum[0]);
-        }
-        
-        CardInHand *cards = _players[dir]->_cards;
-        cards->IsMing = true;
-    }
-    
-    delete info;
-
     switch(_actCtrl.decision) {
         case aPENG:
             _curPlayer = whoGive;
@@ -741,9 +775,29 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 _uiManager->_AnGangEffect(dir,card);
             }
             break;
+        case aMING:
+            {
+                _curPlayer = dir;
+                
+                if(_curPlayer==MIDDLE) {
+                    PlayerDir_t zhuang = GetLastWinner();
+                    for(int i=0;i<PLAYER_NUM;i++) {
+                        if((zhuang+i)%3!=MIDDLE) {
+                            _mingBuf.num[(zhuang+i)%3] = info->huCardsNum[i];
+                            memcpy(_mingBuf.cards[(zhuang+i)%3],info->huCards[i], sizeof(CardNode_t)*info->huCardsNum[i]);
+                        }
+                    }
+                } else {
+                    memcpy(_mingBuf.cards[_curPlayer],info->huCards[0], sizeof(CardNode_t)*info->huCardsNum[0]);
+                }
+
+            }
+            break;
         case aHU:
             break;
     }
+
+    delete info;
 }
 
 void NetRoundManager::_UpdateWin(HuInfo_t *player) {

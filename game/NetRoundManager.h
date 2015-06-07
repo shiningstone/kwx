@@ -59,14 +59,30 @@ public:
     bool _HandoutNotify;
     void _NotifyHandout();
 
+    static const int MAX_WAIT_NUM = 4;
+    RequestId_t _waitQueue[MAX_WAIT_NUM];
+    int         _waitNum;
+    
     RequestId_t _waiting;
     bool        _permited;
+    void WaitQueueAdd(RequestId_t req);
+    void WaitQueueDel(RequestId_t req);
+    bool IsWaiting(RequestId_t req = REQ_INVALID) const;
     void Resume(DsInstruction *di);
     bool Wait(RequestId_t req);
+    bool Wait(RequestId_t req1,RequestId_t req2);
+
 
     Reminds_t  _serverReminds;
     void _order_small_to_big(Card_t kinds[],int num);
     void _restoreRemindInfo(const Reminds_t &remind);
+
+
+    typedef struct _MingDecisionBuf_t {
+        CardNode_t       cards[PLAYER_NUM][18]; /* this struct is used for buffering the cards received by ming decision */
+        int              num[PLAYER_NUM];
+    }MingDecisionBuf;
+    MingDecisionBuf _mingBuf;
 /* networks end   */
 /******************/
 
