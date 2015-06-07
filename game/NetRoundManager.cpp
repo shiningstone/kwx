@@ -37,7 +37,6 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     }
 
     _HandoutNotify = false;
-    _waiting = REQ_INVALID;
     _waitNum = 0;
     for(int i=0;i<MAX_WAIT_NUM;i++) {
         _waitQueue[i] = REQ_INVALID;
@@ -337,8 +336,9 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 		_isMingTime      = false;
 
         _SendAction(aMING_CONFIRM);
-        Wait(REQ_GAME_DIST_DECISION,REQ_GAME_DIST_DAOJISHI);
-
+        Wait(REQ_GAME_DIST_DECISION);
+        Wait(REQ_GAME_DIST_DAOJISHI);
+        
         _players[LEFT]->refresh(_mingBuf.cards[LEFT], _mingBuf.num[LEFT]);
         _players[RIGHT]->refresh(_mingBuf.cards[RIGHT], _mingBuf.num[RIGHT]);
 
@@ -501,18 +501,6 @@ void NetRoundManager::Resume(DsInstruction *di) {
         HandleMsg(di);
         WaitQueueDel(req);
     }
-}
-
-bool NetRoundManager::Wait(RequestId_t req1,RequestId_t req2) {
-    WaitQueueAdd(req1);
-    WaitQueueAdd(req2);
-    _permited     = false;
-    
-    while(_waitNum>0) {/*BUG : resume only all wait req are handled*/
-        _delay(100);
-    }
-    
-    return _permited;
 }
 
 bool NetRoundManager::Wait(RequestId_t req) {

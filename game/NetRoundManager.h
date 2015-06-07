@@ -56,26 +56,27 @@ public:
     
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
 
+    /* handout request only can be sent after DAOJISHI received.
+       postpone this process to abolish ui-effect-lagging */
     bool _HandoutNotify;
     void _NotifyHandout();
 
+    /* wait queue for specified request, which will be handled in Non-main process */
     static const int MAX_WAIT_NUM = 4;
+
     RequestId_t _waitQueue[MAX_WAIT_NUM];
     int         _waitNum;
-    
-    RequestId_t _waiting;
-    bool        _permited;
+    bool        _permited;    /* this flag is used for judging conflicting actions from different players */
+
     void WaitQueueAdd(RequestId_t req);
     void WaitQueueDel(RequestId_t req);
     bool IsWaiting(RequestId_t req = REQ_INVALID) const;
     void Resume(DsInstruction *di);
     bool Wait(RequestId_t req);
-    bool Wait(RequestId_t req1,RequestId_t req2);
-
 
     Reminds_t  _serverReminds;
-    void _order_small_to_big(Card_t kinds[],int num);
     void _restoreRemindInfo(const Reminds_t &remind);
+    void _order_small_to_big(Card_t kinds[],int num);
 
 
     typedef struct _MingDecisionBuf_t {
