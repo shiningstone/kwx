@@ -143,7 +143,7 @@ void NetRoundManager::HandleMsg(void * aMsg) {
 }
 
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
-    if(dir==MIDDLE) {
+    if(dir==MIDDLE || IsMing(MIDDLE)) {
         RoundManager::UpdateCards(dir,action,actKind);
     } else {
         if(action==aPENG) {
