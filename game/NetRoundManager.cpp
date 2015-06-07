@@ -621,6 +621,7 @@ void NetRoundManager::_DiRecv(DistCardNotif *info) {
     _distributedNum    = info->remain;
     delete info;
 
+    _curPlayer = target;
     ServerDistributeTo(target,card);
 
     _players[target]->_cards->push_back(card);
