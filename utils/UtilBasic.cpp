@@ -137,6 +137,76 @@ void _convert_to_utf16(INT8U *utf16,const INT8U *buf) {
     strcpy((char *)utf16,(char *)buf);
 }
 
+#define UTF8_1_START      (0xOOO1)
+#define UTF8_1_END        (0x007F)
+#define UTF8_2_START      (0x0080)
+#define UTF8_2_END        (0x07FF)
+#define UTF8_3_START      (0x0800)
+#define UTF8_3_END        (0xFFFF)
+
+void Utf16ToUtf8(Utf16* pUtf16Start, Utf16* pUtf16End, Utf8* pUtf8Start, Utf8* pUtf8End)
+{
+    Utf16* pTempUtf16 = pUtf16Start;
+    Utf8*  pTempUtf8  = pUtf8Start;
+ 
+    while (pTempUtf16 < pUtf16End)
+    {
+        if (*pTempUtf16 <= UTF8_1_END && pTempUtf8 + 1 < pUtf8End)
+        {//0000 - 007F  0xxxxxxx
+            *pTempUtf8++ = (Utf8)*pTempUtf16;
+        }
+        else if(*pTempUtf16 >= UTF8_2_START && *pTempUtf16 <= UTF8_2_END && pTempUtf8 + 2 < pUtf8End) 
+        {//0080 - 07FF 110xxxxx 10xxxxxx
+            *pTempUtf8++ = (*pTempUtf16 >> 6) | 0xC0;
+            *pTempUtf8++ = (*pTempUtf16 & 0x3F) | 0x80;
+        }
+        else if(*pTempUtf16 >= UTF8_3_START && *pTempUtf16 <= UTF8_3_END && pTempUtf8 + 3 < pUtf8End)
+        {//0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
+            *pTempUtf8++ = (*pTempUtf16 >> 12) | 0xE0;
+            *pTempUtf8++ = ((*pTempUtf16 >> 6) & 0x3F) | 0x80;
+            *pTempUtf8++ = (*pTempUtf16 & 0x3F) | 0x80;
+        }
+        else
+        {
+            break;
+        }
+        pTempUtf16++;
+    }
+    *pTempUtf8 = 0;
+}
+
+void Utf8ToUtf16(Utf8* pUtf8Start, Utf8* pUtf8End, Utf16* pUtf16Start, Utf16* pUtf16End)
+{
+    Utf16* pTempUtf16 = pUtf16Start;
+    Utf8* pTempUtf8 = pUtf8Start;
+ 
+    while (pTempUtf8 < pUtf8End && pTempUtf16+1 < pUtf16End)
+    {
+        if (*pTempUtf8 >= 0xE0 && *pTempUtf8 <= 0xEF)//是3个字节的格式
+        {//0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
+            *pTempUtf16 |= ((*pTempUtf8++ & 0xEF) << 12);
+            *pTempUtf16 |= ((*pTempUtf8++ & 0x3F) << 6);
+            *pTempUtf16 |= (*pTempUtf8++ & 0x3F);
+ 
+        }
+        else if (*pTempUtf8 >= 0xC0 && *pTempUtf8 <= 0xDF)//是2个字节的格式
+        {//0080 - 07FF 110xxxxx 10xxxxxx
+            *pTempUtf16 |= ((*pTempUtf8++ & 0x1F) << 6);
+            *pTempUtf16 |= (*pTempUtf8++ & 0x3F);
+        }
+        else if(*pTempUtf8 >= 0 && *pTempUtf8 <= 0x7F)//是1个字节的格式
+        {//0000 - 007F  0xxxxxxx
+            *pTempUtf16 = *pTempUtf8++;
+        }
+        else
+        {
+            break;
+        }
+        pTempUtf16++;
+    }
+    *pTempUtf16 = 0;
+}
+
 /****************************************************************
     platform dependent
 ****************************************************************/
