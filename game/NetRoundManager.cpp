@@ -186,7 +186,8 @@ void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
         distInfo.cardsLen = _players[dir]->_cards->size();
         distInfo.newCard  = card;
         distInfo.remain   = TOTAL_CARD_NUM - _distributedNum;
-        
+
+        LOGGER_WRITE("Distribute %s to %s",DescPlayer(dir),DescCard(card));
         _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
     } else {
 		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
