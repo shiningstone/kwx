@@ -396,6 +396,7 @@ void NetRoundManager::RecvMingCancel() {
     
     _isMingTime=false;
     _actCtrl.decision = aQi;
+    _actCtrl.choices  = 0;
     
     _players[MIDDLE]->_cards->cancel_ming();
     /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
