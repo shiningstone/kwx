@@ -34,11 +34,11 @@ extern bool _is_active(INT32U value,INT32U mask);
     0080 - 07FF  110xxxxx 10xxxxxx
     0800 - FFFF  1110xxxx 10xxxxxx 10xxxxxx
 ************************************/
-typedef char  Utf8;
+typedef char    Utf8;
 typedef wchar_t Utf16;
 
-extern void Utf16ToUtf8(Utf16* pUtf16Start, Utf16* pUtf16End, Utf8* pUtf8Start, Utf8* pUtf8End);
-extern void Utf8ToUtf16(Utf8* pUtf8Start, Utf8* pUtf8End, Utf16* pUtf16Start, Utf16* pUtf16End);
+extern int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start);
+extern int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start);
 
 /****************************************
 string tranfer to bytes
@@ -50,8 +50,5 @@ extern int _bytes(char *buf,const char *str);
 typedef int (*MsgHandler_t )(const INT8U *msg,int &len);
 
 extern void _delay(int ms);
-
-void _convert_from_utf16(INT8U *buf,const INT8U *utf16);
-void _convert_to_utf16(INT8U *buf,const INT8U *utf16);
 
 #endif

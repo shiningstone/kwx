@@ -1,16 +1,13 @@
 
+#include "MsgFormats.h"
 #include "CommonMsg.h"
 
 #include "KwxMsgLogin.h"
 
-typedef enum {
-    VISITOR,
-    QQer,
-}UserType_t;
-
 int RequestLogin::Set() {
-    INT8U  type = VISITOR;
-
+    _add_item( new Item(60,_userType) );
+    _add_utf16_string(131,(const INT8U *)_account);
+    
     return 0;
 }
 

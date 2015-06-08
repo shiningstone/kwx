@@ -64,6 +64,7 @@ protected:
     
 	void _set_size(INT8U *buf,INT16U len);
 	int  _add_item(Item *item);
+    int  _add_utf16_string(Item_t id,const INT8U *hostString);
 
     int SetRequestCode(RequestId_t code);
     int AddSeatInfo();

@@ -5,9 +5,34 @@
 #include "KwxMsgBasic.h"
 class UsMsg;
 
+typedef enum {
+    VISITOR,
+    QQer,
+}UserType_t;
+
+typedef Utf8       HostString[MAX_UTF8_BUF];
+typedef Utf16      NetString[MAX_CHARS];
+
+typedef HostString Account_t;
+typedef HostString MacAddr_t;
+typedef HostString Imsi_t;
+typedef HostString Resolution_t;
+typedef HostString Product_t;
+typedef HostString OsVersion_t;
+typedef HostString SessionKey_t;
+
 class RequestLogin : public UsMsg {
 public:
     int Set();
+
+    UserType_t    _userType;
+    Account_t     _account;
+    MacAddr_t     _mac;
+    Imsi_t        _imsi;
+    Resolution_t  _resolution;
+    Product_t     _product;
+    OsVersion_t   _osVer;
+    SessionKey_t  _session;
 };
 
 

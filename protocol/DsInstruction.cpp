@@ -296,8 +296,8 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     for(int i=0;i<playerNum;i++) {
         status[i] = (msg._body->_items[5]->_buf[i]!=0);
         score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
-        _convert_from_utf16(name[i],msg._body->_items[7]->_buf);
-        _convert_from_utf16(image[i],msg._body->_items[8]->_buf);
+        memcpy(name[i],msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen);
+        memcpy(image[i],msg._body->_items[8]->_buf,msg._body->_items[8]->_bufLen);
     }
     
     return 0;

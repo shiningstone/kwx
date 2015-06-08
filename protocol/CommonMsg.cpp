@@ -228,6 +228,21 @@ int UsMsg::_add_item(Item *item) {
 	return 0;
 }
 
+int UsMsg::_add_utf16_string(Item_t id,const INT8U *hostString) {
+    Utf16 utfBuf[MAX_CHARS] = {0};
+    INT8U buf[MAX_CHARS*2]  = {0};
+    
+    int len = Utf8ToUtf16((Utf8 *)hostString,utfBuf);
+    
+    for(int i=0;i<len/2;i++) {
+        *((INT16U *)buf[i*2]) = _htons(*(utfBuf+i));
+    }
+
+    _add_item( new Item(131,len,buf) );
+
+    return 0;
+}
+
 #include "KwxMsgEnv.h"
 int UsMsg::AddSeatInfo() {
     INT32U roomPath = _htonl(_seatInfo->_roomPath);

@@ -4,6 +4,7 @@
 
 #include "./../utils/UtilBasic.h"
 
+#include "KwxMsgBasic.h"
 #include "MsgIntf.h"
 
 #define ITEM_BUF_LEN   128
@@ -14,8 +15,6 @@ typedef enum {
     ID_WITH_INT,
     ID_WITH_BUF,
 }ItemType_t;
-
-typedef INT8U Item_t;
 
 class Header : public MsgIntf {
 public:

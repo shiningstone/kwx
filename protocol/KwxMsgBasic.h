@@ -82,5 +82,10 @@ typedef enum {
     REQ_INVALID                 = 0xff,
 }RequestId_t;
 
+#define MAX_CHARS      128
+#define MAX_UTF8_BUF   MAX_CHARS*3
+
+typedef INT8U Item_t;
+
 #endif
 

@@ -14,9 +14,9 @@ void testUtfCoding() {
     wchar_t utf16[256] = {L"ÄãaºÃbÂð234ÖÐ¹ú~!"};
     char    utf8[256];
      
-    Utf16ToUtf8(utf16, utf16+wcslen(utf16), utf8, utf8+256);
+    Utf16ToUtf8(utf16, utf8);
     memset(utf16, 0, sizeof(utf16));
-    Utf8ToUtf16(utf8, utf8 + strlen(utf8), utf16, utf16+256);
+    Utf8ToUtf16(utf8, utf16);
 }
 
 void startRun() {

@@ -129,38 +129,49 @@ int _bytes(char *buf,const char *str) {
 /****************************************************************
     code
 ****************************************************************/
-void _convert_from_utf16(INT8U *buf,const INT8U *utf16) {
-    strcpy((char *)buf,(char *)utf16);
-}
+typedef struct _Range_t {
+    int start;
+    int end;
+}Range_t;
 
-void _convert_to_utf16(INT8U *utf16,const INT8U *buf) {
-    strcpy((char *)utf16,(char *)buf);
-}
+/***********************************************
+    UTF16 to UTF8 mapper
+        the range indicates how many bytes UTF8 would contain to represent the UTF16 word.
+************************************************/
+const Range_t UTF16_MAPPER[3] = {
+    {0x0001,0x007F},
+    {0x0080,0x07FF},
+    {0x0800,0xFFFF},
+};
 
-#define UTF8_1_START      (0xOOO1)
-#define UTF8_1_END        (0x007F)
-#define UTF8_2_START      (0x0080)
-#define UTF8_2_END        (0x07FF)
-#define UTF8_3_START      (0x0800)
-#define UTF8_3_END        (0xFFFF)
+/***********************************************
+    UTF8 to UTF16 mapper
+************************************************/
+const Range_t UTF8_MAPPER[3] = {
+    {0x00,0x7F},   /* 0bbbbbbb                      */
+    {0xC0,0XDF},   /* 110bbbbb    10bbbbbb          */
+    {0xE0,0xEF},   /* 1110bbbb    10bbbbbb 10bbbbbb */
+};
 
-void Utf16ToUtf8(Utf16* pUtf16Start, Utf16* pUtf16End, Utf8* pUtf8Start, Utf8* pUtf8End)
+int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
 {
-    Utf16* pTempUtf16 = pUtf16Start;
+    const Utf16* pUtf16End  = pUtf16Start + wcslen(pUtf16Start);
+
+    const Utf16* pTempUtf16 = pUtf16Start;
     Utf8*  pTempUtf8  = pUtf8Start;
  
-    while (pTempUtf16 < pUtf16End)
+    while(pTempUtf16<pUtf16End)
     {
-        if (*pTempUtf16 <= UTF8_1_END && pTempUtf8 + 1 < pUtf8End)
+        if (*pTempUtf16 <= UTF16_MAPPER[0].end)
         {//0000 - 007F  0xxxxxxx
             *pTempUtf8++ = (Utf8)*pTempUtf16;
         }
-        else if(*pTempUtf16 >= UTF8_2_START && *pTempUtf16 <= UTF8_2_END && pTempUtf8 + 2 < pUtf8End) 
+        else if(*pTempUtf16 >= UTF16_MAPPER[1].start && *pTempUtf16 <= UTF16_MAPPER[1].end) 
         {//0080 - 07FF 110xxxxx 10xxxxxx
             *pTempUtf8++ = (*pTempUtf16 >> 6) | 0xC0;
             *pTempUtf8++ = (*pTempUtf16 & 0x3F) | 0x80;
         }
-        else if(*pTempUtf16 >= UTF8_3_START && *pTempUtf16 <= UTF8_3_END && pTempUtf8 + 3 < pUtf8End)
+        else if(*pTempUtf16 >= UTF16_MAPPER[2].start && *pTempUtf16 <= UTF16_MAPPER[2].end)
         {//0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
             *pTempUtf8++ = (*pTempUtf16 >> 12) | 0xE0;
             *pTempUtf8++ = ((*pTempUtf16 >> 6) & 0x3F) | 0x80;
@@ -172,29 +183,33 @@ void Utf16ToUtf8(Utf16* pUtf16Start, Utf16* pUtf16End, Utf8* pUtf8Start, Utf8* p
         }
         pTempUtf16++;
     }
+    
     *pTempUtf8 = 0;
+
+    return (pTempUtf8-pUtf8Start);
 }
 
-void Utf8ToUtf16(Utf8* pUtf8Start, Utf8* pUtf8End, Utf16* pUtf16Start, Utf16* pUtf16End)
+int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
 {
+    const Utf8*  pUtf8End = pUtf8Start + strlen(pUtf8Start);
+
     Utf16* pTempUtf16 = pUtf16Start;
-    Utf8* pTempUtf8 = pUtf8Start;
+    const Utf8*  pTempUtf8 = pUtf8Start;
  
-    while (pTempUtf8 < pUtf8End && pTempUtf16+1 < pUtf16End)
+    while (pTempUtf8 < pUtf8End)
     {
-        if (*pTempUtf8 >= 0xE0 && *pTempUtf8 <= 0xEF)//是3个字节的格式
+        if (*pTempUtf8 >= UTF8_MAPPER[2].start && *pTempUtf8 <= UTF8_MAPPER[2].end)
         {//0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
             *pTempUtf16 |= ((*pTempUtf8++ & 0xEF) << 12);
             *pTempUtf16 |= ((*pTempUtf8++ & 0x3F) << 6);
             *pTempUtf16 |= (*pTempUtf8++ & 0x3F);
- 
         }
-        else if (*pTempUtf8 >= 0xC0 && *pTempUtf8 <= 0xDF)//是2个字节的格式
+        else if (*pTempUtf8 >= UTF8_MAPPER[1].start && *pTempUtf8 <= UTF8_MAPPER[1].end)
         {//0080 - 07FF 110xxxxx 10xxxxxx
             *pTempUtf16 |= ((*pTempUtf8++ & 0x1F) << 6);
             *pTempUtf16 |= (*pTempUtf8++ & 0x3F);
         }
-        else if(*pTempUtf8 >= 0 && *pTempUtf8 <= 0x7F)//是1个字节的格式
+        else if(*pTempUtf8 >= UTF8_MAPPER[0].start && *pTempUtf8 <= UTF8_MAPPER[0].end)
         {//0000 - 007F  0xxxxxxx
             *pTempUtf16 = *pTempUtf8++;
         }
@@ -204,7 +219,10 @@ void Utf8ToUtf16(Utf8* pUtf8Start, Utf8* pUtf8End, Utf16* pUtf16Start, Utf16* pU
         }
         pTempUtf16++;
     }
+    
     *pTempUtf16 = 0;
+
+    return (pTempUtf16-pUtf16Start);
 }
 
 /****************************************************************
