@@ -85,7 +85,7 @@ Item::Item(Item_t itemId, INT16U bufLen,INT8U *buf) {
 	memcpy(_buf,buf,bufLen);
 }
 
-Item_t Item::_IdType(INT8U id) {
+ItemType_t Item::_IdType(Item_t id) {
     if( id<50 ) {
         return PURE_ID ;
     } else if( id>=50 && id<128 ) {
@@ -95,7 +95,7 @@ Item_t Item::_IdType(INT8U id) {
     }
 }
 
-Item_t Item::GetIdType() const {
+ItemType_t Item::GetIdType() const {
     return _IdType(_id);
 }
 

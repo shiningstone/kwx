@@ -13,7 +13,9 @@ typedef enum {
     PURE_ID,
     ID_WITH_INT,
     ID_WITH_BUF,
-}Item_t;
+}ItemType_t;
+
+typedef INT8U Item_t;
 
 class Header : public MsgIntf {
 public:
@@ -78,14 +80,14 @@ public:
     virtual int Serialize(INT8U *outMsg);
     virtual int Deserialize(const INT8U *inMsg);
 
-    Item_t  GetIdType() const ;
+    ItemType_t  GetIdType() const ;
 
     Item_t   _id;
     INT8U    _value;
     INT16U   _bufLen;
     INT8U    _buf[ITEM_BUF_LEN];
 protected:
-    static Item_t _IdType(INT8U id);
+    static ItemType_t _IdType(Item_t id);
 };
 
 class MsgBody : public MsgIntf {
