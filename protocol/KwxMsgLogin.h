@@ -35,6 +35,5 @@ public:
     SessionKey_t  _session;
 };
 
-
 #endif
 
