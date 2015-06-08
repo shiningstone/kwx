@@ -3,7 +3,10 @@
 #define __KWX_MSG_LOGIN__
 
 #include "KwxMsgBasic.h"
+
 class UsMsg;
+class DsMsg;
+class DsInstruction;
 
 typedef enum {
     VISITOR,
@@ -33,6 +36,11 @@ public:
     Product_t     _product;
     OsVersion_t   _osVer;
     SessionKey_t  _session;
+};
+
+class LoginResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
 };
 
 #endif

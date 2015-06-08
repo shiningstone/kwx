@@ -1,6 +1,7 @@
 
 #include "MsgFormats.h"
 #include "CommonMsg.h"
+#include "DsInstruction.h"
 
 #include "KwxMsgLogin.h"
 
@@ -17,5 +18,4 @@ int RequestLogin::Set() {
 
     return 0;
 }
-
 
