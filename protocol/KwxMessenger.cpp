@@ -161,6 +161,14 @@ int RequestTingInfo::Set() {
     return 0;
 }
 
+int RequestTuoGuan::Set(bool status) {
+    SetRequestCode(REQ_GAME_SEND_AGENT);
+    AddSeatInfo();
+    _add_item( new Item(61,(status?1:0)) );
+
+    return 0;
+}
+
 int RequestEnterRoom::Set(int id) {
     SetRequestCode(REQ_GAME_SEND_ENTER);
 

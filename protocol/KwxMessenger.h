@@ -80,6 +80,10 @@ public:
     int Set();
 };
 
+class RequestTuoGuan : public UsMsg {
+public:
+    int Set(bool status);
+};
 
 class RequestEnterRoom : public UsMsg {
 public:

@@ -279,6 +279,17 @@ int HuInfoNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int TuoGuanResponse::Construct(const DsMsg &msg) {
+    status = msg.GetItemValue(0);
+    return 0;
+}
+
+int TuoGuanNotif::Construct(const DsMsg &msg) {
+    dir    = _GetPlayer(msg.GetItemValue(0));
+    status = (msg.GetItemValue(1)==1);
+    return 0;
+}
+
 int EnterRoomResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         

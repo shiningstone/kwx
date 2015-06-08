@@ -120,6 +120,12 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_HU_CALCULATE:
             _DiRecv((HuInfoNotif *)di);
             break;
+        case REQ_GAME_SEND_AGENT:
+            _DiRecv((TuoGuanResponse *)di);
+            break;
+        case REQ_GAME_RECV_AGENT:
+            _DiRecv((TuoGuanNotif *)di);
+            break;
 
         /*********************************************
             ÅÆ¾ÖÎÞ¹ØREQUEST
@@ -833,6 +839,12 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     delete info;
 
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
+}
+
+void NetRoundManager::_DiRecv(TuoGuanResponse *info) {
+}
+
+void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {

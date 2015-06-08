@@ -193,6 +193,21 @@ public:
     HuInfo_t         hu[3];
 };
 
+class TuoGuanResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+
+    INT8U            status;
+};
+
+class TuoGuanNotif : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+
+    PlayerDir_t      dir;
+    bool             status;
+};
+
 class EnterRoomResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
