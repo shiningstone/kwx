@@ -14,7 +14,7 @@ int RequestLogin::Set() {
     _add_utf16_string(134,(const INT8U *)_resolution);
     _add_utf16_string(135,(const INT8U *)_product);
     _add_utf16_string(136,(const INT8U *)_osVer);
-    _add_utf16_string(136,(const INT8U *)_session);
+    _add_utf16_string(137,(const INT8U *)_session);
 
     return 0;
 }
