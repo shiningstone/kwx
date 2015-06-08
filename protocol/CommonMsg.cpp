@@ -238,7 +238,7 @@ int UsMsg::_add_utf16_string(Item_t id,const INT8U *hostString) {
         *((INT16U *)buf[i*2]) = _htons(*(utfBuf+i));
     }
 
-    _add_item( new Item(131,len,buf) );
+    _add_item( new Item(id,len,buf) );/* multiply by 2??? */
 
     return 0;
 }
