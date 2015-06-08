@@ -820,7 +820,14 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     _UpdateWin(info->hu);
 
     for(int i=0;i<PLAYER_NUM;i++) {
-        _players[i]->refresh(info->hu[i].card, info->hu[i].cardNum, info->hu[i].fan);
+        if(info->hu[i].status==ZI_MO || info->hu[i].status==HU_PAI) {
+            int len = info->hu[i].cardNum;
+            
+            _players[i]->refresh(info->hu[i].card, len-1, info->hu[i].fan);
+            _players[i]->_cards->push_back(&info->hu[i].card[len-1]);
+        } else {
+            _players[i]->refresh(info->hu[i].card, info->hu[i].cardNum, info->hu[i].fan);
+        }
     }
 
     delete info;
