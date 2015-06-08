@@ -117,6 +117,10 @@ PlayerDir_t SeatInfo::GetPlayer(SeatId_t seat)const {
 }
 
 SeatId_t SeatInfo::GetSeatId(PlayerDir_t dir)const {
-    return _dirToSeat[dir];
+    if(dir==SERVER) {
+        return 0;
+    } else {
+        return _dirToSeat[dir];
+    }
 }
 

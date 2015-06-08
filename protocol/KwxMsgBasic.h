@@ -50,6 +50,9 @@ typedef enum {
     REQ_GAME_RECV_ACTION        = 76,
     REQ_GAME_RECV_START         = 77,
     
+    REQ_GAME_SEND_AGENT         = 47,
+    REQ_GAME_RECV_AGENT         = 78,
+
     /*********************************************
         牌局无关REQUEST
     *********************************************/
@@ -61,9 +64,6 @@ typedef enum {
     /*********************************************
         待实现REQUEST
     *********************************************/
-    REQ_GAME_SEND_AGENT         = 47,
-    REQ_GAME_RECV_AGENT         = 78,
-
     /*  login */
     REQ_LOGIN                   = 1,
     REQ_GAME_SEND_RECONNECT     = 42,
