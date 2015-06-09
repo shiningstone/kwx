@@ -19,7 +19,9 @@ EnvVariable::EnvVariable() {
 	_platform = 6;                 
 	_buildNo  = 7;                 
 	_customerId = 0x0809;          
-	_productId  = 0x0a0b;          
+	_productId  = 0x0a0b;
+
+    _key = 0x01020304;
 #else
 	_protocol = 16;                //const value in terms of version
 	_userId   = 0x01020304;        //set by device Id
@@ -32,20 +34,28 @@ EnvVariable::EnvVariable() {
 }
 
 
-Key_t EnvVariable::GetKey() {
-    return 0x01020304;
+void EnvVariable::SetKey(Key_t key) {
+    _key = key;
 }
 
-RoomPath_t EnvVariable::GetRoomPath(int id) {
-    return 11;
+Key_t EnvVariable::GetKey() {
+    return _key;
+}
+
+void EnvVariable::SetUserId(INT32U id) {
+    _userId = id;
 }
 
 INT32U EnvVariable::GetUserId() {
     return _userId;
 }
 
+RoomPath_t EnvVariable::GetRoomPath(int id) {
+    return 11;
+}
 
-
+/*******************************************************************************
+********************************************************************************/
 SeatInfo *SeatInfo::_instance[MAX_JOINABLE_TABLE] = {0};
 
 SeatInfo *SeatInfo::getInstance(int threadId) {

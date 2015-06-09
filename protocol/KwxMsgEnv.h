@@ -15,10 +15,13 @@ class EnvVariable {
 public:
 	static EnvVariable *getInstance();
 
-    RoomPath_t GetKey();
+    void       SetKey(Key_t key);
+    Key_t      GetKey();
+    void       SetUserId(INT32U id);
     INT32U     GetUserId();
     RoomPath_t GetRoomPath(int id);
 
+    Key_t    _key;
     
     INT8U    _protocol;
 	INT32U   _userId;

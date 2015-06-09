@@ -34,10 +34,12 @@ int LoginResponse::Construct(const DsMsg &msg) {
     _userType          = (UserType_t)msg.GetItemValue(1);
     _userActivated     = msg.GetItemValue(2);
     _reconnectRequired = msg.GetItemValue(3);
-    _userId            = msg.GetItemValue(4);
-    _key               = msg.GetItemValue(5);
+    
+    EnvVariable::getInstance()->SetUserId(msg.GetItemValue(4));
+    EnvVariable::getInstance()->SetKey(msg.GetItemValue(5));
+
     _roomServerId      = msg.GetItemValue(6);
-    Utf16ToUtf8((const Utf16 *)msg._body->_items[7]->_buf,(Utf8 *)_roomServerIp);
+    Utf16ToUtf8((const Utf16 *)msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen,(Utf8 *)_roomServerIp);
     _roomServerPort    = msg.GetItemValue(8);
 
     return 0;
