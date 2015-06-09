@@ -34,6 +34,8 @@ private:
 
 /*******************************************************************************
 	NOTE:
+        SeatInfo records the information in Server, used to convert local dir to server seatId.
+        
         if a player is allowed to join more than one table in the meantime,
         getInstance should be called with the param "threadInfo"
 ********************************************************************************/

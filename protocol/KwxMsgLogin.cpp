@@ -6,16 +6,18 @@
 #include "KwxMsgLogin.h"
 
 int RequestLogin::Set() {
+    _get_device_info(_device);
+
     SetRequestCode(REQ_LOGIN);
 
     _add_item( new Item(60,_userType) );
     
     _add_utf16_string(131,(const INT8U *)_account);
-    _add_utf16_string(132,(const INT8U *)_mac);
-    _add_utf16_string(133,(const INT8U *)_imsi);
-    _add_utf16_string(134,(const INT8U *)_resolution);
-    _add_utf16_string(135,(const INT8U *)_product);
-    _add_utf16_string(136,(const INT8U *)_osVer);
+    _add_utf16_string(132,_device.mac);
+    _add_utf16_string(133,_device.imsi);
+    _add_utf16_string(134,_device.resolution);
+    _add_utf16_string(135,_device.protoType);
+    _add_utf16_string(136,_device.osVer);
     _add_utf16_string(137,(const INT8U *)_session);
 
     return 0;
@@ -73,10 +75,10 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     for(int i=0;i<playerNum;i++) {
         status[i] = (msg._body->_items[5]->_buf[i]!=0);
         score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
-        memcpy(name[i],msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen);
-        memcpy(image[i],msg._body->_items[8]->_buf,msg._body->_items[8]->_bufLen);
+        //Utf16ToUtf8((Utf16 *)msg._body->_items[7]->_buf,(Utf8 *)name[i]);
+        //Utf16ToUtf8((Utf16 *)msg._body->_items[8]->_buf,(Utf8 *)image[i]);
     }
-    
+
     return 0;
 }
 
@@ -209,7 +211,7 @@ void KwxHeart::SetRate(int second) {
 }
 
 void KwxHeart::_Beats() {
-    #if 0
+#ifndef NO_HEART_BEAT
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
@@ -221,7 +223,7 @@ void KwxHeart::_Beats() {
         _socket->Send((char *)buf,len);
         _delay(_rate*100);
     }
-    #endif
+#endif
 }
 
 KwxHeart* KwxHeart::_instance = NULL;

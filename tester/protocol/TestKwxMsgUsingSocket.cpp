@@ -6,6 +6,8 @@
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/CommonMsg.h"
 #include "./../../protocol/KwxMessenger.h"
+#include "./../../protocol/DsInstruction.h"
+#include "./../../protocol/KwxMsgLogin.h"
 
 #include "./../../network/CSockets.h"
 #include "./../../network/GameSocket.h"

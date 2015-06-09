@@ -238,3 +238,8 @@ void _delay(int ms) {
     Sleep(ms);
     #endif
 }
+
+void _get_device_info(DeviceInfo_t &info) {
+
+}
+

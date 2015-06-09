@@ -20,14 +20,10 @@ class RequestLogin : public UsMsg {
 public:
     int Set();
 
-    UserType_t  _userType;
-    HostString  _account;
-    HostString  _mac;
-    HostString  _imsi;
-    HostString  _resolution;
-    HostString  _product;
-    HostString  _osVer;
-    HostString  _session;
+    UserType_t   _userType;
+    HostString   _account;
+    DeviceInfo_t _device;
+    HostString   _session;
 };
 
 class LoginResponse : public DsInstruction {

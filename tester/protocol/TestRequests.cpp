@@ -6,6 +6,7 @@
 #include "./../../protocol/DsInstruction.h"
 #include "./../../protocol/KwxMsgEnv.h"
 #include "./../../protocol/KwxMessenger.h"
+#include "./../../protocol/KwxMsgLogin.h"
 
 /********************************************************************
 	TestCases
