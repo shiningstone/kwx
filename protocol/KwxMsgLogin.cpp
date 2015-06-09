@@ -59,6 +59,21 @@ int RequestEnterRoom::Set(int id) {
 }
 
 #include <string.h>
+void EnterRoomResponse::_LoadStrings(INT8U strings[3][128],const INT8U *buf,int bufLen) {
+    char Utf8Buf[512] = {0};
+    Utf16ToUtf8((Utf16 *)buf,(Utf8 *)Utf8Buf);
+
+    const char *SPLIT = "%@";
+    int idx = 0;
+
+    char *token = strtok(Utf8Buf,SPLIT);
+    
+    while(token!=NULL) {
+        strcpy((char *)strings[idx++],token);
+        token = strtok(NULL,SPLIT);
+    }
+}
+
 int EnterRoomResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
@@ -71,13 +86,16 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     baseScore= msg.GetItemValue(4);
     
     playerNum= msg._body->_items[5]->_bufLen;
-    
+
+    int nameLen  = 0;
+    int imageLen = 0;
     for(int i=0;i<playerNum;i++) {
         status[i] = (msg._body->_items[5]->_buf[i]!=0);
         score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
-        //Utf16ToUtf8((Utf16 *)msg._body->_items[7]->_buf,(Utf8 *)name[i]);
-        //Utf16ToUtf8((Utf16 *)msg._body->_items[8]->_buf,(Utf8 *)image[i]);
     }
+
+    _LoadStrings(name,msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen);
+    _LoadStrings(image,msg._body->_items[8]->_buf,msg._body->_items[8]->_bufLen);
 
     return 0;
 }

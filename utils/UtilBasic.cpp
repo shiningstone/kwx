@@ -188,7 +188,7 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
     
     *pTempUtf8 = 0;
 
-    return (pTempUtf8-pUtf8Start);
+    return 2*(pTempUtf16-pUtf16Start);
 }
 
 int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
@@ -226,7 +226,7 @@ int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
     
     *pTempUtf16 = 0;
 
-    return (pTempUtf16-pUtf16Start);
+    return (pUtf8End-pUtf8Start);
 }
 
 /****************************************************************
