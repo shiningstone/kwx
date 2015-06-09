@@ -86,8 +86,6 @@ public:
 class RequestReconnect : public UsMsg {
 public:
     int Set();
-
-    INT32U  _key;
 };
 
 class ReconnectResponse : public DsInstruction {

@@ -30,6 +30,8 @@ EnvVariable::EnvVariable() {
 	_buildNo  = 7;                 //const value in terms of version
 	_customerId = 0x0809;          //???
 	_productId  = 0x0a0b;          //???
+
+    _key = 0x01020304;
 #endif
 }
 

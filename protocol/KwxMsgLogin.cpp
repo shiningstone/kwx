@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "MsgFormats.h"
 #include "CommonMsg.h"
 #include "DsInstruction.h"
@@ -60,7 +62,6 @@ int RequestEnterRoom::Set(int id) {
     return 0;
 }
 
-#include <string.h>
 void EnterRoomResponse::_LoadStrings(INT8U strings[3][128],const INT8U *buf,int bufLen) {
     char Utf8Buf[512] = {0};
     Utf16ToUtf8((Utf16 *)buf,(Utf8 *)Utf8Buf);
@@ -119,8 +120,10 @@ int EnterRoomNotif::Construct(const DsMsg &msg) {
 int RequestReconnect::Set() {
     SetRequestCode(REQ_GAME_SEND_RECONNECT);
 
-    INT32U value = _htons(_key);
-    _add_item( new Item(130,4,(INT8U *)&value) );
+    Key_t key = EnvVariable::getInstance()->GetKey();
+    INT32U keyid = _htonl((INT32U)key);
+
+    _add_item( new Item(130,4,(INT8U *)&keyid) );
     AddSeatInfo();
 
     return 0;
