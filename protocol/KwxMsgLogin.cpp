@@ -56,6 +56,38 @@ int RequestEnterRoom::Set(int id) {
     return 0;
 }
 
+#include <string.h>
+int EnterRoomResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    roomPath = msg.GetItemValue(0);
+    roomId   = msg.GetItemValue(1);
+    tableId  = msg.GetItemValue(2);
+    seat     = msg.GetItemValue(3);
+    SeatInfo::getInstance()->Set(roomPath,roomId,tableId,seat);
+    
+    baseScore= msg.GetItemValue(4);
+    
+    playerNum= msg._body->_items[5]->_bufLen;
+    
+    for(int i=0;i<playerNum;i++) {
+        status[i] = (msg._body->_items[5]->_buf[i]!=0);
+        score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
+        memcpy(name[i],msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen);
+        memcpy(image[i],msg._body->_items[8]->_buf,msg._body->_items[8]->_bufLen);
+    }
+    
+    return 0;
+}
+
+int EnterRoomNotif::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    seat     = msg.GetItemValue(0);
+    
+    return 0;
+}
+
 int RequestReconnect::Set() {
     SetRequestCode(REQ_GAME_SEND_RECONNECT);
 

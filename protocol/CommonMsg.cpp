@@ -8,6 +8,7 @@
 #include "MsgFormats.h"
 #include "CommonMsg.h"
 #include "DsInstruction.h"
+#include "KwxMsgLogin.h"
 
 #include "DbgRequestDesc.h"
 

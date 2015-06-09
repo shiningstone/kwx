@@ -11,6 +11,7 @@ using namespace ui;
 #include "./../utils/LogManager.h"
 #include "./../utils/MsgQueue.h"
 #include "./../protocol/DsInstruction.h"
+#include "./../protocol/KwxMsgLogin.h"
 
 class Player;
 class RoundManager;

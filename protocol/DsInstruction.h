@@ -208,37 +208,6 @@ public:
     bool             status;
 };
 
-class EnterRoomResponse : public DsInstruction {
-public:
-    virtual int  Construct(const DsMsg &msg);
-private:    
-    RoomPath_t       roomPath;
-    RoomId_t         roomId;
-    TableId_t        tableId;
-    SeatId_t         seat;
-    
-public:    
-    INT32U           baseScore;
-
-    int              playerNum;
-    bool             status[3];
-    INT32U           score[3];
-    INT8U            name[3][128];
-    INT8U            image[3][128];    
-};
-
-class EnterRoomNotif : public DsInstruction {
-public:
-    virtual int  Construct(const DsMsg &msg);
-
-    int              seat;
-    INT32U           baseScore;
-    bool             status;
-    INT32U           score;
-    INT8U            name[128];
-    INT8U            image[128];    
-};
-
 class CounterNotif : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
