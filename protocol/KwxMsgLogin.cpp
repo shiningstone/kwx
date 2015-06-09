@@ -90,7 +90,7 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     int nameLen  = 0;
     int imageLen = 0;
     for(int i=0;i<playerNum;i++) {
-        status[i] = (msg._body->_items[5]->_buf[i]!=0);
+        status[i] = (PlayerStatus_t)msg._body->_items[5]->_buf[i];
         score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
     }
 
@@ -103,8 +103,14 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
 int EnterRoomNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
-    seat     = msg.GetItemValue(0);
+    seat      = _GetPlayer(msg.GetItemValue(0));
+    baseScore = msg.GetItemValue(1);
     
+    score     = msg.GetItemValue(3);
+
+    Utf16ToUtf8((Utf16 *)msg._body->_items[4]->_buf,msg._body->_items[4]->_bufLen,(Utf8 *)name);
+    Utf16ToUtf8((Utf16 *)msg._body->_items[5]->_buf,msg._body->_items[5]->_bufLen,(Utf8 *)image);
+
     return 0;
 }
 

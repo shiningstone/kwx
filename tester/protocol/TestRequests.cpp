@@ -1293,10 +1293,10 @@ public:
             6,
             61,2,                    //new comer
             131,0,4,0,0,0,1,         //µ×·Ö base score
-            61,2,                    //player status
-            131,0,4,0,0,0,1,         //player score
-            131,0,4,1,2,3,4,         //player name
-            131,0,4,5,6,7,8,         //player image
+            62,2,                    //player status
+            132,0,4,0,0,0,1,         //player score
+            133,0,4,0,1,0,2,         //player name
+            134,0,4,0,3,0,4,         //player image
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;

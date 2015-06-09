@@ -45,6 +45,13 @@ public:
     int Set(int id=0);
 };
 
+typedef enum {
+    ABSENT          = 0,
+    WAIT_FOR_START  = 1,
+    WAIT_FOR_PIAO   = 2,
+    READY           = 5,
+}PlayerStatus_t;
+
 class EnterRoomResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
@@ -60,7 +67,7 @@ public:
     INT32U           baseScore;
 
     int              playerNum;
-    bool             status[3];
+    PlayerStatus_t   status[3];
     INT32U           score[3];
     INT8U            name[3][128];
     INT8U            image[3][128];    
