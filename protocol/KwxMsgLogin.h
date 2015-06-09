@@ -44,24 +44,34 @@ public:
     INT32U      _roomServerPort;
 };
 
-class RequestXiaPiao : public UsMsg {
+class CSocket;
+class KwxHeart {
 public:
-    int Set(INT32U score);
+    static KwxHeart *getInstance(int second=5);
+    static void      destroyInstance();
+
+    void SetRate(int second);
+private:
+    KwxHeart(int second);
+    ~KwxHeart();
+
+    void    _Beats();
+
+    CSocket *_socket;
+    int      _rate;
+    bool     _running;
+
+    static KwxHeart *_instance;
 };
 
-class XiaPiaoResponse : public DsInstruction {
+class RequestHeartBeat : public UsMsg {
 public:
-    virtual int  Construct(const DsMsg &msg);
-    
-    INT32U _score;
+    int Set();
 };
 
-class XiaPiaoNotif : public DsInstruction {
+class RequestEnterRoom : public UsMsg {
 public:
-    virtual int  Construct(const DsMsg &msg);
-
-    PlayerDir_t _dir;    
-    INT32U      _score;
+    int Set(int id=0);
 };
 
 class RequestReconnect : public UsMsg {
@@ -107,6 +117,26 @@ public:
 
     PlayerDir_t   _dir;
     LeaveStatus_t _status;
+};
+
+class RequestXiaPiao : public UsMsg {
+public:
+    int Set(INT32U score);
+};
+
+class XiaPiaoResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+    
+    INT32U _score;
+};
+
+class XiaPiaoNotif : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+
+    PlayerDir_t _dir;    
+    INT32U      _score;
 };
 
 typedef enum {

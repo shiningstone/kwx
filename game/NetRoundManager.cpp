@@ -7,6 +7,12 @@ USING_NS_CC;
 #include "./../protocol/CommonMsg.h"
 #include "./../protocol/KwxMessenger.h"
 
+/************************************/
+/* temporary for RequestEnterRoom   */
+#include "./../protocol/DsInstruction.h"
+#include "./../protocol/KwxMsgLogin.h"
+/************************************/
+
 #include "CardCollection.h"
 #include "Player.h"
 #include "RaceLayer.h"

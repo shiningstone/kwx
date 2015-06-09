@@ -32,26 +32,6 @@ private:
     static Logger       *_logger;
 };
 
-class CSocket;
-class KwxHeart {
-public:
-    static KwxHeart *getInstance(int second=5);
-    static void destroyInstance();
-
-    void SetRate(int second);
-private:
-    KwxHeart(int second);
-    ~KwxHeart();
-
-    void    _Beats();
-
-    CSocket *_socket;
-    int      _rate;
-    bool     _running;
-
-    static KwxHeart *_instance;
-};
-
 class RequestSendAction : public UsMsg {
 public:
     int Set(ActionId_t action,Card_t card);
@@ -83,16 +63,6 @@ public:
 class RequestTuoGuan : public UsMsg {
 public:
     int Set(bool status);
-};
-
-class RequestEnterRoom : public UsMsg {
-public:
-    int Set(int id=0);
-};
-
-class RequestHeartBeat : public UsMsg {
-public:
-    int Set();
 };
 
 #endif
