@@ -54,26 +54,19 @@ void test_3_bytes() {
     assert(len==3);
 }
 
+#include "./../../protocol/MsgFormats.h"
+#include "./../../protocol/CommonMsg.h"
+#include "./../../protocol/DsInstruction.h"
+#include "./../../protocol/KwxMsgLogin.h"
 void test_split() {
     wchar_t utf16Buf[] = L"name1%@name2%@name3";
-    char strings[3][128] = {{0}};
-    
-    char Utf8Buf[512] = {0};
-    Utf16ToUtf8((Utf16 *)utf16Buf,(Utf8 *)Utf8Buf);
+    INT8U strings[3][128] = {{0}};
 
-    const char *SPLIT = "%@";
-    int idx = 0;
+    EnterRoomResponse::_LoadStrings(strings,(INT8U *)utf16Buf,wcslen(utf16Buf));
 
-    char *token = strtok(Utf8Buf,SPLIT);
-    
-    while(token!=NULL) {
-        strcpy((char *)strings[idx++],token);
-        token = strtok(NULL,SPLIT);
-    }
-
-    assert(!strcmp(strings[0],"name1"));
-    assert(!strcmp(strings[1],"name2"));
-    assert(!strcmp(strings[2],"name3"));
+    assert(!strcmp((char *)strings[0],"name1"));
+    assert(!strcmp((char *)strings[1],"name2"));
+    assert(!strcmp((char *)strings[2],"name3"));
 }
 
 void test_utf16() {

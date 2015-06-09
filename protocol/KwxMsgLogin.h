@@ -48,8 +48,8 @@ public:
 class EnterRoomResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
-private:    
-    void _LoadStrings(INT8U strings[][128],const INT8U *buf,int bufLen);
+    static void  _LoadStrings(INT8U strings[][128],const INT8U *buf,int bufLen);
+private:
 
     RoomPath_t       roomPath;
     RoomId_t         roomId;
