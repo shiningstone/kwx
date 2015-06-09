@@ -162,20 +162,22 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
  
     while(pTempUtf16<pUtf16End)
     {
-        if (*pTempUtf16 <= UTF16_MAPPER[0].end)
+        unsigned wchar_t byte = *pTempUtf16;
+        
+        if (byte <= UTF16_MAPPER[0].end)
         {//0000 - 007F  0xxxxxxx
-            *pTempUtf8++ = (Utf8)*pTempUtf16;
+            *pTempUtf8++ = (Utf8)byte;
         }
-        else if(*pTempUtf16 >= UTF16_MAPPER[1].start && *pTempUtf16 <= UTF16_MAPPER[1].end) 
+        else if(byte >= UTF16_MAPPER[1].start && byte <= UTF16_MAPPER[1].end) 
         {//0080 - 07FF 110xxxxx 10xxxxxx
-            *pTempUtf8++ = (*pTempUtf16 >> 6) | 0xC0;
-            *pTempUtf8++ = (*pTempUtf16 & 0x3F) | 0x80;
+            *pTempUtf8++ = (byte >> 6) | 0xC0;
+            *pTempUtf8++ = (byte & 0x3F) | 0x80;
         }
-        else if(*pTempUtf16 >= UTF16_MAPPER[2].start && *pTempUtf16 <= UTF16_MAPPER[2].end)
+        else if(byte >= UTF16_MAPPER[2].start && byte <= UTF16_MAPPER[2].end)
         {//0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
-            *pTempUtf8++ = (*pTempUtf16 >> 12) | 0xE0;
-            *pTempUtf8++ = ((*pTempUtf16 >> 6) & 0x3F) | 0x80;
-            *pTempUtf8++ = (*pTempUtf16 & 0x3F) | 0x80;
+            *pTempUtf8++ = (byte >> 12) | 0xE0;
+            *pTempUtf8++ = ((byte >> 6) & 0x3F) | 0x80;
+            *pTempUtf8++ = (byte & 0x3F) | 0x80;
         }
         else
         {
@@ -198,18 +200,20 @@ int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
  
     while (pTempUtf8 < pUtf8End)
     {
-        if (*pTempUtf8 >= UTF8_MAPPER[2].start && *pTempUtf8 <= UTF8_MAPPER[2].end)
+        unsigned char byte = *pTempUtf8;
+        
+        if (byte >= UTF8_MAPPER[2].start && byte <= UTF8_MAPPER[2].end)
         {//0800 - FFFF 1110xxxx 10xxxxxx 10xxxxxx
             *pTempUtf16 |= ((*pTempUtf8++ & 0xEF) << 12);
             *pTempUtf16 |= ((*pTempUtf8++ & 0x3F) << 6);
             *pTempUtf16 |= (*pTempUtf8++ & 0x3F);
         }
-        else if (*pTempUtf8 >= UTF8_MAPPER[1].start && *pTempUtf8 <= UTF8_MAPPER[1].end)
+        else if (byte >= UTF8_MAPPER[1].start && byte <= UTF8_MAPPER[1].end)
         {//0080 - 07FF 110xxxxx 10xxxxxx
             *pTempUtf16 |= ((*pTempUtf8++ & 0x1F) << 6);
             *pTempUtf16 |= (*pTempUtf8++ & 0x3F);
         }
-        else if(*pTempUtf8 >= UTF8_MAPPER[0].start && *pTempUtf8 <= UTF8_MAPPER[0].end)
+        else if(byte >= UTF8_MAPPER[0].start && byte <= UTF8_MAPPER[0].end)
         {//0000 - 007F  0xxxxxxx
             *pTempUtf16 = *pTempUtf8++;
         }
