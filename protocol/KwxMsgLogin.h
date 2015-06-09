@@ -44,31 +44,6 @@ public:
     INT32U      _roomServerPort;
 };
 
-class CSocket;
-class KwxHeart {
-public:
-    static KwxHeart *getInstance(int second=5);
-    static void      destroyInstance();
-
-    void SetRate(int second);
-private:
-    KwxHeart(int second);
-    ~KwxHeart();
-
-    void    _Beats();
-
-    CSocket *_socket;
-    int      _rate;
-    bool     _running;
-
-    static KwxHeart *_instance;
-};
-
-class RequestHeartBeat : public UsMsg {
-public:
-    int Set();
-};
-
 class RequestEnterRoom : public UsMsg {
 public:
     int Set(int id=0);
@@ -150,6 +125,13 @@ public:
     LeaveStatus_t _status;
 };
 
+class LoginConflictNotif : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+    
+    HostString    _info;
+};
+
 class RequestXiaPiao : public UsMsg {
 public:
     int Set(INT32U score);
@@ -199,11 +181,30 @@ public:
     HostString    _content;
 };
 
-class LoginConflictNotif : public DsInstruction {
+class CSocket;
+class KwxHeart {
 public:
-    virtual int  Construct(const DsMsg &msg);
-    
-    HostString    _info;
+    static KwxHeart *getInstance(int second=5);
+    static void      destroyInstance();
+
+    void SetRate(int second);
+private:
+    KwxHeart(int second);
+    ~KwxHeart();
+
+    void    _Beats();
+
+    CSocket *_socket;
+    int      _rate;
+    bool     _running;
+
+    static KwxHeart *_instance;
 };
+
+class RequestHeartBeat : public UsMsg {
+public:
+    int Set();
+};
+
 #endif
 
