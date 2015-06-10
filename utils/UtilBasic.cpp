@@ -153,13 +153,6 @@ const Range_t UTF8_MAPPER[3] = {
     {0xE0,0xEF},   /* 1110bbbb    10bbbbbb 10bbbbbb */
 };
 
-int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start) {
-    Utf16 buf[128] = {0};
-    memcpy(buf,pUtf16Start,len);
-
-    return Utf16ToUtf8(buf,pUtf8Start);
-}
-
 int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
 {
     const Utf16* pUtf16End  = pUtf16Start + wcslen(pUtf16Start);
@@ -196,6 +189,13 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
     *pTempUtf8 = 0;
 
     return 2*(pTempUtf16-pUtf16Start);
+}
+
+int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start) {
+    Utf16 buf[128] = {0};
+    memcpy(buf,pUtf16Start,len);
+
+    return Utf16ToUtf8(buf,pUtf8Start);
 }
 
 int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)

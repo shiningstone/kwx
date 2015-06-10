@@ -37,7 +37,6 @@ extern bool _is_active(INT32U value,INT32U mask);
 typedef char    Utf8;
 typedef wchar_t Utf16;
 
-extern int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start);
 extern int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start);
 extern int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start);
 

@@ -64,7 +64,7 @@ int RequestEnterRoom::Set(int id) {
 
 void EnterRoomResponse::_LoadStrings(INT8U strings[3][128],const INT8U *buf,int bufLen) {
     char Utf8Buf[512] = {0};
-    Utf16ToUtf8((Utf16 *)buf,(Utf8 *)Utf8Buf);
+    Utf16ToUtf8((Utf16 *)buf,bufLen,(Utf8 *)Utf8Buf);
 
     const char *SPLIT = "%@";
     int idx = 0;
@@ -167,7 +167,7 @@ int LeaveNotif::Construct(const DsMsg &msg) {
 }
 
 int LoginConflictNotif::Construct(const DsMsg &msg) {
-    Utf16ToUtf8((const Utf16 *)msg._body->_items[0]->_buf,(Utf8 *)_info);
+    Utf16ToUtf8((const Utf16 *)msg._body->_items[0]->_buf,msg._body->_items[0]->_bufLen,(Utf8 *)_info);
     return 0;
 }
 
@@ -209,7 +209,7 @@ int TalkResponse::Construct(const DsMsg &msg) {
 
 int TalkNotif::Construct(const DsMsg &msg) {
     _type = (TalkType_t)msg.GetItemValue(0);
-    Utf16ToUtf8((const Utf16 *)msg._body->_items[1]->_buf,(Utf8 *)_content);
+    Utf16ToUtf8((const Utf16 *)msg._body->_items[1]->_buf,msg._body->_items[1]->_bufLen,(Utf8 *)_content);
         
     return 0;
 }
