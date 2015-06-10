@@ -85,9 +85,7 @@ void RaceLayer::CreateRace(GameMode_t mode)
     
 	for(int dir=0;dir<3;dir++) {
         if(_roundManager->_players[dir]->_isExist) {
-            _UpdateHeadImage(dir,_roundManager->_players[dir]->_profile.photo);
-            _UpdateNickName(dir,_roundManager->_players[dir]->_profile.name);
-            GuiUpdateScore(dir,_roundManager->_players[dir]->_profile.property);
+            GuiPlayerShow((PlayerDir_t)dir);
         }
 	}
 
@@ -4754,6 +4752,12 @@ void RaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
 		head_image->setPosition(Vec2(_layout->_playerBkg[2]->getTextureRect().size.width*1/2,_layout->_playerBkg[2]->getTextureRect().size.height*23/24));
 		_layout->_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
 	}
+}
+
+void RaceLayer::GuiPlayerShow(PlayerDir_t dir) {
+    _UpdateHeadImage(dir,_roundManager->_players[dir]->_profile.photo);
+    _UpdateNickName(dir,_roundManager->_players[dir]->_profile.name);
+    GuiUpdateScore(dir,_roundManager->_players[dir]->_profile.property);
 }
 
 void RaceLayer::GuiJinBiShow(PlayerDir_t dir, int gold) {

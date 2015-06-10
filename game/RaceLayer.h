@@ -141,6 +141,7 @@ private:
     void _CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND kind);
 
 public:
+    void GuiPlayerShow(PlayerDir_t dir);
     void GuiJinBiShow(PlayerDir_t dir, int gold);
 
 	void start_timer(int time,PlayerDir_t direction);

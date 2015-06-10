@@ -858,6 +858,8 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
             profile.property = info->score[i];
 
             _players[i]->Set(&profile);
+
+            uiManager->GuiPlayerShow((PlayerDir_t)i);
         }
     }
     #else
@@ -885,6 +887,8 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
     profile.property = info->score;
 
     _players[dir]->Set(&profile);
+    
+    uiManager->GuiPlayerShow((PlayerDir_t)dir);
     #endif
 }
 
