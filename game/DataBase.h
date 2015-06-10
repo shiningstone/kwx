@@ -17,8 +17,11 @@ public:
     static Database *getInstance();
     static void destroyInstance();
 
+    static void get_local_image(char *buf,const char *id);
+    
     void GetUserProfile(int id,UserProfile_t &profile);
     void SetProperty(int id,int property);
+    
 protected:
     Database();
     ~Database();

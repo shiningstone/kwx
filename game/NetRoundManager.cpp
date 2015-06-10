@@ -20,6 +20,8 @@ USING_NS_CC;
 #include "NetRoundManager.h"
 #include "StrategyRm.h"
 
+#include "./../utils/DebugCtrl.h"
+
 
 NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 :RoundManager(uiManager) {
@@ -847,19 +849,21 @@ void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
-    #if 0
+    #ifndef USE_LOCAL_PROFILE
+    Database *data = Database::getInstance();
+    
     for(int i=0;i<PLAYER_NUM;i++) {
         if(info->status[i]!=ABSENT) {
             _players[i]->_isExist = true;
 
             UserProfile_t profile = {0};
-            memcpy(profile.name,info->name[i],strlen((char *)info->name[i]));
-            memcpy(profile.photo,info->image[i],strlen((char *)info->image[i]));
             profile.property = info->score[i];
+            memcpy(profile.name,info->name[i],strlen((char *)info->name[i]));
+            data->get_local_image(profile.photo,(char *)info->image[i]);
 
             _players[i]->Set(&profile);
 
-            uiManager->GuiPlayerShow((PlayerDir_t)i);
+            _uiManager->GuiPlayerShow((PlayerDir_t)i);
         }
     }
     #else
@@ -876,19 +880,21 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
 }
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
-    #if 0
+    #ifndef USE_LOCAL_PROFILE
+    Database *data = Database::getInstance();
+    
     int dir = info->seat;
     
     _players[dir]->_isExist = true;
 
     UserProfile_t profile = {0};
-    memcpy(profile.name,info->name,strlen((char *)info->name));
-    memcpy(profile.photo,info->image,strlen((char *)info->image));
     profile.property = info->score;
+    memcpy(profile.name,info->name,strlen((char *)info->name));
+    data->get_local_image(profile.photo,(char *)info->image);
 
     _players[dir]->Set(&profile);
     
-    uiManager->GuiPlayerShow((PlayerDir_t)dir);
+    _uiManager->GuiPlayerShow((PlayerDir_t)dir);
     #endif
 }
 

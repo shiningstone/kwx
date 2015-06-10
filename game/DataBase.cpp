@@ -50,6 +50,12 @@ void Database::SetProperty(int id,int property) {
     sCocos2dUserDefault->setIntegerForKey(title,property);
 }
 
+void Database::get_local_image(char *buf,const char *id) {
+    memset(buf,0,32);
+    memcpy(buf,"PhotoOfRobot",strlen("PhotoOfRobot"));
+    strcat(buf,id);
+}
+
 void Database::GetUserProfile(int id,UserProfile_t &profile) {
     if (id<17) {
         return _getRobotProfile(id,profile);

@@ -19,7 +19,7 @@
         round manager will ignore the count if this macro is enabled
 **********************************************************************************/
 #define TIMER_FREE
-
+//#define USE_LOCAL_PROFILE
 #define NO_HEART_BEAT
 
 #endif
