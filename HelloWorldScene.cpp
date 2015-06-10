@@ -117,7 +117,7 @@ void HelloWorld::enterRoomStandAlone()
 	SpriteFrameCache::getInstance()->removeSpriteFrames();
     TextureCache::sharedTextureCache()->removeAllTextures();
 
-#ifdef SINGLE_GAME
+#ifndef NETWORK_GAME_DEBUG
     RaceLayer *layer = RaceLayer::create();
     scene->addChild(layer);
     layer->CreateRace(LOCAL_GAME);

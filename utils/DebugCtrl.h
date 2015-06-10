@@ -3,11 +3,9 @@
 #define __DEBUG_CTRL__
 
 /**********************************************************************************
-    this macro is used to control start a 
-        single game OR
-        a game client 
+    this macro provides a shortcut to start a network game by Button "DanJiBan" 
 **********************************************************************************/
-#define SINGLE_GAME
+#define NETWORK_GAME_DEBUG
 
 /********************************************************************************** 
     this macro is used to control the client is connected to 
