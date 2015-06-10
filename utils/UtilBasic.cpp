@@ -251,6 +251,14 @@ void _delay(int ms) {
 }
 
 void _get_device_info(DeviceInfo_t &info) {
-
+#ifdef WIN32
+    memcpy(info.mac,"win32_mac",strlen("win32_mac"));    
+    memcpy(info.imsi,"win32_imsi",strlen("win32_imsi"));    
+    memcpy(info.resolution,"1024*768",strlen("1024*768"));    
+    memcpy(info.protoType,"win32_protoType",strlen("win32_protoType"));    
+    memcpy(info.osVer,"win32_osVer",strlen("win32_osVer"));
+#else
+#error "device information should be provided in _get_device_info()"
+#endif
 }
 

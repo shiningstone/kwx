@@ -54,6 +54,13 @@ void test_3_bytes() {
     assert(len==3);
 }
 
+void test_utf16_name() {
+	char Utf16Buf[] = {0xfe,0xff,0x73,0x8b,0x5c,0x0f,0x4e,0x8c,0,0};
+
+	char    Utf8Buf[4] = {0};
+	Utf16ToUtf8((Utf16 *)Utf16Buf,Utf8Buf);
+}
+
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/CommonMsg.h"
 #include "./../../protocol/DsInstruction.h"
@@ -64,15 +71,17 @@ void test_split() {
 
     EnterRoomResponse::_LoadStrings(strings,(INT8U *)utf16Buf,wcslen(utf16Buf));
 
-    assert(!strcmp((char *)strings[0],"name1"));
-    assert(!strcmp((char *)strings[1],"name2"));
-    assert(!strcmp((char *)strings[2],"name3"));
+    assert(!strcmp((char *)strings[1],"name1"));
+    assert(!strcmp((char *)strings[2],"name2"));
+    assert(!strcmp((char *)strings[0],"name3"));
 }
 
 void test_utf16() {
     test_1_byte();
 	test_2_bytes();
     test_3_bytes();
+
+	test_utf16_name();
 
     test_split();
 }
