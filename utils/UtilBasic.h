@@ -37,7 +37,12 @@ extern bool _is_active(INT32U value,INT32U mask);
 typedef char    Utf8;
 typedef wchar_t Utf16;
 
+static Utf16 UTF16_HEADER = 0xfeff;
+#define UTF16_HEADER_LEN 2
+
+/* the original Utf16 string always include header 0xfeff */
 extern int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start);
+/* the generated Utf16 string will include header 0xfeff */
 extern int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start);
 
 /****************************************

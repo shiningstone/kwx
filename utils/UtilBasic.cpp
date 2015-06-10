@@ -193,7 +193,7 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
 
 int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start) {
     Utf16 buf[128] = {0};
-    memcpy(buf,pUtf16Start,len);
+    memcpy(buf,pUtf16Start+1,(len-1)*sizeof(Utf16));
 
     return Utf16ToUtf8(buf,pUtf8Start);
 }
@@ -202,7 +202,9 @@ int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
 {
     const Utf8*  pUtf8End = pUtf8Start + strlen(pUtf8Start);
 
-    Utf16* pTempUtf16 = pUtf16Start;
+    pUtf16Start[0] = UTF16_HEADER;
+    
+    Utf16* pTempUtf16 = pUtf16Start+1;
     const Utf8*  pTempUtf8 = pUtf8Start;
  
     while (pTempUtf8 < pUtf8End)
