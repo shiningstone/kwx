@@ -33,6 +33,8 @@ EnvVariable::EnvVariable() {
 
     _key = 0x01020304;
 #endif
+
+    _get_device_info(_device);
 }
 
 

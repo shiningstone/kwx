@@ -30,6 +30,8 @@ public:
     INT8U    _buildNo;
     INT16U   _customerId;
     INT16U   _productId;
+
+    DeviceInfo_t _device;
 private:
 	EnvVariable();
 	static EnvVariable *_instance;
