@@ -50,6 +50,7 @@ void RoundManager::InitPlayers() {
     _strategy->load_profiles(profile);
 
     for(int dir=0;dir<PLAYER_NUM;dir++) {   
+        _players[dir]->_isExist = true;
         _players[dir]->Set(&profile[dir]);
     }
 }

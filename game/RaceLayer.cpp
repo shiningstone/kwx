@@ -84,9 +84,11 @@ void RaceLayer::CreateRace(GameMode_t mode)
 	this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
     
 	for(int dir=0;dir<3;dir++) {
-		_UpdateHeadImage(dir,_roundManager->_players[dir]->_profile.photo);
-		_UpdateNickName(dir,_roundManager->_players[dir]->_profile.name);
-		GuiUpdateScore(dir,_roundManager->_players[dir]->_profile.property);
+        if(_roundManager->_players[dir]->_isExist) {
+            _UpdateHeadImage(dir,_roundManager->_players[dir]->_profile.photo);
+            _UpdateNickName(dir,_roundManager->_players[dir]->_profile.name);
+            GuiUpdateScore(dir,_roundManager->_players[dir]->_profile.property);
+        }
 	}
 
     for(int i=0;i<4;i++) {

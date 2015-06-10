@@ -11,6 +11,7 @@ Player::Player(PlayerDir_t dir) {
     _cards = NULL;
     _river = NULL;
 
+    _isExist = false;
     _isReady = false;
 
     memset(&_profile,0,sizeof(UserProfile_t));

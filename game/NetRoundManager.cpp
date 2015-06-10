@@ -71,13 +71,6 @@ void NetRoundManager::InitPlayers() {
 	_players[0] = new Player(LEFT);
 	_players[1] = new Player(MIDDLE);
 	_players[2] = new Player(RIGHT);
-
-    UserProfile_t profile[PLAYER_NUM] = {{0}};
-    _strategy->load_profiles(profile);
-
-    for(int dir=0;dir<PLAYER_NUM;dir++) {   
-        _players[dir]->Set(&profile[dir]);
-    }
 }
 
 /****************************************
@@ -854,13 +847,33 @@ void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
-    LOGGER_WRITE("NOTE: profile of players should be updated here\n");
-    LOGGER_WRITE("Start heartbeats\n");
+    for(int i=0;i<PLAYER_NUM;i++) {
+        if(info->status[i]!=ABSENT) {
+            _players[i]->_isExist = true;
+
+            UserProfile_t profile = {0};
+            memcpy(profile.name,info->name[i],strlen((char *)info->name[i]));
+            memcpy(profile.photo,info->image[i],strlen((char *)info->image[i]));
+            profile.property = info->score[i];
+
+            _players[i]->Set(&profile);
+        }
+    }
+
     KwxHeart::getInstance();
 }
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
-    LOGGER_WRITE("NOTE: profile of players should be updated here\n");
+    int dir = info->seat;
+    
+    _players[dir]->_isExist = true;
+
+    UserProfile_t profile = {0};
+    memcpy(profile.name,info->name,strlen((char *)info->name));
+    memcpy(profile.photo,info->image,strlen((char *)info->image));
+    profile.property = info->score;
+
+    _players[dir]->Set(&profile);
 }
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {

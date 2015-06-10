@@ -72,7 +72,9 @@ void EnterRoomResponse::_LoadStrings(INT8U strings[3][128],const INT8U *buf,int 
     char *token = strtok(Utf8Buf,SPLIT);
     
     while(token!=NULL) {
-        strcpy((char *)strings[idx++],token);
+        strcpy((char *)strings[(MIDDLE+idx)%3],token);
+        idx++;
+        
         token = strtok(NULL,SPLIT);
     }
 }
@@ -80,6 +82,9 @@ void EnterRoomResponse::_LoadStrings(INT8U strings[3][128],const INT8U *buf,int 
 int EnterRoomResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
+    memset(name,0,sizeof(name));
+    memset(image,0,sizeof(image));
+            
     roomPath = msg.GetItemValue(0);
     roomId   = msg.GetItemValue(1);
     tableId  = msg.GetItemValue(2);
@@ -93,8 +98,10 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
     int nameLen  = 0;
     int imageLen = 0;
     for(int i=0;i<playerNum;i++) {
-        status[i] = (PlayerStatus_t)msg._body->_items[5]->_buf[i];
-        score[i]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
+        int dir = (MIDDLE+i)%3;
+        
+        status[dir] = (PlayerStatus_t)msg._body->_items[5]->_buf[i];
+        score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
     }
 
     _LoadStrings(name,msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen);
@@ -105,7 +112,10 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
 
 int EnterRoomNotif::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
-        
+
+    memset(name,0,sizeof(name));
+    memset(image,0,sizeof(image));
+
     seat      = _GetPlayer(msg.GetItemValue(0));
     baseScore = msg.GetItemValue(1);
     

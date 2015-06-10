@@ -16,6 +16,7 @@ public:
 
     StrategyPlayer *_strategy;
 
+    bool          _isExist;
     bool          _isReady;
     UserProfile_t _profile;    
 
