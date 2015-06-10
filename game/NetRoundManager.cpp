@@ -847,6 +847,7 @@ void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
+    #if 0
     for(int i=0;i<PLAYER_NUM;i++) {
         if(info->status[i]!=ABSENT) {
             _players[i]->_isExist = true;
@@ -859,11 +860,21 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
             _players[i]->Set(&profile);
         }
     }
+    #else
+    UserProfile_t profile[PLAYER_NUM] = {{0}};
+    _strategy->load_profiles(profile);
+    
+    for(int i=0;i<PLAYER_NUM;i++) {
+        _players[i]->_isExist = true;
+        _players[i]->Set(&profile[i]);
+    }
+    #endif
 
     KwxHeart::getInstance();
 }
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
+    #if 0
     int dir = info->seat;
     
     _players[dir]->_isExist = true;
@@ -874,6 +885,7 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
     profile.property = info->score;
 
     _players[dir]->Set(&profile);
+    #endif
 }
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {
