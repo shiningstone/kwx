@@ -8,6 +8,7 @@ Logger *NetMessenger::_logger = 0;
 
 NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
+    
 	_keepListen = false;
     _handle_msg = 0;
 
@@ -31,8 +32,8 @@ void NetMessenger::SetHandler(MsgHandler_t func) {
     _handle_msg = func;
 }
 
-void NetMessenger::Start() {
-	_socket->Start();
+void NetMessenger::Start(const char *serverIp,int port) {
+	_socket->Start(serverIp,port);
 
     if(!_keepListen) {
 	    std::thread t1(&NetMessenger::_collect_bytes,this);

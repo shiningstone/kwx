@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "./../network/NetMessenger.h"
 #include "./../utils/DebugCtrl.h"
 
@@ -17,11 +19,26 @@ static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
 NetMessenger *KwxMessenger::_messenger = 0;
 Logger       *KwxMessenger::_logger = 0;
 
-KwxMessenger::KwxMessenger() {
+KwxMessenger::KwxMessenger(MsgType_t type) {
+    EnvVariable *env = EnvVariable::getInstance();
+    
+    switch(type) {
+        case MSG_LOGIN:
+            memcpy(_serverIp,env->_loginServer.ipaddr,strlen(env->_loginServer.ipaddr));
+            _port = env->_loginServer.port;
+            break;
+        case MSG_GAME:
+            memcpy(_serverIp,env->_roomServer.ipaddr,strlen(env->_roomServer.ipaddr));
+            _port = env->_roomServer.port;
+            break;
+        case MSG_CHAT:
+            break;
+    }
+    
     _messenger = NetMessenger::getInstance();
     
     #if 0/*如果要用StartReceiving，不能调用Start*/
-    _messenger->Start();
+    _messenger->Start((char *)_serverIp,_port);
     #endif
 
     _sendCnt = 0;
@@ -38,7 +55,7 @@ KwxMessenger::~KwxMessenger() {
 ************************************************************/
 void KwxMessenger::StartReceiving(MsgHandler_t handle) {
     _messenger->SetHandler(handle);
-    _messenger->Start();
+    _messenger->Start((char *)_serverIp,_port);
 }
 
 void KwxMessenger::StartReceiving() {
@@ -51,7 +68,7 @@ void KwxMessenger::StartReceiving() {
     }
 
     _messenger->SetHandler(_HANDLE_DS_PACKAGES);
-    _messenger->Start();
+    _messenger->Start((char *)_serverIp,_port);
 }
 
 void KwxMessenger::StopReceiving() {

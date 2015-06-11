@@ -50,7 +50,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
         _waitQueue[i] = REQ_INVALID;
     }
 
-    _messenger = new KwxMessenger();
+    _messenger = new KwxMessenger(MSG_GAME);
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
 

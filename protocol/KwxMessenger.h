@@ -11,20 +11,29 @@ class NetMessenger;
 #include "KwxMsgBasic.h"
 class UsMsg;
 
+typedef enum {
+    MSG_LOGIN,
+    MSG_GAME,
+    MSG_CHAT,
+}MsgType_t;
+
 class KwxMessenger {
 public:
-    KwxMessenger();
+    KwxMessenger(MsgType_t type);
     ~KwxMessenger();
     
     /* auto receive */
-    static void StartReceiving();
-    static void StopReceiving();
+    void StartReceiving();
+    void StopReceiving();
 
     int Send(UsMsg &aMsg);/* why cannot declare as const UsMsg??? */
 
 private:
     friend class TestKwxAutoRecv;
-    static void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
+    void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
+
+    INT8U       _serverIp[32];
+    int         _port;
 
     int         _sendCnt;
 

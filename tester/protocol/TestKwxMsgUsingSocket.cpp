@@ -54,12 +54,14 @@ class TestKwxAutoRecv : public CTestMessenger {
 	virtual void ClientActions() {
         memset(RecvBuf,0,256);
 
-        KwxMessenger::StartReceiving((MsgHandler_t)&TestKwxAutoRecv::MsgHandler);
+		KwxMessenger aMessenger(MSG_GAME);
+
+        aMessenger.StartReceiving((MsgHandler_t)&TestKwxAutoRecv::MsgHandler);
         Sleep(DELAY);
 
         assert( !memcmp(RecvBuf,MESSAGE,MESSAGE_LEN) );
 
-        KwxMessenger::StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        aMessenger.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 };
 
@@ -95,9 +97,11 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
 	}
 
 	virtual void ClientActions() {
-        KwxMessenger::StartReceiving();
+		KwxMessenger aMessenger(MSG_GAME);
+
+        aMessenger.StartReceiving();
         Sleep(DELAY);
-        KwxMessenger::StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        aMessenger.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
     }
 };
 
@@ -158,14 +162,14 @@ class TestSendAction : public TestRequest {
 	}
 
 	virtual void ClientActions() {
-        KwxMessenger aMessenger;
-        KwxMessenger::StartReceiving();
+        KwxMessenger aMessenger(MSG_GAME);
+        aMessenger.StartReceiving();
         
         RequestSendAction aMsg;
         aMsg.Set(aPENG,TIAO_3);
         aMessenger.Send(aMsg);
 
-        KwxMessenger::StopReceiving();
+        aMessenger.StopReceiving();
     }
 };
 
