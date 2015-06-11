@@ -5,6 +5,11 @@
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
 
+#include "protocol/CommonMsg.h"
+#include "protocol/DsInstruction.h"
+#include "protocol/KwxMessenger.h"
+#include "protocol/KwxMsgLogin.h"
+
 #include "utils/DebugCtrl.h"
 
 HelloWorld::HelloWorld()
@@ -69,7 +74,15 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 	default:
 		break;
 	}
-	auto scene = Scene::create();
+
+    KwxMessenger aMessenger = KwxMessenger(MSG_LOGIN);
+    RequestLogin aReq;
+    aReq.Set();
+
+    aMessenger.StartReceiving();
+    aMessenger.Send(aReq);
+
+    auto scene = Scene::create();
 	auto layer = IMLoad::create();
 	scene->addChild(layer);
 	Director::getInstance()->replaceScene(scene);

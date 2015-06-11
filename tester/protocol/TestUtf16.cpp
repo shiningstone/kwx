@@ -19,7 +19,7 @@ void test_1_byte() {
 
     len = Utf8ToUtf16(utf8,utf16);
     assert(!wcscmp(Utf16Exp,utf16));
-    assert(len==7);
+    assert(len==16);
 }
 
 void test_2_bytes() {
@@ -35,7 +35,7 @@ void test_2_bytes() {
 	wchar_t Utf16Buf[3] = {0};
 	len = Utf8ToUtf16(Utf8Exp,Utf16Buf);
 	assert(!memcmp(Utf16Buf,Utf16Exp,4));
-    assert(len==2);
+    assert(len==4);
 }
 
 void test_3_bytes() {
@@ -51,7 +51,7 @@ void test_3_bytes() {
 	wchar_t Utf16Buf[3] = {0};
 	len = Utf8ToUtf16(Utf8Exp,Utf16Buf);
 	assert(!memcmp(Utf16Buf,Utf16Exp,4));
-    assert(len==3);
+    assert(len==4);
 }
 
 void test_utf16_name() {

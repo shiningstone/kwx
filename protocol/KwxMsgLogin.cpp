@@ -13,7 +13,10 @@ int RequestLogin::Set() {
     SetRequestCode(REQ_LOGIN);
 
     _add_item( new Item(60,_userType) );
-    
+
+    memset(_account,0,MAX_UTF8_BUF);
+    memset(_session,0,MAX_UTF8_BUF);
+
     _add_utf16_string(131,(const INT8U *)_account);
     _add_utf16_string(132,_device.mac);
     _add_utf16_string(133,_device.imsi);

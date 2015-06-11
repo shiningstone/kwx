@@ -1,5 +1,7 @@
 
 #include <string.h>
+#include <stdio.h>
+
 #include "UtilBasic.h"
 
 /****************************************
@@ -237,7 +239,7 @@ int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
     
     *pTempUtf16 = 0;
 
-    return (pUtf8End-pUtf8Start);
+    return (pTempUtf16-pUtf16Start)*2;
 }
 
 /****************************************************************
@@ -256,11 +258,13 @@ void _delay(int ms) {
 
 void _get_device_info(DeviceInfo_t &info) {
 #ifdef WIN32
-    memcpy(info.mac,"win32_mac",strlen("win32_mac"));    
-    memcpy(info.imsi,"win32_imsi",strlen("win32_imsi"));    
-    memcpy(info.resolution,"1024*768",strlen("1024*768"));    
-    memcpy(info.protoType,"win32_protoType",strlen("win32_protoType"));    
-    memcpy(info.osVer,"win32_osVer",strlen("win32_osVer"));
+    memset(&info,0,sizeof(DeviceInfo_t));
+
+    sprintf((char *)info.mac,"win32_mac");    
+    sprintf((char *)info.imsi,"win32_imsi");    
+    sprintf((char *)info.resolution,"1024*768");    
+    sprintf((char *)info.protoType,"win32_protoType");    
+    sprintf((char *)info.osVer,"win32_osVer");
 #else
 #error "device information should be provided in _get_device_info()"
 #endif

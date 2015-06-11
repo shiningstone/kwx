@@ -241,8 +241,8 @@ int UsMsg::_add_utf16_string(Item_t id,const INT8U *hostString) {
     
     int len = Utf8ToUtf16((Utf8 *)hostString,utfBuf);
     
-    for(int i=0;i<len/2;i++) {
-        *((INT16U *)buf[i*2]) = _htons(*(utfBuf+i));
+    for(int i=0;i<len;i++) {
+        *((INT16U *)&buf[i*2]) = _htons(*(utfBuf+i));
     }
 
     _add_item( new Item(id,len,buf) );/* multiply by 2??? */
