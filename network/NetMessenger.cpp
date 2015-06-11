@@ -139,24 +139,6 @@ int NetMessenger::_usedLen() {
 }
 
 /*******************************************************
-        单例模式 
-*******************************************************/
-NetMessenger * NetMessenger::_instance   = 0;
-
-NetMessenger * NetMessenger::getInstance() {
-	if(_instance==0) {
-		_instance = new NetMessenger();
-	}
-
-	return _instance;
-}
-
-void NetMessenger::destroyInstance() {
-    delete _instance;
-    _instance = 0;
-}
-
-/*******************************************************
         报文格式处理 
 *******************************************************/
 #include "./../protocol/KwxMsgBasic.h"

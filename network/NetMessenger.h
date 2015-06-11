@@ -20,8 +20,8 @@ class CSocket;
 
 class NetMessenger {
 public:
-	static NetMessenger *getInstance();
-	static void          destroyInstance();
+	NetMessenger();
+	~NetMessenger();
 
 	void Start(const char *serverIp,int port);
     void SetHandler(MsgHandler_t func);
@@ -30,11 +30,6 @@ public:
 	int  Send(const INT8U *buf,int len);
 
     void ClearRecvBuf();
-protected:
-	NetMessenger();
-	~NetMessenger();
-
-	static NetMessenger *_instance;
 private:
     CSocket      *_socket;
 	bool         _keepListen;

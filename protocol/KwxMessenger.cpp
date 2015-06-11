@@ -35,7 +35,7 @@ KwxMessenger::KwxMessenger(MsgType_t type) {
             break;
     }
     
-    _messenger = NetMessenger::getInstance();
+    _messenger = new NetMessenger();
     
     #if 0/*如果要用StartReceiving，不能调用Start*/
     _messenger->Start((char *)_serverIp,_port);
@@ -60,7 +60,7 @@ void KwxMessenger::StartReceiving(MsgHandler_t handle) {
 
 void KwxMessenger::StartReceiving() {
     if(_messenger==0) {
-        _messenger = NetMessenger::getInstance();
+        _messenger = new NetMessenger();
     }
 
     if (_logger==0) {
