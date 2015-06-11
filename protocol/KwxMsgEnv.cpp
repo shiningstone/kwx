@@ -1,5 +1,14 @@
 
+#include <stdio.h>
+#include <string.h>
+
 #include "KwxMsgEnv.h"
+
+#define LOGIN_SERVER_IP  "127.0.0.1"
+#define ROOM_SERVER_IP   "127.0.0.1"
+#define LOCAL_SERVER     "127.0.0.1"
+#define DEF_SOCKET_PORT  60905
+
 
 EnvVariable *EnvVariable::_instance = 0;
 
@@ -9,6 +18,38 @@ EnvVariable *EnvVariable::getInstance() {
 	}
 
 	return _instance;
+}
+
+void EnvVariable::SetServerIp(Server_t &server,const char *ip) {
+#ifdef WIN32
+    FILE * target = NULL;
+        
+    #ifdef USE_REMOTE_SERVER
+    target = fopen("E:\\server_ip.txt","r");
+    #endif
+        
+    if(target!=NULL) {
+        fgets(server.ipaddr,128,target);
+    } else {
+        strcpy(server.ipaddr,LOCAL_SERVER);
+    }
+#else
+    sprintf(server.ipaddr,ip);
+#endif
+}
+
+void EnvVariable::LoginServerInit() {
+    _loginServer.id = 0;
+    sprintf(_loginServer.name,"loginServer");
+    SetServerIp(_loginServer,LOGIN_SERVER_IP);
+    _loginServer.port = DEF_SOCKET_PORT;
+}
+
+void EnvVariable::RoomServerInit(int roomId) {
+    _roomServer.id = roomId;
+    sprintf(_roomServer.name,"roomServer%d",roomId);
+    SetServerIp(_roomServer,ROOM_SERVER_IP);
+    _roomServer.port = DEF_SOCKET_PORT;
 }
 
 EnvVariable::EnvVariable() {
@@ -33,7 +74,9 @@ EnvVariable::EnvVariable() {
 
     _key = 0x01020304;
 #endif
-
+    LoginServerInit();
+    RoomServerInit(0);
+    
     _get_device_info(_device);
 }
 

@@ -32,9 +32,17 @@ public:
     INT16U   _productId;
 
     DeviceInfo_t _device;
+    
+    Server_t     _loginServer;
+    Server_t     _roomServer;
+    
 private:
 	EnvVariable();
 	static EnvVariable *_instance;
+
+    static void SetServerIp(Server_t &server,const char *ip);
+    void LoginServerInit();
+    void RoomServerInit(int roomId);
 };
 
 /*******************************************************************************

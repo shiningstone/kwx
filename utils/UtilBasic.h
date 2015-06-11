@@ -66,5 +66,12 @@ typedef struct _DeviceInfo_t {
     INT8U osVer[128];
 }DeviceInfo_t;
 
+typedef struct {
+    int  id;
+    char name[32];
+    char ipaddr[32];
+    int  port;
+}Server_t;
+
 extern void _get_device_info(DeviceInfo_t &device);
 #endif

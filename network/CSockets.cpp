@@ -95,8 +95,8 @@ void ServerSocket::Start(const char *serverIp,int port) {
 void ClientSocket::Start(const char *serverIp,int port) {
 	Init();
 
-#ifdef WIN32
     char strServerIp[128] = {0};
+#ifdef WIN32/*windows*/
     FILE * target = NULL;
 
 #ifdef USE_REMOTE_SERVER
@@ -108,6 +108,8 @@ void ClientSocket::Start(const char *serverIp,int port) {
     } else {
         strcpy(strServerIp,serverIp);
     }
+#else/*android*/
+    strcpy(strServerIp,serverIp);
 #endif
 
 	_keepAlive   = false;
