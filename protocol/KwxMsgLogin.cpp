@@ -4,6 +4,7 @@
 #include "MsgFormats.h"
 #include "CommonMsg.h"
 #include "DsInstruction.h"
+#include "DsMsgParser.h"
 
 #include "KwxMsgLogin.h"
 
@@ -70,20 +71,6 @@ int RequestEnterRoom::Set(int id) {
     return 0;
 }
 
-void EnterRoomResponse::_Split(INT8U strings[3][128],const INT8U *buf) {
-    const char *SPLIT = "%@";
-    int idx = 0;
-
-    char *token = strtok((char *)buf,SPLIT);
-    
-    while(token!=NULL) {
-        strcpy((char *)strings[(MIDDLE+idx)%3],token);
-        idx++;
-        
-        token = strtok(NULL,SPLIT);
-    }
-}
-
 int EnterRoomResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
@@ -111,11 +98,11 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
 
     INT8U names[512] = {0};
     msg.GetString(7,names);
-    _Split(name,names);
+    _split(name,names);
     
     INT8U images[512] = {0};
     msg.GetString(8,images);
-    _Split(image,images);
+    _split(image,images);
 
     return 0;
 }
@@ -150,6 +137,48 @@ int RequestReconnect::Set() {
 }
 
 int ReconnectResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    memset(name,0,sizeof(name));
+    memset(image,0,sizeof(image));
+
+    int seatId = msg.GetItemValue(0);
+    baseScore  = msg.GetItemValue(1);
+    curPlayer  = _GetPlayer(msg.GetItemValue(2));
+    
+    for(int i=0;i<PLAYER_NUM;i++) {
+        int dir = (MIDDLE+i)%3;
+        
+        status[dir] = (PlayerStatus_t)msg._body->_items[3]->_buf[i];
+        score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[4]->_buf + 4*i) );
+        isMing[dir] = msg._body->_items[6]->_buf[i];
+    }
+
+    CardNode_t temp[3][18];
+    INT8U      tempNum[3];
+    DsMsgParser::_load(temp, tempNum, msg, 5);
+    for(int i=0;i<PLAYER_NUM;i++) {
+        int dir = (MIDDLE+i)%3;
+        memcpy(cardsInHand[dir],temp[i],sizeof(CardNode_t)*18);
+        cardsNum[dir] = tempNum[i];
+    }
+    
+    DsMsgParser::_load(temp, tempNum, msg, 7);
+    for(int i=0;i<PLAYER_NUM;i++) {
+        int dir = (MIDDLE+i)%3;
+        memcpy(river[dir],temp[i],sizeof(CardNode_t)*18);
+        riverNum[dir] = tempNum[i];
+    }
+
+    
+    INT8U names[512] = {0};
+    msg.GetString(8,names);
+    _split(name,names);
+    
+    INT8U images[512] = {0};
+    msg.GetString(9,images);
+    _split(image,images);
+
     return 0;
 }
 

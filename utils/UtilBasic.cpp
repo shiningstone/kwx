@@ -242,6 +242,21 @@ int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
     return (pTempUtf16-pUtf16Start)*2;
 }
 
+#define MIDDLE 1
+void _split(INT8U strings[3][128],const INT8U *buf) {
+    const char *SPLIT = "%@";
+    int idx = 0;
+
+    char *token = strtok((char *)buf,SPLIT);
+    
+    while(token!=NULL) {
+        strcpy((char *)strings[(MIDDLE+idx)%3],token);
+        idx++;
+        
+        token = strtok(NULL,SPLIT);
+    }
+}
+
 /****************************************************************
     platform dependent
 ****************************************************************/

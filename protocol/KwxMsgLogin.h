@@ -50,7 +50,6 @@ typedef enum {
 class EnterRoomResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
-    static void  _Split(INT8U strings[][128],const INT8U *buf);
 private:
 
     RoomPath_t       roomPath;
@@ -88,7 +87,18 @@ public:
 class ReconnectResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
-    
+
+    INT32U           baseScore;
+    PlayerDir_t      curPlayer;
+    PlayerStatus_t   status[3];
+    INT32U           score[3];
+    INT8U            cardsNum[3];
+    CardNode_t       cardsInHand[3][18];
+    bool             isMing[3];
+    INT8U            riverNum[3];
+    CardNode_t       river[3][18];
+    INT8U            name[3][128];
+    INT8U            image[3][128];    
 };
 
 class ReconnectNotif : public DsInstruction {

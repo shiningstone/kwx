@@ -46,6 +46,8 @@ extern int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start);
 /* the generated Utf16 string will include header 0xfeff */
 extern int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start);
 
+void _split(INT8U strings[3][128],const INT8U *buf);
+
 /****************************************
 string tranfer to bytes
     seperator should be ','
