@@ -61,6 +61,16 @@ void test_utf16_name() {
 	Utf16ToUtf8((Utf16 *)Utf16Buf,sizeof(Utf16Buf)/2,Utf8Buf);
 }
 
+void test_image() {
+    char utf8Exp[] = "2";
+    
+    wchar_t utf16Buf[] = {0xfeff,0x32};
+    char utf8Buf[8] = {0};
+
+    Utf16ToUtf8((Utf16 *)utf16Buf,sizeof(utf16Buf)/2,utf8Buf);
+    assert(!strcmp(utf8Buf,utf8Exp));
+}
+
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/CommonMsg.h"
 #include "./../../protocol/DsInstruction.h"
@@ -82,6 +92,7 @@ void test_utf16() {
     test_3_bytes();
 
 	test_utf16_name();
+    test_image();
 
     test_split();
 }

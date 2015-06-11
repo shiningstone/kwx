@@ -134,19 +134,12 @@ typedef struct _Range_t {
     int end;
 }Range_t;
 
-/***********************************************
-    UTF16 to UTF8 mapper
-        the range indicates how many bytes UTF8 would contain to represent the UTF16 word.
-************************************************/
 const Range_t UTF16_MAPPER[3] = {
     {0x0001,0x007F},
     {0x0080,0x07FF},
     {0x0800,0xFFFF},
 };
 
-/***********************************************
-    UTF8 to UTF16 mapper
-************************************************/
 const Range_t UTF8_MAPPER[3] = {
     {0x00,0x7F},   /* 0bbbbbbb                      */
     {0xC0,0XDF},   /* 110bbbbb    10bbbbbb          */
@@ -193,7 +186,7 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, Utf8* pUtf8Start)
 
 int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start) {
     Utf16 buf[128] = {0};
-    memcpy(buf,pUtf16Start+1,(len-1)*sizeof(Utf16));
+    memcpy(buf,pUtf16Start+1,(len-1)*sizeof(Utf16));    /*Extract 0xfeff*/
 
     return Utf16ToUtf8(buf,pUtf8Start);
 }
