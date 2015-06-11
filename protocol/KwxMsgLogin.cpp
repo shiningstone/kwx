@@ -223,8 +223,10 @@ int TalkNotif::Construct(const DsMsg &msg) {
 #include <thread>
 
 KwxHeart::KwxHeart(int second) {
+    EnvVariable *env = EnvVariable::getInstance();
+
     _socket = new ClientSocket;
-    _socket->Start();
+    _socket->Start(env->_roomServer.ipaddr,env->_roomServer.port);
 
     _rate = second;
     _running = true;

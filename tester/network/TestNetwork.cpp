@@ -10,6 +10,9 @@
 
 #include "./CTestSocket.h"
 
+#define DEF_SERVER_IP    "127.0.0.1"
+#define DEF_SOCKET_PORT  60905
+
 class TestSingleSendAndRecv : public CTestSocket {
 	virtual void ServerActions() {
 		SERVER.Start();
