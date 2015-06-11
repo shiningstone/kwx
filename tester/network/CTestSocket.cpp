@@ -43,7 +43,7 @@ int CTestSocket::Execute() {
 void CTestMessenger::Start() {
     CTestSocket::Start();
 
-    MESSENGER = NetMessenger::getInstance();
+    MESSENGER = new NetMessenger();
 }
 
 void CTestMessenger::Stop() {
@@ -51,5 +51,7 @@ void CTestMessenger::Stop() {
     NetMessenger::destroyInstance();
     MESSENGER = 0;
 #endif
+    _delay(100);
+    delete MESSENGER;
     CTestSocket::Stop();
 }

@@ -14,6 +14,9 @@
 
 #include "./../network/CTestSocket.h"
 
+#define LOCAL_SERVER     "127.0.0.1"
+#define DEF_SOCKET_PORT  60905
+
 class TestKwxAutoRecv : public CTestMessenger {
 	INT8U MESSAGE[MSG_MAX_LEN];
 	int   MESSAGE_LEN;
@@ -38,7 +41,7 @@ class TestKwxAutoRecv : public CTestMessenger {
 	}
 
 	virtual void ServerActions() {
-		SERVER.Start();
+		SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
 
 		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
 
@@ -89,7 +92,7 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
 	}
 
 	virtual void ServerActions() {
-		SERVER.Start();
+		SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
 
 		SERVER.Send((char *)MESSAGE,MESSAGE_LEN);
 
@@ -122,7 +125,7 @@ protected:
         INT8U msgInNetwork[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-		SERVER.Start();
+		SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
 
 		SERVER.Recv((char *)msgInNetwork,&len);
 
@@ -256,7 +259,7 @@ class TestHeartBeatContinuous : public TestRequest {
 
         int RecvCount = 0;
         
-		SERVER.Start();
+		SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
 
 		while( SERVER.Recv((char *)msgInNetwork,&len) ) {
             if(++RecvCount>EXP_RECVS) {

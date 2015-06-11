@@ -18,13 +18,14 @@ NetMessenger::NetMessenger() {
 }
 
 NetMessenger::~NetMessenger() {
-	_socket->Stop();
-	delete _socket;
-    _socket = 0;
-
     _keepListen = false;
     _handle_msg = 0;
-    
+
+	_socket->Stop();
+
+    _socket = 0;
+	delete _socket;
+
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -186,7 +187,7 @@ void NetMessenger::_collect_packages() {
         INT8U msg[MSG_MAX_LEN] = {0};
         int   msgLen = 0;
 
-        while( Recv(msg, msgLen) ) {
+        while( _keepListen && _handle_msg && Recv(msg, msgLen) ) {
             if(_handle_msg!=0) {
                 _handle_msg(msg,msgLen);
             }
