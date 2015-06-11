@@ -58,13 +58,6 @@ bool RaceLayer::init() {
 ************************************************/
 void RaceLayer::CreateRace(GameMode_t mode)
 {
-    if(mode==LOCAL_GAME) {
-        _roundManager = RoundManager::getInstance();
-    } else {
-        _roundManager = NetRoundManager::getInstance();
-    }
-    _roundManager->CreateRace(this);
-
 	_isResoucePrepared=false;
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
@@ -77,17 +70,10 @@ void RaceLayer::CreateRace(GameMode_t mode)
 
     _CreateMeneButtons();
     _CreateResidueCards();
-	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
     _CreateHeadImage();
 
 	this->addChild(_object->CreateMicIcon(),1,MIC_TAG_ID);
 	this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
-    
-	for(int dir=0;dir<3;dir++) {
-        if(_roundManager->_players[dir]->_isExist) {
-            GuiPlayerShow((PlayerDir_t)dir);
-        }
-	}
 
     for(int i=0;i<4;i++) {
         auto mapai = _object->CreateMaPai(i);
@@ -97,6 +83,22 @@ void RaceLayer::CreateRace(GameMode_t mode)
     auto StartButton = _object->CreateButton(BTN_START);
     StartButton->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnStartHandler,this));
     this->addChild(StartButton,2,START_GAME_TAG_ID);
+
+
+    if(mode==LOCAL_GAME) {
+        _roundManager = RoundManager::getInstance();
+    } else {
+        _roundManager = NetRoundManager::getInstance();
+    }
+    _roundManager->CreateRace(this);
+
+	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
+
+    for(int dir=0;dir<3;dir++) {
+        if(_roundManager->_players[dir]->_isExist) {
+            GuiPlayerShow((PlayerDir_t)dir);
+        }
+    }
 }
 
 void RaceLayer::StartGame()

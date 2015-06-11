@@ -51,9 +51,12 @@ void Database::SetProperty(int id,int property) {
 }
 
 void Database::get_local_image(char *buf,const char *id) {
-    memset(buf,0,32);
-    memcpy(buf,"PhotoOfRobot",strlen("PhotoOfRobot"));
-    strcat(buf,id);
+    char photo[32]    = {0};
+
+    sprintf(photo,"PhotoOfRobot");
+    strcat(photo,id);
+
+    strcpy(buf, sCocos2dUserDefault->getStringForKey(photo).c_str());
 }
 
 void Database::GetUserProfile(int id,UserProfile_t &profile) {
