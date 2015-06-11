@@ -121,11 +121,20 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_HU_CALCULATE:
             _DiRecv((HuInfoNotif *)di);
             break;
+
         case REQ_GAME_SEND_AGENT:
             _DiRecv((TuoGuanResponse *)di);
             break;
         case REQ_GAME_RECV_AGENT:
             _DiRecv((TuoGuanNotif *)di);
+            break;
+            
+
+        case REQ_GAME_DIST_DAOJISHI:
+            _DiRecv((CounterNotif *)di);
+            break;
+        case REQ_GAME_SEND_CALSCORE:
+            _DiRecv((ScoreNotif *)di);
             break;
 
         /*********************************************
@@ -137,12 +146,13 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_RECV_ENTER:
             _DiRecv((EnterRoomNotif *)di);
             break;
-        case REQ_GAME_DIST_DAOJISHI:
-            _DiRecv((CounterNotif *)di);
+        case REQ_GAME_SEND_RECONNECT:
+            _DiRecv((ReconnectResponse *)di);
             break;
-        case REQ_GAME_SEND_CALSCORE:
-            _DiRecv((ScoreNotif *)di);
+        case REQ_GAME_RECV_RECONNECT:
+            _DiRecv((ReconnectNotif *)di);
             break;
+
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
@@ -843,12 +853,6 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
     _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
 }
 
-void NetRoundManager::_DiRecv(TuoGuanResponse *info) {
-}
-
-void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
-}
-
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
     #ifndef USE_LOCAL_PROFILE
     Database *data = Database::getInstance();
@@ -908,6 +912,18 @@ void NetRoundManager::_DiRecv(CounterNotif *info) {
 
 void NetRoundManager::_DiRecv(ScoreNotif *info) {
     UpdateGold((int *)info->val);
+}
+
+void NetRoundManager::_DiRecv(TuoGuanResponse *info) {
+}
+
+void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
+}
+
+void NetRoundManager::_DiRecv(ReconnectResponse *info) {
+}
+
+void NetRoundManager::_DiRecv(ReconnectNotif *info) {
 }
 
 /*************************************
