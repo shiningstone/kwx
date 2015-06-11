@@ -37,12 +37,15 @@ int LoginResponse::Construct(const DsMsg &msg) {
     _userActivated     = msg.GetItemValue(2);
     _reconnectRequired = msg.GetItemValue(3);
     
-    EnvVariable::getInstance()->SetUserId(msg.GetItemValue(4));
-    EnvVariable::getInstance()->SetKey(msg.GetItemValue(5));
+    INT32U roomId      = msg.GetItemValue(6);
+    INT8U  roomIp[32] = {0};
+    msg.GetString(7,roomIp);
+    INT32U roomPort    = msg.GetItemValue(8);
 
-    _roomServerId      = msg.GetItemValue(6);
-    msg.GetString(7,_roomServerIp);
-    _roomServerPort    = msg.GetItemValue(8);
+    EnvVariable *env = EnvVariable::getInstance();
+    env->SetUserId(msg.GetItemValue(4));
+    env->SetKey(msg.GetItemValue(5));
+    env->SetRoomServer(roomId,(char *)roomIp,roomPort);
 
     return 0;
 }

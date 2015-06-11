@@ -33,9 +33,6 @@ public:
     UserType_t  _userType;
     bool        _userActivated;
     bool        _reconnectRequired;
-    INT32U      _roomServerId;
-    INT8U       _roomServerIp[32];
-    INT32U      _roomServerPort;
 };
 
 class RequestEnterRoom : public UsMsg {

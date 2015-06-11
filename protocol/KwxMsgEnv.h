@@ -15,6 +15,7 @@ class EnvVariable {
 public:
 	static EnvVariable *getInstance();
 
+    void       SetRoomServer(int roomId,const char *ip,int port);
     void       SetKey(Key_t key);
     Key_t      GetKey();
     void       SetUserId(INT32U id);

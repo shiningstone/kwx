@@ -47,6 +47,8 @@ KwxMessenger::KwxMessenger(MsgType_t type) {
 }
 
 KwxMessenger::~KwxMessenger() {
+    delete _messenger;
+    
     LOGGER_DEREGISTER(_logger);
 }
 
