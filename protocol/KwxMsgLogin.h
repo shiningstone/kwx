@@ -18,7 +18,7 @@ typedef Utf16      NetString[MAX_CHARS];
 
 class RequestLogin : public UsMsg {
 public:
-    int Set();
+    int Set(UserType_t type=VISITOR);
 
     UserType_t   _userType;
     HostString   _account;

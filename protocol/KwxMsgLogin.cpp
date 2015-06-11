@@ -7,7 +7,9 @@
 
 #include "KwxMsgLogin.h"
 
-int RequestLogin::Set() {
+int RequestLogin::Set(UserType_t type) {
+    _userType = type;
+
     _get_device_info(_device);
 
     SetRequestCode(REQ_LOGIN);
