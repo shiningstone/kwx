@@ -22,9 +22,9 @@ class NetMessenger {
 public:
 	static NetMessenger *getInstance();
 	static void          destroyInstance();
-    static void          SetHandler(MsgHandler_t func);
 
 	void Start();
+    void SetHandler(MsgHandler_t func);
 	bool Recv(INT8U *buf,int &len);
     bool Recv(INT8U *buf,int &len,INT16U request);
 	int  Send(const INT8U *buf,int len);
@@ -35,12 +35,13 @@ protected:
 	~NetMessenger();
 
 	static NetMessenger *_instance;
-	static CSocket      *_socket;
-	static bool         _keepListen;
-    static MsgHandler_t _handle_msg;
 private:
-    int    _sendCnt;
-    int    _recvCnt;
+    CSocket      *_socket;
+	bool         _keepListen;
+    MsgHandler_t _handle_msg;
+
+    int          _sendCnt;
+    int          _recvCnt;
     
     /*** 报文自动接收   ***/
     bool _is_kwx_exist();

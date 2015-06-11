@@ -141,9 +141,6 @@ int NetMessenger::_usedLen() {
         µ¥ÀıÄ£Ê½ 
 *******************************************************/
 NetMessenger * NetMessenger::_instance   = 0;
-bool           NetMessenger::_keepListen = false;
-CSocket      * NetMessenger::_socket     = 0;
-MsgHandler_t   NetMessenger::_handle_msg = 0;
 
 NetMessenger * NetMessenger::getInstance() {
 	if(_instance==0) {
@@ -154,8 +151,6 @@ NetMessenger * NetMessenger::getInstance() {
 }
 
 void NetMessenger::destroyInstance() {
-    _keepListen = false;
-    _handle_msg = 0;
     delete _instance;
     _instance = 0;
 }
