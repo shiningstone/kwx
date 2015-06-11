@@ -41,7 +41,7 @@ int LoginResponse::Construct(const DsMsg &msg) {
     EnvVariable::getInstance()->SetKey(msg.GetItemValue(5));
 
     _roomServerId      = msg.GetItemValue(6);
-    Utf16ToUtf8((const Utf16 *)msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen,(Utf8 *)_roomServerIp);
+    msg.GetString(7,_roomServerIp);
     _roomServerPort    = msg.GetItemValue(8);
 
     return 0;
@@ -62,14 +62,11 @@ int RequestEnterRoom::Set(int id) {
     return 0;
 }
 
-void EnterRoomResponse::_LoadStrings(INT8U strings[3][128],const INT8U *buf,int bufLen) {
-    char Utf8Buf[512] = {0};
-    Utf16ToUtf8((Utf16 *)buf,bufLen,(Utf8 *)Utf8Buf);
-
+void EnterRoomResponse::_Split(INT8U strings[3][128],const INT8U *buf) {
     const char *SPLIT = "%@";
     int idx = 0;
 
-    char *token = strtok(Utf8Buf,SPLIT);
+    char *token = strtok((char *)buf,SPLIT);
     
     while(token!=NULL) {
         strcpy((char *)strings[(MIDDLE+idx)%3],token);
@@ -104,12 +101,13 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
         score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
     }
 
-    INT8U buf[128] = {0};
-    _ntohs(msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen,buf);
-    _LoadStrings(name,buf,msg._body->_items[7]->_bufLen);
+    INT8U names[512] = {0};
+    msg.GetString(7,names);
+    _Split(name,names);
     
-    _ntohs(msg._body->_items[8]->_buf,msg._body->_items[8]->_bufLen,buf);
-    _LoadStrings(image,buf,msg._body->_items[8]->_bufLen);
+    INT8U images[512] = {0};
+    msg.GetString(8,images);
+    _Split(image,images);
 
     return 0;
 }
@@ -125,12 +123,8 @@ int EnterRoomNotif::Construct(const DsMsg &msg) {
     
     score     = msg.GetItemValue(3);
 
-    INT8U buf[128] = {0};
-    _ntohs(msg._body->_items[4]->_buf,msg._body->_items[4]->_bufLen,buf);
-    Utf16ToUtf8((Utf16 *)buf,msg._body->_items[4]->_bufLen,(Utf8 *)name);
-
-    _ntohs(msg._body->_items[5]->_buf,msg._body->_items[5]->_bufLen,buf);
-    Utf16ToUtf8((Utf16 *)buf,msg._body->_items[5]->_bufLen,(Utf8 *)image);
+    msg.GetString(4, name);
+    msg.GetString(5, image);
 
     return 0;
 }
@@ -175,7 +169,7 @@ int LeaveNotif::Construct(const DsMsg &msg) {
 }
 
 int LoginConflictNotif::Construct(const DsMsg &msg) {
-    Utf16ToUtf8((const Utf16 *)msg._body->_items[0]->_buf,msg._body->_items[0]->_bufLen,(Utf8 *)_info);
+    msg.GetString(0,(INT8U *)_info);
     return 0;
 }
 
@@ -217,7 +211,7 @@ int TalkResponse::Construct(const DsMsg &msg) {
 
 int TalkNotif::Construct(const DsMsg &msg) {
     _type = (TalkType_t)msg.GetItemValue(0);
-    Utf16ToUtf8((const Utf16 *)msg._body->_items[1]->_buf,msg._body->_items[1]->_bufLen,(Utf8 *)_content);
+    msg.GetString(1,(INT8U *)_content);
         
     return 0;
 }

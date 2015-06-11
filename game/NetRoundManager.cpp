@@ -863,8 +863,6 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
             data->get_local_image(profile.photo,(char *)info->image[i]);
 
             _players[i]->Set(&profile);
-
-            //_uiManager->GuiPlayerShow((PlayerDir_t)i);
         }
     }
     #else

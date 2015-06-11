@@ -76,10 +76,10 @@ void test_image() {
 #include "./../../protocol/DsInstruction.h"
 #include "./../../protocol/KwxMsgLogin.h"
 void test_split() {
-    wchar_t utf16Buf[] = {0xfeff,L"name1%@name2%@name3"};
+    char  utf16Buf[] = "name1%@name2%@name3";
     INT8U strings[3][128] = {{0}};
 
-    EnterRoomResponse::_LoadStrings(strings,(INT8U *)(utf16Buf),sizeof(utf16Buf)/2);
+    EnterRoomResponse::_LoadStrings(strings,(INT8U *)(utf16Buf),strlen(utf16Buf));
 
     assert(!strcmp((char *)strings[1],"name1"));
     assert(!strcmp((char *)strings[2],"name2"));

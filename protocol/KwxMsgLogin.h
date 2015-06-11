@@ -53,7 +53,7 @@ typedef enum {
 class EnterRoomResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
-    static void  _LoadStrings(INT8U strings[][128],const INT8U *buf,int bufLen);
+    static void  _Split(INT8U strings[][128],const INT8U *buf);
 private:
 
     RoomPath_t       roomPath;
