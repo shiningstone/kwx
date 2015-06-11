@@ -31,6 +31,15 @@ INT16U _ntohs(INT16U n) {
     return *((INT16U *)ha);
 }
 
+void _ntohs(const INT8U *buf,int len,INT8U *output) {
+    memset(output,0,len+2);
+    
+    for(int i=0;i<len/2;i++) {
+        output[2*i]     = buf[2*i + 1];
+        output[2*i + 1] = buf[2*i];
+    }
+}
+
 INT16U _htons(INT16U n) {
     return _ntohs(n);
 }

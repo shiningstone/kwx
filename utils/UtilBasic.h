@@ -19,6 +19,7 @@ extern INT32U _htonl(INT32U n);
 extern INT16U _ntohs(INT16U n);
 extern INT16U _htons(INT16U n);
 
+extern void _ntohs(const INT8U *buf,int len,INT8U *output);
 /************************************
     bit operation
 ************************************/

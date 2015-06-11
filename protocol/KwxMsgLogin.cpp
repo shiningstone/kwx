@@ -104,8 +104,12 @@ int EnterRoomResponse::Construct(const DsMsg &msg) {
         score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[6]->_buf + 4*i) );
     }
 
-    _LoadStrings(name,msg._body->_items[7]->_buf+UTF16_HEADER_LEN,msg._body->_items[7]->_bufLen-UTF16_HEADER_LEN);
-    _LoadStrings(image,msg._body->_items[8]->_buf+UTF16_HEADER_LEN,msg._body->_items[8]->_bufLen-UTF16_HEADER_LEN);
+    INT8U buf[128] = {0};
+    _ntohs(msg._body->_items[7]->_buf,msg._body->_items[7]->_bufLen,buf);
+    _LoadStrings(name,buf,msg._body->_items[7]->_bufLen);
+    
+    _ntohs(msg._body->_items[8]->_buf,msg._body->_items[8]->_bufLen,buf);
+    _LoadStrings(image,buf,msg._body->_items[8]->_bufLen);
 
     return 0;
 }
@@ -121,8 +125,12 @@ int EnterRoomNotif::Construct(const DsMsg &msg) {
     
     score     = msg.GetItemValue(3);
 
-    Utf16ToUtf8((Utf16 *)msg._body->_items[4]->_buf+UTF16_HEADER_LEN,msg._body->_items[4]->_bufLen-UTF16_HEADER_LEN,(Utf8 *)name);
-    Utf16ToUtf8((Utf16 *)msg._body->_items[5]->_buf+UTF16_HEADER_LEN,msg._body->_items[5]->_bufLen-UTF16_HEADER_LEN,(Utf8 *)image);
+    INT8U buf[128] = {0};
+    _ntohs(msg._body->_items[4]->_buf,msg._body->_items[4]->_bufLen,buf);
+    Utf16ToUtf8((Utf16 *)buf,msg._body->_items[4]->_bufLen,(Utf8 *)name);
+
+    _ntohs(msg._body->_items[5]->_buf,msg._body->_items[5]->_bufLen,buf);
+    Utf16ToUtf8((Utf16 *)buf,msg._body->_items[5]->_bufLen,(Utf8 *)image);
 
     return 0;
 }
