@@ -221,6 +221,7 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     _messenger->Send(aReq);
     Wait(REQ_GAME_SEND_ENTER);
     /**********************************************/
+    _uiManager->GuiPlayerShow(MIDDLE);
 }
 
 void NetRoundManager::StartGame() {
@@ -863,7 +864,7 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
 
             _players[i]->Set(&profile);
 
-            _uiManager->GuiPlayerShow((PlayerDir_t)i);
+            //_uiManager->GuiPlayerShow((PlayerDir_t)i);
         }
     }
     #else
@@ -893,7 +894,7 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
     data->get_local_image(profile.photo,(char *)info->image);
 
     _players[dir]->Set(&profile);
-    
+
     _uiManager->GuiPlayerShow((PlayerDir_t)dir);
     #endif
 }

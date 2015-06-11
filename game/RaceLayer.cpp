@@ -84,6 +84,7 @@ void RaceLayer::CreateRace(GameMode_t mode)
     StartButton->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnStartHandler,this));
     this->addChild(StartButton,2,START_GAME_TAG_ID);
 
+	_UpdateResidueCards(TOTAL_CARD_NUM);
 
     if(mode==LOCAL_GAME) {
         _roundManager = RoundManager::getInstance();
@@ -91,8 +92,6 @@ void RaceLayer::CreateRace(GameMode_t mode)
         _roundManager = NetRoundManager::getInstance();
     }
     _roundManager->CreateRace(this);
-
-	_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 
     for(int dir=0;dir<3;dir++) {
         if(_roundManager->_players[dir]->_isExist) {
