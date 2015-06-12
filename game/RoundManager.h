@@ -15,6 +15,7 @@ using namespace ui;
 
 extern void load_test_round(int idx,Card_t *output);
 
+class RaceLayer;
 class Player;
 class StrategyRm;
 

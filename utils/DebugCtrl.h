@@ -21,5 +21,6 @@
 #define TIMER_FREE
 //#define USE_LOCAL_PROFILE
 #define NO_HEART_BEAT
+//#define USE_TEST_ROUND
 
 #endif

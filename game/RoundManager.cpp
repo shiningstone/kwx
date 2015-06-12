@@ -56,11 +56,12 @@ void RoundManager::InitPlayers() {
 }
 
 int RoundManager::Shuffle() {
-#if 0
+#ifndef USE_TEST_ROUND
     _strategy->load_card_sequence(_unDistributedCards);
 #else
     load_test_round(1,_unDistributedCards);
 #endif
+
     _gRiver->clear();
     _distributedNum = 0;
     _LogRoundCards();

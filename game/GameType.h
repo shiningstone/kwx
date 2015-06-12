@@ -245,9 +245,9 @@ typedef enum _RobotTarget_t {
 
 #else
 
-    char *DescAct(ActionId_t act) {return 0;}
-    char *DescCard(Card_t kind)    {return 0;}
-    char *DescPlayer(PlayerDir_t dir) {return 0;}
+    char *DescAct(ActionId_t act);
+    char *DescCard(Card_t kind);
+    char *DescPlayer(PlayerDir_t dir);
 
 #endif
 

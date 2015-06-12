@@ -38,6 +38,7 @@ protected:
 
 class SmartList;
 class RoundManager;
+class Alternatives;
 class CardInHand : public CardList {
 public:
     CardInHand();

@@ -1,7 +1,7 @@
 
-#ifdef WIN32
-
 #include "DbgRequestDesc.h"
+
+#ifdef WIN32
 
 RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_SEND_START),
@@ -34,6 +34,10 @@ char *DescReq(RequestId_t id) {
 
     return "Desc undefined";
 }
+
+#else 
+
+char *DescReq(RequestId_t id) { return 0; }
 
 #endif
 

@@ -1,10 +1,10 @@
 #include "HelloWorldScene.h"
 #include "IMLoadScene.h"
 #include "EnterRoomScene.h"
-#include "game/RaceLayer.h"
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
 
+#include "game/RaceLayer.h"
 #include "protocol/CommonMsg.h"
 #include "protocol/DsInstruction.h"
 #include "protocol/KwxMessenger.h"

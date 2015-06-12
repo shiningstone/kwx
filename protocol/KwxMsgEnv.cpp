@@ -34,7 +34,7 @@ void EnvVariable::SetServerIp(Server_t &server,const char *ip) {
         strcpy(server.ipaddr,LOCAL_SERVER);
     }
 #else
-    sprintf(server.ipaddr,ip);
+    sprintf(server.ipaddr,"%s",ip);
 #endif
 }
 

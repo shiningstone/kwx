@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "./../utils/LogManager.h"
 
 #include "CardCollection.h"

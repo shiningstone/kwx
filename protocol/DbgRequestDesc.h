@@ -16,7 +16,7 @@
 
 #else
 
-    char *DescReq(RequestId_t id) {return 0;}
+    char *DescReq(RequestId_t id);
 
 #endif
 
