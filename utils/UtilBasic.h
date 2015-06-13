@@ -59,15 +59,6 @@ typedef int (*MsgHandler_t )(const INT8U *msg,int &len);
 
 extern void _delay(int ms);
 
-
-typedef struct _DeviceInfo_t {
-    INT8U mac[128];    
-    INT8U imsi[128];    
-    INT8U resolution[128];    
-    INT8U protoType[128];    
-    INT8U osVer[128];
-}DeviceInfo_t;
-
 typedef struct {
     int  id;
     char name[32];
@@ -75,5 +66,5 @@ typedef struct {
     int  port;
 }Server_t;
 
-extern void _get_device_info(DeviceInfo_t &device);
 #endif
+

@@ -246,6 +246,10 @@ bool HelloWorld::init()
 	SimpleAudioEngine::sharedEngine()->preloadEffect("Music/ui_click.ogg");
 	auto thisSpaen=Spawn::create(log_bg1_action,log_bg2_action,cliper_action,lightEffect_action,NULL);
 	this->runAction(Spawn::create(LogoVoiceEffect,thisSpaen,NULL));
+
+    DeviceInfo_t info;
+    _get_device_info(info);
+    
     return true;
 }
 

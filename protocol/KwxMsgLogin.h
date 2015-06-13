@@ -22,7 +22,6 @@ public:
 
     UserType_t   _userType;
     HostString   _account;
-    DeviceInfo_t _device;
     HostString   _session;
 };
 

@@ -257,7 +257,13 @@ void _split(INT8U strings[3][128],const INT8U *buf) {
 ****************************************************************/
 #ifdef WIN32
 #include <windows.h>
+#else
+#include "platform/android/jni/JniHelper.h"
+#include <jni.h>
+
+USING_NS_CC;
 #endif
+
 void _delay(int ms) {
     #ifdef WIN32
     Sleep(ms);
@@ -265,18 +271,3 @@ void _delay(int ms) {
     /*android interface*/
     #endif
 }
-
-void _get_device_info(DeviceInfo_t &info) {
-#ifdef WIN32
-    memset(&info,0,sizeof(DeviceInfo_t));
-
-    sprintf((char *)info.mac,"win32_mac");    
-    sprintf((char *)info.imsi,"win32_imsi");    
-    sprintf((char *)info.resolution,"1024*768");    
-    sprintf((char *)info.protoType,"win32_protoType");    
-    sprintf((char *)info.osVer,"win32_osVer");
-#else
-    /*android interface*/
-#endif
-}
-

@@ -5,14 +5,14 @@
 /**********************************************************************************
     this macro provides a shortcut to start a network game by Button "DanJiBan" 
 **********************************************************************************/
-#define NETWORK_GAME_DEBUG
+//#define NETWORK_GAME_DEBUG
 
 /********************************************************************************** 
     this macro is used to control the client is connected to 
         local server(127.0.0.1) OR 
         remote server(the ip address is stored in E:/server_ip.txt)
 **********************************************************************************/
-#define USE_REMOTE_SERVER
+//#define USE_REMOTE_SERVER
 
 /********************************************************************************** 
     this macro is used to control the timer limitation

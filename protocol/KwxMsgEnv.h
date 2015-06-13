@@ -3,6 +3,7 @@
 #define __KWX_ENV_VARIABLES_H__
 
 #include "./../utils/UtilBasic.h"
+#include "./../utils/UtilPlatform.h"
 
 #include "KwxMsgBasic.h"
 /*******************************************************************************

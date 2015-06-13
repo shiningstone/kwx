@@ -9,23 +9,23 @@
 #include "KwxMsgLogin.h"
 
 int RequestLogin::Set(UserType_t type) {
-    _userType = type;
+    memset(_account,0,MAX_UTF8_BUF);
+    memset(_session,0,MAX_UTF8_BUF);
 
-    _get_device_info(_device);
+    _userType = type;
 
     SetRequestCode(REQ_LOGIN);
 
     _add_item( new Item(60,_userType) );
 
-    memset(_account,0,MAX_UTF8_BUF);
-    memset(_session,0,MAX_UTF8_BUF);
+    DeviceInfo_t &device = EnvVariable::getInstance()->_device;
 
     _add_utf16_string(131,(const INT8U *)_account);
-    _add_utf16_string(132,_device.mac);
-    _add_utf16_string(133,_device.imsi);
-    _add_utf16_string(134,_device.resolution);
-    _add_utf16_string(135,_device.protoType);
-    _add_utf16_string(136,_device.osVer);
+    _add_utf16_string(132,device.mac);
+    _add_utf16_string(133,device.imsi);
+    _add_utf16_string(134,device.resolution);
+    _add_utf16_string(135,device.protoType);
+    _add_utf16_string(136,device.osVer);
     _add_utf16_string(137,(const INT8U *)_session);
 
     return 0;
