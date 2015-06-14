@@ -32,11 +32,11 @@ void _get_device_info(DeviceInfo_t &info) {
     memset(&info,0,sizeof(DeviceInfo_t));
 
 #ifdef WIN32
-    sprintf((char *)info.mac,"win32_mac");    
-    sprintf((char *)info.imsi,"win32_imsi");    
-    sprintf((char *)info.resolution,"1024*768");    
-    sprintf((char *)info.protoType,"win32_protoType");    
-    sprintf((char *)info.osVer,"win32_osVer");
+    sprintf((char *)info.mac,"11:22:33:44:55:66");    
+    sprintf((char *)info.imsi,"310260000000000");    
+    sprintf((char *)info.resolution,"480*800");    
+    sprintf((char *)info.protoType,"GT-I9100");    
+    sprintf((char *)info.osVer,"2.3.5");
 #else
     CallJava(info.mac, "getMac");
     CallJava(info.imsi, "getImsi");
