@@ -247,8 +247,12 @@ bool HelloWorld::init()
 	auto thisSpaen=Spawn::create(log_bg1_action,log_bg2_action,cliper_action,lightEffect_action,NULL);
 	this->runAction(Spawn::create(LogoVoiceEffect,thisSpaen,NULL));
 
+	/**********************************/
+    /* Jiangbo: this is just for test */
     DeviceInfo_t info;
     _get_device_info(info);
+    log("mac is %s",info.mac);
+	/**********************************/
     
     return true;
 }

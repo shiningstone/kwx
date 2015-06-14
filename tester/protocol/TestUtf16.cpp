@@ -79,7 +79,7 @@ void test_split() {
     char  utf16Buf[] = "name1%@name2%@name3";
     INT8U strings[3][128] = {{0}};
 
-    EnterRoomResponse::_Split(strings,(INT8U *)(utf16Buf));
+    _split(strings,(INT8U *)(utf16Buf));
 
     assert(!strcmp((char *)strings[1],"name1"));
     assert(!strcmp((char *)strings[2],"name2"));
