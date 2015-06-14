@@ -12,18 +12,21 @@ USING_NS_CC;
 
 #include "UtilPlatform.h"
 
+#ifndef WIN32
 static int CallJava(INT8U *buf,const char *jmethod) {
     JniMethodInfo method;
-    jobject obj;
+    bool IsMethodValid = false;
 
-    bool ret = JniHelper::getStaticMethodInfo(method,"org/cocos2dx/cpp/DeviceInfo",jmethod,"()Ljava/lang/String;");
-    if(ret) {
-        obj = method.env->CallStaticObjectMethod(method.classID,method.methodID);
+    jstring str; 
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,"org/cocos2dx/cpp/AppActivity",jmethod,"()Ljava/lang/String;");
+    if(IsMethodValid) {
+        str = (jstring)method.env->CallStaticObjectMethod(method.classID,method.methodID);
+
+        std::string text = JniHelper::jstring2string(str);
+        memcpy(buf, text.c_str(), text.size());
     }
-
-    const char *sBuf = method.env->GetStringUTFChars(static_cast<jstring>(obj),NULL);
-    memcpy(buf, sBuf, strlen(sBuf));
 }
+#endif
 
 void _get_device_info(DeviceInfo_t &info) {
     memset(&info,0,sizeof(DeviceInfo_t));
@@ -36,6 +39,10 @@ void _get_device_info(DeviceInfo_t &info) {
     sprintf((char *)info.osVer,"win32_osVer");
 #else
     CallJava(info.mac, "getMac");
+    CallJava(info.imsi, "getImsi");
+    CallJava(info.resolution, "getResolution");
+    CallJava(info.protoType, "getProtoType");
+    CallJava(info.osVer, "getOsVer");
 #endif
 }
 

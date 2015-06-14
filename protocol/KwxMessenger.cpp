@@ -24,11 +24,11 @@ KwxMessenger::KwxMessenger(MsgType_t type) {
     
     switch(type) {
         case MSG_LOGIN:
-            memcpy(_serverIp,env->_loginServer.ipaddr,strlen(env->_loginServer.ipaddr));
+            strcpy((char *)_serverIp,env->_loginServer.ipaddr);
             _port = env->_loginServer.port;
             break;
         case MSG_GAME:
-            memcpy(_serverIp,env->_roomServer.ipaddr,strlen(env->_roomServer.ipaddr));
+            strcpy((char *)_serverIp,env->_roomServer.ipaddr);
             _port = env->_roomServer.port;
             break;
         case MSG_CHAT:

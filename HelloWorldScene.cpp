@@ -252,6 +252,10 @@ bool HelloWorld::init()
     DeviceInfo_t info;
     _get_device_info(info);
     log("mac is %s",info.mac);
+    log("imsi is %s",info.imsi);
+    log("reso is %s",info.resolution);
+    log("prototype is %s",info.protoType);
+    log("osVer is %s",info.osVer);
 	/**********************************/
     
     return true;

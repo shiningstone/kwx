@@ -4,6 +4,8 @@
 
 #include "KwxMsgEnv.h"
 
+#include "./../utils/DebugCtrl.h"
+
 #define LOGIN_SERVER_IP  "127.0.0.1"
 #define ROOM_SERVER_IP   "127.0.0.1"
 #define LOCAL_SERVER     "127.0.0.1"
@@ -21,18 +23,20 @@ EnvVariable *EnvVariable::getInstance() {
 }
 
 void EnvVariable::SetServerIp(Server_t &server,const char *ip) {
-#ifdef WIN32
-    FILE * target = NULL;
-        
-    #ifdef USE_REMOTE_SERVER
-    target = fopen("E:\\server_ip.txt","r");
-    #endif
-        
-    if(target!=NULL) {
-        fgets(server.ipaddr,128,target);
-    } else {
+#ifdef DBG_REMOTE_SERVER
+    #if (DBG_REMOTE_SERVER==1)
         strcpy(server.ipaddr,LOCAL_SERVER);
-    }
+    #elif (DBG_REMOTE_SERVER==2)
+        strcpy(server.ipaddr,LAN_SERVER);
+    #else
+        FILE * target = NULL;
+        target = fopen("E:\\server_ip.txt","r");
+        if(target!=NULL) {
+            fgets(server.ipaddr,128,target);
+        } else {
+            strcpy(server.ipaddr,LOCAL_SERVER);
+        }
+    #endif
 #else
     sprintf(server.ipaddr,"%s",ip);
 #endif

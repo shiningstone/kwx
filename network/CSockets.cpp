@@ -95,23 +95,6 @@ void ServerSocket::Start(const char *serverIp,int port) {
 void ClientSocket::Start(const char *serverIp,int port) {
 	Init();
 
-    char strServerIp[128] = {0};
-#ifdef WIN32/*windows*/
-    FILE * target = NULL;
-
-#ifdef USE_REMOTE_SERVER
-	target = fopen("E:\\server_ip.txt","r");
-#endif
-
-	if(target!=NULL) {
-        fgets(strServerIp,128,target);
-    } else {
-        strcpy(strServerIp,serverIp);
-    }
-#else/*android*/
-    strcpy(strServerIp,serverIp);
-#endif
-
 	_keepAlive   = false;
 	_blockSecond = BLOCKSECONDS;
 
@@ -139,7 +122,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
 #endif   
 
 	sockaddr_in server;
-    server.sin_addr.s_addr=inet_addr(strServerIp);
+    server.sin_addr.s_addr=inet_addr(serverIp);
     server.sin_family=AF_INET;
     server.sin_port=htons(port);
 

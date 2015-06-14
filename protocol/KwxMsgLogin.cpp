@@ -8,6 +8,23 @@
 
 #include "KwxMsgLogin.h"
 
+#include "./../utils/DebugCtrl.h"
+
+/* Example from 9100 without Sim card
+    4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 01 00 8e 
+    08
+    3c 00
+    83 00 02 fe ff
+    84 00 24 
+    	fe ff 00 39 00 38 00 3a 00 30 00 43 00 3a 00 39 
+    	00 32 00 3a 00 43 00 39 00 3a 00 41 00 36 00 3a 
+    	00 31 00 42
+    85 00 02 fe ff 
+    86 00 10 fe ff 00 34 00 38 00 30 00 2a 00 38 00 30 00 30 
+    87 00 12 fe ff 00 47 00 54 00 2d 00 49 00 39 00 31 00 30 00 30 
+    88 00 0c fe ff 00 32 00 2e 00 33 00 2e 00 35
+    89 00 02 fe ff
+*/
 int RequestLogin::Set(UserType_t type) {
     memset(_account,0,MAX_UTF8_BUF);
     memset(_session,0,MAX_UTF8_BUF);

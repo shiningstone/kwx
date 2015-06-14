@@ -161,9 +161,9 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start) {
     Utf16 buf[128] = {0};
     memcpy(buf,pUtf16Start+1,(len-1)*sizeof(Utf16));    /*Extract 0xfeff*/
 
-    const Utf16* pUtf16End  = pUtf16Start + len;
+    const Utf16* pUtf16End  = pUtf16Start + len/2;
 
-    const Utf16* pTempUtf16 = pUtf16Start;
+    const Utf16* pTempUtf16 = pUtf16Start + 1;
     Utf8*  pTempUtf8  = pUtf8Start;
  
     while(pTempUtf16<pUtf16End)
