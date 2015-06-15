@@ -6,12 +6,8 @@ USING_NS_CC;
 
 #include "./../protocol/CommonMsg.h"
 #include "./../protocol/KwxMessenger.h"
-
-/************************************/
-/* temporary for RequestEnterRoom   */
 #include "./../protocol/DsInstruction.h"
 #include "./../protocol/KwxMsgLogin.h"
-/************************************/
 
 #include "CardCollection.h"
 #include "Player.h"
@@ -224,13 +220,11 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
 
     _messenger->StartReceiving();
     
-    /**********************************************/
-    /* enter room should be called somewhere else */
     RequestEnterRoom aReq;
     aReq.Set();
     _messenger->Send(aReq);
     Wait(REQ_GAME_SEND_ENTER);
-    /**********************************************/
+
     _uiManager->GuiPlayerShow(MIDDLE);
 }
 

@@ -21,9 +21,11 @@ public:
     Key_t      GetKey();
     void       SetUserId(INT32U id);
     INT32U     GetUserId();
-    RoomPath_t GetRoomPath(int id);
+    void       SetRoomPath(RoomPath_t id);
+    RoomPath_t GetRoomPath();
 
-    Key_t    _key;
+    Key_t      _key;
+    RoomPath_t _roomPath;
     
     INT8U    _protocol;
 	INT32U   _userId;

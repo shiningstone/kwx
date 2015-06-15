@@ -77,7 +77,7 @@ int RequestEnterRoom::Set(int id) {
     SetRequestCode(REQ_GAME_SEND_ENTER);
 
     Key_t key = EnvVariable::getInstance()->GetKey();
-    RoomPath_t roomPath = EnvVariable::getInstance()->GetRoomPath(id);
+    RoomPath_t roomPath = EnvVariable::getInstance()->GetRoomPath();
 
     INT32U keyid = _htonl((INT32U)key);
     INT32U roomId = _htonl((INT32U)roomPath);

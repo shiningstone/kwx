@@ -105,8 +105,13 @@ INT32U EnvVariable::GetUserId() {
     return _userId;
 }
 
-RoomPath_t EnvVariable::GetRoomPath(int id) {
+void EnvVariable::SetRoomPath(RoomPath_t id) {
+    _roomPath = id;
+}
+
+RoomPath_t EnvVariable::GetRoomPath() {
     return 11;
+    /*return _roomPath;*/
 }
 
 /*******************************************************************************
