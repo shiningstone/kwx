@@ -215,9 +215,6 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     InitPlayers();
 	_isGameStart=false;
 
-    SeatInfo *seat = SeatInfo::getInstance();
-    seat->Set(1,0x10010000,1,1);
-
     _messenger->StartReceiving();
     
     RequestEnterRoom aReq;
