@@ -11,16 +11,31 @@ class MyBaseInformation :
 public:
 	MyBaseInformation(void);
 	~MyBaseInformation(void);
-	enum MyEnum
+#define MY_BASEINFO_ID				1
+#define MY_ACCOUNT_LABEL			2
+#define EDITBOX_FOR_NAME			3
+#define LABEL_FOR_NAME				4
+#define SEX_BOY_SIGN				5
+#define SEX_GIRL_SIGN				6
+#define WIN_RATE					7
+#define MAX_HISTORY					8
+	Size visibleSize;
+	Vec2 origin;
+	enum MySex
 	{
-		boy,
-		girl
-	}sex;
+		BOY,
+		GIRL
+	}my_sex;
 	virtual bool init();
-	void onButtonBoy(Ref* pSender,Widget::TouchEventType type);
-	void onButtonGirl(Ref* pSender,Widget::TouchEventType type);
-	void menuCloseCallback(cocos2d::Ref* pSender);
 	void onButtonChangePhoto(Ref* pSender,Widget::TouchEventType type);
+	void ChangeAccountCallBack(Ref* pSender,Widget::TouchEventType type);
+	void UpgradeAccount(Ref* pSender,Widget::TouchEventType type);
+	void ManagePassWord(Ref* pSender,Widget::TouchEventType type);
+	void ChangeNameForPenCallBack(Ref* pSender,Widget::TouchEventType type);
+	void CallBack_ForJiaHao(Ref* pSender,Widget::TouchEventType type);
+
+
+	//void editBoxEditingDidEnd(EditBox* editBox);
 	CREATE_FUNC(MyBaseInformation);
 };
 

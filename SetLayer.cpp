@@ -39,7 +39,7 @@ bool SetLayer::init()
 	imageOfVibration->setPosition(origin.x+visiableSize.width*0.055,origin.y+visiableSize.height*0.1228);
 	this->addChild(imageOfVibration,1);
 
-	auto imageOfPlayCard=Sprite::createWithSpriteFrameName("chupai.png");
+	auto imageOfPlayCard=Sprite::createWithSpriteFrameName("Dialect.png");
 	imageOfPlayCard->setAnchorPoint(Vec2(0,0));
 	imageOfPlayCard->setPosition(origin.x+visiableSize.width*0.476,origin.y+visiableSize.height*0.6828);
 	this->addChild(imageOfPlayCard,1);
@@ -91,7 +91,7 @@ bool SetLayer::init()
 	this->addChild(VibrationButton,1,3);
 	
 
-	auto onceClickButton=Button::create("danji2.png","danji.png","danji.png",TextureResType::PLIST);
+	auto onceClickButton=Button::create("bottn-Mandarin2.png","bottn-Mandarin.png","bottn-Mandarin.png",TextureResType::PLIST);
 	onceClickButton->setAnchorPoint(Vec2(0,0));
 	onceClickButton->setPosition(Vec2(origin.x+visiableSize.width*0.5977,origin.y+visiableSize.height*0.6594));
 	onceClickButton->addTouchEventListener(CC_CALLBACK_2(SetLayer::onButtonOnceClick, this));
@@ -99,9 +99,9 @@ bool SetLayer::init()
 	onceClickButton->setHighlighted(true);
 	onceClickButton->setTouchEnabled(false);
 
-	auto doubleClickButton=Button::create("shuangji2.png","shuangji.png","shuangji.png",TextureResType::PLIST);
+	auto doubleClickButton=Button::create("bottn-Dialect2.png","bottn-Dialect.png","bottn-Dialect.png",TextureResType::PLIST);
 	doubleClickButton->setAnchorPoint(Vec2(0,0));
-	doubleClickButton->setPosition(Vec2(origin.x+visiableSize.width*0.763,origin.y+visiableSize.height*0.66));
+	doubleClickButton->setPosition(Vec2(origin.x+visiableSize.width*0.763-4,origin.y+visiableSize.height*0.66));
 	doubleClickButton->addTouchEventListener(CC_CALLBACK_2(SetLayer::onButtonDoubleClick, this));
 	this->addChild(doubleClickButton,2,5);
 	doubleClickButton->setHighlighted(false);

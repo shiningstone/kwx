@@ -69,7 +69,6 @@ bool TaskReward::init()
 	this->addChild(sc,4);
 	sc->setInnerContainerSize(Size(visiableSize.width,visiableSize.height*1.8));
 	sc->addChild(containLayer);
-	
 
 	return true;
 }

@@ -8,55 +8,66 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
+
 class EnterRoom : public cocos2d::Layer
 {
-    public:
-        EnterRoom();
-        virtual ~EnterRoom();
-    public:
-    // there's no 'id' in cpp, so we recommend returning the class instance pointer
-#define MAX_CONTINE_LOAD_DAYS 7
-   float s_scale;
-   int s_no;
-   int cur_days;
-   int cur_status;
-   ParticleSnow* _emitter;
-   ParticleSnow* _emitter1;
-   ParticleSnow* _emitter2;
-   ParticleSnow* _emitter3;
-   ParticleSnow* _emitter4;
-   ParticleSnow* _emitter5;
-    // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
-   virtual bool init();
-   void removeDayReward();
-   void startEmitter();
-   void stopEmitter(float t);
-   void onButtonSignField(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void message_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void prize_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void rank_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void active_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void mall_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void set_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void normal_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void compete_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void fastRace_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void myBaseInfo_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void back_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void rankBack_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
-   void entranceToCommonField(float t);
-   void commonFieldAction();
-   void entranceToCompeteField(float t);
-   void competeFieldAction();
-   void entranceToFastRace(float t);
-   void fastRaceAction();
-   void allButtonAction(float t);
-   void allButtonAction2(float t);
-   void deletePaddle(float t);
-   void deletePaddle1(float t);
-   void call_gold_prize();
-   void goldreceiveCallback(cocos2d::Ref* pSender);
-   CREATE_FUNC(EnterRoom);
+public:
+	EnterRoom();
+	virtual ~EnterRoom();
+public:
+	// there's no 'id' in cpp, so we recommend returning the class instance pointer
+#define NODE_CHILD_ID_ONE			1	
+#define NODE_CHILD_ID_TWO			2	
+#define NODE_CHILD_ID_THREE			3
+#define MAX_CONTINE_LOAD_DAYS		7
+
+#define THIS_FRIEND_CHAT_BKG		1
+#define THIS_MYFEIEND_BUTTON		2
+#define THIS_NEARPEOPLE_BUTTON		3
+#define	THIS_FRIEND_SCROLLVIEW		4
+#define	THIS_NEARLY_SCROLLVIEW		5
+#define THIS_GET_DAYGOLD_BKG		6
+#define RANKSCROLL_LAYER			7
+
+#define LABEL_FOR_PLAYERNAME		8
+#define LABEL_FOR_GOLD				9
+#define LABEL_FOR_QUAN				10
+#define SPRITE_FOR_PHOTO			11
+	Size visibleSize;
+	Point origin;
+	float s_scale;
+	int s_no;
+	bool ifDayAwardGetted;
+	/////////////////////////////////////////////////
+	//int cur_days;
+	//int cur_status;
+	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
+	virtual bool init();
+	//void addRes();
+	void MyDataUIPrepare();
+	void FunctionBarUIPrepare();
+	void competeButtons();
+	void FriendAndStrangers();
+	void myBaseInfo_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite 
+	void mall_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
+	void message_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
+	void prize_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
+	void rank_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);				//ReWrite
+	void active_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
+	void set_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
+	void back_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);				//ReWrite
+	void normal_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
+	void compete_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
+
+	void FriendScCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
+	void ChatRecordCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
+	void CommonLanguageCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite
+	void MyFriendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
+	void NearPersonCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
+	void MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite
+	void call_gold_prize();																//ReWrite
+		
+	CREATE_FUNC(EnterRoom);
 };
 #endif  //__ENTERROOM_SCENE_H__
 

@@ -101,7 +101,12 @@ void CompetitionField::onButtonBack(Ref* pSender,Widget::TouchEventType type)
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		Director::getInstance()->popScene();
+		{
+			auto scene = Scene::create();
+			auto layer = EnterRoom::create();
+			scene->addChild(layer);
+			Director::getInstance()->replaceScene(scene);
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
 		break;

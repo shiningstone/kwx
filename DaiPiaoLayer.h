@@ -6,31 +6,53 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
-class DaiPiaoLayer :
-	public Layer
+class DaiPiaoLayer : public Layer
 {
 public:
+#define BUTTON_BINGYISE				11
+#define SHADE_BINGYISE				12
+#define BUTTON_DASANYUAN			33
+#define SHADE_DASANYUAN				34
+#define BUTTON_MINGSIGUI			54
+#define SHADE_MINGSIGUI				55
+#define	BUTTON_GANGGANG				22
+#define SHADE_GANGGANG				23
+#define	BUTTON_XIAOSANYUAN			44
+#define SHADE_XIAOSANYUAN			45
+#define BUTTON_LONGQIDUI			65
+#define SHADE_LONGQIDUI				66
+#define ACTION_PNG_BYS				"bingyise.png"
+#define ACTION_PNG_DSY				"dasanyuan.png"
+#define ACTION_PNG_MSG				"mingsigui.png"
+#define ACTION_PNG_GSG				"gangshanggang.png"
+#define ACTION_PNG_XSY				"xiaosanyuan.png"
+#define ACTION_PNG_LQD				"longqidui.png"
 	DaiPiaoLayer(void);
 	~DaiPiaoLayer(void);
-	void onButtonKaWuXing(Ref* pSender,Widget::TouchEventType type);
-	void onButtonTiaoYiSe(Ref* pSender,Widget::TouchEventType type);
-	void onButtonGangShangHua(Ref* pSender,Widget::TouchEventType type);
-	void onButtonAnSiGui(Ref* pSender,Widget::TouchEventType type);
-	void onButtonHaiDilao(Ref* pSender,Widget::TouchEventType type);
-	void onButtonPengPengHu(Ref* pSender,Widget::TouchEventType type);
-	void actionKaWuXing();
-	void entranceToKaWuXing(float t);
-	void actionAnSiGui();
-	void entranceToAnSiGui(float t);
-	void actionTiaoYiSe();
-	void entranceToTiaoYiSe(float t);
-	void actionHaiDiLao();
-	void entranceHaiDiLao(float t);
-	void actionGangShangHua();
-	void entranceGangShangHua(float t);
-	void actionPengPengHu();
-	void entrancePengPengHu(float t);
+	Size visibleSize;
+	Vec2 origin;
 	virtual bool init();
+	TargetedAction* TouchShadeAction(Vec2 curPos,std::string actionName);
+	void enterRoomStandAlone();
+
+	void onbuttonBingYiSe(Ref* pSender,Widget::TouchEventType type);
+	void entranceToBingYiSe();
+
+	void onbuttonDaSanYuan(Ref* pSender,Widget::TouchEventType type);
+	void entranceDaSanYuan();
+
+	void onbuttonMingSiGui(Ref* pSender,Widget::TouchEventType type);
+	void entranceMingSiGui();
+
+	void onButtonGangGang(Ref* pSender,Widget::TouchEventType type);
+	void entranceToGangGang();
+
+	void onButtonXSY(Ref* pSender,Widget::TouchEventType type);
+	void entranceXSY();
+
+	void onButtonLQD(Ref* pSender,Widget::TouchEventType type);
+	void entranceLQD();
+
 	CREATE_FUNC(DaiPiaoLayer);
 };
 

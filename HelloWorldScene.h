@@ -3,11 +3,10 @@
 
 #include "cocos2d.h"
 USING_NS_CC;
-//#include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
-//USING_NS_CC_EXT;
 using namespace ui;
+
 class HelloWorld : public cocos2d::Layer
 {
 public:
@@ -19,14 +18,19 @@ public:
 	float s_scale;
 	int s_no;
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
-	void addButton();
+	void addButton();	//¨¬¨ª?¨®¡ã¡ä?£¤
+	void set_userDefault();		//¡À?¦Ì?¨ºy?Y
 	virtual bool init();
 	void qqLoadCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void imLoadCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+
 	// a selector callback
-	void menuCloseCallback(cocos2d::Ref* pSender);
-	void enterroomCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void enterroomCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);	//¦Ì£¤?¨²Button
 	void enterRoomStandAlone();
+
+	void menuCloseCallback(cocos2d::Ref* pSender);	//¡ê?¡ê?¡ê?
+
+	void onEnterTransitionDidFinish();
 	CREATE_FUNC(HelloWorld);
 };
 

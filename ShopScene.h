@@ -9,6 +9,11 @@ class ShopScene :
 	public Scene
 {
 public:
+#define CANGJINGGE_MOJI			1
+#define TONGCHIDAO_MOJI			2
+#define	CANGJINGGE_BUTT			3
+#define TONGCHIDAO_BUTT			4
+#define CURENT_UI_LAYER			5
 	ShopScene(void);
 	~ShopScene(void);
 	void onButtonBack(Ref* pSender,Widget::TouchEventType type);

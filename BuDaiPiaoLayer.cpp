@@ -1,4 +1,5 @@
 #include "BuDaiPiaoLayer.h"
+#include "game/RaceLayer.h"
 
 
 BuDaiPiaoLayer::BuDaiPiaoLayer(void)
@@ -10,56 +11,97 @@ BuDaiPiaoLayer::~BuDaiPiaoLayer(void)
 {
 }
 
+TargetedAction* BuDaiPiaoLayer::TouchShadeAction(Vec2 curPos,std::string actionName)
+{
+	auto curActionButton=Sprite::createWithSpriteFrameName(actionName);
+	curActionButton->setScale(0.8);
+	curActionButton->setOpacity(100);
+	auto curSize=curActionButton->getContentSize();
+	curActionButton->setAnchorPoint(Vec2(0.5,0.5));
+	curActionButton->setPosition(curPos);
+	this->addChild(curActionButton,0);
+
+	auto fadeOut=FadeOut::create(0.3);
+	auto easeBounce=ScaleTo::create(0.3,1.1);
+	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
+	auto shadeTarget=TargetedAction::create(curActionButton,spawn);
+
+	return shadeTarget;
+}
+void BuDaiPiaoLayer::enterRoomStandAlone()
+{
+	auto scene = Scene::create();
+	//SpriteFrameCache::getInstance()->removeSpriteFrames();
+	//TextureCache::sharedTextureCache()->removeAllTextures();
+
+#ifndef NETWORK_GAME_DEBUG
+	RaceLayer *layer = RaceLayer::create();
+	scene->addChild(layer);
+	layer->CreateRace(LOCAL_GAME);
+#else
+	RaceLayer *layer = RaceLayer::create();
+	scene->addChild(layer);
+	layer->CreateRace(NETWORK_GAME);
+#endif
+
+	Director::getInstance()->replaceScene(scene);
+}
 bool BuDaiPiaoLayer::init()
 {
 	if(!Layer::init())
 	{
 		return false;
 	}
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
+	visibleSize=Director::getInstance()->getVisibleSize();
+	origin=Director::getInstance()->getVisibleOrigin();
 
-	auto buttonKaWuXing=Button::create("kawuxing.png","kawuxing.png","kawuxing.png",TextureResType::PLIST);
+	auto buttonKaWuXing=Button::create("kawuxingBtn.png","kawuxingBtn.png","kawuxingBtn.png",TextureResType::PLIST);
+	buttonKaWuXing->setScale(0.8);
 	auto kaWuXingSize=buttonKaWuXing->getContentSize();
 	buttonKaWuXing->setAnchorPoint(Vec2(0.5,0.5));
-	buttonKaWuXing->setPosition(Vec2(origin.x+visibleSize.width*0.026+kaWuXingSize.width/2,origin.y+visibleSize.height*0.43+kaWuXingSize.height/2));
+	buttonKaWuXing->setPosition(Vec2(origin.x+visibleSize.width*0.026+kaWuXingSize.width/2,origin.y+visibleSize.height*0.43+kaWuXingSize.height/2+30));
 	buttonKaWuXing->addTouchEventListener(CC_CALLBACK_2(BuDaiPiaoLayer::onButtonKaWuXing,this));
-	this->addChild(buttonKaWuXing,1,11);
+	this->addChild(buttonKaWuXing,1,KAWUXING_BUTTON);
 
 	auto buttonTiaoYiSe=Button::create("tiaoyise.png","tiaoyise.png","tiaoyise.png",TextureResType::PLIST);
+	buttonTiaoYiSe->setScale(0.8);
 	auto sizeOfButtonTiaoYiSe=buttonTiaoYiSe->getContentSize();
 	buttonTiaoYiSe->setAnchorPoint(Vec2(0.5,0.5));
-	buttonTiaoYiSe->setPosition(Vec2(origin.x+visibleSize.width*0.326+sizeOfButtonTiaoYiSe.width/2,origin.y+visibleSize.height*0.43+sizeOfButtonTiaoYiSe.height/2));
+	buttonTiaoYiSe->setPosition(Vec2(origin.x+visibleSize.width*0.326+sizeOfButtonTiaoYiSe.width/2,origin.y+visibleSize.height*0.43+sizeOfButtonTiaoYiSe.height/2+30));
 	buttonTiaoYiSe->addTouchEventListener(CC_CALLBACK_2(BuDaiPiaoLayer::onButtonTiaoYiSe,this));
-	this->addChild(buttonTiaoYiSe,1,33);
+	this->addChild(buttonTiaoYiSe,1,TIAOYISE_BUTTON);
 
 	auto buttonGangShangHua=Button::create("gangshanghua.png","gangshanghua.png","gangshanghua.png",TextureResType::PLIST);
+	buttonGangShangHua->setScale(0.8);
 	auto sizeOfButtonGangShangHua=buttonGangShangHua->getContentSize();
 	buttonGangShangHua->setAnchorPoint(Vec2(0.5,0.5));
-	buttonGangShangHua->setPosition(Vec2(origin.x+visibleSize.width*0.626+sizeOfButtonGangShangHua.width/2,origin.y+visibleSize.height*0.43+sizeOfButtonGangShangHua.height/2));
+	buttonGangShangHua->setPosition(Vec2(origin.x+visibleSize.width*0.626+sizeOfButtonGangShangHua.width/2,origin.y+visibleSize.height*0.43+sizeOfButtonGangShangHua.height/2+30));
 	buttonGangShangHua->addTouchEventListener(CC_CALLBACK_2(BuDaiPiaoLayer::onButtonGangShangHua,this));
-	this->addChild(buttonGangShangHua,1,54);
+	this->addChild(buttonGangShangHua,1,GANGSHANGHUA_BT);
 	
 	auto buttonAnSiGui=Button::create("ansigui.png","ansigui.png","ansigui.png",TextureResType::PLIST);
+	buttonAnSiGui->setScale(0.8);
 	auto sizeOfButtonAnSiGui=buttonAnSiGui->getContentSize();
 	buttonAnSiGui->setAnchorPoint(Vec2(0.5,0.5));
-	buttonAnSiGui->setPosition(Vec2(origin.x+visibleSize.width*0.026+sizeOfButtonAnSiGui.width/2,origin.y+sizeOfButtonAnSiGui.height/2));
+	buttonAnSiGui->setPosition(Vec2(origin.x+visibleSize.width*0.026+sizeOfButtonAnSiGui.width/2,origin.y+sizeOfButtonAnSiGui.height/2+60));
 	buttonAnSiGui->addTouchEventListener(CC_CALLBACK_2(BuDaiPiaoLayer::onButtonAnSiGui,this));
-	this->addChild(buttonAnSiGui,1,22);
+	this->addChild(buttonAnSiGui,1,ANSIGUI_BUTTON);
 
 	auto buttonHaiDiLao=Button::create("haidilao.png","haidilao.png","haidilao.png",TextureResType::PLIST);
+	buttonHaiDiLao->setScale(0.8);
 	auto sizeOfButtonHaiDiLao=buttonHaiDiLao->getContentSize();
 	buttonHaiDiLao->setAnchorPoint(Vec2(0.5,0.5));
-	buttonHaiDiLao->setPosition(Vec2(origin.x+visibleSize.width*0.326+sizeOfButtonHaiDiLao.width/2,origin.y+sizeOfButtonHaiDiLao.height/2));
+	buttonHaiDiLao->setPosition(Vec2(origin.x+visibleSize.width*0.326+sizeOfButtonHaiDiLao.width/2,origin.y+sizeOfButtonHaiDiLao.height/2+60));
 	buttonHaiDiLao->addTouchEventListener(CC_CALLBACK_2(BuDaiPiaoLayer::onButtonHaiDilao,this));
-	this->addChild(buttonHaiDiLao,1,44);
+	this->addChild(buttonHaiDiLao,1,HAIDILAO_BUTTON);
 
 	auto buttonPengPengHu=Button::create("pengpenghu.png","pengpenghu.png","pengpenghu.png",TextureResType::PLIST);
+	buttonPengPengHu->setScale(0.8);
 	auto sizeOfButtonPengPengHu=buttonPengPengHu->getContentSize();
 	buttonPengPengHu->setAnchorPoint(Vec2(0.5,0.5));
-	buttonPengPengHu->setPosition(Vec2(origin.x+visibleSize.width*0.626+sizeOfButtonPengPengHu.width/2,origin.y+sizeOfButtonPengPengHu.height/2));
+	buttonPengPengHu->setPosition(Vec2(origin.x+visibleSize.width*0.626+sizeOfButtonPengPengHu.width/2,origin.y+sizeOfButtonPengPengHu.height/2+60));
 	buttonPengPengHu->addTouchEventListener(CC_CALLBACK_2(BuDaiPiaoLayer::onButtonPengPengHu,this));
-	this->addChild(buttonPengPengHu,1,65);
+	this->addChild(buttonPengPengHu,1,PENGPENG_BUTTON);
 
 	for(int i=0;i<3;i++)
 	{
@@ -67,14 +109,16 @@ bool BuDaiPiaoLayer::init()
 		auto heightOfButton=buttonKaWuXing->getContentSize().height;
 
 		auto bgOfButton1=Sprite::createWithSpriteFrameName("yinying.png");
+		bgOfButton1->setScale(0.8);
 		auto bgOfButton1Size=bgOfButton1->getContentSize();
 		bgOfButton1->setAnchorPoint(Vec2(0.5,0.5));
-		bgOfButton1->setPosition(Vec2(origin.x+visibleSize.width*(0.06+0.3*i)+bgOfButton1Size.width/2,origin.y+visibleSize.height*0.39+bgOfButton1Size.height/2));
+		bgOfButton1->setPosition(Vec2(origin.x+visibleSize.width*(0.06+0.3*i)+bgOfButton1Size.width/2-3,origin.y+visibleSize.height*0.39+bgOfButton1Size.height/2+33));
 
 		auto bgOfButton2=Sprite::createWithSpriteFrameName("yinying.png");
+		bgOfButton2->setScale(0.8);
 		auto bgOfButton2Size=bgOfButton2->getContentSize();
 		bgOfButton2->setAnchorPoint(Vec2(0.5,0.5));
-		bgOfButton2->setPosition(Vec2(origin.x+visibleSize.width*(0.06+0.3*i)+bgOfButton2Size.width/2,origin.y+visibleSize.height*(-0.04)+bgOfButton2Size.height/2));
+		bgOfButton2->setPosition(Vec2(origin.x+visibleSize.width*(0.06+0.3*i)+bgOfButton2Size.width/2,origin.y+visibleSize.height*(-0.04)+bgOfButton2Size.height/2+60));
 
 		auto labelImage1=Sprite::createWithSpriteFrameName("dizhu.png");
 		labelImage1->setAnchorPoint(Vec2(0.5,0.5));
@@ -121,8 +165,8 @@ bool BuDaiPiaoLayer::init()
 
 		if(i==0)
 		{
-			this->addChild(bgOfButton1,0,12);
-			this->addChild(bgOfButton2,0,23);
+			this->addChild(bgOfButton1,0,KAWUXING_SHADE);
+			this->addChild(bgOfButton2,0,ANSIGUI_SHADE);
 			buttonKaWuXing->addChild(labelImage1,2);
 			buttonAnSiGui->addChild(labelImage2,2);
 			buttonKaWuXing->addChild(labelImage3,2);
@@ -136,8 +180,8 @@ bool BuDaiPiaoLayer::init()
 		}
 		else if(i==1)
 		{
-			this->addChild(bgOfButton1,0,34);
-			this->addChild(bgOfButton2,0,45);
+			this->addChild(bgOfButton1,0,TIAOYISE_SHADE);
+			this->addChild(bgOfButton2,0,HAIDILAO_SHADE);
 			buttonTiaoYiSe->addChild(labelImage1,2);
 			buttonHaiDiLao->addChild(labelImage2,2);
 			buttonTiaoYiSe->addChild(labelImage3,2);
@@ -151,8 +195,8 @@ bool BuDaiPiaoLayer::init()
 		}
 		else if(i==2)
 		{
-			this->addChild(bgOfButton1,0,55);
-			this->addChild(bgOfButton2,0,66);
+			this->addChild(bgOfButton1,0,GANGHUA_SHADE);
+			this->addChild(bgOfButton2,0,PENGPENG_SHADE);
 			buttonGangShangHua->addChild(labelImage1,2);
 			buttonPengPengHu->addChild(labelImage2,2,67);
 			buttonGangShangHua->addChild(labelImage3,2);
@@ -302,288 +346,236 @@ bool BuDaiPiaoLayer::init()
 			buttonPengPengHu->addChild(labelImage19,2);
 		}
 	}
+
+	auto quickStartButton=Button::create("QuickGame.png","QuickGame2.png","QuickGame2.png",UI_TEX_TYPE_PLIST);
+	quickStartButton->setAnchorPoint(Vec2(0.5,0));
+	quickStartButton->setPosition(Vec2(origin.x+visibleSize.width*0.48,origin.y/*-visibleSize.height*0.15*/));
+	quickStartButton->setScale(0.8);
+	this->addChild(quickStartButton);
 	
 	return true;
 }
 
 void BuDaiPiaoLayer::onButtonKaWuXing(Ref* pSender,Widget::TouchEventType type)
 {
-	auto Button=(Sprite*)this->getChildByTag(11);
-	auto ButtonBg=(Sprite*)this->getChildByTag(12);
+	auto curButton=(Button*)pSender;
+	auto ButtonBg=(Sprite*)this->getChildByTag(KAWUXING_SHADE);
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
-		Button->runAction(ScaleTo::create(0.1,1.1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1.1));
+		curButton->runAction(ScaleTo::create(0.1,0.9));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.9));
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
-		Button->runAction(Sequence::create(ScaleTo::create(0.1,1),CallFunc::create(this,callfunc_selector(BuDaiPiaoLayer::actionKaWuXing)),NULL));
-		scheduleOnce(schedule_selector(BuDaiPiaoLayer::entranceToKaWuXing),0.5);
+		{
+			curButton->setTouchEnabled(false);
+			auto ButtonBgTar=TargetedAction::create(ButtonBg,ScaleTo::create(0.1,0.8));
+			auto shadeTarget=TouchShadeAction(curButton->getPosition(),ACTION_PNG_KWX);
+			auto seqButtonAction=Sequence::create(ScaleTo::create(0.1,0.8),shadeTarget,NULL);
+			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
+			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
+			auto entranceFun=CallFunc::create([=](){
+				enterRoomStandAlone();
+			});
+			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
+		curButton->runAction(ScaleTo::create(0.1,0.8));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
 }
 
 void BuDaiPiaoLayer::onButtonTiaoYiSe(Ref* pSender,Widget::TouchEventType type)
 {
-	auto Button=(Sprite*)this->getChildByTag(33);
-	auto ButtonBg=(Sprite*)this->getChildByTag(34);
+	auto curButton=(Button*)pSender;
+	auto ButtonBg=(Sprite*)this->getChildByTag(TIAOYISE_SHADE);
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
-		Button->runAction(ScaleTo::create(0.1,1.1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1.1));
+		curButton->runAction(ScaleTo::create(0.1,0.9));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.9));
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
-		Button->runAction(CallFunc::create(this,callfunc_selector(BuDaiPiaoLayer::actionTiaoYiSe)));
-		scheduleOnce(schedule_selector(BuDaiPiaoLayer::entranceToKaWuXing),0.5);
+		{
+			curButton->setTouchEnabled(false);
+			auto ButtonBgTar=TargetedAction::create(ButtonBg,ScaleTo::create(0.1,0.8));
+			auto shadeTarget=TouchShadeAction(curButton->getPosition(),ACTION_PNG_TYS);
+			auto seqButtonAction=Sequence::create(ScaleTo::create(0.1,0.8),shadeTarget,NULL);
+			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
+			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
+			auto entranceFun=CallFunc::create([=](){
+				enterRoomStandAlone();
+			});
+			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
+		curButton->runAction(ScaleTo::create(0.1,0.8));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
 }
 void BuDaiPiaoLayer::onButtonGangShangHua(Ref* pSender,Widget::TouchEventType type)
 {
-	auto Button=(Sprite*)this->getChildByTag(54);
-	auto ButtonBg=(Sprite*)this->getChildByTag(55);
+	auto curButton=(Button*)pSender;
+	auto ButtonBg=(Sprite*)this->getChildByTag(GANGHUA_SHADE);
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
-		Button->runAction(ScaleTo::create(0.1,1.1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1.1));
+		curButton->runAction(ScaleTo::create(0.1,0.9));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.9));
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
-		Button->runAction(CallFunc::create(this,callfunc_selector(BuDaiPiaoLayer::actionGangShangHua)));
-		scheduleOnce(schedule_selector(BuDaiPiaoLayer::entranceGangShangHua),0.5);
+		{
+			curButton->setTouchEnabled(false);
+			auto ButtonBgTar=TargetedAction::create(ButtonBg,ScaleTo::create(0.1,0.8));
+			auto shadeTarget=TouchShadeAction(curButton->getPosition(),ACTION_PNG_GSH);
+			auto seqButtonAction=Sequence::create(ScaleTo::create(0.1,0.8),shadeTarget,NULL);
+			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
+			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
+			auto entranceFun=CallFunc::create([=](){
+				enterRoomStandAlone();
+			});
+			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
+		curButton->runAction(ScaleTo::create(0.1,0.8));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
 }
 void BuDaiPiaoLayer::onButtonAnSiGui(Ref* pSender,Widget::TouchEventType type)
 {
-	auto Button=(Sprite*)this->getChildByTag(22);
-	auto ButtonBg=(Sprite*)this->getChildByTag(23);
+	auto curButton=(Button*)pSender;
+	auto ButtonBg=(Sprite*)this->getChildByTag(ANSIGUI_SHADE);
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
-		Button->runAction(ScaleTo::create(0.1,1.1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1.1));
+		curButton->runAction(ScaleTo::create(0.1,0.9));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.9));
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
-		Button->runAction(CallFunc::create(this,callfunc_selector(BuDaiPiaoLayer::actionAnSiGui)));
-		scheduleOnce(schedule_selector(BuDaiPiaoLayer::entranceToTiaoYiSe),0.5);
+		{
+			curButton->setTouchEnabled(false);
+			auto ButtonBgTar=TargetedAction::create(ButtonBg,ScaleTo::create(0.1,0.8));
+			auto shadeTarget=TouchShadeAction(curButton->getPosition(),ACTION_PNG_ASG);
+			auto seqButtonAction=Sequence::create(ScaleTo::create(0.1,0.8),shadeTarget,NULL);
+			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
+			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
+			auto entranceFun=CallFunc::create([=](){
+				enterRoomStandAlone();
+			});
+			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
+		curButton->runAction(ScaleTo::create(0.1,0.8));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
 }
 void BuDaiPiaoLayer::onButtonHaiDilao(Ref* pSender,Widget::TouchEventType type)
 {
-	auto Button=(Sprite*)this->getChildByTag(44);
-	auto ButtonBg=(Sprite*)this->getChildByTag(45);
+	auto curButton=(Button*)pSender;
+	auto ButtonBg=(Sprite*)this->getChildByTag(HAIDILAO_SHADE);
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
-		Button->runAction(ScaleTo::create(0.1,1.1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1.1));
+		curButton->runAction(ScaleTo::create(0.1,0.9));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.9));
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
-		Button->runAction(CallFunc::create(this,callfunc_selector(BuDaiPiaoLayer::actionHaiDiLao)));
-		scheduleOnce(schedule_selector(BuDaiPiaoLayer::entranceHaiDiLao),0.5);
+		{
+			curButton->setTouchEnabled(false);
+			auto ButtonBgTar=TargetedAction::create(ButtonBg,ScaleTo::create(0.1,0.8));
+			auto shadeTarget=TouchShadeAction(curButton->getPosition(),ACTION_PNG_HDL);
+			auto seqButtonAction=Sequence::create(ScaleTo::create(0.1,0.8),shadeTarget,NULL);
+			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
+			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
+			auto entranceFun=CallFunc::create([=](){
+				enterRoomStandAlone();
+			});
+			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
+		curButton->runAction(ScaleTo::create(0.1,0.8));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
 }
 void BuDaiPiaoLayer::onButtonPengPengHu(Ref* pSender,Widget::TouchEventType type)
 {
-	auto Button=(Sprite*)this->getChildByTag(65);
-	auto ButtonBg=(Sprite*)this->getChildByTag(66);
+	auto curButton=(Button*)pSender;
+	auto ButtonBg=(Sprite*)this->getChildByTag(PENGPENG_SHADE);
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
-		Button->runAction(ScaleTo::create(0.1,1.1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1.1));
+		curButton->runAction(ScaleTo::create(0.1,0.9));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.9));
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
-		Button->runAction(CallFunc::create(this,callfunc_selector(BuDaiPiaoLayer::actionPengPengHu)));
-		scheduleOnce(schedule_selector(BuDaiPiaoLayer::entrancePengPengHu),0.5);
+		{
+			curButton->setTouchEnabled(false);
+			auto ButtonBgTar=TargetedAction::create(ButtonBg,ScaleTo::create(0.1,0.8));
+			auto shadeTarget=TouchShadeAction(curButton->getPosition(),ACTION_PNG_PPH);
+			auto seqButtonAction=Sequence::create(ScaleTo::create(0.1,0.8),shadeTarget,NULL);
+			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
+			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
+			auto entranceFun=CallFunc::create([=](){
+				enterRoomStandAlone();
+			});
+			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
+		}
 		break;
 	case Widget::TouchEventType::CANCELED:
-		Button->runAction(ScaleTo::create(0.1,1));
-		ButtonBg->runAction(ScaleTo::create(0.1,1));
+		curButton->runAction(ScaleTo::create(0.1,0.8));
+		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
 }
 
-void BuDaiPiaoLayer::actionKaWuXing()
+void BuDaiPiaoLayer::entranceToKaWuXing()
 {
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
-
-	auto buttonKaWuXing=Sprite::createWithSpriteFrameName("kawuxing.png");
-	buttonKaWuXing->setOpacity(100);
-	auto kaWuXingSize=buttonKaWuXing->getContentSize();
-	buttonKaWuXing->setAnchorPoint(Vec2(0.5,0.5));
-	buttonKaWuXing->setPosition(Vec2(origin.x+visibleSize.width*0.026+kaWuXingSize.width/2,origin.y+visibleSize.height*0.43+kaWuXingSize.height/2));
-	this->addChild(buttonKaWuXing,0);
-
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	buttonKaWuXing->runAction(spawn);
+	//卡五星
 }
 
-void BuDaiPiaoLayer::entranceToKaWuXing(float t)
-{
-	//进入游戏场卡五星
-}
-
-void BuDaiPiaoLayer::actionAnSiGui()
-{
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
-
-	auto button=Sprite::createWithSpriteFrameName("ansigui.png");
-	button->setOpacity(100);
-	auto buttonSize=button->getContentSize();
-	button->setAnchorPoint(Vec2(0.5,0.5));
-	button->setPosition(Vec2(origin.x+visibleSize.width*0.026+buttonSize.width/2,origin.y+buttonSize.height/2));
-	this->addChild(button,0);
-
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	button->runAction(spawn);
-}
-
-void BuDaiPiaoLayer::entranceToAnSiGui(float t)
+void BuDaiPiaoLayer::entranceToAnSiGui()
 {
 	//进入游戏场暗四归
 }
 
-void BuDaiPiaoLayer::actionTiaoYiSe()
-{
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
-
-	auto button=Sprite::createWithSpriteFrameName("tiaoyise.png");
-	button->setOpacity(100);
-	auto buttonSize=button->getContentSize();
-	button->setAnchorPoint(Vec2(0.5,0.5));
-	button->setPosition(Vec2(origin.x+visibleSize.width*0.326+buttonSize.width/2,origin.y+visibleSize.height*0.43+buttonSize.height/2));
-	this->addChild(button,0);
-
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	button->runAction(spawn);
-}
-
-void BuDaiPiaoLayer::entranceToTiaoYiSe(float t)
+void BuDaiPiaoLayer::entranceToTiaoYiSe()
 {
 	//进入游戏条一色
 }
 
-void BuDaiPiaoLayer::actionHaiDiLao()
-{
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
-
-	auto button=Sprite::createWithSpriteFrameName("haidilao.png");
-	button->setOpacity(100);
-	auto buttonSize=button->getContentSize();
-	button->setAnchorPoint(Vec2(0.5,0.5));
-	button->setPosition(Vec2(origin.x+visibleSize.width*0.326+buttonSize.width/2,origin.y+buttonSize.height/2));
-	this->addChild(button,0);
-
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	button->runAction(spawn);
-}
-
-void BuDaiPiaoLayer::entranceHaiDiLao(float t)
+void BuDaiPiaoLayer::entranceHaiDiLao()
 {
 	//进入游戏海底捞
 }
 
-void BuDaiPiaoLayer::actionGangShangHua()
-{
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
-
-	auto button=Sprite::createWithSpriteFrameName("gangshanghua.png");
-	button->setOpacity(100);
-	auto buttonSize=button->getContentSize();
-	button->setAnchorPoint(Vec2(0.5,0.5));
-	button->setPosition(Vec2(origin.x+visibleSize.width*0.626+buttonSize.width/2,origin.y+visibleSize.height*0.43+buttonSize.height/2));
-	this->addChild(button,0);
-
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	button->runAction(spawn);
-}
-void BuDaiPiaoLayer::entranceGangShangHua(float t)
+void BuDaiPiaoLayer::entranceGangShangHua()
 {
 	//进入游戏杠上花
 }
 
-void BuDaiPiaoLayer::actionPengPengHu()
-{
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
-
-	auto button=Sprite::createWithSpriteFrameName("pengpenghu.png");
-	button->setOpacity(100);
-	auto buttonSize=button->getContentSize();
-	button->setAnchorPoint(Vec2(0.5,0.5));
-	button->setPosition(Vec2(origin.x+visibleSize.width*0.626+buttonSize.width/2,origin.y+buttonSize.height/2));
-	this->addChild(button,0);
-
-	auto fadeOut=FadeOut::create(0.3);
-	auto easeBounce=ScaleTo::create(0.3,1.3);
-	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
-	button->runAction(spawn);
-}
-
-void BuDaiPiaoLayer::entrancePengPengHu(float t)
+void BuDaiPiaoLayer::entrancePengPengHu()
 {
 	//进入游戏碰碰胡
 }

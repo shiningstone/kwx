@@ -1,11 +1,9 @@
 #include "MyBaseInformation.h"
-
+#include "ShopScene.h"
 
 MyBaseInformation::MyBaseInformation(void)
 {
 }
-
-
 MyBaseInformation::~MyBaseInformation(void)
 {
 }
@@ -16,9 +14,8 @@ bool MyBaseInformation::init()
 	{
 		return false;
 	}
-	this->sex=boy;
-	auto visibleSize = Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
+	visibleSize = Director::getInstance()->getVisibleSize();
+	origin=Director::getInstance()->getVisibleOrigin();
 	this->setContentSize(Size(origin.x+visibleSize.width,origin.y+visibleSize.height*0.7877));
 	
 	auto perInfoBg=Sprite::create("PerInformation.png");
@@ -42,11 +39,21 @@ bool MyBaseInformation::init()
 	labelOfID->setAnchorPoint(Vec2(0,0));
 	labelOfID->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.7304));
 	this->addChild(labelOfID,1);
+
+	auto LabelForID=LabelTTF::create("12345678","Arial",30);
+	LabelForID->setAnchorPoint(Vec2(0,0));
+	LabelForID->setPosition(Vec2(origin.x+visibleSize.width*0.3678+labelOfID->getContentSize().width+10,origin.y+visibleSize.height*0.7304));
+	this->addChild(LabelForID,1,MY_BASEINFO_ID);
 	
 	auto labelOfAccount=LabelTTF::create("账户:","Arial",30);
 	labelOfAccount->setAnchorPoint(Vec2(0,0));
 	labelOfAccount->setPosition(Vec2(origin.x+visibleSize.width*0.596,origin.y+visibleSize.height*0.73));
 	this->addChild(labelOfAccount,1);
+
+	auto LabelForAccount=LabelTTF::create("934830895@qq.com","Arial",30);
+	LabelForAccount->setAnchorPoint(Vec2(0,0));
+	LabelForAccount->setPosition(Vec2(origin.x+visibleSize.width*0.596+labelOfAccount->getContentSize().width+10,origin.y+visibleSize.height*0.73));
+	this->addChild(LabelForAccount,1,MY_ACCOUNT_LABEL);
 
 	auto labelOfName=LabelTTF::create("昵称:","Arial",30);
 	labelOfName->setAnchorPoint(Vec2(0,0));
@@ -63,27 +70,37 @@ bool MyBaseInformation::init()
 	labelOfWinRate->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.3835));
 	this->addChild(labelOfWinRate,1);
 
+	auto WinRate=LabelTTF::create("100%","Arial",30);
+	WinRate->setAnchorPoint(Vec2(0,0));
+	WinRate->setPosition(Vec2(labelOfWinRate->getPosition().x+labelOfWinRate->getContentSize().width+20,origin.y+visibleSize.height*0.3835));
+	this->addChild(WinRate,1,WIN_RATE);
+
 	auto labelOfHistory=LabelTTF::create("历史最大番次数:","Arial",30);
 	labelOfHistory->setAnchorPoint(Vec2(0,0));
 	labelOfHistory->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.2821));
 	this->addChild(labelOfHistory,1);
 
+	auto MaxHistory=LabelTTF::create("128","Arial",30);
+	MaxHistory->setAnchorPoint(Vec2(0,0));
+	MaxHistory->setPosition(Vec2(labelOfHistory->getPosition().x+labelOfHistory->getContentSize().width+20,origin.y+visibleSize.height*0.2821));
+	this->addChild(MaxHistory,1,MAX_HISTORY);
+
 	auto buttonChangeAccount=Button::create("qiehuanzhanghao2.png","qiehuanzhanghao1.png","qiehuanzhanghao1.png",TextureResType::PLIST);
 	buttonChangeAccount->setAnchorPoint(Vec2(0,0));
 	buttonChangeAccount->setPosition(Vec2(origin.x+visibleSize.width*0.357,origin.y+visibleSize.height*0.13));
-	buttonChangeAccount->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonChangePhoto,this));
+	buttonChangeAccount->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::ChangeAccountCallBack,this));
 	this->addChild(buttonChangeAccount,1);
 
 	auto buttonChangeAccountLevel=Button::create("zhanghaoshengji2.png","zhanghaoshengji1.png","zhanghaoshengji1.png",TextureResType::PLIST);
 	buttonChangeAccountLevel->setAnchorPoint(Vec2(0,0));
 	buttonChangeAccountLevel->setPosition(Vec2(origin.x+visibleSize.width*0.5599,origin.y+visibleSize.height*0.13));
-	buttonChangeAccountLevel->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonChangePhoto,this));
+	buttonChangeAccountLevel->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::UpgradeAccount,this));
 	this->addChild(buttonChangeAccountLevel,1);
 
 	auto buttonManageCode=Button::create("mimaguanli2.png","mimaguanli1.png","mimaguanli1.png",TextureResType::PLIST);
 	buttonManageCode->setAnchorPoint(Vec2(0,0));
 	buttonManageCode->setPosition(Vec2(origin.x+visibleSize.width*0.7635,origin.y+visibleSize.height*0.13));
-	buttonManageCode->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonChangePhoto,this));
+	buttonManageCode->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::ManagePassWord,this));
 	this->addChild(buttonManageCode,1);
 
 	for(int i=0;i<4;i++)
@@ -94,63 +111,73 @@ bool MyBaseInformation::init()
 		this->addChild(line,1);
 	}
 
-	auto buttonPen=Button::create("bi1.png","bi2.png","bi2.png",TextureResType::PLIST);
-	buttonPen->setAnchorPoint(Vec2(0,0));
-	buttonPen->setPosition(Vec2(origin.x+visibleSize.width*0.773,origin.y+visibleSize.height*0.593));
-	buttonPen->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonChangePhoto,this));
-	this->addChild(buttonPen,1);
-	
 	auto ItemOfPetName=Sprite::createWithSpriteFrameName("nichengkuang.png");
 	ItemOfPetName->setAnchorPoint(Vec2(0,0));
-	ItemOfPetName->setPosition(Vec2(origin.x+visibleSize.width*0.439,origin.y+visibleSize.height*0.593));
+	ItemOfPetName->setPosition(Vec2(origin.x+visibleSize.width*0.439,origin.y+visibleSize.height*0.593+5));
 	this->addChild(ItemOfPetName,1);
+
+	//auto LabelForName=EditBox::create(Size(visibleSize.width*0.3,30),Scale9Sprite::createWithSpriteFrameName("bi2.png"));
+	//LabelForName->setAnchorPoint(Vec2(0,0));
+	//LabelForName->setPosition(Vec2(origin.x+visibleSize.width*0.3678+10,origin.y+visibleSize.height*0.6145));
+	//LabelForName->setFontColor(ccWHITE);
+	//LabelForName->setMaxLength(16);
+	//LabelForName->setInputMode(cocos2d::extension::EditBox::InputMode::ANY);
+	//this->addChild(LabelForName,1,EDITBOX_FOR_NAME);
+
+	auto buttonPen=Button::create("bi2.png","bi1.png","bi2.png",TextureResType::PLIST);
+	buttonPen->setAnchorPoint(Vec2(0,0));
+	buttonPen->setPosition(Vec2(origin.x+visibleSize.width*0.773,origin.y+visibleSize.height*0.593+5));
+	buttonPen->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::ChangeNameForPenCallBack,this));
+	this->addChild(buttonPen,1);
+
+	auto LabelForName=LabelTTF::create("赵钱孙李","Arial",30);
+	LabelForName->setAnchorPoint(Vec2(0,0));
+	LabelForName->setPosition(Vec2(origin.x+visibleSize.width*0.3678+100,origin.y+visibleSize.height*0.6145));
+	LabelForName->setColor(ccBLACK);
+	this->addChild(LabelForName,2,LABEL_FOR_NAME);
+
+	my_sex=BOY;
 
 	auto manLogo=Sprite::createWithSpriteFrameName("nan.png");
 	manLogo->setAnchorPoint(Vec2(0,0));
 	manLogo->setPosition(Vec2(origin.x+visibleSize.width*0.539,origin.y+visibleSize.height*0.4986));
 	this->addChild(manLogo,1);
 
-	auto buttonBoy=ui::Button::create("xingbie1.png","xingbie1.png","xingbie1.png",TextureResType::PLIST);
+	auto buttonBoy=Sprite::createWithSpriteFrameName("xingbie1.png");
 	buttonBoy->setAnchorPoint(Vec2(0,0));
 	buttonBoy->setPosition(Vec2(origin.x+visibleSize.width*0.457,origin.y+visibleSize.height*0.4888));
-	buttonBoy->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonBoy,this));
 	this->addChild(buttonBoy,1);
 
 	auto chooseedFlag1=Sprite::createWithSpriteFrameName("xingbie.png");
 	chooseedFlag1->setAnchorPoint(Vec2(0,0));
 	chooseedFlag1->setPosition(Vec2(origin.x+visibleSize.width*0.4655,origin.y+visibleSize.height*0.501));
-	this->addChild(chooseedFlag1,2,1);
-	if(sex==boy)
-	{
-		chooseedFlag1->setVisible(true);
-	}
-	else
-	{
-		chooseedFlag1->setVisible(false);
-	}
+	this->addChild(chooseedFlag1,2,SEX_BOY_SIGN);
 
 	auto womanLogo=Sprite::createWithSpriteFrameName("nv.png");
 	womanLogo->setAnchorPoint(Vec2(0,0));
 	womanLogo->setPosition(Vec2(origin.x+visibleSize.width*0.7758,origin.y+visibleSize.height*0.4986));
 	this->addChild(womanLogo,1);
 
-	auto buttonGirl=ui::Button::create("xingbie1.png","xingbie1.png","xingbie1.png",TextureResType::PLIST);
+	auto buttonGirl=Sprite::createWithSpriteFrameName("xingbie1.png");
 	buttonGirl->setAnchorPoint(Vec2(0,0));
 	buttonGirl->setPosition(Vec2(origin.x+visibleSize.width*0.6937,origin.y+visibleSize.height*0.4888));
-	buttonGirl->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonGirl,this));
 	this->addChild(buttonGirl,1);
 	
 	auto chooseedFlag2=Sprite::createWithSpriteFrameName("xingbie.png");
 	chooseedFlag2->setAnchorPoint(Vec2(0,0));
 	chooseedFlag2->setPosition(Vec2(origin.x+visibleSize.width*0.702,origin.y+visibleSize.height*0.501));
-	this->addChild(chooseedFlag2,2,2);
-	if(sex==girl)
+	this->addChild(chooseedFlag2,2,SEX_GIRL_SIGN);
+
+	switch (my_sex)
 	{
-		chooseedFlag2->setVisible(true);
-	}
-	else
-	{
+	case MyBaseInformation::BOY:
 		chooseedFlag2->setVisible(false);
+		break;
+	case MyBaseInformation::GIRL:
+		chooseedFlag1->setVisible(false);
+		break;
+	default:
+		break;
 	}
 
 	auto goodNameBar=Sprite::createWithSpriteFrameName("shang.png");
@@ -177,7 +204,7 @@ bool MyBaseInformation::init()
 	auto buttonPlus=Button::create("jiahao.png","jiahao5.png","jiahao5.png",TextureResType::PLIST);
 	buttonPlus->setAnchorPoint(Vec2(0,0));
 	buttonPlus->setPosition(Vec2(origin.x+visibleSize.width*0.196,origin.y+visibleSize.height*0.215));
-	buttonPlus->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::onButtonChangePhoto,this));
+	buttonPlus->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::CallBack_ForJiaHao,this));
 	this->addChild(buttonPlus,2);
 
 	auto TaskBar=Sprite::createWithSpriteFrameName("xia.png");
@@ -213,11 +240,90 @@ bool MyBaseInformation::init()
 	return true;
 }
 
-void MyBaseInformation::menuCloseCallback(Ref* pSender)
+void MyBaseInformation::ChangeAccountCallBack(Ref* pSender,Widget::TouchEventType type)
 {
-
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
-
+void MyBaseInformation::UpgradeAccount(Ref* pSender,Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+void MyBaseInformation::ManagePassWord(Ref* pSender,Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+void MyBaseInformation::CallBack_ForJiaHao(Ref* pSender,Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			auto shopScene=ShopScene::create();
+			Director::getInstance()->pushScene(shopScene);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+void MyBaseInformation::ChangeNameForPenCallBack(Ref* pSender,Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
 void MyBaseInformation::onButtonChangePhoto(Ref* pSender,Widget::TouchEventType type)
 {
 	switch(type)
@@ -227,44 +333,6 @@ void MyBaseInformation::onButtonChangePhoto(Ref* pSender,Widget::TouchEventType 
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		break;
-	case Widget::TouchEventType::CANCELED:
-		break;
-	}
-}
-
-void MyBaseInformation::onButtonBoy(Ref* pSender,Widget::TouchEventType type)
-{
-	auto choosedBoyFlag=this->getChildByTag(1);
-	auto choosedGirlFlag=this->getChildByTag(2);
-	switch(type)
-	{
-	case Widget::TouchEventType::BEGAN:
-		break;
-	case Widget::TouchEventType::MOVED:
-		break;
-	case Widget::TouchEventType::ENDED:
-		choosedBoyFlag->setVisible(true);
-		choosedGirlFlag->setVisible(false);
-		break;
-	case Widget::TouchEventType::CANCELED:
-		break;
-	}
-}
-
-void MyBaseInformation::onButtonGirl(Ref* pSender,Widget::TouchEventType type)
-{
-	auto choosedBoyFlag=this->getChildByTag(1);
-	auto choosedGirlFlag=this->getChildByTag(2);
-	switch(type)
-	{
-	case Widget::TouchEventType::BEGAN:
-		break;
-	case Widget::TouchEventType::MOVED:
-		break;
-	case Widget::TouchEventType::ENDED:
-		choosedBoyFlag->setVisible(false);
-		choosedGirlFlag->setVisible(true);
 		break;
 	case Widget::TouchEventType::CANCELED:
 		break;

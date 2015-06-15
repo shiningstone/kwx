@@ -38,27 +38,28 @@ bool ShopScene::init()
 	auto selectEffectOfInfo=Sprite::createWithSpriteFrameName("moji12.png");
 	selectEffectOfInfo->setAnchorPoint(Vec2(0,0));
 	selectEffectOfInfo->setPosition(origin.x+visibleSize.width*0.3552,origin.y+visibleSize.height*0.866);
-	this->addChild(selectEffectOfInfo,1,1);
 	selectEffectOfInfo->setVisible(true);
+	this->addChild(selectEffectOfInfo,1,CANGJINGGE_MOJI);
 
 	auto selectEffectOfCheatCode=Sprite::createWithSpriteFrameName("moji12.png");
 	selectEffectOfCheatCode->setAnchorPoint(Vec2(0,0));
 	selectEffectOfCheatCode->setPosition(origin.x+visibleSize.width*0.6445,origin.y+visibleSize.height*0.866);
-	this->addChild(selectEffectOfCheatCode,1,2);
 	selectEffectOfCheatCode->setVisible(false);
-	
+	this->addChild(selectEffectOfCheatCode,1,TONGCHIDAO_MOJI);
 
 	auto buttonSutraHall=Button::create("cangjingge.png","cangjingge2.png","cangjingge2.png",TextureResType::PLIST);
+	buttonSutraHall->setTouchEnabled(false);
 	buttonSutraHall->setAnchorPoint(Vec2(0,0));
 	buttonSutraHall->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.9));
 	buttonSutraHall->addTouchEventListener(CC_CALLBACK_2(ShopScene::onButtonSutraHall, this));
-	this->addChild(buttonSutraHall,3);
+	this->addChild(buttonSutraHall,3,CANGJINGGE_BUTT);
 
-	auto buttonEatIsland=Button::create("tongchidao.png","tongchidao.png","tongchidao.png",TextureResType::PLIST);
+	auto buttonEatIsland=Button::create("tongchidao.png","tongchidao2.png","tongchidao2.png",TextureResType::PLIST);
 	buttonEatIsland->setAnchorPoint(Vec2(0,0));
+	buttonEatIsland->setHighlighted(true);
 	buttonEatIsland->setPosition(Vec2(origin.x+visibleSize.width*0.6568,origin.y+visibleSize.height*0.9));
 	buttonEatIsland->addTouchEventListener(CC_CALLBACK_2(ShopScene::onButtonEatIsland, this));
-	this->addChild(buttonEatIsland,3);
+	this->addChild(buttonEatIsland,3,TONGCHIDAO_BUTT);
 
 	auto buttonBack=Button::create("12.png","12.png","12.png",TextureResType::LOCAL);
 	buttonBack->setAnchorPoint(Vec2(0,0));
@@ -84,7 +85,7 @@ bool ShopScene::init()
 	this->addChild(goldBar,3);
 
 	auto shopLayer=ShopLayer::create();
-	this->addChild(shopLayer,3,3);
+	this->addChild(shopLayer,3,CURENT_UI_LAYER);
 
 	return true;
 }
@@ -109,21 +110,31 @@ void ShopScene::onButtonBack(Ref* pSender,Widget::TouchEventType type)
 
 void ShopScene::onButtonSutraHall(Ref* pSender,Widget::TouchEventType type)
 {
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto effectOnSutraHall=this->getChildByTag(1);
-	auto effectOnEatIsland=this->getChildByTag(2);
-	auto shopLayer=ShopLayer::create();
+
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
+		{
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+			curButton->setHighlighted(false);
+			auto curMoji=this->getChildByTag(CANGJINGGE_MOJI);
+			curMoji->setVisible(true);
+
+			auto anotherBut=(Button*)this->getChildByTag(TONGCHIDAO_BUTT);
+			anotherBut->setTouchEnabled(true);
+			anotherBut->setHighlighted(true);
+			auto anotherMJ=this->getChildByTag(TONGCHIDAO_MOJI);
+			anotherMJ->setVisible(false);
+
+			auto shopLayer=ShopLayer::create();
+			this->removeChildByTag(CURENT_UI_LAYER,true);
+			this->addChild(shopLayer,3,CURENT_UI_LAYER);
+		}
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		this->removeChildByTag(3);
-		this->addChild(shopLayer,3,3);
-		effectOnEatIsland->setVisible(false);
-		effectOnSutraHall->setVisible(true);
 		break;
 	case Widget::TouchEventType::CANCELED:
 		break;
@@ -134,21 +145,30 @@ void ShopScene::onButtonSutraHall(Ref* pSender,Widget::TouchEventType type)
 
 void ShopScene::onButtonEatIsland(Ref* pSender,Widget::TouchEventType type)
 {
-	auto visibleSize=Director::getInstance()->getVisibleSize();
-	auto effectOnSutraHall=this->getChildByTag(1);
-	auto effectOnEatIsland=this->getChildByTag(2);
-	auto eatIslandLayer=EatIsland::create();
 	switch(type)
 	{
 	case Widget::TouchEventType::BEGAN:
+		{
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+			curButton->setHighlighted(false);
+			auto curMoji=this->getChildByTag(TONGCHIDAO_MOJI);
+			curMoji->setVisible(true);
+
+			auto anotherBut=(Button*)this->getChildByTag(CANGJINGGE_BUTT);
+			anotherBut->setTouchEnabled(true);
+			anotherBut->setHighlighted(true);
+			auto anotherMJ=this->getChildByTag(CANGJINGGE_MOJI);
+			anotherMJ->setVisible(false);
+
+			auto shopLayer=EatIsland::create();
+			this->removeChildByTag(CURENT_UI_LAYER,true);
+			this->addChild(shopLayer,3,CURENT_UI_LAYER);
+		}
 		break;
 	case Widget::TouchEventType::MOVED:
 		break;
 	case Widget::TouchEventType::ENDED:
-		this->removeChildByTag(3);
-		this->addChild(eatIslandLayer,3,3);
-		effectOnEatIsland->setVisible(true);
-		effectOnSutraHall->setVisible(false);
 		break;
 	case Widget::TouchEventType::CANCELED:
 		break;

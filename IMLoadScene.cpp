@@ -1,6 +1,5 @@
 #include "IMLoadScene.h"
 #include "EnterRoomScene.h"
-//#include "QQLoadScene.h"
 
 USING_NS_CC;
 
@@ -13,30 +12,45 @@ IMLoad::IMLoad()
 IMLoad::~IMLoad()
 {
 }
-void IMLoad::enterRoom(float dt)
+void IMLoad::enterRoom()
 {
     auto scene = Scene::create();
-
 	auto layer = EnterRoom::create();
-
     scene->addChild(layer);
-
     Director::getInstance()->replaceScene(scene);
 }
-
-void IMLoad::addRes(float dt)
+const std::string ResFileName[16]={"load_room.plist","jibenxinximian.plist","chongfuziyuan.plist","chongfuziyuan2.plist",
+	"shezhijiemian.plist","changguichangbupiao.plist","changguichangdaipiao.plist","bisaichang.plist",
+	"bisaidengdai.plist","bisaibaoming.plist","RankImage.plist","ChatImg.plist","FriendsImage.plist",
+	"selectGameAndScene.plist","dengluzhutu.plist","changguichang2.plist"};
+//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ChatImg.plist");
+//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("FriendsImage.plist");
+//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("selectGameAndScene.plist");
+//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
+void IMLoad::addRes()
 {
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("load_room.plist");
-	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("volume.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("jibenxinximian.plist"); 
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("chongfuziyuan.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("chongfuziyuan2.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("shezhijiemian.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("changguichangbupiao.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("changguichangdaipiao.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaichang.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaidengdai.plist");
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaibaoming.plist");
+	for(int insertNum=0;insertNum<16;insertNum++)
+	{
+		SpriteFrameCache::getInstance()->addSpriteFramesWithFile(ResFileName[insertNum]);
+		curLoadingBar->setPercentage((float)(insertNum+1)/11*100);
+	}
+	auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
+	this->runAction(EnterNextRoom);
+
+	//Vector<FiniteTimeAction *> addList;
+	//for(int insertNum=0;insertNum<16;insertNum++)
+	//{
+	//	auto curFunc=CallFunc::create([=](){
+	//		SpriteFrameCache::getInstance()->addSpriteFramesWithFile(ResFileName[insertNum]);
+	//		auto to1 = ProgressTo::create(0.2,(float)(insertNum+1)/11*100);
+	//		curLoadingBar->runAction(to1);
+	//	});
+	//	auto delayTime=DelayTime::create(0.1);
+	//	addList.insert(insertNum,Sequence::create(curFunc,delayTime,NULL));
+	//}
+	//auto allSeq=Sequence::create(addList);
+	//auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
+	//this->runAction(Sequence::create(allSeq,EnterNextRoom,NULL));
 }
 
 bool IMLoad::init()
@@ -53,30 +67,32 @@ bool IMLoad::init()
 		sprite = Sprite::create("loadwin.png");
 	else
 		sprite = Sprite::create("loadwin2.png");
-	// position the sprite on the center of the screen
 	sprite->setPosition(Point(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
 	sprite->setScaleX(s_scale);
 	sprite->setScaleY(s_scale);
 	this->addChild(sprite, 0);
 
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("load.plist");
+
   	auto ring= Sprite::createWithSpriteFrameName("ring.png");
-    ring->setPosition(Point(visibleSize.width/2 + origin.x, visibleSize.height*7/12 + origin.y));
+	ring->setAnchorPoint(Vec2(0.5,0.5));
+    ring->setPosition(Point(visibleSize.width*0.4945788 + origin.x, visibleSize.height*0.6 + origin.y));//0.5 7/12
     this->addChild(ring,1);
 
     auto chs=Sprite::createWithSpriteFrameName("character.png");
-    chs->setPosition(Point(ring->getPosition().x,ring->getPosition().y));
+	chs->setAnchorPoint(Vec2(0.5,0.5));
+    //chs->setPosition(Point(ring->getPosition().x,ring->getPosition().y));
+    chs->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*0.6));
     this->addChild(chs,1);
 
     auto bar=Sprite::createWithSpriteFrameName("black_bar.png");
-    auto to1 = ProgressTo::create(3,100);
-    auto s_bar=ProgressTimer::create(bar);
-    s_bar->setType(ProgressTimer::Type::BAR);
-    s_bar->setMidpoint(Point(0,0));
-    s_bar->setBarChangeRate(Point(1,0));
-    this->addChild(s_bar,1);
-    s_bar->setPosition(Point(ring->getPosition().x,ring->getPosition().y-ring->getContentSize().height*3/4));
-    s_bar->runAction(RepeatForever::create(to1));
+    curLoadingBar=ProgressTimer::create(bar);
+    curLoadingBar->setType(ProgressTimer::Type::BAR);
+    curLoadingBar->setBarChangeRate(Point(1,0));
+    curLoadingBar->setMidpoint(Point(0,0));
+	curLoadingBar->setPercentage(0.0f);
+    curLoadingBar->setPosition(Point(ring->getPosition().x,ring->getPosition().y-ring->getContentSize().height*3/4));
+    this->addChild(curLoadingBar,1,110);
 
     auto you=Sprite::createWithSpriteFrameName("you.png");
     you->setPosition(Point(ring->getPosition().x-bar->getTextureRect().size.width/3,ring->getPosition().y-ring->getContentSize().height*3/4+bar->getTextureRect().size.height/2+10));
@@ -174,10 +190,11 @@ bool IMLoad::init()
 
 	ring->runAction(RepeatForever::create(rotate));
 
-	//SpriteFrameCache::getInstance()->removeSpriteFrames();
-	//scheduleOnce(schedule_selector(IMLoad::addRes),0.5);
-	scheduleOnce(schedule_selector(IMLoad::enterRoom),3.0);
-	scheduleOnce(schedule_selector(IMLoad::addRes),0.5f);
+	addRes();
+
+	//auto addAllRes=CallFunc::create(this,callfunc_selector(IMLoad::addRes));
+	//auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
+	//this->runAction(Sequence::create(addAllRes,EnterNextRoom,NULL));
 
     return true;
 }

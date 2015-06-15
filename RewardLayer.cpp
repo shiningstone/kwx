@@ -54,9 +54,6 @@ bool RewardLayer::init()
 		buttonGet->_ID=i;
 		buttonGet->setPosition(Vec2(origin.x+visiableSize.width*0.85,origin.y+visiableSize.height*(1.683-i*0.2225)));
 		buttonGet->setScale(0.8);
-		/*buttonGet->setTitleText("领取");
-		buttonGet->setTitleFontName("黑体");
-		buttonGet->setTitleFontSize(35);*/
 		buttonGet->addTouchEventListener(CC_CALLBACK_2(RewardLayer::onButtonGet, this));
 		this->addChild(buttonGet,2);
 	}

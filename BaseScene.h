@@ -6,16 +6,22 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
-class BaseScene :
-	public Scene
+class BaseScene : public Scene
 {
 public:
+#define MY_INFO_MOJI		1
+#define MY_INFO_BUTON		2
+#define MY_BAG_MOJI			3
+#define MY_BAG_BUTTON		4
+#define CUR_HAVED_LAYER		5
 	BaseScene(void);
 	~BaseScene(void);
+	Size visibleSize;
+	Vec2 origin;
 	virtual bool init();
-	void buttonMyInfo(Ref* pSender,Widget::TouchEventType type);
-	void buttonMyXbox(Ref* pSender,Widget::TouchEventType type);
-	void buttonBack(Ref* pSender,Widget::TouchEventType type);
+	void buttonMyInfo(Ref* pSender,Widget::TouchEventType type);		//ReWrite
+	void buttonMyXbox(Ref* pSender,Widget::TouchEventType type);		//ReWrite
+	void buttonBack(Ref* pSender,Widget::TouchEventType type);			//ReWrite
 	CREATE_FUNC(BaseScene);
 };
 

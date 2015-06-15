@@ -2,8 +2,10 @@
 #include "CompetitionField.h"
 
 
-EnterForCompetitionLayer::EnterForCompetitionLayer(void)
+EnterForCompetitionLayer::EnterForCompetitionLayer(Node* parent)
 {
+	parentScene=(CompetitionField*)parent;
+	init();
 }
 
 
@@ -201,7 +203,7 @@ bool EnterForCompetitionLayer::init()
 
 void EnterForCompetitionLayer::onButtonQuit(Ref* pSender,Widget::TouchEventType type)
 {
-	auto competitionField=CompetitionField::create();
+	//auto competitionField=CompetitionField::create();
 	//auto layer=this->getParent();
 	auto buttonQuit=(Button*)this->getChildByTag(1);
 	switch(type)
@@ -213,7 +215,8 @@ void EnterForCompetitionLayer::onButtonQuit(Ref* pSender,Widget::TouchEventType 
 		break;
 	case Widget::TouchEventType::ENDED:
 		//layer->removeChildByTag();
-		Director::getInstance()->replaceScene(competitionField);
+		//Director::getInstance()->replaceScene(competitionField);
+		parentScene->removeChildByTag(BAO_MING_COMPETE_LAYER);
 		buttonQuit->setHighlighted(false);
 		break;
 	case Widget::TouchEventType::CANCELED:

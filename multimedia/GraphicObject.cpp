@@ -220,7 +220,7 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
         case MENUBTN_TUOGUAN:
             return Button::create("tuoguan.png","tuoguan1.png","tuoguan1.png",UI_TEX_TYPE_PLIST);
         case MENUBTN_SHEZHI:
-            return Button::create("shezhi.png","shezhi.png","shezhi.png",UI_TEX_TYPE_PLIST);
+            return Button::create("shezhiInGame.png","shezhiInGame.png","shezhiInGame.png",UI_TEX_TYPE_PLIST);
         case MENUBTN_SHOP:
             return Button::create("shangcheng2.png","shangcheng2.png","shangcheng2.png",UI_TEX_TYPE_PLIST);
         case MENUBTN_GAMEBACK:

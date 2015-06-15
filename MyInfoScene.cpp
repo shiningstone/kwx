@@ -3,11 +3,9 @@
 #include "MyInfo.h"
 #include "SystemNotice.h"
 
-
 MyInfoScene::MyInfoScene(void)
 {
 }
-
 
 MyInfoScene::~MyInfoScene(void)
 {
@@ -20,12 +18,12 @@ bool MyInfoScene::init()
 		return false;
 	}
 
-	auto visiableSize=Director::getInstance()->getVisibleSize();
-	auto origin=Director::getInstance()->getVisibleOrigin();
+	visiableSize=Director::getInstance()->getVisibleSize();
+	origin=Director::getInstance()->getVisibleOrigin();
 	float s_scale=1.189f;
 
 	auto bg=Sprite::create("602.png");
-	bg->setPosition(Vec2(origin.x+visiableSize.width/2,origin.y+visiableSize.height/2));
+	bg->setPosition(Vec2(origin.x+visiableSize.width/2,origin.y+visiableSize.height/2));//609	358
 	bg->setScaleX(s_scale);
 	bg->setScaleY(s_scale);
 	this->addChild(bg,0);
@@ -33,89 +31,136 @@ bool MyInfoScene::init()
 	auto paddle=LayerColor::create(Color4B(47,86,110,100));
 	auto sizeOfPaddle=paddle->getContentSize();
 	paddle->setContentSize(Size(visiableSize.width,visiableSize.height*564/716));
-	paddle->setPosition(Vec2(origin.x,origin.y+visiableSize.height*0.0656));
+	paddle->setPosition(Vec2(origin.x,origin.y+visiableSize.height*0.0656));//0	46.9696007
 	this->addChild(paddle,1);
 
 	auto selectEffectOfInfo=Sprite::createWithSpriteFrameName("moji12.png");
 	auto sizeOfEffect=selectEffectOfInfo->getContentSize();
-	selectEffectOfInfo->setPosition(origin.x+((sizeOfEffect.width/2+300)/1218)*visiableSize.width,origin.y+((620+sizeOfEffect.height/2)/716)*visiableSize.height);
-	this->addChild(selectEffectOfInfo,1,1);
+	selectEffectOfInfo->setPosition(origin.x+visiableSize.width*397/1218,origin.y+visiableSize.height*669.5/716);//397.000031	669.5
 	selectEffectOfInfo->setVisible(true);
+	this->addChild(selectEffectOfInfo,1,MY_MESSAGE_MOJI);
 
 	auto selectEffectOfCheatCode=Sprite::createWithSpriteFrameName("moji12.png");
-	selectEffectOfCheatCode->setPosition(origin.x+((sizeOfEffect.width/2+710)/1218)*visiableSize.width,origin.y+((620+sizeOfEffect.height/2)/716)*visiableSize.height);
-	this->addChild(selectEffectOfCheatCode,1,2);
+	selectEffectOfCheatCode->setPosition(origin.x+visiableSize.width*807/1218,origin.y+visiableSize.height*669.5/716);//807	669.5
 	selectEffectOfCheatCode->setVisible(false);
+	this->addChild(selectEffectOfCheatCode,1,SYSTEM_MES_MOJI);
 
-	auto imageOfBaseInfo1 = Sprite::createWithSpriteFrameName("wodexinxi.png"); 
-	auto imageOfBaseInfo2 = Sprite::createWithSpriteFrameName("wodexinxi2.png"); 
-	auto itemOfMenuBaseInfo= MenuItemSprite::create(imageOfBaseInfo1,imageOfBaseInfo2,CC_CALLBACK_1(MyInfoScene::buttonMyInfo, this));
-	auto sizeOfBaseInfo=itemOfMenuBaseInfo->getContentSize();
-	auto ButtonBaseInfo = Menu::create(itemOfMenuBaseInfo,NULL);
-	ButtonBaseInfo->setPosition(origin.x+((sizeOfBaseInfo.width/2+297)/1218)*visiableSize.width,origin.y+((716-20-sizeOfBaseInfo.height/2)/716)*visiableSize.height);
-	this->addChild(ButtonBaseInfo, 3);
+	auto MyMessage=Button::create("wodexinxi.png","wodexinxi2.png","wodexinxi2.png",UI_TEX_TYPE_PLIST);
+	MyMessage->setTouchEnabled(false);
+	MyMessage->addTouchEventListener(CC_CALLBACK_2(MyInfoScene::buttonMyInfo,this));
+	MyMessage->setPosition(Vec2(origin.x+visiableSize.width*395.5/1218,origin.y+visiableSize.height*668/716));
+	this->addChild(MyMessage,3,MY_MESSAGE_BUTT);
 
-	auto imageSystemNotice1 = CCSprite::createWithSpriteFrameName("xitonggonggao.png"); 
-	auto imageSystemNotice2 = CCSprite::createWithSpriteFrameName("xitonggonggao2.png"); 
-	auto itemOfSystemNotice= MenuItemSprite::create(imageSystemNotice1,imageSystemNotice2,CC_CALLBACK_1(MyInfoScene::buttonSystemNotice, this));
-	auto sizeOfSystemNotice=itemOfSystemNotice->getContentSize();
-	auto buttonOfSystemNotice = Menu::create(itemOfSystemNotice,NULL);
-	buttonOfSystemNotice->setPosition(origin.x+((708+sizeOfSystemNotice.width/2)/1218)*visiableSize.width,origin.y+((716-20-sizeOfBaseInfo.height/2)/716)*visiableSize.height);
-	this->addChild(buttonOfSystemNotice, 3);
+	auto SystemMes=Button::create("xitonggonggao.png","xitonggonggao2.png","xitonggonggao2.png",UI_TEX_TYPE_PLIST);
+	SystemMes->addTouchEventListener(CC_CALLBACK_2(MyInfoScene::buttonSystemNotice,this));
+	SystemMes->setPosition(Vec2(origin.x+visiableSize.width*805/1218,origin.y+visiableSize.height*668/716));
+	SystemMes->setHighlighted(true);
+	this->addChild(SystemMes,3,SYSTEM_MES_BUTT);
 
-	auto buttonItemBack1 = Sprite::create("12.png"); 
-	auto buttonItemBack2 = Sprite::create("12.png"); 
-	auto itemOfMenuBack = MenuItemSprite::create(buttonItemBack1,buttonItemBack2,CC_CALLBACK_1(MyInfoScene::buttonBack, this));
-	auto sizeOfBack=itemOfMenuBack->getContentSize();
-	auto menu7 = Menu::create(itemOfMenuBack,NULL);
-	menu7->setPosition(origin.x+((sizeOfBack.width/2+1120)/1218)*visiableSize.width,origin.y+((716-12-sizeOfBack.height/2)/716)*visiableSize.height);
-	this->addChild(menu7, 3);
+	auto Back=Button::create("12.png","12.png","12.png",UI_TEX_TYPE_LOCAL);
+	Back->addTouchEventListener(CC_CALLBACK_2(MyInfoScene::buttonBack,this));
+	Back->setPosition(Vec2(origin.x+visiableSize.width*1170/1218,origin.y+visiableSize.height*671/716));
+	this->addChild(Back,3);
 
 	auto flower=Sprite::createWithSpriteFrameName("meihua.png");
 	auto sizeOfFlower=flower->getContentSize();
 	flower->setAnchorPoint(Vec2(1,0));
-	flower->setPosition(origin.x+visiableSize.width*1.0095,origin.y-visiableSize.height*0.028);
+	flower->setPosition(origin.x+visiableSize.width*1.0095,origin.y-visiableSize.height*0.028);//1229.57104		-20.0480003
 	this->addChild(flower,0);
 
 	auto photoFrame=Sprite::create("huodongzhonxinkuang.png");
 	photoFrame->setAnchorPoint(Vec2(0,0));
-	photoFrame->setPosition(Vec2(origin.x+visiableSize.width*0.0082,origin.y+visiableSize.height*0.0698));
+	photoFrame->setPosition(Vec2(origin.x+visiableSize.width*0.0082,origin.y+visiableSize.height*0.0698));//9.98760033		49.9767990
 	this->addChild(photoFrame,2);
 
 	auto myInfo=MyInfo::create();
-	this->addChild(myInfo,4,3);
+	this->addChild(myInfo,4,CURENT_UI_LAYER);
 
 	return true;
 }
 
-void MyInfoScene::buttonBack(Ref* pSender)
+void MyInfoScene::buttonBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
 {
-    Director::getInstance()->popScene();
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		Director::getInstance()->popScene();
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
 
-void MyInfoScene::buttonMyInfo(Ref* pSender)
+void MyInfoScene::buttonMyInfo(cocos2d::Ref* pSender,Widget::TouchEventType type)
 {
-	auto imageOfEffectInfo=this->getChildByTag(1);
-	imageOfEffectInfo->setVisible(true);
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		{
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+			curButton->setHighlighted(false);
+			auto curMoji=this->getChildByTag(MY_MESSAGE_MOJI);
+			curMoji->setVisible(true);
 
-	auto imageOfEffectXbox=this->getChildByTag(2);
-	imageOfEffectXbox->setVisible(false);
+			auto anOtherBut=(Button*)this->getChildByTag(SYSTEM_MES_BUTT);
+			anOtherBut->setTouchEnabled(true);
+			anOtherBut->setHighlighted(true);
+			auto anOtherMJ=this->getChildByTag(SYSTEM_MES_MOJI);
+			anOtherMJ->setVisible(false);
 
-	this->removeChildByTag(3);
-	auto myInfo=MyInfo::create();
-	this->addChild(myInfo,4,3);
-	
+			auto myInfo=MyInfo::create();
+			this->removeChildByTag(CURENT_UI_LAYER,true);
+			this->addChild(myInfo,4,CURENT_UI_LAYER);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }
 
-void MyInfoScene::buttonSystemNotice(Ref* pSender)
+void MyInfoScene::buttonSystemNotice(cocos2d::Ref* pSender,Widget::TouchEventType type)
 {
-	auto imageOfEffectInfo=this->getChildByTag(1);
-	imageOfEffectInfo->setVisible(false);
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		{
+			auto curButton=(Button*)pSender;
+			curButton->setTouchEnabled(false);
+			curButton->setHighlighted(false);
+			auto curMoji=this->getChildByTag(SYSTEM_MES_MOJI);
+			curMoji->setVisible(true);
 
-	auto imageOfEffectXbox=this->getChildByTag(2);
-	imageOfEffectXbox->setVisible(true);
+			auto anOtherBut=(Button*)this->getChildByTag(MY_MESSAGE_BUTT);
+			anOtherBut->setTouchEnabled(true);
+			anOtherBut->setHighlighted(true);
+			auto anOtherMJ=this->getChildByTag(MY_MESSAGE_MOJI);
+			anOtherMJ->setVisible(false);
 
-	this->removeChildByTag(3);
-	auto systemNotice=SystemNotice::create();
-	this->addChild(systemNotice,4,3);
+			auto myInfo=SystemNotice::create();
+			this->removeChildByTag(CURENT_UI_LAYER,true);
+			this->addChild(myInfo,4,CURENT_UI_LAYER);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }

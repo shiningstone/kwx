@@ -17,7 +17,29 @@ HelloWorld::HelloWorld()
 	s_scale=1.189;
 	s_no=1;
 }
+void HelloWorld::onEnterTransitionDidFinish()
+{
+	set_userDefault();
+	bool ifYinYueOn;
+	bool ifYinXiaoOn;
+	bool ifZhenDongOn;
+	bool ifFangYanOn; 
+	auto userDefault=UserDefault::getInstance();
+	ifYinYueOn=userDefault->getBoolForKey("ifYinYueOn");
+	ifYinXiaoOn=userDefault->getBoolForKey("ifYinXiaoOn");
+	ifZhenDongOn=userDefault->getBoolForKey("ifZhenDongOn");
+	ifFangYanOn=userDefault->getBoolForKey("ifFangYanOn");
+	if(ifYinYueOn)
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("Music/playing.mp3",true);
+	else
+	{
+		SimpleAudioEngine::sharedEngine()->setBackgroundMusicVolume(0);
+		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("Music/playing.mp3",true);
+	}
+	if(!ifYinXiaoOn)
+		SimpleAudioEngine::sharedEngine()->setEffectsVolume(0);
 
+}
 HelloWorld::~HelloWorld()
 {
 	//SimpleAudioEngine::sharedEngine()->end();
@@ -26,14 +48,6 @@ HelloWorld::~HelloWorld()
 
 void HelloWorld::qqLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-	/*auto scene = Scene::create();
-	auto layer = new QQLoad(s_scale,s_no);
-	scene->addChild(layer);
-	Director::getInstance()->replaceScene(scene);*/
-	auto curButton=(Button*)pSender;
-	auto VoiceEffect=CallFunc::create([=](){
-		SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");	
-	});
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -42,6 +56,11 @@ void HelloWorld::qqLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+			auto curButton=(Button*)pSender;
+			auto VoiceEffect=CallFunc::create([=](){
+				SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");	
+			});
+
 			curButton->setTouchEnabled(false);
 			this->runAction(VoiceEffect);
 		}
@@ -54,10 +73,6 @@ void HelloWorld::qqLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 }
 void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-	auto curButton=(Button*)pSender;
-	auto VoiceEffect=CallFunc::create([=](){
-		SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");	
-	});
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -66,7 +81,24 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+			auto curButton=(Button*)pSender;
+			auto VoiceEffect=CallFunc::create([=](){
+				SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");	
+			});
+
+			curButton->setTouchEnabled(false);
 			this->runAction(VoiceEffect);
+    		KwxMessenger aMessenger = KwxMessenger(MSG_LOGIN);
+    		RequestLogin aReq;
+    		aReq.Set();
+
+   			 aMessenger.StartReceiving();
+    		aMessenger.Send(aReq);
+
+    		auto scene = Scene::create();
+			auto layer = IMLoad::create();
+			scene->addChild(layer);
+			Director::getInstance()->replaceScene(scene);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -74,27 +106,12 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 	default:
 		break;
 	}
-
-    KwxMessenger aMessenger = KwxMessenger(MSG_LOGIN);
-    RequestLogin aReq;
-    aReq.Set();
-
-    aMessenger.StartReceiving();
-    aMessenger.Send(aReq);
-
-    auto scene = Scene::create();
-	auto layer = IMLoad::create();
-	scene->addChild(layer);
-	Director::getInstance()->replaceScene(scene);
 }
 
 
 void HelloWorld::enterroomCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
-	auto curButton=(Button*)pSender;
-	auto ButtonClickVoice=CallFunc::create([=](){
-		SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");
-	});
+
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
@@ -103,6 +120,11 @@ void HelloWorld::enterroomCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventT
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+			auto curButton=(Button*)pSender;
+			auto ButtonClickVoice=CallFunc::create([=](){
+				SimpleAudioEngine::sharedEngine()->playEffect("Music/ui_click.ogg");
+			});
+
 			curButton->setTouchEnabled(false);
 			auto race=Sprite::createWithSpriteFrameName("danjichang.png");
 			race->setAnchorPoint(Point(0.5f,0.5f));
@@ -114,7 +136,6 @@ void HelloWorld::enterroomCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventT
 			auto danjiPhoto_action=TargetedAction::create(race,spawn);
 			auto enterRoom=CallFunc::create(CC_CALLBACK_0(HelloWorld::enterRoomStandAlone,this));
 			this->runAction(Sequence::create(Spawn::create(danjiPhoto_action,ButtonClickVoice,NULL),DelayTime::create(0.3),enterRoom,NULL));
-			//scheduleOnce(schedule_selector(HelloWorld::enterRoomStandAlone),0.4);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -129,26 +150,19 @@ void HelloWorld::enterRoomStandAlone()
 	auto scene = Scene::create();
 	SpriteFrameCache::getInstance()->removeSpriteFrames();
     TextureCache::sharedTextureCache()->removeAllTextures();
-
+	RaceLayer *layer = RaceLayer::create();
+    scene->addChild(layer);
 #ifndef NETWORK_GAME_DEBUG
-    RaceLayer *layer = RaceLayer::create();
-    scene->addChild(layer);
-    layer->CreateRace(LOCAL_GAME);
+    layer->CreateRace(LOCAL_GAME);//NETWORK_GAME
 #else
-    RaceLayer *layer = RaceLayer::create();
-    scene->addChild(layer);
     layer->CreateRace(NETWORK_GAME);
 #endif
-
 
     Director::getInstance()->replaceScene(scene);
 }
 
 void HelloWorld::addButton()
 {
-	Size visibleSize = Director::getInstance()->getVisibleSize();
-	Point origin = Director::getInstance()->getVisibleOrigin();
-
 	auto danji_race=Button::create("danjichang.png","danjichang.png","danjichang.png",UI_TEX_TYPE_PLIST);
 	danji_race->addTouchEventListener(CC_CALLBACK_2(HelloWorld::enterroomCallback,this));
 	danji_race->setAnchorPoint(Vec2(0.5,0.5));
@@ -169,6 +183,59 @@ void HelloWorld::addButton()
 	///SpriteFrameCache::getInstance()->removeSpriteFrames();
 }
 
+void HelloWorld::set_userDefault()
+{
+	auto userDefault=UserDefault::getInstance();//UserDefault判断
+	if(userDefault->getBoolForKey("userDefault")==false)
+	{
+		userDefault->setBoolForKey("userDefault",true);
+		userDefault->setIntegerForKey("load_days",1);
+		userDefault->setIntegerForKey("cur_sta",1);
+		userDefault->setIntegerForKey("load_time",7352);
+
+		userDefault->setStringForKey("MyNickName","雀友");
+		userDefault->setIntegerForKey("MyProperty",50000);
+		userDefault->setStringForKey("MyLevel","菜鸟");
+		userDefault->setStringForKey("MyPhoto","Head17.png");
+		userDefault->setStringForKey("MySex","Boy");
+		std::string RobotName[16]={"十堰冰冰","随州青霞","武汉丽缇","襄阳韦彤","孝感歆艺","郧西子怡","郧县若瑄",
+			"竹山紫琪","房县老李","十堰小李","随州小张","武汉关哥","襄阳小刘","孝感小王","郧西老杨","郧县小陈"};
+		char buffer[80];
+		for(int i=0;i<16;i++)
+		{
+			sprintf(buffer,"Robot%d",i);
+			std::string robotName=buffer;
+			sprintf(buffer,"PropertyOfRobot%d",i);
+			std::string robotProperty=buffer;
+			sprintf(buffer,"LevelOfRobot%d",i);
+			std::string robotLevel=buffer;
+			sprintf(buffer,"PhotoOfRobot%d",i);
+			std::string robotPhoto=buffer;
+			sprintf(buffer,"SexOfRobot%d",i);
+			std::string robotSex=buffer;
+			sprintf(buffer,"Head%d.png",i+1);
+			std::string robotPath=buffer;
+			userDefault->setStringForKey(robotName.c_str(),RobotName[i]);
+			userDefault->setIntegerForKey(robotProperty.c_str(),50000);
+			userDefault->setStringForKey(robotLevel.c_str(),"菜鸟");
+			userDefault->setStringForKey(robotPhoto.c_str(),robotPath);
+			if(i<9)
+				userDefault->setStringForKey(robotSex.c_str(),"Girl");
+			else
+				userDefault->setStringForKey(robotSex.c_str(),"Boy");
+		}
+		sprintf(buffer,"Language%d",0);
+		std::string  languageKind=buffer;
+		userDefault->setStringForKey(languageKind.c_str(),"PuTongBan");
+
+		userDefault->setBoolForKey("ifYinYueOn",true);
+		userDefault->setBoolForKey("ifYinXiaoOn",true);
+		userDefault->setBoolForKey("ifZhenDongOn",false);
+		userDefault->setBoolForKey("ifFangYanOn",false);
+		UserDefault::getInstance()->flush();
+	}
+}
+
 bool HelloWorld::init()
 {
 	if(!Layer::init())
@@ -177,7 +244,6 @@ bool HelloWorld::init()
 	}
 	SimpleAudioEngine::sharedEngine()->preloadBackgroundMusic("Music/playing.mp3");
 	SimpleAudioEngine::sharedEngine()->preloadEffect("Music/majiang_logo.ogg");
-
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 
@@ -187,21 +253,18 @@ bool HelloWorld::init()
 	else
 		sprite = Sprite::create("loadwin2.png");
 	sprite->setPosition(Point(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
 	sprite->setScaleX(s_scale);
 	sprite->setScaleY(s_scale);
 	this->addChild(sprite,0);
-	//SimpleAudioEngine::sharedEngine()->playBackgroundMusic("Music/playing.mp3",true);
-	//auto cache=SpriteFrameCache::sharedSpriteFrameCache();
-	//cache->addSpriteFramesWithFile("dengluzhutu.plist","dengluzhutu.png");
+
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
+
 	auto log_bg1=Sprite::createWithSpriteFrameName("logo.png");
 	log_bg1->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height*31/48 + origin.y));
 	this->addChild(log_bg1,1);
 	log_bg1->setScale(0.1f);
 
 	auto easeBounceInOut1= EaseBounceOut::create(ScaleTo::create(0.5,1));
-	//log_bg1->runAction(easeBounceInOut1);
 	auto log_bg1_action=TargetedAction::create(log_bg1,easeBounceInOut1);
 
 	auto log_bg2=Sprite::createWithSpriteFrameName("logo.png");
@@ -216,7 +279,6 @@ bool HelloWorld::init()
 	auto easeBounce=ScaleTo::create(0.3,1.3);
 	auto spawn=Spawn::create(fadeOut,easeBounce,NULL);
 	auto seqFor2=Sequence::create(easeBounceInOut2,spawn,NULL);
-	//log_bg2->runAction(seqFor2);
 	auto log_bg2_action=TargetedAction::create(log_bg2,seqFor2);
 
 	auto start_log= Sprite::createWithSpriteFrameName("kwx.png");
@@ -233,31 +295,17 @@ bool HelloWorld::init()
 	cliper->setScale(0.1f);
 
 	auto easeBounceInOut3= EaseBounceOut::create(ScaleTo::create(0.5,1));
-	//cliper->runAction(easeBounceInOut3);
 	auto cliper_action=TargetedAction::create(cliper,easeBounceInOut3);
 
 	auto actionTo=MoveTo::create(0.8,Vec2(start_log->getContentSize().width/2,0));
 	auto callFunc=CallFunc::create(this,callfunc_selector(HelloWorld::addButton));
 	auto seqForLight=Sequence::create(DelayTime::create(0.5),actionTo,DelayTime::create(0.5),callFunc,NULL);
-	//lightEffect->runAction(seqForLight);
 	auto lightEffect_action=TargetedAction::create(lightEffect,seqForLight);
 
 	auto LogoVoiceEffect=CallFunc::create([=](){SimpleAudioEngine::sharedEngine()->playEffect("Music/majiang_logo.ogg");});
 	SimpleAudioEngine::sharedEngine()->preloadEffect("Music/ui_click.ogg");
-	auto thisSpaen=Spawn::create(log_bg1_action,log_bg2_action,cliper_action,lightEffect_action,NULL);
-	this->runAction(Spawn::create(LogoVoiceEffect,thisSpaen,NULL));
-
-	/**********************************/
-    /* Jiangbo: this is just for test */
-    DeviceInfo_t info;
-    _get_device_info(info);
-    log("mac is %s",info.mac);
-    log("imsi is %s",info.imsi);
-    log("reso is %s",info.resolution);
-    log("prototype is %s",info.protoType);
-    log("osVer is %s",info.osVer);
-	/**********************************/
-    
+	auto thisSpawn=Spawn::create(log_bg1_action,log_bg2_action,cliper_action,lightEffect_action,NULL);
+	this->runAction(Spawn::create(LogoVoiceEffect,thisSpawn,NULL));
     return true;
 }
 
