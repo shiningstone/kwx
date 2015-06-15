@@ -33,7 +33,7 @@ public:
 	Size visibleSize;
 	Vec2 origin;
 	TargetedAction* TouchShadeAction(Vec2 curPos,std::string actionName);
-	void enterRoomStandAlone();
+	void enterRoom(int id);
 
 	void onButtonKaWuXing(Ref* pSender,Widget::TouchEventType type);
 	void entranceToKaWuXing();

@@ -913,15 +913,18 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
 
-    static int handout = 1;
+    static int handout = 0;
 
-    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+    if(recvBuf[16]==REQ_LOGIN) {
+        return;
+    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
         SendLine(SERVER,1);
         SendLine(SERVER,2);
         SendLine(SERVER,3);
         SendLine(SERVER,4);
         SendLine(SERVER,5);
     } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        handout++;
         SendLine(SERVER,6);
         SendLine(SERVER,7);
     } else if(handout==1) {

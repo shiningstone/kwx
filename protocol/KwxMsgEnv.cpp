@@ -69,8 +69,6 @@ EnvVariable::EnvVariable() {
 	_buildNo  = 7;                 
 	_customerId = 0x0809;          
 	_productId  = 0x0a0b;
-
-    _key = 0x01020304;
 #else
 	_protocol = 16;                //const value in terms of version
 	_userId   = 0x01020304;        //set by device Id
@@ -79,9 +77,10 @@ EnvVariable::EnvVariable() {
 	_buildNo  = 7;                 //const value in terms of version
 	_customerId = 0x0809;          //???
 	_productId  = 0x0a0b;          //???
-
-    _key = 0x01020304;
 #endif
+    _key      = 0x01020304;
+    _roomPath = 11;
+
     LoginServerInit();
     RoomServerInit(0);
     
@@ -110,8 +109,7 @@ void EnvVariable::SetRoomPath(RoomPath_t id) {
 }
 
 RoomPath_t EnvVariable::GetRoomPath() {
-    return 11;
-    /*return _roomPath;*/
+    return _roomPath;
 }
 
 /*******************************************************************************
