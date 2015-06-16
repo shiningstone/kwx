@@ -39,7 +39,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
      //create a scene. it's an autorelease object
 	auto scene = Scene::create();
 	
-	std::string curEdition="1.1.1.0";
+	std::string curEdition="1.1.1.2";
 	std::string newestEdition="1.1.1.1";
 	Layer* startLayer;
 	if(newestEdition>curEdition)

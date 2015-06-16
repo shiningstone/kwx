@@ -46,7 +46,7 @@ void BuDaiPiaoLayer::enterRoom(int roomPath)
 
 	RaceLayer *layer = RaceLayer::create();
 	scene->addChild(layer);
-	layer->CreateRace(LOCAL_GAME);
+	layer->CreateRace(NETWORK_GAME);
 
 	Director::getInstance()->replaceScene(scene);
 }

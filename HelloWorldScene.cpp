@@ -88,14 +88,17 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 
 			curButton->setTouchEnabled(false);
 			this->runAction(VoiceEffect);
+            
+#ifndef IGNORE_LOGIN_REQUEST
     		KwxMessenger aMessenger = KwxMessenger(MSG_LOGIN);
     		RequestLogin aReq;
     		aReq.Set();
 
-   			 aMessenger.StartReceiving();
+   			aMessenger.StartReceiving();
     		aMessenger.Send(aReq);
+#endif
 
-    		auto scene = Scene::create();
+            auto scene = Scene::create();
 			auto layer = IMLoad::create();
 			scene->addChild(layer);
 			Director::getInstance()->replaceScene(scene);

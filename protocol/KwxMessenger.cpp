@@ -16,7 +16,6 @@
 
 static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
 
-NetMessenger *KwxMessenger::_messenger = 0;
 Logger       *KwxMessenger::_logger = 0;
 
 KwxMessenger::KwxMessenger(MsgType_t type) {

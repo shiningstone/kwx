@@ -2,6 +2,7 @@
 #ifndef __DEBUG_CTRL__
 #define __DEBUG_CTRL__
 
+#define LAN_SERVER "192.168.1.102"
 /**********************************************************************************
     this macro provides a shortcut to start a network game by Button "DanJiBan" 
 **********************************************************************************/
@@ -14,7 +15,10 @@
         3 : remote server(the ip address is stored in E:/server_ip.txt)   Vs virtual phone, test with real server
 **********************************************************************************/
 #define DBG_REMOTE_SERVER 1
-#define LAN_SERVER "192.168.1.102"
+
+#if (DBG_REMOTE_SERVER!=3)
+#define IGNORE_LOGIN_REQUEST    /* local server only support one connection */
+#endif
 /********************************************************************************** 
     this macro is used to control the timer limitation
         round manager will ignore the count if this macro is enabled

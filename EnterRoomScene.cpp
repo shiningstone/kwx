@@ -12,6 +12,8 @@
 #include "dayByDay.h"
 #include "HelloWorldScene.h"
 
+#include "utils/DebugCtrl.h"
+
 EnterRoom::EnterRoom()
 {
 	s_scale=1.189;
@@ -687,10 +689,11 @@ bool EnterRoom::init()
 	FriendAndStrangers();//好友列表
 	competeButtons();//比赛按钮
 	/////////////////////////////////////////////////////////////////////
-
+#ifndef NETWORK_GAME_DEBUG
 	ifDayAwardGetted=false;
 	if(!ifDayAwardGetted)
 		call_gold_prize();
+#endif
 
 	return true;
 }

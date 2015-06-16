@@ -34,10 +34,10 @@ private:
 
     INT8U       _serverIp[32];
     int         _port;
+	NetMessenger *_messenger;
 
     int         _sendCnt;
 
-	static NetMessenger *_messenger;/*it makes more sense to let KwxMessenger derived from NetMessenger*/
     static Logger       *_logger;
 };
 

@@ -19,9 +19,9 @@ void IMLoad::enterRoom()
     scene->addChild(layer);
     Director::getInstance()->replaceScene(scene);
 }
-const std::string ResFileName[16]={"load_room.plist","jibenxinximian.plist","chongfuziyuan.plist","chongfuziyuan2.plist",
+const std::string ResFileName[]={"load_room.plist","jibenxinximian.plist","chongfuziyuan.plist","chongfuziyuan2.plist",
 	"shezhijiemian.plist","changguichangbupiao.plist","changguichangdaipiao.plist","bisaichang.plist",
-	"bisaidengdai.plist","bisaibaoming.plist","RankImage.plist","ChatImg.plist","FriendsImage.plist",
+	"bisaidengdai.plist","bisaibaoming.plist","ChatImg.plist","FriendsImage.plist",
 	"selectGameAndScene.plist","dengluzhutu.plist","changguichang2.plist"};
 //SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ChatImg.plist");
 //SpriteFrameCache::getInstance()->addSpriteFramesWithFile("FriendsImage.plist");
@@ -29,7 +29,7 @@ const std::string ResFileName[16]={"load_room.plist","jibenxinximian.plist","cho
 //SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
 void IMLoad::addRes()
 {
-	for(int insertNum=0;insertNum<16;insertNum++)
+	for(int insertNum=0;insertNum<15;insertNum++)
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile(ResFileName[insertNum]);
 		curLoadingBar->setPercentage((float)(insertNum+1)/11*100);
