@@ -16,6 +16,8 @@ class EnvVariable {
 public:
 	static EnvVariable *getInstance();
 
+    void       SetReconnect(bool flag);
+    bool       IsReconnectRequired();
     void       SetRoomServer(int roomId,const char *ip,int port);
     void       SetKey(Key_t key);
     Key_t      GetKey();
@@ -43,6 +45,8 @@ public:
 private:
 	EnvVariable();
 	static EnvVariable *_instance;
+
+    bool       _reconnectRequired;
 
     static void SetServerIp(Server_t &server,const char *ip);
     void LoginServerInit();

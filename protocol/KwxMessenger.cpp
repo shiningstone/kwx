@@ -34,6 +34,11 @@ KwxMessenger::KwxMessenger(MsgType_t type) {
             break;
     }
     
+    _waitNum = 0;
+    for(int i=0;i<MAX_WAIT_NUM;i++) {
+        _waitQueue[i] = REQ_INVALID;
+    }
+
     _messenger = new NetMessenger();
     
     #if 0/*如果要用StartReceiving，不能调用Start*/
@@ -98,6 +103,49 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     LOGGER_WRITE("----------------> #%d: %s",++_sendCnt,desc);
     
     return 0;
+}
+
+/*************************************
+        response wait
+*************************************/
+void KwxMessenger::WaitQueueAdd(RequestId_t req) {
+    _waitQueue[_waitNum++] = req;
+}
+
+void KwxMessenger::WaitQueueDel(RequestId_t req) {
+    for(int i=0;i<_waitNum;i++) {
+        if(_waitQueue[i]==req) {
+            for(int j=i;j<_waitNum;j++) {
+                _waitQueue[j] = _waitQueue[j+1];
+            }
+        }
+    }
+
+    _waitNum--;
+}
+
+bool KwxMessenger::IsWaiting(RequestId_t req) const {
+    if(req==REQ_INVALID) {
+        return (_waitNum>0);
+    }
+    
+    for(int i=0;i<_waitNum;i++) {
+        if(_waitQueue[i]==req) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool KwxMessenger::Wait(RequestId_t req) {
+    WaitQueueAdd(req);
+    
+    while(_waitNum>0) {/*BUG : resume only all wait req are handled*/
+        _delay(100);
+    }
+
+    return true;
 }
 
 /**********************************************************

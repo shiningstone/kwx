@@ -28,7 +28,18 @@ public:
 
     int Send(UsMsg &aMsg);/* why cannot declare as const UsMsg??? */
 
+    bool IsWaiting(RequestId_t req = REQ_INVALID) const;
+    bool Wait(RequestId_t req);
+    void WaitQueueDel(RequestId_t req);
 private:
+    /* wait queue for specified request, which will be handled in Non-main process */
+    static const int MAX_WAIT_NUM = 4;
+
+    RequestId_t _waitQueue[MAX_WAIT_NUM];
+    int         _waitNum;
+
+    void WaitQueueAdd(RequestId_t req);
+
     friend class TestKwxAutoRecv;
     void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
 

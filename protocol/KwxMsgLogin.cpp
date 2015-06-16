@@ -51,6 +51,8 @@ int RequestLogin::Set(UserType_t type) {
 int LoginResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         
+    EnvVariable *env = EnvVariable::getInstance();
+
     INT8U status = msg.GetItemValue(0);
     if(status!=0) {
         return status;
@@ -58,17 +60,19 @@ int LoginResponse::Construct(const DsMsg &msg) {
 
     _userType          = (UserType_t)msg.GetItemValue(1);
     _userActivated     = msg.GetItemValue(2);
-    _reconnectRequired = msg.GetItemValue(3);
-    
-    INT32U roomId      = msg.GetItemValue(6);
-    INT8U  roomIp[32] = {0};
-    msg.GetString(7,roomIp);
-    INT32U roomPort    = msg.GetItemValue(8);
 
-    EnvVariable *env = EnvVariable::getInstance();
-    env->SetUserId(msg.GetItemValue(4));
-    env->SetKey(msg.GetItemValue(5));
-    env->SetRoomServer(roomId,(char *)roomIp,roomPort);
+    if(msg.GetItemValue(3)==1) {
+        env->SetReconnect(true);
+
+        INT32U roomId      = msg.GetItemValue(6);
+        INT8U  roomIp[32] = {0};
+        msg.GetString(7,roomIp);
+        INT32U roomPort    = msg.GetItemValue(8);
+        
+        env->SetUserId(msg.GetItemValue(4));
+        env->SetKey(msg.GetItemValue(5));
+        env->SetRoomServer(roomId,(char *)roomIp,roomPort);
+    }
 
     return 0;
 }

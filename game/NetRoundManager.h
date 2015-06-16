@@ -66,15 +66,7 @@ public:
     bool _HandoutNotify;
     void _NotifyHandout();
 
-    /* wait queue for specified request, which will be handled in Non-main process */
-    static const int MAX_WAIT_NUM = 4;
-
-    RequestId_t _waitQueue[MAX_WAIT_NUM];
-    int         _waitNum;
-    bool        _permited;    /* this flag is used for judging conflicting actions from different players */
-
-    void WaitQueueAdd(RequestId_t req);
-    void WaitQueueDel(RequestId_t req);
+    bool _permited;    /* this flag is used for judging conflicting actions from different players */
     bool IsWaiting(RequestId_t req = REQ_INVALID) const;
     void Resume(DsInstruction *di);
     bool Wait(RequestId_t req);

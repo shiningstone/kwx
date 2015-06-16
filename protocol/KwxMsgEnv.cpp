@@ -78,6 +78,7 @@ EnvVariable::EnvVariable() {
 	_customerId = 0x0809;          //???
 	_productId  = 0x0a0b;          //???
 #endif
+    _reconnectRequired = false;
     _key      = 0x01020304;
     _roomPath = 11;
 
@@ -87,6 +88,13 @@ EnvVariable::EnvVariable() {
     _get_device_info(_device);
 }
 
+void EnvVariable::SetReconnect(bool flag) {
+    _reconnectRequired = flag;
+}
+
+bool EnvVariable::IsReconnectRequired() {
+    return _reconnectRequired;
+}
 
 void EnvVariable::SetKey(Key_t key) {
     _key = key;

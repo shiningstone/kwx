@@ -31,7 +31,6 @@ public:
 
     UserType_t  _userType;
     bool        _userActivated;
-    bool        _reconnectRequired;
 };
 
 class RequestEnterRoom : public UsMsg {

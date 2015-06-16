@@ -41,10 +41,6 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     }
 
     _HandoutNotify = false;
-    _waitNum = 0;
-    for(int i=0;i<MAX_WAIT_NUM;i++) {
-        _waitQueue[i] = REQ_INVALID;
-    }
 
     _messenger = new KwxMessenger(MSG_GAME);
     _logger = LOGGER_REGISTER("NetRoundManager");
@@ -476,53 +472,22 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 /*************************************
         response wait
 *************************************/
-void NetRoundManager::WaitQueueAdd(RequestId_t req) {
-    _waitQueue[_waitNum++] = req;
-}
-
-void NetRoundManager::WaitQueueDel(RequestId_t req) {
-    for(int i=0;i<_waitNum;i++) {
-        if(_waitQueue[i]==req) {
-            for(int j=i;j<_waitNum;j++) {
-                _waitQueue[j] = _waitQueue[j+1];
-            }
-        }
-    }
-
-    _waitNum--;
-}
-
 bool NetRoundManager::IsWaiting(RequestId_t req) const {
-    if(req==REQ_INVALID) {
-        return (_waitNum>0);
-    }
-    
-    for(int i=0;i<_waitNum;i++) {
-        if(_waitQueue[i]==req) {
-            return true;
-        }
-    }
-
-    return false;
+    return _messenger->IsWaiting(req);
 }
 
 void NetRoundManager::Resume(DsInstruction *di) {
     RequestId_t req = di->request;
     
-    if(IsWaiting(req)) {
+    if(_messenger->IsWaiting(req)) {
+        _messenger->WaitQueueDel(req);
+
         HandleMsg(di);
-        WaitQueueDel(req);
     }
 }
 
 bool NetRoundManager::Wait(RequestId_t req) {
-    WaitQueueAdd(req);
-    _permited     = false;
-    
-    while(_waitNum>0) {/*BUG : resume only all wait req are handled*/
-        _delay(100);
-    }
-    
+    _messenger->Wait(req);
     return _permited;
 }
 
