@@ -33,25 +33,14 @@ public:
 	Vec2 origin;
 	virtual bool init();
 	TargetedAction* TouchShadeAction(Vec2 curPos,std::string actionName);
-	void enterRoomStandAlone();
+	void enterRoom(int roomPath);
 
 	void onbuttonBingYiSe(Ref* pSender,Widget::TouchEventType type);
-	void entranceToBingYiSe();
-
 	void onbuttonDaSanYuan(Ref* pSender,Widget::TouchEventType type);
-	void entranceDaSanYuan();
-
 	void onbuttonMingSiGui(Ref* pSender,Widget::TouchEventType type);
-	void entranceMingSiGui();
-
 	void onButtonGangGang(Ref* pSender,Widget::TouchEventType type);
-	void entranceToGangGang();
-
-	void onButtonXSY(Ref* pSender,Widget::TouchEventType type);
-	void entranceXSY();
-
-	void onButtonLQD(Ref* pSender,Widget::TouchEventType type);
-	void entranceLQD();
+	void onButtonXiaoSanYuan(Ref* pSender,Widget::TouchEventType type);
+	void onButtonLongQiDui(Ref* pSender,Widget::TouchEventType type);
 
 	CREATE_FUNC(DaiPiaoLayer);
 };

@@ -36,22 +36,11 @@ public:
 	void enterRoom(int id);
 
 	void onButtonKaWuXing(Ref* pSender,Widget::TouchEventType type);
-	void entranceToKaWuXing();
-
 	void onButtonTiaoYiSe(Ref* pSender,Widget::TouchEventType type);
-	void entranceToTiaoYiSe();
-
 	void onButtonGangShangHua(Ref* pSender,Widget::TouchEventType type);
-	void entranceGangShangHua();
-
 	void onButtonAnSiGui(Ref* pSender,Widget::TouchEventType type);
-	void entranceToAnSiGui();
-
 	void onButtonHaiDilao(Ref* pSender,Widget::TouchEventType type);
-	void entranceHaiDiLao();
-
 	void onButtonPengPengHu(Ref* pSender,Widget::TouchEventType type);
-	void entrancePengPengHu();
 
 	CREATE_FUNC(BuDaiPiaoLayer);
 };

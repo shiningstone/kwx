@@ -39,8 +39,6 @@ TargetedAction* BuDaiPiaoLayer::TouchShadeAction(Vec2 curPos,std::string actionN
 void BuDaiPiaoLayer::enterRoom(int roomPath)
 {
 	auto scene = Scene::create();
-	//SpriteFrameCache::getInstance()->removeSpriteFrames();
-	//TextureCache::sharedTextureCache()->removeAllTextures();
 
     EnvVariable::getInstance()->SetRoomPath((RoomPath_t )roomPath);
 
@@ -553,34 +551,4 @@ void BuDaiPiaoLayer::onButtonPengPengHu(Ref* pSender,Widget::TouchEventType type
 		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
-}
-
-void BuDaiPiaoLayer::entranceToKaWuXing()
-{
-	//卡五星
-}
-
-void BuDaiPiaoLayer::entranceToAnSiGui()
-{
-	//进入游戏场暗四归
-}
-
-void BuDaiPiaoLayer::entranceToTiaoYiSe()
-{
-	//进入游戏条一色
-}
-
-void BuDaiPiaoLayer::entranceHaiDiLao()
-{
-	//进入游戏海底捞
-}
-
-void BuDaiPiaoLayer::entranceGangShangHua()
-{
-	//进入游戏杠上花
-}
-
-void BuDaiPiaoLayer::entrancePengPengHu()
-{
-	//进入游戏碰碰胡
 }

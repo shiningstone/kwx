@@ -1,5 +1,15 @@
-#include "DaiPiaoLayer.h"
+
 #include "game/RaceLayer.h"
+#include "protocol/KwxMsgEnv.h"
+
+#include "DaiPiaoLayer.h"
+
+#define BING_YI_SE    11
+#define DA_SAN_YUAN   12
+#define MING_SI_GUI   13
+#define GANG_SHANG_GANG  14
+#define XIAO_SAN_YUAN 15
+#define LONG_QI_UI    16
 
 DaiPiaoLayer::DaiPiaoLayer(void)
 {
@@ -26,18 +36,15 @@ TargetedAction* DaiPiaoLayer::TouchShadeAction(Vec2 curPos,std::string actionNam
 
 	return shadeTarget;
 }
-void DaiPiaoLayer::enterRoomStandAlone()
+void DaiPiaoLayer::enterRoom(int roomPath)
 {
 	auto scene = Scene::create();
-	SpriteFrameCache::getInstance()->removeSpriteFrames();
-	TextureCache::sharedTextureCache()->removeAllTextures();
+
+    EnvVariable::getInstance()->SetRoomPath((RoomPath_t )roomPath);
+
 	RaceLayer *layer = RaceLayer::create();
 	scene->addChild(layer);
-#ifndef NETWORK_GAME_DEBUG
-	layer->CreateRace(LOCAL_GAME);
-#else
 	layer->CreateRace(NETWORK_GAME);
-#endif
 
 	Director::getInstance()->replaceScene(scene);
 }
@@ -88,7 +95,7 @@ bool DaiPiaoLayer::init()
 	auto sizeOfButtonXSY=buttonXSY->getContentSize();
 	buttonXSY->setAnchorPoint(Vec2(0.5,0.5));
 	buttonXSY->setPosition(Vec2(origin.x+visibleSize.width*0.326+sizeOfButtonXSY.width/2,origin.y+sizeOfButtonXSY.height/2+60));
-	buttonXSY->addTouchEventListener(CC_CALLBACK_2(DaiPiaoLayer::onButtonXSY,this));
+	buttonXSY->addTouchEventListener(CC_CALLBACK_2(DaiPiaoLayer::onButtonXiaoSanYuan,this));
 	this->addChild(buttonXSY,1,BUTTON_XIAOSANYUAN);
 
 	auto buttonLQD=Button::create("longqidui.png","longqidui.png","longqidui.png",TextureResType::PLIST);
@@ -96,7 +103,7 @@ bool DaiPiaoLayer::init()
 	auto sizeOfButtonLQD=buttonLQD->getContentSize();
 	buttonLQD->setAnchorPoint(Vec2(0.5,0.5));
 	buttonLQD->setPosition(Vec2(origin.x+visibleSize.width*0.626+sizeOfButtonLQD.width/2,origin.y+sizeOfButtonLQD.height/2+60));
-	buttonLQD->addTouchEventListener(CC_CALLBACK_2(DaiPiaoLayer::onButtonLQD,this));
+	buttonLQD->addTouchEventListener(CC_CALLBACK_2(DaiPiaoLayer::onButtonLongQiDui,this));
 	this->addChild(buttonLQD,1,BUTTON_LONGQIDUI);
 
 	for(int i=0;i<3;i++)
@@ -364,7 +371,7 @@ void DaiPiaoLayer::onbuttonBingYiSe(Ref* pSender,Widget::TouchEventType type)
 			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
 			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
 			auto entranceFun=CallFunc::create([=](){
-				enterRoomStandAlone();
+				enterRoom(BING_YI_SE);
 			});
 			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
 		}
@@ -397,7 +404,7 @@ void DaiPiaoLayer::onbuttonDaSanYuan(Ref* pSender,Widget::TouchEventType type)
 			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
 			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
 			auto entranceFun=CallFunc::create([=](){
-				enterRoomStandAlone();
+				enterRoom(DA_SAN_YUAN);
 			});
 			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
 		}
@@ -429,7 +436,7 @@ void DaiPiaoLayer::onbuttonMingSiGui(Ref* pSender,Widget::TouchEventType type)
 			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
 			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
 			auto entranceFun=CallFunc::create([=](){
-				enterRoomStandAlone();
+				enterRoom(MING_SI_GUI);
 			});
 			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
 		}
@@ -461,7 +468,7 @@ void DaiPiaoLayer::onButtonGangGang(Ref* pSender,Widget::TouchEventType type)
 			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
 			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
 			auto entranceFun=CallFunc::create([=](){
-				enterRoomStandAlone();
+				enterRoom(GANG_SHANG_GANG);
 			});
 			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
 		}
@@ -472,7 +479,7 @@ void DaiPiaoLayer::onButtonGangGang(Ref* pSender,Widget::TouchEventType type)
 		break;
 	}
 }
-void DaiPiaoLayer::onButtonXSY(Ref* pSender,Widget::TouchEventType type)
+void DaiPiaoLayer::onButtonXiaoSanYuan(Ref* pSender,Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 	auto ButtonBg=(Sprite*)this->getChildByTag(SHADE_XIAOSANYUAN);
@@ -493,7 +500,7 @@ void DaiPiaoLayer::onButtonXSY(Ref* pSender,Widget::TouchEventType type)
 			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
 			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
 			auto entranceFun=CallFunc::create([=](){
-				enterRoomStandAlone();
+				enterRoom(XIAO_SAN_YUAN);
 			});
 			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
 		}
@@ -504,7 +511,7 @@ void DaiPiaoLayer::onButtonXSY(Ref* pSender,Widget::TouchEventType type)
 		break;
 	}
 }
-void DaiPiaoLayer::onButtonLQD(Ref* pSender,Widget::TouchEventType type)
+void DaiPiaoLayer::onButtonLongQiDui(Ref* pSender,Widget::TouchEventType type)
 {
 	auto curButton=(Button*)pSender;
 	auto ButtonBg=(Sprite*)this->getChildByTag(SHADE_LONGQIDUI);
@@ -525,7 +532,7 @@ void DaiPiaoLayer::onButtonLQD(Ref* pSender,Widget::TouchEventType type)
 			auto curButtonTar=TargetedAction::create(curButton,seqButtonAction);
 			auto EffectForThis=Spawn::create(ButtonBgTar,curButtonTar,NULL);
 			auto entranceFun=CallFunc::create([=](){
-				enterRoomStandAlone();
+				enterRoom(LONG_QI_UI);
 			});
 			this->runAction(Sequence::create(EffectForThis,entranceFun,NULL));
 		}
@@ -535,34 +542,4 @@ void DaiPiaoLayer::onButtonLQD(Ref* pSender,Widget::TouchEventType type)
 		ButtonBg->runAction(ScaleTo::create(0.1,0.8));
 		break;
 	}
-}
-
-void DaiPiaoLayer::entranceToBingYiSe()
-{
-	//进入游戏场卡五星
-}
-
-void DaiPiaoLayer::entranceToGangGang()
-{
-	//进入游戏场暗四归
-}
-
-void DaiPiaoLayer::entranceDaSanYuan()
-{
-	//进入游戏条一色
-}
-
-void DaiPiaoLayer::entranceXSY()
-{
-	//进入游戏海底捞
-}
-
-void DaiPiaoLayer::entranceMingSiGui()
-{
-	//进入游戏杠上花
-}
-
-void DaiPiaoLayer::entranceLQD()
-{
-	//进入游戏碰碰胡
 }
