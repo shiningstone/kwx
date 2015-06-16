@@ -103,6 +103,7 @@ public:
     virtual void WaitForResponse(PlayerDir_t dir);
     virtual void DistributeTo(PlayerDir_t dir,Card_t card);
     virtual void ActionAfterGang(PlayerDir_t dir);
+    virtual ActionMask_t judge_action_again(PlayerDir_t dir);
 
     virtual void InitPlayers();
 

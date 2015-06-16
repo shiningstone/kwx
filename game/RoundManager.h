@@ -86,6 +86,7 @@ public:
     virtual void WaitForTuoGuanHandle();
     virtual void DistributeTo(PlayerDir_t dir,Card_t card);
     virtual void ActionAfterGang(PlayerDir_t dir);
+    virtual ActionMask_t judge_action_again(PlayerDir_t dir);
 
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
     void SetDecision(PlayerDir_t dir,ActionId_t act);

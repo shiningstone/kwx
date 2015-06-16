@@ -454,6 +454,10 @@ void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
 void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
 }
 
+ActionMask_t NetRoundManager::judge_action_again(PlayerDir_t dir) {
+	return 0;
+}
+
 void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 

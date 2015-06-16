@@ -649,6 +649,10 @@ void RoundManager::ActionAfterGang(PlayerDir_t dir) {
     }
 }
 
+ActionMask_t RoundManager::judge_action_again(PlayerDir_t dir) {
+	return _players[dir]->judge_action_again();
+}
+
 void RoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
     if(action==a_AN_GANG) {
         _players[dir]->action(_isNewDistributed,aAN_GANG,actKind);
