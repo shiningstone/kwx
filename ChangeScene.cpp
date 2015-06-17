@@ -39,15 +39,15 @@ bool ChangeScene::init()
 	button->alignItemsVertically();  
 	this->addChild(button);
 
-	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("jibenxinximian.plist"); 
-	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("chongfuziyuan.plist");
-	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("chongfuziyuan2.plist");
-	CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("shezhijiemian.plist");
-	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("changguichangbupiao.plist");
-	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("changguichangdaipiao.plist");
-	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaichang.plist");
-	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaidengdai.plist");
-	CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaibaoming.plist");
+	//CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("jibenxinximian.plist"); 
+	//CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("chongfuziyuan.plist");
+	//CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("chongfuziyuan2.plist");
+	//CCSpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("shezhijiemian.plist");
+	//CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("changguichangbupiao.plist");
+	//CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("changguichangdaipiao.plist");
+	//CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaichang.plist");
+	//CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaidengdai.plist");
+	//CCSpriteFrameCache::getInstance()->addSpriteFramesWithFile("bisaibaoming.plist");
 
 	return true;
 }

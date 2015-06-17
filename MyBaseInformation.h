@@ -32,7 +32,7 @@ public:
 	void UpgradeAccount(Ref* pSender,Widget::TouchEventType type);
 	void ManagePassWord(Ref* pSender,Widget::TouchEventType type);
 	void ChangeNameForPenCallBack(Ref* pSender,Widget::TouchEventType type);
-	void CallBack_ForJiaHao(Ref* pSender,Widget::TouchEventType type);
+	//void CallBack_ForJiaHao(Ref* pSender,Widget::TouchEventType type);
 
 
 	//void editBoxEditingDidEnd(EditBox* editBox);

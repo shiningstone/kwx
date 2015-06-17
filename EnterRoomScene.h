@@ -28,6 +28,7 @@ public:
 #define	THIS_NEARLY_SCROLLVIEW		5
 #define THIS_GET_DAYGOLD_BKG		6
 #define RANKSCROLL_LAYER			7
+#define CREATE_ROLE_LAYER			8
 
 #define LABEL_FOR_PLAYERNAME		8
 #define LABEL_FOR_GOLD				9
@@ -66,6 +67,8 @@ public:
 	void NearPersonCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
 	void MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite
 	void call_gold_prize();																//ReWrite
+
+	void createRole();
 		
 	CREATE_FUNC(EnterRoom);
 };

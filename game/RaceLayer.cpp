@@ -6280,7 +6280,6 @@ void RaceLayer::BtnBackHandler(Ref* pSender,cocos2d::ui::Widget::TouchEventType 
 		break;
 	}
 }
-
 void RaceLayer::Back()
 {
 	SpriteFrameCache::sharedSpriteFrameCache()->addSpriteFramesWithFile("GlobalUI.plist");

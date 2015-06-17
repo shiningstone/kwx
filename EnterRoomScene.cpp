@@ -658,6 +658,35 @@ void EnterRoom::FriendAndStrangers()//photo sex name Lv score
 	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("selectGameAndScene.plist");
 	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
 //}
+void EnterRoom::createRole()
+{
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
+
+	auto createRoleBkg=Sprite::create("Createrolebj.png");
+	auto BkgSize=createRoleBkg->getContentSize();
+	createRoleBkg->setAnchorPoint(Vec2(0.5,0.5));
+	createRoleBkg->setPosition(Vec2(0.5,0.5));
+	this->addChild(createRoleBkg,5,CREATE_ROLE_LAYER);
+
+	auto SwallowLayer=LayerColor::create();
+	SwallowLayer->setContentSize(Size(visibleSize.width,visibleSize.height));
+	SwallowLayer->setColor(ccWHITE);
+	SwallowLayer->setOpacity(50);
+	SwallowLayer->ignoreAnchorPointForPosition(false);
+	SwallowLayer->setAnchorPoint(Vec2(0.5,0.5));
+	SwallowLayer->setPosition(Vec2(BkgSize.width/2,BkgSize.height/2));
+	createRoleBkg->addChild(SwallowLayer,1);
+	EventListenerTouchOneByOne* SwallowListener=EventListenerTouchOneByOne::create();
+	SwallowListener->setSwallowTouches(true);
+	SwallowListener->onTouchBegan=[=](Touch* touch, Event* event){return true;};
+	SwallowListener->onTouchMoved=[=](Touch* touch, Event* event){};
+	SwallowListener->onTouchEnded=[=](Touch* touch, Event* event){};
+	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(SwallowListener,SwallowLayer);
+
+
+
+
+}
 bool EnterRoom::init()
 {
 	if(!Layer::init())
