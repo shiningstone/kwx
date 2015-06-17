@@ -4,3 +4,8 @@ Login服务器、房间服务器
 MyHandoutEffect
 PengEffectNode          需要删除
 包胡、包庄
+
+Login/reconnect/error code/leave/dayaward
+删除资源
+支付sdk
+版本升级
