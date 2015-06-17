@@ -18,7 +18,7 @@ public:
 
     void       SetReconnect(bool flag);
     bool       IsReconnectRequired();
-    void       SetRoomServer(int roomId,const char *ip,int port);
+    void       SetRoomServer(int roomId,const char *ip,int port,int voicePort);
     void       SetKey(Key_t key);
     Key_t      GetKey();
     void       SetUserId(INT32U id);

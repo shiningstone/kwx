@@ -50,14 +50,15 @@ void EnvVariable::LoginServerInit() {
 }
 
 void EnvVariable::RoomServerInit(int roomId) {
-    SetRoomServer(roomId,ROOM_SERVER_IP,DEF_SOCKET_PORT);
+    SetRoomServer(roomId,ROOM_SERVER_IP,DEF_SOCKET_PORT,0);
 }
 
-void EnvVariable::SetRoomServer(int roomId,const char *ip,int port) {
+void EnvVariable::SetRoomServer(int roomId,const char *ip,int port,int voicePort) {
     _roomServer.id = roomId;
     sprintf(_roomServer.name,"roomServer%d",roomId);
     SetServerIp(_roomServer,ip);
     _roomServer.port = port;
+    _roomServer.voicePort = voicePort;
 }
 
 EnvVariable::EnvVariable() {

@@ -59,20 +59,27 @@ int LoginResponse::Construct(const DsMsg &msg) {
     }
 
     _userType          = (UserType_t)msg.GetItemValue(1);
-    _userActivated     = msg.GetItemValue(2);
+    _userActivated     = (msg.GetItemValue(2)==1);
 
-    if(msg.GetItemValue(3)==1) {
+    if(msg._body->_items[3]->_bufLen/4 > 1) {/* reconnect required */
+        INT32U roomPath = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[4]);
+        INT32U roomId   = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[8]);
+        INT32U tableId  = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[12]);
+        INT32U seatId   = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[16]);
+
+        SeatInfo::getInstance()->Set(roomPath,roomId,tableId,seatId);
         env->SetReconnect(true);
-
-        INT32U roomId      = msg.GetItemValue(6);
-        INT8U  roomIp[32] = {0};
-        msg.GetString(7,roomIp);
-        INT32U roomPort    = msg.GetItemValue(8);
-        
-        env->SetUserId(msg.GetItemValue(4));
-        env->SetKey(msg.GetItemValue(5));
-        env->SetRoomServer(roomId,(char *)roomIp,roomPort);
     }
+
+    INT32U roomId      = msg.GetItemValue(6);
+    INT8U  roomIp[32] = {0};
+    msg.GetString(7,roomIp);
+    INT32U roomPort    = msg.GetItemValue(8);
+    INT32U voicePort   = msg.GetItemValue(9);
+    
+    env->SetUserId(msg.GetItemValue(4));
+    env->SetKey(msg.GetItemValue(5));
+    env->SetRoomServer(roomId,(char *)roomIp,roomPort,voicePort);
 
     return 0;
 }
@@ -80,13 +87,10 @@ int LoginResponse::Construct(const DsMsg &msg) {
 int RequestEnterRoom::Set(int id) {
     SetRequestCode(REQ_GAME_SEND_ENTER);
 
-    Key_t key = EnvVariable::getInstance()->GetKey();
     RoomPath_t roomPath = EnvVariable::getInstance()->GetRoomPath();
 
-    INT32U keyid = _htonl((INT32U)key);
     INT32U roomId = _htonl((INT32U)roomPath);
     
-    _add_item( new Item((Item_t)132,4,(INT8U *)&keyid) );
     _add_item( new Item((Item_t)131,4,(INT8U *)&roomId) );
 
     return 0;
