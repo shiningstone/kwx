@@ -154,7 +154,7 @@ void test_basic() {
     发送消息实现
     消息格式 : lineNo:PACKAGE_INFO:4B,57,58,10,01,02,03,04,05,06,07,08,09,0a,0b,00,2b,00,36,00,00,00,00,00,00,00,00,00,00,00
 ****************************************************/
-#define WORKING_PATH "D:\\kwx\\kwx\\Classes\\tester\\network\\DATA\\\\"
+#define WORKING_PATH "D:\\kwx\\svn\\trunk\\kwx\\Classes\\tester\\network\\DATA\\"
 
 #include <stdio.h>
 
@@ -329,108 +329,78 @@ static void SendLine(ServerSocket SERVER,int lineNo) {
 }
 
 void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
     static int handout = 0;
 
-    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
-        char sendBuf[] = {
-            'K','W','X',           //KWX
-            0x00,44,               //request code
-            7,                     //package level
-            0x00,84,               //package size
-            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
-
-            9,
-            131,0,4,0,1,2,3,         //roomPath:0x00010203
-            132,0,4,4,5,6,7,         //roomId:  0x04050607
-            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
-            60,1,                    //site:    1
-            134,0,4,0,0,0,1,         //底分 base score
-            135,0,3,1,1,1,           //player status
-            136,0,12,                //player score
-                0,0,0,100,
-                0,0,0,200,
-                0,0,0,300,
-            137,0,3,0,1,2,           //player name, UTF-16
-            138,0,3,0,1,2            //player image, UTF-16
-        };
-        
-        SERVER.Send(sendBuf,sizeof(sendBuf));
-        SaveLog(fmonitor,"SEND",sendBuf,sizeof(sendBuf));
-    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+    if(recvBuf[16]==REQ_LOGIN) {
+        return;
+    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
         SendLine(SERVER,1);
         SendLine(SERVER,2);
         SendLine(SERVER,3);
         SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
     } else if(handout==0) {
         handout++;
     
-        SendLine(SERVER,5);
-        SendLine(SERVER,6);
-    } else if(handout==1) {
-        handout++;
-    
-        SendLine(SERVER,7);
         SendLine(SERVER,8);
         SendLine(SERVER,9);
-        SendLine(SERVER,10);
-        SendLine(SERVER,11);
-        SendLine(SERVER,12);
+    } else if(handout==1) {
+        handout++;
+
+        for(int i=10;i<=15;i++) {
+            SendLine(SERVER,i);
+        }
     } else if(handout==2) {
         handout++;
-    
-        SendLine(SERVER,13);
-        SendLine(SERVER,14);
-        SendLine(SERVER,15);
-        SendLine(SERVER,16);
-        SendLine(SERVER,17);
-        SendLine(SERVER,18);
+
+        for(int i=16;i<=21;i++) {
+            SendLine(SERVER,i);
+        }
     } else if(handout==3) {
         handout++;
-    
-        SendLine(SERVER,19);
-        SendLine(SERVER,20);
+
+        for(int i=22;i<=23;i++) {
+            SendLine(SERVER,i);
+        }
     } else if(handout==4) {
         handout++;
     
-        SendLine(SERVER,21);
-        SendLine(SERVER,22);
-    } else if(handout==5) {
-        handout++;
-    
-        SendLine(SERVER,23);
         SendLine(SERVER,24);
         SendLine(SERVER,25);
-        SendLine(SERVER,26);
-        SendLine(SERVER,27);
-        SendLine(SERVER,28);
-        SendLine(SERVER,29);
+    } else if(handout==5) {
+        handout++;
+
+        for(int i=26;i<=32;i++) {
+            SendLine(SERVER,i);
+        }
     } else if(handout==6) {
         handout++;
     
-        SendLine(SERVER,30);
-        SendLine(SERVER,31);
-    } else if(handout==7) {
-        handout++;
-    
-        SendLine(SERVER,32);
         SendLine(SERVER,33);
         SendLine(SERVER,34);
-        SendLine(SERVER,35);
-        SendLine(SERVER,36);
-        SendLine(SERVER,37);
+    } else if(handout==7) {
+        handout++;
+
+        for(int i=35;i<=40;i++) {
+            SendLine(SERVER,i);
+        }
     } else if(handout==8) {
         handout++;
     
-        SendLine(SERVER,38);
-        SendLine(SERVER,39);
-    } else if(handout==9) {
-        handout++;
-    
-        SendLine(SERVER,40);
         SendLine(SERVER,41);
         SendLine(SERVER,42);
-        SendLine(SERVER,43);
-        SendLine(SERVER,44);
+    } else if(handout==9) {
+        handout++;
+
+        for(int i=43;i<=47;i++) {
+            SendLine(SERVER,i);
+        }    
     }
 }
 
@@ -1014,21 +984,20 @@ void test_server_console() {
     SetFile("E0605_gang");
     gHandle = E0605_gang_handle_requests;
 
-    SetFile("Round1");/*基本操作*/
-    gHandle = round1_handle_requests;
-
     SetFile("Round5");/*竞争动作*/
     gHandle = round5_handle_requests;
-
-    SetFile("Round6");/*明牌*/
-    gHandle = round6_handle_requests;
 
     SetFile("Round2");/*胡牌*/
     gHandle = round2_handle_requests;
 
+    SetFile("Round6");/*明牌*/
+    gHandle = round6_handle_requests;
+
     SetFile("temp");
     gHandle = temp_handle_requests;
 
+    SetFile("Round1");/*基本操作*/
+    gHandle = round1_handle_requests;
 
     test_smart_game_round_x();
 #endif
