@@ -64,6 +64,7 @@ typedef struct {
     char name[32];
     char ipaddr[32];
     int  port;
+    int  voicePort;
 }Server_t;
 
 #endif

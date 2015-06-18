@@ -101,6 +101,8 @@ int KwxMessenger::Send(UsMsg &aMsg) {
     char desc[512] = {0};
     aMsg.Desc(desc);
     LOGGER_WRITE("----------------> #%d: %s",++_sendCnt,desc);
+
+    Wait((RequestId_t)aMsg._header->_requestCode);
     
     return 0;
 }
@@ -146,6 +148,12 @@ bool KwxMessenger::Wait(RequestId_t req) {
     }
 
     return true;
+}
+
+void KwxMessenger::Resume(RequestId_t req) {
+    if(IsWaiting(req)) {
+        WaitQueueDel(req);
+    }
 }
 
 /**********************************************************

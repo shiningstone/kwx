@@ -481,13 +481,7 @@ bool NetRoundManager::IsWaiting(RequestId_t req) const {
 }
 
 void NetRoundManager::Resume(DsInstruction *di) {
-    RequestId_t req = di->request;
-    
-    if(_messenger->IsWaiting(req)) {
-        _messenger->WaitQueueDel(req);
-
-        HandleMsg(di);
-    }
+    _messenger->Resume(di->request);
 }
 
 bool NetRoundManager::Wait(RequestId_t req) {

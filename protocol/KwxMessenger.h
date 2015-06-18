@@ -30,6 +30,7 @@ public:
 
     bool IsWaiting(RequestId_t req = REQ_INVALID) const;
     bool Wait(RequestId_t req);
+    void Resume(RequestId_t req);
     void WaitQueueDel(RequestId_t req);
 private:
     /* wait queue for specified request, which will be handled in Non-main process */
