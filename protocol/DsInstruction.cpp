@@ -38,8 +38,10 @@ int DsInstruction::Dispatch() {
     
     #ifndef __UNIT_TEST__
     _delay(10);/*防止接收的包在等待函数之前就处理了*/
-    if(_roundManager->IsWaiting()) {
-        _roundManager->Resume(this);
+    if(_roundManager->_messenger->IsWaiting()) {
+        _roundManager->HandleMsg(this);/*注意 : 非main线程，不能调用UI接口*/
+        _roundManager->_messenger->Resume(this->request);
+    } else {
         _roundManager->RecvMsg(this);
     }
     #endif

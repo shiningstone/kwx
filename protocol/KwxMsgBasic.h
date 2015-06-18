@@ -87,5 +87,22 @@ typedef enum {
 
 typedef INT8U Item_t;
 
+typedef enum {
+    RSP_OK,
+    RECONNECT_REQUIRED,
+    VERSION_TOO_OLD,
+    AUTHORIZE_FAIL,
+    DATAGRAM_ERROR,
+    L2_ROOM_NOT_EXIST,
+    L3_ROOM_NOT_EXIST,
+    TABLE_NOT_EXIST,
+    SEAT_ID_ERROR,
+    PIAO_ERROR,
+    IN_GAME_ALREADY,
+    ROOM_FULL,
+    TIMEOUT,
+    IN_GAME,
+}FailureCode_t;
+
 #endif
 

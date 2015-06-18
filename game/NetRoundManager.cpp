@@ -476,14 +476,6 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
 /*************************************
         response wait
 *************************************/
-bool NetRoundManager::IsWaiting(RequestId_t req) const {
-    return _messenger->IsWaiting(req);
-}
-
-void NetRoundManager::Resume(DsInstruction *di) {
-    _messenger->Resume(di->request);
-}
-
 bool NetRoundManager::Wait(RequestId_t req) {
     _messenger->Wait(req);
     return _permited;

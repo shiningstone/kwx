@@ -67,8 +67,6 @@ public:
     void _NotifyHandout();
 
     bool _permited;    /* this flag is used for judging conflicting actions from different players */
-    bool IsWaiting(RequestId_t req = REQ_INVALID) const;
-    void Resume(DsInstruction *di);
     bool Wait(RequestId_t req);
 
     Reminds_t  _serverReminds;
