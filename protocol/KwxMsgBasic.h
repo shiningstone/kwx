@@ -66,6 +66,7 @@ typedef enum {
     *********************************************/
     /*  login */
     REQ_LOGIN                   = 1,
+    REQ_DAILY_LOGIN             = 37,
     REQ_GAME_SEND_RECONNECT     = 42,
     REQ_GAME_RECV_RECONNECT     = 74,
     REQ_GAME_SEND_LEAVE_ROOM    = 45,
@@ -88,20 +89,27 @@ typedef enum {
 typedef INT8U Item_t;
 
 typedef enum {
-    RSP_OK,
-    RECONNECT_REQUIRED,
-    VERSION_TOO_OLD,
-    AUTHORIZE_FAIL,
-    DATAGRAM_ERROR,
+    REQUEST_ACCEPTED,
+    DATAGRAM_ERROR     = 56,
     L2_ROOM_NOT_EXIST,
     L3_ROOM_NOT_EXIST,
     TABLE_NOT_EXIST,
-    SEAT_ID_ERROR,
+    SEAT_ERROR,
     PIAO_ERROR,
     IN_GAME_ALREADY,
     ROOM_FULL,
     TIMEOUT,
     IN_GAME,
+    USER_NOT_EXIST,
+    LACK_OF_GOLD,
+    USER_UNREGISTERED,
+    USER_STATUS_DISMATCH,
+    ROOM_UNINITIALIZED,
+    RECONNECT_REQUIRED,
+    SERVER_BOOTING,
+    DATA_SYNC_ERROR,
+    LOGIN_DUPLICATED,
+    FAILURE_UNDEFINED = 250,
 }FailureCode_t;
 
 #endif

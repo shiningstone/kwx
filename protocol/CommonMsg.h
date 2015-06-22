@@ -8,11 +8,12 @@
 
 #include "KwxMsgBasic.h"
 #include "MsgIntf.h"
-#include "KwxMsgEnv.h"
 
 class Header;
 class MsgBody;
 class Item;
+class EnvVariable;
+class SeatInfo;
 
 class CommonMsg {
 public:

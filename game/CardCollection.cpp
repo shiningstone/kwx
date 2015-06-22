@@ -1571,13 +1571,12 @@ void Alternatives::load_gang_info(ActionMask_t actions,const Card_t kinds[],int 
     if(num>0) {
         for(int i=0;i<num;i++) {
             int cardIdx[4] = {0};
-        
-            _cards->find_cards(kinds[i],cardIdx);
+            int cardNum = _cards->find_cards(kinds[i],cardIdx);
         
             if(actions & aAN_GANG) {
                 AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
             } else if(actions & aMING_GANG) {
-                AddGroup(4,cardIdx,sMING_GANG,sGANG_ENABLE);
+                AddGroup(cardNum,cardIdx,sMING_GANG,sGANG_ENABLE);
             } else {
                 AddGroup(4,cardIdx,sSHOU_GANG,sGANG_ENABLE);
             }

@@ -26,6 +26,8 @@ public:
     static int _unload(TingInfo_t    &ting);
     static int _unload(MingInfo_t &ming);
     static int _unload(Reminds_t &remind);
+
+    static int _load_seat_info(SeatInfo_t &info,const DsMsg &msg,int itemIdx);
 };
 
 #endif

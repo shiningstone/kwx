@@ -156,6 +156,19 @@ void RaceLayer::StartGame()
     _roundManager->StartGame();
 }
 
+void RaceLayer::reload() {
+    for(int i=0;i<PLAYER_NUM;i++) {
+        PlayerDir_t dir = (PlayerDir_t)i;
+        
+        _CardInHandUpdateEffect(dir);
+        _CardRiverUpdateEffect(dir);
+        GuiPlayerShow(dir);
+    }
+
+    _UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);       
+    _ShowZhuang(_roundManager->GetLastWinner());
+}
+
 void RaceLayer::WaitForFirstAction(PlayerDir_t zhuang)
 {
     ListenToCardTouch();
@@ -2015,14 +2028,18 @@ void RaceLayer::_RaceBeginPrepare() {
     _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
 
     int lastWinner = _roundManager->GetLastWinner();
-    _zhuangSign->setAnchorPoint(_layout->AnchorOfZhuang((PlayerDir_t)lastWinner));
-    _zhuangSign->setPosition(_layout->_playerPosi[lastWinner].zhuangPoint);
+    _ShowZhuang((PlayerDir_t)lastWinner);
+}
+
+void RaceLayer::_ShowZhuang(PlayerDir_t dir) {
+    _zhuangSign->setAnchorPoint(_layout->AnchorOfZhuang(dir));
+    _zhuangSign->setPosition(_layout->_playerPosi[dir].zhuangPoint);
 	_zhuangSign->runAction(Sequence::create(
         DelayTime::create(0.65),
         EaseBounceOut::create(ScaleTo::create(0.3,1)),NULL));
 
-	auto MingSignForMe=(Sprite*)this->getChildByTag(MING_STATUS_PNG_1);
-	if(lastWinner!=1) {
+    auto MingSignForMe=(Sprite*)this->getChildByTag(MING_STATUS_PNG_1);
+    if(dir!=MIDDLE) {
         MingSignForMe->setPosition(_layout->PositionOfMingSignForMe());
     } else {
         MingSignForMe->setPosition(_layout->PositionOfMingSignForMe(_zhuangSign->getTextureRect().size.width));
@@ -6205,6 +6222,9 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
 		{
 			auto curButton=(Button*)pSender;
 			curButton->setTouchEnabled(false);
+
+            _roundManager->StopGame();
+            
 			auto scene = Scene::create();
 			auto startLayer=HelloWorld::create();
 			scene->addChild(startLayer,1);

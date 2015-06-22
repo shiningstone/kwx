@@ -23,6 +23,14 @@ RequestDesc RequestDescTbl[] = {
     DESC(HEART_BEAT),
     DESC(REQ_GAME_SEND_ENTER),
     DESC(REQ_GAME_RECV_ENTER),
+    DESC(REQ_LOGIN),
+    DESC(REQ_DAILY_LOGIN),
+    DESC(REQ_GAME_SEND_RECONNECT),
+    DESC(REQ_GAME_RECV_RECONNECT),
+    DESC(REQ_GAME_SEND_LEAVE_ROOM),
+    DESC(REQ_GAME_RECV_LEAVE_ROOM),
+    DESC(REQ_GAME_DIST_DUALLOGIN),
+    DESC(REQ_GAME_SEND_XIA_PIAO),
 };
 
 char *DescReq(RequestId_t id) {
@@ -35,9 +43,40 @@ char *DescReq(RequestId_t id) {
     return "Desc undefined";
 }
 
+ErrDesc ErrDescTbl[] = {
+    DESC(DATAGRAM_ERROR),
+    DESC(L2_ROOM_NOT_EXIST),
+    DESC(L3_ROOM_NOT_EXIST),
+    DESC(TABLE_NOT_EXIST),
+    DESC(SEAT_ERROR),
+    DESC(PIAO_ERROR),
+    DESC(IN_GAME_ALREADY),
+    DESC(ROOM_FULL),
+    DESC(TIMEOUT),
+    DESC(IN_GAME),
+    DESC(USER_NOT_EXIST),
+    DESC(LACK_OF_GOLD),
+    DESC(USER_UNREGISTERED),
+    DESC(USER_STATUS_DISMATCH),
+    DESC(ROOM_UNINITIALIZED),
+    DESC(RECONNECT_REQUIRED),
+    DESC(SERVER_BOOTING),
+    DESC(DATA_SYNC_ERROR),
+    DESC(LOGIN_DUPLICATED),
+};
+
+char *DescErr(FailureCode_t id) {
+    for(int i=0;i<sizeof(ErrDescTbl)/sizeof(ErrDescTbl[0]);i++) {
+        if(id==ErrDescTbl[i].id) {
+            return ErrDescTbl[i].desc;
+        }
+    }
+}
+
 #else 
 
-char *DescReq(RequestId_t id) { return 0; }
+char *DescReq(RequestId_t id)   { return 0; }
+char *DescErr(FailureCode_t id) { return 0; }
 
 #endif
 

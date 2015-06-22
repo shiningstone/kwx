@@ -92,6 +92,7 @@ private:
     void _ShowMenuButtons();
     void _CreateMeneButtons();
     void _CreateHeadImage();
+    void _ShowZhuang(PlayerDir_t dir);
     bool _ResourcePrepare();
     void _StartParticleSystem(float delta);
     void ListenToDoubleHu();
@@ -253,6 +254,7 @@ public:
 	   function,then CreateRace();
 	##############################*/
 	void CreateRace(GameMode_t mode);//创建比赛场景
+    void reload();
 	void _UpdateResidueCards(int no);//更新剩余牌数
     void _RightBatchDistribute(int batchIdx, float delayRef, int cardLen=13);
     void _LeftBatchDistribute(int batchIdx, float delayRef, int cardLen=13);

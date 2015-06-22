@@ -27,6 +27,8 @@ public:
 /******************/
 /* networks start */
     virtual void HandleMsg(void * aMsg);
+    void RecordError(void *aError);
+    void HandleError();
 
     KwxMessenger   *_messenger;
 
@@ -66,7 +68,8 @@ public:
     bool _HandoutNotify;
     void _NotifyHandout();
 
-    bool _permited;    /* this flag is used for judging conflicting actions from different players */
+    FailureCode_t _response;
+    bool          _permited;    /* this flag is used for judging conflicting actions from different players */
     bool Wait(RequestId_t req);
 
     Reminds_t  _serverReminds;
@@ -79,6 +82,9 @@ public:
         int              num[PLAYER_NUM];
     }MingDecisionBuf;
     MingDecisionBuf _mingBuf;
+
+    void SendReconnect();
+
 /* networks end   */
 /******************/
 
@@ -108,6 +114,7 @@ public:
     /* main process */
     virtual void CreateRace(RaceLayer *uiManager);
     virtual void StartGame();
+    virtual void StopGame();
 private:
     NetRoundManager(RaceLayer *uiManager);
     ~NetRoundManager();

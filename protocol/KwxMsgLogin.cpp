@@ -1,6 +1,9 @@
 
 #include <string.h>
 
+#include "./../utils/UtilPlatform.h"
+#include "./../network/KwxEnv.h"
+
 #include "MsgFormats.h"
 #include "CommonMsg.h"
 #include "DsInstruction.h"
@@ -80,6 +83,35 @@ int LoginResponse::Construct(const DsMsg &msg) {
     env->SetUserId(msg.GetItemValue(4));
     env->SetKey(msg.GetItemValue(5));
     env->SetRoomServer(roomId,(char *)roomIp,roomPort,voicePort);
+
+    return 0;
+}
+
+int RequestDailyLogin::Set(Key_t key) {
+    SetRequestCode(REQ_DAILY_LOGIN);
+
+    INT32U keyVal = _htonl((INT32U)key);
+    
+    _add_item( new Item((Item_t)131,4,(INT8U *)&keyVal) );
+
+    return 0;
+}
+
+int DailyLoginResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    if(msg._body->_items[0]->_bufLen==4) {
+        hasReward = false;
+    } else {
+        hasReward = true;
+        continuousDays = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+4));
+        dailyReward    = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+8));
+    }
+    
+    msg.GetString(1, name);
+    msg.GetString(2, image);
+    gold   = msg.GetItemValue(3);
+    coupon = msg.GetItemValue(4);
 
     return 0;
 }
@@ -168,27 +200,30 @@ int ReconnectResponse::Construct(const DsMsg &msg) {
     memset(image,0,sizeof(image));
 
     int seatId = msg.GetItemValue(0);
-    baseScore  = msg.GetItemValue(1);
-    curPlayer  = _GetPlayer(msg.GetItemValue(2));
+    curPlayer  = _GetPlayer(msg.GetItemValue(1));
+    zhuang     = _GetPlayer(msg.GetItemValue(2));
+    remains    = msg.GetItemValue(3);
+    count      = msg.GetItemValue(4);
     
+    baseScore  = msg.GetItemValue(5);
     for(int i=0;i<PLAYER_NUM;i++) {
         int dir = (MIDDLE+i)%3;
         
-        status[dir] = (PlayerStatus_t)msg._body->_items[3]->_buf[i];
-        score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[4]->_buf + 4*i) );
-        isMing[dir] = msg._body->_items[6]->_buf[i];
+        status[dir] = (PlayerStatus_t)msg._body->_items[6]->_buf[i];
+        score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[7]->_buf + 4*i) );
+        isMing[dir] = msg._body->_items[9]->_buf[i];
     }
 
     CardNode_t temp[3][18];
     INT8U      tempNum[3];
-    DsMsgParser::_load(temp, tempNum, msg, 5);
+    DsMsgParser::_load(temp, tempNum, msg, 8);
     for(int i=0;i<PLAYER_NUM;i++) {
         int dir = (MIDDLE+i)%3;
         memcpy(cardsInHand[dir],temp[i],sizeof(CardNode_t)*18);
         cardsNum[dir] = tempNum[i];
     }
     
-    DsMsgParser::_load(temp, tempNum, msg, 7);
+    DsMsgParser::_load(temp, tempNum, msg, 10);
     for(int i=0;i<PLAYER_NUM;i++) {
         int dir = (MIDDLE+i)%3;
         memcpy(river[dir],temp[i],sizeof(CardNode_t)*18);
@@ -197,11 +232,11 @@ int ReconnectResponse::Construct(const DsMsg &msg) {
 
     
     INT8U names[512] = {0};
-    msg.GetString(8,names);
+    msg.GetString(11,names);
     _split(name,names);
     
     INT8U images[512] = {0};
-    msg.GetString(9,images);
+    msg.GetString(12,images);
     _split(image,images);
 
     return 0;

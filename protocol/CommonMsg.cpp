@@ -4,7 +4,9 @@
 #include "./../utils/UtilBasic.h"
 #include "./../game/GameType.h"
 #include "./../network/NetMessenger.h"
+#include "./../network/KwxEnv.h"
 
+#include "SeatInfo.h"
 #include "MsgFormats.h"
 #include "CommonMsg.h"
 #include "DsInstruction.h"
@@ -144,6 +146,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_GAME_DIST_DAOJISHI:
             return new CounterNotif();
 
+        case REQ_GAME_SEND_RECONNECT:
+            return new ReconnectResponse();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }
@@ -250,7 +255,7 @@ int UsMsg::_add_utf16_string(Item_t id,const INT8U *hostString) {
     return 0;
 }
 
-#include "KwxMsgEnv.h"
+#include "./../network/KwxEnv.h"
 int UsMsg::AddSeatInfo() {
     INT32U roomPath = _htonl(_seatInfo->_roomPath);
     INT32U roomId   = _htonl(_seatInfo->_roomId);

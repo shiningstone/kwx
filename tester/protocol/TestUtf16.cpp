@@ -15,7 +15,7 @@ void test_1_byte() {
 
     len = Utf16ToUtf8(utf16,wcslen(utf16),utf8);
     assert(!strcmp(Utf8Exp,utf8));
-    assert(len==14);
+    assert(len==7);
 
     len = Utf8ToUtf16(utf8,utf16);
     assert(!wcscmp(Utf16Exp,utf16));
@@ -28,7 +28,7 @@ void test_2_bytes() {
     int len = 0;
 
 	char    Utf8Buf[4] = {0};
-	len = Utf16ToUtf8(Utf16Exp,3,Utf8Buf);
+	len = Utf16ToUtf8(Utf16Exp,2,Utf8Buf);
 	assert(!memcmp(Utf8Buf,Utf8Exp,4));
     assert(len==2);
 
@@ -44,9 +44,9 @@ void test_3_bytes() {
     int len = 0;
 
 	char    Utf8Buf[4] = {0};
-	len = Utf16ToUtf8(Utf16Exp,3,Utf8Buf);
+	len = Utf16ToUtf8(Utf16Exp,2,Utf8Buf);
 	assert(!memcmp(Utf8Buf,Utf8Exp,4));
-    assert(len==2);
+    assert(len==3);
 
 	wchar_t Utf16Buf[3] = {0};
 	len = Utf8ToUtf16(Utf8Exp,Utf16Buf);

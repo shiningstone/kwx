@@ -211,7 +211,6 @@ typedef struct _MingInfo_t {
 typedef unsigned int HuTarget_t;
 typedef unsigned int HuFan_t;
 
-
 typedef enum _RobotTarget_t {
 	SAME_TIAO,
 	SAME_TONG,
@@ -219,7 +218,6 @@ typedef enum _RobotTarget_t {
 	FOUR_PENG,
 	PI_HU
 }RobotTarget_t;
-
 
 #define DESC(x) { x,#x }
 

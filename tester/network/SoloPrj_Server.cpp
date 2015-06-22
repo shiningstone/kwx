@@ -334,9 +334,7 @@ void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
 
     static int handout = 0;
 
-    if(recvBuf[16]==REQ_LOGIN) {
-        return;
-    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
         SendLine(SERVER,1);
         SendLine(SERVER,2);
         SendLine(SERVER,3);
@@ -843,7 +841,11 @@ void round6_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,10);
         SendLine(SERVER,11);
         SendLine(SERVER,12);
-    } 
+    } else if(handout==3) {
+        handout++;
+        
+        SendLine(SERVER,13);
+    }
 }
 
 void right_actions_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
@@ -878,6 +880,134 @@ void right_actions_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } 
 }
 
+void reconnect_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 1;
+
+    if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+    } else if(handout==1) {
+        handout++;
+        SendLine(SERVER,8);
+    } else if(handout==2) {
+        handout++;
+        SendLine(SERVER,9);
+    } 
+}
+
+void lde_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_LOGIN) {
+        return;
+    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        handout++;
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+    } else if(handout==1) {
+        handout++;
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+    } else if(handout==2) {
+        handout++;
+        SendLine(SERVER,10);
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
+    } else if(handout==3) {
+        handout++;
+        for(int i=13;i<=23;i++) {
+            SendLine(SERVER,i);
+        }
+    } 
+}
+
+void le_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_LOGIN) {
+        return;
+    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        handout++;
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+    } else if(handout==1) {
+        handout++;
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+    } else if(handout==2) {
+        handout++;
+        SendLine(SERVER,10);
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
+    } else if(handout==3) {
+        handout++;
+        for(int i=13;i<=23;i++) {
+            SendLine(SERVER,i);
+        }
+    } 
+}
+
+void lr_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
+    char sendBuf[BUF_LEN] = {0};
+    int  sendLen = 0;
+
+    static int handout = 0;
+
+    if(recvBuf[16]==REQ_LOGIN) {
+        return;
+    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        SendLine(SERVER,1);
+        SendLine(SERVER,2);
+        SendLine(SERVER,3);
+        SendLine(SERVER,4);
+        SendLine(SERVER,5);
+    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+        handout++;
+        SendLine(SERVER,6);
+        SendLine(SERVER,7);
+    } else if(handout==1) {
+        handout++;
+        SendLine(SERVER,8);
+        SendLine(SERVER,9);
+    } else if(handout==2) {
+        handout++;
+        SendLine(SERVER,10);
+        SendLine(SERVER,11);
+        SendLine(SERVER,12);
+    } else if(handout==3) {
+        handout++;
+        for(int i=13;i<=23;i++) {
+            SendLine(SERVER,i);
+        }
+    } 
+}
 
 void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[BUF_LEN] = {0};
@@ -984,20 +1114,36 @@ void test_server_console() {
     SetFile("E0605_gang");
     gHandle = E0605_gang_handle_requests;
 
-    SetFile("Round5");/*竞争动作*/
-    gHandle = round5_handle_requests;
-
     SetFile("Round2");/*胡牌*/
     gHandle = round2_handle_requests;
-
-    SetFile("Round6");/*明牌*/
-    gHandle = round6_handle_requests;
 
     SetFile("temp");
     gHandle = temp_handle_requests;
 
+    SetFile("Round6");/*明牌*/
+    gHandle = round6_handle_requests;
+
+    SetFile("right_actions");/*明牌右碰杠胡*/
+    gHandle = right_actions_handle_requests;
+
+    SetFile("Round5");/*竞争动作*/
+    gHandle = round5_handle_requests;
+
+    SetFile("reconnect");
+    gHandle = reconnect_handle_requests;
+
     SetFile("Round1");/*基本操作*/
     gHandle = round1_handle_requests;
+
+    /* login test 需要取消IGNORE_LOGIN_REQUEST */
+    SetFile("login_dailylogin_enterroom");
+    gHandle = lde_handle_requests;
+
+    SetFile("login_enterroom");
+    gHandle = le_handle_requests;
+
+    SetFile("login_recoonect");
+    gHandle = lr_handle_requests;
 
     test_smart_game_round_x();
 #endif

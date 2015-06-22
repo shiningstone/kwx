@@ -6,8 +6,8 @@
 
 #include "RequestStructs.h"
 #include "CommonMsg.h"
+#include "SeatInfo.h"
 
-class SeatInfo;
 class NetRoundManager;
 /****************************************************
     DOWNSTREAM : Instruction structure
@@ -19,10 +19,13 @@ public:
     virtual void Show() const;
 
     RequestId_t      request;
+    FailureCode_t    failure;
+    SeatInfo_t       reconnectInfo;
 protected:
     DsInstruction();
     static SeatInfo *_seatInfo;
 
+    bool             _IsRejection(const DsMsg &msg);
     PlayerDir_t      _GetPlayer(INT8U seat);
 
     static int       _recvCnt;

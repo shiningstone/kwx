@@ -33,6 +33,27 @@ public:
     bool        _userActivated;
 };
 
+class RequestDailyLogin : public UsMsg {
+public:
+    int Set(Key_t key);
+};
+
+class DailyLoginResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+
+    bool        hasReward;
+    INT32U      continuousDays;
+    INT32U      dailyReward;
+    
+    INT8U       image[128];
+    INT8U       name[128];
+    INT32U      gold;
+    INT32U      coupon;
+    INT8U       friends;
+    INT8U       strangers;
+};
+
 class RequestEnterRoom : public UsMsg {
 public:
     int Set(int id=0);
@@ -86,8 +107,12 @@ class ReconnectResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
 
-    INT32U           baseScore;
+    INT8U            seatId;
     PlayerDir_t      curPlayer;
+    PlayerDir_t      zhuang;
+    INT32U           remains;
+    INT32U           count;
+    INT32U           baseScore;
     PlayerStatus_t   status[3];
     INT32U           score[3];
     INT8U            cardsNum[3];

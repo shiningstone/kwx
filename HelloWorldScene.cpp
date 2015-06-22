@@ -7,8 +7,10 @@ using namespace CocosDenshion;
 #include "game/RaceLayer.h"
 #include "protocol/CommonMsg.h"
 #include "protocol/DsInstruction.h"
-#include "protocol/KwxMessenger.h"
+#include "protocol/UsRequest.h"
 #include "protocol/KwxMsgLogin.h"
+#include "network/KwxEnv.h"
+#include "network/KwxMessenger.h"
 
 #include "utils/DebugCtrl.h"
 
@@ -362,19 +364,29 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 
    			aMessenger.StartReceiving();
     		aMessenger.Send(aReq);
+            
+            EnvVariable *env = EnvVariable::getInstance();
+            if(env->IsReconnectRequired()) {
+                auto scene = Scene::create();
+                RaceLayer *layer = RaceLayer::create();
+                scene->addChild(layer);
+                layer->CreateRace(NETWORK_GAME);
+                Director::getInstance()->replaceScene(scene);
+                return;
+            }
 #endif
-			bool ifAccountHaved=true;
-			if(!ifAccountHaved)
-			{
-				LogInWithAccount();
-			}
-			else
-			{
-				auto scene = Scene::create();
-				auto layer = IMLoad::create();
-				scene->addChild(layer);
-				Director::getInstance()->replaceScene(scene);
-			}
+            bool ifAccountHaved=true;
+            if(!ifAccountHaved)
+            {
+                LogInWithAccount();
+            }
+            else
+            {
+                auto scene = Scene::create();
+                auto layer = IMLoad::create();
+                scene->addChild(layer);
+                Director::getInstance()->replaceScene(scene);
+            }
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

@@ -5,9 +5,12 @@
 USING_NS_CC;
 
 #include "./../protocol/CommonMsg.h"
-#include "./../protocol/KwxMessenger.h"
 #include "./../protocol/DsInstruction.h"
 #include "./../protocol/KwxMsgLogin.h"
+#include "./../protocol/UsRequest.h"
+
+#include "./../network/KwxEnv.h"
+#include "./../network/KwxMessenger.h"
 
 #include "CardCollection.h"
 #include "Player.h"
@@ -18,7 +21,20 @@ USING_NS_CC;
 
 #include "./../utils/DebugCtrl.h"
 
+#define RETURN_IF_FAIL(x) do { \
+    if(x!=REQUEST_ACCEPTED) { \
+        HandleError(); \
+        return; \
+    } \
+} while(0)
 
+#define RETURN_VALUE_IF_FAIL(x,value) do { \
+    if(x!=REQUEST_ACCEPTED) { \
+        HandleError(); \
+        return value; \
+    } \
+} while(0)
+    
 NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 :RoundManager(uiManager) {
     _MODE = NETWORK_GAME;
@@ -41,6 +57,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     }
 
     _HandoutNotify = false;
+    _response = REQUEST_ACCEPTED;
 
     _messenger = new KwxMessenger(MSG_GAME);
     _logger = LOGGER_REGISTER("NetRoundManager");
@@ -72,8 +89,9 @@ void NetRoundManager::InitPlayers() {
 ****************************************/
 void NetRoundManager::HandleMsg(void * aMsg) {
     auto di = static_cast<DsInstruction *>(aMsg);
+    RequestId_t req = di->request;
 
-    switch(di->request) {
+    switch(req) {
         case REQ_GAME_SEND_START:
             _DiRecv((GameStartResponse *)di);
             break;
@@ -149,6 +167,44 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;
     }
+    
+    _messenger->Resume(req);
+}
+
+void NetRoundManager::RecordError(void *aError) {
+    DsInstruction *di = static_cast<DsInstruction *>(aError);
+
+    _response = di->failure;
+
+    if(_response==RECONNECT_REQUIRED) {
+        EnvVariable::getInstance()->SetReconnect(true);
+        SeatInfo::getInstance()->Set(di->reconnectInfo);
+    }
+
+    _messenger->Resume();
+
+    LOGGER_WRITE("%s (%d)",__FUNCTION__,_response);
+    delete di;
+}
+
+void NetRoundManager::HandleError() {
+    switch(_response) {
+        case RECONNECT_REQUIRED:
+            SendReconnect();
+            break;
+    }
+}
+
+void NetRoundManager::SendReconnect() {
+    LOGGER_WRITE("%s",__FUNCTION__);
+    _response = REQUEST_ACCEPTED;
+
+    RequestReconnect aReq;
+    aReq.Set();
+    _messenger->Send(aReq);
+    RETURN_IF_FAIL(_response);
+
+    _uiManager->reload();
 }
 
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
@@ -216,7 +272,7 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     RequestEnterRoom aReq;
     aReq.Set();
     _messenger->Send(aReq);
-    Wait(REQ_GAME_SEND_ENTER);
+    RETURN_IF_FAIL(_response);
 
     _uiManager->GuiPlayerShow(MIDDLE);
 }
@@ -227,18 +283,28 @@ void NetRoundManager::StartGame() {
     RequestGameStart aReq;
     aReq.Set();
     _messenger->Send(aReq);
+    RETURN_IF_FAIL(_response);
+}
+
+void NetRoundManager::StopGame() {
+	_isGameStart=false;
+    
+    RequestLeave aReq;
+    aReq.Set();
+    _messenger->Send(aReq);
+    RETURN_IF_FAIL(_response);
 }
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     Card_t kind = LastHandout();
-    bool actionPermit = false;
     
     if(dir==MIDDLE) {
+        _permited = false;
         _SendAction(aPENG,kind);
-        actionPermit = Wait(REQ_GAME_SEND_ACTION);
+        RETURN_VALUE_IF_FAIL(_response,CARD_UNKNOWN);
     }
 
-    if( dir==MIDDLE && !actionPermit ) {
+    if( dir==MIDDLE && !_permited ) {
         _uiManager->hide_action_tip(aPENG);
         return CARD_UNKNOWN;
     } else {
@@ -251,6 +317,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
     if(dir==MIDDLE) {
         _SendAction(aHU);
+        RETURN_IF_FAIL(_response);
     }
 }
 
@@ -264,7 +331,6 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     int*        gangIdx = new int[4];
     ActionId_t  action  = aNULL;
     Card_t      card;
-    bool        actionPermit = false;
 
     card = cards->_alter->get_activated_cards(gangIdx,&action);
     cards->_alter->clear();
@@ -272,11 +338,12 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     SetDecision(dir,action);
 
     if(dir==MIDDLE) {
+        _permited = false;
         _SendAction(_actCtrl.decision,card);
-        actionPermit = Wait(REQ_GAME_SEND_ACTION);
+        RETURN_VALUE_IF_FAIL(_response,CARD_UNKNOWN);
     }
 
-    if( dir==MIDDLE && !actionPermit ) {
+    if( dir==MIDDLE && !_permited ) {
         _uiManager->hide_action_tip(aGANG);
         return CARD_UNKNOWN;
     } else {
@@ -311,6 +378,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 
 void NetRoundManager::RecvQi() {
     _SendAction(aQi);
+    RETURN_IF_FAIL(_response);
     
     SetDecision(MIDDLE,aQi);
     _uiManager->QiEffect();
@@ -321,13 +389,17 @@ void NetRoundManager::_NotifyHandout() {
         _HandoutNotify = false;
         
         if(_actCtrl.choices && _actCtrl.decision==aQi) {
+            /*提前加入等待，以防接收过快导致等待状态判断错误*/
+            _messenger->WaitQueueAdd(REQ_GAME_DIST_DAOJISHI);
+
             _SendAction(aQi);
-            Wait(REQ_GAME_DIST_DAOJISHI);
+            RETURN_IF_FAIL(_response);
         }
         
         RequestShowCard aReq;
         aReq.Set(LastHandout());
         _messenger->Send(aReq);
+        RETURN_IF_FAIL(_response);
     }
 }
 
@@ -343,6 +415,8 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 		_isMingTime      = false;
 
         _SendAction(aMING_CONFIRM);
+        RETURN_IF_FAIL(_response);
+
         Wait(REQ_GAME_DIST_DECISION);
         Wait(REQ_GAME_DIST_DAOJISHI);
         
@@ -372,6 +446,7 @@ void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
 
     _SendAction(aKOU_CANCEL);
+    RETURN_IF_FAIL(_response);
 
     _uiManager->KouCancelEffect(aKOU,_players[MIDDLE]->_cards);
 }
@@ -390,12 +465,14 @@ void NetRoundManager::RecvKouConfirm() {
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->_alter->get_activated_kinds(kinds);
     _SendAction(aKOU,kindNum,kinds);
+    RETURN_IF_FAIL(_response);
 
     _uiManager->KouConfirmEffect();
 }
 
 void NetRoundManager::RecvMingCancel() {
     _SendAction(aMING_CANCEL);
+    RETURN_IF_FAIL(_response);
 
     UpdateCards(MIDDLE,(ARRAY_ACTION)aMING_CANCEL);/*BUG HERE???*/
     
@@ -423,6 +500,7 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
             _players[MIDDLE]->_strategy->scan_ming();
 
             _SendAction(aMING);
+            RETURN_IF_FAIL(_response);
             
             UpdateCards(MIDDLE,a_MING);
             _uiManager->QueryMingOutCard();
@@ -788,7 +866,10 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
             int len = info->hu[i].cardNum;
             
             _players[i]->refresh(info->hu[i].card, len-1, info->hu[i].fan);
-            _players[i]->_cards->push_back(&info->hu[i].card[len-1]);
+            
+            CardNode_t *last = new CardNode_t;
+            *last = info->hu[i].card[len-1];
+            _players[i]->_cards->push_back(last);
         } else {
             _players[i]->refresh(info->hu[i].card, info->hu[i].cardNum, info->hu[i].fan);
         }
@@ -867,6 +948,37 @@ void NetRoundManager::_DiRecv(TuoGuanNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(ReconnectResponse *info) {
+    _curPlayer = info->curPlayer;
+    _distributedNum = TOTAL_CARD_NUM - info->remains;
+
+    /*手牌*/
+    for(int i=0;i<PLAYER_NUM;i++) {
+        _players[i]->_river->clear();
+        for(int k=0;k<info->riverNum[i];k++) {
+            _players[i]->_river->push_back(info->river[i][k].kind);
+        }
+
+        _players[i]->_cards->refresh(info->cardsInHand[i],info->cardsNum[i]);
+        _players[i]->_cards->set_ming(CARD_UNKNOWN);
+    }
+
+    /*玩家信息*/
+    Database *data = Database::getInstance();
+    for(int i=0;i<PLAYER_NUM;i++) {
+        if(info->status[i]!=ABSENT) {
+            _players[i]->_isExist = true;
+
+            UserProfile_t profile = {0};
+            profile.property = info->score[i];
+            memcpy(profile.name,info->name[i],strlen((char *)info->name[i]));
+            data->get_local_image(profile.photo,(char *)info->image[i]);
+
+            _players[i]->Set(&profile);
+        }
+    }
+
+    SetWin(SINGLE_WIN,info->zhuang);
+    _uiManager->start_timer(info->count,(PlayerDir_t)_curPlayer);
 }
 
 void NetRoundManager::_DiRecv(ReconnectNotif *info) {

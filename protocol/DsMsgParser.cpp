@@ -1,6 +1,7 @@
 
 #include <string.h>
 
+#include "SeatInfo.h"
 #include "MsgFormats.h"
 #include "CommonMsg.h"
 #include "DsMsgParser.h"
@@ -215,6 +216,25 @@ int DsMsgParser::_load(Reminds_t &remind,const DsMsg &msg,int itemIdx) {
 
 int DsMsgParser::_unload(Reminds_t &remind) {
     _unload(remind.ming);
+    return 0;
+}
+
+int DsMsgParser::_load_seat_info(SeatInfo_t &info,const DsMsg &msg,int itemIdx) {
+    INT8U buf[128] = {0};
+    msg.GetString(itemIdx,buf);
+
+    char *num = strtok((char *)buf,",");
+    info.roomPath = stoi(num);
+
+    num = strtok(NULL,",");
+    info.roomId   = stoi(num);
+    
+    num = strtok(NULL,",");
+    info.tableId  = stoi(num);
+    
+    num = strtok(NULL,",");
+    info.seatId   = stoi(num);
+    
     return 0;
 }
 

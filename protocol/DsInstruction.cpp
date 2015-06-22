@@ -1,14 +1,15 @@
 
 #include <string.h>
 
+#include "./../network/KwxEnv.h"
+
 #include "MsgFormats.h"
 #include "DsInstruction.h"
 #include "DsMsgParser.h"
-#include "KwxMsgEnv.h"
 
 #ifndef __UNIT_TEST__
+#include "./../network/KwxMessenger.h"
 #include "./../game/RaceLayer.h"
-#include "./../protocol/KwxMessenger.h"
 #include "./../game/RoundManager.h"
 #include "./../game/NetRoundManager.h"
 #endif
@@ -29,18 +30,21 @@ DsInstruction::DsInstruction() {
 }
 
 int DsInstruction::Construct(const DsMsg &msg) {
-    request = msg.GetRequestCode();
-    return 0;
+   request = msg.GetRequestCode();
+    return _IsRejection(msg);
 }
 
 int DsInstruction::Dispatch() {
     Show();
     
     #ifndef __UNIT_TEST__
-    _delay(10);/*防止接收的包在等待函数之前就处理了*/
-    if(_roundManager->_messenger->IsWaiting()) {
-        _roundManager->HandleMsg(this);/*注意 : 非main线程，不能调用UI接口*/
-        _roundManager->_messenger->Resume(this->request);
+    _delay(100);/*防止接收的包在等待函数之前就处理了*/
+    if(_roundManager->_messenger->IsWaiting(this->request)) {
+        if(failure==REQUEST_ACCEPTED) {                            /*注意 : 非main线程，不能调用UI接口*/
+            _roundManager->HandleMsg(this);
+        } else {
+            _roundManager->RecordError(this);
+        }
     } else {
         _roundManager->RecvMsg(this);
     }
@@ -62,6 +66,46 @@ PlayerDir_t DsInstruction::_GetPlayer(INT8U seat) {
     } else {
         return dir;
     }
+}
+
+bool DsInstruction::_IsRejection(const DsMsg &msg) {
+    RequestId_t Responses[] = {
+        REQ_GAME_SEND_START,
+        REQ_GAME_SEND_SHOWCARD,
+        REQ_GAME_SEND_ACTION,
+        REQ_GAME_GET_TINGINFO,
+        REQ_GAME_SEND_ENTER,
+        REQ_LOGIN,
+        REQ_DAILY_LOGIN,
+        REQ_GAME_SEND_RECONNECT,
+        REQ_GAME_SEND_LEAVE_ROOM,
+        REQ_GAME_SEND_XIA_PIAO,
+        REQ_GAME_SEND_MSG,
+    };
+
+    RequestId_t req = (RequestId_t)msg._header->_requestCode;
+
+    for(int i=0;i<sizeof(Responses);i++) {
+        if(req==Responses[i]) {
+            if(msg._body->_items[0]->_id==60) {
+                failure = (FailureCode_t)msg.GetItemValue(0);
+
+                if(failure<DATAGRAM_ERROR) {
+                    failure = REQUEST_ACCEPTED;
+                    return false;
+                }
+
+                if(failure==RECONNECT_REQUIRED) {
+                    DsMsgParser::_load_seat_info(reconnectInfo,msg,1);
+                }
+                
+                return true;
+            }
+        }
+    }
+
+    failure = REQUEST_ACCEPTED;
+    return false;
 }
 
 /*****************************************************

@@ -102,6 +102,7 @@ public:
 
     virtual void CreateRace(RaceLayer *uiManager);
     virtual void StartGame();
+    virtual void StopGame();
     virtual void InitPlayers();
 
     void QiangGangHuJudge(PlayerDir_t target,Card_t kind);

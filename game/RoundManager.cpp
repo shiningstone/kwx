@@ -115,6 +115,9 @@ void RoundManager::StartGame() {
 	_uiManager->FirstRoundDistributeEffect((PlayerDir_t)lastWinner);//鐗屽眬寮�濮嬪彂鐗屾晥鏋溿�?
 }
 
+void RoundManager::StopGame() {
+
+}
 /***********************************************************
     玩家动作处理
 ***********************************************************/

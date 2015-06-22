@@ -105,6 +105,7 @@ class TestKwxAutoHandleMsg : public CTestMessenger {
         aMessenger.StartReceiving();
         Sleep(DELAY);
         aMessenger.StopReceiving();        //为了不影响后续的测试用例，是不是应该为TestCase增加Stop？
+        Sleep(DELAY);
     }
 };
 
@@ -170,7 +171,7 @@ class TestSendAction : public TestRequest {
         
         RequestSendAction aMsg;
         aMsg.Set(aPENG,TIAO_3);
-        aMessenger.Send(aMsg);
+        aMessenger.Send(aMsg,true);
 
         aMessenger.StopReceiving();
     }

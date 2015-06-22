@@ -1,12 +1,12 @@
 
 #include "./../../game/GameType.h"
-
+#include "./../../network/KwxEnv.h"
 #include "./../../protocol/RequestStructs.h"
 #include "./../../protocol/CommonMsg.h"
 #include "./../../protocol/DsInstruction.h"
-#include "./../../protocol/KwxMsgEnv.h"
-#include "./../../protocol/KwxMessenger.h"
+#include "./../../protocol/UsRequest.h"
 #include "./../../protocol/KwxMsgLogin.h"
+#include "./../../network/KwxMessenger.h"
 
 /********************************************************************
 	TestCases
@@ -875,6 +875,40 @@ public:
     }
 };
 
+class TestActionRsp_Reconnect : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,50,               //request code
+            7,                     //package level
+            0x00,28,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            2,
+            60,RECONNECT_REQUIRED, //error code:    1
+            131,0,16,0xfe,0xff,
+                0,0x31,0,',',0,0x33,0,',',0,0x35,0,',',0,0x37,         //roomPath:0x00010203
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        TingInfoResponse ting;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        ting.Construct(*aMsg);
+
+        assert(ting.failure==RECONNECT_REQUIRED);
+        assert(ting.reconnectInfo.roomPath==1);
+        assert(ting.reconnectInfo.roomId==3);
+        assert(ting.reconnectInfo.tableId==5);
+        assert(ting.reconnectInfo.seatId==7);
+        
+        return 0;
+    }
+};
+
 class TestRecvHuInfoNotif_MeWin : public CTestCase {
 public:
     virtual int Execute() {
@@ -1068,11 +1102,10 @@ public:
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,44,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
-            0x00,45,               //package size
+            0x00,38,               //package size
             0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
 
-            2,
-            132,0,4,1,2,3,4,         //KEY
+            1,
             131,0,4,0,0,0,11,         //roomPath
         };
         INT8U buf[MSG_MAX_LEN] = {0};
@@ -1350,40 +1383,112 @@ public:
     }
 };
 
-#include "./../../protocol/KwxMsgLogin.h"
-
-class TestLogin : public CTestCase {
+class TestRecvReconnectResponse : public CTestCase {
 public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x10,                  //protocol version
-            0x01,0x02,0x03,0x04,   //user id
-            0x05,                  //language id
-            0x06,                  //client platform
-            0x07,                  //client build number
-            0x08,0x09,             //customer id
-            0x0a,0x0b,             //product id
-            0x00,40,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
-            0x00,38,               //package size
-            0,0,0,0,0,0,0,0,0,0,0, //reserved(11)
+            0x00,42,               //request code
+            7,                     //package level
+            0x00,185,              //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            1,
-            131,0,4,1,2,3,4,         //userId
+            13,
+            61,1,                    //site:    1
+            62,2,                    //current player
+            63,3,                    //zhuang
+            129,0,4,0,0,0,1,         //剩余牌数
+            130,0,4,0,0,1,0,         //倒计时
+            131,0,4,0,0,0,1,         //底分 base score
+            132,0,3,1,1,1,           //player status
+            133,0,12,                //player score
+                0,0,0,100,
+                0,0,0,200,
+                0,0,0,300,
+            134,0x00,41,             //手牌
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x09,0x09,0x0a,0x0a,0xff,     /*MIDDLE 14*/
+                0x10,0x11,0x12,0x13,0x14,0x10,0x11,0x06,0x07,0x08,0x01,0x02,0x04,0xff,     /*RIGHT  13*/
+                0x10,0x11,0x12,0x13,0x14,0x10,0x11,0x06,0x07,0x08,0x01,0x02,0x04,          /*LEFT   13*/
+            135,0,3,0,0,0,           //明状态
+            136,0x00,5,              //出牌
+                0x01,0xff,
+                0x02,0xff,
+                0x03,     
+            137,0,36,                //名字
+                0xfe,0xff,0x00,0x6a,0x00,0x69,0x00,0x61,0x00,0x6e,0x00,0x67,0x00,0x62,0x00,0x6f,0,'@',0,'%',
+                0x00,0x6a,0x00,0x69,0x00,0x61,0,'@',0,'%',
+                0x00,0x6e,0x00,0x67,0x00,0x62,
+            138,0,16,                //头像
+                0xfe,0xff,0x00,0x31,0,'@',0,'%',
+                0x00,0x31,0,'@',0,'%',
+                0x00,0x31,
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
-        RequestLogin aMsg;
-        aMsg.Set();
-        len = aMsg.Serialize(buf);
+        DsMsg *aMsg = DsMsg::getInstance();
+        ReconnectResponse info;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        info.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
-        assert(!memcmp(buf,msgInNetwork,len));
-
+        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_RECONNECT );
+        assert( aMsg->GetLevel()==7 );
+        
         return 0;
     }
 };
+
+class TestRecvLoginResponse_Normal : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,44,               //request code
+            7,                     //package level
+            0x00,90,               //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            9,
+            131,0,4,0,1,2,3,         //roomPath:0x00010203
+            132,0,4,4,5,6,7,         //roomId:  0x04050607
+            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
+            60,1,                    //site:    1
+            134,0,4,0,0,0,1,         //底分 base score
+            135,0,3,1,1,1,           //player status
+            136,0,12,                //player score
+                0,0,0,100,
+                0,0,0,200,
+                0,0,0,300,
+            137,0,6,0,1,0,2,0,0,           //player name, UTF-16
+            138,0,6,0,1,0,2,0,0            //player image, UTF-16
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        EnterRoomResponse room;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        room.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ENTER );
+        assert( aMsg->GetLevel()==7 );
+
+        SeatInfo *seat = SeatInfo::getInstance();
+        assert(seat->_roomPath==0x00010203);
+        assert(seat->_roomId==0x04050607);
+        assert(seat->_tableId==0x08090a0b);
+        assert(seat->_seatId==1);
+        
+        return 0;
+    }
+};
+
+
+#include "./../../protocol/KwxMsgLogin.h"
 
 void testOtherRequests() {
 	CTestCase *aCase;
@@ -1408,10 +1513,15 @@ void testOtherRequests() {
     
     aCase = new TestHeartBeat();
     aCase->Execute();
-#if 0
-    aCase = new TestLogin();
+
+    aCase = new TestActionRsp_Reconnect();
     aCase->Execute();
-#endif
+
+    aCase = new TestRecvReconnectResponse();
+    aCase->Execute();
+
+    aCase = new TestRecvLoginResponse_Normal();
+    aCase->Execute();
 }
 
 void testRequests() {

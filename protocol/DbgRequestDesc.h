@@ -12,11 +12,18 @@
         char        desc[32];
     }RequestDesc;
 
+    typedef struct _ErrDesc {
+        FailureCode_t id;
+        char          desc[32];
+    }ErrDesc;
+
     extern char *DescReq(RequestId_t id);
+    extern char *DescErr(FailureCode_t id);
 
 #else
 
     char *DescReq(RequestId_t id);
+    char *DescErr(FailureCode_t id);
 
 #endif
 

@@ -1,5 +1,5 @@
 #include "game/RaceLayer.h"
-#include "protocol/KwxMsgEnv.h"
+#include "network/KwxEnv.h"
 
 #include "BuDaiPiaoLayer.h"
 
