@@ -1,5 +1,4 @@
 #include "./../network/CSockets.h"
-#include "./../network/GameSocket.h"
 
 class CTestCase {
 public:

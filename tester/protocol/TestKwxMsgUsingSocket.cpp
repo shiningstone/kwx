@@ -5,13 +5,11 @@
 
 #include "./../../protocol/MsgFormats.h"
 #include "./../../protocol/CommonMsg.h"
-#include "./../../protocol/KwxMessenger.h"
 #include "./../../protocol/DsInstruction.h"
+#include "./../../protocol/UsRequest.h"
 #include "./../../protocol/KwxMsgLogin.h"
-
+#include "./../../network/KwxMessenger.h"
 #include "./../../network/CSockets.h"
-#include "./../../network/GameSocket.h"
-
 #include "./../network/CTestSocket.h"
 
 #define LOCAL_SERVER     "127.0.0.1"
@@ -201,7 +199,7 @@ static void testAutoRecv() {
 	aCase->Stop();
 }
 
-#include "./../../protocol/KwxMessenger.h"
+#include "./../../network/KwxMessenger.h"
 class TestHeartBeatOnce : public TestRequest {
 	virtual void ServerActions() {
         INT8U MESSAGE[] = {

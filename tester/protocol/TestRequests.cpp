@@ -1477,12 +1477,6 @@ public:
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ENTER );
         assert( aMsg->GetLevel()==7 );
 
-        SeatInfo *seat = SeatInfo::getInstance();
-        assert(seat->_roomPath==0x00010203);
-        assert(seat->_roomId==0x04050607);
-        assert(seat->_tableId==0x08090a0b);
-        assert(seat->_seatId==1);
-        
         return 0;
     }
 };
