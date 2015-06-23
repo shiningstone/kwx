@@ -5,7 +5,6 @@
 #include "./../CTestCase.h"
 
 #include "./../../network/CSockets.h"
-#include "./../../network/GameSocket.h"
 
 #define DELAY 100
 
@@ -25,7 +24,6 @@ public:
 protected:
 	ServerSocket SERVER;
 	ClientSocket CLIENT;
-	CGameSocket  GAME_CLIENT;
 
 	virtual void ServerActions() = 0;
 	virtual void ClientActions() = 0;

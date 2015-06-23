@@ -1447,35 +1447,44 @@ public:
             'K','W','X',           //KWX
             0x00,44,               //request code
             7,                     //package level
-            0x00,90,               //package size
+            0x00,88,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
-            9,
-            131,0,4,0,1,2,3,         //roomPath:0x00010203
-            132,0,4,4,5,6,7,         //roomId:  0x04050607
-            133,0,4,8,9,10,11,       //tableId: 0x08090a0b
-            60,1,                    //site:    1
-            134,0,4,0,0,0,1,         //µ×·Ö base score
-            135,0,3,1,1,1,           //player status
-            136,0,12,                //player score
-                0,0,0,100,
-                0,0,0,200,
-                0,0,0,300,
-            137,0,6,0,1,0,2,0,0,           //player name, UTF-16
-            138,0,6,0,1,0,2,0,0            //player image, UTF-16
+            10,
+            60,0,                    //status
+            61,0,                    //user type
+            62,0,                    //user activated
+            129,0,4,0,0,0,0,         //reconnect info
+            130,0,4,0,0,0,1,         //user id
+            131,0,4,0,0,0,2,         //key
+            135,0,4,0,0,0,3,         //room server id
+            136,0,16,                //room server ip
+                0xfe,0xff,0,'1',0,'.',0,'2',0,'.',0,'3',0,'.',0,'4',
+            137,0,4,0,0,0,5,         //room server port
+            138,0,4,0,0,0,6,         //room server voice port
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
 
         DsMsg *aMsg = DsMsg::getInstance();
-        EnterRoomResponse room;
+        LoginResponse login;
 
         len = aMsg->Deserialize(msgInNetwork);
-        room.Construct(*aMsg);
+        login.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ENTER );
         assert( aMsg->GetLevel()==7 );
+
+        assert(login._userType==0);
+        assert(login._userActivated==0);
+
+        EnvVariable *env = EnvVariable::getInstance();
+        assert(env->_key==2);
+        assert(env->_roomServer.id==3);
+        assert(env->_roomServer.port==5);
+        assert(env->_roomServer.voicePort==6);
+        //assert(!strcmp(env->_roomServer.ipaddr,"1.2.3.4"));
 
         return 0;
     }
