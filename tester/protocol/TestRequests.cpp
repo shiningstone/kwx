@@ -1484,8 +1484,71 @@ public:
         assert(env->_roomServer.id==3);
         assert(env->_roomServer.port==5);
         assert(env->_roomServer.voicePort==6);
-        //assert(!strcmp(env->_roomServer.ipaddr,"1.2.3.4"));
+        //IP of server is controlled by NETWORK_GAME_DEBUG
+        //assert(!strcmp(env->_roomServer.ipaddr,"1.2.3.4")); 
+        assert(!env->IsReconnectRequired());
 
+        return 0;
+    }
+};
+
+class TestRecvLoginResponse_Reconnect : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,44,               //request code
+            7,                     //package level
+            0x00,104,              //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            10,
+            60,0,                    //status
+            61,0,                    //user type
+            62,0,                    //user activated
+            129,0,20,                //reconnect info
+                0,0,0,1,         
+                0,0,0,1,         
+                0,0,0,2,         
+                0,0,0,3,         
+                0,0,0,4,         
+            130,0,4,0,0,0,1,         //user id
+            131,0,4,0,0,0,2,         //key
+            135,0,4,0,0,0,3,         //room server id
+            136,0,16,                //room server ip
+                0xfe,0xff,0,'1',0,'.',0,'2',0,'.',0,'3',0,'.',0,'4',
+            137,0,4,0,0,0,5,         //room server port
+            138,0,4,0,0,0,6,         //room server voice port
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        LoginResponse login;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        login.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ENTER );
+        assert( aMsg->GetLevel()==7 );
+
+        assert(login._userType==0);
+        assert(login._userActivated==0);
+
+        EnvVariable *env = EnvVariable::getInstance();
+        assert(env->_key==2);
+        assert(env->_roomServer.id==3);
+        assert(env->_roomServer.port==5);
+        assert(env->_roomServer.voicePort==6);
+        assert(env->IsReconnectRequired());
+
+        SeatInfo *seat = SeatInfo::getInstance();
+        assert(seat->_roomPath==1);
+        assert(seat->_roomId==2);
+        assert(seat->_tableId==3);
+        assert(seat->_seatId==4);
+        
         return 0;
     }
 };
@@ -1524,6 +1587,9 @@ void testOtherRequests() {
     aCase->Execute();
 
     aCase = new TestRecvLoginResponse_Normal();
+    aCase->Execute();
+
+    aCase = new TestRecvLoginResponse_Reconnect();
     aCase->Execute();
 }
 

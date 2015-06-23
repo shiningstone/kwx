@@ -28,6 +28,7 @@ public:
 private:
     friend class TestRecvEnterResponse;
     friend class TestRecvReconnectResponse;
+    friend class TestRecvLoginResponse_Reconnect;
     
     RoomPath_t _roomPath;
     RoomId_t   _roomId;

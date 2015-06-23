@@ -65,10 +65,10 @@ int LoginResponse::Construct(const DsMsg &msg) {
     _userActivated     = (msg.GetItemValue(2)==1);
 
     if(msg._body->_items[3]->_bufLen/4 > 1) {/* reconnect required */
-        INT32U roomPath = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[4]);
-        INT32U roomId   = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[8]);
-        INT32U tableId  = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[12]);
-        INT32U seatId   = _ntohl(*(INT32U *)msg._body->_items[3]->_buf[16]);
+        INT32U roomPath = _ntohl(*(INT32U *)(msg._body->_items[3]->_buf+4));
+        INT32U roomId   = _ntohl(*(INT32U *)(msg._body->_items[3]->_buf+8));
+        INT32U tableId  = _ntohl(*(INT32U *)(msg._body->_items[3]->_buf+12));
+        INT32U seatId   = _ntohl(*(INT32U *)(msg._body->_items[3]->_buf+16));
 
         SeatInfo::getInstance()->Set(roomPath,roomId,tableId,seatId);
         env->SetReconnect(true);
