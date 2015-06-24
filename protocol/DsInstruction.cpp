@@ -39,7 +39,7 @@ int DsInstruction::Dispatch() {
     
     #ifndef __UNIT_TEST__
     _delay(100);/*防止接收的包在等待函数之前就处理了*/
-    if(_roundManager->_messenger->IsWaiting(this->request)) {
+    if(KwxMessenger::IsWaiting(this->request)) {
         if(failure==REQUEST_ACCEPTED) {                            /*注意 : 非main线程，不能调用UI接口*/
             _roundManager->HandleMsg(this);
         } else {

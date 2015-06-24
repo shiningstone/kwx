@@ -163,6 +163,11 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             _DiRecv((ReconnectNotif *)di);
             break;
 
+        case REQ_LOGIN:
+            break;
+        case REQ_DAILY_LOGIN:
+            break;
+
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
             break;

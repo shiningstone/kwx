@@ -30,16 +30,16 @@ public:
 
     int Send(UsMsg &aMsg,bool ignoreRsp=false);/* why cannot declare as const UsMsg??? */
 
-    bool IsWaiting(RequestId_t req = REQ_INVALID) const;
-    bool Wait(RequestId_t req);
-    void Resume(RequestId_t req = REQ_INVALID);
-    void WaitQueueAdd(RequestId_t req);
+    static bool IsWaiting(RequestId_t req = REQ_INVALID);
+    static bool Wait(RequestId_t req);
+    static void Resume(RequestId_t req = REQ_INVALID);
+    static void WaitQueueAdd(RequestId_t req);
 private:
     /* wait queue for specified request, which will be handled in Non-main process */
     static const int MAX_WAIT_NUM = 4;
 
-    std::vector<RequestId_t> _waitQueue;
-    int WaitQueueFind(RequestId_t req) const;
+    static std::vector<RequestId_t> _waitQueue;
+    static int WaitQueueFind(RequestId_t req);
 
     friend class TestKwxAutoRecv;
     void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.

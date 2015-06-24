@@ -14,6 +14,7 @@
 #endif
 
 static int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len);
+std::vector<RequestId_t> KwxMessenger::_waitQueue;
 
 Logger       *KwxMessenger::_logger = 0;
 
@@ -87,7 +88,7 @@ void KwxMessenger::WaitQueueAdd(RequestId_t req) {
     _waitQueue.push_back(req);
 }
 
-int KwxMessenger::WaitQueueFind(RequestId_t req) const {
+int KwxMessenger::WaitQueueFind(RequestId_t req) {
     for(int i=0;i<_waitQueue.size();i++) {
         if(_waitQueue.at(i)==req) {
             return i;
@@ -97,7 +98,7 @@ int KwxMessenger::WaitQueueFind(RequestId_t req) const {
     return INVALID;
 }
 
-bool KwxMessenger::IsWaiting(RequestId_t req) const {
+bool KwxMessenger::IsWaiting(RequestId_t req) {
     if(req==REQ_INVALID) {
         return (_waitQueue.size()>0);
     }
