@@ -33,10 +33,7 @@ KwxMessenger::KwxMessenger(MsgType_t type) {
             break;
     }
     
-    _waitNum = 0;
-    for(int i=0;i<MAX_WAIT_NUM;i++) {
-        _waitQueue[i] = REQ_INVALID;
-    }
+	_waitQueue.clear();
 
     #if 0/*如果要用StartReceiving，不能调用Start*/
     Start((char *)_serverIp,_port);
@@ -87,56 +84,44 @@ int KwxMessenger::Send(UsMsg &aMsg, bool ignoreRsp) {
 }
 
 void KwxMessenger::WaitQueueAdd(RequestId_t req) {
-    _waitQueue[_waitNum++] = req;
+    _waitQueue.push_back(req);
 }
 
-void KwxMessenger::WaitQueueDel(RequestId_t req) {
-    for(int i=0;i<_waitNum;i++) {
-        if(_waitQueue[i]==req) {
-            for(int j=i;j<_waitNum;j++) {
-                _waitQueue[j] = _waitQueue[j+1];
-            }
+int KwxMessenger::WaitQueueFind(RequestId_t req) const {
+    for(int i=0;i<_waitQueue.size();i++) {
+        if(_waitQueue.at(i)==req) {
+            return i;
         }
     }
 
-    _waitNum--;
+    return INVALID;
 }
 
 bool KwxMessenger::IsWaiting(RequestId_t req) const {
     if(req==REQ_INVALID) {
-        return (_waitNum>0);
+        return (_waitQueue.size()>0);
     }
     
-    for(int i=0;i<_waitNum;i++) {
-        if(_waitQueue[i]==req) {
-            return true;
-        }
-    }
-
-    return false;
+    return (WaitQueueFind(req)!=INVALID);
 }
 
 bool KwxMessenger::Wait(RequestId_t req) {
     WaitQueueAdd(req);
     
-    while(_waitNum>0) {/*BUG : resume only all wait req are handled*/
+    while(_waitQueue.size()>0) {/*BUG : resume only all wait req are handled*/
         _delay(100);
     }
 
     return true;
 }
 
-void KwxMessenger::Resume() {
-    for(int i=0;i<_waitNum;i++) {
-        _waitQueue[i] = REQ_INVALID;
-    }
-
-    _waitNum = 0;
-}
-
 void KwxMessenger::Resume(RequestId_t req) {
-    if(IsWaiting(req)) {
-        WaitQueueDel(req);
+    int pos = WaitQueueFind(req);
+    
+    if(pos!=INVALID) {
+        _waitQueue.erase(_waitQueue.begin()+pos);
+    } else {
+        _waitQueue.clear();
     }
 }
 

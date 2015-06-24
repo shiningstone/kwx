@@ -2,6 +2,9 @@
 #ifndef __KWX_MESSENGER_H__
 #define __KWX_MESSENGER_H__
 
+#include <vector>
+using namespace std;
+
 #include "./../utils/UtilBasic.h"
 #include "./../utils/LogManager.h"
 #include "./../game/GameType.h"
@@ -29,16 +32,14 @@ public:
 
     bool IsWaiting(RequestId_t req = REQ_INVALID) const;
     bool Wait(RequestId_t req);
-    void Resume();
-    void Resume(RequestId_t req);
+    void Resume(RequestId_t req = REQ_INVALID);
     void WaitQueueAdd(RequestId_t req);
-    void WaitQueueDel(RequestId_t req);
 private:
     /* wait queue for specified request, which will be handled in Non-main process */
     static const int MAX_WAIT_NUM = 4;
 
-    RequestId_t _waitQueue[MAX_WAIT_NUM];
-    int         _waitNum;
+    std::vector<RequestId_t> _waitQueue;
+    int WaitQueueFind(RequestId_t req) const;
 
     friend class TestKwxAutoRecv;
     void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
