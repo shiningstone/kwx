@@ -12,6 +12,20 @@
 		get from OTHER MODULES or set to a CONST VALUE, 
 		while they are set to keep accordance with test cases during unit test
 ********************************************************************************/
+    
+typedef struct {
+    bool        hasReward;
+    INT32U      continuousDays;
+    INT32U      dailyReward;
+    
+    INT8U       image[128];
+    INT8U       name[128];
+    INT32U      gold;
+    INT32U      coupon;
+    INT8U       friends;
+    INT8U       strangers;
+}DataDailyLogin_t;
+
 class EnvVariable {
 public:
 	static EnvVariable *getInstance();
@@ -41,7 +55,8 @@ public:
     
     Server_t     _loginServer;
     Server_t     _roomServer;
-    
+
+    DataDailyLogin_t _dailyLogin;
 private:
 	EnvVariable();
 	static EnvVariable *_instance;

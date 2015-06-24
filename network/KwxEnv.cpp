@@ -87,6 +87,8 @@ EnvVariable::EnvVariable() {
     RoomServerInit(0);
     
     _get_device_info(_device);
+
+    memset(&_dailyLogin,0,sizeof(_dailyLogin));
 }
 
 void EnvVariable::SetReconnect(bool flag) {

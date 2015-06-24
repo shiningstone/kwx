@@ -98,20 +98,24 @@ int RequestDailyLogin::Set(Key_t key) {
 }
 
 int DailyLoginResponse::Construct(const DsMsg &msg) {
+    DataDailyLogin_t *info = &(EnvVariable::getInstance()->_dailyLogin);
+    memset(info,0,sizeof(DataDailyLogin_t));
+    
     DsInstruction::Construct(msg);
-        
+
     if(msg._body->_items[0]->_bufLen==4) {
-        hasReward = false;
+        info->hasReward = false;
     } else {
-        hasReward = true;
-        continuousDays = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+4));
-        dailyReward    = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+8));
+        info->hasReward = true;
+        info->continuousDays = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+4));
+        info->dailyReward    = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+8));
     }
     
-    msg.GetString(1, name);
-    msg.GetString(2, image);
-    gold   = msg.GetItemValue(3);
-    coupon = msg.GetItemValue(4);
+    msg.GetString(1, info->name);
+    msg.GetString(2, info->image);
+    
+    info->gold   = msg.GetItemValue(3);
+    info->coupon = msg.GetItemValue(4);
 
     return 0;
 }
