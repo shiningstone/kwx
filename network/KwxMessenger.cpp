@@ -132,3 +132,18 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 	return 0;
 }
 
+KwxMessenger *KwxMessenger::_instances[MSG_TYPE_MAX] = {0};
+KwxMessenger *KwxMessenger::getInstance(MsgType_t type) {
+    if(!_instances[type]) {
+        _instances[type] = new KwxMessenger(type);
+    }
+
+    return _instances[type];
+}
+
+void KwxMessenger::destroyInstances() {
+    for(int i=0;i<MSG_TYPE_MAX;i++) {
+        delete _instances[i];
+        _instances[i] = NULL;
+    }
+}

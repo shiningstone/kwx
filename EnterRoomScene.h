@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"
+#include "LoginType.h"
+
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
@@ -13,6 +15,7 @@ class EnterRoom : public cocos2d::Layer
 {
 public:
 	EnterRoom();
+	EnterRoom(MainLayer_myInfo myInfo,Friend_Info friendList[],OtherPlayers_Info NearbyPlayers[],OtherPlayers_Info Stranger[]);
 	virtual ~EnterRoom();
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
@@ -24,11 +27,12 @@ public:
 #define THIS_FRIEND_CHAT_BKG		1
 #define THIS_MYFEIEND_BUTTON		2
 #define THIS_NEARPEOPLE_BUTTON		3
-#define	THIS_FRIEND_SCROLLVIEW		4
-#define	THIS_NEARLY_SCROLLVIEW		5
-#define THIS_GET_DAYGOLD_BKG		6
-#define RANKSCROLL_LAYER			7
-#define CREATE_ROLE_LAYER			8
+#define THIS_STRANGERS_BUTTON		4
+#define	THIS_FRIEND_SCROLLVIEW		5
+#define	THIS_NEARLY_SCROLLVIEW		6
+#define THIS_GET_DAYGOLD_BKG		7
+#define RANKSCROLL_LAYER			8
+#define CREATE_ROLE_LAYER			9
 
 #define LABEL_FOR_PLAYERNAME		8
 #define LABEL_FOR_GOLD				9

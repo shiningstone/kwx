@@ -2,9 +2,13 @@
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"	
+
+#include "Game/GameType.h"
+
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace cocos2d::ui;
+
 class MyInfoScene :
 	public Scene
 {
@@ -14,7 +18,7 @@ public:
 #define MY_MESSAGE_BUTT			3
 #define SYSTEM_MES_BUTT			4
 #define CURENT_UI_LAYER			5
-	MyInfoScene(void);
+	MyInfoScene();
 	~MyInfoScene(void);
 
 	Size visiableSize;

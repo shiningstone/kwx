@@ -621,7 +621,7 @@ void EnterRoom::FriendAndStrangers()//photo sex name Lv score
 		NearPeopel->addChild(FriendBar,1);
 	}
 
-	auto CharRecord=Button::create("Friends_friendRankBtn.png","Friends_friendBtnSel.png","Friends_friendRankBtn.png",UI_TEX_TYPE_PLIST);
+	auto CharRecord=Button::create("Myfriend.png","Myfriend_sel.png","Myfriend_sel.png",UI_TEX_TYPE_PLIST);
 	CharRecord->setAnchorPoint(Vec2(0.5,0.5));
 	CharRecord->setPosition(Vec2(visibleSize.width*0.118396,visibleSize.height*0.6676));
 	CharRecord->addTouchEventListener(CC_CALLBACK_2(EnterRoom::MyFriendCallBack,this));
@@ -631,19 +631,30 @@ void EnterRoom::FriendAndStrangers()//photo sex name Lv score
 	this->addChild(CharRecord,2,THIS_MYFEIEND_BUTTON);
 	auto CharRecordAction=EaseBounceIn::create(Sequence::create(DelayTime::create(0.5),ScaleTo::create(0.3,1),NULL));
 	CharRecord->runAction(CharRecordAction);
-	auto CommonLanguage=Button::create("Friends_friendRankBtn.png","Friends_friendBtnSel.png","Friends_friendRankBtn.png",UI_TEX_TYPE_PLIST);
-	CommonLanguage->setAnchorPoint(Vec2(0.5,0.5));
-	CommonLanguage->setPosition(Vec2(visibleSize.width*0.241549,visibleSize.height*0.6676));
-	CommonLanguage->addTouchEventListener(CC_CALLBACK_2(EnterRoom::NearPersonCallBack,this));
-	CommonLanguage->setScale(0,1);
-	this->addChild(CommonLanguage,2,THIS_NEARPEOPLE_BUTTON);
-	auto CommonLanguageAction=EaseBounceIn::create(Sequence::create(DelayTime::create(0.5),ScaleTo::create(0.3,1),NULL));
-	CommonLanguage->runAction(CommonLanguageAction);
+
+	auto nearlyBtn=Button::create("Near_the_game player.png","Near_the_game player_sel.png","Near_the_game player_sel.png",UI_TEX_TYPE_PLIST);
+	nearlyBtn->setAnchorPoint(Vec2(0.5,0.5));
+	nearlyBtn->setPosition(Vec2(visibleSize.width*0.241549,visibleSize.height*0.6676));
+	nearlyBtn->addTouchEventListener(CC_CALLBACK_2(EnterRoom::NearPersonCallBack,this));
+	nearlyBtn->setScale(0,1);
+	this->addChild(nearlyBtn,2,THIS_NEARPEOPLE_BUTTON);
+	auto nearlyBtnAction=EaseBounceIn::create(Sequence::create(DelayTime::create(0.5),ScaleTo::create(0.3,1),NULL));
+	nearlyBtn->runAction(nearlyBtnAction);
+
+	auto strangerBtn=Button::create("Stranger.png","Stranger_sel.png","Stranger_sel.png",UI_TEX_TYPE_PLIST);
+	strangerBtn->setAnchorPoint(Vec2(0.5,0.5));
+	strangerBtn->setPosition(Vec2(visibleSize.width*0.364702,visibleSize.height*0.6676));
+	strangerBtn->addTouchEventListener(CC_CALLBACK_2(EnterRoom::NearPersonCallBack,this));
+	strangerBtn->setScale(0,1);
+	this->addChild(strangerBtn,2,THIS_STRANGERS_BUTTON);
+	auto strangerBtnAction=EaseBounceIn::create(Sequence::create(DelayTime::create(0.5),ScaleTo::create(0.3,1),NULL));
+	strangerBtn->runAction(strangerBtnAction);
 
 	auto FriendBKup=Sprite::createWithSpriteFrameName("Friends_reelHead.png");
 	FriendBKup->setAnchorPoint(Vec2(0.5,0.5));
 	FriendBKup->setPosition(Vec2(origin.x+visibleSize.width*0.29-2,origin.y+visibleSize.height*0.73-4));
 	this->addChild(FriendBKup,3);
+
 	auto FriendBKdown=Sprite::createWithSpriteFrameName("Friends_reelfoot.png");
 	FriendBKdown->setAnchorPoint(Vec2(0.5,0));
 	FriendBKdown->setPosition(Vec2(origin.x+visibleSize.width*0.29-2,origin.y+visibleSize.height*0.73-4-FriendBKdown->getTextureRect().size.height/2));
@@ -651,15 +662,10 @@ void EnterRoom::FriendAndStrangers()//photo sex name Lv score
 	auto DownAction=EaseIn::create(Sequence::create(DelayTime::create(0.1),MoveTo::create(0.4,Vec2(origin.x+visibleSize.width*0.29-2,7)),NULL),5);
 	FriendBKdown->runAction(DownAction);
 }
-//void EnterRoom::addRes()
-//{
-	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("ChatImg.plist");
-	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("FriendsImage.plist");
-	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("selectGameAndScene.plist");
-	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
-//}
+
 void EnterRoom::createRole()
 {
+
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
 
 	auto createRoleBkg=Sprite::create("Createrolebj.png");
@@ -683,10 +689,8 @@ void EnterRoom::createRole()
 	SwallowListener->onTouchEnded=[=](Touch* touch, Event* event){};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(SwallowListener,SwallowLayer);
 
-
-
-
 }
+
 bool EnterRoom::init()
 {
 	if(!Layer::init())
@@ -718,11 +722,11 @@ bool EnterRoom::init()
 	FriendAndStrangers();//好友列表
 	competeButtons();//比赛按钮
 	/////////////////////////////////////////////////////////////////////
-#ifndef NETWORK_GAME_DEBUG
+//#ifndef NETWORK_GAME_DEBUG
 	ifDayAwardGetted=false;
 	if(!ifDayAwardGetted)
 		call_gold_prize();
-#endif
+//#endif
 
 	return true;
 }

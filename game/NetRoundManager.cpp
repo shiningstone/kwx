@@ -52,14 +52,12 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 	}
     _distributedNum = 0;
 
-    for(int i=0;i<PLAYER_NUM;i++) {
-        _players[i] = NULL;
-    }
+    InitPlayers();
 
     _HandoutNotify = false;
     _response = REQUEST_ACCEPTED;
 
-    _messenger = new KwxMessenger(MSG_GAME);
+    _messenger = KwxMessenger::getInstance(MSG_GAME);
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
 
@@ -69,7 +67,6 @@ NetRoundManager::~NetRoundManager() {
         delete _players[i];
     }
 
-    delete _messenger;
     LOGGER_DEREGISTER(_logger);
 }
 
@@ -269,26 +266,36 @@ void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
 ****************************************/
 void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     _uiManager = uiManager;
-    InitPlayers();
 	_isGameStart=false;
 
     _messenger->StartReceiving();
     
-    RequestEnterRoom aReq;
-    aReq.Set();
-    _messenger->Send(aReq);
-    RETURN_IF_FAIL(_response);
+    EnvVariable *env = EnvVariable::getInstance();
+    if(env->IsReconnectRequired()) {
+		_uiManager->StartGame();
+    } else {
+        RequestEnterRoom aReq;
+        aReq.Set();
+        _messenger->Send(aReq);
+        RETURN_IF_FAIL(_response);
 
-    _uiManager->GuiPlayerShow(MIDDLE);
+        _uiManager->GuiPlayerShow(MIDDLE);
+    }
 }
 
 void NetRoundManager::StartGame() {
-	_isGameStart=false;
-    
-    RequestGameStart aReq;
-    aReq.Set();
-    _messenger->Send(aReq);
-    RETURN_IF_FAIL(_response);
+    EnvVariable *env = EnvVariable::getInstance();
+    if(env->IsReconnectRequired()) {
+        env->SetReconnect(false);
+        _uiManager->reload();
+    } else {
+        _isGameStart=false;
+        
+        RequestGameStart aReq;
+        aReq.Set();
+        _messenger->Send(aReq);
+        RETURN_IF_FAIL(_response);
+    }
 }
 
 void NetRoundManager::StopGame() {
@@ -964,7 +971,7 @@ void NetRoundManager::_DiRecv(ReconnectResponse *info) {
         }
 
         _players[i]->_cards->refresh(info->cardsInHand[i],info->cardsNum[i]);
-        _players[i]->_cards->set_ming(CARD_UNKNOWN);
+        //_players[i]->_cards->set_ming(CARD_UNKNOWN);
     }
 
     /*Íæ¼ÒÐÅÏ¢*/
@@ -983,7 +990,9 @@ void NetRoundManager::_DiRecv(ReconnectResponse *info) {
     }
 
     SetWin(SINGLE_WIN,info->zhuang);
-    _uiManager->start_timer(info->count,(PlayerDir_t)_curPlayer);
+    if(_uiManager) {
+        _uiManager->start_timer(info->count,(PlayerDir_t)_curPlayer);
+    }
 }
 
 void NetRoundManager::_DiRecv(ReconnectNotif *info) {

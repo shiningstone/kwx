@@ -911,32 +911,12 @@ void lde_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     static int handout = 0;
 
     if(recvBuf[16]==REQ_LOGIN) {
-        return;
-    } else if(recvBuf[16]==REQ_GAME_SEND_ENTER) {
+        handout++;
         SendLine(SERVER,1);
+    } else if(recvBuf[16]==REQ_GAME_SEND_RECONNECT) {
+        handout++;
         SendLine(SERVER,2);
-        SendLine(SERVER,3);
-        SendLine(SERVER,4);
-        SendLine(SERVER,5);
-    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
-        handout++;
-        SendLine(SERVER,6);
-        SendLine(SERVER,7);
-    } else if(handout==1) {
-        handout++;
-        SendLine(SERVER,8);
-        SendLine(SERVER,9);
-    } else if(handout==2) {
-        handout++;
-        SendLine(SERVER,10);
-        SendLine(SERVER,11);
-        SendLine(SERVER,12);
-    } else if(handout==3) {
-        handout++;
-        for(int i=13;i<=23;i++) {
-            SendLine(SERVER,i);
-        }
-    } 
+    }
 }
 
 void le_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
@@ -1135,15 +1115,17 @@ void test_server_console() {
     SetFile("Round1");/*基本操作*/
     gHandle = round1_handle_requests;
 
+    /*******************************************/
     /* login test 需要取消IGNORE_LOGIN_REQUEST */
-    SetFile("login_dailylogin_enterroom");
-    gHandle = lde_handle_requests;
-
+    /*******************************************/
     SetFile("login_enterroom");
     gHandle = le_handle_requests;
 
     SetFile("login_recoonect");
     gHandle = lr_handle_requests;
+
+    SetFile("login_dailylogin_enterroom");
+    gHandle = lde_handle_requests;
 
     test_smart_game_round_x();
 #endif

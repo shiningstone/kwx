@@ -149,6 +149,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_GAME_SEND_RECONNECT:
             return new ReconnectResponse();
 
+        case REQ_LOGIN:
+            return new LoginResponse();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }

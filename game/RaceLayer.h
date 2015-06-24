@@ -216,7 +216,6 @@ private:
 	void _RaceBeginPrepare();//牌局开始效果
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
-	void StartGame();//功能--开始
 	void BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type);
 	void BtnStartHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void BtnBackHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//功能--返回
@@ -239,6 +238,7 @@ private:
 	void WaitForFirstAction(PlayerDir_t zhuang);
 	void _MyHandoutEffect(Card_t outCard,Vec2 location,int time,bool turnToMing=false);
 public:
+	void StartGame();//功能--开始
 	void GuiUpdateScore(int direction,int score);//更新分数
 	void _DistributeEvent(const std::string event_type,void* val);
     void _PengEffect(PlayerDir_t dir, PlayerDir_t prevDir, Card_t card);

@@ -17,12 +17,14 @@ typedef enum {
     MSG_LOGIN,
     MSG_GAME,
     MSG_CHAT,
+    MSG_TYPE_MAX,
 }MsgType_t;
 
 class KwxMessenger : public NetMessenger {
 public:
-    KwxMessenger(MsgType_t type);
-    ~KwxMessenger();
+    static KwxMessenger *getInstance(MsgType_t type);
+    static void destroyInstances();
+    static KwxMessenger *_instances[MSG_TYPE_MAX];
     
     /* auto receive */
     void StartReceiving();
@@ -35,6 +37,9 @@ public:
     static void Resume(RequestId_t req = REQ_INVALID);
     static void WaitQueueAdd(RequestId_t req);
 private:
+    KwxMessenger(MsgType_t type);
+    ~KwxMessenger();
+    
     /* wait queue for specified request, which will be handled in Non-main process */
     static const int MAX_WAIT_NUM = 4;
 

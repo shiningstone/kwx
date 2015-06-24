@@ -11,11 +11,8 @@ class HelloWorld : public cocos2d::Layer
 {
 #define QQ_LOG_IN					1
 #define LIJI_LOGIN					2
-#define LOGIN_ACCOUNT				3
-#define REGISTER_LAYER				4
+#define LOGIN_REGISTER				3
 
-
-#define CHOOSE_FLAG					1
 public:
 	HelloWorld();
 	virtual ~HelloWorld();
@@ -30,16 +27,6 @@ public:
 	virtual bool init();
 	void qqLoadCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 	void imLoadCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-
-	void LogInWithAccount();
-	void RegisteredAccount();
-	void LogInWithAccountBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void RememberChoose(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void RegistCall(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void LogInGame(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-
-	void RegisterBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void GetVerificationCode(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
 
 	// a selector callback
 	void enterroomCallback(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);	//¦Ì£¤?¨²Button

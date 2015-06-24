@@ -5,7 +5,7 @@
 class MyInfo :public cocos2d::Layer, public cocos2d::extension::TableViewDataSource, public cocos2d::extension::TableViewDelegate
 {
 public:
-	MyInfo(void);
+	MyInfo();
 	~MyInfo(void);
 	virtual bool init();
 	CREATE_FUNC(MyInfo);

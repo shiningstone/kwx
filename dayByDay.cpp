@@ -1,9 +1,10 @@
 #include "dayByDay.h"
 
 
-dayAward::dayAward(Node* p)
+dayAward::dayAward(Node* p,int receiveTime,int GoldNum)
 {
 	parent=(EnterRoom*)p;
+	ReceiveTime=receiveTime;
 	init();
 }
 TargetedAction* dayAward::GoldGetEffect(Vec2 curPos)
@@ -49,12 +50,12 @@ TargetedAction* dayAward::GoldGetEffect(Vec2 curPos)
 }
 void dayAward::receiveTimeCount()
 {
-	receiveTime+=1;
-	if(receiveTime>8)
-		receiveTime%=8;
-	UserDefault::getInstance()->setIntegerForKey("load_days",receiveTime);
+	ReceiveTime+=1;
+	if(ReceiveTime>8)
+		ReceiveTime%=8;
+	UserDefault::getInstance()->setIntegerForKey("load_days",ReceiveTime);
 	UserDefault::getInstance()->flush();
-	CCLOG("receiveTime:%d",receiveTime);
+	CCLOG("ReceiveTime:%d",ReceiveTime);
 }
 void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
 {
@@ -67,9 +68,9 @@ void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
 		break;       
 	case Widget::TouchEventType::ENDED:
 		{
-			auto curGold=(Button*)this->getChildByTag(receiveTime);
-			auto haveGetted=(Sprite*)this->getChildByTag(GOLD_HAVE_GETTED+receiveTime-1);
-			auto duiGou=(Sprite*)this->getChildByTag(GOLD_ENABLE_DUIGOU+receiveTime-1);
+			auto curGold=(Button*)this->getChildByTag(ReceiveTime);
+			auto haveGetted=(Sprite*)this->getChildByTag(GOLD_HAVE_GETTED+ReceiveTime-1);
+			auto duiGou=(Sprite*)this->getChildByTag(GOLD_ENABLE_DUIGOU+ReceiveTime-1);
 
 			auto curButton=(Button*)pSender;
 			curButton->setTouchEnabled(false);
@@ -102,7 +103,7 @@ bool dayAward::init()
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("denglupaihang.plist");
 	visibleSize=Director::getInstance()->getVisibleSize();//大小和原点
 	origin=Director::getInstance()->getVisibleOrigin();
-	receiveTime=UserDefault::getInstance()->getIntegerForKey("load_days");
+	ReceiveTime=UserDefault::getInstance()->getIntegerForKey("load_days");
 
 	auto InkScroll=Sprite::createWithSpriteFrameName("juanzhou.png");//卷轴
 	InkScroll->setAnchorPoint(Vec2(0.5,0.5));
@@ -139,9 +140,9 @@ bool dayAward::init()
 			muchGold->setPosition(Vec2(origin.x+visibleSize.width*(290+213*a)/1218,origin.y+visibleSize.height*465/716));
 		else
 			muchGold->setPosition(Vec2(origin.x+visibleSize.width*(290+213*(a-4))/1218,origin.y+visibleSize.height*305/716));
-		if(a<(receiveTime-1))
+		if(a<(ReceiveTime-1))
 			muchGold->setHighlighted(true);
-		else if(a==(receiveTime-1))
+		else if(a==(ReceiveTime-1))
 			muchGold->setBright(false);
 		this->addChild(muchGold,2,a+GOLD_PNG_UI);
 
@@ -152,7 +153,7 @@ bool dayAward::init()
 			receiveEnd->setPosition(Vec2(origin.x+visibleSize.width*(290+213*a)/1218,origin.y+visibleSize.height*495/716));
 		else
 			receiveEnd->setPosition(Vec2(origin.x+visibleSize.width*(290+213*(a-4))/1218,origin.y+visibleSize.height*335/716));
-		if(a<(receiveTime-1))
+		if(a<(ReceiveTime-1))
 			receiveEnd->setVisible(true);
 		this->addChild(receiveEnd,3,a+GOLD_HAVE_GETTED);
 
@@ -163,7 +164,7 @@ bool dayAward::init()
 			rightIcon->setPosition(Vec2(origin.x+visibleSize.width*(360+213*a)/1218,origin.y+visibleSize.height*455/716));
 		else
 			rightIcon->setPosition(Vec2(origin.x+visibleSize.width*(360+213*(a-4))/1218,origin.y+visibleSize.height*295/716));
-		if(a==(receiveTime-1))
+		if(a==(ReceiveTime-1))
 			rightIcon->runAction(RepeatForever::create(Blink::create(1,1)));
 		this->addChild(rightIcon,3,a+GOLD_ENABLE_DUIGOU);		
 

@@ -1445,7 +1445,7 @@ public:
     virtual int Execute() {
         INT8U msgInNetwork[] = {
             'K','W','X',           //KWX
-            0x00,44,               //request code
+            0x00,1,                //request code
             7,                     //package level
             0x00,88,               //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
@@ -1473,7 +1473,7 @@ public:
         login.Construct(*aMsg);
 
         assert(len==sizeof(msgInNetwork));
-        assert( aMsg->GetRequestCode()==REQ_GAME_SEND_ENTER );
+        assert( aMsg->GetRequestCode()==REQ_LOGIN );
         assert( aMsg->GetLevel()==7 );
 
         assert(login._userType==0);

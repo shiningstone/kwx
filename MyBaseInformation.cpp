@@ -1,8 +1,10 @@
 #include "MyBaseInformation.h"
 #include "ShopScene.h"
 
-MyBaseInformation::MyBaseInformation(void)
+MyBaseInformation::MyBaseInformation(Personal_Information curPlayer)
 {
+	playerInforMation=curPlayer;
+	init();
 }
 MyBaseInformation::~MyBaseInformation(void)
 {
@@ -17,17 +19,24 @@ bool MyBaseInformation::init()
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin=Director::getInstance()->getVisibleOrigin();
 	this->setContentSize(Size(origin.x+visibleSize.width,origin.y+visibleSize.height*0.7877));
-	
+	char tempChar[20];
+
 	auto perInfoBg=Sprite::create("PerInformation.png");
 	perInfoBg->setAnchorPoint(Vec2(0,0));
 	perInfoBg->setPosition(Vec2(origin.x+visibleSize.width*0.3087,origin.y+visibleSize.height*0.85));
 	perInfoBg->setRotation(90);
 	this->addChild(perInfoBg,1);
 
-	auto playerPhoto=Sprite::createWithSpriteFrameName("touxiangkuang.png");
-	playerPhoto->setAnchorPoint(Vec2(0,0));
-	playerPhoto->setPosition(Vec2(origin.x+visibleSize.width*0.0435,origin.y+visibleSize.height*0.474));
-	this->addChild(playerPhoto,1);
+	auto photoKuang=Sprite::createWithSpriteFrameName("touxiangkuang.png");
+	photoKuang->setAnchorPoint(Vec2(0,0));
+	photoKuang->setPosition(Vec2(origin.x+visibleSize.width*0.0435,origin.y+visibleSize.height*0.474));
+	this->addChild(photoKuang,1);
+
+	auto playerPhoto=Sprite::create(playerInforMation.PhotoName);//头像
+	playerPhoto->setAnchorPoint(Vec2(0.5,0.5));
+	playerPhoto->setPosition(Vec2(photoKuang->getContentSize().width/2,photoKuang->getContentSize().height/2));
+	playerPhoto->setScale(227/playerPhoto->getTextureRect().size.width,227/playerPhoto->getTextureRect().size.height);
+	photoKuang->addChild(playerPhoto);
 
 	auto buttonChangePhoto=Button::create("xiugaitouxiang.png","xiugaitouxiang1.png","xiugaitouxiang1.png",TextureResType::PLIST);
 	buttonChangePhoto->setAnchorPoint(Vec2(0,0));
@@ -40,7 +49,8 @@ bool MyBaseInformation::init()
 	labelOfID->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.7304));
 	this->addChild(labelOfID,1);
 
-	auto LabelForID=LabelTTF::create("12345678","Arial",30);
+	sprintf(tempChar,"%d",playerInforMation.id);
+	auto LabelForID=LabelTTF::create(tempChar,"Arial",30);//ID
 	LabelForID->setAnchorPoint(Vec2(0,0));
 	LabelForID->setPosition(Vec2(origin.x+visibleSize.width*0.3678+labelOfID->getContentSize().width+10,origin.y+visibleSize.height*0.7304));
 	this->addChild(LabelForID,1,MY_BASEINFO_ID);
@@ -50,7 +60,7 @@ bool MyBaseInformation::init()
 	labelOfAccount->setPosition(Vec2(origin.x+visibleSize.width*0.596,origin.y+visibleSize.height*0.73));
 	this->addChild(labelOfAccount,1);
 
-	auto LabelForAccount=LabelTTF::create("934830895@qq.com","Arial",30);
+	auto LabelForAccount=LabelTTF::create(playerInforMation.account,"Arial",30);//账户
 	LabelForAccount->setAnchorPoint(Vec2(0,0));
 	LabelForAccount->setPosition(Vec2(origin.x+visibleSize.width*0.596+labelOfAccount->getContentSize().width+10,origin.y+visibleSize.height*0.73));
 	this->addChild(LabelForAccount,1,MY_ACCOUNT_LABEL);
@@ -70,7 +80,8 @@ bool MyBaseInformation::init()
 	labelOfWinRate->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.3835));
 	this->addChild(labelOfWinRate,1);
 
-	auto WinRate=LabelTTF::create("100%","Arial",30);
+	sprintf(tempChar,"%d",playerInforMation.Winrate);
+	auto WinRate=LabelTTF::create(tempChar,"Arial",30);//胜率
 	WinRate->setAnchorPoint(Vec2(0,0));
 	WinRate->setPosition(Vec2(labelOfWinRate->getPosition().x+labelOfWinRate->getContentSize().width+20,origin.y+visibleSize.height*0.3835));
 	this->addChild(WinRate,1,WIN_RATE);
@@ -80,7 +91,8 @@ bool MyBaseInformation::init()
 	labelOfHistory->setPosition(Vec2(origin.x+visibleSize.width*0.3678,origin.y+visibleSize.height*0.2821));
 	this->addChild(labelOfHistory,1);
 
-	auto MaxHistory=LabelTTF::create("128","Arial",30);
+	sprintf(tempChar,"%d",playerInforMation.maxTime);
+	auto MaxHistory=LabelTTF::create(tempChar,"Arial",30);//最大番型
 	MaxHistory->setAnchorPoint(Vec2(0,0));
 	MaxHistory->setPosition(Vec2(labelOfHistory->getPosition().x+labelOfHistory->getContentSize().width+20,origin.y+visibleSize.height*0.2821));
 	this->addChild(MaxHistory,1,MAX_HISTORY);
@@ -122,13 +134,11 @@ bool MyBaseInformation::init()
 	buttonPen->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::ChangeNameForPenCallBack,this));
 	this->addChild(buttonPen,1);
 
-	auto LabelForName=LabelTTF::create("赵钱孙李","Arial",30);
+	auto LabelForName=LabelTTF::create(playerInforMation.Nickname,"Arial",30);//昵称
 	LabelForName->setAnchorPoint(Vec2(0,0));
 	LabelForName->setPosition(Vec2(origin.x+visibleSize.width*0.3678+100,origin.y+visibleSize.height*0.6145));
 	LabelForName->setColor(ccBLACK);
 	this->addChild(LabelForName,2,LABEL_FOR_NAME);
-
-	my_sex=BOY;
 
 	auto manLogo=Sprite::createWithSpriteFrameName("nan.png");
 	manLogo->setAnchorPoint(Vec2(0,0));
@@ -160,77 +170,57 @@ bool MyBaseInformation::init()
 	chooseedFlag2->setPosition(Vec2(origin.x+visibleSize.width*0.702,origin.y+visibleSize.height*0.501));
 	this->addChild(chooseedFlag2,2,SEX_GIRL_SIGN);
 
-	switch (my_sex)
+	switch (playerInforMation.PlayerSex)//性别
 	{
-	case MyBaseInformation::BOY:
+	case BOY:
 		chooseedFlag2->setVisible(false);
 		break;
-	case MyBaseInformation::GIRL:
+	case GIRL:
 		chooseedFlag1->setVisible(false);
 		break;
 	default:
 		break;
 	}
 
-	//auto goodNameBar=Sprite::createWithSpriteFrameName("shang.png");
-	//goodNameBar->setAnchorPoint(Vec2(0,0));
-	//goodNameBar->setPosition(Vec2(origin.x+visibleSize.width*0.04,origin.y+visibleSize.height*0.268));
-	//this->addChild(goodNameBar,1);
-	//
-	//auto goodName=Sprite::createWithSpriteFrameName("812.png");
-	//goodName->setAnchorPoint(Vec2(0,0));
-	//goodName->setPosition(Vec2(origin.x+visibleSize.width*0.04,origin.y+visibleSize.height*0.264));
-	//this->addChild(goodName,2);
-
-	//auto competeBar=Sprite::createWithSpriteFrameName("middle.png");
-	//competeBar->setAnchorPoint(Vec2(0,0));
-	//competeBar->setPosition(Vec2(origin.x+visibleSize.width*0.04,origin.y+visibleSize.height*0.215));
-	//this->addChild(competeBar,1);
-	//
-	//auto compete=Sprite::createWithSpriteFrameName("jinbi.png");
-	//compete->setAnchorPoint(Vec2(0,0));
-	//compete->setPosition(Vec2(origin.x+visibleSize.width*0.0398,origin.y+visibleSize.height*0.214));
-	//compete->setScale(0.5f);
-	//this->addChild(compete,2);
-
-	//auto buttonPlus=Button::create("jiahao.png","jiahao5.png","jiahao5.png",TextureResType::PLIST);
-	//buttonPlus->setAnchorPoint(Vec2(0,0));
-	//buttonPlus->setPosition(Vec2(origin.x+visibleSize.width*0.196,origin.y+visibleSize.height*0.215));
-	//buttonPlus->addTouchEventListener(CC_CALLBACK_2(MyBaseInformation::CallBack_ForJiaHao,this));
-	//this->addChild(buttonPlus,2);
-
-	//auto TaskBar=Sprite::createWithSpriteFrameName("xia.png");
-	//TaskBar->setAnchorPoint(Vec2(0,0));
-	//TaskBar->setPosition(Vec2(origin.x+visibleSize.width*0.04,origin.y+visibleSize.height*0.166));
-	//this->addChild(TaskBar,1);
-
-	//auto task=Sprite::createWithSpriteFrameName("juan.png");
-	//task->setAnchorPoint(Vec2(0,0));
-	//task->setPosition(Vec2(origin.x+visibleSize.width*0.045,origin.y+visibleSize.height*0.1676));
-	//this->addChild(task,2);
-
 	auto LevelProgressBg=Sprite::createWithSpriteFrameName("jingyantiao.png");
 	LevelProgressBg->setAnchorPoint(Vec2(0.5,0.5));
 	LevelProgressBg->setPosition(Vec2(origin.x+visibleSize.width*0.12,origin.y+visibleSize.height*0.3));
 	this->addChild(LevelProgressBg,1);
 
-	auto LevelProgress=Sprite::createWithSpriteFrameName("jingyantiao1.png");
+	int playerLv=(int)playerInforMation.PlayerLv;
+
+	auto LevelProgress=Sprite::createWithSpriteFrameName("jingyantiao1.png");//经验条
 	CCProgressTimer* pt = CCProgressTimer::create(LevelProgress);  
     pt->setMidpoint(ccp(0, 0));  
 	pt->setType(kCCProgressTimerTypeBar);
     pt->setBarChangeRate(ccp(1,0));  
-    pt->setPercentage(100.0f);  
+    pt->setPercentage((playerInforMation.PlayerLv-playerLv)*100);  
 	pt->ignoreAnchorPointForPosition(false);
 	pt->setAnchorPoint(Vec2(0.5,0.5));
     pt->setPosition(Vec2(origin.x+visibleSize.width*0.12,origin.y+visibleSize.height*0.3));
     this->addChild(pt,2);  
 
-	auto labelOfLevel=LabelTTF::create("Lv.1","Arial",20);
+	sprintf(tempChar,"Lv.%d",playerLv);//等级
+	auto labelOfLevel=LabelTTF::create(tempChar,"Arial",20);
 	labelOfLevel->setAnchorPoint(Vec2(0,0.5));
 	labelOfLevel->setPosition(Vec2(origin.x+visibleSize.width*0.22,origin.y+visibleSize.height*0.3));
 	this->addChild(labelOfLevel,2);
 
-	auto identity=LabelTTF::create("当前身份: 游客身份","Arial",30);
+	LabelTTF* identity;
+	switch (playerInforMation.accountType)//用户身份
+	{
+	case Tourist:
+		identity=LabelTTF::create("当前身份: 游客身份","Arial",30);
+		break;
+	case QQAccount:
+		identity=LabelTTF::create("当前身份: QQ用户","Arial",30);
+		break;
+	case WeChatAccount:
+		identity=LabelTTF::create("当前身份: 微信用户","Arial",30);
+		break;
+	default:
+		break;
+	}
 	identity->setAnchorPoint(Vec2(0,0.5));
 	identity->setPosition(Vec2(origin.x+visibleSize.width*0.05,origin.y+visibleSize.height*0.2));
 	this->addChild(identity,2);
@@ -240,7 +230,8 @@ bool MyBaseInformation::init()
 	GoldFont->setPosition(Vec2(origin.x+visibleSize.width*0.05,origin.y+visibleSize.height*0.13));
 	this->addChild(GoldFont,2);
 
-	auto GoldNum=LabelTTF::create("5000","Arial",30);
+	sprintf(tempChar,"%d",playerInforMation.GoldNum);
+	auto GoldNum=LabelTTF::create(tempChar,"Arial",30);
 	GoldNum->setAnchorPoint(Vec2(0,0.5));
 	GoldNum->setPosition(Vec2(GoldFont->getPosition().x+GoldFont->getContentSize().width,origin.y+visibleSize.height*0.13));
 	this->addChild(GoldNum,2);

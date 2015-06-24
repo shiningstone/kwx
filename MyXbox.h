@@ -5,6 +5,9 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
+
+#include "LoginType.h"
+
 class MyXbox :	public Layer
 {
 #define MY_BOX_MIJIK_TAG					1
@@ -29,7 +32,7 @@ class MyXbox :	public Layer
 #define NUM_ITEM_THREE						9
 #define NUM_ITEM_FOUR						10
 public:
-	MyXbox(void);
+	MyXbox(Backpack_Item MyGoods[]=NULL);
 	~MyXbox(void);
 	Size visibleSize;
 	Vec2 origin;
@@ -37,6 +40,6 @@ public:
 	void convertCallback(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	void itemsInBox_callBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	virtual bool init();
-	CREATE_FUNC(MyXbox);
+	//CREATE_FUNC(MyXbox);
 };
 

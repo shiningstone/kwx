@@ -3,7 +3,7 @@
 #include "MyInfo.h"
 #include "SystemNotice.h"
 
-MyInfoScene::MyInfoScene(void)
+MyInfoScene::MyInfoScene()
 {
 }
 

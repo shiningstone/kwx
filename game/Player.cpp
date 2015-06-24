@@ -10,8 +10,8 @@ Player::Player(PlayerDir_t dir) {
 	_strategy = new StrategyPlayer(this);
 
     _dir = dir;
-    _cards = NULL;
-    _river = NULL;
+    _cards = new CardInHand();
+    _river = new CardList();
 
     _isExist = false;
     _isReady = false;
@@ -40,9 +40,6 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     _aimDone = 0;
     _fan     = 0;
 	_score   = 0;
-
-    _cards = new CardInHand();
-    _river = new CardList();
 
 	for(int i=0;i<13;i++) {
         CardNode_t node;

@@ -1,8 +1,8 @@
 #include "MyXbox.h"
-MyXbox::MyXbox(void)
+#include "Game/GameType.h"
+MyXbox::MyXbox(Backpack_Item MyGoods[])
 {
 }
-
 
 MyXbox::~MyXbox(void)
 {
