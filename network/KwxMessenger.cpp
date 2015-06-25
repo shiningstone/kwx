@@ -149,6 +149,7 @@ void KwxMessenger::destroyInstances() {
 }
 
 #include "./../protocol/DsInstruction.h"
+#include "./../protocol/UsRequest.h"
 #include "./../protocol/KwxMsgLogin.h"
 int KwxMessenger::Send(RequestId_t req) {
     switch(req) {
@@ -156,18 +157,30 @@ int KwxMessenger::Send(RequestId_t req) {
 			{
     			RequestLogin aReq;
     			aReq.Set();
-    			Send(aReq);
-				break;
+    			return Send(aReq);
 			}
             
         case REQ_GAME_SEND_RECONNECT:
 			{
 				RequestReconnect aReq;
 				aReq.Set();
-				Send(aReq);
-				break;
-			}            
+				return Send(aReq);
+			}   
+		default:
+			LOGGER_WRITE("%s unsupported request id %d",__FUNCTION__,req);
     }
-
-    return 0;
 }
+
+int KwxMessenger::Send(ActionId_t action,Card_t card) {
+    RequestSendAction aReq;
+    aReq.Set(action,card);
+    return Send(aReq);
+}
+
+int KwxMessenger::Send(ActionId_t code,int kindNum,Card_t kinds[]) {
+    RequestSendAction aReq;
+    aReq.Set(code,kindNum,kinds);
+    return Send(aReq);
+}
+
+
