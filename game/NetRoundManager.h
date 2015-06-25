@@ -32,9 +32,6 @@ public:
 
     KwxMessenger   *_messenger;
 
-    int _SendAction(ActionId_t action,Card_t card = CARD_UNKNOWN);
-    int _SendAction(ActionId_t code,int kindNum,Card_t cards[]);
-
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);
     void _DiRecv(FirstDistZhuang *info);

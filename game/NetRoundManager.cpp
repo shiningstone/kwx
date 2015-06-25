@@ -301,7 +301,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     
     if(dir==MIDDLE) {
         _permited = false;
-        _SendAction(aPENG,kind);
+        _messenger->Send(aPENG,kind);
         RETURN_VALUE_IF_FAIL(_response,CARD_UNKNOWN);
     }
 
@@ -317,7 +317,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
     if(dir==MIDDLE) {
-        _SendAction(aHU);
+        _messenger->Send(aHU);
         RETURN_IF_FAIL(_response);
     }
 }
@@ -340,7 +340,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 
     if(dir==MIDDLE) {
         _permited = false;
-        _SendAction(_actCtrl.decision,card);
+        _messenger->Send(_actCtrl.decision,card);
         RETURN_VALUE_IF_FAIL(_response,CARD_UNKNOWN);
     }
 
@@ -378,7 +378,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 }
 
 void NetRoundManager::RecvQi() {
-    _SendAction(aQi);
+    _messenger->Send(aQi);
     RETURN_IF_FAIL(_response);
     
     SetDecision(MIDDLE,aQi);
@@ -393,7 +393,7 @@ void NetRoundManager::_NotifyHandout() {
             /*提前加入等待，以防接收过快导致等待状态判断错误*/
             _messenger->WaitQueueAdd(REQ_GAME_DIST_DAOJISHI);
 
-            _SendAction(aQi);
+            _messenger->Send(aQi);
             RETURN_IF_FAIL(_response);
         }
         
@@ -415,7 +415,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	if(_isMingTime) {
 		_isMingTime      = false;
 
-        _SendAction(aMING_CONFIRM);
+        _messenger->Send(aMING_CONFIRM);
         RETURN_IF_FAIL(_response);
 
         Wait(REQ_GAME_DIST_DECISION);
@@ -446,7 +446,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
 
-    _SendAction(aKOU_CANCEL);
+    _messenger->Send(aKOU_CANCEL);
     RETURN_IF_FAIL(_response);
 
     _uiManager->KouCancelEffect(aKOU,_players[MIDDLE]->_cards);
@@ -465,14 +465,14 @@ void NetRoundManager::RecvKouConfirm() {
 
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->_alter->get_activated_kinds(kinds);
-    _SendAction(aKOU,kindNum,kinds);
+    _messenger->Send(aKOU,kindNum,kinds);
     RETURN_IF_FAIL(_response);
 
     _uiManager->KouConfirmEffect();
 }
 
 void NetRoundManager::RecvMingCancel() {
-    _SendAction(aMING_CANCEL);
+    _messenger->Send(aMING_CANCEL);
     RETURN_IF_FAIL(_response);
 
     UpdateCards(MIDDLE,(ARRAY_ACTION)aMING_CANCEL);/*BUG HERE???*/
@@ -500,7 +500,7 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
         } else {
             _players[MIDDLE]->_strategy->scan_ming();
 
-            _SendAction(aMING);
+            _messenger->Send(aMING);
             RETURN_IF_FAIL(_response);
             
             UpdateCards(MIDDLE,a_MING);
@@ -563,18 +563,6 @@ bool NetRoundManager::Wait(RequestId_t req) {
 /*************************************
         server requests handlers
 *************************************/
-int NetRoundManager::_SendAction(ActionId_t action,Card_t card) {
-    RequestSendAction aReq;
-    aReq.Set(action,card);
-    return _messenger->Send(aReq);
-}
-
-int NetRoundManager::_SendAction(ActionId_t code,int kindNum,Card_t kinds[]) {
-    RequestSendAction aReq;
-    aReq.Set(code,kindNum,kinds);
-    return _messenger->Send(aReq);
-}
-
 void NetRoundManager::_order_small_to_big(Card_t kinds[],int num) {
     for(int i=0;i<num-1;i++) {
         for(int j=i+1;j<num;j++) {

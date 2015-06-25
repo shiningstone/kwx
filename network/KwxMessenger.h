@@ -32,7 +32,7 @@ public:
 
     int Send(UsMsg &aMsg,bool ignoreRsp=false);/* why cannot declare as const UsMsg??? */
     int Send(RequestId_t req);
-    int Send(ActionId_t action,Card_t card);
+    int Send(ActionId_t action,Card_t card = CARD_IGNORE);
     int Send(ActionId_t code,int kindNum,Card_t kinds[]);
 
     static bool IsWaiting(RequestId_t req = REQ_INVALID);
