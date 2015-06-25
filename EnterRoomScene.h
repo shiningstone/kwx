@@ -4,7 +4,8 @@
 #include "cocos2d.h"
 #include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"
-#include "LoginType.h"
+//#include "LoginType.h"
+#include "network/KwxEnv.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -15,7 +16,6 @@ class EnterRoom : public cocos2d::Layer
 {
 public:
 	EnterRoom();
-	EnterRoom(MainLayer_myInfo myInfo,Friend_Info friendList[],OtherPlayers_Info NearbyPlayers[],OtherPlayers_Info Stranger[]);
 	virtual ~EnterRoom();
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
@@ -52,7 +52,7 @@ public:
 	void MyDataUIPrepare();
 	void FunctionBarUIPrepare();
 	void competeButtons();
-	void FriendAndStrangers();
+	//void FriendAndStrangers();
 	void myBaseInfo_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite 
 	void mall_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	void message_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);
@@ -64,17 +64,13 @@ public:
 	void normal_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
 	void compete_callback(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
 
-	void FriendScCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
-	void ChatRecordCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
-	void CommonLanguageCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite
-	void MyFriendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
-	void NearPersonCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);			//ReWrite
-	void MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);		//ReWrite
 	void call_gold_prize();																//ReWrite
 
 	void createRole();
 		
 	CREATE_FUNC(EnterRoom);
+private:
+	MainLayer_myInfo personalSimpleInfo;
 };
 #endif  //__ENTERROOM_SCENE_H__
 

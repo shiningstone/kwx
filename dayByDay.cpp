@@ -1,10 +1,12 @@
 #include "dayByDay.h"
+#include "network/KwxEnv.h"
 
 
-dayAward::dayAward(Node* p,int receiveTime,int GoldNum)
+dayAward::dayAward(Node* p)
 {
+	ReceiveTime=EnvVariable::getInstance()->_dailyLogin.continuousDays;
+	RewardGold=EnvVariable::getInstance()->_dailyLogin.dailyReward;
 	parent=(EnterRoom*)p;
-	ReceiveTime=receiveTime;
 	init();
 }
 TargetedAction* dayAward::GoldGetEffect(Vec2 curPos)
@@ -55,7 +57,6 @@ void dayAward::receiveTimeCount()
 		ReceiveTime%=8;
 	UserDefault::getInstance()->setIntegerForKey("load_days",ReceiveTime);
 	UserDefault::getInstance()->flush();
-	CCLOG("ReceiveTime:%d",ReceiveTime);
 }
 void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
 {
@@ -121,7 +122,7 @@ bool dayAward::init()
 	listTitle->setPosition(Vec2(origin.x+visibleSize.width*407/1218,origin.y+visibleSize.height*628/716));
 	this->addChild(listTitle,2);
 	
-	auto huahua=Sprite::createWithSpriteFrameName("hua.png");//花花
+	auto huahua=Sprite::createWithSpriteFrameName("hua.png");//梅花
 	huahua->setAnchorPoint(Vec2(0.5,0.5));
 	huahua->setScale(0.8,0.8);
 	huahua->setPosition(Vec2(origin.x+visibleSize.width*975/1218,origin.y+visibleSize.height*535/716));

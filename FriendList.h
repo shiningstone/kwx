@@ -10,6 +10,11 @@ using namespace ui;
 
 //#include "EnterRoomScene.h"
 #include "LoginType.h"
+#include <vector>
+using namespace std;
+
+#include "network/KwxEnv.h"
+#include "EnterRoomScene.h"
 
 class FriendList : public Layer
 {
@@ -21,14 +26,12 @@ class FriendList : public Layer
 #define NEAR_LIST					5
 #define STRANGER_LIST				6
 
-#define FRIEND_CHAT_BKG				7
-
 #define CHAT_CHILD_BAK				1
 #define CHATRECORD_BTN				2
 #define COMMON_BTN					3
 #define CHAT_EDIT_BOX				4
 public:
-	FriendList(Friend_Info friendsList[],OtherPlayers_Info NearbyPlayers[],OtherPlayers_Info Stranger[]);
+	FriendList(EnterRoom* p);
 	~FriendList(void);
 
 	Size visibleSize;
@@ -36,16 +39,22 @@ public:
 	virtual bool init();
 
 	void ListBtnCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
-	void FriendCellBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
+
 	void ChatOneToOneCreate();
+
+	//void selectedItemEvent(cocos2d::Ref* pSender,ListViewEventType type);
 
 	void ChatRecordCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	void CommonLanguageCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	void MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
+
+	//CREATE_FUNC(FriendList);
 private:
-	//Vector <Friend_Info> MyFriendList;
-	//Vector <OtherPlayers_Info> NearyPeopleList;
-	//Vector <OtherPlayers_Info> StrangersList;
+	EnterRoom* parentNode;
+	std::vector <Friend_Info> MyFriendList;	
+	std::vector <OtherPlayers_Info> NearyPeopleList;
+	std::vector <OtherPlayers_Info> StrangersList;
+
 };
 
 #endif

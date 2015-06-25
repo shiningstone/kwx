@@ -1,31 +1,34 @@
 #include "FriendList.h"
 
-FriendList::FriendList(Friend_Info friendsList[],OtherPlayers_Info NearbyPlayers[],OtherPlayers_Info Stranger[])
+FriendList::FriendList(EnterRoom* p)
 {
-	//int a=0;
-	//while (friendsList[a].photoFileName!="")
-	//{
-	//	MyFriendList.insert(a,friendsList[a]);
-	//	a++;
-	//}
-	//a=0;
-	//while (NearbyPlayers[a].photoFileName!="")
-	//{
-	//	NearyPeopleList.insert(a,NearbyPlayers[a]);
-	//	a++;
-	//}
-	//a=0;
-	//while (Stranger[a].photoFileName!="")
-	//{
-	//	StrangersList.insert(a,Stranger[a]);
-	//	a++;
-	//}
+	parentNode=p;
+	MyFriendList=EnvVariable::getInstance()->get_MyFriendList();
+	NearyPeopleList=EnvVariable::getInstance()->get_NearyPeopleList();
+	StrangersList=EnvVariable::getInstance()->get_StrangersList();
+	init();
 }
 
 FriendList::~FriendList(void)
 {
 }
-
+//void FriendList::selectedItemEvent(cocos2d::Ref* pSender,ListViewEventType type)
+//{
+//	switch (type)
+//	{
+//	case cocos2d::ui::LISTVIEW_ONSELECTEDITEM_START:
+//		break;
+//	case cocos2d::ui::LISTVIEW_ONSELECTEDITEM_END:
+//		{
+//			ChatOneToOneCreate();
+//		}
+//		break;
+//	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+//		break;
+//	default:
+//		break;
+//	}
+//}
 bool FriendList::init()
 {
 	if(!Layer::init())
@@ -34,7 +37,6 @@ bool FriendList::init()
 	}
 	visibleSize=Director::getInstance()->getVisibleSize();
 	origin=Director::getInstance()->getVisibleOrigin();
-
 
 	//BackGround------
 	auto FriendBKG=Sprite::createWithSpriteFrameName("Friends_reel.png");//ºÃÓÑ
@@ -49,19 +51,181 @@ bool FriendList::init()
 	auto ProgressAction=EaseIn::create(Sequence::create(DelayTime::create(0.1),ProgressTo::create(0.4,100),NULL),5);
 	ProgressBar->runAction(ProgressAction);
 
-
 	//ListView-----myFriend
-	auto FriendList=ListView::create();
-	FriendList->setDirection(SCROLLVIEW_DIR_VERTICAL);//SCROLLVIEW_DIR_VERTICAL
-	FriendList->setTouchEnabled(true);
-	FriendList->setBounceEnabled(true);
-	FriendList->setSize(Size(visibleSize.width*0.4334975,visibleSize.height*0.5726257));
-	FriendList->ignoreAnchorPointForPosition(false);
-	FriendList->setAnchorPoint(Vec2(0.5,0));
-	FriendList->setPosition(Vec2(visibleSize.width*0.27358,45));
-	this->addChild(FriendList,2,FRIEND_LIST);
+	auto FriendsList=ListView::create();
+	FriendsList->setDirection(SCROLLVIEW_DIR_VERTICAL);//SCROLLVIEW_DIR_VERTICAL
+	FriendsList->setGravity(LISTVIEW_GRAVITY_CENTER_VERTICAL);
+	FriendsList->setTouchEnabled(true);
+	FriendsList->setBounceEnabled(true);
+	FriendsList->setSize(Size(visibleSize.width*0.4334975,visibleSize.height*0.5726257));
+	FriendsList->ignoreAnchorPointForPosition(false);
+	FriendsList->setAnchorPoint(Vec2(0.5,0));
+	FriendsList->setPosition(Vec2(visibleSize.width*0.27358,45));
+	//FriendsList->addEventListenerListView(this,listvieweventselector(FriendList::selectedItemEvent));
+	this->addChild(FriendsList,2,FRIEND_LIST);
+
+	for(int a=0;a<MyFriendList.size();a++)
+	{
+		auto curBtn=Button::create("Friends_cellBg.png","Friends_cellBg.png","Friends_cellBg.png",UI_TEX_TYPE_PLIST);
+		curBtn->setAnchorPoint(Vec2(0.5,0.5));
+		auto curItem=Layout::create();
+		auto BtnSize=curBtn->getSize();
+
+		auto curPhoto=Sprite::createWithSpriteFrameName(MyFriendList[a].photoFileName);
+		curPhoto->setAnchorPoint(Vec2(0,0.5));
+		curPhoto->setPosition(Vec2(3,BtnSize.height/2));
+		curPhoto->setScale(76/curPhoto->getTextureRect().size.height);
+		curBtn->addChild(curPhoto);
+		auto curPhotoSize=curPhoto->getTextureRect().size*curPhoto->getScale();
+
+		auto curName=LabelTTF::create(MyFriendList[a].NikeName,"Arial",20);
+		curName->setAnchorPoint(Vec2(0,1));
+		curName->setPosition(Vec2(curPhoto->getPosition().x+curPhotoSize.width+10,curPhoto->getPosition().y+curPhotoSize.height/2));
+		curBtn->addChild(curName);
+
+		Sprite* curSex;
+		switch (MyFriendList[a].friendSex)
+		{
+		case BOY:
+			curSex=Sprite::createWithSpriteFrameName("Friends_man.png");
+			break;
+		case GIRL:
+			curSex=Sprite::createWithSpriteFrameName("Friends_woman.png");
+			break;
+		default:
+			break;
+		}
+		curSex->setAnchorPoint(Vec2(0.5,0));
+		curSex->setPosition(Vec2(curName->getPosition().x+curName->getContentSize().width/2,curPhoto->getPosition().y-curPhotoSize.height/2));
+		curBtn->addChild(curSex);
+
+		char tempChar[10];
+		sprintf(tempChar,"%d",MyFriendList[a].FriendGold);
+		auto curGold=LabelTTF::create(tempChar,"Arial",20);
+		curGold->setAnchorPoint(Vec2(1,0.5));
+		curGold->setPosition(Vec2(BtnSize.width-10,BtnSize.height/2));
+		curBtn->addChild(curGold);
+
+		curItem->setTouchEnabled(true);
+		curItem->setSize(BtnSize);
+		curBtn->setPosition(Vec2(curItem->getSize().width/2,curItem->getSize().height/2));
+		curItem->addChild(curBtn);
+
+		FriendsList->pushBackCustomItem(curItem);
+	}
 	//ListView-----nearPeople
+	auto nearPerponList=ListView::create();
+	nearPerponList->setDirection(SCROLLVIEW_DIR_VERTICAL);//SCROLLVIEW_DIR_VERTICAL
+	nearPerponList->setGravity(LISTVIEW_GRAVITY_CENTER_VERTICAL);
+	nearPerponList->setTouchEnabled(true);
+	nearPerponList->setBounceEnabled(true);
+	nearPerponList->setSize(Size(visibleSize.width*0.4334975,visibleSize.height*0.5726257));
+	nearPerponList->ignoreAnchorPointForPosition(false);
+	nearPerponList->setAnchorPoint(Vec2(0.5,0));
+	nearPerponList->setPosition(Vec2(visibleSize.width*0.27358,45));
+	//nearPerponList->addEventListenerListView(this,listvieweventselector(FriendList::selectedItemEvent));
+	nearPerponList->setVisible(false);
+	this->addChild(nearPerponList,2,NEAR_LIST);
+
+	for(int a=0;a<NearyPeopleList.size();a++)
+	{
+		auto curBtn=Button::create("Friends_cellBg.png","Friends_cellBg.png","Friends_cellBg.png",UI_TEX_TYPE_PLIST);
+		curBtn->setAnchorPoint(Vec2(0.5,0.5));
+		auto curItem=Layout::create();
+		auto BtnSize=curBtn->getSize();
+
+		auto curPhoto=Sprite::createWithSpriteFrameName(NearyPeopleList[a].photoFileName);
+		curPhoto->setAnchorPoint(Vec2(0,0.5));
+		curPhoto->setPosition(Vec2(3,BtnSize.height/2));
+		curPhoto->setScale(76/curPhoto->getTextureRect().size.width,76/curPhoto->getTextureRect().size.height);
+		curBtn->addChild(curPhoto);
+		auto curPhotoSize=curPhoto->getTextureRect().size*curPhoto->getScale();
+
+		auto curName=LabelTTF::create(NearyPeopleList[a].NikeName,"Arial",20);
+		curName->setAnchorPoint(Vec2(0,1));
+		curName->setPosition(Vec2(curPhoto->getPosition().x+curPhotoSize.width+10,curPhoto->getPosition().y+curPhotoSize.height/2));
+		curBtn->addChild(curName);
+
+		Sprite* curSex;
+		switch (NearyPeopleList[a].friendSex)
+		{
+		case BOY:
+			curSex=Sprite::createWithSpriteFrameName("Friends_man.png");
+			break;
+		case GIRL:
+			curSex=Sprite::createWithSpriteFrameName("Friends_woman.png");
+			break;
+		default:
+			break;
+		}
+		curSex->setAnchorPoint(Vec2(0.5,0));
+		curSex->setPosition(Vec2(curName->getPosition().x+curName->getContentSize().width/2,curPhoto->getPosition().y-curPhotoSize.height/2));
+		curBtn->addChild(curSex);
+
+		curItem->setTouchEnabled(true);
+		curItem->setSize(BtnSize);
+		curBtn->setPosition(Vec2(curItem->getSize().width/2,curItem->getSize().height/2));
+		curItem->addChild(curBtn);
+
+		nearPerponList->pushBackCustomItem(curItem);
+	}
+
 	//ListView-----strangers
+	auto strangerList=ListView::create();
+	strangerList->setDirection(SCROLLVIEW_DIR_VERTICAL);//SCROLLVIEW_DIR_VERTICAL
+	strangerList->setGravity(LISTVIEW_GRAVITY_CENTER_VERTICAL);
+	strangerList->setTouchEnabled(true);
+	strangerList->setBounceEnabled(true);
+	strangerList->setSize(Size(visibleSize.width*0.4334975,visibleSize.height*0.5726257));
+	strangerList->ignoreAnchorPointForPosition(false);
+	strangerList->setAnchorPoint(Vec2(0.5,0));
+	strangerList->setPosition(Vec2(visibleSize.width*0.27358,45));
+	//strangerList->addEventListenerListView(this,listvieweventselector(FriendList::selectedItemEvent));
+	strangerList->setVisible(false);
+	this->addChild(strangerList,2,STRANGER_LIST);
+
+	for(int a=0;a<StrangersList.size();a++)
+	{
+		auto curBtn=Button::create("Friends_cellBg.png","Friends_cellBg.png","Friends_cellBg.png",UI_TEX_TYPE_PLIST);
+		curBtn->setAnchorPoint(Vec2(0.5,0.5));
+		auto curItem=Layout::create();
+		auto BtnSize=curBtn->getSize();
+
+		auto curPhoto=Sprite::createWithSpriteFrameName(StrangersList[a].photoFileName);
+		curPhoto->setAnchorPoint(Vec2(0,0.5));
+		curPhoto->setPosition(Vec2(3,BtnSize.height/2));
+		curPhoto->setScale(76/curPhoto->getTextureRect().size.width,76/curPhoto->getTextureRect().size.height);
+		curBtn->addChild(curPhoto);
+		auto curPhotoSize=curPhoto->getTextureRect().size*curPhoto->getScale();
+
+		auto curName=LabelTTF::create(StrangersList[a].NikeName,"Arial",20);
+		curName->setAnchorPoint(Vec2(0,1));
+		curName->setPosition(Vec2(curPhoto->getPosition().x+curPhotoSize.width+10,curPhoto->getPosition().y+curPhotoSize.height/2));
+		curBtn->addChild(curName);
+
+		Sprite* curSex;
+		switch (StrangersList[a].friendSex)
+		{
+		case BOY:
+			curSex=Sprite::createWithSpriteFrameName("Friends_man.png");
+			break;
+		case GIRL:
+			curSex=Sprite::createWithSpriteFrameName("Friends_woman.png");
+			break;
+		default:
+			break;
+		}
+		curSex->setAnchorPoint(Vec2(0.5,0));
+		curSex->setPosition(Vec2(curName->getPosition().x+curName->getContentSize().width/2,curPhoto->getPosition().y-curPhotoSize.height/2));
+		curBtn->addChild(curSex);
+
+		curItem->setTouchEnabled(true);
+		curItem->setSize(BtnSize);
+		curBtn->setPosition(Vec2(curItem->getSize().width/2,curItem->getSize().height/2));
+		curItem->addChild(curBtn);
+
+		strangerList->pushBackCustomItem(curItem);
+	}
 	//Button------
 	auto FriendListBtn=Button::create("Myfriend.png","Myfriend_sel.png","Myfriend_sel.png",UI_TEX_TYPE_PLIST);
 	FriendListBtn->setAnchorPoint(Vec2(0.5,0.5));
@@ -74,7 +238,7 @@ bool FriendList::init()
 	auto CharRecordAction=EaseBounceIn::create(Sequence::create(DelayTime::create(0.5),ScaleTo::create(0.3,1),NULL));
 	FriendListBtn->runAction(CharRecordAction);
 
-	auto NearListBtn=Button::create("Near_the_game player.png","Near_the_game player.png","Near_the_game player.png",UI_TEX_TYPE_PLIST);
+	auto NearListBtn=Button::create("Near_the_game player.png","Near_the_game player_sel.png","Near_the_game player_sel.png",UI_TEX_TYPE_PLIST);
 	NearListBtn->setAnchorPoint(Vec2(0.5,0.5));
 	NearListBtn->setPosition(Vec2(visibleSize.width*0.241549,visibleSize.height*0.6676));
 	NearListBtn->addTouchEventListener(CC_CALLBACK_2(FriendList::ListBtnCallBack,this));
@@ -164,7 +328,7 @@ void FriendList::ChatOneToOneCreate()
 	FriendTalkBKG->setColor(Color3B(28,120,135));
 	FriendTalkBKG->setOpacity(50);
 	FriendTalkBKG->setPosition(Vec2::ZERO);
-	this->addChild(FriendTalkBKG,5,FRIEND_CHAT_BKG);
+	parentNode->addChild(FriendTalkBKG,5,THIS_FRIEND_CHAT_BKG);
 
 	auto chatBkg=Sprite::createWithSpriteFrameName("chat_common_back.png");
 	chatBkg->setAnchorPoint(Vec2(0.5,0.5));
@@ -223,42 +387,19 @@ void FriendList::ChatOneToOneCreate()
 		if(!rect.containsPoint(touch->getLocation()))
 		{
 			auto deleteFunc=CallFunc::create([=](){
-				if(this->getChildByTag(FRIEND_CHAT_BKG))
-					this->removeChildByTag(FRIEND_CHAT_BKG,true);
+				if(parentNode->getChildByTag(THIS_FRIEND_CHAT_BKG))
+					parentNode->removeChildByTag(THIS_FRIEND_CHAT_BKG,true);
 			});
-			this->runAction(deleteFunc);
+			parentNode->runAction(deleteFunc);
 		}
 	};
 	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(SettingChooseListener,FriendTalkBKG);
-}
-void FriendList::FriendCellBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
-{
-	switch (type)
-	{
-	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
-		{
-			ChatOneToOneCreate();
-		}
-		break;
-	case cocos2d::ui::Widget::TouchEventType::CANCELED:
-		break;
-	default:
-		break;
-	}
 }
 void FriendList::ListBtnCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
 {
 	switch (type)
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::MOVED:
-		break;
-	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
 			auto curBtn=(Button*)pSender;
 			auto curTag=curBtn->getTag();
@@ -277,6 +418,10 @@ void FriendList::ListBtnCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 			List1->setVisible(false);
 			List2->setVisible(false);
 		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		break;

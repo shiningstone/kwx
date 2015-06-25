@@ -3,7 +3,8 @@
 #include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"
 
-#include "LoginType.h"
+//#include "LoginType.h"
+#include "network/KwxEnv.h"
 
 USING_NS_CC;
 USING_NS_CC_EXT;
@@ -12,7 +13,7 @@ class MyBaseInformation :
 	public Layer
 {
 public:
-	MyBaseInformation(Personal_Information curPlayer);
+	MyBaseInformation(void);
 	~MyBaseInformation(void);
 #define MY_BASEINFO_ID				1
 #define MY_ACCOUNT_LABEL			2
@@ -30,12 +31,8 @@ public:
 	void UpgradeAccount(Ref* pSender,Widget::TouchEventType type);
 	void ManagePassWord(Ref* pSender,Widget::TouchEventType type);
 	void ChangeNameForPenCallBack(Ref* pSender,Widget::TouchEventType type);
-	//void CallBack_ForJiaHao(Ref* pSender,Widget::TouchEventType type);
-
+	CREATE_FUNC(MyBaseInformation);
 private:
 	Personal_Information playerInforMation;
-
-	//void editBoxEditingDidEnd(EditBox* editBox);
-	//CREATE_FUNC(MyBaseInformation);
 };
 

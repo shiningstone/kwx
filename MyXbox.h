@@ -6,7 +6,8 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
-#include "LoginType.h"
+//#include "LoginType.h"
+#include "network/KwxEnv.h"
 
 class MyXbox :	public Layer
 {
@@ -21,25 +22,34 @@ class MyXbox :	public Layer
 #define ZI_NUM								3
 
 #define SC_FOR_MYBOX						1
-#define	DETAILED_OF_MIJI					2
-#define CURMJ_ITEM_ONE						3
-#define CURMJ_ITEM_TWO						4
-#define CURMJ_ITEM_THREE					5
-#define CURMJ_ITEM_FOUR						6
+#define ITEM_INFORMATION_LAY				2
+#define SYSTEM_NOTICE						3
+
+#define ZI_KUANG_PNG						1
+#define ZI_COUNT_NUM						1
+
 
 #define NUM_ITEM_ONE						7
 #define NUM_ITEM_TWO						8
 #define NUM_ITEM_THREE						9
 #define NUM_ITEM_FOUR						10
 public:
-	MyXbox(Backpack_Item MyGoods[]=NULL);
+	MyXbox(void);
 	~MyXbox(void);
 	Size visibleSize;
 	Vec2 origin;
 	int curEffectNum;
 	void convertCallback(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	void itemsInBox_callBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
+
+	void composeCreate(Backpack_Item curItem);//∫œ≥…√Ê∞Â
+	void inforPanelCreate(Backpack_Item curItem);
+	void updateGoodCount();
+	void NoticeCreate(std::string photoName);
+	void NoticeEnsure(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	virtual bool init();
-	//CREATE_FUNC(MyXbox);
+	CREATE_FUNC(MyXbox);
+private:
+	std::vector <Backpack_Item> myBackpack;	
 };
 

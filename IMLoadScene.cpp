@@ -15,7 +15,7 @@ IMLoad::~IMLoad()
 void IMLoad::enterRoom()
 {
     auto scene = Scene::create();
-	auto layer = EnterRoom::create();
+	auto layer =EnterRoom::create();
     scene->addChild(layer);
     Director::getInstance()->replaceScene(scene);
 }
@@ -36,6 +36,7 @@ const std::string ResFileName[]={"load_room.plist","Personalinformation.plist","
 //SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
 void IMLoad::addRes()
 {
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");//ceshi_yusi
 	for(int insertNum=0;insertNum<21;insertNum++)
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile(ResFileName[insertNum]);

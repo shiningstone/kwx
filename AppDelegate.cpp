@@ -38,6 +38,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
      //create a scene. it's an autorelease object
 	auto scene = Scene::create();
 	
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("systemprompt.plist");
 	std::string curEdition="1.1.1.2";
 	std::string newestEdition="1.1.1.1";
 	Layer* startLayer;

@@ -1,10 +1,9 @@
 #include "MyBaseInformation.h"
 #include "ShopScene.h"
 
-MyBaseInformation::MyBaseInformation(Personal_Information curPlayer)
+MyBaseInformation::MyBaseInformation()
 {
-	playerInforMation=curPlayer;
-	init();
+	playerInforMation=EnvVariable::getInstance()->get_personalDetailed();
 }
 MyBaseInformation::~MyBaseInformation(void)
 {
@@ -32,7 +31,7 @@ bool MyBaseInformation::init()
 	photoKuang->setPosition(Vec2(origin.x+visibleSize.width*0.0435,origin.y+visibleSize.height*0.474));
 	this->addChild(photoKuang,1);
 
-	auto playerPhoto=Sprite::create(playerInforMation.PhotoName);//头像
+	auto playerPhoto=Sprite::createWithSpriteFrameName(playerInforMation.PhotoName);//头像
 	playerPhoto->setAnchorPoint(Vec2(0.5,0.5));
 	playerPhoto->setPosition(Vec2(photoKuang->getContentSize().width/2,photoKuang->getContentSize().height/2));
 	playerPhoto->setScale(227/playerPhoto->getTextureRect().size.width,227/playerPhoto->getTextureRect().size.height);
@@ -212,11 +211,11 @@ bool MyBaseInformation::init()
 	case Tourist:
 		identity=LabelTTF::create("当前身份: 游客身份","Arial",30);
 		break;
+	case KWXAccount:
+		identity=LabelTTF::create("当前身份: KWX用户","Arial",30);
+		break;
 	case QQAccount:
 		identity=LabelTTF::create("当前身份: QQ用户","Arial",30);
-		break;
-	case WeChatAccount:
-		identity=LabelTTF::create("当前身份: 微信用户","Arial",30);
 		break;
 	default:
 		break;

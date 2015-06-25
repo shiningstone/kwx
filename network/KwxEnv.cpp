@@ -89,6 +89,8 @@ EnvVariable::EnvVariable() {
     _get_device_info(_device);
 
     memset(&_dailyLogin,0,sizeof(_dailyLogin));
+
+	TestDataFunction();
 }
 
 void EnvVariable::SetReconnect(bool flag) {
@@ -120,6 +122,87 @@ void EnvVariable::SetRoomPath(RoomPath_t id) {
 }
 
 RoomPath_t EnvVariable::GetRoomPath() {
-    return _roomPath;
+	return _roomPath;
+}
+/*****************************************************/
+//void EnvVariable::RoomServerInit(int roomId)
+//{
+//}
+/******************”‡Àº*******************************/
+void EnvVariable::set__dailyLogin()
+{
+	_dailyLogin.hasReward=false;
+	_dailyLogin.dailyReward=500;
+	_dailyLogin.continuousDays=1;
+}
+void EnvVariable::set_MyFriendList()
+{
+	Friend_Info tempInfo={"Head17.png","tempName",BOY,5000,12345678};
+	for(int a=0;a<20;a++)
+		MyFriendList.push_back(tempInfo);
+}
+std::vector <Friend_Info> EnvVariable::get_MyFriendList()
+{
+	return MyFriendList;
+}
+void EnvVariable::set_NearyPeopleList()
+{
+	OtherPlayers_Info tempInfo={"Head17.png","tempName",BOY,12345678};
+	for(int a=0;a<20;a++)
+		NearyPeopleList.push_back(tempInfo);
+}
+std::vector <OtherPlayers_Info> EnvVariable::get_NearyPeopleList()
+{
+	return NearyPeopleList;
+}
+void EnvVariable::set_StrangersList()
+{
+	OtherPlayers_Info tempInfo={"Head17.png","tempName",BOY,12345678};
+	for(int a=0;a<20;a++)
+		StrangersList.push_back(tempInfo);
+}
+std::vector <OtherPlayers_Info> EnvVariable::get_StrangersList()
+{
+	return StrangersList;
+}
+void EnvVariable::set_personalDetailed()
+{
+	Personal_Information tempInfo={12345678,"ye10203",Tourist,"tempName",BOY,50,128,"Head17.png",3.254,5000};
+	personalDetailed=tempInfo;
+}
+Personal_Information EnvVariable::get_personalDetailed()
+{
+	return personalDetailed;
+}
+void EnvVariable::set_myBackpack()
+{
+	Backpack_Item tempItem={"Cheats-dgbf.png","¥Úπ∑∞Ù∑®","∫«∫«°£°£",{"Cheats-da.png","Cheats-gou.png","Cheats-bang.png","Cheats-fa.png"},{2,5,4,3},1};
+	for(int a=0;a<6;a++)
+		myBackpack.push_back(tempItem);
+}
+std::vector <Backpack_Item> EnvVariable::get_myBackpack()
+{
+	return myBackpack;
+}
+void EnvVariable::TestDataFunction()
+{
+	set__dailyLogin();
+	set_personalSimple();
+	set_MyFriendList();
+	set_NearyPeopleList();
+	set_StrangersList();
+	set_personalDetailed();
+	set_myBackpack();
+}
+void EnvVariable::set_personalSimple()
+{
+	personalSimple.GoldNum=5000;
+	personalSimple.NikeName="tempName";
+	personalSimple.photoFileName="Head17.png";
+	personalSimple.QuanNum=5000;
+}
+MainLayer_myInfo EnvVariable::get_personalSimple()
+{
+	return personalSimple;
 }
 

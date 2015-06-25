@@ -4,10 +4,8 @@
 #include "MyXbox.h"
 
 
-BaseScene::BaseScene(Personal_Information curPlayer)
+BaseScene::BaseScene()
 {
-	PlayerInformation=curPlayer;
-	init();
 }
 BaseScene::~BaseScene(void)
 {
@@ -65,7 +63,7 @@ bool BaseScene::init()
 	buttonMyXbox->addTouchEventListener(CC_CALLBACK_2(BaseScene::buttonMyXbox, this));
 	this->addChild(buttonMyXbox,2,MY_BAG_BUTTON);
 
-	auto infoLayer=new MyBaseInformation(PlayerInformation);
+	auto infoLayer=MyBaseInformation::create();
 	this->addChild(infoLayer,3,CUR_HAVED_LAYER);
 	
 	return true;
@@ -100,7 +98,7 @@ void BaseScene::buttonMyInfo(Ref* pSender,Widget::TouchEventType type)
 			auto BagMoJi=this->getChildByTag(MY_BAG_MOJI);
 			auto BagBut=(Button*)this->getChildByTag(MY_BAG_BUTTON);
 			infoBut->setTouchEnabled(false);
-			auto infoLayer=new MyBaseInformation(PlayerInformation);
+			auto infoLayer=MyBaseInformation::create();
 			infoMoJi->setVisible(true);
 			BagMoJi->setVisible(false);
 			infoBut->setHighlighted(true);
@@ -133,7 +131,7 @@ void BaseScene::buttonMyXbox(Ref* pSender,Widget::TouchEventType type)
 			auto buttonInfo=(Button*)this->getChildByTag(MY_INFO_BUTON);
 			auto buttonXbox=(Button*)this->getChildByTag(MY_BAG_BUTTON);
 			buttonXbox->setTouchEnabled(false);
-			auto xBox=new MyXbox();
+			auto xBox=MyXbox::create();
 			imageOfEffectInfo->setVisible(false);
 			imageOfEffectXbox->setVisible(true);
 			buttonInfo->setTouchEnabled(true);

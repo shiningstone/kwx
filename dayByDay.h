@@ -18,9 +18,10 @@ public:
 #define GOLD_ENABLE_DUIGOU		17
 	Size visibleSize;
 	Vec2 origin;
-	dayAward(Node* p,int receiveTime=1,int GoldNum=300);
+	dayAward(Node* p);
 	EnterRoom* parent;
 	int ReceiveTime;
+	int RewardGold;
 	
 	virtual bool init();
 	TargetedAction* GoldGetEffect(Vec2 curPos);
