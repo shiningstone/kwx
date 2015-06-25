@@ -15,13 +15,13 @@ HTTPManager::~HTTPManager() {
 void HTTPManager::sendGetRequest(std::string url,std::string requestTag) {     
     HttpRequest* request = new HttpRequest();
 
-    request->setRequestType(cocos2d::network::HttpRequest::Type::GET);
+    request->setRequestType(HttpRequest::Type::GET);
     request->setUrl(url.c_str());
 
     request->setResponseCallback(CC_CALLBACK_2(HTTPManager::onHttpRequestCompleted, this));
 
     request->setTag(requestTag.c_str());
-    network::HttpClient::getInstance()->send(request);
+    HttpClient::getInstance()->send(request);
     request->release();
 }   
 
@@ -38,11 +38,11 @@ void HTTPManager::getFormData(std::string parameter) {
     request->setTag("getFormData");     
     log("url = %s",request->getUrl());
     
-    cocos2d::network::HttpClient::getInstance()->send(request);     
+    HttpClient::getInstance()->send(request);     
     request->release(); 
 }   
 
-void HTTPManager::onHttpRequestCompleted(cocos2d::network::HttpClient *sender, cocos2d::network::HttpResponse *response) {
+void HTTPManager::onHttpRequestCompleted(HttpClient *sender, HttpResponse *response) {
     if (!response) {
         return;     
     }
@@ -69,7 +69,7 @@ void HTTPManager::onHttpRequestCompleted(cocos2d::network::HttpClient *sender, c
     const char* resTag = response->getHttpRequest()->getTag(); 
 }   
 
-void HTTPManager::writeFileFromRequest(cocos2d::network::HttpResponse *response,std::string filename) {
+void HTTPManager::writeFileFromRequest(HttpResponse *response,std::string filename) {
     std::vector<CHAR>* buffer = response->getResponseData();     
     printf("Http Test,dump data:"); 
     
