@@ -200,10 +200,7 @@ void NetRoundManager::HandleError() {
 void NetRoundManager::SendReconnect() {
     LOGGER_WRITE("%s",__FUNCTION__);
     _response = REQUEST_ACCEPTED;
-
-    RequestReconnect aReq;
-    aReq.Set();
-    _messenger->Send(aReq);
+    _messenger->Send(REQ_GAME_SEND_RECONNECT);
     RETURN_IF_FAIL(_response);
 
     _uiManager->reload();
@@ -274,9 +271,7 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     if(env->IsReconnectRequired()) {
 		_uiManager->StartGame();
     } else {
-        RequestEnterRoom aReq;
-        aReq.Set();
-        _messenger->Send(aReq);
+        _messenger->Send(REQ_GAME_SEND_ENTER);
         RETURN_IF_FAIL(_response);
 
         _uiManager->GuiPlayerShow(MIDDLE);
@@ -290,20 +285,14 @@ void NetRoundManager::StartGame() {
         _uiManager->reload();
     } else {
         _isGameStart=false;
-        
-        RequestGameStart aReq;
-        aReq.Set();
-        _messenger->Send(aReq);
+        _messenger->Send(REQ_GAME_SEND_START);
         RETURN_IF_FAIL(_response);
     }
 }
 
 void NetRoundManager::StopGame() {
 	_isGameStart=false;
-    
-    RequestLeave aReq;
-    aReq.Set();
-    _messenger->Send(aReq);
+    _messenger->Send(REQ_GAME_SEND_LEAVE_ROOM);
     RETURN_IF_FAIL(_response);
 }
 

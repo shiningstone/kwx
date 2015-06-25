@@ -89,7 +89,7 @@ void KwxMessenger::WaitQueueAdd(RequestId_t req) {
 }
 
 int KwxMessenger::WaitQueueFind(RequestId_t req) {
-    for(int i=0;i<_waitQueue.size();i++) {
+    for(unsigned int i=0;i<_waitQueue.size();i++) {
         if(_waitQueue.at(i)==req) {
             return i;
         }
@@ -165,9 +165,32 @@ int KwxMessenger::Send(RequestId_t req) {
 				RequestReconnect aReq;
 				aReq.Set();
 				return Send(aReq);
-			}   
+			}
+
+        case REQ_GAME_SEND_ENTER:
+            {
+                RequestEnterRoom aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+
+        case REQ_GAME_SEND_START:
+            {
+                RequestGameStart aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+
+        case REQ_GAME_SEND_LEAVE_ROOM:
+            {
+                RequestLeave aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+        
 		default:
 			LOGGER_WRITE("%s unsupported request id %d",__FUNCTION__,req);
+			return INVALID;
     }
 }
 
