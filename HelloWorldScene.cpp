@@ -94,18 +94,14 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 			this->runAction(VoiceEffect);
             
 #ifndef IGNORE_LOGIN_REQUEST
-    		KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_LOGIN);
-    		RequestLogin aReq;
-    		aReq.Set();
-
-   			aMessenger->StartReceiving();
-    		aMessenger->Send(aReq);
-            
             EnvVariable *env = EnvVariable::getInstance();
+
+    		KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_LOGIN);
+   			aMessenger->StartReceiving();
+    		aMessenger->Send(REQ_LOGIN);
+            
             if(env->IsReconnectRequired()) {
-                RequestReconnect aReq;
-                aReq.Set();
-                aMessenger->Send(aReq);
+                aMessenger->Send(REQ_GAME_SEND_RECONNECT);
 
                 auto scene = Scene::create();
                 RaceLayer *layer = RaceLayer::create();

@@ -38,7 +38,7 @@ void HTTPManager::getFormData(std::string parameter) {
     request->setTag("getFormData");     
     log("url = %s",request->getUrl());
     
-    network::HttpClient::getInstance()->send(request);     
+    cocos2d::network::HttpClient::getInstance()->send(request);     
     request->release(); 
 }   
 

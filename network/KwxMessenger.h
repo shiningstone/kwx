@@ -31,6 +31,7 @@ public:
     void StopReceiving();
 
     int Send(UsMsg &aMsg,bool ignoreRsp=false);/* why cannot declare as const UsMsg??? */
+    int Send(RequestId_t req);
 
     static bool IsWaiting(RequestId_t req = REQ_INVALID);
     static bool Wait(RequestId_t req);

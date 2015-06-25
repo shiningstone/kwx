@@ -147,3 +147,27 @@ void KwxMessenger::destroyInstances() {
         _instances[i] = NULL;
     }
 }
+
+#include "./../protocol/DsInstruction.h"
+#include "./../protocol/KwxMsgLogin.h"
+int KwxMessenger::Send(RequestId_t req) {
+    switch(req) {
+        case REQ_LOGIN:
+			{
+    			RequestLogin aReq;
+    			aReq.Set();
+    			Send(aReq);
+				break;
+			}
+            
+        case REQ_GAME_SEND_RECONNECT:
+			{
+				RequestReconnect aReq;
+				aReq.Set();
+				Send(aReq);
+				break;
+			}            
+    }
+
+    return 0;
+}
