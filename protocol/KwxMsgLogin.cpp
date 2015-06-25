@@ -215,8 +215,9 @@ int ReconnectResponse::Construct(const DsMsg &msg) {
         
         status[dir] = (PlayerStatus_t)msg._body->_items[6]->_buf[i];
         score[dir]  = _ntohl( *(INT32U *)(msg._body->_items[7]->_buf + 4*i) );
-        isMing[dir] = msg._body->_items[9]->_buf[i];
     }
+
+    DsMsgParser::_load(isMing,tingNum,tingCards,msg,9);
 
     CardNode_t temp[3][18];
     INT8U      tempNum[3];

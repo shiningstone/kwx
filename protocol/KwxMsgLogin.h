@@ -118,6 +118,8 @@ public:
     INT8U            cardsNum[3];
     CardNode_t       cardsInHand[3][18];
     bool             isMing[3];
+    INT8U            tingNum[3];
+    Card_t           tingCards[3][18];
     INT8U            riverNum[3];
     CardNode_t       river[3][18];
     INT8U            name[3][128];

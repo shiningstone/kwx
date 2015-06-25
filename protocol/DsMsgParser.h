@@ -22,6 +22,7 @@ public:
     static int _load_ting_remind(TingInfo_t &ting,const INT8U *inMsg);
     static int _load(MingInfo_t &info,const DsMsg &msg,int itemIdx);
     static int _load(Reminds_t &remind,const DsMsg &msg,int itemIdx);
+    static int _load(bool isMing[3],INT8U tingNum[3],Card_t tingCards[3][18],const DsMsg &msg,int itemIdx);
 
     static int _unload(TingInfo_t    &ting);
     static int _unload(MingInfo_t &ming);

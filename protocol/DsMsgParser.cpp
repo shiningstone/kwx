@@ -87,6 +87,35 @@ int DsMsgParser::_load(CardNode_t cards[3][18],INT8U cardNum[3],const DsMsg &msg
     return 0;
 }
 
+int DsMsgParser::_load(bool isMing[3],INT8U tingNum[3],Card_t tingCards[3][18],const DsMsg &msg,int itemIdx) {
+    for(int i=0;i<3;i++) {
+        tingNum[i] = 0;
+    }
+
+    int bufLen = msg._body->_items[itemIdx]->_bufLen;
+    INT8U *buf = msg._body->_items[itemIdx]->_buf;
+    int player = MIDDLE;
+    int idx = 0;
+
+    isMing[player] = (buf[idx]==0);
+    idx++;
+
+    while(idx<bufLen) {
+        if(buf[idx]!=CARD_UNKNOWN) {
+            tingCards[player][tingNum[player]] = (Card_t)buf[idx];
+            tingNum[player]++;
+            idx++;
+        } else {
+            idx++;
+            player = (player+1)%3;
+            isMing[player] = (buf[idx]==0);
+            idx++;
+        }
+    }
+
+    return 0;
+}
+
 /*****************************************
     input  :  ting.kindNum
 *****************************************/

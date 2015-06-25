@@ -1390,7 +1390,7 @@ public:
             'K','W','X',           //KWX
             0x00,42,               //request code
             7,                     //package level
-            0x00,185,              //package size
+            0x00,193,              //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             13,
@@ -1409,7 +1409,7 @@ public:
                 0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x09,0x09,0x0a,0x0a,0xff,     /*MIDDLE 14*/
                 0x10,0x11,0x12,0x13,0x14,0x10,0x11,0x06,0x07,0x08,0x01,0x02,0x04,0xff,     /*RIGHT  13*/
                 0x10,0x11,0x12,0x13,0x14,0x10,0x11,0x06,0x07,0x08,0x01,0x02,0x04,          /*LEFT   13*/
-            135,0,3,0,0,0,           //Ã÷×´Ì¬
+            135,0,11,0,1,0xff,0,2,3,0xff,0,4,5,6,           //Ã÷×´Ì¬
             136,0x00,5,              //³öÅÆ
                 0x01,0xff,
                 0x02,0xff,
@@ -1435,6 +1435,10 @@ public:
         assert(len==sizeof(msgInNetwork));
         assert( aMsg->GetRequestCode()==REQ_GAME_SEND_RECONNECT );
         assert( aMsg->GetLevel()==7 );
+
+        assert(info.isMing[MIDDLE]);
+        assert(info.tingNum[MIDDLE]==1);
+        assert(info.tingCards[MIDDLE][0]==TIAO_2);
         
         return 0;
     }
