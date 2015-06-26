@@ -145,6 +145,7 @@ public:
     bool scan_ming(const CardList *river = NULL/*if don't care about remain number*/);
     void load_ming_info(const MingInfo_t &info);/* for MIDDLE only*/
     void set_ting_info(const TingInfo_t &ting);/*for others only*/
+    void set_ting_info(int tingNum,Card_t tingCards[]);
     void update_ting_num(const CardList *river);
 
     int  get_ting_num(Card_t kind);

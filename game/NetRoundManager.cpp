@@ -948,7 +948,14 @@ void NetRoundManager::_DiRecv(ReconnectResponse *info) {
         }
 
         _players[i]->_cards->refresh(info->cardsInHand[i],info->cardsNum[i]);
-        //_players[i]->_cards->set_ming(CARD_UNKNOWN);
+
+        if(info->isMing[i]) {
+            _players[i]->_cards->IsMing = true;
+            _players[i]->_cards->lock_all_cards(true);
+            _players[i]->_cards->set_ting_info(info->tingNum[i],info->tingCards[i]);
+        } else {
+            _players[i]->_cards->IsMing = false;
+        }
     }
 
     /*Íæ¼ÒÐÅÏ¢*/

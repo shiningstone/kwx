@@ -1118,6 +1118,16 @@ void CardInHand::set_ting_info(const TingInfo_t &ting) {
     }
 }
 
+void CardInHand::set_ting_info(int tingNum,Card_t tingCards[]) {
+    _ting = new TingInfo_t;
+    _ting->kindNum = tingNum;
+    _ting->cards = new TingItem_t[9];
+    
+    for(INT8U i=0;i<tingNum;i++) {
+        (_ting->cards+i)->kind = tingCards[i];
+    }
+}
+
 bool CardInHand::can_handout(int idx) const {
     if( _mingChoicesMask & (1<<idx) ) {
         return true;
