@@ -88,6 +88,15 @@ typedef struct {						//排行榜
 	int RankingNum;
 }TheCharts;
 
+typedef struct
+{											//商城物品
+	std::string photoFileName;				//图片
+	std::string GoodsName;					//物品名称
+	std::string GoodsIntroduct;				//物品简介
+	int GooldPrice;							//物品售价
+	bool CanBuy;							//能否购买
+}Mall_Items;
+
 class EnvVariable {
 public:
 	static EnvVariable *getInstance();
@@ -141,6 +150,21 @@ public:
 	void set_myBackpack();			//背包
 	std::vector <Backpack_Item> get_myBackpack();
 
+	void set_RaningList_DayGain();	//每日盈利
+	std::vector <TheCharts> get_RaningList_DayGain();
+
+	void set_RaningList_Riches();	//财富排行
+	std::vector <TheCharts> get_RaningList_Riches();
+
+	void set_RaningList_MaxType();	//最大番型
+	std::vector <TheCharts> get_RaningList_MaxType();
+
+	void set_RaningList_Record();	//战绩排行
+	std::vector <TheCharts> get_RaningList_Record();
+
+	void set_Mall_GoodList();	//商城物品
+	std::vector <Mall_Items> get_Mall_GoodList();
+
 	void TestDataFunction();									//测试数据初始化
 	/**************************/
 private:
@@ -154,16 +178,17 @@ private:
     void RoomServerInit(int roomId);
 
 	/**************************/
-	Personal_Information personalDetailed;						//个人信息
-	std::vector <Friend_Info> MyFriendList;						//好友列表
-	std::vector <OtherPlayers_Info> NearyPeopleList;			//附近玩家
-	std::vector <OtherPlayers_Info> StrangersList;				//陌生人
-	std::vector <Backpack_Item> myBackpack;						//我的背包
-	MainLayer_myInfo personalSimple;							//主页面个人数据
-	std::vector <TheCharts> RaningList_DayGain;					//日盈利
-	std::vector <TheCharts> RaningList_Riches;					//财富榜
-	std::vector <TheCharts> RaningList_MaxType;					//最大番型
-	std::vector <TheCharts> RaningList_Record;					//战绩榜
+	Personal_Information personalDetailed;						//个人信息..
+	std::vector <Friend_Info> MyFriendList;						//好友列表..
+	std::vector <OtherPlayers_Info> NearyPeopleList;			//附近玩家..
+	std::vector <OtherPlayers_Info> StrangersList;				//陌生人..
+	std::vector <Backpack_Item> myBackpack;						//我的背包..
+	MainLayer_myInfo personalSimple;							//主页面个人数据..
+	std::vector <TheCharts> RaningList_DayGain;					//日盈利..
+	std::vector <TheCharts> RaningList_Riches;					//财富榜..
+	std::vector <TheCharts> RaningList_MaxType;					//最大番型..
+	std::vector <TheCharts> RaningList_Record;					//战绩榜..
+	std::vector <Mall_Items> Mall_GoodList;						//商城
 	/**************************/
 };
 

@@ -19,25 +19,17 @@ public:
 	virtual ~EnterRoom();
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
-#define NODE_CHILD_ID_ONE			1	
-#define NODE_CHILD_ID_TWO			2	
-#define NODE_CHILD_ID_THREE			3
-#define MAX_CONTINE_LOAD_DAYS		7
+#define NODE_CHILD_ID_ONE			1				//RankingScroll
 
-#define THIS_FRIEND_CHAT_BKG		1
-#define THIS_MYFEIEND_BUTTON		2
-#define THIS_NEARPEOPLE_BUTTON		3
-#define THIS_STRANGERS_BUTTON		4
-#define	THIS_FRIEND_SCROLLVIEW		5
-#define	THIS_NEARLY_SCROLLVIEW		6
-#define THIS_GET_DAYGOLD_BKG		7
-#define RANKSCROLL_LAYER			8
-#define CREATE_ROLE_LAYER			9
 
-#define LABEL_FOR_PLAYERNAME		8
-#define LABEL_FOR_GOLD				9
-#define LABEL_FOR_QUAN				10
-#define SPRITE_FOR_PHOTO			11
+#define THIS_GET_DAYGOLD_BKG		1
+#define RANKSCROLL_LAYER			2
+#define THIS_FRIEND_CHAT_BKG		3//ÁÄÌì¶Ô»°¿ò
+
+#define LABEL_FOR_PLAYERNAME		4
+#define LABEL_FOR_GOLD				5
+#define LABEL_FOR_QUAN				6
+#define SPRITE_FOR_PHOTO			7
 	Size visibleSize;
 	Point origin;
 	float s_scale;
@@ -48,7 +40,6 @@ public:
 	//int cur_status;
 	// Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
 	virtual bool init();
-	//void addRes();
 	void MyDataUIPrepare();
 	void FunctionBarUIPrepare();
 	void competeButtons();

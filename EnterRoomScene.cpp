@@ -18,6 +18,8 @@
 
 EnterRoom::EnterRoom()
 {
+	s_scale=1.189;
+	s_no=1;
 	personalSimpleInfo=EnvVariable::getInstance()->get_personalSimple();
 }
 EnterRoom::~EnterRoom()
@@ -348,34 +350,6 @@ void EnterRoom::competeButtons()
 	this->addChild(PleaseWaiting,1);
 }
 
-void EnterRoom::createRole()
-{
-
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
-
-	auto createRoleBkg=Sprite::create("Createrolebj.png");
-	auto BkgSize=createRoleBkg->getContentSize();
-	createRoleBkg->setAnchorPoint(Vec2(0.5,0.5));
-	createRoleBkg->setPosition(Vec2(0.5,0.5));
-	this->addChild(createRoleBkg,5,CREATE_ROLE_LAYER);
-
-	auto SwallowLayer=LayerColor::create();
-	SwallowLayer->setContentSize(Size(visibleSize.width,visibleSize.height));
-	SwallowLayer->setColor(ccWHITE);
-	SwallowLayer->setOpacity(50);
-	SwallowLayer->ignoreAnchorPointForPosition(false);
-	SwallowLayer->setAnchorPoint(Vec2(0.5,0.5));
-	SwallowLayer->setPosition(Vec2(BkgSize.width/2,BkgSize.height/2));
-	createRoleBkg->addChild(SwallowLayer,1);
-	EventListenerTouchOneByOne* SwallowListener=EventListenerTouchOneByOne::create();
-	SwallowListener->setSwallowTouches(true);
-	SwallowListener->onTouchBegan=[=](Touch* touch, Event* event){return true;};
-	SwallowListener->onTouchMoved=[=](Touch* touch, Event* event){};
-	SwallowListener->onTouchEnded=[=](Touch* touch, Event* event){};
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(SwallowListener,SwallowLayer);
-
-}
-
 bool EnterRoom::init()
 {
 	if(!Layer::init())
@@ -395,7 +369,6 @@ bool EnterRoom::init()
 	sprite->setScaleY(s_scale);
 	this->addChild(sprite, 0);
 
-	//addRes();//加载plist
 	MyDataUIPrepare();//头像等个人信息
 	FunctionBarUIPrepare();//功能
 
@@ -406,10 +379,6 @@ bool EnterRoom::init()
 
 	auto FriendLayer=new FriendList(this);
 	this->addChild(FriendLayer);
-
-	/***********///ceshi_yusi
-	//FriendAndStrangers();//好友列表
-	/***********/
 
 	competeButtons();//比赛按钮
 	if(!EnvVariable::getInstance()->_dailyLogin.hasReward)

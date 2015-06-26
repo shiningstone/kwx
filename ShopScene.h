@@ -17,8 +17,8 @@ public:
 	ShopScene(void);
 	~ShopScene(void);
 	void onButtonBack(Ref* pSender,Widget::TouchEventType type);
-	void onButtonSutraHall(Ref* pSender,Widget::TouchEventType type);
-	void onButtonEatIsland(Ref* pSender,Widget::TouchEventType type);
+	//void onButtonSutraHall(Ref* pSender,Widget::TouchEventType type);
+	//void onButtonEatIsland(Ref* pSender,Widget::TouchEventType type);
 	virtual bool init();
 	CREATE_FUNC(ShopScene);
 };

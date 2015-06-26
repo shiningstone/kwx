@@ -27,9 +27,9 @@ class FriendList : public Layer
 #define STRANGER_LIST				6
 
 #define CHAT_CHILD_BAK				1
-#define CHATRECORD_BTN				2
-#define COMMON_BTN					3
-#define CHAT_EDIT_BOX				4
+#define CHATRECORD_BTN				1
+#define COMMON_BTN					2
+#define CHAT_EDIT_BOX				3
 public:
 	FriendList(EnterRoom* p);
 	~FriendList(void);
@@ -38,16 +38,20 @@ public:
 	Vec2 origin;
 	virtual bool init();
 
-	void ListBtnCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);
+	void ChatOneToOneCreate(Friend_Info chatFriend);//聊天窗口
 
-	void ChatOneToOneCreate();
+	void ListBtnCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//列表切换按钮
+	void listItemCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//好友Item回调
 
-	//void selectedItemEvent(cocos2d::Ref* pSender,ListViewEventType type);
+	void ChatBtnCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);//聊天窗口切换按钮
+	void MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);//消息发送
 
-	void ChatRecordCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
-	void CommonLanguageCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
-	void MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
 
+	void insertItemForFriend();					//好友列表刷新
+	void ListEventCall(cocos2d::Ref *pSender,ListViewEventType type);
+
+	void updateTest(float delt);
+	void updateTest1(float delt);
 	//CREATE_FUNC(FriendList);
 private:
 	EnterRoom* parentNode;

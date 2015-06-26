@@ -178,7 +178,7 @@ void HelloWorld::enterRoomStandAlone()
 	RaceLayer *layer = RaceLayer::create();
     scene->addChild(layer);
 #ifndef NETWORK_GAME_DEBUG
-    layer->CreateRace(LOCAL_GAME);//NETWORK_GAME
+    layer->CreateRace(LOCAL_GAME);
 #else
     layer->CreateRace(NETWORK_GAME);
 #endif

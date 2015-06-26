@@ -6,6 +6,8 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
+#include "network/KwxEnv.h"
+
 class ShopLayer :
 	public Layer
 {
@@ -15,5 +17,7 @@ public:
 	void onButtonBuy(Ref* pSender,Widget::TouchEventType type);
 	virtual bool init();
 	CREATE_FUNC(ShopLayer);
+private:
+	std::vector <Mall_Items> MallGoodList;
 };
 

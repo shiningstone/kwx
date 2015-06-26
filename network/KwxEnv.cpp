@@ -128,10 +128,16 @@ RoomPath_t EnvVariable::GetRoomPath() {
 //void EnvVariable::RoomServerInit(int roomId)
 //{
 //}
+
+
+
+
+
+
 /******************”‡Àº*******************************/
 void EnvVariable::set__dailyLogin()
 {
-	_dailyLogin.hasReward=false;
+	_dailyLogin.hasReward=true;
 	_dailyLogin.dailyReward=500;
 	_dailyLogin.continuousDays=1;
 }
@@ -141,19 +147,11 @@ void EnvVariable::set_MyFriendList()
 	for(int a=0;a<20;a++)
 		MyFriendList.push_back(tempInfo);
 }
-std::vector <Friend_Info> EnvVariable::get_MyFriendList()
-{
-	return MyFriendList;
-}
 void EnvVariable::set_NearyPeopleList()
 {
 	OtherPlayers_Info tempInfo={"Head17.png","tempName",BOY,12345678};
 	for(int a=0;a<20;a++)
 		NearyPeopleList.push_back(tempInfo);
-}
-std::vector <OtherPlayers_Info> EnvVariable::get_NearyPeopleList()
-{
-	return NearyPeopleList;
 }
 void EnvVariable::set_StrangersList()
 {
@@ -161,18 +159,10 @@ void EnvVariable::set_StrangersList()
 	for(int a=0;a<20;a++)
 		StrangersList.push_back(tempInfo);
 }
-std::vector <OtherPlayers_Info> EnvVariable::get_StrangersList()
-{
-	return StrangersList;
-}
 void EnvVariable::set_personalDetailed()
 {
 	Personal_Information tempInfo={12345678,"ye10203",Tourist,"tempName",BOY,50,128,"Head17.png",3.254,5000};
 	personalDetailed=tempInfo;
-}
-Personal_Information EnvVariable::get_personalDetailed()
-{
-	return personalDetailed;
 }
 void EnvVariable::set_myBackpack()
 {
@@ -180,9 +170,86 @@ void EnvVariable::set_myBackpack()
 	for(int a=0;a<6;a++)
 		myBackpack.push_back(tempItem);
 }
+void EnvVariable::set_RaningList_DayGain()
+{
+	TheCharts tempItem={"Head17.png","tempName",5000};
+	for(int a=0;a<20;a++)
+		RaningList_DayGain.push_back(tempItem);
+}
+void EnvVariable::set_RaningList_Riches()
+{
+	TheCharts tempItem={"Head17.png","tempName",5000};
+	for(int a=0;a<20;a++)
+		RaningList_Riches.push_back(tempItem);
+}
+void EnvVariable::set_RaningList_MaxType()
+{
+	TheCharts tempItem={"Head17.png","tempName",5000};
+	for(int a=0;a<20;a++)
+		RaningList_MaxType.push_back(tempItem);
+}
+void EnvVariable::set_RaningList_Record()
+{
+	TheCharts tempItem={"Head17.png","tempName",5000};
+	for(int a=0;a<20;a++)
+		RaningList_Record.push_back(tempItem);
+}
+void EnvVariable::set_personalSimple()
+{
+	personalSimple.GoldNum=5000;
+	personalSimple.NikeName="tempName";
+	personalSimple.photoFileName="Head17.png";
+	personalSimple.QuanNum=5000;
+}
+void EnvVariable::set_Mall_GoodList()
+{
+	Mall_Items tempItem={"Head17.png","±Ÿ–∞Ω£∆◊","∫«∫«°£°£°£",500,true};
+	for(int a=0;a<10;a++)
+		Mall_GoodList.push_back(tempItem);
+}
+std::vector <Mall_Items> EnvVariable::get_Mall_GoodList()
+{
+	return Mall_GoodList;
+}
+std::vector <Friend_Info> EnvVariable::get_MyFriendList()
+{
+	return MyFriendList;
+}
+std::vector <OtherPlayers_Info> EnvVariable::get_NearyPeopleList()
+{
+	return NearyPeopleList;
+}
+std::vector <OtherPlayers_Info> EnvVariable::get_StrangersList()
+{
+	return StrangersList;
+}
+Personal_Information EnvVariable::get_personalDetailed()
+{
+	return personalDetailed;
+}
 std::vector <Backpack_Item> EnvVariable::get_myBackpack()
 {
 	return myBackpack;
+}
+std::vector <TheCharts> EnvVariable::get_RaningList_DayGain()
+{
+	return RaningList_DayGain;
+}
+std::vector <TheCharts> EnvVariable::get_RaningList_Riches()
+{
+	return RaningList_Riches;
+}
+std::vector <TheCharts> EnvVariable::get_RaningList_MaxType()
+{
+	return RaningList_MaxType;
+}
+std::vector <TheCharts> EnvVariable::get_RaningList_Record()
+{
+	return RaningList_Record;
+}
+MainLayer_myInfo EnvVariable::get_personalSimple()
+{
+	return personalSimple;
 }
 void EnvVariable::TestDataFunction()
 {
@@ -193,16 +260,11 @@ void EnvVariable::TestDataFunction()
 	set_StrangersList();
 	set_personalDetailed();
 	set_myBackpack();
+	set_RaningList_DayGain();
+	set_RaningList_Riches();
+	set_RaningList_MaxType();
+	set_RaningList_Record();
+	set_Mall_GoodList();
 }
-void EnvVariable::set_personalSimple()
-{
-	personalSimple.GoldNum=5000;
-	personalSimple.NikeName="tempName";
-	personalSimple.photoFileName="Head17.png";
-	personalSimple.QuanNum=5000;
-}
-MainLayer_myInfo EnvVariable::get_personalSimple()
-{
-	return personalSimple;
-}
+
 
