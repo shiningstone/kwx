@@ -177,6 +177,8 @@ private:
     void RoomServerInit(int roomId);
 
 	/**************************/
+    friend class BasicInfoResponse;
+    
 	Personal_Information personalDetailed;						//个人信息..
 	std::vector <Friend_Info> MyFriendList;						//好友列表..
 	std::vector <OtherPlayers_Info> NearyPeopleList;			//附近玩家..

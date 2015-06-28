@@ -11,13 +11,13 @@ USING_NS_CC_EXT;
 using namespace cocos2d::network; 
 
 class  HTTPManagerDelegate { 
-public:    
+public:
     virtual void onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) = 0; 
 };   
 
 class HTTPManager:public Ref { 
 public:     
-    typedef std::function<VOID(HttpClient *sender,HttpResponse *response)> ccHttpManagerCallback;     
+    typedef std::function<void(HttpClient *sender,HttpResponse *response)> ccHttpManagerCallback;     
 
     HTTPManager();     
     ~HTTPManager();     

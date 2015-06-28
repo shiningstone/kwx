@@ -4,6 +4,7 @@
 #include "./../utils/UtilPlatform.h"
 #include "./../network/KwxEnv.h"
 #include "./../network/KwxMessenger.h"
+#include "./../hall/VersionManager.h"
 
 #include "MsgFormats.h"
 #include "CommonMsg.h"
@@ -115,10 +116,35 @@ int RequestVersionUpdate::Set() {
 int VersionUpdateResponse::Construct(const DsMsg & msg) {
     CHECK_STATUS(msg);
 
-    verCode = msg.GetItemValue(1);
-    msg.GetString(2,verName);
-    msg.GetString(3,content);
-    msg.GetString(4,url);
+    VerInfo_t &ver = VersionManager::getInstance()->_newVer;
+    
+    ver.code = msg.GetItemValue(1);
+    msg.GetString(2,ver.name);
+    msg.GetString(3,ver.content);
+    msg.GetString(4,ver.size);
+    msg.GetString(5,ver.url);
+    
+    return 0;
+}
+
+int RequestBasicInfo::Set() {
+    SetRequestCode(RRQ_BASIC_INFO);
+    return 0;
+}
+
+int BasicInfoResponse::Construct(const DsMsg &msg) {
+    Personal_Information &info = EnvVariable::getInstance()->personalDetailed;
+
+    info.id          = msg.GetItemValue(0);
+    msg.GetString(1,info.account);
+    info.accountType = (Account_Type)msg.GetItemValue(2);
+    msg.GetString(3,info.Nickname);
+    info.PlayerSex   = (Sex_t)msg.GetItemValue(4);
+    //info.Winrate
+    info.maxTime     = msg.GetItemValue(6);
+    msg.GetString(7,info.PhotoName);
+    //info.PlayerLv
+    info.GoldNum     = msg.GetItemValue(9);
     
     return 0;
 }

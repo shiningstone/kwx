@@ -47,6 +47,7 @@ public:
     INT32U      GetItemValue(int idx) const;
     INT16U      GetItemBufLen(int idx) const;
     void        GetString(int idx,INT8U *utf8string) const;
+    void        GetString(int idx,std::string &utf8string) const;
 
 private:
 	static DsMsg *_instance;

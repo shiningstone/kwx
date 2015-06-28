@@ -70,7 +70,7 @@ void HTTPManager::onHttpRequestCompleted(HttpClient *sender, HttpResponse *respo
 }   
 
 void HTTPManager::writeFileFromRequest(HttpResponse *response,std::string filename) {
-    std::vector<CHAR>* buffer = response->getResponseData();     
+    std::vector<char>* buffer = response->getResponseData();     
     printf("Http Test,dump data:"); 
     
     std::string path     = FileUtils::getInstance()->getWritablePath();     

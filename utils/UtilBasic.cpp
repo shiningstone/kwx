@@ -168,7 +168,7 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, int utf16Len, Utf8* pUtf8Start) {
  
     while(pTempUtf16<pUtf16End)
     {
-        unsigned wchar_t byte = *pTempUtf16;
+        INT16U byte = *pTempUtf16;
         
         if (byte <= UTF16_MAPPER[0].end)
         {//0000 - 007F  0xxxxxxx
@@ -199,7 +199,7 @@ int Utf16ToUtf8(const Utf16* pUtf16Start, int utf16Len, Utf8* pUtf8Start) {
 
 int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start)
 {
-    const Utf8*  pUtf8End = pUtf8Start + strlen(pUtf8Start);
+    const Utf8*  pUtf8End = pUtf8Start + strlen((char *)pUtf8Start);
 
     pUtf16Start[0] = UTF16_HEADER;
     
@@ -252,6 +252,15 @@ void _split(INT8U strings[3][128],const INT8U *buf) {
     }
 }
 
+void _split(vector<string> &strings,const INT8U *buf,const char *spliter) {
+    char *token = strtok((char *)buf,spliter);
+    
+    while(token!=NULL) {
+        strings.push_back(token);
+        token = strtok(NULL,spliter);
+    }
+}
+
 /****************************************************************
     platform dependent
 ****************************************************************/
@@ -260,6 +269,7 @@ void _split(INT8U strings[3][128],const INT8U *buf) {
 #else
 #include "platform/android/jni/JniHelper.h"
 #include <jni.h>
+#include <unistd.h>
 
 USING_NS_CC;
 #endif
@@ -268,6 +278,6 @@ void _delay(int ms) {
     #ifdef WIN32
     Sleep(ms);
     #else
-    /*android interface*/
+    usleep(ms);
     #endif
 }

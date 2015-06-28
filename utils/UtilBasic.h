@@ -2,6 +2,10 @@
 #ifndef __UTIL_BASIC__
 #define __UTIL_BASIC__
 
+#include <string>
+#include <vector>
+using namespace std;
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -35,8 +39,8 @@ extern bool _is_active(INT32U value,INT32U mask);
     0080 - 07FF  110xxxxx 10xxxxxx
     0800 - FFFF  1110xxxx 10xxxxxx 10xxxxxx
 ************************************/
-typedef char    Utf8;
-typedef wchar_t Utf16;
+typedef INT8U   Utf8;
+typedef INT16U  Utf16;
 
 static Utf16 UTF16_HEADER = 0xfeff;
 #define UTF16_HEADER_LEN 2
@@ -47,7 +51,7 @@ extern int Utf16ToUtf8(const Utf16* pUtf16Start, int len, Utf8* pUtf8Start);
 extern int Utf8ToUtf16(const Utf8* pUtf8Start, Utf16* pUtf16Start);
 
 void _split(INT8U strings[3][128],const INT8U *buf);
-
+void _split(vector<string> &strings,const INT8U *buf,const char *spliter);
 /****************************************
 string tranfer to bytes
     seperator should be ','

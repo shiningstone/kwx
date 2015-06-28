@@ -55,12 +55,16 @@ public:
 class VersionUpdateResponse : public DsInstruction {
 public:
     virtual int Construct(const DsMsg &msg);
+};
 
-    INT8U      verCode;
-    INT8U      verName[128];
-    INT8U      content[128];
-    INT8U      versize[128];
-    INT8U      url[128];
+class RequestBasicInfo : public UsMsg {
+public:
+    int Set();
+};
+
+class BasicInfoResponse : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
 };
 
 class RequestDailyLogin : public UsMsg {

@@ -875,7 +875,6 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
-    #ifndef USE_LOCAL_PROFILE
     Database *data = Database::getInstance();
     
     for(int i=0;i<PLAYER_NUM;i++) {
@@ -890,21 +889,11 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
             _players[i]->Set(&profile);
         }
     }
-    #else
-    UserProfile_t profile[PLAYER_NUM] = {{0}};
-    _strategy->load_profiles(profile);
-    
-    for(int i=0;i<PLAYER_NUM;i++) {
-        _players[i]->_isExist = true;
-        _players[i]->Set(&profile[i]);
-    }
-    #endif
 
     KwxHeart::getInstance();
 }
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
-    #ifndef USE_LOCAL_PROFILE
     Database *data = Database::getInstance();
     
     int dir = info->seat;
@@ -919,7 +908,6 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
     _players[dir]->Set(&profile);
 
     _uiManager->GuiPlayerShow((PlayerDir_t)dir);
-    #endif
 }
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {

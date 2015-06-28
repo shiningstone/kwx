@@ -152,6 +152,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_LOGIN:
             return new LoginResponse();
 
+        case RRQ_BASIC_INFO:
+            return new BasicInfoResponse();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }
@@ -204,6 +207,12 @@ void DsMsg::GetString(int idx,INT8U *utf8string)const {
     
     _ntohs(_body->_items[idx]->_buf,_body->_items[idx]->_bufLen,buf);
     Utf16ToUtf8((const Utf16 *)buf,_body->_items[idx]->_bufLen/2,(Utf8 *)utf8string);
+}
+
+void DsMsg::GetString(int idx,std::string &utf8string)const {
+    INT8U buf[128] = {0};
+    GetString(idx,buf);
+    utf8string = (char *)buf;
 }
 /**********************************************************
 	UpStream

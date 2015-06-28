@@ -61,13 +61,11 @@ typedef enum {
     REQ_GAME_SEND_ENTER         = 44,
     REQ_GAME_RECV_ENTER         = 71,
 
-    /*********************************************
-        ´ýÊµÏÖREQUEST
-    *********************************************/
     /*  login */
     REQ_LOGIN                   = 1,
     REQ_RES_UPDATE              = 2,
     REQ_VER_UPDATE              = 3,
+    RRQ_BASIC_INFO              = 31,
     REQ_DAILY_LOGIN             = 37,
     REQ_GAME_SEND_RECONNECT     = 42,
     REQ_GAME_RECV_RECONNECT     = 74,
