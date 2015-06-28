@@ -221,33 +221,24 @@ typedef enum _RobotTarget_t {
 
 #define DESC(x) { x,#x }
 
-#ifdef WIN32
-    typedef struct _ActionDesc {
-        ActionId_t  id;
-        char        desc[32];
-    }ActionDesc;
+typedef struct _ActionDesc {
+    ActionId_t  id;
+    char        desc[32];
+}ActionDesc;
 
-    typedef struct _CardDesc {
-        Card_t      id;
-        char        desc[32];
-    }CardDesc;
+typedef struct _CardDesc {
+    Card_t      id;
+    char        desc[32];
+}CardDesc;
 
-    typedef struct _PlayerDesc {
-        PlayerDir_t id;
-        char        desc[32];
-    }PlayerDesc;
-    
-    extern char *DescAct(ActionId_t act);
-    extern char *DescCard(Card_t kind);
-    extern char *DescPlayer(PlayerDir_t dir);
+typedef struct _PlayerDesc {
+    PlayerDir_t id;
+    char        desc[32];
+}PlayerDesc;
 
-#else
-
-    char *DescAct(ActionId_t act);
-    char *DescCard(Card_t kind);
-    char *DescPlayer(PlayerDir_t dir);
-
-#endif
+extern char *DescAct(ActionId_t act);
+extern char *DescCard(Card_t kind);
+extern char *DescPlayer(PlayerDir_t dir);
 
 #endif
 

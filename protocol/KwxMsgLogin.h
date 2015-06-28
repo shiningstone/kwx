@@ -3,6 +3,7 @@
 #define __KWX_MSG_LOGIN__
 
 #include "KwxMsgBasic.h"
+#include "./../network/KwxEnv.h"
 
 class UsMsg;
 class DsMsg;
@@ -33,6 +34,35 @@ public:
     bool        _userActivated;
 };
 
+class RequestResourceUpdate : public UsMsg {
+public:
+    int Set();
+};
+
+class ResourceUpdateResponse : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+
+    INT32U     maxResId;
+    INT8U      url[128];
+};
+
+class RequestVersionUpdate : public UsMsg {
+public:
+    int Set();
+};
+
+class VersionUpdateResponse : public DsInstruction {
+public:
+    virtual int Construct(const DsMsg &msg);
+
+    INT8U      verCode;
+    INT8U      verName[128];
+    INT8U      content[128];
+    INT8U      versize[128];
+    INT8U      url[128];
+};
+
 class RequestDailyLogin : public UsMsg {
 public:
     int Set(Key_t key);
@@ -41,17 +71,6 @@ public:
 class DailyLoginResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
-
-    bool        hasReward;
-    INT32U      continuousDays;
-    INT32U      dailyReward;
-    
-    INT8U       image[128];
-    INT8U       name[128];
-    INT32U      gold;
-    INT32U      coupon;
-    INT8U       friends;
-    INT8U       strangers;
 };
 
 class RequestEnterRoom : public UsMsg {

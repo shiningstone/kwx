@@ -13,6 +13,8 @@ using namespace CocosDenshion;
 #include "network/KwxMessenger.h"
 #include "LoginAndRegister.h"
 
+#include "ChineseChar.h"
+
 #include "utils/DebugCtrl.h"
 
 HelloWorld::HelloWorld()
@@ -109,6 +111,14 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
                 layer->CreateRace(NETWORK_GAME);
                 Director::getInstance()->replaceScene(scene);
                 return;
+            } else if(aMessenger->_response==VERSION_TOO_OLD) {
+
+            } else if(aMessenger->_response==NEW_VERSION_AVAILABLE) {
+
+            } else if(aMessenger->_response==NEW_RES_AVAILABLE) {
+
+            } else if(aMessenger->_response==SERVER_DATA_ERROR) {
+
             }
 #endif
             bool ifAccountHaved=true;
@@ -218,13 +228,17 @@ void HelloWorld::set_userDefault()
 		userDefault->setIntegerForKey("cur_sta",1);
 		userDefault->setIntegerForKey("load_time",7352);
 
-		userDefault->setStringForKey("MyNickName","雀友");
+		userDefault->setStringForKey("MyNickName",QueYou);
 		userDefault->setIntegerForKey("MyProperty",50000);
-		userDefault->setStringForKey("MyLevel","菜鸟");
+		userDefault->setStringForKey("MyLevel",CaiNiao);
 		userDefault->setStringForKey("MyPhoto","Head17.png");
 		userDefault->setStringForKey("MySex","Boy");
-		std::string RobotName[16]={"十堰冰冰","随州青霞","武汉丽缇","襄阳韦彤","孝感歆艺","郧西子怡","郧县若瑄",
-			"竹山紫琪","房县老李","十堰小李","随州小张","武汉关哥","襄阳小刘","孝感小王","郧西老杨","郧县小陈"};
+		std::string RobotName[16]={
+            ShiYanBingBing,  SuiZhouQingXia,  WuHanLiti,         XiangYangWeiTong,  XiaoGanXinYi,
+            YunXiZiYi,       YunXianRuoXuan,  ZuShanZiQi,        FangXianLaoLi,     ShiYanXiaoLi,
+            SuiZhouXiaoZhang,WuHanGuanGe,     XiangYangXiaoLiu , XiaoGanXiaoWang,   YunXiLaoYang,
+            YunXianXiaoChen, 
+        };
 		char buffer[80];
 		for(int i=0;i<16;i++)
 		{
@@ -242,7 +256,7 @@ void HelloWorld::set_userDefault()
 			std::string robotPath=buffer;
 			userDefault->setStringForKey(robotName.c_str(),RobotName[i]);
 			userDefault->setIntegerForKey(robotProperty.c_str(),50000);
-			userDefault->setStringForKey(robotLevel.c_str(),"菜鸟");
+			userDefault->setStringForKey(robotLevel.c_str(),CaiNiao);
 			userDefault->setStringForKey(robotPhoto.c_str(),robotPath);
 			if(i<9)
 				userDefault->setStringForKey(robotSex.c_str(),"Girl");

@@ -17,20 +17,6 @@ using namespace std;
 		get from OTHER MODULES or set to a CONST VALUE, 
 		while they are set to keep accordance with test cases during unit test
 ********************************************************************************/
-    
-typedef struct {
-    bool        hasReward;                          //是否已领取
-    INT32U      continuousDays;						//连续登陆天数
-    INT32U      dailyReward;						//当前奖励数量
-    
-    INT8U       image[128];							//这几个是做什么用的
-    INT8U       name[128];
-    INT32U      gold;
-    INT32U      coupon;
-    INT8U       friends;
-    INT8U       strangers;
-}DataDailyLogin_t;
-
 typedef enum					//账户类型		
 {
 	Tourist,
@@ -96,6 +82,19 @@ typedef struct
 	int GooldPrice;							//物品售价
 	bool CanBuy;							//能否购买
 }Mall_Items;
+    
+typedef struct {
+    bool        hasReward;                          //是否已领取
+    INT32U      continuousDays;						//连续登陆天数
+    
+    INT8U       image[128];							//这几个是做什么用的
+    INT8U       name[128];
+    INT32U      gold;
+    INT32U      coupon;
+    vector<Friend_Info>       friends;
+    vector<OtherPlayers_Info> strangers;
+    vector<OtherPlayers_Info> nearbys;
+}DataDailyLogin_t;
 
 class EnvVariable {
 public:

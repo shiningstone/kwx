@@ -1,8 +1,6 @@
 
 #include "DbgRequestDesc.h"
 
-#ifdef WIN32
-
 RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_SEND_START),
     DESC(REQ_GAME_SEND_SHOWCARD),
@@ -72,11 +70,4 @@ char *DescErr(FailureCode_t id) {
         }
     }
 }
-
-#else 
-
-char *DescReq(RequestId_t id)   { return 0; }
-char *DescErr(FailureCode_t id) { return 0; }
-
-#endif
 

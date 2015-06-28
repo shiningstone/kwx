@@ -154,14 +154,16 @@ MsgBody::~MsgBody() {
 }
 
 int MsgBody::Serialize(INT8U *outMsg) {
-    outMsg[0] = _itemNum;
-
-    int bodyLen = 1;
-
-    for( int i=0; i<_itemNum; i++ ) {
-        bodyLen += _items[i]->Serialize(outMsg+bodyLen);
+    int bodyLen = 0;
+    
+    if(_itemNum>0) {
+        outMsg[bodyLen++] = _itemNum;
+        
+        for( int i=0; i<_itemNum; i++ ) {
+            bodyLen += _items[i]->Serialize(outMsg+bodyLen);
+        }
     }
-
+    
     return bodyLen;
 }
 

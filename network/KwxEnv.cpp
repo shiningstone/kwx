@@ -138,7 +138,6 @@ RoomPath_t EnvVariable::GetRoomPath() {
 void EnvVariable::set__dailyLogin()
 {
 	_dailyLogin.hasReward=true;
-	_dailyLogin.dailyReward=500;
 	_dailyLogin.continuousDays=1;
 }
 void EnvVariable::set_MyFriendList()

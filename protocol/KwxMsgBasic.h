@@ -66,6 +66,8 @@ typedef enum {
     *********************************************/
     /*  login */
     REQ_LOGIN                   = 1,
+    REQ_RES_UPDATE              = 2,
+    REQ_VER_UPDATE              = 3,
     REQ_DAILY_LOGIN             = 37,
     REQ_GAME_SEND_RECONNECT     = 42,
     REQ_GAME_RECV_RECONNECT     = 74,
@@ -109,6 +111,10 @@ typedef enum {
     SERVER_BOOTING,
     DATA_SYNC_ERROR,
     LOGIN_DUPLICATED,
+    VERSION_TOO_OLD,
+    NEW_VERSION_AVAILABLE,
+    NEW_RES_AVAILABLE,
+    SERVER_DATA_ERROR,
     FAILURE_UNDEFINED = 250,
 }FailureCode_t;
 

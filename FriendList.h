@@ -2,7 +2,7 @@
 #define FRIEND_LIST_H
 
 #include "cocos2d.h"
-#include "cocos-ext.h"
+#include "extensions/cocos-ext.h"
 #include "ui/CocosGUI.h"
 USING_NS_CC;
 USING_NS_CC_EXT;

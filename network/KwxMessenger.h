@@ -39,6 +39,8 @@ public:
     static bool Wait(RequestId_t req);
     static void Resume(RequestId_t req = REQ_INVALID);
     static void WaitQueueAdd(RequestId_t req);
+
+    static FailureCode_t _response;
 private:
     KwxMessenger(MsgType_t type);
     ~KwxMessenger();

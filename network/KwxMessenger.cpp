@@ -126,13 +126,9 @@ void KwxMessenger::Resume(RequestId_t req) {
     }
 }
 
-int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    DsMsg *aMsg = DsMsg::getInstance();
-    aMsg->Dispatch(pkg,len);
-	return 0;
-}
-
+FailureCode_t KwxMessenger::_response = REQUEST_ACCEPTED;
 KwxMessenger *KwxMessenger::_instances[MSG_TYPE_MAX] = {0};
+
 KwxMessenger *KwxMessenger::getInstance(MsgType_t type) {
     if(!_instances[type]) {
         _instances[type] = new KwxMessenger(type);
@@ -148,6 +144,12 @@ void KwxMessenger::destroyInstances() {
     }
 }
 
+int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
+    DsMsg *aMsg = DsMsg::getInstance();
+    aMsg->Dispatch(pkg,len);
+	return 0;
+}
+
 #include "./../protocol/DsInstruction.h"
 #include "./../protocol/UsRequest.h"
 #include "./../protocol/KwxMsgLogin.h"
@@ -160,6 +162,20 @@ int KwxMessenger::Send(RequestId_t req) {
     			return Send(aReq);
 			}
             
+        case REQ_RES_UPDATE:
+            {
+                RequestResourceUpdate aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+            
+        case REQ_VER_UPDATE:
+            {
+                RequestVersionUpdate aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+                    
         case REQ_GAME_SEND_RECONNECT:
 			{
 				RequestReconnect aReq;

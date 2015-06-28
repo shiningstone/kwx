@@ -246,9 +246,9 @@ bool VersionUpgrade::init()
 	char promptMessage[100];
 	std::string messageHead;
 	std::string messageEnd;
-	sprintf(promptMessage,"检测到您当前版本号为%s",curGameEdition);//sprintf 参数中如果有两个%s ERROR
+	sprintf(promptMessage,"检测到您当前版本号为%s",curGameEdition.c_str());//sprintf 参数中如果有两个%s ERROR
 	messageHead=promptMessage;
-	sprintf(promptMessage,"低于最新版本%s,是否立即更新？",targetEditon);
+	sprintf(promptMessage,"低于最新版本%s,是否立即更新？",targetEditon.c_str());
 	messageEnd=promptMessage;
 	std::string allMessageStr=messageHead+messageEnd;
 	auto noticeFont=LabelTTF::create(allMessageStr,"Arial",30);

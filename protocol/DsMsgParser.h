@@ -3,9 +3,10 @@
 #define _DS_MSG_PARSER_
 
 #include "./../utils/UtilBasic.h"
-#include "./../game/GameType.h"
 #include "./../utils/LogManager.h"
+#include "./../game/GameType.h"
 #include "./../game/CardCollection.h"
+#include "./../network/KwxEnv.h"
 
 #include "RequestStructs.h"
 
@@ -29,6 +30,8 @@ public:
     static int _unload(Reminds_t &remind);
 
     static int _load_seat_info(SeatInfo_t &info,const DsMsg &msg,int itemIdx);
+    static int _load_friends_info(vector<Friend_Info> &info,const DsMsg &msg,int itemIdx);
+    static int _load_others_info(vector<OtherPlayers_Info> &info,const DsMsg &msg,int itemIdx);
 };
 
 #endif

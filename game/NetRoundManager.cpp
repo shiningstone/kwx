@@ -55,9 +55,10 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     InitPlayers();
 
     _HandoutNotify = false;
-    _response = REQUEST_ACCEPTED;
 
     _messenger = KwxMessenger::getInstance(MSG_GAME);
+    _messenger->_response = REQUEST_ACCEPTED;
+
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
 
@@ -79,6 +80,10 @@ void NetRoundManager::InitPlayers() {
 	_players[0] = new Player(LEFT);
 	_players[1] = new Player(MIDDLE);
 	_players[2] = new Player(RIGHT);
+
+    for(int i=0;i<3;i++) {
+        _players[i]->_strategy->assign(this);
+    }
 }
 
 /****************************************
@@ -176,21 +181,21 @@ void NetRoundManager::HandleMsg(void * aMsg) {
 void NetRoundManager::RecordError(void *aError) {
     DsInstruction *di = static_cast<DsInstruction *>(aError);
 
-    _response = di->failure;
+    _messenger->_response = di->failure;
 
-    if(_response==RECONNECT_REQUIRED) {
+    if(_messenger->_response==RECONNECT_REQUIRED) {
         EnvVariable::getInstance()->SetReconnect(true);
         SeatInfo::getInstance()->Set(di->reconnectInfo);
     }
 
     _messenger->Resume();
 
-    LOGGER_WRITE("%s (%d)",__FUNCTION__,_response);
+    LOGGER_WRITE("%s (%d)",__FUNCTION__,_messenger->_response);
     delete di;
 }
 
 void NetRoundManager::HandleError() {
-    switch(_response) {
+    switch(_messenger->_response) {
         case RECONNECT_REQUIRED:
             SendReconnect();
             break;
@@ -199,9 +204,9 @@ void NetRoundManager::HandleError() {
 
 void NetRoundManager::SendReconnect() {
     LOGGER_WRITE("%s",__FUNCTION__);
-    _response = REQUEST_ACCEPTED;
+    _messenger->_response = REQUEST_ACCEPTED;
     _messenger->Send(REQ_GAME_SEND_RECONNECT);
-    RETURN_IF_FAIL(_response);
+    RETURN_IF_FAIL(_messenger->_response);
 
     _uiManager->reload();
 }
@@ -272,7 +277,7 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
 		_uiManager->StartGame();
     } else {
         _messenger->Send(REQ_GAME_SEND_ENTER);
-        RETURN_IF_FAIL(_response);
+        RETURN_IF_FAIL(_messenger->_response);
 
         _uiManager->GuiPlayerShow(MIDDLE);
     }
@@ -286,14 +291,14 @@ void NetRoundManager::StartGame() {
     } else {
         _isGameStart=false;
         _messenger->Send(REQ_GAME_SEND_START);
-        RETURN_IF_FAIL(_response);
+        RETURN_IF_FAIL(_messenger->_response);
     }
 }
 
 void NetRoundManager::StopGame() {
 	_isGameStart=false;
     _messenger->Send(REQ_GAME_SEND_LEAVE_ROOM);
-    RETURN_IF_FAIL(_response);
+    RETURN_IF_FAIL(_messenger->_response);
 }
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
@@ -302,7 +307,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     if(dir==MIDDLE) {
         _permited = false;
         _messenger->Send(aPENG,kind);
-        RETURN_VALUE_IF_FAIL(_response,CARD_UNKNOWN);
+        RETURN_VALUE_IF_FAIL(_messenger->_response,CARD_UNKNOWN);
     }
 
     if( dir==MIDDLE && !_permited ) {
@@ -318,7 +323,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
     if(dir==MIDDLE) {
         _messenger->Send(aHU);
-        RETURN_IF_FAIL(_response);
+        RETURN_IF_FAIL(_messenger->_response);
     }
 }
 
@@ -341,7 +346,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     if(dir==MIDDLE) {
         _permited = false;
         _messenger->Send(_actCtrl.decision,card);
-        RETURN_VALUE_IF_FAIL(_response,CARD_UNKNOWN);
+        RETURN_VALUE_IF_FAIL(_messenger->_response,CARD_UNKNOWN);
     }
 
     if( dir==MIDDLE && !_permited ) {
@@ -379,7 +384,7 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 
 void NetRoundManager::RecvQi() {
     _messenger->Send(aQi);
-    RETURN_IF_FAIL(_response);
+    RETURN_IF_FAIL(_messenger->_response);
     
     SetDecision(MIDDLE,aQi);
     _uiManager->QiEffect();
@@ -394,13 +399,13 @@ void NetRoundManager::_NotifyHandout() {
             _messenger->WaitQueueAdd(REQ_GAME_DIST_DAOJISHI);
 
             _messenger->Send(aQi);
-            RETURN_IF_FAIL(_response);
+            RETURN_IF_FAIL(_messenger->_response);
         }
         
         RequestShowCard aReq;
         aReq.Set(LastHandout());
         _messenger->Send(aReq);
-        RETURN_IF_FAIL(_response);
+        RETURN_IF_FAIL(_messenger->_response);
     }
 }
 
@@ -416,7 +421,7 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 		_isMingTime      = false;
 
         _messenger->Send(aMING_CONFIRM);
-        RETURN_IF_FAIL(_response);
+        RETURN_IF_FAIL(_messenger->_response);
 
         Wait(REQ_GAME_DIST_DECISION);
         Wait(REQ_GAME_DIST_DAOJISHI);
@@ -447,7 +452,7 @@ void NetRoundManager::RecvKouCancel() {
     _players[MIDDLE]->_cards->_alter->clear();
 
     _messenger->Send(aKOU_CANCEL);
-    RETURN_IF_FAIL(_response);
+    RETURN_IF_FAIL(_messenger->_response);
 
     _uiManager->KouCancelEffect(aKOU,_players[MIDDLE]->_cards);
 }
@@ -466,14 +471,14 @@ void NetRoundManager::RecvKouConfirm() {
     Card_t kinds[4];
     int    kindNum = _players[MIDDLE]->_cards->_alter->get_activated_kinds(kinds);
     _messenger->Send(aKOU,kindNum,kinds);
-    RETURN_IF_FAIL(_response);
+    RETURN_IF_FAIL(_messenger->_response);
 
     _uiManager->KouConfirmEffect();
 }
 
 void NetRoundManager::RecvMingCancel() {
     _messenger->Send(aMING_CANCEL);
-    RETURN_IF_FAIL(_response);
+    RETURN_IF_FAIL(_messenger->_response);
 
     UpdateCards(MIDDLE,(ARRAY_ACTION)aMING_CANCEL);/*BUG HERE???*/
     
@@ -501,7 +506,7 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
             _players[MIDDLE]->_strategy->scan_ming();
 
             _messenger->Send(aMING);
-            RETURN_IF_FAIL(_response);
+            RETURN_IF_FAIL(_messenger->_response);
             
             UpdateCards(MIDDLE,a_MING);
             _uiManager->QueryMingOutCard();

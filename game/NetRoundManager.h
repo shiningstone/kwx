@@ -65,8 +65,7 @@ public:
     bool _HandoutNotify;
     void _NotifyHandout();
 
-    FailureCode_t _response;
-    bool          _permited;    /* this flag is used for judging conflicting actions from different players */
+    bool _permited;    /* this flag is used for judging conflicting actions from different players */
     bool Wait(RequestId_t req);
 
     Reminds_t  _serverReminds;

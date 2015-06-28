@@ -203,7 +203,7 @@ void DsMsg::GetString(int idx,INT8U *utf8string)const {
     INT8U buf[128] = {0};
     
     _ntohs(_body->_items[idx]->_buf,_body->_items[idx]->_bufLen,buf);
-    Utf16ToUtf8((const Utf16 *)buf,_body->_items[idx]->_bufLen,(Utf8 *)utf8string);
+    Utf16ToUtf8((const Utf16 *)buf,_body->_items[idx]->_bufLen/2,(Utf8 *)utf8string);
 }
 /**********************************************************
 	UpStream

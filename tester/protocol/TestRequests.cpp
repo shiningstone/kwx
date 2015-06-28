@@ -1129,7 +1129,7 @@ public:
             'K','W','X',           //KWX
             0x00,44,               //request code
             7,                     //package level
-            0x00,90,               //package size
+            0x00,110,              //package size
             0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
 
             9,
@@ -1143,8 +1143,8 @@ public:
                 0,0,0,100,
                 0,0,0,200,
                 0,0,0,300,
-            137,0,6,0,1,0,2,0,0,           //player name, UTF-16
-            138,0,6,0,1,0,2,0,0            //player image, UTF-16
+            137,0,16,0xfe,0xff,0,0x31,0,'@',0,'%',0,0x32,0,'@',0,'%',0,0x30,           //player name, UTF-16
+            138,0,16,0xfe,0xff,0,0x31,0,'@',0,'%',0,0x32,0,'@',0,'%',0,0x30            //player image, UTF-16
         };
         INT8U buf[MSG_MAX_LEN] = {0};
         int   len = 0;
@@ -1164,6 +1164,9 @@ public:
         assert(seat->_roomId==0x04050607);
         assert(seat->_tableId==0x08090a0b);
         assert(seat->_seatId==1);
+
+        assert(!strcmp((char *)room.name[MIDDLE],"1"));
+        assert(!strcmp((char *)room.image[MIDDLE],"1"));
         
         return 0;
     }

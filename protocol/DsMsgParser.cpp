@@ -1,5 +1,6 @@
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "SeatInfo.h"
 #include "MsgFormats.h"
@@ -253,17 +254,49 @@ int DsMsgParser::_load_seat_info(SeatInfo_t &info,const DsMsg &msg,int itemIdx) 
     msg.GetString(itemIdx,buf);
 
     char *num = strtok((char *)buf,",");
-    info.roomPath = stoi(num);
+    info.roomPath = atoi(num);
 
     num = strtok(NULL,",");
-    info.roomId   = stoi(num);
+    info.roomId   = atoi(num);
     
     num = strtok(NULL,",");
-    info.tableId  = stoi(num);
+    info.tableId  = atoi(num);
     
     num = strtok(NULL,",");
-    info.seatId   = stoi(num);
+    info.seatId   = atoi(num);
     
+    return 0;
+}
+
+int DsMsgParser::_load_friends_info(vector<Friend_Info> &infos,const DsMsg &msg,int itemIdx) {
+    INT8U buf[512] = {0};
+    msg.GetString(itemIdx,buf);
+
+    vector<string> friends;
+    _split(friends,buf,"%@");
+
+    for(int i=0;i<friends.size();i++) {
+        vector<string> profile;
+        _split(profile,(INT8U *)friends.at(i).c_str(),",");
+
+        Friend_Info info;
+        info._id           = atoi(profile.at(0).c_str());
+        info.photoFileName = profile.at(1);
+        info.NikeName      = profile.at(2);
+        if(!strcmp(profile.at(3).c_str(),"boy")) {
+            info.friendSex = BOY;
+        } else {
+            info.friendSex = GIRL;
+        }
+        info.FriendGold    = atoi(profile.at(4).c_str());
+
+        infos.push_back(info);
+    }
+
+    return 0;
+}
+
+int DsMsgParser::_load_others_info(vector<OtherPlayers_Info> &infos,const DsMsg &msg,int itemIdx) {
     return 0;
 }
 

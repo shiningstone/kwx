@@ -5,7 +5,6 @@
 dayAward::dayAward(Node* p)
 {
 	ReceiveTime=EnvVariable::getInstance()->_dailyLogin.continuousDays;
-	RewardGold=EnvVariable::getInstance()->_dailyLogin.dailyReward;
 	parent=(EnterRoom*)p;
 	init();
 }

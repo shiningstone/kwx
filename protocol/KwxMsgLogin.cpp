@@ -3,6 +3,7 @@
 
 #include "./../utils/UtilPlatform.h"
 #include "./../network/KwxEnv.h"
+#include "./../network/KwxMessenger.h"
 
 #include "MsgFormats.h"
 #include "CommonMsg.h"
@@ -12,6 +13,16 @@
 #include "KwxMsgLogin.h"
 
 #include "./../utils/DebugCtrl.h"
+
+#define CHECK_STATUS(msg) do { \
+    int status = msg.GetItemValue(0); \
+    if(status!=0) { \
+        KwxMessenger::getInstance(MSG_LOGIN)->_response = (FailureCode_t)status; \
+        return status; \
+    } else { \
+        KwxMessenger::getInstance(MSG_LOGIN)->_response = REQUEST_ACCEPTED; \
+    } \
+} while(0)
 
 /* Example from 9100 without Sim card
     4b 57 58 10 01 02 03 04 05 06 07 08 09 0a 0b 00 01 00 8e 
@@ -53,17 +64,13 @@ int RequestLogin::Set(UserType_t type) {
 
 int LoginResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
-        
-    EnvVariable *env = EnvVariable::getInstance();
 
-    INT8U status = msg.GetItemValue(0);
-    if(status!=0) {
-        return status;
-    }
-
+    CHECK_STATUS(msg);
+    
     _userType          = (UserType_t)msg.GetItemValue(1);
     _userActivated     = (msg.GetItemValue(2)==1);
 
+    EnvVariable *env = EnvVariable::getInstance();
     if(msg._body->_items[3]->_bufLen/4 > 1) {/* reconnect required */
         INT32U roomPath = _ntohl(*(INT32U *)(msg._body->_items[3]->_buf+4));
         INT32U roomId   = _ntohl(*(INT32U *)(msg._body->_items[3]->_buf+8));
@@ -84,6 +91,35 @@ int LoginResponse::Construct(const DsMsg &msg) {
     env->SetKey(msg.GetItemValue(5));
     env->SetRoomServer(roomId,(char *)roomIp,roomPort,voicePort);
 
+    return 0;
+}
+
+int RequestResourceUpdate::Set() {
+    SetRequestCode(REQ_RES_UPDATE);
+    return 0;
+}
+
+int ResourceUpdateResponse::Construct(const DsMsg & msg) {
+    CHECK_STATUS(msg);
+    
+    maxResId = msg.GetItemValue(1);
+    msg.GetString(2,url);
+    return 0;
+}
+
+int RequestVersionUpdate::Set() {
+    SetRequestCode(REQ_VER_UPDATE);
+    return 0;
+}
+
+int VersionUpdateResponse::Construct(const DsMsg & msg) {
+    CHECK_STATUS(msg);
+
+    verCode = msg.GetItemValue(1);
+    msg.GetString(2,verName);
+    msg.GetString(3,content);
+    msg.GetString(4,url);
+    
     return 0;
 }
 
@@ -108,7 +144,6 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
     } else {
         info->hasReward = true;
         info->continuousDays = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+4));
-        info->dailyReward    = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+8));
     }
     
     msg.GetString(1, info->name);
@@ -116,6 +151,10 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
     
     info->gold   = msg.GetItemValue(3);
     info->coupon = msg.GetItemValue(4);
+
+    DsMsgParser::_load_friends_info(info->friends,msg,5);
+    DsMsgParser::_load_others_info(info->strangers,msg,6);
+    DsMsgParser::_load_others_info(info->nearbys,msg,7);
 
     return 0;
 }
