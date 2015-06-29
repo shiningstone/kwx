@@ -19,9 +19,6 @@
 #define MAX_MODULES         64
 #define MODULE_NAME_LEN     32
 
-#define RET_OK              0
-#define RET_ERROR           1
-
 #define LOGGER_REGISTER(x)     LogManager::GetInstance()->Recruit(x)
 #define LOGGER_DEREGISTER(x)   LogManager::GetInstance()->Dismiss(x)
 #define LOGGER_WRITE(fmt,...)      if(_logger!=NULL) { \

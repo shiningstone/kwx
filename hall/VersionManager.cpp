@@ -10,10 +10,6 @@
     } \
 }while(0)
 
-void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) {
-
-}
-
 VersionCode_t VersionManager::getCurrentVerCode() const {
     return 0;
 }
@@ -32,16 +28,44 @@ int VersionManager::_requestUpdate() {
     
     return messenger->_response;
 }
+    
+void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) {
+    if (strcmp(response->getHttpRequest()->getTag(), VERSION_CODE) == 0) {             
+        LOGGER_WRITE("%s",VERSION_CODE);
+
+        _hm->writeFileFromRequest(response,"qwe.json");             
+    
+        std::string version = "version";             
+        std::string table   = "version";             
+    
+        if (!(strcmp(version.c_str(), table.c_str()) == 0)) {
+        }                                     
+    }                             
+    
+    if (strcmp(response->getHttpRequest()->getTag(), "update_mobile") == 0) {                           
+        LOGGER_WRITE("%s","update_mobile");
+    }
+}
 
 int VersionManager::_download() {
+    _hm = new HTTPManager();  
+    
+    _hm->retain();
+    _hm->setHttpDelegate(this);     
+    _hm->sendGetRequest(VERSION_PAGE, VERSION_CODE);     
+
     return 0;
 }
 
-int VersionManager::_upgrade() {
+int VersionManager::_update() {
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+        
+#endif
+
     return 0;
 }
 
-int VersionManager::update() {
+int VersionManager::upgrade() {
     int retcode = 0;
     
     retcode = _requestUpdate();
@@ -50,7 +74,7 @@ int VersionManager::update() {
     retcode = _download();
     RETURN_IF_FAIL(retcode);
 
-    retcode = _upgrade();
+    retcode = _update();
     RETURN_IF_FAIL(retcode);
 
     return retcode;

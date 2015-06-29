@@ -10,6 +10,9 @@ using namespace std;
 
 #include "./../network/KwxHttpManager.h"
 
+#define VERSION_PAGE "localhost:8080/qwe.json"
+#define VERSION_CODE "update_time"
+
 typedef INT32U VersionCode_t;
 
 typedef struct _VerInfo_t {
@@ -29,16 +32,17 @@ public:
 
     VersionCode_t   getCurrentVerCode() const;
     string          getCurrentVerName() const;
-    int             update();
+    int             upgrade();
 private:
     VersionManager();
 
     int _requestUpdate();
     int _download();
-    int _upgrade();
+    int _update();
 
     friend class VersionUpdateResponse;
     VerInfo_t       _newVer;
+    HTTPManager     *_hm;
 
     Logger *_logger;
     static VersionManager *_instance;

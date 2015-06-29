@@ -1,4 +1,5 @@
 
+#include "UtilBasic.h"
 #include "LogManager.h"
 
 #ifdef __DISABLE_LOGGER__

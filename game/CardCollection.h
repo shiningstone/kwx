@@ -116,6 +116,7 @@ public:
             antificial intelligence (for single-game only)
     ***************************************************/
     void update_statistics(Card_t huKind);
+    void _ClearStats();
     void _JudgeDaXiaoSanYuan() ;
     void _JudgeKaWuXing(Card_t kind) ;
     void _JudgeQiDui() ;

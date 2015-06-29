@@ -187,13 +187,7 @@ void CardInHand::init(Card_t *cards,int len) {
     IsMing    = false;
 	FreeStart = 0;
 
-    statFreeCards      = 0;
-    statCouples        = 0;
-    statGroupSameNum   = 0;
-    statzhongFaBai[0]  = 0;
-    statzhongFaBai[1]  = 0;
-    statzhongFaBai[2]  = 0;
-    statHuFanMask      = 0;
+    _ClearStats();
 }
 
 int CardInHand::real_last() const {
@@ -848,7 +842,19 @@ void CardInHand::_SetHu(INT32U hu) {
     _set(statHuFanMask,hu);
 }
 
+void CardInHand::_ClearStats() {
+    statFreeCards      = 0;
+    statCouples        = 0;
+    statGroupSameNum   = 0;
+    statzhongFaBai[0]  = 0;
+    statzhongFaBai[1]  = 0;
+    statzhongFaBai[2]  = 0;
+    statHuFanMask      = 0;
+}
+
 void CardInHand::update_statistics(Card_t huKind) {
+    _ClearStats();
+
     _SetHu(RH_QINYISE);
         
     int color = huKind/9;

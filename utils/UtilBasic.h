@@ -10,6 +10,9 @@ using namespace std;
 #define NULL 0
 #endif
 
+#define RET_OK     0
+#define RET_ERROR  -1
+
 typedef unsigned char  INT8U;
 typedef unsigned short INT16U;
 typedef unsigned int   INT32U;

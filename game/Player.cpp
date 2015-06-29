@@ -41,7 +41,13 @@ unsigned char Player::init(Card_t cards[],int len,int aim) {
     _fan     = 0;
 	_score   = 0;
 
-	for(int i=0;i<13;i++) {
+    _cards->clear();
+    _cards->IsMing    = false;
+	_cards->FreeStart = 0;
+    
+    _river->clear();
+    
+    for(int i=0;i<13;i++) {
         CardNode_t node;
 
 		node.kind    = cards[i];

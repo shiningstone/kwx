@@ -6,6 +6,8 @@
 #include "../cocos2d/extensions/cocos-ext.h"
 #include "network/HttpClient.h"
 
+#include "./../utils/LogManager.h"
+
 USING_NS_CC; 
 USING_NS_CC_EXT; 
 using namespace cocos2d::network; 
@@ -30,8 +32,12 @@ public:
     void sendGetRequest(std::string url,std::string requestTag);     
     void writeFileFromRequest(HttpResponse *response,std::string filename);     
     void addHttpListener(ccHttpManagerCallback& callback);   
-private:     
+private:
+    int _CheckResponse(HttpResponse *response);
+
     ccHttpManagerCallback _eventCallback; 
+
+    Logger *_logger;
 }; 
 
 #endif
