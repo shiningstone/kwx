@@ -7,6 +7,8 @@ FriendList::FriendList(EnterRoom* p)
 	NearyPeopleList=EnvVariable::getInstance()->get_NearyPeopleList();
 	StrangersList=EnvVariable::getInstance()->get_StrangersList();
 	init();
+	for(int a=0;a<5;a++)//ceshi_yusi
+		TouchNum[a]=0;
 }
 
 FriendList::~FriendList(void)
@@ -17,8 +19,16 @@ void FriendList::ListEventCall(cocos2d::Ref *pSender,ListViewEventType type)
 	switch (type)
 	{
 	case LISTVIEW_ONSELECTEDITEM_START:
+		{
+			CCLOG("ListView------->Begin       TouchTime : %d",TouchNum[0]);
+			TouchNum[0]++;
+		}
 		break;
 	case LISTVIEW_ONSELECTEDITEM_END:
+		{
+			CCLOG("ListView------->Ended       TouchTime : %d",TouchNum[1]);
+			TouchNum[1]++;
+		}
 		break;
 	default:
 		break;
@@ -58,6 +68,7 @@ bool FriendList::init()
 	FriendsList->ignoreAnchorPointForPosition(false);
 	FriendsList->setAnchorPoint(Vec2(0.5,0));
 	FriendsList->setPosition(Vec2(visibleSize.width*0.27358,45));
+	FriendsList->addEventListenerListView(this,listvieweventselector(FriendList::ListEventCall));
 	this->addChild(FriendsList,2,FRIEND_LIST);
 	/**********0000**************/
 	auto defaultBtn=Button::create("Friends_cellBg.png","Friends_cellBg.png","Friends_cellBg.png",UI_TEX_TYPE_PLIST);
@@ -72,11 +83,12 @@ bool FriendList::init()
 
 	for(int a=0;a<MyFriendList.size();a++)
 	{
+		//auto curBtn=Sprite::createWithSpriteFrameName("Friends_cellBg.png");
 		auto curBtn=Button::create("Friends_cellBg.png","Friends_cellBg.png","Friends_cellBg.png",UI_TEX_TYPE_PLIST);
 		curBtn->setAnchorPoint(Vec2(0.5,0.5));
 		curBtn->addTouchEventListener(CC_CALLBACK_2(FriendList::listItemCallBack,this));
 		auto curItem=Layout::create();
-		auto BtnSize=curBtn->getSize();
+		auto BtnSize=curBtn->getContentSize();
 
 		auto curPhoto=Sprite::createWithSpriteFrameName(MyFriendList[a].photoFileName);
 		curPhoto->setAnchorPoint(Vec2(0,0.5));
@@ -114,6 +126,14 @@ bool FriendList::init()
 		curBtn->addChild(curGold);
 
 		curItem->setTouchEnabled(true);
+		//EventListenerTouchOneByOne* FriendCellListener=EventListenerTouchOneByOne::create();
+		//FriendCellListener->setSwallowTouches(false);
+		//FriendCellListener->onTouchBegan=[=](Touch* touch, Event* event){
+		//	CCLOG("onTouchBegan : FriendCell");
+		//	return true;};
+		//FriendCellListener->onTouchMoved=[=](Touch* touch, Event* event){CCLOG("onTouchMoved : FriendCell");};
+		//FriendCellListener->onTouchEnded=[=](Touch* touch, Event* event){CCLOG("onTouchEnd : FriendCell");};
+		//Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(FriendCellListener,curItem);
 		curItem->setSize(BtnSize);
 		curBtn->setPosition(Vec2(curItem->getSize().width/2,curItem->getSize().height/2));
 		curItem->addChild(curBtn,1,a);
@@ -401,24 +421,25 @@ void FriendList::listItemCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 	{
 	case cocos2d::ui::Widget::TouchEventType::BEGAN:
 		{
-			curBtn->setScale(0.7);
+			CCLOG("Button------->Begin       TouchTime : %d",TouchNum[2]);
+			TouchNum[2]++;
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		{
-			curBtn->setScale(0.8);
+			//CCLOG("Button------->Moved       TouchTime : %d",TouchNum[3]);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
+			CCLOG("Button------->Ended       TouchTime : %d",TouchNum[4]);
+			TouchNum[4]++;
 			//auto curBtn=(Button*)pSender;
-			curBtn->setScale(0.9);
-			ChatOneToOneCreate(MyFriendList[curBtn->getTag()]);
+			//ChatOneToOneCreate(MyFriendList[curBtn->getTag()]);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		{
-			curBtn->setScale(1);
 		}
 		break;
 	default:

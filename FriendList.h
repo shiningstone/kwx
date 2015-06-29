@@ -48,11 +48,12 @@ public:
 
 
 	void insertItemForFriend();					//好友列表刷新
-	void ListEventCall(cocos2d::Ref *pSender,ListViewEventType type);
+	void ListEventCall(cocos2d::Ref *pSender,ListViewEventType type);		//listView的监听
 
 	void updateTest(float delt);
 	void updateTest1(float delt);
 	//CREATE_FUNC(FriendList);
+	int TouchNum[5];
 private:
 	EnterRoom* parentNode;
 	std::vector <Friend_Info> MyFriendList;	

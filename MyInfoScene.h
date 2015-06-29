@@ -9,8 +9,7 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace cocos2d::ui;
 
-class MyInfoScene :
-	public Scene
+class MyInfoScene :	public Scene
 {
 public:
 #define MY_MESSAGE_MOJI			1

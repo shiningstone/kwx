@@ -5,8 +5,7 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
-class RewardLayer :
-	public Layer
+class RewardLayer :	public Layer
 {
 public:
 	RewardLayer(void);

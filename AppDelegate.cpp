@@ -2,6 +2,8 @@
 #include "HelloWorldScene.h"
 #include "VersionUpgrade.h"
 
+#include "IMLoadScene.h"
+
 USING_NS_CC;
 
 AppDelegate::AppDelegate() {
@@ -45,7 +47,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	if(newestEdition>curEdition)
 		startLayer=new VersionUpgrade(curEdition,newestEdition);
 	else
-		startLayer=HelloWorld::create();
+		startLayer=IMLoad::create();
 
 	scene->addChild(startLayer,1);
     director->runWithScene(scene);

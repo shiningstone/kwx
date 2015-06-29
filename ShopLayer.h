@@ -8,8 +8,7 @@ using namespace ui;
 
 #include "network/KwxEnv.h"
 
-class ShopLayer :
-	public Layer
+class ShopLayer : public Layer
 {
 public:
 	ShopLayer(void);

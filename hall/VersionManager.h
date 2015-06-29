@@ -5,8 +5,8 @@
 #include <string>
 using namespace std;
 
-#include "utils/UtilBasic.h"
-#include "utils/LogManager.h"
+#include "./../utils/UtilBasic.h"
+#include "./../utils/LogManager.h"
 
 #include "./../network/KwxHttpManager.h"
 

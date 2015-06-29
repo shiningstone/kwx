@@ -9,8 +9,7 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
-class MyBaseInformation :
-	public Layer
+class MyBaseInformation : public Layer
 {
 public:
 	MyBaseInformation(void);

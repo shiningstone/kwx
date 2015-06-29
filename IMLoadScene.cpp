@@ -103,7 +103,7 @@ bool IMLoad::init()
     this->addChild(curLoadingBar,1,110);
 
     auto you=Sprite::createWithSpriteFrameName("you.png");
-    you->setPosition(Point(ring->getPosition().x-bar->getTextureRect().size.width/3,ring->getPosition().y-ring->getContentSize().height*3/4+bar->getTextureRect().size.height/2+10));
+    you->setPosition(Point(ring->getPosition().x-visibleSize.width*0.3,ring->getPosition().y-ring->getContentSize().height*3/4+bar->getTextureRect().size.height/2+10));
     this->addChild(you,1);
 
     auto xi=Sprite::createWithSpriteFrameName("xi.png");

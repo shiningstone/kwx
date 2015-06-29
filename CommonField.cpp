@@ -60,8 +60,6 @@ bool CommonField::init()
 	backButton->addTouchEventListener(CC_CALLBACK_2(CommonField::onButtonBack,this));
 	this->addChild(backButton,2);
 
-
-
 	auto selectBuPiaoEffect=Sprite::createWithSpriteFrameName("moji.png");
 	selectBuPiaoEffect->setVisible(true);
 	selectBuPiaoEffect->setAnchorPoint(Vec2(0,0));
