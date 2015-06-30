@@ -388,12 +388,8 @@ void test_reference() {
 	aFather._son->_aim = 5;
 	printf("father aim is %d\n",aFather.aim);
 }
-/**********************************
-    main
-**********************************/
-void test_card_list() {
-	test_reference();
 
+void test_basic() {
 	Card_t cards[] = {TIAO_1,TONG_1,ZHONG,FA,BAI};
 	CardInHand list;
 
@@ -413,9 +409,37 @@ void test_card_list() {
 	//test push_back
 	list.push_back(TIAO_2);
 	list.show();
+}
 
+void test_judge_peng_peng_hu() {
+	int seq[] = {
+        0x0d,0x0d,0x0d,0x00,0x00,0x00,0x01,0x01,0x01,0x06,0x06,0x10,0x10,0x10,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+
+    list.update_statistics((Card_t)0x10);
+    assert(_is_active(list.statHuFanMask,RH_SIPENG));
+}
+/**********************************
+    main
+**********************************/
+void test_smart_list() {
 	test_remove();
     test_pattern_match();
     test_can_hu();
+}
+
+void test_card_list() {
+	test_reference();
+    test_smart_list();
+    test_basic();
     test_refresh();
+    
+    test_judge_peng_peng_hu();
 }

@@ -720,27 +720,25 @@ void CardInHand::_JudgeQiDui() {
 }
 
 void CardInHand::_JudgePengPengHu() {
-    int usedLen  = 0;
+    INT32U checked = 0;
     int GroupSameCount = 0;
     
-    for(INT8U i=0;i<size()-1;i+=usedLen) {
-        int sameCount = 1;
-        
-        for(INT8U j=i+1;j<size();j++) {
-            if(get_kind(j)==get_kind(i)) {
-                sameCount++;
+    for(INT8U i=0;i<size()-1;i++) {
+        if(!_is_active(checked,1<<i)) {
+            _set(checked,1<<i);
+            int sameCount = 1;
+
+            for(INT8U j=i+1;j<size();j++) {
+                if(get_kind(j)==get_kind(i)) {
+                    _set(checked,1<<j);
+                    sameCount++;
+                }
+
+                if(sameCount>=3) {
+                    GroupSameCount++;
+                    break;
+                }
             }
-        }
-        
-        if(sameCount==4) {
-            break;
-        } else if(sameCount==3) {
-            usedLen   += 3;
-            GroupSameCount++;
-        } else if(sameCount==2) {
-            usedLen   += 2;
-        } else {
-            usedLen   += 1;
         }
     }
     
