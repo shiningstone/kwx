@@ -335,6 +335,9 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
         win.giver = target;
         _uiManager->DoubleWin(win);
 	} else if(action1&a_HU||action2&a_HU) {
+        PlayerDir_t winner = (action1&a_HU)?no1:no2;
+	    _players[winner]->_cards->pop_back();
+    
         _actCtrl.choices   = aHU;
 
         _isQiangGangAsking = true;
@@ -342,10 +345,13 @@ void RoundManager::QiangGangHuJudge(PlayerDir_t target,Card_t kind) {
         
         WinInfo_t win;
         win.kind   = SINGLE_WIN;
-        win.winner = (action1&a_HU) ? no1 : no2;
+        win.winner = winner;
         win.giver  = target;
         _uiManager->SingleWin(win);
 	} else {
+	    _players[no1]->_cards->pop_back();
+	    _players[no2]->_cards->pop_back();
+        
         _uiManager->GangGoldEffect(target,target);
 	}
 }

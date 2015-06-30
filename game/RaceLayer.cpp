@@ -1818,7 +1818,7 @@ TargetedAction *RaceLayer::_OthersShowCardEffect(PlayerDir_t dir,Card_t outCard,
 void RaceLayer::_OthersMingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir,bool isNewDistributed,Card_t card) {
     Sequence *gang_seq;
     
-    auto hideOutCard = Sequence::create(NULL);
+    auto hideOutCard = Sequence::create(DelayTime::create(0.06),NULL);
     auto goldEffect  = CallFunc::create([=](){NULL;});
 
     if(!isNewDistributed) {

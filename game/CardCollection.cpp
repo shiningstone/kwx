@@ -723,7 +723,7 @@ void CardInHand::_JudgePengPengHu() {
     int usedLen  = 0;
     int GroupSameCount = 0;
     
-    for(INT8U i=FreeStart;i<size()-1;i+=usedLen) {
+    for(INT8U i=0;i<size()-1;i+=usedLen) {
         int sameCount = 1;
         
         for(INT8U j=i+1;j<size();j++) {
@@ -910,9 +910,9 @@ void CardInHand::update_statistics(Card_t huKind) {
     
 	if(statFreeCards==2) {
 		_SetHu(RH_SHOUYIZHUA);
- 	} else {
-		_JudgePengPengHu();
-	}
+ 	}
+    
+	_JudgePengPengHu();
 
     _JudgeDaXiaoSanYuan();
 
