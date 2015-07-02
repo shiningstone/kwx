@@ -8,9 +8,11 @@
 #define HTTPHeader "http://www.epicc.com.cn/QrDmzBastionNB/BastionServlet"  
 
 HTTPManager::HTTPManager() { 
+    _logger = LOGGER_REGISTER("HTTPManager");
 } 
 
 HTTPManager::~HTTPManager() { 
+    LOGGER_DEREGISTER(_logger);
 } 
 
 void HTTPManager::sendGetRequest(std::string url,std::string requestTag) {     
@@ -66,25 +68,6 @@ void HTTPManager::onHttpRequestCompleted(HttpClient *sender, HttpResponse *respo
         const char* resTag = response->getHttpRequest()->getTag(); 
     }
 }   
-
-void HTTPManager::writeFileFromRequest(HttpResponse *response,std::string filename) {
-    std::vector<char>* buffer = response->getResponseData();     
-    
-    std::string path     = FileUtils::getInstance()->getWritablePath();     
-    std::string fullPath =  path + filename;     
-
-    FILE* fp = fopen(fullPath.c_str(), "wb");             
-    LOGGER_WRITE("write file to %s",fullPath.c_str());
-    
-    /*Ð§ÂÊ?*/
-    unsigned char bf;
-    for (unsigned int i  = 0; i < buffer->size(); i++) {
-        bf = buffer->at(i);
-        fwrite(&bf, 1, 1, fp);
-    }
-    
-    fclose(fp);
-}
 
 void HTTPManager::addHttpListener(ccHttpManagerCallback &callback) {
     _eventCallback = callback;       

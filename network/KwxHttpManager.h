@@ -30,7 +30,6 @@ public:
 
     void getFormData(std::string parameter);     
     void sendGetRequest(std::string url,std::string requestTag);     
-    void writeFileFromRequest(HttpResponse *response,std::string filename);     
     void addHttpListener(ccHttpManagerCallback& callback);   
 private:
     int _CheckResponse(HttpResponse *response);

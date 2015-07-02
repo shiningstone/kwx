@@ -6,6 +6,7 @@
 #include "./../utils/DebugCtrl.h"
 #include "./../protocol/MsgFormats.h"
 #include "./../protocol/CommonMsg.h"
+#include "./../protocol/DbgRequestDesc.h"
 
 #include "KwxMessenger.h"
 
@@ -108,9 +109,18 @@ bool KwxMessenger::IsWaiting(RequestId_t req) {
 
 bool KwxMessenger::Wait(RequestId_t req) {
     WaitQueueAdd(req);
-    
+
+    int waitCount = 0;
     while(_waitQueue.size()>0) {/*BUG : resume only all wait req are handled*/
-        _delay(100);
+        if(waitCount<5) {
+            LOGGER_WRITE("wait %d second",waitCount);
+            _delay(100);
+            waitCount++;
+        } else {
+            LOGGER_WRITE("wait %s timeout",DescReq(req));
+            _response = TIMEOUT;
+            return false;
+        }
     }
 
     return true;

@@ -230,7 +230,7 @@ void LoginAndRegister::LogInGame(cocos2d::Ref* pSender,cocos2d::ui::Widget::Touc
 			TextureCache::sharedTextureCache()->removeAllTextures();
 			RaceLayer *layer = RaceLayer::create();
 			scene->addChild(layer);
-#ifndef NETWORK_GAME_DEBUG
+#ifndef DEBUG_ENTRANCE
 			layer->CreateRace(LOCAL_GAME);//NETWORK_GAME
 #else
 			layer->CreateRace(NETWORK_GAME);

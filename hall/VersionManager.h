@@ -34,6 +34,9 @@ public:
     string          getCurrentVerName() const;
     int             upgrade();
 private:
+    friend void test_download_version();
+    friend void test_update_version();
+    
     VersionManager();
 
     int _requestUpdate();

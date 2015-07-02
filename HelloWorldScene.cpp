@@ -121,6 +121,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 
             }
 #endif
+
             bool ifAccountHaved=true;
             if(!ifAccountHaved)
             {
@@ -187,13 +188,17 @@ void HelloWorld::enterRoomStandAlone()
     TextureCache::sharedTextureCache()->removeAllTextures();
 	RaceLayer *layer = RaceLayer::create();
     scene->addChild(layer);
-#ifndef NETWORK_GAME_DEBUG
-    layer->CreateRace(LOCAL_GAME);
-#else
-    layer->CreateRace(NETWORK_GAME);
-#endif
 
+#if (DEBUG_ENTRANCE==1)
+    layer->CreateRace(NETWORK_GAME);
     Director::getInstance()->replaceScene(scene);
+#elif (DEBUG_ENTRANCE==2)
+    extern void test_interface();
+    test_interface();
+#else
+    layer->CreateRace(LOCAL_GAME);
+    Director::getInstance()->replaceScene(scene);
+#endif
 }
 
 void HelloWorld::addButton()

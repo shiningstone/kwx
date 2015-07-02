@@ -13,6 +13,8 @@ typedef struct _DeviceInfo_t {
 }DeviceInfo_t;
 
 extern void _get_device_info(DeviceInfo_t &device);
+extern void _write_file(const char *filename,std::vector<char>* buf);
+extern void _update_version();
 
 #endif
 
