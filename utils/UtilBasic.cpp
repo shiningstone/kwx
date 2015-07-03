@@ -278,6 +278,6 @@ void _delay(int ms) {
     #ifdef WIN32
     Sleep(ms);
     #else
-    usleep(10000*ms);
+    usleep(1000*ms);
     #endif
 }
