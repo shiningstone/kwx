@@ -27,7 +27,7 @@ static int CallJava(const char *jmethod,INT8U *retString) {
     }
 }
 
-static int CallJava(const char *jmethod) {
+static int CallJavaNonStatic(const char *jmethod,const char *param) {
     JniMethodInfo method;
     bool IsMethodValid = false;
     jobject _instance;
@@ -37,9 +37,10 @@ static int CallJava(const char *jmethod) {
         _instance = method.env->CallStaticObjectMethod(method.classID,method.methodID);
     }
 
-    IsMethodValid = JniHelper::getMethodInfo(method,"org/cocos2dx/cpp/AppActivity",jmethod,"()V");
+    IsMethodValid = JniHelper::getMethodInfo(method,"org/cocos2dx/cpp/AppActivity",jmethod,"(Ljava/lang/String;)V");
     if(IsMethodValid) {
-        method.env->CallVoidMethod(_instance, method.methodID);
+        jobject str = method.env->NewStringUTF(param);
+        method.env->CallVoidMethod(_instance, method.methodID, str);
     }
 }
 #endif
@@ -97,8 +98,11 @@ void _write_file(const char *filename,std::vector<char>* buf) {
     fclose(fp);
 }
 
-void _update_version() {
-    CallJava("updateVersion");
+void _update_version(const char *apk) {
+    std::string path     = FileUtils::getInstance()->getWritablePath();     
+    std::string fullPath = path + apk;
+
+    CallJavaNonStatic("updateVersion",fullPath.c_str());
 }
 
 #endif

@@ -41,7 +41,7 @@ int VersionManager::_download() {
 
 int VersionManager::_update() {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    _update_version();
+    _update_version("kwx.apk");
 #endif
 
     return 0;

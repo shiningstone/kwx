@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "./../utils/UtilPlatform.h"
 #include "KwxEnv.h"
 
 #include "./../utils/DebugCtrl.h"

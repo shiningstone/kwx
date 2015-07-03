@@ -74,5 +74,13 @@ typedef struct {
     int  voicePort;
 }Server_t;
 
+typedef struct _DeviceInfo_t {
+    INT8U mac[128];    
+    INT8U imsi[128];    
+    INT8U resolution[128];    
+    INT8U protoType[128];    
+    INT8U osVer[128];
+}DeviceInfo_t;
+
 #endif
 
