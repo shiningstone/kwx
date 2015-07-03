@@ -7,7 +7,12 @@
 
 #include "./../utils/DebugCtrl.h"
 
+#ifdef LAN_SERVER
+#define LOGIN_SERVER_IP  LAN_SERVER
+#else
 #define LOGIN_SERVER_IP  "127.0.0.1"
+#endif
+
 #define ROOM_SERVER_IP   "127.0.0.1"
 #define LOCAL_SERVER     "127.0.0.1"
 #define LOGIN_SOCKET_PORT 20000
@@ -69,7 +74,7 @@ EnvVariable::EnvVariable() {
 	_userId   = 0x01020304;        
 	_language = 5;                 
 	_platform = 6;                 
-	_buildNo  = 7;                 
+	_buildNo  = 1;                 
 	_customerId = 0x0809;          
 	_productId  = 0x0a0b;
 #else

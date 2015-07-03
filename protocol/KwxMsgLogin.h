@@ -23,7 +23,7 @@ public:
 
     UserType_t   _userType;
     HostString   _account;
-    HostString   _session;
+    HostString   _pwd;
 };
 
 class LoginResponse : public DsInstruction {

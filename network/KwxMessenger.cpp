@@ -113,7 +113,9 @@ bool KwxMessenger::Wait(RequestId_t req) {
     int waitCount = 0;
     while(_waitQueue.size()>0) {/*BUG : resume only all wait req are handled*/
         if(waitCount<50) {
-            LOGGER_WRITE("wait %d second",waitCount);
+            if((waitCount+1)%10==0) {
+                //LOGGER_WRITE("wait %d second",(waitCount+1)/10);
+            }
             _delay(100);
             waitCount++;
         } else {

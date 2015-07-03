@@ -42,9 +42,11 @@
 */
 int RequestLogin::Set(UserType_t type) {
     memset(_account,0,MAX_UTF8_BUF);
-    memset(_session,0,MAX_UTF8_BUF);
+    memset(_pwd,0,MAX_UTF8_BUF);
 
     _userType = type;
+    sprintf((char *)_account,"0");
+    sprintf((char *)_pwd,"0");
 
     SetRequestCode(REQ_LOGIN);
 
@@ -58,7 +60,7 @@ int RequestLogin::Set(UserType_t type) {
     _add_utf16_string(134,device.resolution);
     _add_utf16_string(135,device.protoType);
     _add_utf16_string(136,device.osVer);
-    _add_utf16_string(137,(const INT8U *)_session);
+    _add_utf16_string(137,(const INT8U *)_pwd);
 
     return 0;
 }
