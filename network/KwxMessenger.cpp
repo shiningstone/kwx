@@ -60,6 +60,7 @@ void KwxMessenger::StartReceiving(MsgHandler_t handle) {
 
 void KwxMessenger::StartReceiving() {
     SetHandler(_HANDLE_DS_PACKAGES);
+    LOGGER_WRITE("server ip:%s, port:%d",_serverIp,_port);
     Start((char *)_serverIp,_port);
 }
 

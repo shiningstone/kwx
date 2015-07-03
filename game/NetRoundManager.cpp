@@ -56,9 +56,6 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
 
     _HandoutNotify = false;
 
-    _messenger = KwxMessenger::getInstance(MSG_GAME);
-    _messenger->_response = REQUEST_ACCEPTED;
-
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
 
@@ -270,6 +267,8 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
     _uiManager = uiManager;
 	_isGameStart=false;
 
+    _messenger = KwxMessenger::getInstance(MSG_GAME);
+    _messenger->_response = REQUEST_ACCEPTED;
     _messenger->StartReceiving();
     
     EnvVariable *env = EnvVariable::getInstance();

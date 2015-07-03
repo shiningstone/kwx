@@ -7,15 +7,20 @@
 
 #include "./../utils/DebugCtrl.h"
 
-#ifdef LAN_SERVER
-#define LOGIN_SERVER_IP  LAN_SERVER
+#ifdef DBG_LAN_SERVER
+#define LOGIN_SERVER_IP   DBG_LAN_SERVER
+#define DEF_SERVER_IP     DBG_LAN_SERVER
 #else
-#define LOGIN_SERVER_IP  "127.0.0.1"
+#define LOGIN_SERVER_IP   "127.0.0.1"
+#define DEF_SERVER_IP     "127.0.0.1"
 #endif
 
-#define ROOM_SERVER_IP   "127.0.0.1"
-#define LOCAL_SERVER     "127.0.0.1"
+#ifdef DBG_LOGIN_PORT
+#define LOGIN_SOCKET_PORT DBG_LOGIN_PORT
+#else
 #define LOGIN_SOCKET_PORT 20000
+#endif
+
 #define DEF_SOCKET_PORT   60905
 
 
@@ -30,34 +35,18 @@ EnvVariable *EnvVariable::getInstance() {
 }
 
 void EnvVariable::SetServerIp(Server_t &server,const char *ip) {
-#ifdef DBG_REMOTE_SERVER
-    #if (DBG_REMOTE_SERVER==1)
-        strcpy(server.ipaddr,LOCAL_SERVER);
-    #elif (DBG_REMOTE_SERVER==2)
-        strcpy(server.ipaddr,LAN_SERVER);
-    #else
-        FILE * target = NULL;
-        target = fopen("E:\\server_ip.txt","r");
-        if(target!=NULL) {
-            fgets(server.ipaddr,128,target);
-        } else {
-            strcpy(server.ipaddr,LOCAL_SERVER);
-        }
-    #endif
-#else
     sprintf(server.ipaddr,"%s",ip);
-#endif
 }
 
 void EnvVariable::LoginServerInit() {
     _loginServer.id = 0;
     sprintf(_loginServer.name,"loginServer");
-    SetServerIp(_loginServer,LOGIN_SERVER_IP);
+    strcpy(_loginServer.ipaddr,LOGIN_SERVER_IP);
     _loginServer.port = LOGIN_SOCKET_PORT;
 }
 
 void EnvVariable::RoomServerInit(int roomId) {
-    SetRoomServer(roomId,ROOM_SERVER_IP,DEF_SOCKET_PORT,0);
+    SetRoomServer(roomId,DEF_SERVER_IP,DEF_SOCKET_PORT,0);
 }
 
 void EnvVariable::SetRoomServer(int roomId,const char *ip,int port,int voicePort) {
