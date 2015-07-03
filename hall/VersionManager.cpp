@@ -34,14 +34,14 @@ int VersionManager::_download() {
     
     _hm->retain();
     _hm->setHttpDelegate(this);     
-    _hm->sendGetRequest(VERSION_PAGE, VERSION_CODE);     
+    _hm->sendGetRequest(_newVer.url.c_str(), VERSION_CODE);     
 
     return 0;
 }
 
 int VersionManager::_update() {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    _update_version("kwx.apk");
+    _update_version(_newVer.name.c_str());
 #endif
 
     return 0;
@@ -50,7 +50,12 @@ int VersionManager::_update() {
 void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) {
     if (strcmp(response->getHttpRequest()->getTag(), VERSION_CODE) == 0) {             
         LOGGER_WRITE("%s",VERSION_CODE);
-        _write_file("qwe.json",response->getResponseData());
+
+        if(atoi(_newVer.size.c_str())==response->getResponseData()->size()) {
+            _write_file(_newVer.name.c_str(),response->getResponseData());
+        } else {
+            LOGGER_WRITE("%s error image size",__FUNCTION__);
+        }
     }                             
     
     if (strcmp(response->getHttpRequest()->getTag(), "update_mobile") == 0) {                           
@@ -74,6 +79,11 @@ int VersionManager::upgrade() {
 }
 
 VersionManager::VersionManager() {
+    _logger = LOGGER_REGISTER("VersionManager");
+}
+
+VersionManager::~VersionManager() {
+    LOGGER_DEREGISTER(_logger);
 }
 
 VersionManager* VersionManager::_instance = NULL;

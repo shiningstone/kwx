@@ -38,6 +38,7 @@ private:
     friend void test_update_version();
     
     VersionManager();
+    ~VersionManager();
 
     int _requestUpdate();
     int _download();

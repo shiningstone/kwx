@@ -10,7 +10,8 @@
 #define LOGIN_SERVER_IP  "127.0.0.1"
 #define ROOM_SERVER_IP   "127.0.0.1"
 #define LOCAL_SERVER     "127.0.0.1"
-#define DEF_SOCKET_PORT  60905
+#define LOGIN_SOCKET_PORT 20000
+#define DEF_SOCKET_PORT   60905
 
 
 EnvVariable *EnvVariable::_instance = 0;
@@ -47,7 +48,7 @@ void EnvVariable::LoginServerInit() {
     _loginServer.id = 0;
     sprintf(_loginServer.name,"loginServer");
     SetServerIp(_loginServer,LOGIN_SERVER_IP);
-    _loginServer.port = DEF_SOCKET_PORT;
+    _loginServer.port = LOGIN_SOCKET_PORT;
 }
 
 void EnvVariable::RoomServerInit(int roomId) {
