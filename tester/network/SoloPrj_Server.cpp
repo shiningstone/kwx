@@ -4,8 +4,8 @@
 
 #include "./../../utils/UtilBasic.h"
 #include "./../../network/CSockets.h"
+#include "./../../utils/DebugCtrl.h"
 
-#define LOCAL_SERVER     "127.0.0.1"
 #define DEF_SOCKET_PORT  60905
 
 typedef enum {
@@ -96,7 +96,7 @@ void test_basic_recv_and_send() {
 
             SERVER.Send(buf,strlen(buf));
         } else {
-        	SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
+        	SERVER.Start(DBG_LAN_SERVER,DEF_SOCKET_PORT);
             printf("server started\n");
             start = true;
         }
@@ -136,7 +136,7 @@ void test_peng_effect() {
             }
 
         } else {
-        	SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
+        	SERVER.Start(DBG_LAN_SERVER,DEF_SOCKET_PORT);
             printf("server started\n");
             start = true;
         }
@@ -276,7 +276,7 @@ void test_game_server() {
             sendLen = GetSendData(sendBuf,line);
             SERVER.Send(sendBuf,sendLen);
         } else {
-        	SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
+        	SERVER.Start(DBG_LAN_SERVER,DEF_SOCKET_PORT);
             printf("server started\n");
             start = true;
         }
@@ -1044,7 +1044,7 @@ void test_smart_game_round_x() {
             SaveLog(fmonitor,"RECV",recvBuf,recvLen);
             gHandle(SERVER,recvBuf,recvLen);
         } else {
-        	SERVER.Start(LOCAL_SERVER,DEF_SOCKET_PORT);
+        	SERVER.Start(DBG_LAN_SERVER,DEF_SOCKET_PORT);
             printf("server started\n");
             start = true;
         }
