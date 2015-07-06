@@ -4,6 +4,8 @@
 #include "SimpleAudioEngine.h"
 using namespace CocosDenshion;
 
+#include "VersionUpgrade.h"
+
 #include "game/RaceLayer.h"
 #include "protocol/CommonMsg.h"
 #include "protocol/DsInstruction.h"
@@ -94,6 +96,11 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 
 			curButton->setTouchEnabled(false);
 			this->runAction(VoiceEffect);
+
+            #if (DEBUG_ENTRANCE==3)
+            _showVersionUpgrade();
+            return;
+            #endif
             
 #ifndef IGNORE_LOGIN_REQUEST
             EnvVariable *env = EnvVariable::getInstance();
@@ -102,10 +109,9 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
    			aMessenger->StartReceiving();
     		aMessenger->Send(REQ_LOGIN);
             
-    		KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
-   			bMessenger->StartReceiving();
-
             if(env->IsReconnectRequired()) {
+                KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+                bMessenger->StartReceiving();
                 bMessenger->Send(REQ_GAME_SEND_RECONNECT);
 
                 auto scene = Scene::create();
@@ -115,15 +121,19 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
                 Director::getInstance()->replaceScene(scene);
                 return;
             } else if(aMessenger->_response==VERSION_TOO_OLD) {
-
+                _showVersionUpgrade();
+                return;
             } else if(aMessenger->_response==NEW_VERSION_AVAILABLE) {
-
+                _showVersionUpgrade();
+                return;
             } else if(aMessenger->_response==NEW_RES_AVAILABLE) {
 
             } else if(aMessenger->_response==SERVER_DATA_ERROR) {
 
             } else {
                 #ifndef DEBUG_ENTRANCE
+                KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+                bMessenger->StartReceiving();
                 bMessenger->Send(REQ_DAILY_LOGIN);
                 #endif
             }
@@ -373,3 +383,15 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
     exit(0);
 #endif
 }
+
+void HelloWorld::_showVersionUpgrade() {
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("systemprompt.plist");
+    
+    std::string curEdition="1.1.1.2";
+    std::string newestEdition="1.1.1.1";
+    
+    Layer* prompt = new VersionUpgrade(curEdition,newestEdition);
+    prompt->setVisible(true);
+    this->addChild(prompt,99);
+}
+

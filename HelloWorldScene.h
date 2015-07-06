@@ -35,7 +35,11 @@ public:
 	void menuCloseCallback(cocos2d::Ref* pSender);	//¡ê?¡ê?¡ê?
 
 	void onEnterTransitionDidFinish();
+
 	CREATE_FUNC(HelloWorld);
+
+private:
+    void _showVersionUpgrade();
 };
 
 #endif // __HELLOWORLD_SCENE_H__
