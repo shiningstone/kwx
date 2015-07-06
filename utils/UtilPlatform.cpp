@@ -12,13 +12,15 @@ USING_NS_CC;
 
 #include "UtilPlatform.h"
 
+#define MAIN_ACTIVITY "org/cocos2dx/cpp/AppActivity"
+
 #ifndef WIN32
 static int CallJava(const char *jmethod,INT8U *retString) {
     JniMethodInfo method;
     bool IsMethodValid = false;
 
     jstring str; 
-    IsMethodValid = JniHelper::getStaticMethodInfo(method,"org/cocos2dx/cpp/AppActivity",jmethod,"()Ljava/lang/String;");
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,MAIN_ACTIVITY,jmethod,"()Ljava/lang/String;");
     if(IsMethodValid) {
         str = (jstring)method.env->CallStaticObjectMethod(method.classID,method.methodID);
 
@@ -32,12 +34,12 @@ static int CallJavaNonStatic(const char *jmethod,const char *param) {
     bool IsMethodValid = false;
     jobject _instance;
 
-    IsMethodValid = JniHelper::getStaticMethodInfo(method,"org/cocos2dx/cpp/AppActivity","getAppActivity","()Ljava/lang/Object;");
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,MAIN_ACTIVITY,"getAppActivity","()Ljava/lang/Object;");
     if(IsMethodValid) {
         _instance = method.env->CallStaticObjectMethod(method.classID,method.methodID);
     }
 
-    IsMethodValid = JniHelper::getMethodInfo(method,"org/cocos2dx/cpp/AppActivity",jmethod,"(Ljava/lang/String;)V");
+    IsMethodValid = JniHelper::getMethodInfo(method,MAIN_ACTIVITY,jmethod,"(Ljava/lang/String;)V");
     if(IsMethodValid) {
         jobject str = method.env->NewStringUTF(param);
         method.env->CallVoidMethod(_instance, method.methodID, str);
@@ -45,6 +47,9 @@ static int CallJavaNonStatic(const char *jmethod,const char *param) {
 }
 #endif
 
+/****************************************************************
+    设备信息接口
+****************************************************************/
 void _get_device_info(DeviceInfo_t &info) {
     memset(&info,0,sizeof(DeviceInfo_t));
 
@@ -63,24 +68,20 @@ void _get_device_info(DeviceInfo_t &info) {
 #endif
 }
 
+
+/****************************************************************
+    升级接口
+****************************************************************/
 #include <IOSTREAM>
-
-#ifdef WIN32
-void _write_file(const char *filename,std::vector<char>* buf) {
-    printf("write to file %s",filename);
-}
-
-void _update_version() {
-    printf("%s",__FUNCTION__);
-}
-
-#else
+#ifndef WIN32
 #include "cocos2d.h"
 #include "../cocos2d/extensions/cocos-ext.h"
 USING_NS_CC; 
-USING_NS_CC_EXT; 
+USING_NS_CC_EXT;
+#endif
 
 void _write_file(const char *filename,std::vector<char>* buf) {
+#ifndef WIN32/*ANDROID*/
     std::string path     = FileUtils::getInstance()->getWritablePath();     
     std::string fullPath = path + filename;     
 
@@ -96,16 +97,95 @@ void _write_file(const char *filename,std::vector<char>* buf) {
     }
     
     fclose(fp);
+#else/*WIN32*/
+    printf("write to file %s",filename);
+#endif
 }
 
 void _update_version(const char *apk) {
+#ifndef WIN32/*ANDROID*/
     std::string path     = FileUtils::getInstance()->getWritablePath();     
     std::string fullPath = path + apk;
 
     CallJavaNonStatic("updateVersion",fullPath.c_str());
+#else/*WIN32*/
+    printf("%s",__FUNCTION__);
+#endif
 }
 
+/****************************************************************
+    支付宝接口
+****************************************************************/
+void _ali_pay(const char *product,const char *desc,const char *price) {
+#ifndef WIN32
+    JniMethodInfo method;
+    bool IsMethodValid = false;
+    jobject _instance;
+
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,MAIN_ACTIVITY,"getAppActivity","()Ljava/lang/Object;");
+    if(IsMethodValid) {
+        _instance = method.env->CallStaticObjectMethod(method.classID,method.methodID);
+    }
+
+    IsMethodValid = JniHelper::getMethodInfo(method,MAIN_ACTIVITY,"pay","(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+    if(IsMethodValid) {
+        jobject p1 = method.env->NewStringUTF(product);
+        jobject p2 = method.env->NewStringUTF(desc);
+        jobject p3 = method.env->NewStringUTF(price);
+
+        method.env->CallVoidMethod(_instance, method.methodID, p1, p2, p3);
+    }
+#else
+    printf("%s : product %s, desc %s, price %s",__FUNCTION__, product, desc, price);
 #endif
+}
 
+bool _ali_is_account_exist() {
+#ifndef WIN32
+    JniMethodInfo method;
+    bool IsMethodValid = false;
+    jobject _instance;
 
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,MAIN_ACTIVITY,"getAppActivity","()Ljava/lang/Object;");
+    if(IsMethodValid) {
+        _instance = method.env->CallStaticObjectMethod(method.classID,method.methodID);
+    }
+
+    IsMethodValid = JniHelper::getMethodInfo(method,MAIN_ACTIVITY,"check","()V");
+    if(IsMethodValid) {
+        method.env->CallVoidMethod(_instance, method.methodID);
+    }
+
+    _delay(1000);/* 等待ali执行完成，可能有进程同步问题 */
+
+    bool isExist; 
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,MAIN_ACTIVITY,"getAccountStatus","()Z");
+    if(IsMethodValid) {
+        isExist = method.env->CallStaticBooleanMethod(method.classID,method.methodID);
+        return isExist;
+    } else {
+        return false;
+    }
+#else
+    printf("%s",__FUNCTION__);
+    return true;
+#endif
+}
+
+string _ali_get_sdk_version() {
+#ifndef WIN32
+    JniMethodInfo method;
+    bool IsMethodValid = false;
+
+    jstring str; 
+    IsMethodValid = JniHelper::getStaticMethodInfo(method,MAIN_ACTIVITY,"getSDKVersion","()Ljava/lang/String;");
+    if(IsMethodValid) {
+        str = (jstring)method.env->CallStaticObjectMethod(method.classID,method.methodID);
+        return JniHelper::jstring2string(str);
+    }
+#else
+    printf("%s",__FUNCTION__);
+    return string("win32_mock");
+#endif
+}
 
