@@ -13,16 +13,6 @@ using namespace std;
 #define VERSION_PAGE "localhost:8080/qwe.json"
 #define VERSION_CODE "update_time"
 
-typedef INT32U VersionCode_t;
-
-typedef struct _VerInfo_t {
-    VersionCode_t   code;
-    string          name;
-    string          content;
-    string          size;
-    string          url;
-}VerInfo_t;
-
 class VersionManager : public HTTPManagerDelegate {
 public:
     static VersionManager *getInstance();

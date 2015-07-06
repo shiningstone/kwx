@@ -12,7 +12,7 @@
 #include "./../../network/CSockets.h"
 #include "./../network/CTestSocket.h"
 
-#include "./../utils/DebugCtrl.h"
+#include "./../../utils/DebugCtrl.h"
 
 #define DEF_SOCKET_PORT  60905
 

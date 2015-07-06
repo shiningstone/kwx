@@ -82,5 +82,15 @@ typedef struct _DeviceInfo_t {
     INT8U osVer[128];
 }DeviceInfo_t;
 
+typedef INT32U VersionCode_t;
+
+typedef struct _VerInfo_t {
+    VersionCode_t   code;
+    string          name;
+    string          content;
+    string          size;
+    string          url;
+}VerInfo_t;
+
 #endif
 

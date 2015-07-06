@@ -4,7 +4,9 @@
 #include "./../utils/UtilPlatform.h"
 #include "./../network/KwxEnv.h"
 #include "./../network/KwxMessenger.h"
+#ifndef WIN32
 #include "./../hall/VersionManager.h"
+#endif
 
 #include "MsgFormats.h"
 #include "CommonMsg.h"
@@ -117,9 +119,12 @@ int RequestVersionUpdate::Set() {
 
 int VersionUpdateResponse::Construct(const DsMsg & msg) {
     CHECK_STATUS(msg);
-
+#ifndef WIN32
     VerInfo_t &ver = VersionManager::getInstance()->_newVer;
-    
+#else
+    VerInfo_t ver = {0};
+#endif
+
     ver.code = msg.GetItemValue(1);
     msg.GetString(2,ver.name);
     msg.GetString(3,ver.content);
