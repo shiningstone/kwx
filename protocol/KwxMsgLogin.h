@@ -69,7 +69,7 @@ public:
 
 class RequestDailyLogin : public UsMsg {
 public:
-    int Set(Key_t key);
+    int Set(Key_t key=INVALID);
 };
 
 class DailyLoginResponse : public DsInstruction {

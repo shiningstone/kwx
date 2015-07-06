@@ -175,6 +175,13 @@ int KwxMessenger::Send(RequestId_t req) {
     			return Send(aReq);
 			}
             
+        case REQ_DAILY_LOGIN:
+            {
+                RequestDailyLogin aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+                
         case REQ_RES_UPDATE:
             {
                 RequestResourceUpdate aReq;

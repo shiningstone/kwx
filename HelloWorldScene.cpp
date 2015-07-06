@@ -119,6 +119,8 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 
             } else if(aMessenger->_response==SERVER_DATA_ERROR) {
 
+            } else {
+                aMessenger->Send(REQ_DAILY_LOGIN);
             }
 #endif
 

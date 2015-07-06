@@ -154,7 +154,13 @@ int BasicInfoResponse::Construct(const DsMsg &msg) {
 int RequestDailyLogin::Set(Key_t key) {
     SetRequestCode(REQ_DAILY_LOGIN);
 
-    INT32U keyVal = _htonl((INT32U)key);
+    INT32U keyVal = 0;
+
+    if(key==INVALID) {
+        keyVal = _htonl((INT32U)EnvVariable::getInstance()->GetKey());
+    } else {
+        keyVal = _htonl((INT32U)key);
+    }
     
     _add_item( new Item((Item_t)131,4,(INT8U *)&keyVal) );
 
