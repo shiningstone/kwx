@@ -102,8 +102,11 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
    			aMessenger->StartReceiving();
     		aMessenger->Send(REQ_LOGIN);
             
+    		KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+   			bMessenger->StartReceiving();
+
             if(env->IsReconnectRequired()) {
-                aMessenger->Send(REQ_GAME_SEND_RECONNECT);
+                bMessenger->Send(REQ_GAME_SEND_RECONNECT);
 
                 auto scene = Scene::create();
                 RaceLayer *layer = RaceLayer::create();
@@ -120,7 +123,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             } else if(aMessenger->_response==SERVER_DATA_ERROR) {
 
             } else {
-                aMessenger->Send(REQ_DAILY_LOGIN);
+                bMessenger->Send(REQ_DAILY_LOGIN);
             }
 #endif
 
