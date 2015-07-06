@@ -21,11 +21,7 @@ void IMLoad::enterRoom()
 }
 const std::string ResFileName[]={"load_room.plist","Personalinformation.plist","chongfuziyuan.plist","chongfuziyuan2.plist",
 	"shezhijiemian.plist","changguichangbupiao.plist","changguichangdaipiao.plist","bisaichang.plist",
-//<<<<<<< .mine
-	"bisaidengdai.plist","bisaibaoming.plist",/*"RankImage.plist",*/"ChatImg.plist","FriendsImage.plist",
-//=======
 	"bisaidengdai.plist","bisaibaoming.plist","ChatImg.plist","FriendsImage.plist",
-//>>>>>>> .r320
 	"selectGameAndScene.plist","dengluzhutu.plist","changguichang2.plist",
 //new
 	"Createrole.plist","mall.plist"
@@ -37,10 +33,10 @@ const std::string ResFileName[]={"load_room.plist","Personalinformation.plist","
 void IMLoad::addRes()
 {
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");//ceshi_yusi
-	for(int insertNum=0;insertNum<21;insertNum++)
+	for(int insertNum=0;insertNum<sizeof(ResFileName)/sizeof(string);insertNum++)
 	{
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile(ResFileName[insertNum]);
-		curLoadingBar->setPercentage((float)(insertNum+1)/21*100);
+		curLoadingBar->setPercentage((float)(insertNum+1)/(sizeof(ResFileName)/sizeof(string))*100);
 	}
 	auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
 	this->runAction(EnterNextRoom);

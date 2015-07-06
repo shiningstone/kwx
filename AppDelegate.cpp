@@ -47,7 +47,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	if(newestEdition>curEdition)
 		startLayer=new VersionUpgrade(curEdition,newestEdition);
 	else
-		startLayer=IMLoad::create();
+		startLayer=HelloWorld::create();
 
 	scene->addChild(startLayer,1);
     director->runWithScene(scene);
