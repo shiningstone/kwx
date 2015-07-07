@@ -113,6 +113,30 @@ void _update_version(const char *apk) {
 #endif
 }
 
+int _get_file_size(const char *filename) {
+#ifndef WIN32
+    std::string path     = FileUtils::getInstance()->getWritablePath();     
+    std::string fullPath = path + filename;
+
+    FILE* fp = fopen("c:/Test.txt", "rb");
+    
+    if(fp==NULL) {
+        log("open file %s ERROR", fullPath.c_str());
+       return 0;
+    } else {
+        fseek(fp,0,SEEK_END);
+        return ftell(fp);
+    }
+#else
+    printf("%s",__FUNCTION__);
+	return 0;
+#endif
+}
+
+#include <time.h>
+int _get_system_time() {
+    return GetTickCount();
+}
 /****************************************************************
     Ö§¸¶±¦½Ó¿Ú
 ****************************************************************/

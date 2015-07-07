@@ -27,10 +27,6 @@ public:
 	Size visibleSize;
 	Vec2 origin;
     
-	int downSpeed;
-	float targetFileSize;
-	float haveDownSize;
-
 	VersionUpgrade(bool forceUpgrade);
 	~VersionUpgrade(void);
 

@@ -61,15 +61,14 @@ void VersionUpgrade::downDataUpdate(float delta)
     
     bool isFinished = _vm->get_download_status(rate,percentage);
 
-	downSpeed          = rate;
-	haveDownSize       = totalSize*percentage;
+	float haveDownSize = totalSize*percentage;
 	float persentCount = percentage*100;
 
 	if(!isFinished)
 	{
-		char tempNumber[20];
+		char tempNumber[64];
 
-		sprintf(tempNumber,"下载速度: %d ",downSpeed);
+		sprintf(tempNumber,"下载速度: %.1f ",rate);
 		speedLabel->setString(tempNumber);
 
 		sprintf(tempNumber,"文件大小: %.1f ",haveDownSize);
@@ -84,15 +83,13 @@ void VersionUpgrade::downDataUpdate(float delta)
 	}
 	else
 	{
-		haveDownSize=targetFileSize;
-		persentCount=100;
 		this->unschedule(schedule_selector(VersionUpgrade::downDataUpdate));
 
 		auto delayFunc=CallFunc::create([=](){
 			char tempNumber[20];
 
 			speedLabel->setString("下载速度: 0 ");
-			sprintf(tempNumber,"文件大小: %.1f ",targetFileSize);
+			sprintf(tempNumber,"文件大小: %.1f ",totalSize);
 			downSize->setString(tempNumber);
 			downUnit->setPosition(Vec2(downSize->getPosition().x+downSize->getContentSize().width,downSize->getPosition().y));
 
@@ -132,9 +129,7 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 
             _vm->upgrade();
 
-			downSpeed=0;
-			targetFileSize=21.5;
-			haveDownSize=0;
+            float totalSize  = atoi(_vm->getNewVerSize().c_str());
 			char tempCount[10];
 
 			auto progressBKG=Sprite::createWithSpriteFrameName("systemprompt-schedule.png");
@@ -159,7 +154,7 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 			fileSizeFont->setPosition(Vec2(BKG_POS.x-BKG_SIZE.width/2,BKG_POS.y+BKG_SIZE.height/2+10));
 			this->addChild(fileSizeFont,2,HAVE_DOWN_SIZE);
 
-			sprintf(tempCount,"M/%.1fM",targetFileSize);
+			sprintf(tempCount,"M/%.1fM",totalSize);
 			auto fileSize=LabelTTF::create(tempCount,"Arial",20);
 			fileSize->setAnchorPoint(Vec2(0,0));
 			fileSize->setPosition(Vec2(fileSizeFont->getPosition().x+fileSizeFont->getContentSize().width+3,BKG_POS.y+BKG_SIZE.height/2+10));
