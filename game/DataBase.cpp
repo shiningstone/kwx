@@ -160,8 +160,8 @@ void Database::_setDefaults() {
     char language[32] = "Language0";
     sCocos2dUserDefault->setStringForKey(language,"PuTongBan");
 
-    sCocos2dUserDefault->setIntegerForKey("VersionCode",0);
-    sCocos2dUserDefault->setStringForKey("VersionName","0.0.0.0");
+    sCocos2dUserDefault->setIntegerForKey("VersionCode",KWX_VERSION_CODE);
+    sCocos2dUserDefault->setStringForKey("VersionName",KWX_VERSION_NAME);
 }
 
 /******************************************

@@ -2,6 +2,9 @@
 #ifndef __DATABASE__
 #define __DATABASE__
 
+#define KWX_VERSION_CODE 0
+#define KWX_VERSION_NAME "0.0.0.0"
+
 typedef struct {
     int  id;
     char name[32];

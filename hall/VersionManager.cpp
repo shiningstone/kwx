@@ -100,6 +100,10 @@ int VersionManager::upgrade() {
 
 VersionManager::VersionManager() {
     _logger = LOGGER_REGISTER("VersionManager");
+
+    /*TEST DATA*/
+    _newVer.code = 1;
+    _newVer.name = "1.0.0.0";
 }
 
 VersionManager::~VersionManager() {
