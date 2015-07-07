@@ -7,8 +7,9 @@
     0 单机版
     1 网络版
     2 其他功能入口
+    3 版本升级UI测试
 **********************************************************************************/
-#define DEBUG_ENTRANCE 2
+#define DEBUG_ENTRANCE 3
 
 /**********************************************************************************
     网络版SERVER IP
@@ -16,8 +17,13 @@
         手机调试版本，      本机局域网ip
         windows联调版本     实际的server ip
 **********************************************************************************/
+#if 0
 #define DBG_LAN_SERVER "10.101.104.116"
 #define DBG_LOGIN_PORT 20000
+#else
+#define DBG_LAN_SERVER "127.0.0.1"
+#define DBG_LOGIN_PORT 60905
+#endif
 
 /**********************************************************************************
     本机服务器测试控制
@@ -26,7 +32,7 @@
 /* 不发送RequestLogin - 使用本机服务器测试时设置 */
 //#define IGNORE_LOGIN_REQUEST
 /* 不发送DailyLogin   - 使用本机服务器测试LoginRequest时设置*/
-//#define IGNORE_DAILY_LOGIN_REQUEST
+#define IGNORE_DAILY_LOGIN_REQUEST
 
 /* 使用预先设置好的牌局 - 单机版测试 */
 //#define USE_TEST_ROUND

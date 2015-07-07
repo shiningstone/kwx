@@ -88,7 +88,7 @@ typedef struct _VerInfo_t {
     VersionCode_t   code;
     string          name;
     string          content;
-    string          size;
+    string          size;/*Mbytes*/
     string          url;
 }VerInfo_t;
 

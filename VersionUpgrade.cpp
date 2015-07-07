@@ -55,7 +55,7 @@ void VersionUpgrade::downDataUpdate(float delta)
 	auto speedLabel=(LabelTTF*)this->getChildByTag(DOWN_SPEED_KB);//download speed
 	auto downdPersent=(LabelTTF*)this->getChildByTag(DOWN_PERSETTAGE);//persent for progress bar
 
-    float totalSize  = atoi(_vm->getNewVerSize().c_str());
+    const float totalSize  = _vm->getNewVerSize();
 	float rate       = 0;
 	float percentage = 0;
     
@@ -71,7 +71,7 @@ void VersionUpgrade::downDataUpdate(float delta)
 		sprintf(tempNumber,"下载速度: %.1f ",rate);
 		speedLabel->setString(tempNumber);
 
-		sprintf(tempNumber,"文件大小: %.1f ",haveDownSize);
+		sprintf(tempNumber,"文件大小: %.1fM/%.1fM ",haveDownSize,totalSize);
 		downSize->setString(tempNumber);
 		downUnit->setPosition(Vec2(downSize->getPosition().x+downSize->getContentSize().width,downSize->getPosition().y));
 
@@ -127,11 +127,6 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 					this->getChildByTag(SMALL_MESSAGE+a)->setVisible(false);
 			}
 
-            _vm->upgrade();
-
-            float totalSize  = atoi(_vm->getNewVerSize().c_str());
-			char tempCount[10];
-
 			auto progressBKG=Sprite::createWithSpriteFrameName("systemprompt-schedule.png");
 			progressBKG->setAnchorPoint(Vec2(0.5,0.5));
 			progressBKG->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2-50));
@@ -154,8 +149,7 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 			fileSizeFont->setPosition(Vec2(BKG_POS.x-BKG_SIZE.width/2,BKG_POS.y+BKG_SIZE.height/2+10));
 			this->addChild(fileSizeFont,2,HAVE_DOWN_SIZE);
 
-			sprintf(tempCount,"M/%.1fM",totalSize);
-			auto fileSize=LabelTTF::create(tempCount,"Arial",20);
+			auto fileSize=LabelTTF::create("","Arial",20);
 			fileSize->setAnchorPoint(Vec2(0,0));
 			fileSize->setPosition(Vec2(fileSizeFont->getPosition().x+fileSizeFont->getContentSize().width+3,BKG_POS.y+BKG_SIZE.height/2+10));
 			this->addChild(fileSize,2,HAVE_DOWN_UNIT);
@@ -187,6 +181,8 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 			this->addChild(downloadCancel,2);
 
 			schedule(schedule_selector(VersionUpgrade::downDataUpdate),1.0f);
+
+            _vm->upgrade();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

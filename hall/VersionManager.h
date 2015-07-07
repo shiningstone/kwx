@@ -23,9 +23,9 @@ public:
     string          getCurrentVerName() const;
     VersionCode_t   getNewVerCode() const;
     string          getNewVerName() const;
-    string          getNewVerSize() const;
+    float           getNewVerSize() const;
     int             upgrade();
-    bool            get_download_status(float &rate,float &percentage);
+    bool            get_download_status(float &Kbps,float &percentage);
 private:
     friend void test_download_version();
     friend void test_update_version();

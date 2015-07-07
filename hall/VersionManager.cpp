@@ -31,8 +31,8 @@ string VersionManager::getNewVerName() const {
     return _newVer.name;
 }
 
-string VersionManager::getNewVerSize() const {
-    return _newVer.size;
+float VersionManager::getNewVerSize() const {
+    return atof(_newVer.size.c_str());
 }
 
 int VersionManager::_requestUpdate() {
@@ -111,11 +111,11 @@ int VersionManager::upgrade() {
     return retcode;
 }
 
-bool VersionManager::get_download_status(float &rate,float &percentage) {
+bool VersionManager::get_download_status(float &Kbps,float &percentage) {
     bool finish = false;
 
-    int totalSize = atoi(_newVer.size.c_str());
-    int newTime = _get_system_time();
+    float totalSize = getNewVerSize();
+    int   newTime = _get_system_time();
 
     #if (DEBUG_ENTRANCE==3)
     float newSize = _curFileSize + totalSize/30;
@@ -123,7 +123,7 @@ bool VersionManager::get_download_status(float &rate,float &percentage) {
     float newSize = _get_file_size(_newVer.name.c_str())/float(1024*1024);
     #endif
     
-    rate = (newSize-_curFileSize)*(1024*1024) / ((newTime-_curTime)/(float)1000);
+    Kbps = (newSize-_curFileSize)*(1024) / ((newTime-_curTime)/(float)1000);
 
     _curTime     = newTime;
     _curFileSize = newSize;
