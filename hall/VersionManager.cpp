@@ -146,6 +146,8 @@ VersionManager::VersionManager() {
     _newVer.code = 1;
     _newVer.name = "1.0.0.0";
     _newVer.size = "100";
+	_newVer.url = "http://120.25.169.221:8080/kwx.apk";
+    _newVer.name = "kwx.apk";
 }
 
 VersionManager::~VersionManager() {

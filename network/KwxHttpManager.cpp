@@ -18,11 +18,16 @@ HTTPManager::~HTTPManager() {
 void HTTPManager::sendGetRequest(std::string url,std::string requestTag) {     
     HttpRequest* request = new HttpRequest();
 
+    LOGGER_WRITE("Get %s in 300 seconds",url.c_str());     
     request->setRequestType(HttpRequest::Type::GET);
     request->setUrl(url.c_str());
     request->setResponseCallback(CC_CALLBACK_2(HTTPManager::onHttpRequestCompleted, this));
     request->setTag(requestTag.c_str());
-    HttpClient::getInstance()->send(request);
+
+    HttpClient *httpClient = HttpClient::getInstance();
+    httpClient->setTimeoutForRead(300);
+    httpClient->send(request);
+    
     request->release();
 }   
 
