@@ -21,6 +21,9 @@ public:
     static void destroyInstance();
 
     static void get_local_image(char *buf,const char *id);
+
+    bool IsYinYueOn() const;
+    bool IsYinXiaoOn() const;
     
     void GetUserProfile(int id,UserProfile_t &profile);
     void SetProperty(int id,int property);

@@ -5,7 +5,7 @@
 
 VersionUpgrade::VersionUpgrade(bool forceUpgrade)
 :_forceUpgrade(forceUpgrade) {
-    VersionManager *_vm = VersionManager::getInstance();
+    _vm = VersionManager::getInstance();
     
 	init();
 }

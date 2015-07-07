@@ -69,6 +69,14 @@ void Database::get_local_image(char *buf,const char *id) {
     strcpy(buf, sCocos2dUserDefault->getStringForKey(photo).c_str());
 }
 
+bool Database::IsYinYueOn() const {
+    return sCocos2dUserDefault->getBoolForKey("ifYinYueOn");
+}
+
+bool Database::IsYinXiaoOn() const {
+    return sCocos2dUserDefault->getBoolForKey("ifYinXiaoOn");
+}
+
 void Database::GetUserProfile(int id,UserProfile_t &profile) {
     if (id<17) {
         return _getRobotProfile(id,profile);
@@ -162,6 +170,13 @@ void Database::_setDefaults() {
 
     sCocos2dUserDefault->setIntegerForKey("VersionCode",KWX_VERSION_CODE);
     sCocos2dUserDefault->setStringForKey("VersionName",KWX_VERSION_NAME);
+
+	sCocos2dUserDefault->setBoolForKey("ifYinYueOn",true);
+	sCocos2dUserDefault->setBoolForKey("ifYinXiaoOn",true);
+	sCocos2dUserDefault->setBoolForKey("ifZhenDongOn",false);
+	sCocos2dUserDefault->setBoolForKey("ifFangYanOn",false);
+
+	sCocos2dUserDefault->flush();
 }
 
 /******************************************

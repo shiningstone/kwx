@@ -7,6 +7,7 @@ using namespace CocosDenshion;
 #include "VersionUpgrade.h"
 
 #include "game/RaceLayer.h"
+#include "game/DataBase.h"
 #include "protocol/CommonMsg.h"
 #include "protocol/DsInstruction.h"
 #include "protocol/UsRequest.h"
@@ -26,25 +27,18 @@ HelloWorld::HelloWorld()
 }
 void HelloWorld::onEnterTransitionDidFinish()
 {
-	set_userDefault();
-	bool ifYinYueOn;
-	bool ifYinXiaoOn;
-	bool ifZhenDongOn;
-	bool ifFangYanOn; 
-	auto userDefault=UserDefault::getInstance();
-	ifYinYueOn=userDefault->getBoolForKey("ifYinYueOn");
-	ifYinXiaoOn=userDefault->getBoolForKey("ifYinXiaoOn");
-	ifZhenDongOn=userDefault->getBoolForKey("ifZhenDongOn");
-	ifFangYanOn=userDefault->getBoolForKey("ifFangYanOn");
-	if(ifYinYueOn)
+    Database *aDatabase = Database::getInstance();
+    
+    if(aDatabase->IsYinYueOn()) {
 		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("Music/playing.mp3",true);
-	else
-	{
+    } else {
 		SimpleAudioEngine::sharedEngine()->setBackgroundMusicVolume(0);
 		SimpleAudioEngine::sharedEngine()->playBackgroundMusic("Music/playing.mp3",true);
 	}
-	if(!ifYinXiaoOn)
+    
+	if(!aDatabase->IsYinXiaoOn()) {
 		SimpleAudioEngine::sharedEngine()->setEffectsVolume(0);
+    }
 
 }
 HelloWorld::~HelloWorld()
