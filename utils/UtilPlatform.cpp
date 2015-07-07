@@ -135,7 +135,13 @@ int _get_file_size(const char *filename) {
 
 #include <time.h>
 int _get_system_time() {
+#ifndef WIN32
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    return tv.tv_sec*1000 + tv.tv_usec/1000;
+#else
     return GetTickCount();
+#endif
 }
 /****************************************************************
     Ö§¸¶±¦½Ó¿Ú

@@ -53,6 +53,8 @@ int VersionManager::_requestUpdate() {
 int VersionManager::_download() {
     _curFileSize = 0;
     _curTime = _get_system_time();
+
+    LOGGER_WRITE("%s (%d)",__FUNCTION__,_curTime);
     
     _hm = new HTTPManager();  
     
@@ -73,12 +75,15 @@ int VersionManager::_update() {
 
 void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) {
     if (strcmp(response->getHttpRequest()->getTag(), VERSION_CODE) == 0) {             
-        LOGGER_WRITE("%s",VERSION_CODE);
+        LOGGER_WRITE("%s (%d)",__FUNCTION__,_curTime);
 
-        if(atoi(_newVer.size.c_str())==response->getResponseData()->size()) {
+        if(getNewVerSize()==response->getResponseData()->size()) {
             _write_file(_newVer.name.c_str(),response->getResponseData());
+            _update();
+            _recordVersion();
         } else {
-            LOGGER_WRITE("%s error image size",__FUNCTION__);
+            LOGGER_WRITE("%s error image size(Exp %d,Act %d)",
+                __FUNCTION__, getNewVerSize(), response->getResponseData()->size());
         }
     }                             
     
@@ -100,12 +105,6 @@ int VersionManager::upgrade() {
     RETURN_IF_FAIL(retcode);
 
     retcode = _download();
-    RETURN_IF_FAIL(retcode);
-
-    retcode = _update();
-    RETURN_IF_FAIL(retcode);
-
-    retcode = _recordVersion();
     RETURN_IF_FAIL(retcode);
 
     return retcode;
@@ -145,8 +144,8 @@ VersionManager::VersionManager() {
     /*TEST DATA*/
     _newVer.code = 1;
     _newVer.name = "1.0.0.0";
-    _newVer.size = "100";
-	_newVer.url = "http://120.25.169.221:8080/kwx.apk";
+    _newVer.size = "100MB";
+	_newVer.url  = "http://120.25.169.221:8080/kwx.apk";
     _newVer.name = "kwx.apk";
 }
 
