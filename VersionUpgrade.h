@@ -26,6 +26,7 @@ public:
     
 	Size visibleSize;
 	Vec2 origin;
+    
 	int downSpeed;
 	float targetFileSize;
 	float haveDownSize;

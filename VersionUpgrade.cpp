@@ -55,11 +55,17 @@ void VersionUpgrade::downDataUpdate(float delta)
 	auto speedLabel=(LabelTTF*)this->getChildByTag(DOWN_SPEED_KB);//download speed
 	auto downdPersent=(LabelTTF*)this->getChildByTag(DOWN_PERSETTAGE);//persent for progress bar
 
-	downSpeed=rand()%2048;
-	haveDownSize+=((float)downSpeed/1024);
-	float persentCount=haveDownSize/targetFileSize*100;
+    float totalSize  = atoi(_vm->getNewVerSize().c_str());
+	float rate       = 0;
+	float percentage = 0;
+    
+    bool isFinished = _vm->get_download_status(rate,percentage);
 
-	if(haveDownSize<targetFileSize)
+	downSpeed          = rate;
+	haveDownSize       = totalSize*percentage;
+	float persentCount = percentage*100;
+
+	if(!isFinished)
 	{
 		char tempNumber[20];
 
@@ -123,6 +129,8 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 				if(this->getChildByTag(SMALL_MESSAGE+a))
 					this->getChildByTag(SMALL_MESSAGE+a)->setVisible(false);
 			}
+
+            _vm->upgrade();
 
 			downSpeed=0;
 			targetFileSize=21.5;

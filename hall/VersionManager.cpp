@@ -4,6 +4,8 @@
 #include "./../network/KwxMessenger.h"
 #include "VersionManager.h"
 
+#include "./../utils/DebugCtrl.h"
+
 #define RETURN_IF_FAIL(x) do { \
     if(x!=0) { \
         LOGGER_WRITE("%s fail : %s = %d",__FUNCTION__, #x, x); \
@@ -29,7 +31,14 @@ string VersionManager::getNewVerName() const {
     return _newVer.name;
 }
 
+string VersionManager::getNewVerSize() const {
+    return _newVer.size;
+}
+
 int VersionManager::_requestUpdate() {
+#if (DEBUG_ENTRANCE==3)
+    return 0;
+#else
     KwxMessenger *messenger = KwxMessenger::getInstance(MSG_LOGIN);
     messenger->Send(REQ_VER_UPDATE);
 
@@ -38,9 +47,13 @@ int VersionManager::_requestUpdate() {
     }
     
     return messenger->_response;
+#endif
 }
 
 int VersionManager::_download() {
+    _curFileSize = 0;
+    _curTime = _get_system_time();
+    
     _hm = new HTTPManager();  
     
     _hm->retain();
@@ -98,12 +111,41 @@ int VersionManager::upgrade() {
     return retcode;
 }
 
+bool VersionManager::get_download_status(float &rate,float &percentage) {
+    bool finish = false;
+
+    int totalSize = atoi(_newVer.size.c_str());
+    int newTime = _get_system_time();
+
+    #if (DEBUG_ENTRANCE==3)
+    float newSize = _curFileSize + totalSize/30;
+    #else
+    float newSize = _get_file_size(_newVer.name.c_str())/float(1024*1024);
+    #endif
+    
+    rate = (newSize-_curFileSize)*(1024*1024) / ((newTime-_curTime)/(float)1000);
+
+    _curTime     = newTime;
+    _curFileSize = newSize;
+
+    if(_curFileSize>=totalSize) {
+        percentage = 1.0;
+        finish = true;
+    } else {
+        percentage = _curFileSize / totalSize;
+        finish = false;
+    }
+
+    return finish;
+}
+
 VersionManager::VersionManager() {
     _logger = LOGGER_REGISTER("VersionManager");
 
     /*TEST DATA*/
     _newVer.code = 1;
     _newVer.name = "1.0.0.0";
+    _newVer.size = "100";
 }
 
 VersionManager::~VersionManager() {
