@@ -152,6 +152,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_LOGIN:
             return new LoginResponse();
 
+        case REQ_DAILY_LOGIN:
+            return new DailyLoginResponse();
+
         case RRQ_BASIC_INFO:
             return new BasicInfoResponse();
 

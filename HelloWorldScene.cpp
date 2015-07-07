@@ -131,7 +131,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             } else if(aMessenger->_response==SERVER_DATA_ERROR) {
 
             } else {
-                #ifndef DEBUG_ENTRANCE
+                #ifndef IGNORE_DAILY_LOGIN_REQUEST
                 KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
                 bMessenger->StartReceiving();
                 bMessenger->Send(REQ_DAILY_LOGIN);

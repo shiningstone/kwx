@@ -16,12 +16,17 @@
         手机调试版本，      本机局域网ip
         windows联调版本     实际的server ip
 **********************************************************************************/
-#define DBG_LAN_SERVER "127.0.0.1"
-#define DBG_LOGIN_PORT 60905
+#define DBG_LAN_SERVER "10.101.104.116"
+#define DBG_LOGIN_PORT 20000
 
-
-/* 不发送RequestLogin - 本地服务器仅支持一个sockect连接 */
+/**********************************************************************************
+    本机服务器测试控制
+        由于本机服务器只支持一个socket连接，只能模拟登陆服务器和房间服务器中的一个
+**********************************************************************************/
+/* 不发送RequestLogin - 使用本机服务器测试时设置 */
 //#define IGNORE_LOGIN_REQUEST
+/* 不发送DailyLogin   - 使用本机服务器测试LoginRequest时设置*/
+//#define IGNORE_DAILY_LOGIN_REQUEST
 
 /* 使用预先设置好的牌局 - 单机版测试 */
 //#define USE_TEST_ROUND
