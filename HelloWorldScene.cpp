@@ -98,7 +98,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 			this->runAction(VoiceEffect);
 
             #if (DEBUG_ENTRANCE==3)
-            _showVersionUpgrade();
+            _showVersionUpgrade(true);
             return;
             #endif
             
@@ -121,10 +121,10 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
                 Director::getInstance()->replaceScene(scene);
                 return;
             } else if(aMessenger->_response==VERSION_TOO_OLD) {
-                _showVersionUpgrade();
+                _showVersionUpgrade(true);
                 return;
             } else if(aMessenger->_response==NEW_VERSION_AVAILABLE) {
-                _showVersionUpgrade();
+                _showVersionUpgrade(false);
                 return;
             } else if(aMessenger->_response==NEW_RES_AVAILABLE) {
 
@@ -384,13 +384,9 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 #endif
 }
 
-void HelloWorld::_showVersionUpgrade() {
+void HelloWorld::_showVersionUpgrade(bool forceUpgrade) {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("systemprompt.plist");
-    
-    std::string curEdition="1.1.1.2";
-    std::string newestEdition="1.1.1.1";
-    
-    Layer* prompt = new VersionUpgrade(curEdition,newestEdition);
+    Layer* prompt = new VersionUpgrade(forceUpgrade);
     prompt->setVisible(true);
     this->addChild(prompt,99);
 }

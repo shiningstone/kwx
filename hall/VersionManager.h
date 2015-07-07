@@ -20,8 +20,9 @@ public:
 
     virtual void onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response); 
 
-    VersionCode_t   getCurrentVerCode() const;
     string          getCurrentVerName() const;
+    VersionCode_t   getNewVerCode() const;
+    string          getNewVerName() const;
     int             upgrade();
 private:
     friend void test_download_version();
@@ -33,6 +34,7 @@ private:
     int _requestUpdate();
     int _download();
     int _update();
+    int _recordVersion();
 
     friend class VersionUpdateResponse;
     VerInfo_t       _newVer;

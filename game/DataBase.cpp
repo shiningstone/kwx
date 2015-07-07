@@ -50,6 +50,16 @@ void Database::SetProperty(int id,int property) {
     sCocos2dUserDefault->setIntegerForKey(title,property);
 }
 
+void Database::SetVersion(int code,const char * name) {
+	sCocos2dUserDefault->setIntegerForKey("VersionCode",code);
+	sCocos2dUserDefault->setStringForKey( "VersionName",name);
+}
+
+void Database::GetVersion(int &code,char *name) {
+    code = sCocos2dUserDefault->getIntegerForKey("VersionCode");
+    strcpy(name, sCocos2dUserDefault->getStringForKey("VersionName").c_str());
+}
+
 void Database::get_local_image(char *buf,const char *id) {
     char photo[32]    = {0};
 
@@ -149,6 +159,9 @@ void Database::_setDefaults() {
 
     char language[32] = "Language0";
     sCocos2dUserDefault->setStringForKey(language,"PuTongBan");
+
+    sCocos2dUserDefault->setIntegerForKey("VersionCode",0);
+    sCocos2dUserDefault->setStringForKey("VersionName","0.0.0.0");
 }
 
 /******************************************

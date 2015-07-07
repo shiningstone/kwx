@@ -1,28 +1,27 @@
 ﻿#include "VersionUpgrade.h"
 #include "HelloWorldScene.h"
 
-VersionUpgrade::VersionUpgrade(std::string curEdition,std::string newestEdition)
-{
-	curGameEdition=curEdition;
-	targetEditon=newestEdition;
-	smallUpgrade=true;
+#include "hall/VersionManager.h"
 
-	std::string tempStrCur[4]={};
-	std::string tempStrNew[4]={};
-	for(int a=0;a<4;a++)
-	{
-		tempStrCur[a]=curEdition.substr(0+a*2,1);
-		tempStrNew[a]=newestEdition.substr(0+a*2,1);
-	}
-	if(tempStrNew[0]>tempStrCur[0]||tempStrNew[1]>tempStrCur[1]||tempStrNew[2]>tempStrCur[2])
-		smallUpgrade=false;
-	else
-		smallUpgrade=true;
+VersionUpgrade::VersionUpgrade(bool forceUpgrade)
+:_forceUpgrade(forceUpgrade) {
+    VersionManager *_vm = VersionManager::getInstance();
+    
 	init();
 }
+
 VersionUpgrade::~VersionUpgrade(void)
 {
 }
+
+string VersionUpgrade::curVersion() const {
+    return _vm->getCurrentVerName();
+}
+
+string VersionUpgrade::newVersion() const {
+    return _vm->getNewVerName();
+}
+
 void VersionUpgrade::upCancelCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEventType type)
 {
 	switch (type)
@@ -203,7 +202,7 @@ void VersionUpgrade::downCancelCallBack(cocos2d::Ref* pSender,ui::Widget::TouchE
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			if(smallUpgrade)
+			if(_forceUpgrade)
 			{
 				auto scene=Scene::create();
 				auto startLayer=HelloWorld::create();
@@ -246,9 +245,9 @@ bool VersionUpgrade::init()
 	char promptMessage[100];
 	std::string messageHead;
 	std::string messageEnd;
-	sprintf(promptMessage,"检测到您当前版本号为%s",curGameEdition.c_str());//sprintf 参数中如果有两个%s ERROR
+	sprintf(promptMessage,"检测到您当前版本号为%s",curVersion().c_str());//sprintf 参数中如果有两个%s ERROR
 	messageHead=promptMessage;
-	sprintf(promptMessage,"低于最新版本%s,是否立即更新？",targetEditon.c_str());
+	sprintf(promptMessage,"低于最新版本%s,是否立即更新？",newVersion().c_str());
 	messageEnd=promptMessage;
 	std::string allMessageStr=messageHead+messageEnd;
 	auto noticeFont=LabelTTF::create(allMessageStr,"Arial",30);
@@ -256,7 +255,7 @@ bool VersionUpgrade::init()
 	noticeFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2+40));
 	this->addChild(noticeFont,2,SMALL_MESSAGE);
 
-	if(!smallUpgrade)
+	if(!_forceUpgrade)
 	{
 		auto bigNotice=LabelTTF::create("当前版本存在重要更新，请立即更新。","Arial",20);
 		bigNotice->setColor(ccRED);
@@ -276,7 +275,7 @@ bool VersionUpgrade::init()
 	auto upEnsure=Button::create("systemprompt-yes.png","systemprompt--yes2.png","systemprompt--yes2.png",UI_TEX_TYPE_PLIST);
 	upEnsure->addTouchEventListener(CC_CALLBACK_2(VersionUpgrade::upEnsureCallBack,this));
 	upEnsure->setAnchorPoint(Vec2(0.5,0.5));
-	if(smallUpgrade)
+	if(_forceUpgrade)
 		upEnsure->setPosition(Vec2(origin.x+visibleSize.width/2+130,origin.y+visibleSize.height/2-120));
 	else
 		upEnsure->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2-120));

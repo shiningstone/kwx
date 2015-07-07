@@ -6,6 +6,7 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
+class VersionManager;
 class VersionUpgrade : public Layer
 {
 public:
@@ -19,16 +20,17 @@ public:
 #define HAVE_DOWN_UNIT					7
 #define DOWN_SPEED_KB					8
 #define DOWN_PERSETTAGE					9
-	bool smallUpgrade;
-	std::string curGameEdition;
-	std::string targetEditon;
+
+	const bool      _forceUpgrade;
+    VersionManager *_vm;
+    
 	Size visibleSize;
 	Vec2 origin;
 	int downSpeed;
 	float targetFileSize;
 	float haveDownSize;
 
-	VersionUpgrade(std::string curEdition,std::string newestEdition);
+	VersionUpgrade(bool forceUpgrade);
 	~VersionUpgrade(void);
 
 	virtual bool init();
@@ -36,4 +38,7 @@ public:
 	void upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);
 	void downCancelCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEventType type);
 	void downDataUpdate(float delta);
+private:
+    std::string curVersion() const;
+    std::string newVersion() const;
 };

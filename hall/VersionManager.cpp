@@ -1,5 +1,6 @@
 
 #include "./../utils/UtilPlatform.h"
+#include "./../game/DataBase.h"
 #include "./../network/KwxMessenger.h"
 #include "VersionManager.h"
 
@@ -10,12 +11,22 @@
     } \
 }while(0)
 
-VersionCode_t VersionManager::getCurrentVerCode() const {
-    return 0;
+string VersionManager::getCurrentVerName() const {
+    int  code = 0;     
+    char name[32]      = {0};
+    
+    Database *aDatabase = Database::getInstance();
+    aDatabase->GetVersion(code,name);
+
+    return string(name);
 }
 
-string VersionManager::getCurrentVerName() const {
-    return 0;
+VersionCode_t VersionManager::getNewVerCode() const {
+    return _newVer.code;
+}
+
+string VersionManager::getNewVerName() const {
+    return _newVer.name;
 }
 
 int VersionManager::_requestUpdate() {
@@ -63,6 +74,12 @@ void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpRespo
     }
 }
 
+int VersionManager::_recordVersion() {
+    Database *aDatabase = Database::getInstance();
+    aDatabase->SetVersion(_newVer.code,_newVer.name.c_str());
+    return 0;
+}
+
 int VersionManager::upgrade() {
     int retcode = 0;
     
@@ -73,6 +90,9 @@ int VersionManager::upgrade() {
     RETURN_IF_FAIL(retcode);
 
     retcode = _update();
+    RETURN_IF_FAIL(retcode);
+
+    retcode = _recordVersion();
     RETURN_IF_FAIL(retcode);
 
     return retcode;

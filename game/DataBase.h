@@ -21,6 +21,8 @@ public:
     
     void GetUserProfile(int id,UserProfile_t &profile);
     void SetProperty(int id,int property);
+    void GetVersion(int &code,char *name);
+    void SetVersion(int code,const char *name);
     
 protected:
     Database();

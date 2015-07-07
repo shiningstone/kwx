@@ -39,7 +39,7 @@ public:
 	CREATE_FUNC(HelloWorld);
 
 private:
-    void _showVersionUpgrade();
+    void _showVersionUpgrade(bool forceUpgrade);
 };
 
 #endif // __HELLOWORLD_SCENE_H__
