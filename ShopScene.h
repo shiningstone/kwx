@@ -5,8 +5,7 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
-class ShopScene :
-	public Scene
+class ShopScene : public Scene
 {
 public:
 #define CANGJINGGE_MOJI			1

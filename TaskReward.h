@@ -6,8 +6,7 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
-class TaskReward :
-	public Scene
+class TaskReward :	public Scene
 {
 public:
 	TaskReward(void);

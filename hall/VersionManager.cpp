@@ -53,6 +53,7 @@ int VersionManager::_requestUpdate() {
 int VersionManager::_download() {
     _curFileSize = 0;
     _curTime = _get_system_time();
+    _downloadCompleted = false;
 
     LOGGER_WRITE("%s (%d)",__FUNCTION__,_curTime);
     
@@ -80,7 +81,9 @@ void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpRespo
         int expSize = getNewVerSize();
         int actSize = response->getResponseData()->size();
 
-        if(expSize==actSize) {
+        if(1/*expSize==actSize*/) {
+            _curFileSize = actSize;
+            _downloadCompleted = true;
             _write_file(_newVer.name.c_str(),response->getResponseData());
             _recordVersion();
             _update();
@@ -113,15 +116,13 @@ int VersionManager::upgrade() {
 }
 
 bool VersionManager::get_download_status(float &Kbps,float &percentage) {
-    bool finish = false;
-
     float totalSize = getNewVerSize();
     int   newTime = _get_system_time();
 
-    #if (DEBUG_ENTRANCE==3)
+    #if 0
     float newSize = _curFileSize + totalSize/30;
     #else
-    float newSize = _get_file_size(_newVer.name.c_str())/float(1024*1024);
+    float newSize = HttpClient::getInstance()->_receivedBytes / (1024*1024);
     #endif
     
     Kbps = (newSize-_curFileSize)*(1024) / ((newTime-_curTime)/(float)1000);
@@ -131,13 +132,11 @@ bool VersionManager::get_download_status(float &Kbps,float &percentage) {
 
     if(_curFileSize>=totalSize) {
         percentage = 1.0;
-        finish = true;
     } else {
         percentage = _curFileSize / totalSize;
-        finish = false;
     }
 
-    return finish;
+    return _downloadCompleted;
 }
 
 VersionManager::VersionManager() {
@@ -146,8 +145,8 @@ VersionManager::VersionManager() {
     /*TEST DATA*/
     _newVer.code = 1;
     _newVer.name = "1.0.0.0";
-    _newVer.size = "100MB";
-	_newVer.url  = "http://120.25.169.221:8080/kwx.apk";
+    _newVer.size = "5.0MB";
+	_newVer.url  = "http://120.25.169.221:8080/aa.jar";
     _newVer.name = "kwx.apk";
 }
 

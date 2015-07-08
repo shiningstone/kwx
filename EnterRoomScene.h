@@ -58,7 +58,8 @@ public:
 	void call_gold_prize();																//ReWrite
 
 	void createRole();
-		
+
+	MainLayer_myInfo get_personalSimpleInfo();
 	CREATE_FUNC(EnterRoom);
 private:
 	MainLayer_myInfo personalSimpleInfo;

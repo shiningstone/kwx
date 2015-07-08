@@ -6,8 +6,7 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
-class CommonField :
-	public Scene
+class CommonField :	public Scene
 {
 public:
 #define NO_PIAO_CP_MOJI				1

@@ -483,3 +483,7 @@ void EnterRoom::myBaseInfo_callback(cocos2d::Ref* pSender,Widget::TouchEventType
 		break;
 	}
 }
+MainLayer_myInfo EnterRoom::get_personalSimpleInfo()
+{
+	return personalSimpleInfo;
+}

@@ -191,9 +191,9 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
     info->gold   = msg.GetItemValue(3);
     info->coupon = msg.GetItemValue(4);
 
-    DsMsgParser::_load_friends_info(info->friends,msg,5);
-    DsMsgParser::_load_others_info(info->strangers,msg,6);
-    DsMsgParser::_load_others_info(info->nearbys,msg,7);
+    //DsMsgParser::_load_friends_info(info->friends,msg,5);
+    //DsMsgParser::_load_others_info(info->strangers,msg,6);
+    //DsMsgParser::_load_others_info(info->nearbys,msg,7);
 
     return 0;
 }

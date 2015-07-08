@@ -5,8 +5,7 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
-class ActivityCenter :
-	public Scene
+class ActivityCenter :	public Scene
 {
 public:
 	ActivityCenter(void);

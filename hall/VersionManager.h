@@ -44,6 +44,7 @@ private:
 
     float           _curFileSize;
     int             _curTime;
+    bool            _downloadCompleted;
     
     Logger *_logger;
     static VersionManager *_instance;

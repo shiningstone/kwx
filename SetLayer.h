@@ -5,8 +5,7 @@
 USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
-class SetLayer :
-	public cocos2d::Layer
+class SetLayer :public cocos2d::Layer
 {
 public:
 	SetLayer(void);

@@ -96,6 +96,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             return;
             #endif
             
+
 #ifndef IGNORE_LOGIN_REQUEST
             EnvVariable *env = EnvVariable::getInstance();
 
