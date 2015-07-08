@@ -78,11 +78,17 @@ void _get_device_info(DeviceInfo_t &info) {
 #include "../cocos2d/extensions/cocos-ext.h"
 USING_NS_CC; 
 USING_NS_CC_EXT;
+#else
+#define log printf
 #endif
 
 void _write_file(const char *filename,std::vector<char>* buf) {
 #ifndef WIN32/*ANDROID*/
     std::string path     = FileUtils::getInstance()->getWritablePath();     
+#else/*WIN32*/
+    std::string path     = "E://";
+#endif
+
     std::string fullPath = path + filename;     
 
     FILE* fp = fopen(fullPath.c_str(), "wb");
@@ -97,9 +103,6 @@ void _write_file(const char *filename,std::vector<char>* buf) {
     }
     
     fclose(fp);
-#else/*WIN32*/
-    printf("write to file %s",filename);
-#endif
 }
 
 void _update_version(const char *apk) {
@@ -134,7 +137,7 @@ int _get_file_size(const char *filename) {
 }
 
 #include <time.h>
-int _get_system_time() {
+long _get_system_time() {
 #ifndef WIN32
     struct timeval tv;
     gettimeofday(&tv,NULL);

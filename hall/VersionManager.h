@@ -11,7 +11,7 @@ using namespace std;
 #include "./../network/KwxHttpManager.h"
 
 #define VERSION_PAGE "localhost:8080/qwe.json"
-#define VERSION_CODE "update_time"
+#define VERSION_CODE ""
 
 class VersionManager : public HTTPManagerDelegate {
 public:

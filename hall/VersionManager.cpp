@@ -74,16 +74,18 @@ int VersionManager::_update() {
 }
 
 void VersionManager::onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) {
-    if (strcmp(response->getHttpRequest()->getTag(), VERSION_CODE) == 0) {             
-        LOGGER_WRITE("%s (%d)",__FUNCTION__,_curTime);
+    if (strcmp(response->getHttpRequest()->getTag(), VERSION_CODE) == 0) {
+        LOGGER_WRITE("%s (%d)",__FUNCTION__,(_get_system_time()-_curTime)/1000);
 
-        if(getNewVerSize()==response->getResponseData()->size()) {
+        int expSize = getNewVerSize();
+        int actSize = response->getResponseData()->size();
+
+        if(expSize==actSize) {
             _write_file(_newVer.name.c_str(),response->getResponseData());
-            _update();
             _recordVersion();
+            _update();
         } else {
-            LOGGER_WRITE("%s error image size(Exp %d,Act %d)",
-                __FUNCTION__, getNewVerSize(), response->getResponseData()->size());
+            LOGGER_WRITE("%s error image size(Exp %d,Act %d)",__FUNCTION__, expSize, actSize);
         }
     }                             
     

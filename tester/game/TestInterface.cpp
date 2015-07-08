@@ -48,14 +48,14 @@ public:
 
 void HttpTester::onHttpManagerRequestCompleted(HttpClient *sender, HttpResponse *response) {
     log("tag:%s",response->getHttpRequest()->getTag());
+    log("file size:%d",response->getResponseData()->size());
     _write_file("testHttpGetResponse",response->getResponseData());
 }
 
 void test_http_get() {
-    log("test_http_get");
     HTTPManager *hm = new HTTPManager();
     hm->setHttpDelegate(new HttpTester());     
-    hm->sendGetRequest( "http://www.baidu.com","" );
+    hm->sendGetRequest( "http://120.25.169.221:8080/kwx.apk","" );
 }
 
 void test_upgrade() {
@@ -73,12 +73,12 @@ void test_update_version() {
 }
 
 void test_interface_upgrade() {
+    test_download_version();
+#if 0
     test_http_get();
     test_write_file();
     test_upgrade();
     
-#if 0
-    test_download_version();
     test_update_version();
 #endif
 }
@@ -105,7 +105,7 @@ void test_interface_alipay() {
 }
 
 void test_interface() {
-    //test_interface_upgrade();
-    test_interface_alipay();
+    test_interface_upgrade();
+    //test_interface_alipay();
 }
 
