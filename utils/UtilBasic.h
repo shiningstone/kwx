@@ -6,6 +6,8 @@
 #include <vector>
 using namespace std;
 
+#define BUILD_NUMBER    1
+
 #ifndef NULL
 #define NULL 0
 #endif

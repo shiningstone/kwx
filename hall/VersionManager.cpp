@@ -116,16 +116,16 @@ int VersionManager::upgrade() {
 }
 
 bool VersionManager::get_download_status(float &Kbps,float &percentage) {
-    float totalSize = getNewVerSize();
+    float totalSize = getNewVerSize()*1024*1000;
     int   newTime = _get_system_time();
 
     #if 0
     float newSize = _curFileSize + totalSize/30;
     #else
-    float newSize = HttpClient::getInstance()->_receivedBytes / (1024*1024);
+    float newSize = HttpClient::getInstance()->_receivedBytes;
     #endif
     
-    Kbps = (newSize-_curFileSize)*(1024) / ((newTime-_curTime)/(float)1000);
+    Kbps = (newSize-_curFileSize) / (newTime-_curTime);
 
     _curTime     = newTime;
     _curFileSize = newSize;

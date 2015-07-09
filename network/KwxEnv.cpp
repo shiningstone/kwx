@@ -63,7 +63,7 @@ EnvVariable::EnvVariable() {
 	_userId   = 0x01020304;        
 	_language = 5;                 
 	_platform = 6;                 
-	_buildNo  = 1;                 
+	_buildNo  = BUILD_NUMBER;                 
 	_customerId = 0x0809;          
 	_productId  = 0x0a0b;
 #else
@@ -71,7 +71,7 @@ EnvVariable::EnvVariable() {
 	_userId   = 0x01020304;        //set by device Id
 	_language = 5;                 //set by user configuration
 	_platform = 6;                 //set by device type
-	_buildNo  = 7;                 //const value in terms of version
+	_buildNo  = BUILD_NUMBER;      //const value in terms of version
 	_customerId = 0x0809;          //???
 	_productId  = 0x0a0b;          //???
 #endif

@@ -27,7 +27,7 @@ public:
             0x01,0x02,0x03,0x04,   //user id
             0x05,                  //language id
             0x06,                  //client platform
-            0x07,                  //client build number
+            BUILD_NUMBER,          //client build number
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,43,               //request code(请求开始 REQ_GAME_SEND_START)
@@ -127,7 +127,7 @@ public:
             0x01,0x02,0x03,0x04,   //user id
             0x05,                  //language id
             0x06,                  //client platform
-            0x07,                  //client build number
+            BUILD_NUMBER,          //client build number
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,48,               //request code(发送玩家出牌 REQ_GAME_SEND_SHOWCARD)
@@ -236,7 +236,7 @@ public:
             0x01,0x02,0x03,0x04,   //user id
             0x05,                  //language id
             0x06,                  //client platform
-            0x07,                  //client build number
+            BUILD_NUMBER,          //client build number
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,49,               //request code(发送玩家反应 REQ_GAME_SEND_ACTION)
@@ -815,7 +815,7 @@ public:
             0x01,0x02,0x03,0x04,   //user id
             0x05,                  //language id
             0x06,                  //client platform
-            0x07,                  //client build number
+            BUILD_NUMBER,          //client build number
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,50,               //request code(获取停牌信息 REQ_GAME_GET_TINGINFO)
@@ -1098,7 +1098,7 @@ public:
             0x01,0x02,0x03,0x04,   //user id
             0x05,                  //language id
             0x06,                  //client platform
-            0x07,                  //client build number
+            BUILD_NUMBER,          //client build number
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,44,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
@@ -1362,7 +1362,7 @@ public:
             0x01,0x02,0x03,0x04,   //user id
             0x05,                  //language id
             0x06,                  //client platform
-            0x07,                  //client build number
+            BUILD_NUMBER,          //client build number
             0x08,0x09,             //customer id
             0x0a,0x0b,             //product id
             0x00,40,               //request code(请求进入房间 REQ_GAME_SEND_ENTER)
@@ -1487,7 +1487,7 @@ public:
         assert(login._userActivated==0);
 
         EnvVariable *env = EnvVariable::getInstance();
-        assert(env->_key==2);
+//        assert(env->_key==2);
         assert(env->_roomServer.id==3);
         assert(env->_roomServer.port==5);
         assert(env->_roomServer.voicePort==6);
@@ -1544,7 +1544,7 @@ public:
         assert(login._userActivated==0);
 
         EnvVariable *env = EnvVariable::getInstance();
-        assert(env->_key==2);
+//        assert(env->_key==2);
         assert(env->_roomServer.id==3);
         assert(env->_roomServer.port==5);
         assert(env->_roomServer.voicePort==6);
@@ -1561,11 +1561,45 @@ public:
 };
 
 
+class TestRecvDailyLoginResponse : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            0x4b,0x57,0x58,
+            0x00,0x25,
+            0x00,
+            0x00,0x38,
+            0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+
+            0x05,
+            0x81,0x00,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,
+            0x82,0x00,0x04,0xfe,0xff,0x00,0x30,
+            0x83,0x00,0x00,
+            0x84,0x00,0x04,0x00,0x00,0x27,0x10,
+            0x85,0x00,0x04,0x00,0x00,0x00,0x00,
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        DailyLoginResponse room;
+
+        len = aMsg->Deserialize(msgInNetwork);
+        room.Construct(*aMsg);
+       
+        return 0;
+    }
+};
+
+
 #include "./../../protocol/KwxMsgLogin.h"
 
 void testOtherRequests() {
 	CTestCase *aCase;
 
+    aCase = new TestRecvDailyLoginResponse();
+    aCase->Execute();
+    
     aCase = new TestSendEnter();
     aCase->Execute();
     

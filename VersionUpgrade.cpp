@@ -182,7 +182,8 @@ void VersionUpgrade::upEnsureCallBack(cocos2d::Ref* pSender,ui::Widget::TouchEve
 
 			schedule(schedule_selector(VersionUpgrade::downDataUpdate),1.0f);
 
-            _vm->upgrade();
+            std::thread t1(&VersionManager::upgrade,_vm);
+            t1.detach();
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
