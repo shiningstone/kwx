@@ -180,8 +180,8 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
         info->continuousDays = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+4));
     }
     
-    msg.GetString(1, info->name);
-    msg.GetString(2, info->image);
+    msg.GetString(1, info->image);
+    msg.GetString(2, info->name);
     
     info->gold   = msg.GetItemValue(3);
     info->coupon = msg.GetItemValue(4);
