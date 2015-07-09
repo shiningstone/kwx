@@ -9,7 +9,7 @@
 #define UP_STREAM      0
 #define DOWN_STREAM    1
 
-typedef INT32U Key_t;
+typedef std::string Key_t;
 typedef INT32U RoomPath_t;
 typedef INT32U RoomId_t;
 typedef INT32U TableId_t;

@@ -93,7 +93,9 @@ int LoginResponse::Construct(const DsMsg &msg) {
     INT32U voicePort   = msg.GetItemValue(9);
     
     env->SetUserId(msg.GetItemValue(4));
-    env->SetKey(msg.GetItemValue(5));
+    string key;
+    msg.GetString(5,key);
+    env->SetKey(key);
     env->SetRoomServer(roomId,(char *)roomIp,roomPort,voicePort);
 
     return 0;
@@ -156,18 +158,11 @@ int BasicInfoResponse::Construct(const DsMsg &msg) {
     return 0;
 }
 
-int RequestDailyLogin::Set(Key_t key) {
+int RequestDailyLogin::Set() {
     SetRequestCode(REQ_DAILY_LOGIN);
 
-    INT32U keyVal = 0;
-
-    if(key==INVALID) {
-        keyVal = _htonl((INT32U)EnvVariable::getInstance()->GetKey());
-    } else {
-        keyVal = _htonl((INT32U)key);
-    }
-    
-    _add_item( new Item((Item_t)131,4,(INT8U *)&keyVal) );
+    std::string key = EnvVariable::getInstance()->GetKey();
+    _add_utf16_string(131,(const INT8U *)key.c_str());
 
     return 0;
 }
@@ -265,11 +260,8 @@ int EnterRoomNotif::Construct(const DsMsg &msg) {
 
 int RequestReconnect::Set() {
     SetRequestCode(REQ_GAME_SEND_RECONNECT);
-
-    Key_t key = EnvVariable::getInstance()->GetKey();
-    INT32U keyid = _htonl((INT32U)key);
-
-    _add_item( new Item(130,4,(INT8U *)&keyid) );
+    std::string key = EnvVariable::getInstance()->GetKey();
+    _add_utf16_string(130,(const INT8U *)key.c_str());
     AddSeatInfo();
 
     return 0;
