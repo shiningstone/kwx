@@ -3,12 +3,12 @@
 
 #include "BuDaiPiaoLayer.h"
 
-#define KA_WU_XING     1
-#define TIAO_YI_SE     2
-#define GANG_SHANG_HUA 3
-#define AN_SI_GUI      4
-#define HAI_DI_LAO     5
-#define PENG_PENG_HU   6
+#define KA_WU_XING     11
+#define TIAO_YI_SE     12
+#define GANG_SHANG_HUA 13
+#define AN_SI_GUI      14
+#define HAI_DI_LAO     15
+#define PENG_PENG_HU   16
 
 BuDaiPiaoLayer::BuDaiPiaoLayer(void)
 {

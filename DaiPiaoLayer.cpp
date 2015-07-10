@@ -4,12 +4,12 @@
 
 #include "DaiPiaoLayer.h"
 
-#define BING_YI_SE    11
-#define DA_SAN_YUAN   12
-#define MING_SI_GUI   13
-#define GANG_SHANG_GANG  14
-#define XIAO_SAN_YUAN 15
-#define LONG_QI_UI    16
+#define BING_YI_SE    21
+#define DA_SAN_YUAN   22
+#define MING_SI_GUI   23
+#define GANG_SHANG_GANG  24
+#define XIAO_SAN_YUAN 25
+#define LONG_QI_UI    26
 
 DaiPiaoLayer::DaiPiaoLayer(void)
 {
