@@ -169,6 +169,11 @@ void test_can_hu() {
     cards.len--;                    
     cards.insert(TIAO_1);       
     assert(!cards.can_hu());
+
+    TestSmartList card2;
+    card2.Load(TIAO_3,TIAO_3,TONG_1,TONG_1,TONG_1,TONG_4,TONG_5,TONG_8,TONG_8,TONG_8,CARDS_END);
+    card2.insert(TONG_6);
+    assert(card2.can_hu());
 }
 
 void test_refresh_empty() {
@@ -391,6 +396,41 @@ void test_judge_peng_peng_hu() {
     assert(_is_active(list.statHuFanMask,RH_SIPENG));
 }
 
+void test_judge_no_peng_peng_hu() {
+	int seq[] = {
+        TONG_3,TONG_3,TONG_3,TONG_6,TONG_6,TONG_6,TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_4,TIAO_5,TIAO_3,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+
+    list.update_statistics((Card_t)0x10);
+    assert(!_is_active(list.statHuFanMask,RH_SIPENG));
+}
+
+void test_judge_ming_si_gui() {
+	int seq[] = {
+        TONG_4,TONG_4,TONG_8,TONG_8,TIAO_9,TIAO_9,TIAO_7,TIAO_7,TONG_3,TONG_5,TONG_4,TIAO_9,TONG_8,TONG_4,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+    list.perform(aPENG,TONG_4,false);
+    list.perform(aPENG,TONG_8,false);
+    list.perform(aPENG,TIAO_9,false);
+
+    list.update_statistics(TONG_4);
+    assert(_is_active(list.statHuFanMask,RH_MINGSIGUI));
+}
+
 void test_judge_ming() {
 	int seq[] = {
         FA,FA,FA, TIAO_1,TIAO_2,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TONG_6,TONG_7,TONG_8,
@@ -437,5 +477,7 @@ void test_card_list() {
 
     test_judge_ming();
     test_judge_ming2();
+    test_judge_no_peng_peng_hu();
     test_judge_peng_peng_hu();
+    test_judge_ming_si_gui();
 }

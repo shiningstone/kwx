@@ -9,6 +9,49 @@ typedef struct CardSeq {
 }CardSeq_t;
 
 CardSeq_t CardRoundx[] = {
+    {/* ming judge 2 */
+        {TIAO_4,TIAO_5,TIAO_6,TONG_3,TONG_4,TONG_5,TONG_5,TONG_6,TONG_7,ZHONG,FA,FA,FA,ZHONG},
+        {TONG_1,TONG_1,TONG_1,TONG_2,TONG_2,TONG_3,TONG_3,TONG_4,TONG_6,TONG_7,TONG_8,TONG_8,FA},
+        {ZHONG,ZHONG,ZHONG,TONG_2,TONG_2,TONG_3,TONG_3,TONG_4,TONG_6,TONG_7,TONG_8,TONG_9,TONG_9},
+
+        {TIAO_2,TIAO_2,TIAO_2},
+    },
+    {/* ming judge 5(3) bu ming*/
+        {TIAO_6,TONG_1,TONG_1,TONG_2,TONG_3,TONG_5,TONG_6,TONG_7,TONG_7,TONG_8,TONG_9,TONG_9,FA,TIAO_3},
+        {ZHONG,ZHONG,ZHONG,TONG_1,TONG_2,TONG_3,TONG_4,TONG_5,TONG_6,TONG_7,TONG_8,TONG_8,FA},
+        {ZHONG,ZHONG,ZHONG,TIAO_1,TIAO_1,TIAO_1,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TONG_1},
+
+        {TIAO_1,TIAO_5,BAI,BAI,TIAO_2},
+    },
+    {/* ming judge 5 bu ming*/
+        {FA,FA,FA,TIAO_3,TIAO_5,TIAO_5,TIAO_6,TIAO_7,TONG_4,TONG_7,TONG_8,TONG_8,TONG_9,TIAO_7},
+        {ZHONG,ZHONG,ZHONG,TONG_1,TONG_2,TONG_3,TONG_4,TONG_5,TONG_6,TONG_7,TONG_8,TONG_8,FA},
+        {ZHONG,ZHONG,ZHONG,TIAO_1,TIAO_1,TIAO_1,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TONG_1},
+
+        {TIAO_1,TIAO_5,BAI,BAI,TIAO_2},
+    },
+    {/* ming judge 8 ming hu*/
+        {ZHONG,ZHONG,ZHONG,TIAO_3,TIAO_3,TONG_1,TONG_1,TONG_1,TONG_4,TONG_5,TONG_8,TONG_8,TONG_8,TONG_6},
+        {ZHONG,ZHONG,ZHONG,TONG_1,TONG_2,TONG_3,TONG_4,TONG_5,TONG_6,TONG_7,TONG_8,TONG_8,FA},
+        {ZHONG,ZHONG,ZHONG,TIAO_1,TIAO_1,TIAO_1,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TONG_1},
+
+        {TIAO_1,TIAO_5,BAI,BAI,TIAO_2},
+    },
+    {/* ming judge 5(2) bu ming*/
+        {TONG_1,TONG_1,FA,FA,TIAO_3,TIAO_4,TIAO_5,TONG_3,TONG_4,TONG_4,TONG_5,TONG_7,TONG_8,TONG_8},
+        {ZHONG,ZHONG,ZHONG,TONG_1,TONG_2,TONG_3,TONG_4,TONG_5,TONG_6,TONG_7,TONG_8,TONG_8,FA},
+        {ZHONG,ZHONG,ZHONG,TIAO_1,TIAO_1,TIAO_1,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TONG_1},
+
+        {TIAO_1,TIAO_5,BAI,BAI,TIAO_2},
+    },
+    {/* ming judge 1 */
+        {TIAO_1,TIAO_2,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TONG_6,TONG_7,TONG_8,FA,FA,FA,TIAO_2},
+        {TONG_1,TONG_1,TONG_1,TONG_2,TONG_2,TONG_3,TONG_3,TONG_4,TONG_6,TONG_7,TONG_8,TONG_8,FA},
+        {ZHONG,ZHONG,ZHONG,TONG_2,TONG_2,TONG_3,TONG_3,TONG_4,TONG_6,TONG_7,TONG_8,TONG_9,TONG_9},
+
+        {TIAO_2,TIAO_2,TIAO_2},
+    },
+
     {/* Á¬ÐøÊÖ¸Ü - 3 shou gang */
         {TIAO_1,TIAO_1,TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_4},
         {TONG_1,TONG_1,TONG_1,TONG_2,TONG_2,TONG_3,TONG_3,TONG_4,TONG_6,TONG_7,TONG_8,TONG_8,TONG_9},
@@ -37,7 +80,7 @@ CardSeq_t CardRoundx[] = {
 
 		{TONG_5,TIAO_2,TIAO_3,TIAO_4,BAI,TIAO_1,TIAO_2,TIAO_3,TIAO_4,BAI,BAI,BAI,},
     },
-    {/* ???ü */
+    {/* ????*/
         {TIAO_1,TIAO_1,TIAO_2,TIAO_2,TIAO_3,TIAO_3,TIAO_4,TIAO_4,TIAO_5,TIAO_5,TIAO_6,TIAO_6,TIAO_7,TIAO_7},
         {TONG_1,TONG_1,TONG_1,TONG_2,TONG_2,TONG_2,TONG_3,TONG_3,TONG_3,TONG_4,TONG_4,TONG_4,BAI},
         {TONG_1,TONG_1,TONG_1,TONG_2,TONG_2,TONG_2,TONG_3,TONG_3,TONG_3,TONG_4,TONG_4,TONG_4,FA},
@@ -61,23 +104,33 @@ CardSeq_t CardRoundx[] = {
 };
 
 void load_test_round(int roundNo,Card_t *output) {
-    CardSeq_t *cardSeq = &CardRoundx[roundNo-1];
-    
-	int idx = 0;
-	for(int i=0;i<14;i++) {
-		output[idx++] = cardSeq->player1[i];
-	}
-    
-	for(int i=0;i<13;i++) {
-		output[idx++] = cardSeq->player2[i];
-	}
-    
-	for(int i=0;i<13;i++) {
-		output[idx++] = cardSeq->player3[i];
-	}
+    if(roundNo!=-1) {
+        CardSeq_t *cardSeq = &CardRoundx[roundNo-1];
+        
+        int idx = 0;
+        for(int i=0;i<14;i++) {
+            output[idx++] = cardSeq->player1[i];
+        }
+        
+        for(int i=0;i<13;i++) {
+            output[idx++] = cardSeq->player2[i];
+        }
+        
+        for(int i=0;i<13;i++) {
+            output[idx++] = cardSeq->player3[i];
+        }
+        
+        for(int i=0;i<84-40;i++) {
+            output[40+i] = cardSeq->remains[i];
+        }
+    } else {
+        int cards[] = {
+            0x13,0x06,0x12,0x06,0x0a,0x08,0x12,0x10,0x08,0x04,0x14,0x10,0x0f,0x0f,0x05,0x0b,0x03,0x04,0x00,0x0d,0x11,0x13,0x0e,0x00,0x02,0x0e,0x14,0x12,0x0b,0x0a,0x0a,0x0e,0x13,0x04,0x01,0x04,0x14,0x0d,0x07,0x02,0x00,0x01,0x0d,0x0f,0x0c,0x11,0x11,0x02,0x07,0x08,0x10,0x0b,0x03,0x13,0x0c,0x01,0x12,0x00,0x0d,0x03,0x0c,0x0f,0x07,0x09,0x02,0x05,0x0b,0x06,0x0c,0x08,0x14,0x05,0x01,0x06,0x03,0x09,0x07,0x05,0x09,0x0e,0x10,0x11,0x09,0x0a
+        };
 
-    for(int i=0;i<84-40;i++) {
-        output[40+i] = cardSeq->remains[i];
+        for(int i=0;i<84;i++) {
+            output[i] = (Card_t)cards[i];
+        }
     }
 }
 

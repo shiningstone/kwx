@@ -88,19 +88,20 @@ ActionMask_t Player::judge_action_again() {
 ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,bool isLastOne) {
 	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
 
+	if(isNewDistributed) {
+		if(!_cards->IsMing && !isLastOne) {
+			if(_strategy->scan_ming()) {
+				actions |= aMING;
+             }
+		}
+	}
+
 	if(_cards->can_hu(newCard)) {
 		_score = _strategy->calc_score(newCard);
 
 		if(isNewDistributed || pervMing || _score>1) {
 			actions |= aHU;
         }
-	}
-
-	if(isNewDistributed) {
-		if(!_cards->IsMing && !isLastOne) {
-			if(_strategy->scan_ming())
-				actions |= aMING;
-		}
 	}
 
 	return actions;

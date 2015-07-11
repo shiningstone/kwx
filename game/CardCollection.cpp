@@ -720,29 +720,35 @@ void CardInHand::_JudgeQiDui() {
 }
 
 void CardInHand::_JudgePengPengHu() {
-    INT32U checked = 0;
-    int GroupSameCount = 0;
+    INT32U checked    = 0;
+    int    GroupSameCount = 0;
+    int    remainKindNum = 0;
+    int    remainCardNum = 0;
     
     for(INT8U i=0;i<size()-1;i++) {
+        int sameCount = 1;
+
         if(!_is_active(checked,1<<i)) {
+
             _set(checked,1<<i);
-            int sameCount = 1;
 
             for(INT8U j=i+1;j<size();j++) {
                 if(get_kind(j)==get_kind(i)) {
                     _set(checked,1<<j);
                     sameCount++;
                 }
+            }
 
-                if(sameCount>=3) {
-                    GroupSameCount++;
-                    break;
-                }
+            if(sameCount>=3) {
+                GroupSameCount++;
+            } else {
+                remainKindNum++;
+                remainCardNum += sameCount;
             }
         }
     }
     
-    if(GroupSameCount==4) {
+    if(GroupSameCount==4 && remainKindNum==1 && remainCardNum==2) {
         _SetHu(RH_SIPENG);
     }
 }
@@ -1049,6 +1055,8 @@ bool CardInHand::scan_ming(const CardList *river) {
     if(IsMing) {
         return true;
     } else {
+        //show();
+    
         _mingChoicesMask = 0;
         _ming.choiceNum = 0;
         _ming.handouts  = new MingChoice_t[18];
@@ -1409,11 +1417,11 @@ void SmartList::remove(int deleteNum,int deletes[]) {
     int idx = 0;
     
     for(INT8U i=0;i<len;i++) {
-        if(i==deletes[deleteIdx]) {
-            deleteIdx++;
-        } else {
+        if( (i!=deletes[deleteIdx]) || (deleteIdx==deleteNum) ) {
             kind[idx] = kind[i];
             idx++;
+        } else {
+            deleteIdx++;
         }
     }
 
