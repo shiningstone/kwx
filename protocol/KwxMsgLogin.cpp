@@ -195,6 +195,16 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int RequestGetDailyPrize::Set() {
+    SetRequestCode(REQ_GET_DAILY_PRIZE);
+    return 0;
+}
+
+
+int GetDailyPrizeResponse::Construct(const DsMsg &msg) {
+    return 0;
+}
+
 int RequestEnterRoom::Set(int id) {
     SetRequestCode(REQ_GAME_SEND_ENTER);
 

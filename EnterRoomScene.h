@@ -25,11 +25,12 @@ public:
 #define THIS_GET_DAYGOLD_BKG		1
 #define RANKSCROLL_LAYER			2
 #define THIS_FRIEND_CHAT_BKG		3//ÁÄÌì¶Ô»°¿ò
+#define FRIEND_SERCH_HINT			4
 
-#define LABEL_FOR_PLAYERNAME		4
-#define LABEL_FOR_GOLD				5
-#define LABEL_FOR_QUAN				6
-#define SPRITE_FOR_PHOTO			7
+#define LABEL_FOR_PLAYERNAME		5
+#define LABEL_FOR_GOLD				6
+#define LABEL_FOR_QUAN				7
+#define SPRITE_FOR_PHOTO			8
 	Size visibleSize;
 	Point origin;
 	float s_scale;

@@ -21,8 +21,9 @@ bool ChatOneToOne::init()
 
 	auto FriendTalkBKG=LayerColor::create();
 	FriendTalkBKG->setContentSize(Size(visibleSize.width,visibleSize.height));
-	FriendTalkBKG->setColor(Color3B(28,120,135));
-	FriendTalkBKG->setOpacity(50);
+	FriendTalkBKG->setColor(ccWHITE);
+	//FriendTalkBKG->setColor(Color3B(28,120,135));
+	//FriendTalkBKG->setOpacity(50);
 	FriendTalkBKG->ignoreAnchorPointForPosition(false);
 	FriendTalkBKG->setAnchorPoint(Vec2(0.5,0.5));
 	FriendTalkBKG->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
@@ -66,7 +67,7 @@ bool ChatOneToOne::init()
 	ChatLogView->setSize(chatSize);
 	ChatLogView->ignoreAnchorPointForPosition(false);
 	ChatLogView->setAnchorPoint(Vec2(0,0));
-	ChatLogView->setPosition(Vec2(visibleSize.width*0.2573892,chatRecordBKG->getPosition().y+10*1218/visibleSize.width));
+	ChatLogView->setPosition(Vec2(visibleSize.width*0.26,chatRecordBKG->getPosition().y+90*1218/visibleSize.width));
 	ChatLogView->setItemsMargin(10);
 	this->addChild(ChatLogView,2,CHAT_LOG_VIEW);
 
@@ -76,6 +77,8 @@ bool ChatOneToOne::init()
 		auto curCellItem=Message_cell_create(chatLog[a]);
 		ChatLogView->pushBackCustomItem(curCellItem);
 	}
+	receiveChatMessage("asdfasdfasdfasd");
+	ChatLogView->jumpToBottom();
 
 	auto CharRecord=Button::create("chat_chatrecord.png","chat_chatrecord_sel.png","chat_chatrecord_sel.png",UI_TEX_TYPE_PLIST);
 	CharRecord->setAnchorPoint(Vec2(0,0));
@@ -152,10 +155,16 @@ void ChatOneToOne::MessageSendCallBack(cocos2d::Ref* pSender,Widget::TouchEventT
 			std::string curMes=editKuang->getText();
 			if(curMes!="")
 			{
-				auto savedMes=Message_local_save(curMes,true);
-				auto curCellItem=Message_cell_create(savedMes);
-				listChat->pushBackCustomItem(curCellItem);
-				editKuang->setText("");
+				auto mesSend=CallFunc::create([=](){
+					auto savedMes=Message_local_save(curMes,true);
+					auto curCellItem=Message_cell_create(savedMes);
+					listChat->pushBackCustomItem(curCellItem);
+					editKuang->setText("");
+				});
+				auto ToBottom=CallFunc::create([=](){
+					listChat->jumpToBottom();
+				});
+				this->runAction(Sequence::create(mesSend,ToBottom,NULL));
 			}
 		}
 		break;
@@ -172,7 +181,7 @@ void ChatOneToOne::getLocalChatLog()
 	{
 		char tempChar[30];
 		std::string tempStr="";
-		sprintf(tempChar,"%d%S%d",chatFriend._id,KEY_MIDDLE_WORD,a);
+		sprintf(tempChar,"%s%d%d",KEY_MIDDLE_WORD,chatFriend._id,a);
 		tempStr=userDefault->getStringForKey(tempChar,"");
 		if(tempStr=="")
 			break;
@@ -183,7 +192,7 @@ void ChatOneToOne::getLocalChatLog()
 Layout* ChatOneToOne::Message_cell_create(std::string message)
 {
 	std::string flagMes=message.substr(0,11);
-	std::string realMes=message.substr(12,message.size());
+	std::string realMes=message.substr(11,message.size());
 	int RowNum=0;
 	int ColumnNum=0;
 
@@ -192,6 +201,7 @@ Layout* ChatOneToOne::Message_cell_create(std::string message)
 
 	auto chatMes=LabelTTF::create(realMes,"Arial",20);
 	chatMes->setContentSize(Size(chatSize.width*0.7,0));
+	chatMes->setColor(ccBLACK);
 
 	RowAndColumn(chatMes->getContentSize(),RowNum,ColumnNum);
 
@@ -207,7 +217,7 @@ Layout* ChatOneToOne::Message_cell_create(std::string message)
 		myPhoto->setPosition(Vec2(cellSize.width,cellSize.height));
 		curItem->addChild(myPhoto);
 
-		float startPointX=myPhoto->getPosition().x-myPhoto->getContentSize().width;
+		float startPointX=myPhoto->getPosition().x-myPhoto->getContentSize().width*myPhoto->getScaleX();
 		float x,y;
 		for(int a=1;a<=RowNum;a++)
 		{
@@ -268,7 +278,7 @@ Layout* ChatOneToOne::Message_cell_create(std::string message)
 		otherPhoto->setPosition(Vec2(0,cellSize.height));
 		curItem->addChild(otherPhoto);
 
-		float startPointX=myPhoto->getPosition().x+myPhoto->getContentSize().width;
+		float startPointX=otherPhoto->getPosition().x+otherPhoto->getContentSize().width*otherPhoto->getScaleX();
 		float x,y;
 		for(int a=1;a<=RowNum;a++)
 		{
@@ -276,7 +286,7 @@ Layout* ChatOneToOne::Message_cell_create(std::string message)
 			y=cellSize.height-(a-1)*20*716/visibleSize.height;
 			for(int b=1;b<=ColumnNum;b++)
 			{
-				Point anchorPoint=Vec2(1,1);
+				Point anchorPoint=Vec2(0,1);
 				Point curPosition=Vec2(x+(b-1)*24*1218/visibleSize.width,y);
 				Sprite* squareItem;
 				if(a==1)
@@ -332,20 +342,20 @@ Layout* ChatOneToOne::Message_cell_create(std::string message)
 void ChatOneToOne::RowAndColumn(Size labelSize,int &row,int &column)
 {
 	float tempRowTime=(float)(labelSize.height/20);
-	int tempIntegralPart=(int)tempRowTime;
-	float tempDecimalPart=tempRowTime-tempIntegralPart;
+	int Row_IntegralPart=(int)tempRowTime;
+	int Row_DecimalPart=((tempRowTime-Row_IntegralPart)>0)?1:0;
 	if(tempRowTime<3)
 		row=3;
 	else
-		row=tempIntegralPart+(tempDecimalPart>0)?1:0;
+		row=Row_IntegralPart+Row_DecimalPart;
 
 	float tempColumnTime=(float)((labelSize.width+20)/24);
-	int temIntegraColumn=(int)tempColumnTime;
-	float tempDecimalColumn=tempColumnTime-temIntegraColumn;
+	int Column_IntegralPart=(int)tempColumnTime;
+	int Column_DecimalPart=((tempColumnTime-Column_IntegralPart)>0)?1:0;
 	if(tempColumnTime<2)
 		column=2;
 	else
-		column=temIntegraColumn+(tempDecimalColumn>0)?1:0;
+		column=tempColumnTime+Column_DecimalPart;
 }
 std::string ChatOneToOne::Message_local_save(std::string curMes,bool ifMySend)
 {
@@ -356,7 +366,7 @@ std::string ChatOneToOne::Message_local_save(std::string curMes,bool ifMySend)
 		saveMes=LOCAL_MY_MES+curMes;
 	else
 		saveMes=LOCAL_OTHER_MES+curMes;
-	sprintf(tempChar,"%d%s%d",chatFriend._id,KEY_MIDDLE_WORD,chatLog.size());
+	sprintf(tempChar,"%s%d%d",KEY_MIDDLE_WORD,chatFriend._id,chatLog.size());
 	userDefault->setStringForKey(tempChar,saveMes);
 	userDefault->flush();
 	chatLog.push_back(saveMes);

@@ -202,6 +202,15 @@ void EnvVariable::set_Mall_GoodList()
 	for(int a=0;a<10;a++)
 		Mall_GoodList.push_back(tempItem);
 }
+void EnvVariable::set_Searched_Friend()
+{
+	OtherPlayers_Info temp={"Head17.png","tempName",BOY,12346789};
+	searchedFriend=temp;
+}
+OtherPlayers_Info EnvVariable::get_Searched_Friend()
+{
+	return searchedFriend;
+}
 std::vector <Mall_Items> EnvVariable::get_Mall_GoodList()
 {
 	return Mall_GoodList;
@@ -260,6 +269,7 @@ void EnvVariable::TestDataFunction()
 	set_RaningList_MaxType();
 	set_RaningList_Record();
 	set_Mall_GoodList();
+	set_Searched_Friend();
 }
 
 

@@ -67,6 +67,7 @@ typedef enum {
     REQ_VER_UPDATE              = 3,
     RRQ_BASIC_INFO              = 31,
     REQ_DAILY_LOGIN             = 37,
+    REQ_GET_DAILY_PRIZE         = 14,
     REQ_GAME_SEND_RECONNECT     = 42,
     REQ_GAME_RECV_RECONNECT     = 74,
     REQ_GAME_SEND_LEAVE_ROOM    = 45,

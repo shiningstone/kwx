@@ -9,8 +9,6 @@ USING_NS_CC_EXT;
 using namespace ui;
 
 #include "LoginType.h"
-//#include <vector>
-//using namespace std;
 
 #include "network/KwxEnv.h"
 #include "EnterRoomScene.h"

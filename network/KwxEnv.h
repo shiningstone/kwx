@@ -163,6 +163,9 @@ public:
 	void set_Mall_GoodList();	//商城物品
 	std::vector <Mall_Items> get_Mall_GoodList();
 
+	void set_Searched_Friend();		//搜索玩家
+	OtherPlayers_Info get_Searched_Friend();
+
 	void TestDataFunction();									//测试数据初始化
 	/**************************/
 private:
@@ -189,6 +192,7 @@ private:
 	std::vector <TheCharts> RaningList_MaxType;					//最大番型..
 	std::vector <TheCharts> RaningList_Record;					//战绩榜..
 	std::vector <Mall_Items> Mall_GoodList;						//商城
+	OtherPlayers_Info searchedFriend;							//添加好友
 	/**************************/
 };
 

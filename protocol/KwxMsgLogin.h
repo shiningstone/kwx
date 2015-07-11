@@ -77,6 +77,16 @@ public:
     virtual int  Construct(const DsMsg &msg);
 };
 
+class RequestGetDailyPrize : public UsMsg {
+public:
+    int Set();
+};
+
+class GetDailyPrizeResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+};
+
 class RequestEnterRoom : public UsMsg {
 public:
     int Set(int id=0);

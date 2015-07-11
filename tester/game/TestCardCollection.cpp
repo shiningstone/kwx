@@ -353,42 +353,6 @@ void test_refresh() {
     test_refresh_mixed();
 }
 
-class son {
-public:
-	son(int &aim, int score);
-
-	int &_aim;
-	int _score;
-};
-
-son::son(int &aim, int score)
-:_aim(aim) {
-	_score = score;
-}
-
-class father {
-public:
-	int aim;
-	int score;
-
-	son *_son;
-
-	void init();
-};
-
-void father::init() {
-	_son = new son(aim,score);
-}
-
-void test_reference() {
-	father aFather;
-	aFather.init();
-
-	printf("father aim is %d\n",aFather.aim);
-	aFather._son->_aim = 5;
-	printf("father aim is %d\n",aFather.aim);
-}
-
 void test_basic() {
 	Card_t cards[] = {TIAO_1,TONG_1,ZHONG,FA,BAI};
 	CardInHand list;
@@ -426,6 +390,37 @@ void test_judge_peng_peng_hu() {
     list.update_statistics((Card_t)0x10);
     assert(_is_active(list.statHuFanMask,RH_SIPENG));
 }
+
+void test_judge_ming() {
+	int seq[] = {
+        FA,FA,FA, TIAO_1,TIAO_2,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TONG_6,TONG_7,TONG_8,
+        TIAO_2,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+    assert(list.scan_ming());
+}
+
+void test_judge_ming2() {
+	int seq[] = {
+        FA,FA,FA, TIAO_5,TIAO_6,TIAO_7,TONG_3,TONG_4,TONG_5,TONG_5,TONG_6,TONG_7,ZHONG,
+        ZHONG,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+    assert(list.scan_ming());
+}
+
 /**********************************
     main
 **********************************/
@@ -436,10 +431,11 @@ void test_smart_list() {
 }
 
 void test_card_list() {
-	test_reference();
     test_smart_list();
     test_basic();
     test_refresh();
-    
+
+    test_judge_ming();
+    test_judge_ming2();
     test_judge_peng_peng_hu();
 }

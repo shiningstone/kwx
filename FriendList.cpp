@@ -27,7 +27,6 @@ void FriendList::ListEventCall(cocos2d::Ref *pSender,ListViewEventType type)
 	case LISTVIEW_ONSELECTEDITEM_END:
 		{
 			CCLOG("LIST_VIEW_ENDED");
-			//curSelectedItem=-1;
 		}
 		break;
 	default:
@@ -127,6 +126,7 @@ void FriendList::deleteBtn_Hint_create(float delta)
 	auto friendDeleteBtn=Button::create("Friend_Delete.png","Friend_Delete.png","Friend_Delete.png",UI_TEX_TYPE_LOCAL);
 	friendDeleteBtn->setAnchorPoint(Vec2(0.5,0));
 	friendDeleteBtn->setPosition(curTouchPos);
+	friendDeleteBtn->addTouchEventListener(CC_CALLBACK_2(FriendList::friendDeleteCall,this));
 	deleteHintBkg->addChild(friendDeleteBtn,1,FRIEND_DELETE_BTN);
 
 	EventListenerTouchOneByOne* deleteHintBkgListener=EventListenerTouchOneByOne::create();
@@ -177,7 +177,13 @@ void FriendList::friendDeleteCall(cocos2d::Ref *pSender,cocos2d::ui::Widget::Tou
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-			DeleteFriendItem(curSelectedItem);
+			auto deleFriend=CallFunc::create([=](){
+				DeleteFriendItem(curSelectedItem);
+			});
+			auto SelfDestruction=CallFunc::create([=](){
+				deleteBtn_Hint_delete();
+			}); 
+			this->runAction(Sequence::create(SelfDestruction,deleFriend,NULL));
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
@@ -424,8 +430,11 @@ void FriendList::listItemCallBack(cocos2d::Ref* pSender,cocos2d::ui::Widget::Tou
 		{
 			CCLOG("BUTTON***ENDED");
 			unschedule(schedule_selector(FriendList::deleteBtn_Hint_create));
-			auto ChatLayer=new ChatOneToOne(parentNode,MyFriendList[curSelectedItem]);
-			parentNode->addChild(ChatLayer,5,THIS_FRIEND_CHAT_BKG);
+			if(!this->getChildByTag(FRIEND_DELETE_BKG))
+			{
+				auto ChatLayer=new ChatOneToOne(parentNode,MyFriendList[curSelectedItem]);
+				parentNode->addChild(ChatLayer,5,THIS_FRIEND_CHAT_BKG);
+			}
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
