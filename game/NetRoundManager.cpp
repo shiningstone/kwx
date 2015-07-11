@@ -187,7 +187,6 @@ void NetRoundManager::RecordError(void *aError) {
 
     _messenger->Resume();
 
-    LOGGER_WRITE("%s (%d)",__FUNCTION__,_messenger->_response);
     delete di;
 }
 

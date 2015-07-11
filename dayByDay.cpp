@@ -103,8 +103,13 @@ bool dayAward::init()
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("denglupaihang.plist");
 	visibleSize=Director::getInstance()->getVisibleSize();//大小和原点
 	origin=Director::getInstance()->getVisibleOrigin();
-	ReceiveTime=UserDefault::getInstance()->getIntegerForKey("load_days");
 
+    #if 0
+	ReceiveTime=UserDefault::getInstance()->getIntegerForKey("load_days");
+    #else 
+    ReceiveTime=EnvVariable::getInstance()->_dailyLogin.continuousDays + 1;
+    #endif
+    
 	auto InkScroll=Sprite::createWithSpriteFrameName("juanzhou.png");//卷轴
 	InkScroll->setAnchorPoint(Vec2(0.5,0.5));
 	InkScroll->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2-33));

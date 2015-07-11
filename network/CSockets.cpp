@@ -129,6 +129,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
 	int result = connect( _connection, (sockaddr*)&server, sizeof(sockaddr) );
 	if ( result==SOCKET_ERROR ) {
         if (hasError()) {  
+            LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
             Stop();  
         }  else  {// WSAWOLDBLOCK   
             timeval timeout;  
@@ -142,9 +143,11 @@ void ClientSocket::Start(const char *serverIp,int port) {
   
             int ret = select(FD_SETSIZE, NULL, &writeset, &exceptset, &timeout);  
             if (ret == 0 || ret < 0) {  
+                LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
                 Stop();  
             } else  {  
                 if( FD_ISSET(_connection, &exceptset) ) {    // or (!FD_ISSET(m_sockClient, &writeset)   
+                    LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
                     Stop();  
                 }  
             }  

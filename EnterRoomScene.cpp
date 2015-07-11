@@ -14,6 +14,7 @@
 
 #include "utils/DebugCtrl.h"
 #include "network/KwxEnv.h"
+#include "network/KwxMessenger.h"
 #include "FriendList.h"
 
 EnterRoom::EnterRoom()
@@ -356,6 +357,13 @@ bool EnterRoom::init()
 	{
 		return false;
 	}
+
+    #ifndef IGNORE_DAILY_LOGIN_REQUEST
+    KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+    bMessenger->StartReceiving();
+    bMessenger->Send(REQ_DAILY_LOGIN);
+    #endif
+
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 

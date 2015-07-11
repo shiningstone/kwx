@@ -98,7 +98,8 @@ bool DsInstruction::_IsRejection(const DsMsg &msg) {
                 if(failure==RECONNECT_REQUIRED) {
                     DsMsgParser::_load_seat_info(reconnectInfo,msg,1);
                 }
-                
+
+                LOGGER_WRITE("%s (%s)",__FUNCTION__,DescErr(failure));
                 return true;
             }
         }

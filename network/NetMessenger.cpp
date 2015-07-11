@@ -37,6 +37,7 @@ void NetMessenger::Start(const char *serverIp,int port) {
 	_socket->Start(serverIp,port);
 
     if(!_keepListen) {
+        _keepListen = true;
 	    std::thread t1(&NetMessenger::_collect_bytes,this);
 	    t1.detach();
     }
@@ -65,6 +66,7 @@ bool NetMessenger::Recv(INT8U *pkg,int &pkgLen) {
         _get_pkg_from_buffer(pkg,pkgLen);
         return true;
     } else {
+        _delay(100);
         return false;
     }
 }

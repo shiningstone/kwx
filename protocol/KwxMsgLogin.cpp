@@ -173,6 +173,8 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
     
     DsInstruction::Construct(msg);
 
+    CHECK_STATUS(msg);
+
     if(msg._body->_items[0]->_bufLen==4) {
         info->hasReward = false;
     } else {
