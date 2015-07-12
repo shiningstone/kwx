@@ -17,9 +17,9 @@
 
 #include "./../utils/DebugCtrl.h"
 
-#define CHECK_STATUS(msg) do { \
-    int status = msg.GetItemValue(0); \
-    if(status!=0) { \
+#define CHECK_RESPONSE(dsMsg) do { \
+    int status = dsMsg.GetItemValue(0); \
+    if(status!=0 && dsMsg._body->_items[0]->_id==60) { \
         KwxMessenger::getInstance(MSG_LOGIN)->_response = (FailureCode_t)status; \
         return status; \
     } else { \
@@ -70,7 +70,7 @@ int RequestLogin::Set(UserType_t type) {
 int LoginResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
 
-    CHECK_STATUS(msg);
+    CHECK_RESPONSE(msg);
     
     _userType          = (UserType_t)msg.GetItemValue(1);
     _userActivated     = (msg.GetItemValue(2)==1);
@@ -107,7 +107,7 @@ int RequestResourceUpdate::Set() {
 }
 
 int ResourceUpdateResponse::Construct(const DsMsg & msg) {
-    CHECK_STATUS(msg);
+    CHECK_RESPONSE(msg);
     
     maxResId = msg.GetItemValue(1);
     msg.GetString(2,url);
@@ -120,7 +120,7 @@ int RequestVersionUpdate::Set() {
 }
 
 int VersionUpdateResponse::Construct(const DsMsg & msg) {
-    CHECK_STATUS(msg);
+    CHECK_RESPONSE(msg);
 #ifndef WIN32
     VerInfo_t &ver = VersionManager::getInstance()->_newVer;
 #else
@@ -173,7 +173,7 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
     
     DsInstruction::Construct(msg);
 
-    CHECK_STATUS(msg);
+    CHECK_RESPONSE(msg);
 
     if(msg._body->_items[0]->_bufLen==4) {
         info->hasReward = false;
@@ -200,9 +200,9 @@ int RequestGetDailyPrize::Set() {
     return 0;
 }
 
-
 int GetDailyPrizeResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
+    CHECK_RESPONSE(msg);
     _score = msg.GetItemValue(0);
     return 0;
 }
@@ -284,7 +284,7 @@ int RequestReconnect::Set() {
 int ReconnectResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
 
-    CHECK_STATUS(msg);
+    CHECK_RESPONSE(msg);
     
     memset(name,0,sizeof(name));
     memset(image,0,sizeof(image));

@@ -71,7 +71,7 @@ void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
 		{
             KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
             bMessenger->Send(REQ_GET_DAILY_PRIZE);
-            if(bMessenger->_response!=REQUEST_ACCEPTED && bMessenger->_response!=-1) {/*I don't know why here is -1*/
+            if(bMessenger->_response!=REQUEST_ACCEPTED) {
                 string info = string("Error code ") + string(DescErr(bMessenger->_response));
                 _showErrorMessage(info);
                 return;

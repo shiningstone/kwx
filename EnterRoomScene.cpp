@@ -364,7 +364,7 @@ bool EnterRoom::init()
     bMessenger->StartReceiving();
     bMessenger->Send(REQ_DAILY_LOGIN);
 
-    if(bMessenger->_response!=REQUEST_ACCEPTED && bMessenger->_response!=-1) {/*I don't know why here is -1*/
+    if(bMessenger->_response!=REQUEST_ACCEPTED) {
         string info = string("Error code ") + string(DescErr(bMessenger->_response));
         _showErrorMessage(info);
         return false;
@@ -396,7 +396,7 @@ bool EnterRoom::init()
 	this->addChild(FriendLayer);
 
 	competeButtons();//比赛按钮
-	if(!EnvVariable::getInstance()->_dailyLogin.hasReward)
+	if(EnvVariable::getInstance()->_dailyLogin.hasReward)
 		call_gold_prize();
 
 	return true;
