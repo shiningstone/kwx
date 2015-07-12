@@ -61,7 +61,7 @@ int RoundManager::Shuffle() {
 #ifndef USE_TEST_ROUND
     _strategy->load_card_sequence(_unDistributedCards);
 #else
-    load_test_round(1,_unDistributedCards);
+    load_test_round(-1,_unDistributedCards);
 #endif
 
     _gRiver->clear();

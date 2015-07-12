@@ -45,7 +45,9 @@ void CSocket::Stop() {
 int CSocket::Send(char *buf,int len) {
     if(_connection!=INVALID_SOCKET) {
         int actLen = send(_connection, buf, len, 0 );
-        _log(SEND,buf,actLen);
+        if(_dbgInfo) {
+            _log(SEND,buf,actLen);
+        }
         return actLen;
     } else {
         return 0;
@@ -174,6 +176,7 @@ bool CSocket::hasError()
 				¸¨Öúº¯Êý
 ***************************************************/
 CSocket::CSocket() {
+    _dbgInfo = true;
     _logger = LOGGER_REGISTER("CSocket");
 }
 

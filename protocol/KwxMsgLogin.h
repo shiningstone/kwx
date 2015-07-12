@@ -250,7 +250,7 @@ public:
 class CSocket;
 class KwxHeart {
 public:
-    static KwxHeart *getInstance(int second=5);
+    static KwxHeart *getInstance(int second=3);
     static void      destroyInstance();
 
     void SetRate(int second);

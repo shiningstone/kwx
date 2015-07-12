@@ -281,7 +281,9 @@ int RequestReconnect::Set() {
 
 int ReconnectResponse::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
-        
+
+    CHECK_STATUS(msg);
+    
     memset(name,0,sizeof(name));
     memset(image,0,sizeof(image));
 
@@ -410,6 +412,7 @@ KwxHeart::KwxHeart(int second) {
     EnvVariable *env = EnvVariable::getInstance();
 
     _socket = new ClientSocket;
+    _socket->_dbgInfo = false;
     _socket->Start(env->_roomServer.ipaddr,env->_roomServer.port);
 
     _rate = second;
@@ -448,7 +451,7 @@ void KwxHeart::_Beats() {
 
     while(_running) {
         _socket->Send((char *)buf,len);
-        _delay(_rate*100);
+        _delay(_rate*1000);
     }
 #endif
 }

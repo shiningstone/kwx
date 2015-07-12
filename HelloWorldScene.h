@@ -40,6 +40,7 @@ public:
 
 private:
     void _showVersionUpgrade(bool forceUpgrade);
+    void _showErrorMessage(std::string errorMessage);
 };
 
 #endif // __HELLOWORLD_SCENE_H__

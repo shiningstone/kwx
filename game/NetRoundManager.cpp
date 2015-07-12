@@ -887,8 +887,6 @@ void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
             _players[i]->Set(&profile);
         }
     }
-
-    KwxHeart::getInstance();
 }
 
 void NetRoundManager::_DiRecv(EnterRoomNotif *info) {

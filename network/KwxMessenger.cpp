@@ -145,6 +145,7 @@ KwxMessenger *KwxMessenger::_instances[MSG_TYPE_MAX] = {0};
 KwxMessenger *KwxMessenger::getInstance(MsgType_t type) {
     if(!_instances[type]) {
         _instances[type] = new KwxMessenger(type);
+        _response = REQUEST_ACCEPTED;
     }
 
     return _instances[type];

@@ -8,6 +8,7 @@ using namespace CocosDenshion;
 
 #include "game/RaceLayer.h"
 #include "game/DataBase.h"
+#include "protocol/DbgRequestDesc.h"
 #include "protocol/CommonMsg.h"
 #include "protocol/DsInstruction.h"
 #include "protocol/UsRequest.h"
@@ -99,10 +100,15 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
 #ifndef IGNORE_LOGIN_REQUEST
             EnvVariable *env = EnvVariable::getInstance();
 
-    		KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_LOGIN);
-   			aMessenger->StartReceiving();
-    		aMessenger->Send(REQ_LOGIN);
+            KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_LOGIN);
+            aMessenger->StartReceiving();
+            aMessenger->Send(REQ_LOGIN);
             aMessenger->StopReceiving();
+            
+            if(aMessenger->_response!=REQUEST_ACCEPTED) {
+                string info = string("Error code ") + string(DescErr(aMessenger->_response));
+                _showErrorMessage(info);
+            }
             
             if(env->IsReconnectRequired()) {
                 KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
@@ -126,6 +132,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             } else if(aMessenger->_response==SERVER_DATA_ERROR) {
 
             } else {
+                KwxHeart::getInstance();
             }
 #endif
 
@@ -210,6 +217,8 @@ void HelloWorld::enterRoomStandAlone()
     KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
     bMessenger->StartReceiving();
     bMessenger->Send(REQ_GAME_SEND_LEAVE_ROOM);
+#elif (DEBUG_ENTRANCE==5)
+    _showErrorMessage("error message");
 #else
     layer->CreateRace(LOCAL_GAME);
     Director::getInstance()->replaceScene(scene);
@@ -387,5 +396,12 @@ void HelloWorld::_showVersionUpgrade(bool forceUpgrade) {
     Layer* prompt = new VersionUpgrade(forceUpgrade);
     prompt->setVisible(true);
     this->addChild(prompt,99);
+}
+
+#include "SystemMessageHint.h"
+void HelloWorld::_showErrorMessage(std::string errorMessage) {
+    Layer* prompt = new SystemMessageHint(this,errorMessage,98);
+    prompt->setVisible(true);
+    this->addChild(prompt,98);
 }
 

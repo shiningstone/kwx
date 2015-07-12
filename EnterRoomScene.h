@@ -64,6 +64,9 @@ public:
 	CREATE_FUNC(EnterRoom);
 private:
 	MainLayer_myInfo personalSimpleInfo;
+
+    void _showErrorMessage(std::string errorMessage);
+
 };
 #endif  //__ENTERROOM_SCENE_H__
 

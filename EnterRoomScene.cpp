@@ -15,6 +15,7 @@
 #include "utils/DebugCtrl.h"
 #include "network/KwxEnv.h"
 #include "network/KwxMessenger.h"
+#include "protocol/DbgRequestDesc.h"
 #include "FriendList.h"
 
 EnterRoom::EnterRoom()
@@ -362,6 +363,11 @@ bool EnterRoom::init()
     KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
     bMessenger->StartReceiving();
     bMessenger->Send(REQ_DAILY_LOGIN);
+
+    if(bMessenger->_response!=REQUEST_ACCEPTED && bMessenger->_response!=-1) {/*I don't know why here is -1*/
+        string info = string("Error code ") + string(DescErr(bMessenger->_response));
+        _showErrorMessage(info);
+    }            
     #endif
 
 	visibleSize = Director::getInstance()->getVisibleSize();
@@ -495,3 +501,12 @@ MainLayer_myInfo EnterRoom::get_personalSimpleInfo()
 {
 	return personalSimpleInfo;
 }
+
+
+#include "SystemMessageHint.h"
+void EnterRoom::_showErrorMessage(std::string errorMessage) {
+    Layer* prompt = new SystemMessageHint(this,errorMessage,98);
+    prompt->setVisible(true);
+    this->addChild(prompt,98);
+}
+

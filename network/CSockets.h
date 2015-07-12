@@ -39,6 +39,8 @@ public:
 
     int Send(char *buf,int len);
     int Recv(char *buf,int *len,int bufSize=SOCKET_BUFF_SIZE);
+
+    bool   _dbgInfo;
 protected:
     SOCKET _connection;
 	bool   _keepAlive;
