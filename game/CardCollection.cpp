@@ -879,10 +879,10 @@ void CardInHand::update_statistics(Card_t huKind) {
 		}
         
 		if( curCard==huKind ) {
+            sameAsHuKind++;
 			if(get_status(i)==sPENG) {
                 _SetHu(RH_MINGSIGUI);
             } else {
-                sameAsHuKind++;
                 if(sameAsHuKind==4) {
                     _SetHu(RH_ANSIGUI);
                 }
@@ -890,7 +890,7 @@ void CardInHand::update_statistics(Card_t huKind) {
 		}
         
 		int freeSameCard = 0;
-        int sameCard = 0;
+        int sameCard = 1;
 		for(INT8U k=i+1;(k<i+4) & (k<size());k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
                 if( get_status(i)==sFREE ) {
@@ -916,6 +916,10 @@ void CardInHand::update_statistics(Card_t huKind) {
 		_SetHu(RH_SHOUYIZHUA);
  	}
     
+    if(_is_active(statHuFanMask,RH_QINYISE) && statGroupSameNum>0) {
+        _SetHu(RH_ANSIGUI);
+    }
+
 	_JudgePengPengHu();
 
     _JudgeDaXiaoSanYuan();

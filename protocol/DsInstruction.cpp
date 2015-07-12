@@ -30,7 +30,7 @@ DsInstruction::DsInstruction() {
 }
 
 int DsInstruction::Construct(const DsMsg &msg) {
-   request = msg.GetRequestCode();
+    request = msg.GetRequestCode();
     return _IsRejection(msg);
 }
 
@@ -77,6 +77,7 @@ bool DsInstruction::_IsRejection(const DsMsg &msg) {
         REQ_GAME_SEND_ENTER,
         REQ_LOGIN,
         REQ_DAILY_LOGIN,
+        //REQ_GET_DAILY_PRIZE,
         REQ_GAME_SEND_RECONNECT,
         REQ_GAME_SEND_LEAVE_ROOM,
         REQ_GAME_SEND_XIA_PIAO,
@@ -85,7 +86,7 @@ bool DsInstruction::_IsRejection(const DsMsg &msg) {
 
     RequestId_t req = (RequestId_t)msg._header->_requestCode;
 
-    for(int i=0;i<sizeof(Responses);i++) {
+    for(int i=0;i<sizeof(Responses)/sizeof(RequestId_t);i++) {
         if(req==Responses[i]) {
             if(msg._body->_items[0]->_id==60) {
                 failure = (FailureCode_t)msg.GetItemValue(0);
@@ -99,7 +100,10 @@ bool DsInstruction::_IsRejection(const DsMsg &msg) {
                     DsMsgParser::_load_seat_info(reconnectInfo,msg,1);
                 }
 
-                LOGGER_WRITE("%s (%s)",__FUNCTION__,DescErr(failure));
+                char buf[128] = {0};
+                sprintf(buf,"Error code %d",failure);
+                
+                LOGGER_WRITE("%s (%s)",__FUNCTION__,((DescErr(failure)==NULL)?buf:DescErr(failure)));
                 return true;
             }
         }

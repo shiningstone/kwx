@@ -202,6 +202,8 @@ int RequestGetDailyPrize::Set() {
 
 
 int GetDailyPrizeResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+    _score = msg.GetItemValue(0);
     return 0;
 }
 

@@ -63,6 +63,7 @@ ErrDesc ErrDescTbl[] = {
     DESC(SERVER_BOOTING),
     DESC(DATA_SYNC_ERROR),
     DESC(LOGIN_DUPLICATED),
+    DESC(SERVER_DATA_ERROR),
 };
 
 char *DescErr(FailureCode_t id) {
@@ -71,5 +72,7 @@ char *DescErr(FailureCode_t id) {
             return ErrDescTbl[i].desc;
         }
     }
+    
+    return NULL;
 }
 

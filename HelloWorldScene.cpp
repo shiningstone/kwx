@@ -108,6 +108,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             if(aMessenger->_response!=REQUEST_ACCEPTED) {
                 string info = string("Error code ") + string(DescErr(aMessenger->_response));
                 _showErrorMessage(info);
+                return;
             }
             
             if(env->IsReconnectRequired()) {
@@ -210,13 +211,12 @@ void HelloWorld::enterRoomStandAlone()
     extern void test_interface();
     test_interface();
 #elif (DEBUG_ENTRANCE==4)
-    KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_LOGIN);
+    KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_GAME);
     aMessenger->StartReceiving();
-    aMessenger->Send(REQ_LOGIN);
+    aMessenger->Send(REQ_DAILY_LOGIN);
     
-    KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
-    bMessenger->StartReceiving();
-    bMessenger->Send(REQ_GAME_SEND_LEAVE_ROOM);
+    //KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+    aMessenger->Send(REQ_GET_DAILY_PRIZE);
 #elif (DEBUG_ENTRANCE==5)
     _showErrorMessage("error message");
 #else

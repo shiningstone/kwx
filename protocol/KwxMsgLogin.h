@@ -85,6 +85,8 @@ public:
 class GetDailyPrizeResponse : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
+
+    int _score;
 };
 
 class RequestEnterRoom : public UsMsg {

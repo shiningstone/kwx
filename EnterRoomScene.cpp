@@ -367,6 +367,7 @@ bool EnterRoom::init()
     if(bMessenger->_response!=REQUEST_ACCEPTED && bMessenger->_response!=-1) {/*I don't know why here is -1*/
         string info = string("Error code ") + string(DescErr(bMessenger->_response));
         _showErrorMessage(info);
+        return false;
     }            
     #endif
 

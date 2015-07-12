@@ -166,6 +166,8 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             break;
         case REQ_DAILY_LOGIN:
             break;
+        case REQ_GET_DAILY_PRIZE:
+            break;
 
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);

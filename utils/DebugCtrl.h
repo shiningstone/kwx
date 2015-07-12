@@ -9,6 +9,7 @@
     2 其他功能入口
     3 版本升级UI测试
     4 网络通信测试
+    5 错误提示
 **********************************************************************************/
 #define DEBUG_ENTRANCE 0
 
@@ -33,7 +34,6 @@
 #if (DBG_LOGIN_PORT==60905)
 /* 不发送RequestLogin - 使用本机服务器测试时设置 */
 #define IGNORE_LOGIN_REQUEST
-
 /* 不发送DailyLogin   - 使用本机服务器测试LoginRequest时设置*/
 #define IGNORE_DAILY_LOGIN_REQUEST
 #endif
@@ -47,7 +47,21 @@
 #define TIMER_FREE
 
 /* 不发送心跳 */
-#define NO_HEART_BEAT
+//#define NO_HEART_BEAT
+
+#define FORMAL_ANDROID
+#ifdef FORMAL_ANDROID
+    #define DEBUG_ENTRANCE 0
+
+    #define DBG_LAN_SERVER "120.25.169.221"
+    #define DBG_LOGIN_PORT 20000
+
+    #undef IGNORE_LOGIN_REQUEST
+    #undef IGNORE_DAILY_LOGIN_REQUEST
+
+    #undef USE_TEST_ROUND
+    #undef NO_HEART_BEAT
+#endif
 
 #endif
 
