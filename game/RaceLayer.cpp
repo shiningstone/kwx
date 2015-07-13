@@ -6224,6 +6224,7 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
 			curButton->setTouchEnabled(false);
 
             _roundManager->StopGame();
+            _roundManager->destroyInstance();
             
 			auto scene = Scene::create();
 			auto startLayer=HelloWorld::create();
