@@ -168,6 +168,8 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             break;
         case REQ_GET_DAILY_PRIZE:
             break;
+        case REQ_GAME_SEND_LEAVE_ROOM:
+            break;
 
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);

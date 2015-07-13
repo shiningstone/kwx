@@ -6221,9 +6221,6 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
 		{
-            KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_GAME);
-            aMessenger->Send(REQ_GAME_SEND_LEAVE_ROOM);
-            
 			auto curButton=(Button*)pSender;
 			curButton->setTouchEnabled(false);
 
