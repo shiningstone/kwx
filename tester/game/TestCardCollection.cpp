@@ -380,6 +380,23 @@ void test_basic() {
 	list.show();
 }
 
+void test_judge_long_qi_dui() {
+	int seq[] = {
+        TIAO_3,TIAO_3,TIAO_8,TIAO_8,TONG_2,TONG_2,ZHONG,ZHONG,ZHONG,FA,FA,BAI,BAI,ZHONG,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+
+    list.update_statistics((Card_t)ZHONG);
+    assert(_is_active(list.statHuFanMask,RH_HAOHUAQIDUI));
+    assert(!_is_active(list.statHuFanMask,RH_ANSIGUI));
+}
+
 void test_judge_peng_peng_hu() {
 	int seq[] = {
         0x0d,0x0d,0x0d,0x00,0x00,0x00,0x01,0x01,0x01,0x06,0x06,0x10,0x10,0x10,
@@ -511,6 +528,7 @@ void test_card_list() {
 
     test_lian_gang();
 
+    test_judge_long_qi_dui();
     test_judge_an_si_gui();
     test_judge_ming();
     test_judge_ming2();

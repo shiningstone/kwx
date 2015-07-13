@@ -889,9 +889,9 @@ void CardInHand::update_statistics(Card_t huKind) {
             }
 		}
         
-		int freeSameCard = 0;
+		int freeSameCard = 1;
         int sameCard = 1;
-		for(INT8U k=i+1;(k<i+4) & (k<size());k++) {
+		for(INT8U k=i+1;k<size();k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
                 if( get_status(i)==sFREE ) {
                     freeSameCard++;
@@ -925,6 +925,7 @@ void CardInHand::update_statistics(Card_t huKind) {
     _JudgeDaXiaoSanYuan();
 
     if(statCouples==7 && size()==14) {
+        _clr(statHuFanMask,RH_ANSIGUI);
         _JudgeQiDui();
     } else {
         _JudgeKaWuXing(huKind);
