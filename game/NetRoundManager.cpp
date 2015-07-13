@@ -977,15 +977,15 @@ void NetRoundManager::_DiRecv(ReconnectNotif *info) {
         singleton
 *************************************/
 RoundManager *NetRoundManager::getInstance() {
-    if (_instance==NULL) {
-        _instance = new NetRoundManager(NULL);
+    if (_instance[NETWORK_GAME]==NULL) {
+        _instance[NETWORK_GAME] = new NetRoundManager(NULL);
     }
 
-    return _instance;
+    return _instance[NETWORK_GAME];
 }
 
 void NetRoundManager::destroyInstance() {
-    delete _instance;
-    _instance = NULL;
+    delete _instance[NETWORK_GAME];
+    _instance[NETWORK_GAME] = NULL;
 }
 

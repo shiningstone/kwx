@@ -842,19 +842,19 @@ bool RoundManager::IsCurEffectCard(const CardNode_t *card) {
 /*************************************
         singleton
 *************************************/
-RoundManager* RoundManager::_instance = NULL;
+RoundManager* RoundManager::_instance[2] = {NULL,NULL};
 
 RoundManager *RoundManager::getInstance() {
-    if (_instance==NULL) {
-        _instance = new RoundManager(NULL);
+    if (_instance[LOCAL_GAME]==NULL) {
+        _instance[LOCAL_GAME] = new RoundManager(NULL);
     }
 
-    return _instance;
+    return _instance[LOCAL_GAME];
 }
 
 void RoundManager::destroyInstance() {
-    delete _instance;
-    _instance = NULL;
+    delete _instance[LOCAL_GAME];
+    _instance[LOCAL_GAME] = NULL;
 }
 
 /*************************************

@@ -156,7 +156,7 @@ protected:
 private:
     void _LogRoundCards();
 protected:
-    static RoundManager *_instance;
+    static RoundManager *_instance[2];
 };
 
 #endif
