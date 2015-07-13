@@ -31,6 +31,7 @@ RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_DIST_DUALLOGIN),
     DESC(REQ_GAME_SEND_XIA_PIAO),
     DESC(REQ_GET_DAILY_PRIZE),
+    DESC(REQ_GAME_SEND_LEAVE_ROOM),
 };
 
 char *DescReq(RequestId_t id) {

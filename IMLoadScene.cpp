@@ -16,8 +16,10 @@ void IMLoad::enterRoom()
 {
     auto scene = Scene::create();
 	auto layer =EnterRoom::create();
-    scene->addChild(layer);
-    Director::getInstance()->replaceScene(scene);
+    if(layer) {
+        scene->addChild(layer);
+        Director::getInstance()->replaceScene(scene);
+    }
 }
 const std::string ResFileName[]={"load_room.plist","Personalinformation.plist","chongfuziyuan.plist","chongfuziyuan2.plist",
 	"shezhijiemian.plist","changguichangbupiao.plist","changguichangdaipiao.plist","bisaichang.plist",

@@ -297,8 +297,11 @@ void NetRoundManager::StartGame() {
 
 void NetRoundManager::StopGame() {
 	_isGameStart=false;
+
+    #ifndef IGNORE_LOGIN_REQUEST
     _messenger->Send(REQ_GAME_SEND_LEAVE_ROOM);
     RETURN_IF_FAIL(_messenger->_response);
+    #endif
 }
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
@@ -987,5 +990,6 @@ RoundManager *NetRoundManager::getInstance() {
 void NetRoundManager::destroyInstance() {
     delete _instance[NETWORK_GAME];
     _instance[NETWORK_GAME] = NULL;
+    StrategyRm::destroyInstance();
 }
 

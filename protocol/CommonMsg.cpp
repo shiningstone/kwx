@@ -161,6 +161,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case RRQ_BASIC_INFO:
             return new BasicInfoResponse();
 
+        case REQ_GAME_SEND_LEAVE_ROOM:
+            return new LeaveResponse();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }

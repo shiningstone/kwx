@@ -1,7 +1,10 @@
 #include "dayByDay.h"
+
 #include "network/KwxEnv.h"
 #include "network/KwxMessenger.h"
 #include "protocol/DbgRequestDesc.h"
+
+#include "utils/DebugCtrl.h"
 
 dayAward::dayAward(Node* p)
 {
@@ -69,6 +72,7 @@ void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
 		break;       
 	case Widget::TouchEventType::ENDED:
 		{
+            #ifndef IGNORE_DAILY_LOGIN_REQUEST
             KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
             bMessenger->Send(REQ_GET_DAILY_PRIZE);
             if(bMessenger->_response!=REQUEST_ACCEPTED) {
@@ -76,7 +80,8 @@ void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
                 _showErrorMessage(info);
                 return;
             }            
-
+            #endif
+            
 			auto curGold=(Button*)this->getChildByTag(ReceiveTime);
 			auto haveGetted=(Sprite*)this->getChildByTag(GOLD_HAVE_GETTED+ReceiveTime-1);
 			auto duiGou=(Sprite*)this->getChildByTag(GOLD_ENABLE_DUIGOU+ReceiveTime-1);

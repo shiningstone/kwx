@@ -346,6 +346,9 @@ int RequestLeave::Set() {
 }
 
 int LeaveResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+    CHECK_RESPONSE(msg);
+    
     _score = msg.GetItemValue(0);
     return 0;
 }

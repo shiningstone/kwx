@@ -855,6 +855,7 @@ RoundManager *RoundManager::getInstance() {
 void RoundManager::destroyInstance() {
     delete _instance[LOCAL_GAME];
     _instance[LOCAL_GAME] = NULL;
+    StrategyRm::destroyInstance();
 }
 
 /*************************************

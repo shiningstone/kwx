@@ -121,6 +121,7 @@ bool KwxMessenger::Wait(RequestId_t req) {
             waitCount++;
         } else {
             LOGGER_WRITE("wait %s timeout",DescReq(req));
+            _waitQueue.clear();
             _response = TIMEOUT;
             return false;
         }
