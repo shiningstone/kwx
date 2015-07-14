@@ -72,6 +72,8 @@ int KwxMessenger::Send(UsMsg &aMsg, bool ignoreRsp) {
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
+    _response = REQUEST_ACCEPTED;
+
     len = aMsg.Serialize(buf);
     NetMessenger::Send(buf,len);
 

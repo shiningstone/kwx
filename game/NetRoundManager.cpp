@@ -204,7 +204,6 @@ void NetRoundManager::HandleError() {
 
 void NetRoundManager::SendReconnect() {
     LOGGER_WRITE("%s",__FUNCTION__);
-    _messenger->_response = REQUEST_ACCEPTED;
     _messenger->Send(REQ_GAME_SEND_RECONNECT);
     RETURN_IF_FAIL(_messenger->_response);
 
@@ -271,7 +270,6 @@ void NetRoundManager::CreateRace(RaceLayer *uiManager) {
 	_isGameStart=false;
 
     _messenger = KwxMessenger::getInstance(MSG_GAME);
-    _messenger->_response = REQUEST_ACCEPTED;
     _messenger->StartReceiving();
     
     EnvVariable *env = EnvVariable::getInstance();
