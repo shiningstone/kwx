@@ -210,12 +210,7 @@ void HelloWorld::enterRoomStandAlone()
     extern void test_interface();
     test_interface();
 #elif (DEBUG_ENTRANCE==4)
-    KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_GAME);
-    aMessenger->StartReceiving();
-    aMessenger->Send(REQ_DAILY_LOGIN);
-    
-    //KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
-    aMessenger->Send(REQ_GET_DAILY_PRIZE);
+
 #elif (DEBUG_ENTRANCE==5)
     _showErrorMessage("error message");
 #else
