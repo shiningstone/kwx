@@ -77,7 +77,7 @@ bool DsInstruction::_IsRejection(const DsMsg &msg) {
         REQ_GAME_SEND_ENTER,
         REQ_LOGIN,
         REQ_DAILY_LOGIN,
-        //REQ_GET_DAILY_PRIZE,
+        REQ_GET_DAILY_PRIZE,
         REQ_GAME_SEND_RECONNECT,
         REQ_GAME_SEND_LEAVE_ROOM,
         REQ_GAME_SEND_XIA_PIAO,
@@ -94,17 +94,14 @@ bool DsInstruction::_IsRejection(const DsMsg &msg) {
                 if(failure<DATAGRAM_ERROR) {
                     failure = REQUEST_ACCEPTED;
                     return false;
+                } else {
+                    if(failure==RECONNECT_REQUIRED) {
+                        DsMsgParser::_load_seat_info(reconnectInfo,msg,1);
+                    }
+                    
+                    LOGGER_WRITE("%s (%s)",__FUNCTION__,DescErr(failure));
+                    return true;
                 }
-
-                if(failure==RECONNECT_REQUIRED) {
-                    DsMsgParser::_load_seat_info(reconnectInfo,msg,1);
-                }
-
-                char buf[128] = {0};
-                sprintf(buf,"Error code %d",failure);
-                
-                LOGGER_WRITE("%s (%s)",__FUNCTION__,((DescErr(failure)==NULL)?buf:DescErr(failure)));
-                return true;
             }
         }
     }

@@ -1,6 +1,14 @@
 
 #include "DbgRequestDesc.h"
 
+static char GeneralInfoBuf[128] = {0};
+
+static char *GeneralInfo(const char *type,int code) {
+    memset(GeneralInfoBuf,0,128);
+    sprintf(GeneralInfoBuf,"%s(%d)",type,code);
+    return GeneralInfoBuf;
+}
+
 RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_SEND_START),
     DESC(REQ_GAME_SEND_SHOWCARD),
@@ -41,7 +49,7 @@ char *DescReq(RequestId_t id) {
         }
     }
 
-    return "Desc undefined";
+    return GeneralInfo("request id",id);
 }
 
 ErrDesc ErrDescTbl[] = {
@@ -73,7 +81,7 @@ char *DescErr(FailureCode_t id) {
             return ErrDescTbl[i].desc;
         }
     }
-    
-    return NULL;
+
+    return GeneralInfo("failure code",id);
 }
 

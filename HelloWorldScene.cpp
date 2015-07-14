@@ -106,8 +106,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             aMessenger->StopReceiving();
             
             if(aMessenger->_response!=REQUEST_ACCEPTED) {
-                string info = string("Error code ") + string(DescErr(aMessenger->_response));
-                _showErrorMessage(info);
+                _showErrorMessage(DescErr(aMessenger->_response));
                 return;
             }
             

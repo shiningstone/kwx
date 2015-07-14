@@ -365,8 +365,7 @@ bool EnterRoom::init()
     bMessenger->Send(REQ_DAILY_LOGIN);
 
     if(bMessenger->_response!=REQUEST_ACCEPTED) {
-        string info = string("Error code ") + string(DescErr(bMessenger->_response));
-        _showErrorMessage(info);
+        _showErrorMessage(DescErr(bMessenger->_response));
         return false;
     }            
     #endif
