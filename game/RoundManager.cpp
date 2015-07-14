@@ -744,7 +744,6 @@ Card_t RoundManager::NewDistribute() const {
 ***********************************************/
 PlayerDir_t RoundManager::GetLastWinner() {
     if( _lastWin.winner==INVALID_DIR ) {
-        LOGGER_WRITE("NETWORK: Request(last winner) not defined");
         _lastWin.winner = MIDDLE;
     }
     return _lastWin.winner;
@@ -868,7 +867,7 @@ void RoundManager::_LogRoundCards() {
         p[i] = (_unDistributedCards[i]);
     }
 
-    LOGGER_WRITE("new card sequence:\n");
+    LOGGER_WRITE("new card sequence:");
     LOGGER_WRITE_ARRAY(p,TOTAL_CARD_NUM);
 }
 

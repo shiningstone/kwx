@@ -595,7 +595,6 @@ void NetRoundManager::_restoreRemindInfo(const Reminds_t &remind) {
 void NetRoundManager::_DiRecv(GameStartResponse *info) {
     _players[MIDDLE]->_isReady = true;
     _uiManager->GuiShowReady(MIDDLE);
-    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",MIDDLE,info->score);
     delete info;
 }
 
@@ -604,7 +603,6 @@ void NetRoundManager::_DiRecv(GameStartNotif *info) {
         _players[info->seat]->_isReady = true;
         _uiManager->GuiShowReady(info->seat);
     }
-    LOGGER_WRITE("NOTE: Player%d's score should set to %d\n",info->seat,info->score);
     delete info;
 }
 
