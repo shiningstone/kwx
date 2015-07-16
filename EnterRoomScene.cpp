@@ -12,10 +12,8 @@
 #include "dayByDay.h"
 #include "HelloWorldScene.h"
 
-#include "utils/DebugCtrl.h"
 #include "network/KwxEnv.h"
 #include "network/KwxMessenger.h"
-#include "protocol/DbgRequestDesc.h"
 #include "FriendList.h"
 
 EnterRoom::EnterRoom()
@@ -175,6 +173,10 @@ void EnterRoom::back_callback(Ref* pSender,Widget::TouchEventType type)
 		break;
 	case Widget::TouchEventType::ENDED:
 		{
+#ifndef IGNORE_LOGIN_REQUEST
+            KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+            bMessenger->Send(REQ_LOGOUT);
+#endif
 			auto scene = Scene::create();
 			auto startLayer=HelloWorld::create();
 			scene->addChild(startLayer,1);
@@ -359,17 +361,6 @@ bool EnterRoom::init()
 		return false;
 	}
 
-    #ifndef IGNORE_DAILY_LOGIN_REQUEST
-    KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
-    bMessenger->StartReceiving();
-    bMessenger->Send(REQ_DAILY_LOGIN);
-
-    if(bMessenger->_response!=REQUEST_ACCEPTED) {
-        _showErrorMessage(DescErr(bMessenger->_response));
-        return false;
-    }            
-    #endif
-
 	visibleSize = Director::getInstance()->getVisibleSize();
 	origin = Director::getInstance()->getVisibleOrigin();
 
@@ -395,8 +386,10 @@ bool EnterRoom::init()
 	this->addChild(FriendLayer);
 
 	competeButtons();//比赛按钮
-	if(EnvVariable::getInstance()->_dailyLogin.hasReward)
+	if(EnvVariable::getInstance()->_dailyLogin.hasReward) {
 		call_gold_prize();
+        EnvVariable::getInstance()->_dailyLogin.hasReward = false;
+    }
 
 	return true;
 }
@@ -502,11 +495,4 @@ MainLayer_myInfo EnterRoom::get_personalSimpleInfo()
 	return personalSimpleInfo;
 }
 
-
-#include "SystemMessageHint.h"
-void EnterRoom::_showErrorMessage(std::string errorMessage) {
-    Layer* prompt = new SystemMessageHint(this,errorMessage,98);
-    prompt->setVisible(true);
-    this->addChild(prompt,98);
-}
 

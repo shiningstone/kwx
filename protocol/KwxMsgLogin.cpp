@@ -361,6 +361,11 @@ int LoginConflictNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int RequestLogout::Set() {
+    SetRequestCode(REQ_LOGOUT);
+    return 0;
+}
+
 int RequestXiaPiao::Set(INT32U score) {
     SetRequestCode(REQ_GAME_SEND_XIA_PIAO);
     AddSeatInfo();

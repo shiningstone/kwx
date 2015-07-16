@@ -1,11 +1,10 @@
 #include "SystemMessageHint.h"
 #include "HelloWorldScene.h"
 
-SystemMessageHint::SystemMessageHint(Node* p,std::string str,int tag)
+SystemMessageHint::SystemMessageHint(std::string str,MES_HINT_ACTION curAct)
 {
-	parentNode=p;
-	CurTag=tag;
 	NoticeMessage=str;
+	curMesAction=curAct;
 	init();
 }
 SystemMessageHint::~SystemMessageHint(void)
@@ -21,50 +20,121 @@ bool SystemMessageHint::init()
 	visibleSize=Director::getInstance()->getVisibleSize();
 	origin=Director::getInstance()->getVisibleOrigin();
 
-	auto NoticeBKG=LayerColor::create();
-	NoticeBKG->setContentSize(Size(visibleSize.width,visibleSize.height));
-	NoticeBKG->setColor(ccWHITE);
-	NoticeBKG->ignoreAnchorPointForPosition(false);
-	NoticeBKG->setAnchorPoint(Vec2(0.5,0.5));
-	NoticeBKG->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-	this->addChild(NoticeBKG,0);
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("systemprompt.plist");
+
+	auto mesBkg=Sprite::create("system_Notice.png");
+	mesBkg->setAnchorPoint(Vec2(0.5,0.5));
+	mesBkg->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+	this->addChild(mesBkg,0);
+
+	switch (curMesAction)
+	{
+	case mes_Hint_Ensure_Only:
+		HintOnlyEnsure();
+		break;
+	case mes_Hint_Choose:
+		HintWihtChoose();
+		break;
+	default:
+		break;
+	}
 
 	auto NotieHint=Sprite::create("system_Notice.png");
 	NotieHint->setAnchorPoint(Vec2(0.5,0.5));
 	NotieHint->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2));
-	this->addChild(NotieHint,1);
-	auto NotieHintSize=NotieHint->getContentSize();
+	this->addChild(NotieHint,1,SYSTEM_MES_HINT_BKG);
 
 	auto MessageFont=LabelTTF::create(NoticeMessage,"Arial",20);
 	MessageFont->setAnchorPoint(Vec2(0.5,0.5));
 	MessageFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 	this->addChild(MessageFont,2);
 
-	EventListenerTouchOneByOne* NoticeListener=EventListenerTouchOneByOne::create();
-	NoticeListener->setSwallowTouches(true);
-	NoticeListener->onTouchBegan=[=](Touch* touch, Event* event){return true;};
-	NoticeListener->onTouchMoved=[=](Touch* touch, Event* event){};
-	NoticeListener->onTouchEnded=[=](Touch* touch, Event* event){
-		float x=visibleSize.width/2-NotieHintSize.width/2;
-		float y=visibleSize.height/2-NotieHintSize.height/2;
-		Rect rect=Rect(x,y,NotieHintSize.width,NotieHintSize.height);
-		if(!rect.containsPoint(touch->getLocation()))
-		{
-			auto deleteFunc=CallFunc::create([=](){
-				if(parentNode->getChildByTag(CurTag))
-					parentNode->removeChildByTag(CurTag,true);
-			});
-			auto replaceFunc=CallFunc::create([=](){
-				auto scene=Scene::create();
-				auto layer=HelloWorld::create();
-				scene->addChild(layer);
-				Director::getInstance()->replaceScene(scene);
-			});
-			parentNode->runAction(Sequence::create(deleteFunc,replaceFunc,NULL));
-		}
-	};
-	Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(NoticeListener,NoticeBKG);
-
-
 	return true;
+}
+void SystemMessageHint::OnlyEnsureCall(cocos2d::Ref* pSender,ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		{
+			auto scene=Scene::create();
+			auto layer=HelloWorld::create();
+			scene->addChild(layer);
+			Director::getInstance()->replaceScene(scene);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+void SystemMessageHint::HintOnlyEnsure()
+{
+	auto NoticeHint=(Sprite*)this->getChildByTag(SYSTEM_MES_HINT_BKG);
+
+	auto ensureBtn=Button::create("systemprompt-affirm.png","systemprompt-affirm2.png","systemprompt-affirm2.png",UI_TEX_TYPE_PLIST);
+	ensureBtn->setAnchorPoint(Vec2(0.5,0));
+	ensureBtn->setPosition(Vec2(visibleSize.width/2,NoticeHint->getPosition().y-NoticeHint->getContentSize().height/2+15));
+	ensureBtn->addTouchEventListener(CC_CALLBACK_2(SystemMessageHint::OnlyEnsureCall,this));
+	this->addChild(ensureBtn);
+}
+void SystemMessageHint::HintWihtChoose()
+{
+	auto NoticeHint=(Sprite*)this->getChildByTag(SYSTEM_MES_HINT_BKG);
+	auto HintSize=NoticeHint->getContentSize();
+
+	auto ensureBtn=Button::create("systemprompt-affirm.png","systemprompt-affirm2.png","systemprompt-affirm2.png",UI_TEX_TYPE_PLIST);
+	ensureBtn->setAnchorPoint(Vec2(0.5,0));
+	ensureBtn->setPosition(Vec2(visibleSize.width/2-HintSize.width*0.2026144,NoticeHint->getPosition().y-NoticeHint->getContentSize().height/2+15));
+	ensureBtn->addTouchEventListener(CC_CALLBACK_2(SystemMessageHint::ChooseEnsure,this));
+	this->addChild(ensureBtn); 
+
+	auto cancelBtn=Button::create("systemprompt-cancel.png","systemprompt-cancel2.png","systemprompt-cancel2.png",UI_TEX_TYPE_PLIST);
+	cancelBtn->setAnchorPoint(Vec2(0.5,0));
+	cancelBtn->setPosition(Vec2(visibleSize.width/2+HintSize.width*0.2026144,NoticeHint->getPosition().y-NoticeHint->getContentSize().height/2+15));
+	cancelBtn->addTouchEventListener(CC_CALLBACK_2(SystemMessageHint::ChooseCancel,this));
+	this->addChild(cancelBtn); 
+}
+void SystemMessageHint::ChooseEnsure(cocos2d::Ref* pSender,ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+void SystemMessageHint::ChooseCancel(cocos2d::Ref* pSender,ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:	
+		{
+			auto scene=Scene::create();
+			auto layer=HelloWorld::create();
+			scene->addChild(layer);
+			Director::getInstance()->replaceScene(scene);
+		}
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
 }

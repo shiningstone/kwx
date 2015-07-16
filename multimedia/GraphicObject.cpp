@@ -233,6 +233,13 @@ Button *GObjectFactory::CreateButton(MenuButtonId_t id) {
                 button->setPosition(Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2));
                 return button; 
             }
+		case BTN_READY:
+			{
+				Button *button = Button::create("GameReady.png","GameReady2.png","GameReady2.png",UI_TEX_TYPE_PLIST);
+				button->setAnchorPoint(Vec2(0.5,0.5));
+				button->setPosition(Vec2(ORIGIN.x+SIZE.width/2, ORIGIN.y+SIZE.height/2));
+				return button; 
+			}
 
         case BTN_CANCEL:
         case BTN_OK:

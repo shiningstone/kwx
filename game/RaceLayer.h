@@ -142,7 +142,13 @@ private:
     void _CreateFreeCard(Sprite *cards[3], int idxInHand[3], CARD_KIND kind);
 
 public:
-    void GuiPlayerShow(PlayerDir_t dir);
+    void ShowPlayerMes(PlayerDir_t dir,UserProfile_t newPlayer);
+    void GuiPlayerShow(PlayerDir_t dir);		//显示玩家信息
+	void HidePlayerMes(PlayerDir_t dir);			//删除玩家信息
+	void BtnPlayerReady(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type);//游戏准备//ceshi_yusi
+	//void GuiShowReady(int direction);         //已有的准备状态显示
+
+
     void GuiJinBiShow(PlayerDir_t dir, int gold);
 
 	void start_timer(int time,PlayerDir_t direction);
@@ -178,8 +184,8 @@ private:
 	bool ifEndGameChoose;//是否退出游戏
 	bool ifEffectTime;
 	bool ifUpdateDuringEffect;
-	bool ifPengAction;
-	bool ifGangAction;
+	//bool ifPengAction;
+	//bool ifGangAction;
 	//bool ifMyTime;
 	//bool ifTriangleHintEnable;
 	bool ifTingSignBarVisible;

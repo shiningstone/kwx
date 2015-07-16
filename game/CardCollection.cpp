@@ -831,7 +831,7 @@ ActionMask_t CardInHand::judge_action(Card_t newCard,bool isNewDistributed, bool
     }
 
     if(!isNewDistributed && !IsMing) {
-        if( find_cards(newCard,NULL,FreeStart)==3 ) {
+        if( find_cards(newCard,NULL,FreeStart)>=3 ) {
             act |= aPENG;
         }
     }
@@ -878,7 +878,7 @@ void CardInHand::update_statistics(Card_t huKind) {
             _clr(statHuFanMask,RH_QINYISE);
 		}
         
-		if( curCard==huKind ) {
+		if( curCard==huKind ) {//ceshi_yusi_bug
             sameAsHuKind++;
 			if(get_status(i)==sPENG) {
                 _SetHu(RH_MINGSIGUI);
@@ -896,7 +896,6 @@ void CardInHand::update_statistics(Card_t huKind) {
                 if( get_status(i)==sFREE ) {
                     freeSameCard++;
                 }
-                
 				sameCard++;
             }
         }

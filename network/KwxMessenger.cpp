@@ -74,12 +74,12 @@ int KwxMessenger::Send(UsMsg &aMsg, bool ignoreRsp) {
     
     _response = REQUEST_ACCEPTED;
 
-    len = aMsg.Serialize(buf);
-    NetMessenger::Send(buf,len);
-
     char desc[512] = {0};
     aMsg.Desc(desc);
     LOGGER_WRITE("----------------> #%d: %s",++_sendCnt,desc);
+
+    len = aMsg.Serialize(buf);
+    NetMessenger::Send(buf,len);
 
     if(!ignoreRsp) {
         Wait((RequestId_t)aMsg._header->_requestCode);
@@ -233,6 +233,13 @@ int KwxMessenger::Send(RequestId_t req) {
                 RequestLeave aReq;
                 aReq.Set();
                 return Send(aReq);
+            }
+        
+        case REQ_LOGOUT:
+            {
+                RequestLogout aReq;
+                aReq.Set();
+                return Send(aReq,true);
             }
         
 		default:

@@ -40,6 +40,7 @@ RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_SEND_XIA_PIAO),
     DESC(REQ_GET_DAILY_PRIZE),
     DESC(REQ_GAME_SEND_LEAVE_ROOM),
+    DESC(REQ_LOGOUT),
 };
 
 char *DescReq(RequestId_t id) {

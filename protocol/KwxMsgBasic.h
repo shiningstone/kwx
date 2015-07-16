@@ -63,6 +63,7 @@ typedef enum {
 
     /*  login */
     REQ_LOGIN                   = 1,
+    REQ_LOGOUT                  = 15,
     REQ_RES_UPDATE              = 2,
     REQ_VER_UPDATE              = 3,
     RRQ_BASIC_INFO              = 31,

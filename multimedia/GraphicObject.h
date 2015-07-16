@@ -75,6 +75,7 @@ typedef enum {
      MENUBTN_GAMEBACK,
 
      BTN_START,
+	 BTN_READY,
 
      BTN_CANCEL,
      BTN_OK,

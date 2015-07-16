@@ -86,7 +86,7 @@ ActionMask_t Player::judge_action_again() {
 }
 
 ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,bool isLastOne) {
-	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);
+	ActionMask_t actions = _cards->judge_action(newCard,isNewDistributed,isLastOne);//peng / gang
 
 	if(isNewDistributed) {
 		if(!_cards->IsMing && !isLastOne) {

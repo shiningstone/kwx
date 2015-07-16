@@ -1,6 +1,6 @@
 ﻿
 #include "RaceLayer.h"
-#include "./../HelloWorldScene.h"
+#include "./../EnterRoomScene.h"
 #include "RoundManager.h"
 #include "NetRoundManager.h"
 #include "StrategyRm.h"
@@ -81,8 +81,14 @@ void RaceLayer::CreateRace(GameMode_t mode)
         this->addChild(mapai,2,CARD_ARRAGE_LEFT_TAG_ID + i);
     }
 
-    auto StartButton = _object->CreateButton(BTN_START);
+	Button* StartButton;
+#if(DEBUG_ENTRANCE==1)
+	StartButton = _object->CreateButton(BTN_READY);
+	StartButton->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnStartHandler,this));
+#else
+    StartButton = _object->CreateButton(BTN_START);
     StartButton->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnStartHandler,this));
+#endif
     this->addChild(StartButton,2,START_GAME_TAG_ID);
 
 	_UpdateResidueCards(TOTAL_CARD_NUM);
@@ -96,7 +102,7 @@ void RaceLayer::CreateRace(GameMode_t mode)
 
     for(int dir=0;dir<3;dir++) {
         if(_roundManager->_players[dir]->_isExist) {
-            GuiPlayerShow((PlayerDir_t)dir);
+            GuiPlayerShow((PlayerDir_t)dir);//图像准备
         }
     }
 }
@@ -149,8 +155,8 @@ void RaceLayer::StartGame()
     _myChosenCard = INVALID;
     _myTouchedCard = INVALID;
     
-	ifPengAction=false;
-	ifGangAction=false;
+	//ifPengAction=false;
+	//ifGangAction=false;
 
 	_RaceBeginPrepare();
 
@@ -1224,7 +1230,10 @@ void RaceLayer::GuiShowReady(int dir)
             _layout->_playerBkg[0]->getPosition().y - _layout->_playerBkg[0]->getContentSize().height));
 		this->addChild(Ready,2,READY_INDICATE_LEFT_TAG_ID);
 	} else if( dir==1 ) {
-		;
+		Ready->setPosition(Vec2(
+			_layout->_playerBkg[1]->getPosition().x + _layout->_playerBkg[1]->getContentSize().width/2,
+			_layout->_playerBkg[1]->getPosition().y));
+		this->addChild(Ready,2,READY_INDICATE_MID_TAG_ID);
 	} else if( dir==2 ) {
 		Ready->setPosition(Vec2(
             _layout->_playerBkg[2]->getPosition().x - _layout->_playerBkg[2]->getContentSize().width/2,
@@ -1850,7 +1859,7 @@ void RaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToM
 {
 	if(time==1) {
 		if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID))
-			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID);
+			myframe->removeChildByTag(CHOOSE_CARD_TAG_ID,true);
 	}
 
     if(myframe->getChildByTag(OUT_CARD_FRAME_TAG_ID)!=NULL)
@@ -1898,7 +1907,6 @@ void RaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToM
         DelayTime::create(0.5),CallFunc::create([=](){
         ifInsertCardsTime=false;}),Sequence::create(CCCallFunc::create([=]() {
     		_CardRiverUpdateEffect(MIDDLE);}),CCCallFunc::create([=]() {
-            //_roundManager->UpdateCards(MIDDLE,a_JUMP);
             _Show(myframe,TING_SING_BUTTON,true);}),CallFunc::create([=](){
     		if(_isCardInHandUpdated)
     			_isCardInHandUpdated = false;
@@ -2187,7 +2195,7 @@ void RaceLayer::_UpdateCardsInHand(const CardInHand *cards, int chosen) {
 			}
 		}
 		ifChosed = true;
-		_myTouchedCard  = chosen;
+		_myTouchedCard = chosen;
 	}
 }
 
@@ -2497,6 +2505,7 @@ int RaceLayer::_FindCard(int start,int end,Touch *touch) {
 }
 
 bool RaceLayer::_CardTouchBegan(Touch* touch, Event* event) {
+
     if( ifInsertCardsTime ) {
         ifInsertCardsTime=false;
         
@@ -2593,10 +2602,10 @@ void RaceLayer::_CardTouchMove(Touch* touch, Event* event) {
 void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
     CardInHand *cards = _roundManager->_players[MIDDLE]->_cards;
     
-	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL 
-        && (touch->getLocation().y>visibleSize.height*0.2)) {
+	if(myframe->getChildByTag(CHOOSE_CARD_TAG_ID)!=NULL&& (touch->getLocation().y>visibleSize.height*0.2)) {
 		if(_roundManager->_actCtrl.handoutAllow) {
 			_myChosenCard = INVALID;
+			ifChosed=false;
             _roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),1);
 		} else {
 			_myChosenCard=_myTouchedCard;
@@ -2668,6 +2677,7 @@ void RaceLayer::_CardTouchEnd(Touch* touch, Event* event) {
 		if(ChooseConfirm && _roundManager->_actCtrl.handoutAllow) {
 			_myChosenCard=INVALID;
 			_myTouchedCard = chosen;
+			ifChosed=false;
 			if(chosen==cards->last())
 				_roundManager->RecvHandout(_myTouchedCard,touch->getLocation(),2);
 			else
@@ -4727,7 +4737,11 @@ void RaceLayer::_UpdateNickName(int direction,std::string str_Nick)
 
 void RaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
 {
-	auto head_image=Sprite::createWithSpriteFrameName(head_photo);
+	Sprite *head_image;
+	if(Sprite::createWithSpriteFrameName(head_photo))//ceshi_yusi
+		head_image=Sprite::createWithSpriteFrameName(head_photo);
+	else
+		head_image=Sprite::create(head_photo);
 
 	if(direction==0)
 	{
@@ -4772,7 +4786,35 @@ void RaceLayer::_UpdateHeadImage(int direction,std::string head_photo)
 		_layout->_playerBkg[2]->addChild(head_image,1,HEAD_IMG_TAG_ID);
 	}
 }
-
+void RaceLayer::BtnPlayerReady(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
+{
+	switch (type)
+	{
+	case cocos2d::ui::Widget::TouchEventType::BEGAN:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::MOVED:
+		break;
+	case cocos2d::ui::Widget::TouchEventType::ENDED:
+		GuiShowReady(MIDDLE);
+		break;
+	case cocos2d::ui::Widget::TouchEventType::CANCELED:
+		break;
+	default:
+		break;
+	}
+}
+void RaceLayer::ShowPlayerMes(PlayerDir_t dir,UserProfile_t newPlayer)
+{
+	_UpdateHeadImage(dir,newPlayer.photo);
+	_UpdateNickName(dir,newPlayer.name);
+	GuiUpdateScore(dir,newPlayer.property);
+}
+void RaceLayer::HidePlayerMes(PlayerDir_t dir)
+{
+	_Remove(this,READY_INDICATE_LEFT_TAG_ID+dir);
+	_layout->_playerBkg[dir]->removeAllChildren();
+    _UpdateHeadImage(dir,"BlankSeatPho.png");
+}
 void RaceLayer::GuiPlayerShow(PlayerDir_t dir) {
     _UpdateHeadImage(dir,_roundManager->_players[dir]->_profile.photo);
     _UpdateNickName(dir,_roundManager->_players[dir]->_profile.name);
@@ -6228,7 +6270,7 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
             _roundManager->destroyInstance();
             
 			auto scene = Scene::create();
-			auto startLayer=HelloWorld::create();
+			auto startLayer=EnterRoom::create();
 			scene->addChild(startLayer,1);
 			Director::sharedDirector()->replaceScene(scene);
 		}

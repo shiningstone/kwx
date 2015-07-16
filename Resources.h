@@ -41,7 +41,7 @@
 #define SCORE_TAG_ID						1
 #define NICK_NAME_TAG_ID					2
 #define HEAD_IMG_TAG_ID						3
-#define PROPERTY_FONT_UNIT					4
+#define PROPERTY_FONT_UNIT					4//?????×÷ÉõµÄ
 
 /*Race Accout layer related children*/
 #define ACCOUNTBAR_PLAYERZERO				0
@@ -171,8 +171,8 @@
 #define ALARM_CLOCK_INDICATE_LEFT_TAG_ID	113
 #define SHOWCARD_INDICATOR_TAG_ID			114
 #define READY_INDICATE_LEFT_TAG_ID			115
-#define READY_INDICATE_RIGHT_TAG_ID			116
-#define READY_INDICATE_MID_TAG_ID 			117
+#define READY_INDICATE_MID_TAG_ID			116
+#define READY_INDICATE_RIGHT_TAG_ID 		117
 #define START_GAME_TAG_ID               	118
 #define START_GAME_SHADE_TAG_ID				119//???
 #define CARD_ARRAGE_LEFT_TAG_ID				120

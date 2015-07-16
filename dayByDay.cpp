@@ -292,7 +292,7 @@ bool dayAward::init()
 
 #include "SystemMessageHint.h"
 void dayAward::_showErrorMessage(std::string errorMessage) {
-    Layer* prompt = new SystemMessageHint(this,errorMessage,98);
+    Layer* prompt = new SystemMessageHint(errorMessage,mes_Hint_Ensure_Only);
     prompt->setVisible(true);
     this->addChild(prompt,98);
 }

@@ -1,6 +1,10 @@
 #include "IMLoadScene.h"
 #include "EnterRoomScene.h"
 
+#include "utils/DebugCtrl.h"
+#include "network/KwxMessenger.h"
+#include "protocol/DbgRequestDesc.h"
+
 USING_NS_CC;
 
 IMLoad::IMLoad()
@@ -202,6 +206,24 @@ bool IMLoad::init()
 	//auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
 	//this->runAction(Sequence::create(addAllRes,EnterNextRoom,NULL));
 
+#ifndef IGNORE_DAILY_LOGIN_REQUEST
+    KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+    bMessenger->StartReceiving();
+    bMessenger->Send(REQ_DAILY_LOGIN);
+
+    if(bMessenger->_response!=REQUEST_ACCEPTED) {
+        _showErrorMessage(DescErr(bMessenger->_response));
+        return false;
+    }            
+#endif
+
     return true;
+}
+
+#include "SystemMessageHint.h"
+void IMLoad::_showErrorMessage(std::string errorMessage) {
+    Layer* prompt = new SystemMessageHint(errorMessage,mes_Hint_Ensure_Only);
+    prompt->setVisible(true);
+    this->addChild(prompt,98);
 }
 

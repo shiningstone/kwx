@@ -193,6 +193,11 @@ public:
     LeaveStatus_t _status;
 };
 
+class RequestLogout : public UsMsg {
+public:
+    int Set();
+};
+
 class LoginConflictNotif : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);
