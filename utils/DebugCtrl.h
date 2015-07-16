@@ -5,7 +5,7 @@
 /**********************************************************************************
     编手机版本统一定义(无需针对单个宏进行调整)
 **********************************************************************************/
-//#define FORMAL_ANDROID
+#define FORMAL_ANDROID
 
 /**********************************************************************************
     网络版调试版本总开关,控制"单机版"入口
@@ -24,7 +24,7 @@
         手机调试版本，      本机局域网ip
         windows联调版本     实际的server ip
 **********************************************************************************/
-#if 0
+#if 1
 #define DBG_LAN_SERVER "120.25.169.221"
 #define DBG_LOGIN_PORT 20000
 #else
@@ -40,7 +40,7 @@
 /* 不发送RequestLogin - 使用本机服务器测试时设置 */
 #define IGNORE_LOGIN_REQUEST
 /* 不发送DailyLogin   - 使用本机服务器测试LoginRequest时设置*/
-//#define IGNORE_DAILY_LOGIN_REQUEST
+#define IGNORE_DAILY_LOGIN_REQUEST
 #endif
 
 
@@ -52,7 +52,7 @@
 #define TIMER_FREE
 
 /* 不发送心跳 */
-//#define NO_HEART_BEAT
+#define NO_HEART_BEAT
 
 /**********************************************************************************
     编手机版本统一定义(无需针对单个宏进行调整)
@@ -66,8 +66,9 @@
     #undef IGNORE_LOGIN_REQUEST
     #undef IGNORE_DAILY_LOGIN_REQUEST
 
-    #undef USE_TEST_ROUND
-    #undef NO_HEART_BEAT
+    #undef  USE_TEST_ROUND
+    #undef  TIMER_FREE
+    #define NO_HEART_BEAT
 #endif
 
 #endif
