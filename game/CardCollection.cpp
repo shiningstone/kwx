@@ -704,11 +704,9 @@ void CardInHand::_JudgeKaWuXing(Card_t kind) {
 }
 
 void CardInHand::_JudgeQiDui() {
-    if(statzhongFaBai[0]==2&&statzhongFaBai[1]==2&&statzhongFaBai[2]==2) {
+    if(statzhongFaBai[0]==4&&statzhongFaBai[1]==4&&statzhongFaBai[2]==4) {
         _SetHu(RH_SANYUANQIDUI);
-    } 
-    
-    if(statGroupSameNum==1) {
+    }else if(statGroupSameNum==1) {
         _SetHu(RH_HAOHUAQIDUI);
     } else if(statGroupSameNum==2) {
         _SetHu(RH_CHAOHAOHUAQIDUI);
@@ -764,7 +762,7 @@ bool CardInHand::has_shou_gang() const {/*BUG??? : should compare with current g
     }
 }
 
-bool CardInHand::can_hu(Card_t newCard) const {
+HU_KIND_ASSORT CardInHand::can_hu(Card_t newCard) const {
     SmartList cards(*this,ONLY_FREE);
     cards.len--;                    /*the last should not be included*/
     cards.insert(newCard);          /*the last inserted in order*/
@@ -772,7 +770,7 @@ bool CardInHand::can_hu(Card_t newCard) const {
     return cards.can_hu();
 }
 
-bool CardInHand::can_hu(int position, int newKind) const {
+HU_KIND_ASSORT CardInHand::can_hu(int position, int newKind) const {
     SmartList cards(*this,ONLY_FREE);
     cards.displace(position-FreeStart,(Card_t)newKind);
 
@@ -787,7 +785,7 @@ bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
 			for(INT8U k=0;k<CARD_KIND_MAX;k++) {
                 SmartList cards(newCards);
                 cards.displace(i,(Card_t)k);
-				if(cards.can_hu()) {
+				if(cards.can_hu()!=NoHuForGame) {
 					return true;
                 }
 			}
@@ -798,7 +796,7 @@ bool CardInHand::can_kou(Card_t kouKind,Card_t handingout) const {
                 for(INT8U k=0;k<CARD_KIND_MAX;k++) {
                     SmartList cards(newCards);
                     cards.displace(i,(Card_t)k);
-                    if(cards.can_hu()) {
+                    if(cards.can_hu()!=NoHuForGame) {
                         return true;
                     }
                 }
@@ -856,13 +854,15 @@ void CardInHand::_ClearStats() {
     statHuFanMask      = 0;
 }
 
-void CardInHand::update_statistics(Card_t huKind) {
+void CardInHand::update_statistics(Card_t huKind,HU_KIND_ASSORT curHuAssort) {
     _ClearStats();
+	bool ifAnSiGui=false;
+	bool ifMingSiGui=false;
 
-    _SetHu(RH_QINYISE);
+	if(curHuAssort!=SevenPairOnly)
+		_SetHu(RH_QINYISE);
         
     int color = huKind/9;
-    int sameAsHuKind = 0;
         
 	for(INT8U i=0;i<size();i++) {
 		if(get_status(i)==sFREE ) {
@@ -878,57 +878,57 @@ void CardInHand::update_statistics(Card_t huKind) {
             _clr(statHuFanMask,RH_QINYISE);
 		}
         
-		if( curCard==huKind ) {//ceshi_yusi_bug
-            sameAsHuKind++;
-			if(get_status(i)==sPENG) {
-                _SetHu(RH_MINGSIGUI);
-            } else {
-                if(sameAsHuKind==4) {
-                    _SetHu(RH_ANSIGUI);
-                }
-            }
-		}
-        
 		int freeSameCard = 1;
-        int sameCard = 1;
 		for(INT8U k=i+1;k<size();k++) {
 			if(curCard==get_kind(k) && get_status(k)==sFREE) {
                 if( get_status(i)==sFREE ) {
                     freeSameCard++;
                 }
-				sameCard++;
+				else if(get_status(i)==sPENG)
+					ifMingSiGui=true;
             }
         }
 
-        if(freeSameCard==2||freeSameCard==4)
+        if(freeSameCard==2)
 			statCouples++;
-
-        if(sameCard==4)
+		else if(freeSameCard==4)
+		{
+			statCouples++;
 			statGroupSameNum++;
+			ifAnSiGui=true;
+		}
 	}
 
     if(IsMing) {
 		_SetHu(RH_MING);
     }
     
-	if(statFreeCards==2) {
+	if(statFreeCards==2)
 		_SetHu(RH_SHOUYIZHUA);
- 	}
-    
-    if(_is_active(statHuFanMask,RH_QINYISE) && statGroupSameNum>0) {
-        _SetHu(RH_ANSIGUI);
-    }
+	else
+		_JudgePengPengHu();
 
-	_JudgePengPengHu();
 
-    _JudgeDaXiaoSanYuan();
+	if((ifMingSiGui&&ifAnSiGui)||ifAnSiGui)
+		_SetHu(RH_ANSIGUI);
+	else if(ifMingSiGui)
+		_SetHu(RH_MINGSIGUI);
+
+	if(curHuAssort!=SevenPairOnly)
+	{
+		_JudgeKaWuXing(huKind);
+		_JudgeDaXiaoSanYuan();
+	}
 
     if(statCouples==7 && size()==14) {
         _clr(statHuFanMask,RH_ANSIGUI);
+        _clr(statHuFanMask,RH_XIAOSANYUAN);
+        _clr(statHuFanMask,RH_DASANYUAN);
         _JudgeQiDui();
-    } else {
-        _JudgeKaWuXing(huKind);
     }
+	//if(_is_active(statHuFanMask,RH_QINYISE) && statGroupSameNum>0) {//statGroupSameNum????
+	//	_SetHu(RH_ANSIGUI);
+	//}
 }
 
 /***************************************************
@@ -1043,10 +1043,12 @@ int CardInHand::CollectTingItem(TingItem_t *tingCard,Card_t kind,const CardList 
 bool CardInHand::CollectTingInfo(int position,TingInfo_t &ting,const CardList *river) {
     ting.kindNum = 0;
     ting.cardNum   = 0;
+	//TingItem_t tempDate[9];
+ //   ting.cards   = tempDate;
     ting.cards   = new TingItem_t[9];
 
     for(INT8U k=0;k<CARD_KIND_MAX;k++) {
-        if( can_hu(position,k) ) {
+        if( can_hu(position,k)!=NoHuForGame ) {
             ting.cardNum += CollectTingItem(ting.cards+ting.kindNum,(Card_t)k,river);
             ting.kindNum++;
         }
@@ -1449,66 +1451,132 @@ void SmartList::insert(Card_t newCard) {
 }
 
 /*BUG HERE!!! 不能判断包含四个一样的牌型*/
-bool SmartList::_PatternMatch() const {
-    if(_IsCharDismatched()) {
+bool SmartList::ifSevenPairHu() const
+{	
+	if(_GetContinuousCoupleNum()==6)
+		return true;
+    else
         return false;
-    } else if(_GetContinuousCoupleNum()==6) {
-        return true;
-    } else {
-        SmartList remainCards(*this);
-        
-        while(remainCards.len>0) {
-            if(remainCards._IsFirstInGroupSame()) {
-                SmartList subList(remainCards);
+}
+bool SmartList::ifNonSevenPairHu() const
+{
+	SmartList remainCards(*this);
+	while(remainCards.len>0) {
+		if(remainCards._IsFirstInGroupSame()) {
+			SmartList subList(remainCards);
 
-                int deletes[] = {0,1,2};
-                subList.remove(3,deletes);
-                
-                if( subList._PatternMatch() ) {
-                    return true;
-                }
-            }
+			int deletes[] = {0,1,2};
+			subList.remove(3,deletes);
 
-            int seqIdx[3];
-            if(remainCards._IsFirstInGroupSequence(seqIdx)) {
-                remainCards.remove(3,seqIdx);
-                
-                return remainCards._PatternMatch();
-            } else {
-                return false;
-            }
-        }
-        
-        return true;
-    }
+			if( subList.ifNonSevenPairHu() ) {
+				return true;
+			}
+		}
+		int seqIdx[3];
+		if(remainCards._IsFirstInGroupSequence(seqIdx)) {
+			remainCards.remove(3,seqIdx);
+			return remainCards.ifNonSevenPairHu();
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+HU_KIND_ASSORT SmartList::_PatternMatch() const {
+	bool ifQiDuiHu=false;
+	bool ifNonQiDuiHu=false;
+	if(_IsCharDismatched()) {
+		return NoHuForGame;
+	}
+	ifQiDuiHu=ifSevenPairHu();
+	ifNonQiDuiHu=ifNonSevenPairHu();
+
+	if(ifQiDuiHu&&ifNonQiDuiHu)
+		return SevenPairAndNon;
+	else if(ifNonQiDuiHu)
+		return NonSevenPairOnly;
+	else if(ifQiDuiHu)
+		return SevenPairOnly;
+	else 
+		return NoHuForGame;
+
+
+    //if(_IsCharDismatched()) {
+    //    return false;
+    //} else if(_GetContinuousCoupleNum()==6) {
+    //    return true;
+    //} else {
+    //    SmartList remainCards(*this);
+    //    
+    //    while(remainCards.len>0) {
+    //        if(remainCards._IsFirstInGroupSame()) {
+    //            SmartList subList(remainCards);
+
+    //            int deletes[] = {0,1,2};
+    //            subList.remove(3,deletes);
+    //            
+    //            if( subList._PatternMatch() ) {
+    //                return true;
+    //            }
+    //        }
+
+    //        int seqIdx[3];
+    //        if(remainCards._IsFirstInGroupSequence(seqIdx)) {
+    //            remainCards.remove(3,seqIdx);
+    //            
+    //            return remainCards._PatternMatch();
+    //        } else {
+    //            return false;
+    //        }
+    //    }
+    //    
+    //    return true;
+    //}
 }
 
 bool SmartList::is_ka_wu_xing(Card_t wuXing) const {
-    int Pos4   = INVALID;
-    int Pos6   = INVALID;
-    
-    for(INT8U i=0;i<len;i++) {
-        if(kind[i]==wuXing-1)
-            Pos4 = i;
-        else if(kind[i]==wuXing+1)
-            Pos6 = i;
-    }
-        
-    if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
-        int deletes[] = {Pos4,Pos6};
-
+	if(wuXing==ck_WU_TIAO||wuXing==ck_WU_TONG)
+	{
         SmartList remain(*this);
-        remain.remove(2,deletes);
-        if(remain.can_hu()) {
-            return true;
-        }
-    }
 
+        int wuXingNum = 0;
+        int wuXingGroup[4] = {0};
+
+		for(INT8U i=0;i<len;i++) {
+            if(kind[i]==wuXing) {
+                wuXingGroup[wuXingNum] = i;
+                wuXingNum++;
+            }
+		}
+
+        if(wuXingNum==4) {
+            remain.remove(3,wuXingGroup);
+        }
+    
+		int Pos4   = INVALID;
+		int Pos6   = INVALID;
+
+		for(INT8U i=0;i<len;i++) {
+			if(remain.kind[i]==wuXing-1)
+				Pos4 = i;
+			else if(remain.kind[i]==wuXing+1)
+				Pos6 = i;
+		}
+
+		if(Pos4!=INVALID && Pos6!=INVALID) {/*BUG???*/
+			int deletes[] = {Pos4,Pos6};
+
+			remain.remove(2,deletes);
+			if(remain.can_hu()==NoHuForGame) {
+				return true;
+			}
+		}
+	}
     return false;
 }
 
 /*BUG???: cards_stable 如果有一组三个或者四个，被删掉就胡不了*/
-bool SmartList::can_hu() const {
+HU_KIND_ASSORT SmartList::can_hu() const {
 	int i=0;
     
 	while(i<len-1) {
@@ -1517,18 +1585,26 @@ bool SmartList::can_hu() const {
 
             SmartList remainCards(*this);
 			remainCards.remove(2,deletes);
-            if(remainCards._PatternMatch()) {
-				return true;
-            } else {
-                i += 2;
-            }
+
+			auto curHuFlag=remainCards._PatternMatch();
+			if(curHuFlag!=NoHuForGame) {
+				return curHuFlag;
+			} else {
+				i += 2;
+			}
+    //        if(remainCards._PatternMatch()) {
+				//return true;
+    //        } else {
+    //            i += 2;
+    //        }
 		}
 		else {
             i++;
         }
 	}
-    
-	return false;
+
+	//return false;
+	return NoHuForGame;
 }
 
 /***************************************************

@@ -1215,6 +1215,7 @@ void RaceLayer::_UpdateResidueCards(int no)
 
 void RaceLayer::GuiHideReady() {
     _Remove(this,READY_INDICATE_LEFT_TAG_ID);
+    _Remove(this,READY_INDICATE_MID_TAG_ID);
     _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
 }
 
@@ -4803,12 +4804,6 @@ void RaceLayer::BtnPlayerReady(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchE
 		break;
 	}
 }
-void RaceLayer::ShowPlayerMes(PlayerDir_t dir,UserProfile_t newPlayer)
-{
-	_UpdateHeadImage(dir,newPlayer.photo);
-	_UpdateNickName(dir,newPlayer.name);
-	GuiUpdateScore(dir,newPlayer.property);
-}
 void RaceLayer::HidePlayerMes(PlayerDir_t dir)
 {
 	_Remove(this,READY_INDICATE_LEFT_TAG_ID+dir);
@@ -6271,8 +6266,8 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
             
 			auto scene = Scene::create();
 			auto startLayer=EnterRoom::create();
-			scene->addChild(startLayer,1);
-			Director::sharedDirector()->replaceScene(scene);
+			scene->addChild(startLayer);
+			Director::getInstance()->replaceScene(scene);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:

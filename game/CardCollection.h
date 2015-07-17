@@ -115,7 +115,7 @@ public:
     /***************************************************
             antificial intelligence (for single-game only)
     ***************************************************/
-    void update_statistics(Card_t huKind);
+    void update_statistics(Card_t huKind,HU_KIND_ASSORT curHuAssort=SevenPairAndNon);
     void _ClearStats();
     void _JudgeDaXiaoSanYuan() ;
     void _JudgeKaWuXing(Card_t kind) ;
@@ -124,8 +124,8 @@ public:
     void _SetHu(INT32U hu);
 
     bool has_shou_gang() const;
-    bool can_hu(Card_t newCard) const;
-    bool can_hu(int position, int newKind) const;
+    HU_KIND_ASSORT can_hu(Card_t newCard) const;
+    HU_KIND_ASSORT can_hu(int position, int newKind) const;
     bool can_kou(Card_t kouKind,Card_t handingout=CARD_UNKNOWN) const;
     
     RobotTarget_t assess_aim();
@@ -235,7 +235,7 @@ public:
     void displace(int changeIdx, Card_t kind);
     
     bool is_ka_wu_xing(Card_t wuXing)const;
-    bool can_hu()const;
+    HU_KIND_ASSORT can_hu()const;
 
 protected:
     Card_t  kind[18];
@@ -245,7 +245,9 @@ protected:
     bool _IsFirstInGroupSequence(int seqIdx[3]) const ;
     bool _IsCharDismatched() const;
     int  _GetContinuousCoupleNum() const;
-    bool _PatternMatch() const;
+    HU_KIND_ASSORT _PatternMatch() const;
+	bool ifSevenPairHu() const;
+	bool ifNonSevenPairHu() const;
 
     friend class CardInHand;
     friend class TestSmartList;

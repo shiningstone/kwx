@@ -37,7 +37,7 @@ public:
     StrategyPlayer(Player *aPlayer);
     void assign(RoundManager *context);
 
-    long calc_score(Card_t kind);
+    long calc_score(Card_t kind,HU_KIND_ASSORT curHuAssort=SevenPairAndNon);
     void check_task(unsigned int flag);
     int  choose_card(ActionId_t &ming,bool &canKou);
 
@@ -53,7 +53,7 @@ protected:
 
 private:
     void SetScoreContext();
-    long CalcScore(Card_t kind,const ScoreContext_t &ctx);
+    long CalcScore(Card_t kind,const ScoreContext_t &ctx,HU_KIND_ASSORT curHuAssort=SevenPairAndNon);
 
     void SetChooseContext();
     int  ChooseForMing(ActionId_t &ming,bool &canKou);

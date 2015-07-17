@@ -32,7 +32,7 @@ void StrategyPlayer::SetScoreContext() {
     _scoreCtx.isGangHua        = _rm->_isGangHua;
 }
 
-long StrategyPlayer::CalcScore(Card_t kind,const ScoreContext_t &ctx) {
+long StrategyPlayer::CalcScore(Card_t kind,const ScoreContext_t &ctx,HU_KIND_ASSORT curHuAssort) {
     _employer->_fan = 0;
 
     _employer->_cards->update_statistics(kind);
@@ -48,7 +48,7 @@ long StrategyPlayer::CalcScore(Card_t kind,const ScoreContext_t &ctx) {
 
 	if((ctx.continueGang!=0)
         &&(ctx.action==aMING_GANG||ctx.action==aAN_GANG||ctx.action==aQIANG_GANG)) {
-		if(ctx.isNewDistributed&&ctx.action==aQIANG_GANG)
+			if(!ctx.isNewDistributed&&ctx.action==aQIANG_GANG)
 			_employer->_fan |= RH_QIANGGANG;
 		else if(ctx.isNewDistributed&&ctx.isGangHua)
 			_employer->_fan |= RH_GANGHUA;
@@ -62,9 +62,9 @@ long StrategyPlayer::CalcScore(Card_t kind,const ScoreContext_t &ctx) {
 	return _employer->_cards->sum_up_score(_employer->_fan);
 }
 
-long StrategyPlayer::calc_score(Card_t kind) {
+long StrategyPlayer::calc_score(Card_t kind,HU_KIND_ASSORT curHuAssort) {
     SetScoreContext();
-    return CalcScore(kind,_scoreCtx);
+    return CalcScore(kind,_scoreCtx,curHuAssort);
 }
 
 void StrategyPlayer::check_task(unsigned int flag) {

@@ -754,6 +754,8 @@ void RoundManager::SetWin(WinKind_t kind,int player) {
     if(kind==DOUBLE_WIN) {
         _lastWin.winner = INVALID_DIR;
         _lastWin.giver  = (PlayerDir_t)player;
+    } else if(kind==NONE_WIN) {/*BAO ZHUANG*/
+        _lastWin.giver  = (PlayerDir_t)_firstMingNo;
     } else {
         _lastWin.winner = (PlayerDir_t)player;
         _lastWin.giver  = (PlayerDir_t)_curPlayer;

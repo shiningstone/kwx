@@ -96,13 +96,22 @@ ActionMask_t Player::hand_in(Card_t newCard,bool isNewDistributed,bool pervMing,
 		}
 	}
 
-	if(_cards->can_hu(newCard)) {
-		_score = _strategy->calc_score(newCard);
+	auto curHuFlag=_cards->can_hu(newCard);
+	if(curHuFlag!=NoHuForGame) {
+		_score = _strategy->calc_score(newCard,curHuFlag);
 
 		if(isNewDistributed || pervMing || _score>1) {
 			actions |= aHU;
-        }
+		}
 	}
+
+	//if(_cards->can_hu(newCard)) {
+	//	_score = _strategy->calc_score(newCard);
+
+	//	if(isNewDistributed || pervMing || _score>1) {
+	//		actions |= aHU;
+ //       }
+	//}
 
 	return actions;
 }

@@ -64,7 +64,7 @@ int Logger::Write(const char * format, ...) {
 
 #include <ctype.h>
 int Logger::WriteArray(const char *pkg,int len) {
-    char buf[1024] = {0};
+    char buf[2048] = {0};
     int usedBytes  = 0;
 
 	sprintf(buf+usedBytes, "\t");

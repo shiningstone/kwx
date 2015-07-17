@@ -69,6 +69,13 @@ The reason for implement as private inheritance is to hide some interface call b
 #define		RA_BAO					RH_MING|RH_SHOUYIZHUA
 #define		RA_DIAN					RH_MINGSIGUI
 
+typedef enum hu_assort
+{
+	SevenPairAndNon,
+	SevenPairOnly,
+	NonSevenPairOnly,
+	NoHuForGame
+}HU_KIND_ASSORT;
 typedef enum card_kind
 {
 	ck_YI_TIAO=0,

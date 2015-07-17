@@ -32,7 +32,7 @@ void TestSmartList::Load(Card_t first,...) {
 }
 
 bool TestSmartList::Match() {
-    bool result = _PatternMatch();
+    bool result = ifNonSevenPairHu();
     if(result) {
         printf("match    : ");
     } else {
@@ -159,21 +159,21 @@ void test_can_hu() {
     TestSmartList cards;
     cards.Load(TIAO_4,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
     cards.insert(TIAO_5);
-    assert(cards.can_hu());
+    assert(NoHuForGame!=cards.can_hu());
 
     cards.Load(TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
     cards.insert(TIAO_1);
-    assert(!cards.can_hu());
+    assert(NoHuForGame==cards.can_hu());
 
     cards.Load(TIAO_3,TIAO_3,TIAO_3,TIAO_4,TIAO_5,TIAO_6,TIAO_7,TIAO_8,TIAO_9,TONG_1,TONG_1,CARDS_END);
     cards.len--;                    
     cards.insert(TIAO_1);       
-    assert(!cards.can_hu());
+    assert(NoHuForGame==cards.can_hu());
 
     TestSmartList card2;
     card2.Load(TIAO_3,TIAO_3,TONG_1,TONG_1,TONG_1,TONG_4,TONG_5,TONG_8,TONG_8,TONG_8,CARDS_END);
     card2.insert(TONG_6);
-    assert(card2.can_hu());
+    assert(NoHuForGame!=card2.can_hu());
 }
 
 void test_refresh_empty() {
@@ -380,6 +380,23 @@ void test_basic() {
 	list.show();
 }
 
+void test_ansigui_kawuxing() {
+	int seq[] = {
+        TONG_9,TONG_9,TONG_9,TONG_5,TONG_5,TONG_5,TIAO_8,TIAO_8,TONG_4,TONG_6,TONG_6,TONG_7,TONG_8,TONG_5,
+    };
+    Card_t cards[18];
+    for(int i=0;i<sizeof(seq)/sizeof(seq[0]);i++) {
+        cards[i] = (Card_t)seq[i];
+    }
+
+	CardInHand list;
+	list.init(cards,sizeof(seq)/sizeof(seq[0]));
+
+    list.update_statistics(TONG_5);
+    assert(_is_active(list.statHuFanMask,RH_ANSIGUI));
+    assert(_is_active(list.statHuFanMask,RH_KAWUXIN));
+}
+
 void test_judge_long_qi_dui() {
 	int seq[] = {
         TIAO_3,TIAO_3,TIAO_8,TIAO_8,TONG_2,TONG_2,ZHONG,ZHONG,ZHONG,FA,FA,BAI,BAI,ZHONG,
@@ -528,6 +545,7 @@ void test_card_list() {
 
     test_lian_gang();
 
+    test_ansigui_kawuxing();
     test_judge_long_qi_dui();
     test_judge_an_si_gui();
     test_judge_ming();
