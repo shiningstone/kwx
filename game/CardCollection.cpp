@@ -289,7 +289,7 @@ int CardInHand::find_free_cards(int idx[],Card_t kind) const {
     return find_cards(kind,idx,FreeStart);
 }
 
-void CardInHand::FindAnGangCards(int *idx) const {
+int CardInHand::FindAnGangCards(int *idx) const {
     int num = 0;
     
     for(INT8U i=0; i<size(); i++) {   
@@ -297,6 +297,8 @@ void CardInHand::FindAnGangCards(int *idx) const {
             idx[num++] = i;
         }
     }
+
+    return num;
 }
 
 void CardInHand::refresh(CardNode_t cards[],int len) {
@@ -310,12 +312,20 @@ void CardInHand::refresh(CardNode_t cards[],int len) {
         if(cards[i].status==sPENG || cards[i].status==sMING_GANG) {
             continue;
         } else if(cards[i].status==sAN_GANG || cards[i].status==sSHOU_GANG){
-            int idx[4] = {0};
+            int idx[12] = {0};
+            int total = FindAnGangCards(idx);
+            
+            for(int k=0;k<total;k++) {
+                if((at(idx[k]))->kind==CARD_UNKNOWN) {
+                    (at(idx[k]))->kind = cards[i].kind;
 
-            FindAnGangCards(idx);
-            for(int k=0;k<4;k++) {
-                (at(idx[k]))->kind = cards[i].kind;
+                    if((k+1)%4==0) {
+                        break;
+                    }
+                }
             }
+
+            i+=3;
         } else {
             insert_card(cards[i]);
         }

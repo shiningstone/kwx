@@ -59,6 +59,21 @@ int DsMsgParser::_load(CardNode_t cards[18],INT8U &num,const DsMsg &msg,int item
     return 0;
 }
 
+CardStatus_t DsMsgParser::_CardStatus(int netStatus) {
+    switch(netStatus) {
+        case 1:
+            return sPENG;
+        case 2:
+            return sMING_GANG;
+        case 3:
+            return sAN_GANG;
+        case 4:
+            return sMING_KOU;
+        default:
+            return sFREE;
+    }
+}
+
 int DsMsgParser::_load(CardNode_t cards[3][18],INT8U cardNum[3],const DsMsg &msg,int itemIdx) {
     int totalNum = (INT8U)msg.GetItemBufLen(itemIdx);
 
@@ -71,7 +86,7 @@ int DsMsgParser::_load(CardNode_t cards[3][18],INT8U cardNum[3],const DsMsg &msg
 
         if(byte!=CARD_UNKNOWN) {
             cards[player][idx].kind = (Card_t)(byte&0x1f);
-            cards[player][idx].status = (CardStatus_t)((byte&0xe0) >> 5);
+            cards[player][idx].status = _CardStatus((byte&0xe0)>>5);
             cards[player][idx].canPlay = false;
             
             idx++;

@@ -248,16 +248,16 @@ int KwxMessenger::Send(RequestId_t req) {
     }
 }
 
-int KwxMessenger::Send(ActionId_t action,Card_t card) {
+int KwxMessenger::Send(ActionId_t action,Card_t card,bool ignoreRsp) {
     RequestSendAction aReq;
     aReq.Set(action,card);
-    return Send(aReq);
+    return Send(aReq,ignoreRsp);
 }
 
-int KwxMessenger::Send(ActionId_t code,int kindNum,Card_t kinds[]) {
+int KwxMessenger::Send(ActionId_t code,int kindNum,Card_t kinds[],bool ignoreRsp) {
     RequestSendAction aReq;
     aReq.Set(code,kindNum,kinds);
-    return Send(aReq);
+    return Send(aReq,ignoreRsp);
 }
 
 

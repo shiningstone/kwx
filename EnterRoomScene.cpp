@@ -354,6 +354,27 @@ void EnterRoom::competeButtons()
 	this->addChild(PleaseWaiting,1);
 }
 
+void EnterRoom::onDraw() {
+
+	MyDataUIPrepare();//头像等个人信息
+	FunctionBarUIPrepare();//功能
+
+	auto blackbar= Sprite::create("blackbar.png");//弹幕条
+	blackbar->setAnchorPoint(Vec2(0.5,0));
+	blackbar->setPosition(Point(origin.x+visibleSize.width/2+30,origin.y+visibleSize.height*0.76));
+	this->addChild(blackbar,1);
+
+	auto FriendLayer=new FriendList(this);
+	this->addChild(FriendLayer);
+
+	competeButtons();//比赛按钮
+	if(EnvVariable::getInstance()->_dailyLogin.hasReward) {
+		call_gold_prize();
+        EnvVariable::getInstance()->_dailyLogin.hasReward = false;
+    }
+
+}
+
 bool EnterRoom::init()
 {
 	if(!Layer::init())
@@ -374,22 +395,10 @@ bool EnterRoom::init()
 	sprite->setScaleY(s_scale);
 	this->addChild(sprite, 0);
 
-	MyDataUIPrepare();//头像等个人信息
-	FunctionBarUIPrepare();//功能
-
-	auto blackbar= Sprite::create("blackbar.png");//弹幕条
-	blackbar->setAnchorPoint(Vec2(0.5,0));
-	blackbar->setPosition(Point(origin.x+visibleSize.width/2+30,origin.y+visibleSize.height*0.76));
-	this->addChild(blackbar,1);
-
-	auto FriendLayer=new FriendList(this);
-	this->addChild(FriendLayer);
-
-	competeButtons();//比赛按钮
-	if(EnvVariable::getInstance()->_dailyLogin.hasReward) {
-		call_gold_prize();
-        EnvVariable::getInstance()->_dailyLogin.hasReward = false;
-    }
+	auto draw = TargetedAction::create(sprite,Sequence::create(
+        DelayTime::create(0.5),
+        CallFunc::create(this,callfunc_selector(EnterRoom::onDraw)),NULL));
+	this->runAction(Spawn::create(draw,NULL));
 
 	return true;
 }

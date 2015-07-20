@@ -71,7 +71,7 @@ public:
     friend class Alternatives;
     Alternatives *_alter;
 private:
-    void   FindAnGangCards(int *idx) const;
+    int    FindAnGangCards(int *idx) const;
     
     void   _AnGang(Card_t kind = CARD_UNKNOWN);
     void   _MingGang(Card_t kind,bool isZimo);

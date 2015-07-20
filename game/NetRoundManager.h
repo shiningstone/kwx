@@ -66,6 +66,7 @@ public:
     void _NotifyHandout();
 
     bool _permited;    /* this flag is used for judging conflicting actions from different players */
+    bool _needConfirm;
     bool Wait(RequestId_t req);
 
     Reminds_t  _serverReminds;

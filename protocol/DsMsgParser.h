@@ -32,6 +32,8 @@ public:
     static int _load_seat_info(SeatInfo_t &info,const DsMsg &msg,int itemIdx);
     static int _load_friends_info(vector<Friend_Info> &info,const DsMsg &msg,int itemIdx);
     static int _load_others_info(vector<OtherPlayers_Info> &info,const DsMsg &msg,int itemIdx);
+private:
+    static CardStatus_t _CardStatus(int netStatus);
 };
 
 #endif

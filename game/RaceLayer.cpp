@@ -1,6 +1,8 @@
 ﻿
-#include "RaceLayer.h"
+#include "./../HelloWorldScene.h"
 #include "./../EnterRoomScene.h"
+
+#include "RaceLayer.h"
 #include "RoundManager.h"
 #include "NetRoundManager.h"
 #include "StrategyRm.h"
@@ -6261,14 +6263,19 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
 			auto curButton=(Button*)pSender;
 			curButton->setTouchEnabled(false);
 
+            GameMode_t mode = _roundManager->_MODE;
+
             _roundManager->StopGame();
             _roundManager->destroyInstance();
-            
-			auto scene = Scene::create();
-			auto startLayer=EnterRoom::create();
-			scene->addChild(startLayer);
-			Director::getInstance()->replaceScene(scene);
-		}
+
+            auto scene = Scene::create();
+            if(mode==LOCAL_GAME) {
+                scene->addChild(HelloWorld::create());
+            } else {
+                scene->addChild(EnterRoom::create());
+            }
+            Director::getInstance()->replaceScene(scene);
+        }
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		break;

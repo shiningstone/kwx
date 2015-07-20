@@ -146,8 +146,10 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             {
                 auto scene = Scene::create();
                 auto layer = IMLoad::create();
-                scene->addChild(layer);
-                Director::getInstance()->replaceScene(scene);
+                if(layer) {
+                    scene->addChild(layer);
+                    Director::getInstance()->replaceScene(scene);
+                }
             }
 		}
 		break;

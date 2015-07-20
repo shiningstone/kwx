@@ -37,6 +37,10 @@ USING_NS_CC;
 using namespace ui;
 #endif
 
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 /******************************************************
     WINDOWS下需要设置C/C++宏定义： _CRT_SECURE_NO_WARNINGS
     不知道为什么在代码中用“#define”不起作用
@@ -48,6 +52,12 @@ bool Logger::IsEnabled() {
 int Logger::Write(const char * format, ...) {
     if ( _isEnabled ) {
         char buf[256] = {0};
+
+        #ifdef LOG_TIME_ENABLE
+        SYSTEMTIME sys; 
+        GetLocalTime( &sys ); 
+        log( "\n%02d:%02d:%02d.%03d",sys.wHour,sys.wMinute,sys.wSecond,sys.wMilliseconds); 
+        #endif
 
         sprintf(buf, "[%s]: ", _owner);
 

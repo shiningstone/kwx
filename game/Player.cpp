@@ -36,16 +36,9 @@ Player::~Player() {
         user's action
 **************************************************/
 unsigned char Player::init(Card_t cards[],int len,int aim) {
-    _AIM     = aim;
-    _aimDone = 0;
-    _fan     = 0;
-	_score   = 0;
+    restart();
 
-    _cards->clear();
-    _cards->IsMing    = false;
-	_cards->FreeStart = 0;
-    
-    _river->clear();
+    _AIM     = aim;
     
     for(int i=0;i<13;i++) {
         CardNode_t node;
@@ -69,6 +62,19 @@ unsigned char Player::refresh(CardNode_t cards[],int len,HuFan_t fan) {
     _fan = fan;
 
 	return 0;
+}
+
+void Player::restart() {
+    _AIM     = 0;
+    _aimDone = 0;
+    _fan     = 0;
+	_score   = 0;
+
+    _cards->clear();
+    _cards->IsMing    = false;
+	_cards->FreeStart = 0;
+    
+    _river->clear();
 }
 
 ActionMask_t Player::judge_action_again() {

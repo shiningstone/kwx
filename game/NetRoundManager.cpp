@@ -239,7 +239,9 @@ void NetRoundManager::ServerWaitForMyAction() {
 
 	if(_isNewDistributed) {
         _players[MIDDLE]->_cards->_IncludingOthersCard = false;
-	}
+    } else {
+        _players[MIDDLE]->_cards->_IncludingOthersCard = true;
+    }
 }
 
 void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
@@ -290,6 +292,11 @@ void NetRoundManager::StartGame() {
         _uiManager->reload();
     } else {
         _isGameStart=false;
+
+        for(int i=0;i<PLAYER_NUM;i++) {
+            _players[i]->restart();
+        }
+
         _messenger->Send(REQ_GAME_SEND_START);
         RETURN_IF_FAIL(_messenger->_response);
     }
@@ -308,8 +315,8 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     Card_t kind = LastHandout();
     
     if(dir==MIDDLE) {
-        _permited = false;
-        _messenger->Send(aPENG,kind);
+        _permited = _needConfirm ? false : true;
+        _messenger->Send(aPENG,kind,!_needConfirm);
         RETURN_VALUE_IF_FAIL(_messenger->_response,CARD_UNKNOWN);
     }
 
@@ -347,8 +354,8 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     SetDecision(dir,action);
 
     if(dir==MIDDLE) {
-        _permited = false;
-        _messenger->Send(_actCtrl.decision,card);
+        _permited = _needConfirm ? false : true;
+        _messenger->Send(_actCtrl.decision,card,!_needConfirm);
         RETURN_VALUE_IF_FAIL(_messenger->_response,CARD_UNKNOWN);
     }
 
@@ -386,6 +393,8 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 }
 
 void NetRoundManager::RecvQi() {
+    _players[MIDDLE]->_cards->_alter->clear();
+    
     _messenger->Send(aQi);
     RETURN_IF_FAIL(_messenger->_response);
     
@@ -423,18 +432,20 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 	if(_isMingTime) {
 		_isMingTime      = false;
 
+        _messenger->WaitQueueAdd(REQ_GAME_DIST_DECISION);
+        _messenger->WaitQueueAdd(REQ_GAME_DIST_DAOJISHI);
+        
         _messenger->Send(aMING_CONFIRM);
         RETURN_IF_FAIL(_messenger->_response);
 
-        Wait(REQ_GAME_DIST_DECISION);
-        Wait(REQ_GAME_DIST_DAOJISHI);
-        
         _players[LEFT]->refresh(_mingBuf.cards[LEFT], _mingBuf.num[LEFT]);
         _players[RIGHT]->refresh(_mingBuf.cards[RIGHT], _mingBuf.num[RIGHT]);
 
+        #if 0
         /* handout by ForceHandout */
         _players[MIDDLE]->_cards->delete_card(chosen);
         _players[MIDDLE]->_cards->push_back(handingout);
+        #endif
         _actCtrl.choices = 0;
 
         _uiManager->_CardInHandUpdateEffect(MIDDLE);
@@ -548,7 +559,7 @@ ActionMask_t NetRoundManager::judge_action_again(PlayerDir_t dir) {
 void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     _isGameStart = true;
 
-    _uiManager->start_timer(TIME_LIMIT,MIDDLE);
+    _uiManager->start_timer(TIME_LIMIT,zhuang);
 
     _curPlayer = zhuang;
     if(zhuang==MIDDLE) {
@@ -634,9 +645,11 @@ void NetRoundManager::_DiRecv(FirstDistZhuang *info) {
 void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
     _uiManager->GuiHideReady();
 
-    Card_t cards[13];
+    CardNode_t cards[13];
     for(int i=0;i<13;i++) {
-        cards[i] = info->cards[i];
+        cards[i].kind = info->cards[i];
+        cards[i].status = sFREE;
+        cards[i].canPlay = true;
     }
     PlayerDir_t me     = (PlayerDir_t)info->seat;
     PlayerDir_t zhuang = (PlayerDir_t)info->zhuang;
@@ -645,10 +658,17 @@ void NetRoundManager::_DiRecv(FirstDistNonZhuang *info) {
 
     _curPlayer = zhuang;
     PlayerDir_t other  = (zhuang==LEFT)?RIGHT:LEFT;
+
+    CardNode_t unknownCards[14];
+    for(int i=0;i<14;i++) {
+        unknownCards[i].kind = CARD_UNKNOWN;
+        unknownCards[i].status = sFREE;
+        unknownCards[i].canPlay = true;
+    }
     
-    _players[zhuang]->init(&(_unDistributedCards[0]),14,aim[zhuang]);//玩家手牌初始�?
-    _players[MIDDLE]->init(cards,13,aim[MIDDLE]);
-    _players[other]->init(&(_unDistributedCards[27]),13,aim[other]);
+    _players[zhuang]->refresh(unknownCards,14,aim[zhuang]);//玩家手牌初始�?
+    _players[MIDDLE]->refresh(cards,13,aim[MIDDLE]);
+    _players[other]->refresh(unknownCards,13,aim[other]);
 
 	_uiManager->FirstRoundDistributeEffect(zhuang);//牌局开始发牌效果�?
 }
@@ -740,6 +760,7 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
     _actCtrl.target  = info->kind;
     
     _restoreRemindInfo(info->remind);
+    _needConfirm = (info->wait!=SERVER);
 
     delete info;
 
@@ -823,6 +844,12 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
             }
             break;
         case aHU:
+            {
+                PlayerDir_t zhuang = GetLastWinner();
+                for(int i=0;i<PLAYER_NUM;i++) {
+                    _players[(zhuang+i)%PLAYER_NUM]->refresh(info->huCards[i], info->huCardsNum[i], 0);
+                }
+            }
             break;
     }
 

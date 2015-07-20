@@ -916,6 +916,12 @@ void lde_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } else if(recvBuf[16]==REQ_GAME_SEND_RECONNECT) {
         handout++;
         SendLine(SERVER,2);
+    } else if(recvBuf[16]==REQ_DAILY_LOGIN) {
+        handout++;
+        SendLine(SERVER,1);
+    } else if(recvBuf[16]==REQ_GET_DAILY_PRIZE) {
+        handout++;
+        SendLine(SERVER,2);
     }
 }
 
@@ -1003,7 +1009,7 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         SendLine(SERVER,3);
         SendLine(SERVER,4);
         SendLine(SERVER,5);
-    } else if(recvBuf[16]==REQ_GAME_SEND_START) {
+    } else if(handout==0 && recvBuf[16]==REQ_GAME_SEND_START) {
         handout++;
         SendLine(SERVER,6);
         SendLine(SERVER,7);
@@ -1011,17 +1017,22 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
         handout++;
         SendLine(SERVER,8);
         SendLine(SERVER,9);
+        SendLine(SERVER,10);
     } else if(handout==2) {
         handout++;
-        SendLine(SERVER,10);
         SendLine(SERVER,11);
         SendLine(SERVER,12);
     } else if(handout==3) {
         handout++;
-        for(int i=13;i<=23;i++) {
+        for(int i=13;i<=27;i++) {
             SendLine(SERVER,i);
         }
-    } 
+    } else if(handout==4) {
+        handout++;
+        for(int i=28;i<=32;i++) {
+            SendLine(SERVER,i);
+        }
+    }
 }
 
 typedef void (*REQUEST_HANDLER)(ServerSocket SERVER,char *recvBuf,int len);
@@ -1097,23 +1108,11 @@ void test_server_console() {
     SetFile("Round2");/*胡牌*/
     gHandle = round2_handle_requests;
 
-    SetFile("temp");
-    gHandle = temp_handle_requests;
-
-    SetFile("Round6");/*明牌*/
-    gHandle = round6_handle_requests;
-
-    SetFile("right_actions");/*明牌右碰杠胡*/
-    gHandle = right_actions_handle_requests;
-
     SetFile("Round5");/*竞争动作*/
     gHandle = round5_handle_requests;
 
     SetFile("reconnect");
     gHandle = reconnect_handle_requests;
-
-    SetFile("Round1");/*基本操作*/
-    gHandle = round1_handle_requests;
 
     /*******************************************/
     /* login test 需要取消IGNORE_LOGIN_REQUEST */
@@ -1124,8 +1123,20 @@ void test_server_console() {
     SetFile("login_recoonect");
     gHandle = lr_handle_requests;
 
+    SetFile("right_actions");/*明牌右碰杠胡*/
+    gHandle = right_actions_handle_requests;
+
+    SetFile("Round6");/*明牌*/
+    gHandle = round6_handle_requests;
+
     SetFile("login_dailylogin_enterroom");
     gHandle = lde_handle_requests;
+
+    SetFile("Round1");/*基本操作*/
+    gHandle = round1_handle_requests;
+
+    SetFile("temp");
+    gHandle = temp_handle_requests;
 
     test_smart_game_round_x();
 #endif

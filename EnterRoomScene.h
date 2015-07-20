@@ -64,6 +64,8 @@ public:
 	CREATE_FUNC(EnterRoom);
 private:
 	MainLayer_myInfo personalSimpleInfo;
+
+    void onDraw();
 };
 #endif  //__ENTERROOM_SCENE_H__
 

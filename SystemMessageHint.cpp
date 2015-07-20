@@ -27,6 +27,16 @@ bool SystemMessageHint::init()
 	mesBkg->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
 	this->addChild(mesBkg,0);
 
+	auto NotieHint=Sprite::create("system_Notice.png");
+	NotieHint->setAnchorPoint(Vec2(0.5,0.5));
+	NotieHint->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2));
+	this->addChild(NotieHint,1,SYSTEM_MES_HINT_BKG);
+
+	auto MessageFont=LabelTTF::create(NoticeMessage,"Arial",20);
+	MessageFont->setAnchorPoint(Vec2(0.5,0.5));
+	MessageFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
+	this->addChild(MessageFont,2);
+
 	switch (curMesAction)
 	{
 	case mes_Hint_Ensure_Only:
@@ -38,16 +48,6 @@ bool SystemMessageHint::init()
 	default:
 		break;
 	}
-
-	auto NotieHint=Sprite::create("system_Notice.png");
-	NotieHint->setAnchorPoint(Vec2(0.5,0.5));
-	NotieHint->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2));
-	this->addChild(NotieHint,1,SYSTEM_MES_HINT_BKG);
-
-	auto MessageFont=LabelTTF::create(NoticeMessage,"Arial",20);
-	MessageFont->setAnchorPoint(Vec2(0.5,0.5));
-	MessageFont->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height/2));
-	this->addChild(MessageFont,2);
 
 	return true;
 }
