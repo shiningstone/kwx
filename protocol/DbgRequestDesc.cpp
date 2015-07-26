@@ -11,6 +11,7 @@ static char *GeneralInfo(const char *type,int code) {
 
 RequestDesc RequestDescTbl[] = {
     DESC(REQ_GAME_SEND_START),
+    DESC(REQ_GAME_RESTART),
     DESC(REQ_GAME_SEND_SHOWCARD),
     DESC(REQ_GAME_SEND_ACTION),
     DESC(REQ_GAME_GET_TINGINFO),

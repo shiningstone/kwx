@@ -186,6 +186,7 @@
 #define RACE_RESTART_TAG_ID					128
 #define SHINE_TAG_ID						129
 #define GAME_BACK_BAR						130
+#define SHINE_BCK_ID						131
 
 #define BAOMING_MENU_BUTTON					1
 #define TUOGUAN_MENU_BUTTON					2

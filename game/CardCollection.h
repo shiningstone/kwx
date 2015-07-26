@@ -61,6 +61,7 @@ public:
 
     int          FreeStart;
     bool         IsMing;
+    bool         HasKou;
     RobotTarget_t aim;
 
     Card_t find_an_gang_cards(int cardIdx[] = NULL) const;

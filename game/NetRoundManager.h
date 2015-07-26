@@ -32,6 +32,8 @@ public:
 
     KwxMessenger   *_messenger;
 
+    bool _ignoreDaoJiShi;
+
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);
     void _DiRecv(FirstDistZhuang *info);

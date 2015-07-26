@@ -10,6 +10,7 @@ NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
     
 	_keepListen = false;
+    _running    = false;
     _handle_msg = 0;
 
 	ClearRecvBuf();
@@ -19,6 +20,7 @@ NetMessenger::NetMessenger() {
 
 NetMessenger::~NetMessenger() {
     _keepListen = false;
+    _running    = false;
     _handle_msg = 0;
 
 	_socket->Stop();
@@ -42,7 +44,8 @@ void NetMessenger::Start(const char *serverIp,int port) {
 	    t1.detach();
     }
 
-    if(_handle_msg) {
+    if(_handle_msg && !_running) {
+        _running = true;
 	    std::thread autoDetect(&NetMessenger::_collect_packages,this);
 	    autoDetect.detach();
     }

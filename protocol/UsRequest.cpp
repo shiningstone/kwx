@@ -56,6 +56,12 @@ int RequestGameStart::Set() {
     return 0;
 }
 
+int RequestGameRestart::Set() {
+    SetRequestCode(REQ_GAME_RESTART);
+
+    return 0;
+}
+
 int RequestShowCard::Set(Card_t card) {
     SetRequestCode(REQ_GAME_SEND_SHOWCARD);
     AddSeatInfo();

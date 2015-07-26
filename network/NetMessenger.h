@@ -35,6 +35,8 @@ private:
 	bool         _keepListen;
     MsgHandler_t _handle_msg;
 
+
+    bool         _running;
     int          _sendCnt;
     int          _recvCnt;
     

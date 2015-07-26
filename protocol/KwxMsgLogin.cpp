@@ -424,27 +424,28 @@ KwxHeart::KwxHeart(int second) {
 
     _rate = second;
     _running = true;
+    Resume();
 
     std::thread t1(&KwxHeart::_Beats,this);
     t1.detach();
 }
 
+void KwxHeart::Resume() {
+    _duration = 5*60/_rate;     /*5 minutes*/
+}
+
+void KwxHeart::Pause() {
+    _duration = 0;
+}
+
 KwxHeart::~KwxHeart() {
-    _running = false;
-    _delay(_rate*2*100);/* to make sure the last send executed successfully */
+    _duration = 0;
+    _running =  false;
+    
+    _delay(_rate*2*100);        /* to make sure the last send executed successfully */
     
     _socket->Stop();
     delete _socket;
-}
-
-void KwxHeart::SetRate(int second) {
-    _rate = second;
-
-    if(!_running) {
-        _running = true;
-        std::thread t1(&KwxHeart::_Beats,this);
-        t1.detach();
-    }
 }
 
 void KwxHeart::_Beats() {
@@ -457,7 +458,11 @@ void KwxHeart::_Beats() {
     len = aBeat.Serialize(buf);
 
     while(_running) {
-        _socket->Send((char *)buf,len);
+        if(_duration>0) {
+            _socket->Send((char *)buf,len);
+            _duration--;
+        }
+
         _delay(_rate*1000);
     }
 #endif

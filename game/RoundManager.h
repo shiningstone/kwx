@@ -31,7 +31,8 @@ public:
 protected:
     void UpdateGold(int gold[PLAYER_NUM]);
     int TIME_LIMIT;
-    
+
+    bool _isRestart;
 private:
     ActionMask_t GetPlayerChoices(PlayerDir_t dir,bool prevMingStatus);
     void _HandleCardNewDistributed(PlayerDir_t dir);

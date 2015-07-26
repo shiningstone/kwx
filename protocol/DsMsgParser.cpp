@@ -167,7 +167,7 @@ int DsMsgParser::_load_ting_remind(TingInfo_t &ting,const INT8U *inMsg) {
 
     if(_ntohl(*(INT32U *)(inMsg))==0xffffffff) {
         ting.kindNum = 0;
-        return 4;
+        return 0;
     } else {
         _TingItem_t cards[9];
         

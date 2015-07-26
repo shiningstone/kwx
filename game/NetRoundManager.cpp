@@ -55,6 +55,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     InitPlayers();
 
     _HandoutNotify = false;
+    _ignoreDaoJiShi = false;
 
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
@@ -230,6 +231,10 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
 
 void NetRoundManager::ServerWaitForMyAction() {
     _uiManager->start_timer(TIME_LIMIT,MIDDLE);
+
+    if(_players[MIDDLE]->_cards->HasKou) {
+        _actCtrl.choices &= ~aMING;
+    }
     
     _uiManager->ShowActionButtons(_actCtrl.choices);
 
@@ -291,14 +296,20 @@ void NetRoundManager::StartGame() {
         env->SetReconnect(false);
         _uiManager->reload();
     } else {
-        _isGameStart=false;
+        _isGameStart = false;
 
         for(int i=0;i<PLAYER_NUM;i++) {
             _players[i]->restart();
         }
 
-        _messenger->Send(REQ_GAME_SEND_START);
+        if(_isRestart) {
+            _messenger->Send(REQ_GAME_RESTART);
+        } else {
+            _messenger->Send(REQ_GAME_SEND_START);
+        }
         RETURN_IF_FAIL(_messenger->_response);
+
+        _isRestart = false;
     }
 }
 
@@ -316,7 +327,7 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     
     if(dir==MIDDLE) {
         _permited = _needConfirm ? false : true;
-        _messenger->Send(aPENG,kind,!_needConfirm);
+        _messenger->Send(aPENG,kind,_needConfirm);
         RETURN_VALUE_IF_FAIL(_messenger->_response,CARD_UNKNOWN);
     }
 
@@ -354,8 +365,11 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
     SetDecision(dir,action);
 
     if(dir==MIDDLE) {
+        if(_isNewDistributed) {
+            _needConfirm = false;
+        }
         _permited = _needConfirm ? false : true;
-        _messenger->Send(_actCtrl.decision,card,!_needConfirm);
+        _messenger->Send(_actCtrl.decision,card,_needConfirm);
         RETURN_VALUE_IF_FAIL(_messenger->_response,CARD_UNKNOWN);
     }
 
@@ -429,28 +443,6 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     Card_t handingout = _players[MIDDLE]->_cards->get_kind(chosen);
     RecordOutCard(handingout);
 
-	if(_isMingTime) {
-		_isMingTime      = false;
-
-        _messenger->WaitQueueAdd(REQ_GAME_DIST_DECISION);
-        _messenger->WaitQueueAdd(REQ_GAME_DIST_DAOJISHI);
-        
-        _messenger->Send(aMING_CONFIRM);
-        RETURN_IF_FAIL(_messenger->_response);
-
-        _players[LEFT]->refresh(_mingBuf.cards[LEFT], _mingBuf.num[LEFT]);
-        _players[RIGHT]->refresh(_mingBuf.cards[RIGHT], _mingBuf.num[RIGHT]);
-
-        #if 0
-        /* handout by ForceHandout */
-        _players[MIDDLE]->_cards->delete_card(chosen);
-        _players[MIDDLE]->_cards->push_back(handingout);
-        #endif
-        _actCtrl.choices = 0;
-
-        _uiManager->_CardInHandUpdateEffect(MIDDLE);
-	}
-
     bool turnToMing = false;
     if(_actCtrl.decision==aMING && !IsMing(_curPlayer) ) {
         _players[_curPlayer]->_cards->set_ming(chosen);
@@ -458,8 +450,28 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     }
 
 	_actCtrl.decision = aQi;
+    _players[MIDDLE]->_cards->_alter->clear();
 
+	if(_isMingTime) {
+		_isMingTime      = false;
+
+        _messenger->WaitQueueAdd(REQ_GAME_DIST_DECISION);
+        _messenger->Send(aMING_CONFIRM);
+        _ignoreDaoJiShi = true;
+        RETURN_IF_FAIL(_messenger->_response);
+
+        _players[LEFT]->refresh(_mingBuf.cards[LEFT], _mingBuf.num[LEFT]);
+        _players[RIGHT]->refresh(_mingBuf.cards[RIGHT], _mingBuf.num[RIGHT]);
+
+        _actCtrl.choices = 0;
+
+        _uiManager->_CardInHandUpdateEffect(MIDDLE);
+    }
+    
     _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
+
+    _isNewDistributed = false;
+    WaitForResponse(MIDDLE);
 }
 
 void NetRoundManager::RecvKouCancel() {
@@ -512,6 +524,9 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
     _isMingTime=true;
         
     if(!isFromKouStatus) {
+        _messenger->Send(aMING,CARD_IGNORE,false);
+        RETURN_IF_FAIL(_messenger->_response);
+        
         _players[MIDDLE]->_strategy->scan_kou();
         
         if(_players[MIDDLE]->_cards->_alter->group_num()>0) {
@@ -519,9 +534,6 @@ void NetRoundManager::RecvMing(bool isFromKouStatus) {
         } else {
             _players[MIDDLE]->_strategy->scan_ming();
 
-            _messenger->Send(aMING);
-            RETURN_IF_FAIL(_messenger->_response);
-            
             UpdateCards(MIDDLE,a_MING);
             _uiManager->QueryMingOutCard();
         }
@@ -937,11 +949,17 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {
-    _uiManager->start_timer(info->count,(PlayerDir_t)info->seat);
-
-    if(info->seat==MIDDLE) {
-        WaitForMyChoose();
-        _permited = true;
+    if(_ignoreDaoJiShi) {
+        _ignoreDaoJiShi = false;
+        _NotifyHandout();
+    } else {
+        _uiManager->start_timer(info->count,(PlayerDir_t)info->seat);
+        
+        
+        if(info->seat==MIDDLE) {
+            WaitForMyChoose();
+            _permited = true;
+        }
     }
 }
 

@@ -17,6 +17,7 @@ class EnterRoom : public cocos2d::Layer
 public:
 	EnterRoom();
 	virtual ~EnterRoom();
+    virtual void update(float fDelta);
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
 #define NODE_CHILD_ID_ONE			1				//RankingScroll

@@ -16,6 +16,11 @@ IMLoad::IMLoad()
 IMLoad::~IMLoad()
 {
 }
+
+void IMLoad::update(float fDelta) {
+    log("a");
+}
+
 void IMLoad::enterRoom()
 {
     auto scene = Scene::create();
@@ -209,7 +214,7 @@ bool IMLoad::init()
 #ifndef IGNORE_DAILY_LOGIN_REQUEST
     KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
     bMessenger->StartReceiving();
-    bMessenger->Send(REQ_DAILY_LOGIN);
+    bMessenger->Send(REQ_DAILY_LOGIN,false);
 
     if(bMessenger->_response!=REQUEST_ACCEPTED) {
         _showErrorMessage(DescErr(bMessenger->_response));

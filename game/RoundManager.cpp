@@ -101,7 +101,8 @@ void RoundManager::CreateRace(RaceLayer *uiManager) {
 }
 
 void RoundManager::StartGame() {
-	_isGameStart=false;
+	_isGameStart = false;
+    _isRestart   = false;
     
     _players[MIDDLE]->_isReady = true;
 	_uiManager->GuiShowReady(MIDDLE);
@@ -232,6 +233,9 @@ void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     RecordOutCard(_players[_curPlayer]->_cards->get_kind(idx));
 
     _uiManager->MyHandoutEffect(idx,touch,mode,turnToMing);
+
+    _isNewDistributed = false;
+    WaitForResponse(MIDDLE);
 }
 
 void RoundManager::RecvKouCancel() {

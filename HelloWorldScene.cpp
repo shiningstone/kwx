@@ -132,7 +132,7 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             } else if(aMessenger->_response==SERVER_DATA_ERROR) {
 
             } else {
-                KwxHeart::getInstance();
+                KwxHeart::getInstance()->Resume();
             }
 #endif
 

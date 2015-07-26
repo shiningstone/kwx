@@ -157,6 +157,7 @@ CardInHand::CardInHand() {
     _alter = new Alternatives(this);
 
     IsMing    = false;
+    HasKou    = false;
     memset(&_ming,0,sizeof(MingInfo_t));
     _ting = NULL;
 
@@ -185,6 +186,7 @@ void CardInHand::init(Card_t *cards,int len) {
 	}
 
     IsMing    = false;
+    HasKou    = false;
 	FreeStart = 0;
 
     _ClearStats();
@@ -302,12 +304,12 @@ int CardInHand::FindAnGangCards(int *idx) const {
 }
 
 void CardInHand::refresh(CardNode_t cards[],int len) {
-    int num = size()-FreeStart;
-
-    for(int i=0;i<num;i++) {
-        pop_back();
+    for(int i=last();i>=0;i--) {
+        if(get_status(i)==sMING_KOU||get_status(i)==sFREE) {
+            pop_back();
+        }
     }
-    
+
     for(int i=0;i<len;i++) {
         if(cards[i].status==sPENG || cards[i].status==sMING_GANG) {
             continue;
@@ -327,7 +329,9 @@ void CardInHand::refresh(CardNode_t cards[],int len) {
 
             i+=3;
         } else {
-            insert_card(cards[i]);
+            CardNode_t *card = new CardNode_t;
+            *card = cards[i];
+            push_back(card);
         }
     }
 }
@@ -485,6 +489,8 @@ void CardInHand::_Hu(bool isZimo) {
 }
 
 void CardInHand::_Kou() {
+    HasKou = true;
+    
     CardNode_t node;
     node.canPlay = false;
     node.status  = sMING_KOU;
@@ -503,6 +509,8 @@ void CardInHand::_Kou() {
 }
 
 void CardInHand::_CancelKou() {
+    HasKou = false;
+    
     CardNode_t node;
     node.status  = sFREE;
     node.canPlay = true;

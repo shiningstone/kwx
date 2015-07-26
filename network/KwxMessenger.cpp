@@ -68,7 +68,7 @@ void KwxMessenger::StopReceiving() {
     SetHandler(0);
 }
 
-int KwxMessenger::Send(UsMsg &aMsg, bool ignoreRsp) {
+int KwxMessenger::Send(UsMsg &aMsg, bool rspRequired) {
     INT8U buf[MSG_MAX_LEN] = {0};
     int   len = 0;
     
@@ -81,7 +81,7 @@ int KwxMessenger::Send(UsMsg &aMsg, bool ignoreRsp) {
     len = aMsg.Serialize(buf);
     NetMessenger::Send(buf,len);
 
-    if(!ignoreRsp) {
+    if(rspRequired) {
         Wait((RequestId_t)aMsg._header->_requestCode);
     }
     
@@ -170,7 +170,7 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 #include "./../protocol/DsInstruction.h"
 #include "./../protocol/UsRequest.h"
 #include "./../protocol/KwxMsgLogin.h"
-int KwxMessenger::Send(RequestId_t req) {
+int KwxMessenger::Send(RequestId_t req,bool rspRequired) {
     switch(req) {
         case REQ_LOGIN:
 			{
@@ -183,7 +183,7 @@ int KwxMessenger::Send(RequestId_t req) {
             {
                 RequestDailyLogin aReq;
                 aReq.Set();
-                return Send(aReq);
+                return Send(aReq,rspRequired);
             }
                 
         case REQ_GET_DAILY_PRIZE:
@@ -228,6 +228,13 @@ int KwxMessenger::Send(RequestId_t req) {
                 return Send(aReq);
             }
 
+        case REQ_GAME_RESTART:
+            {
+                RequestGameRestart aReq;
+                aReq.Set();
+                return Send(aReq);
+            }
+            
         case REQ_GAME_SEND_LEAVE_ROOM:
             {
                 RequestLeave aReq;
@@ -239,7 +246,7 @@ int KwxMessenger::Send(RequestId_t req) {
             {
                 RequestLogout aReq;
                 aReq.Set();
-                return Send(aReq,true);
+                return Send(aReq,false);
             }
         
 		default:
@@ -248,16 +255,16 @@ int KwxMessenger::Send(RequestId_t req) {
     }
 }
 
-int KwxMessenger::Send(ActionId_t action,Card_t card,bool ignoreRsp) {
+int KwxMessenger::Send(ActionId_t action,Card_t card,bool rspRequired) {
     RequestSendAction aReq;
     aReq.Set(action,card);
-    return Send(aReq,ignoreRsp);
+    return Send(aReq,rspRequired);
 }
 
-int KwxMessenger::Send(ActionId_t code,int kindNum,Card_t kinds[],bool ignoreRsp) {
+int KwxMessenger::Send(ActionId_t code,int kindNum,Card_t kinds[],bool rspRequired) {
     RequestSendAction aReq;
     aReq.Set(code,kindNum,kinds);
-    return Send(aReq,ignoreRsp);
+    return Send(aReq,rspRequired);
 }
 
 

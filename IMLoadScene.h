@@ -5,9 +5,11 @@
 
 class IMLoad : public cocos2d::Layer
 {
-    public:
-        IMLoad();
-        virtual ~IMLoad();
+public:
+    IMLoad();
+    virtual ~IMLoad();
+    virtual void update(float fDelta);
+
 public:
 	cocos2d::ProgressTimer *curLoadingBar;
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer

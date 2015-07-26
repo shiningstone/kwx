@@ -26,6 +26,10 @@ EnterRoom::~EnterRoom()
 {
 }
 
+void EnterRoom::update(float fDelta) {
+    log("a");
+}
+
 void EnterRoom::message_callback(Ref* pSender,Widget::TouchEventType type)
 {
 	switch(type)

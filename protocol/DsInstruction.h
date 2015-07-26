@@ -50,6 +50,13 @@ public:
     INT32U           score;
 };
 
+class GameRestartResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+
+    INT32U           score;
+};
+
 class ShowCardResponse : public DsInstruction {
 public:
     ~ShowCardResponse();

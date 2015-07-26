@@ -30,10 +30,10 @@ public:
     void StartReceiving();
     void StopReceiving();
 
-    int Send(UsMsg &aMsg,bool ignoreRsp=false);/* why cannot declare as const UsMsg??? */
-    int Send(RequestId_t req);
-    int Send(ActionId_t action,Card_t card = CARD_IGNORE,bool ignoreRsp=false);
-    int Send(ActionId_t code,int kindNum,Card_t kinds[],bool ignoreRsp=false);
+    int Send(UsMsg &aMsg,bool rspRequired=true);/* why cannot declare as const UsMsg??? */
+    int Send(RequestId_t req,bool rspRequired=true);
+    int Send(ActionId_t action,Card_t card = CARD_IGNORE,bool rspRequired=true);
+    int Send(ActionId_t code,int kindNum,Card_t kinds[],bool rspRequired=true);
 
     static bool IsWaiting(RequestId_t req = REQ_INVALID);
     static bool Wait(RequestId_t req);

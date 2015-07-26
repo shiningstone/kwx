@@ -257,10 +257,12 @@ public:
 class CSocket;
 class KwxHeart {
 public:
-    static KwxHeart *getInstance(int second=3);
+    static KwxHeart *getInstance(int second=15);
     static void      destroyInstance();
 
-    void SetRate(int second);
+    void Resume();
+    void Pause();
+
 private:
     KwxHeart(int second);
     ~KwxHeart();
@@ -270,6 +272,7 @@ private:
     CSocket *_socket;
     int      _rate;
     bool     _running;
+    int      _duration;
 
     static KwxHeart *_instance;
 };

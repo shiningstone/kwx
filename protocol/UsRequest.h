@@ -29,6 +29,11 @@ public:
     int Set();
 };
 
+class RequestGameRestart : public UsMsg {
+public:
+    int Set();
+};
+
 class RequestTingInfo : public UsMsg {
 public:
     int Set();

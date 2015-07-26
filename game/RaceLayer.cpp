@@ -61,6 +61,8 @@ bool RaceLayer::init() {
 ************************************************/
 void RaceLayer::CreateRace(GameMode_t mode)
 {
+    KwxHeart::getInstance()->Pause();
+
 	_isResoucePrepared=false;
 
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("gameprepareImage.plist");
@@ -132,6 +134,7 @@ void RaceLayer::StartGame()
     _Remove(this,RACE_RESTART_TAG_ID+1);
     _Remove(this,SHINE_TAG_ID);
     _Remove(this,SHINE_TAG_ID+1);
+    _Remove(this,SHINE_BCK_ID);
     _Remove(this,RACE_ACCOUT_TAG_ID);
     _Remove(this,HUANG_ZHUANG_LAYER);
     _Remove(this,HUANG_ZHUANG_FONT);
@@ -1916,10 +1919,7 @@ void RaceLayer::_MyHandoutEffect(Card_t outCard,Vec2 touch,int time,bool turnToM
     		else {
                 _Show(this,MING_STATUS_PNG_1,_roundManager->IsMing(MIDDLE));
     			_CardInHandUpdateEffect(MIDDLE);
-    		}}),NULL),CCCallFunc::create([=]() {
-		_roundManager->_isNewDistributed = false;
-		_roundManager->WaitForResponse(MIDDLE);}),
-        NULL));
+    		}}),NULL),NULL));
 }
 
 /************************************************
@@ -2261,6 +2261,7 @@ void RaceLayer::ShowActionButtons(int actionsMask) {
     /* these actions are controlled by sub-level buttons  */
     actionsMask &= ~aMING_CONFIRM;
     actionsMask &= ~aMING_CANCEL;
+    actionsMask &= ~aKOU_CANCEL;
     
     _Show(myframe,TING_SING_BAR,false);
 
@@ -2277,7 +2278,7 @@ void RaceLayer::ShowActionButtons(int actionsMask) {
 		x = x-width;
 	}
     
-	if(actionsMask&a_MING) {
+	if(actionsMask&a_MING || actionsMask&a_KOU) {
         float width = _AddBtnMing(Vec2(x,y));
 		x = x-width;
 	}
@@ -5818,6 +5819,12 @@ void RaceLayer::raceAccount(float delta)
 	ShowoutOnce->setPosition(Vec2(origin.x+visibleSize.width*0.2996716,origin.y+visibleSize.height*0.075419));
 	this->addChild(ShowoutOnce,11,SHINE_TAG_ID);
 
+	auto backHome=Button::create("fanhui.png","fanhui.png","fanhui.png",UI_TEX_TYPE_PLIST);//返回
+	backHome->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnBackConfirmHandler,this));
+	backHome->setAnchorPoint(Vec2(1,1));
+	backHome->setPosition(Vec2(origin.x+visibleSize.width-5,origin.y+visibleSize.height-5));
+	this->addChild(backHome,11,SHINE_BCK_ID);
+
 	auto PlayOnceAgin=Button::create("zailaiyiju1.png","zailaiyiju2.png","zailaiyiju2.png",UI_TEX_TYPE_PLIST);
 	PlayOnceAgin->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnRestartHandler,this));
 	PlayOnceAgin->setAnchorPoint(Vec2(0.5,0.5));
@@ -6105,6 +6112,8 @@ void RaceLayer::BtnStartHandler(Ref* pSender,ui::Widget::TouchEventType type) {
 			auto startIcon = _object->CreateStartGame();
 			this->addChild(startIcon,2,START_GAME_TAG_ID+1);
 
+            _roundManager->_isRestart = false;
+
 			this->runAction(
                 Sequence::create(
                     Spawn::create(
@@ -6148,6 +6157,8 @@ void RaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) 
             
 			auto restartBtn = _object->CreateRestartGame();
 			this->addChild(restartBtn,2,RACE_RESTART_TAG_ID+1);
+
+            _roundManager->_isRestart = true;
 
 			this->runAction(
                 Sequence::create(
@@ -6272,6 +6283,7 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
             if(mode==LOCAL_GAME) {
                 scene->addChild(HelloWorld::create());
             } else {
+                KwxHeart::getInstance()->Resume();
                 scene->addChild(EnterRoom::create());
             }
             Director::getInstance()->replaceScene(scene);

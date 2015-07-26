@@ -128,6 +128,13 @@ int GameStartNotif::Construct(const DsMsg &msg) {
     return 0;
 }
 
+int GameRestartResponse::Construct(const DsMsg &msg) {
+    DsInstruction::Construct(msg);
+        
+    score   = msg.GetItemValue(0);
+    return 0;
+}
+
 int FirstDistZhuang::Construct(const DsMsg &msg) {
     DsInstruction::Construct(msg);
         

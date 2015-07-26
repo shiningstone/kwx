@@ -81,7 +81,7 @@ void SystemMessageHint::HintOnlyEnsure()
 	ensureBtn->setAnchorPoint(Vec2(0.5,0));
 	ensureBtn->setPosition(Vec2(visibleSize.width/2,NoticeHint->getPosition().y-NoticeHint->getContentSize().height/2+15));
 	ensureBtn->addTouchEventListener(CC_CALLBACK_2(SystemMessageHint::OnlyEnsureCall,this));
-	this->addChild(ensureBtn);
+	this->addChild(ensureBtn,3);
 }
 void SystemMessageHint::HintWihtChoose()
 {
@@ -92,13 +92,13 @@ void SystemMessageHint::HintWihtChoose()
 	ensureBtn->setAnchorPoint(Vec2(0.5,0));
 	ensureBtn->setPosition(Vec2(visibleSize.width/2-HintSize.width*0.2026144,NoticeHint->getPosition().y-NoticeHint->getContentSize().height/2+15));
 	ensureBtn->addTouchEventListener(CC_CALLBACK_2(SystemMessageHint::ChooseEnsure,this));
-	this->addChild(ensureBtn); 
+	this->addChild(ensureBtn,3); 
 
 	auto cancelBtn=Button::create("systemprompt-cancel.png","systemprompt-cancel2.png","systemprompt-cancel2.png",UI_TEX_TYPE_PLIST);
 	cancelBtn->setAnchorPoint(Vec2(0.5,0));
 	cancelBtn->setPosition(Vec2(visibleSize.width/2+HintSize.width*0.2026144,NoticeHint->getPosition().y-NoticeHint->getContentSize().height/2+15));
 	cancelBtn->addTouchEventListener(CC_CALLBACK_2(SystemMessageHint::ChooseCancel,this));
-	this->addChild(cancelBtn); 
+	this->addChild(cancelBtn,3); 
 }
 void SystemMessageHint::ChooseEnsure(cocos2d::Ref* pSender,ui::Widget::TouchEventType type)
 {

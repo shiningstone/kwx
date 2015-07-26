@@ -29,6 +29,7 @@ typedef enum {
     *********************************************/
     /* Upstream & Downstream : request and its response */
     REQ_GAME_SEND_START         = 43,
+    REQ_GAME_RESTART            = 29,
     REQ_GAME_SEND_SHOWCARD      = 48,
     REQ_GAME_SEND_ACTION        = 49,
     REQ_GAME_GET_TINGINFO       = 50,

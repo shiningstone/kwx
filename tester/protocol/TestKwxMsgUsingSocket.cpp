@@ -170,7 +170,7 @@ class TestSendAction : public TestRequest {
         
         RequestSendAction aMsg;
         aMsg.Set(aPENG,TIAO_3);
-        aMessenger->Send(aMsg,true);
+        aMessenger->Send(aMsg,false);
 
         aMessenger->StopReceiving();
     }
