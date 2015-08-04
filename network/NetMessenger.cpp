@@ -56,7 +56,7 @@ void NetMessenger::ClearRecvBuf() {
 	memset(_pkgBuf,0,BUFF_SIZE);
 	_outStart  = 0;
     _inStart   = 0;
-    _isEmpty   = true;
+    _isFull    = false;
 
     _recvCnt = 0;
 }
@@ -97,11 +97,8 @@ void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
         memset(_pkgBuf+_outStart,0,pkgLen);
 	}
 
-    if(_outStart==_inStart) {
-        _isEmpty = true;
-    }
-    
 	_outStart = (_outStart + pkgLen) % BUFF_SIZE;  
+    _isFull   = false;
 }
 
 void NetMessenger::_collect_bytes() {
@@ -110,12 +107,13 @@ void NetMessenger::_collect_bytes() {
 	while(_keepListen) {
 		int availLen;
 
-        if( _inStart==_outStart && _isEmpty ) {
-            availLen   = BUFF_SIZE;
+        if(_isFull) {
+            _delay(10);
+            continue;
         } else if( _inStart < _outStart )  {
 			availLen   = _outStart - _inStart;
 		} else {  
-			availLen   = BUFF_SIZE - _inStart;    /* BUG: it could be package loss when _inStart==_outStart */
+			availLen   = BUFF_SIZE - _inStart + _outStart;
 		}  
   
         if(!_keepListen) {
@@ -123,18 +121,28 @@ void NetMessenger::_collect_bytes() {
         }
 
 		int inLen = 0;
-        if ( _socket->Recv((char *)(_pkgBuf + _inStart), &inLen, availLen)>0 ) {
+        char inBuf[PACKGE_MAX_LEN] = {0};
+        if ( _socket->Recv(inBuf, &inLen, availLen)>0 ) {
+            if(inLen>(BUFF_SIZE-_inStart)) {
+                memcpy(_pkgBuf+_inStart, inBuf, BUFF_SIZE-_inStart);
+                memcpy(_pkgBuf, inBuf+BUFF_SIZE-_inStart, inLen-(BUFF_SIZE-_inStart))
+            } else {
+                memcpy(_pkgBuf+_inStart, inBuf, inLen);
+            }
+            
             _inStart = (_inStart+inLen) % BUFF_SIZE;
             
             if(_inStart==_outStart) {
-                _isEmpty = false;
+                _isFull = true;
             }
         }
 	}
 }
 
 int NetMessenger::_usedLen() {
-    if (_inStart>=_outStart) {
+    if (!_isFull && _inStart==_outStart) {
+        return BUFF_SIZE;
+    } else if (_inStart>=_outStart) {
         return (_inStart-_outStart);
     } else {
         return (_inStart+BUFF_SIZE-_outStart);
