@@ -334,6 +334,12 @@ static void SendLine(ServerSocket SERVER,int lineNo) {
     SaveLog(fmonitor,"SEND",sendBuf,sendLen);
 }
 
+static void SendLines(ServerSocket SERVER,int start,int end) {
+    for(int i=start;i<=end;i++) {
+        SendLine(SERVER,i);
+    }
+}
+
 void round1_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     char sendBuf[BUF_LEN] = {0};
     int  sendLen = 0;
@@ -1018,17 +1024,26 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } else if(handout==0 && recvBuf[16]==REQ_GAME_SEND_START) {
         handout++;
         SendLine(SERVER,6);
-        SendLine(SERVER,10);
-        SendLine(SERVER,11);
+        SendLine(SERVER,134);
+        SendLine(SERVER,135);
     } else if(handout==1) {
         handout++;
-        SendLine(SERVER,12);
-        SendLine(SERVER,13);
-        SendLine(SERVER,14);
-        SendLine(SERVER,15);
-        SendLine(SERVER,34);
-        SendLine(SERVER,35);
-        SendLine(SERVER,36);
+        SendLines(SERVER,136,140);
+    } else if(handout==2) {
+        handout++;
+        SendLines(SERVER,141,142);
+    } else if(handout==3) {
+        handout++;
+        SendLines(SERVER,143,152);
+    } else if(handout==4) {
+        handout++;
+        SendLines(SERVER,153,159);
+    } else if(handout==5) {
+        handout++;
+        SendLines(SERVER,162,166);
+    } else if(handout==6) {
+        handout++;
+        SendLines(SERVER,167,170);
     }
 }
 
