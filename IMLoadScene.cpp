@@ -15,12 +15,8 @@ IMLoad::IMLoad()
 
 IMLoad::~IMLoad()
 {
+	_eventDispatcher->removeCustomEventListeners(ENTER_GAME_HALL_EVENT_TYPE);
 }
-
-void IMLoad::update(float fDelta) {
-    log("a");
-}
-
 void IMLoad::enterRoom()
 {
     auto scene = Scene::create();
@@ -43,6 +39,7 @@ const std::string ResFileName[]={"load_room.plist","Personalinformation.plist","
 //SpriteFrameCache::getInstance()->addSpriteFramesWithFile("dengluzhutu.plist");
 void IMLoad::addRes()
 {
+	/*
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");//ceshi_yusi
 	for(int insertNum=0;insertNum<sizeof(ResFileName)/sizeof(string);insertNum++)
 	{
@@ -50,8 +47,8 @@ void IMLoad::addRes()
 		curLoadingBar->setPercentage((float)(insertNum+1)/(sizeof(ResFileName)/sizeof(string))*100);
 	}
 	auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
-	this->runAction(EnterNextRoom);
-
+	this->runAction(EnterNextRoom);*/
+	enterRoom();
 	//Vector<FiniteTimeAction *> addList;
 	//for(int insertNum=0;insertNum<16;insertNum++)
 	//{
@@ -74,6 +71,12 @@ bool IMLoad::init()
 	{
 		return false;
 	}
+
+	auto EnterHallListener = EventListenerCustom::create(ENTER_GAME_HALL_EVENT_TYPE, [this](EventCustom * event){
+		this->addRes();
+	});
+	_eventDispatcher->addEventListenerWithFixedPriority(EnterHallListener,2);
+
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Point origin = Director::getInstance()->getVisibleOrigin();
 
@@ -99,7 +102,7 @@ bool IMLoad::init()
     //chs->setPosition(Point(ring->getPosition().x,ring->getPosition().y));
     chs->setPosition(Vec2(origin.x+visibleSize.width/2,origin.y+visibleSize.height*0.6));
     this->addChild(chs,1);
-
+	
     auto bar=Sprite::createWithSpriteFrameName("black_bar.png");
     curLoadingBar=ProgressTimer::create(bar);
     curLoadingBar->setType(ProgressTimer::Type::BAR);
@@ -110,7 +113,7 @@ bool IMLoad::init()
     this->addChild(curLoadingBar,1,110);
 
     auto you=Sprite::createWithSpriteFrameName("you.png");
-    you->setPosition(Point(ring->getPosition().x-visibleSize.width*0.3,ring->getPosition().y-ring->getContentSize().height*3/4+bar->getTextureRect().size.height/2+10));
+    you->setPosition(Point(ring->getPosition().x-visibleSize.width*0.1,ring->getPosition().y-ring->getContentSize().height*3/4+bar->getTextureRect().size.height/2+10));
     this->addChild(you,1);
 
     auto xi=Sprite::createWithSpriteFrameName("xi.png");
@@ -184,7 +187,7 @@ bool IMLoad::init()
 	auto seqOfLabel3=Sequence::create(delay03,jump3,delay05,jump3,delay05,jump3,delay05,jump3,delay05,jump3,delay05,jump3,delay05,NULL);
 	auto seqOfLabel4=Sequence::create(delay04,jump4,delay05,jump4,delay05,jump4,delay05,jump4,delay05,jump4,delay05,jump4,delay05,NULL);
 	auto seqOfLabel5=Sequence::create(delay05,jump5,delay05,jump5,delay05,jump5,delay05,jump5,delay05,jump5,delay05,jump5,delay05,NULL);
-
+	
 	you->runAction(seqOfLabel1);
 	xi->runAction(seqOfLabel2);
 	jia->runAction(seqOfLabel3);
@@ -205,30 +208,37 @@ bool IMLoad::init()
 
 	ring->runAction(RepeatForever::create(rotate));
 
-	addRes();
+	//curLoadingBar->setPercentage((float)(insertNum+1)/(sizeof(ResFileName)/sizeof(string))*100);
+
+	//addRes();
 
 	//auto addAllRes=CallFunc::create(this,callfunc_selector(IMLoad::addRes));
 	//auto EnterNextRoom=CallFunc::create(this,callfunc_selector(IMLoad::enterRoom));
 	//this->runAction(Sequence::create(addAllRes,EnterNextRoom,NULL));
 
-#ifndef IGNORE_DAILY_LOGIN_REQUEST
-    KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
-    bMessenger->StartReceiving();
-    bMessenger->Send(REQ_DAILY_LOGIN,false);
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("userhead.plist");//ceshi_yusi
+	for(int insertNum=0;insertNum<sizeof(ResFileName)/sizeof(string);insertNum++)
+	{
+		SpriteFrameCache::getInstance()->addSpriteFramesWithFile(ResFileName[insertNum]);
+	}
 
-    if(bMessenger->_response!=REQUEST_ACCEPTED) {
-        _showErrorMessage(DescErr(bMessenger->_response));
-        return false;
-    }            
-#endif
+	std::thread t1(&IMLoad::nextScence,this);
+	t1.detach();
 
     return true;
 }
 
-#include "SystemMessageHint.h"
-void IMLoad::_showErrorMessage(std::string errorMessage) {
-    Layer* prompt = new SystemMessageHint(errorMessage,mes_Hint_Ensure_Only);
-    prompt->setVisible(true);
-    this->addChild(prompt,98);
+
+void IMLoad::nextScence()
+{
+#ifndef IGNORE_DAILY_LOGIN_REQUEST
+    KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+    bMessenger->StartReceiving();
+    bMessenger->Send(REQ_DAILY_LOGIN);
+    
+    if(bMessenger->_response==REQUEST_ACCEPTED) {
+        _eventDispatcher->dispatchCustomEvent(ENTER_GAME_HALL_EVENT_TYPE,NULL);
+    }            
+#endif
 }
 

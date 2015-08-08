@@ -61,7 +61,9 @@ bool RaceLayer::init() {
 ************************************************/
 void RaceLayer::CreateRace(GameMode_t mode)
 {
+#ifndef NO_HEART_BEAT
     KwxHeart::getInstance()->Pause();
+#endif
 
 	_isResoucePrepared=false;
 
@@ -87,7 +89,7 @@ void RaceLayer::CreateRace(GameMode_t mode)
 
 	Button* StartButton;
 #if(DEBUG_ENTRANCE==1)
-	StartButton = _object->CreateButton(BTN_READY);
+	StartButton = _object->CreateButton(/*BTN_READY*/BTN_START);
 	StartButton->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnStartHandler,this));
 #else
     StartButton = _object->CreateButton(BTN_START);
@@ -299,7 +301,7 @@ void RaceLayer::MyHandoutEffect(int chosenCard,Vec2 touch,int time,bool turnToMi
 	_MyHandoutEffect(_roundManager->LastHandout(),touch,time,turnToMing);
 }
 
-void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
+void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir,bool ignoreTingSignBtn)
 {
 	if(_roundManager->IsMing(dir)) {
         _Show(this,MING_STATUS_PNG_0+dir,true);
@@ -466,7 +468,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 				}
 				else if(status==sAN_GANG)
 				{
-                    int idxInGroup = cards->get_idx_in_group(i);
+                    int idxInGroup = cards->get_idx_in_angang_group(dir,i);
 
 					if(idxInGroup==1)
 						x+=p_list[i]->getTextureRect().size.width*1.0;
@@ -515,7 +517,7 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 		}//for each card
 	}
     
-	if(dir==MIDDLE&&isMing)
+	if(dir==MIDDLE&&isMing&&!ignoreTingSignBtn)
 	{
 		if(!myframe->getChildByTag(TING_SING_BUTTON))
 		{
@@ -524,8 +526,8 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir)
 			auto Ting_Sign = _object->CreateTingSign();
 			myframe->addChild(Ting_Sign,1,TING_SING_BUTTON);
 
-            while(myframe->getChildByTag(TING_SING_BAR))
-				myframe->removeChildByTag(TING_SING_BAR);
+            //while(myframe->getChildByTag(TING_SING_BAR))
+				//myframe->removeChildByTag(TING_SING_BAR);
 
             _TingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
             myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
@@ -1322,6 +1324,11 @@ void RaceLayer::start_timer(int time,PlayerDir_t dir){
     UpdateClock(0);
     schedule(schedule_selector(RaceLayer::UpdateClock), 1.0f, kRepeatForever, 0);
 }
+
+void RaceLayer::stop_timer() {
+    unschedule(schedule_selector(RaceLayer::UpdateClock));
+}
+
 /****************************************************
     effect position
 ****************************************************/
@@ -2261,6 +2268,7 @@ void RaceLayer::ShowActionButtons(int actionsMask) {
     /* these actions are controlled by sub-level buttons  */
     actionsMask &= ~aMING_CONFIRM;
     actionsMask &= ~aMING_CANCEL;
+    actionsMask &= ~aKOU;
     actionsMask &= ~aKOU_CANCEL;
     
     _Show(myframe,TING_SING_BAR,false);
@@ -2278,7 +2286,7 @@ void RaceLayer::ShowActionButtons(int actionsMask) {
 		x = x-width;
 	}
     
-	if(actionsMask&a_MING || actionsMask&a_KOU) {
+	if(actionsMask&a_MING) {
         float width = _AddBtnMing(Vec2(x,y));
 		x = x-width;
 	}
@@ -2475,6 +2483,10 @@ void RaceLayer::ListenToTingButton() {
 		    } else {
 			    ifTingSignBarVisible = !ifTingSignBarVisible;
 		    }
+
+            if(ifTingSignBarVisible  && _roundManager->_MODE==NETWORK_GAME) {
+                _TingHintUpdate();
+            }
 
             _Show(myframe,TING_SING_BAR,ifTingSignBarVisible);
 	};
@@ -3399,7 +3411,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 {
     myframe->_ID = dir;
 
-	if(!_roundManager->_isNewDistributed) {
+	if(!_roundManager->_isNewDistributed&&prevDir!=SERVER) {
         _Remove(myframe,HAND_OUT_CARDS_TAG_ID+prevDir*25 + _roundManager->_players[prevDir]->_river->size());
 	}
     
@@ -3684,7 +3696,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
         /**********************
             update tag
         **********************/
-		for(int a=cards->real_last();a>=0;a--) {
+		for(int a=cards->last();a>=0;a--) {
 			int curTag=HAND_IN_CARDS_TAG_ID+1*20+a;
 			if(!myframe->getChildByTag(curTag))
 				continue;
@@ -3985,7 +3997,13 @@ float RaceLayer::_YofNextCard(PlayerDir_t dir,int idx,CardList *cards,bool isTin
             }
         case sMING_GANG:
         case sAN_GANG:
-            int groupIdx = cards->get_idx_in_group(idx);
+            int groupIdx = 0;
+
+            if(status==sAN_GANG) {
+                groupIdx = cards->get_idx_in_angang_group(dir,idx);
+            } else {
+                groupIdx = cards->get_idx_in_group(idx);
+            }
 
             if( (dir==LEFT&&groupIdx==1) || (dir==RIGHT&&groupIdx==3)) {
                 return up*(refY*0.65);
@@ -4061,6 +4079,18 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
         auto tingSignBar = _object->CreateTingInfoBar(
             curPos,huCards,ting->kindNum,times,remains);
         myframe->addChild(tingSignBar, 30, TING_SING_BAR);
+    }
+}
+
+void RaceLayer::_TingHintUpdate() {
+    if(_roundManager->_MODE==NETWORK_GAME) {
+        auto curPos = myframe->getChildByTag(TING_SING_BAR)->getPosition();
+        
+        TingInfo_t ting;
+        NetRoundManager *rm = static_cast<NetRoundManager *>(_roundManager);
+        rm->query_ting_info(&ting);
+
+        _UpdateTingNum(MIDDLE);
     }
 }
 
@@ -5747,8 +5777,8 @@ void RaceLayer::raceAccount(float delta)
                 break;
             }
         case NONE_WIN:
-            if(_roundManager->_firstMingNo!=INVALID) {
-                int fakeWinner = _roundManager->_firstMingNo;
+            if(_roundManager->GetBaoZhuang()!=INVALID_DIR) {
+                int fakeWinner = _roundManager->GetBaoZhuang();
                 
                 auto WinBar=(LayerColor*)raceAccoutLayer->getChildByTag(fakeWinner); 
                 auto WinBarPlus=(LayerColor*)raceAccoutLayer->getChildByTag((fakeWinner+1)%3);
@@ -6283,7 +6313,9 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
             if(mode==LOCAL_GAME) {
                 scene->addChild(HelloWorld::create());
             } else {
+                #ifndef NO_HEART_BEAT
                 KwxHeart::getInstance()->Resume();
+                #endif
                 scene->addChild(EnterRoom::create());
             }
             Director::getInstance()->replaceScene(scene);

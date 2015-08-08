@@ -24,6 +24,8 @@ public:
     static RoundManager *getInstance();
     static void  destroyInstance();
 
+    std::mutex          _uiLocker;
+
 /******************/
 /* networks start */
     virtual void HandleMsg(void * aMsg);
@@ -32,7 +34,7 @@ public:
 
     KwxMessenger   *_messenger;
 
-    bool _ignoreDaoJiShi;
+    bool _isAfterMing;
 
     void _DiRecv(GameStartResponse *info);
     void _DiRecv(GameStartNotif *info);
@@ -45,10 +47,11 @@ public:
     void _DiRecv(RemindInfo *info);
     void _DiRecv(ActionResponse *info);
     void _DiRecv(ActionNotif *info);
-    void _UpdateWin(HuInfo_t *player);
+    bool _UpdateWin(HuInfo_t *player);
     void _DiRecv(HuInfoNotif *info);
     void _DiRecv(TuoGuanResponse *info);
     void _DiRecv(TuoGuanNotif *info);
+    void _DiRecv(TingInfoResponse *info);
 
     void _DiRecv(EnterRoomResponse *info);
     void _DiRecv(EnterRoomNotif *info);
@@ -83,7 +86,7 @@ public:
     MingDecisionBuf _mingBuf;
 
     void SendReconnect();
-
+    void query_ting_info(TingInfo_t *ting);
 /* networks end   */
 /******************/
 

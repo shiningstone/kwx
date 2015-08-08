@@ -135,6 +135,11 @@ void EnvVariable::set__dailyLogin()
 {
 	_dailyLogin.hasReward=true;
 	_dailyLogin.continuousDays=1;
+
+    _dailyLogin.gold = 5000;
+    _dailyLogin.coupon = 5000;
+    strcpy((char *)_dailyLogin.name,"tempName");
+    strcpy((char *)_dailyLogin.image,"Head17.png");
 }
 void EnvVariable::set_MyFriendList()
 {
@@ -188,13 +193,6 @@ void EnvVariable::set_RaningList_Record()
 	TheCharts tempItem={"Head17.png","tempName",5000};
 	for(int a=0;a<20;a++)
 		RaningList_Record.push_back(tempItem);
-}
-void EnvVariable::set_personalSimple()
-{
-	personalSimple.GoldNum=5000;
-	personalSimple.NikeName="tempName";
-	personalSimple.photoFileName="Head17.png";
-	personalSimple.QuanNum=5000;
 }
 void EnvVariable::set_Mall_GoodList()
 {
@@ -251,14 +249,9 @@ std::vector <TheCharts> EnvVariable::get_RaningList_Record()
 {
 	return RaningList_Record;
 }
-MainLayer_myInfo EnvVariable::get_personalSimple()
-{
-	return personalSimple;
-}
 void EnvVariable::TestDataFunction()
 {
 	set__dailyLogin();
-	set_personalSimple();
 	set_MyFriendList();
 	set_NearyPeopleList();
 	set_StrangersList();

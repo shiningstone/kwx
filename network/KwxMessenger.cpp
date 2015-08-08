@@ -7,6 +7,7 @@
 #include "./../protocol/MsgFormats.h"
 #include "./../protocol/CommonMsg.h"
 #include "./../protocol/DbgRequestDesc.h"
+#include "./../hall/ErrorManager.h"
 
 #include "KwxMessenger.h"
 
@@ -53,15 +54,27 @@ KwxMessenger::~KwxMessenger() {
 /************************************************************
 	auto receiving (Downstream)
 ************************************************************/
-void KwxMessenger::StartReceiving(MsgHandler_t handle) {
+bool KwxMessenger::StartReceiving(MsgHandler_t handle) {
     SetHandler(handle);
-    Start((char *)_serverIp,_port);
+    
+    if(!Start((char *)_serverIp,_port)) {
+        ErrorManager::getInstance()->notify_error(new std::string("SOCKET ERROR"));
+        return false;
+    }
+
+    return true;
 }
 
-void KwxMessenger::StartReceiving() {
+bool KwxMessenger::StartReceiving() {
     SetHandler(_HANDLE_DS_PACKAGES);
     LOGGER_WRITE("server ip:%s, port:%d",_serverIp,_port);
-    Start((char *)_serverIp,_port);
+
+    if(!Start((char *)_serverIp,_port)) {
+        ErrorManager::getInstance()->notify_error(new std::string("SOCKET ERROR"));
+        return false;
+    }
+
+    return true;
 }
 
 void KwxMessenger::StopReceiving() {
@@ -115,13 +128,15 @@ bool KwxMessenger::Wait(RequestId_t req) {
 
     int waitCount = 0;
     while(_waitQueue.size()>0) {/*BUG : resume only all wait req are handled*/
-        if(waitCount<30) {
-            if((waitCount+1)%10==0) {
-                //LOGGER_WRITE("wait %d second",(waitCount+1)/10);
+        if(waitCount<300) {
+            if((waitCount+1)%100==0) {
+                //LOGGER_WRITE("wait %d second",(waitCount+1)/100);
             }
-            _delay(1000);
+            _delay(100);
             waitCount++;
         } else {
+            ErrorManager::getInstance()->notify_error(new std::string(DescErr(TIMEOUT)));
+        
             LOGGER_WRITE("wait %s timeout",DescReq(req));
             _waitQueue.clear();
             _response = TIMEOUT;
@@ -133,12 +148,14 @@ bool KwxMessenger::Wait(RequestId_t req) {
 }
 
 void KwxMessenger::Resume(RequestId_t req) {
-    int pos = WaitQueueFind(req);
-    
-    if(pos!=INVALID) {
-        _waitQueue.erase(_waitQueue.begin()+pos);
-    } else {
+    if(req==REQ_INVALID) {
         _waitQueue.clear();
+    } else {
+        int pos = WaitQueueFind(req);
+        
+        if(pos!=INVALID) {
+            _waitQueue.erase(_waitQueue.begin()+pos);
+        }
     }
 }
 
@@ -170,7 +187,7 @@ int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
 #include "./../protocol/DsInstruction.h"
 #include "./../protocol/UsRequest.h"
 #include "./../protocol/KwxMsgLogin.h"
-int KwxMessenger::Send(RequestId_t req,bool rspRequired) {
+int KwxMessenger::Send(RequestId_t req, bool rspRequired) {
     switch(req) {
         case REQ_LOGIN:
 			{
@@ -183,7 +200,7 @@ int KwxMessenger::Send(RequestId_t req,bool rspRequired) {
             {
                 RequestDailyLogin aReq;
                 aReq.Set();
-                return Send(aReq,rspRequired);
+                return Send(aReq);
             }
                 
         case REQ_GET_DAILY_PRIZE:
@@ -247,6 +264,13 @@ int KwxMessenger::Send(RequestId_t req,bool rspRequired) {
                 RequestLogout aReq;
                 aReq.Set();
                 return Send(aReq,false);
+            }
+        
+        case REQ_GAME_GET_TINGINFO:
+            {
+                RequestTingInfo aReq;
+                aReq.Set();
+                return Send(aReq,rspRequired);
             }
         
 		default:

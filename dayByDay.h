@@ -27,8 +27,5 @@ public:
 	TargetedAction* GoldGetEffect(Vec2 curPos);
 	void LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type);
 	void receiveTimeCount();
-
-
-    void _showErrorMessage(std::string errorMessage);
 };
 #endif

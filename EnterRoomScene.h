@@ -11,13 +11,19 @@ USING_NS_CC;
 USING_NS_CC_EXT;
 using namespace ui;
 
+typedef struct {						//主页面需要的数据
+	std::string photoFileName;
+	std::string NikeName;
+	int GoldNum;
+	int QuanNum;
+}MainLayer_myInfo;
+
 
 class EnterRoom : public cocos2d::Layer
 {
 public:
 	EnterRoom();
 	virtual ~EnterRoom();
-    virtual void update(float fDelta);
 public:
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
 #define NODE_CHILD_ID_ONE			1				//RankingScroll
@@ -61,7 +67,6 @@ public:
 
 	void createRole();
 
-	MainLayer_myInfo get_personalSimpleInfo();
 	CREATE_FUNC(EnterRoom);
 private:
 	MainLayer_myInfo personalSimpleInfo;

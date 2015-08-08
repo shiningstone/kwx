@@ -23,6 +23,7 @@ public:
     int  last() const;
     int  get_num(Card_t kind) const;
     int  get_idx_in_group(int idxInHand) const;
+    int  get_idx_in_angang_group(PlayerDir_t dir,int idxInHand) const;
 
 	void show();
 	Card_t get_kind(unsigned int idx) const;

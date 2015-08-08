@@ -20,14 +20,14 @@ EnterRoom::EnterRoom()
 {
 	s_scale=1.189;
 	s_no=1;
-	personalSimpleInfo=EnvVariable::getInstance()->get_personalSimple();
+    
+    personalSimpleInfo.GoldNum = EnvVariable::getInstance()->_dailyLogin.gold;
+    personalSimpleInfo.QuanNum = EnvVariable::getInstance()->_dailyLogin.coupon;
+    personalSimpleInfo.photoFileName = (char *)EnvVariable::getInstance()->_dailyLogin.image;
+    personalSimpleInfo.NikeName = (char *)EnvVariable::getInstance()->_dailyLogin.name;
 }
 EnterRoom::~EnterRoom()
 {
-}
-
-void EnterRoom::update(float fDelta) {
-    log("a");
 }
 
 void EnterRoom::message_callback(Ref* pSender,Widget::TouchEventType type)
@@ -503,9 +503,4 @@ void EnterRoom::myBaseInfo_callback(cocos2d::Ref* pSender,Widget::TouchEventType
 		break;
 	}
 }
-MainLayer_myInfo EnterRoom::get_personalSimpleInfo()
-{
-	return personalSimpleInfo;
-}
-
 

@@ -1,4 +1,8 @@
+
+#include "network/KwxEnv.h"
+
 #include "ChatOneToOne.h"
+
 
 ChatOneToOne::ChatOneToOne(EnterRoom* p,Friend_Info curFriend)
 {
@@ -197,7 +201,7 @@ Layout* ChatOneToOne::Message_cell_create(std::string message)
 	int ColumnNum=0;
 
 	auto otherPhoto=Sprite::createWithSpriteFrameName(chatFriend.photoFileName);
-	auto myPhoto=Sprite::createWithSpriteFrameName(parentNode->get_personalSimpleInfo().photoFileName);
+	auto myPhoto=Sprite::createWithSpriteFrameName((char *)EnvVariable::getInstance()->_dailyLogin.image);
 
 	auto chatMes=LabelTTF::create(realMes,"Arial",20);
 	chatMes->setContentSize(Size(chatSize.width*0.7,0));

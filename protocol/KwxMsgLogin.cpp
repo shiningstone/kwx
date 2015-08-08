@@ -7,6 +7,7 @@
 #ifndef WIN32
 #include "./../hall/VersionManager.h"
 #endif
+#include "./../game/DataBase.h"
 
 #include "MsgFormats.h"
 #include "CommonMsg.h"
@@ -178,8 +179,12 @@ int DailyLoginResponse::Construct(const DsMsg &msg) {
         info->hasReward = true;
         info->continuousDays = _ntohl(*(INT32U *)(msg._body->_items[0]->_buf+4));
     }
-    
-    msg.GetString(1, info->image);
+
+    string imagecode;
+    msg.GetString(1, imagecode);
+    Database *data = Database::getInstance();
+    data->get_local_image((char *)info->image, imagecode.c_str());
+
     msg.GetString(2, info->name);
     
     info->gold   = msg.GetItemValue(3);
@@ -353,6 +358,11 @@ int LeaveResponse::Construct(const DsMsg &msg) {
 int LeaveNotif::Construct(const DsMsg &msg) {
     _dir    = _GetPlayer(msg.GetItemValue(0));
     _status = (LeaveStatus_t)msg.GetItemValue(1);
+    return 0;
+}
+
+int LogoutResponse::Construct(const DsMsg &msg) {
+    FailureCode_t status = (FailureCode_t)msg.GetItemValue(0);
     return 0;
 }
 

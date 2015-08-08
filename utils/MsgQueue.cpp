@@ -20,10 +20,12 @@ void MsgQueue::update(float fDelta){
 
     if (!_queue->empty()) {
         if(_listener!=NULL) {
-            void *msg = _queue->front();
-            _queue->pop();
-            
-            _listener->HandleMsg(msg);
+            if(_listener->_readyToReceive) {
+                void *msg = _queue->front();
+                _queue->pop();
+                
+                _listener->HandleMsg(msg);
+            }
         }
     }
 
@@ -53,6 +55,7 @@ void MsgQueue::push(void * netPackage){
 *************************************/
 MsgHandle::MsgHandle():
 _msgQueue(this) {
+    _readyToReceive = true;
 }
 
 void MsgHandle::RecvMsg(void *val) {

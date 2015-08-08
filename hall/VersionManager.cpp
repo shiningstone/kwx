@@ -35,7 +35,7 @@ float VersionManager::getNewVerSize() const {
     return atof(_newVer.size.c_str());
 }
 
-int VersionManager::_requestUpdate() {
+int VersionManager::requestUpdate() {
 #if (DEBUG_ENTRANCE==3)
     return 0;
 #else
@@ -106,8 +106,8 @@ int VersionManager::_recordVersion() {
 int VersionManager::upgrade() {
     int retcode = 0;
     
-    retcode = _requestUpdate();
-    RETURN_IF_FAIL(retcode);
+    //retcode = _requestUpdate();
+    //RETURN_IF_FAIL(retcode);
 
     retcode = _download();
     RETURN_IF_FAIL(retcode);
@@ -144,7 +144,6 @@ VersionManager::VersionManager() {
 
     /*TEST DATA*/
     _newVer.code = 1;
-    _newVer.name = "1.0.0.0";
     _newVer.size = "5.0MB";
 	_newVer.url  = "http://120.25.169.221:8080/aa.jar";
     _newVer.name = "kwx.apk";

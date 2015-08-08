@@ -107,6 +107,19 @@ int CardList::get_idx_in_group(int idxInHand) const {
     return 1;
 }
 
+/* cannot judge other's card in hand by kind since all of them are CARD_UNKNOWN */
+int CardList::get_idx_in_angang_group(PlayerDir_t dir,int idxInHand) const {
+    if(dir==MIDDLE) {
+        return get_idx_in_group(idxInHand);
+    } else {
+        int i = 0;
+        while( get_status(idxInHand+i)==sAN_GANG ) {
+            i++;
+        }
+        return (4 - i%4 + 1)%4;
+    }
+}
+
 void CardList::push_back(Card_t kind) {
     CardNode_t *card = new CardNode_t;
     card->kind    = kind;
@@ -328,10 +341,12 @@ void CardInHand::refresh(CardNode_t cards[],int len) {
             }
 
             i+=3;
+        } else if(cards[i].status==sMING_KOU) {
+            CardNode_t *node = new CardNode_t;
+            *node = cards[i];
+            push_back(node);
         } else {
-            CardNode_t *card = new CardNode_t;
-            *card = cards[i];
-            push_back(card);
+            insert_card(cards[i]);
         }
     }
 }
@@ -559,8 +574,8 @@ CartApperance_t CardInHand::get_appearance(int idx,PlayerDir_t dir,bool isMiddle
     } else if(status==sPENG || status==sMING_GANG) {
         return LAYDOWN_SHOW ;
     } else if(status==sAN_GANG) {
-        int groupIdx = get_idx_in_group(idx);
-        
+        int groupIdx = get_idx_in_angang_group(dir,idx);
+
         if((dir==LEFT&&groupIdx==3) || (dir==RIGHT&&groupIdx==2)) {
             if(!IsMing && isMiddleMing) {/* here must be a bug */
                 if(IsMing) {
@@ -613,9 +628,20 @@ void CardInHand::others_perform(bool isNewDistributed,ActionId_t act,Card_t kind
 	} else if(act==aMING_GANG) {
         node.status=sMING_GANG;
 
-        delete_card(FreeStart,4);
-        insert_card(node,4);
-		FreeStart += 4;
+        int pengCards[3] = {0};
+        int num = find_cards(kind,pengCards);
+        if(num==3) {
+            for(int i=0;i<3;i++) {
+                set_status(pengCards[i],sMING_GANG);
+            }
+            
+            insert_card(node,1);
+            FreeStart += 1;
+        } else {
+            delete_card(FreeStart,4);
+            insert_card(node,4);
+            FreeStart += 4;
+        }
 	} else if(act==aAN_GANG || act==aSHOU_GANG) {
         node.kind=CARD_UNKNOWN;
         node.status=sAN_GANG;
@@ -1136,8 +1162,12 @@ void CardInHand::load_ming_info(const MingInfo_t &ming) {
 
             int idx[4] = {0};
             int num = find_cards(src->kind,idx);
-            for(INT8U j=0;j<num;j++) {
-                _mingChoicesMask |= 1<<idx[j];
+            if(num>0) {
+                for(INT8U j=0;j<num;j++) {
+                    _mingChoicesMask |= 1<<idx[j];
+                }
+            } else {
+                _mingChoicesMask |= 1<<size();
             }
         }
     }

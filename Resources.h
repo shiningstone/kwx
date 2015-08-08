@@ -27,6 +27,7 @@
 #define NOONE_WIN_EVENT_TYPE			"noone_win"
 #define DISTRIBUTE_CALL_EVENT_TYPE		"distribute_card_call"
 #define DISTRIBUTE_DONE_EVENT_TYPE      "distribute_card_done"
+#define ENTER_GAME_HALL_EVENT_TYPE		"enter_hall"
 #define ALL_PALYER_HU_DONE_EVENT_TYPE	"hu_done"
 #define DOUBLE_HU_WITH_ME				"double_hu"
 #define DS_INSTRUCTION_EVENT_TYPE       "ds_instruction"

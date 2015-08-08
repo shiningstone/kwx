@@ -3,6 +3,13 @@
 
 #include "cocos2d.h"
 
+#include "utils/MsgQueue.h"
+
+class ErrorInfoHandle : public MsgHandle {
+public:
+    virtual void HandleMsg(void *aMsg);
+};
+
 /**
 @brief    The cocos2d Application.
 

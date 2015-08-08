@@ -5,7 +5,8 @@
 using namespace CocosDenshion;
 
 #include "VersionUpgrade.h"
-
+#include "hall/VersionManager.h"
+#include "hall/ErrorManager.h"
 #include "game/RaceLayer.h"
 #include "game/DataBase.h"
 #include "protocol/DbgRequestDesc.h"
@@ -101,19 +102,25 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             EnvVariable *env = EnvVariable::getInstance();
 
             KwxMessenger *aMessenger = KwxMessenger::getInstance(MSG_LOGIN);
-            aMessenger->StartReceiving();
-            aMessenger->Send(REQ_LOGIN);
-            aMessenger->StopReceiving();
             
-            if(aMessenger->_response!=REQUEST_ACCEPTED) {
-                _showErrorMessage(DescErr(aMessenger->_response));
+            if(aMessenger->StartReceiving()) {
+                aMessenger->Send(REQ_LOGIN);
+
+                if(aMessenger->_response!=REQUEST_ACCEPTED) {
+                    return;
+                }
+            } else {
                 return;
             }
             
             if(env->IsReconnectRequired()) {
                 KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
-                bMessenger->StartReceiving();
-                bMessenger->Send(REQ_GAME_SEND_RECONNECT);
+
+                if(bMessenger->StartReceiving()) {
+                    bMessenger->Send(REQ_GAME_SEND_RECONNECT);
+                } else {
+                    return;
+                }
 
                 auto scene = Scene::create();
                 RaceLayer *layer = RaceLayer::create();
@@ -122,9 +129,11 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
                 Director::getInstance()->replaceScene(scene);
                 return;
             } else if(aMessenger->_response==VERSION_TOO_OLD) {
+				int retcode = VersionManager::getInstance()->requestUpdate();
                 _showVersionUpgrade(true);
                 return;
             } else if(aMessenger->_response==NEW_VERSION_AVAILABLE) {
+				int retcode = VersionManager::getInstance()->requestUpdate();
                 _showVersionUpgrade(false);
                 return;
             } else if(aMessenger->_response==NEW_RES_AVAILABLE) {
@@ -144,6 +153,10 @@ void HelloWorld::imLoadCallback(Ref* pSender,cocos2d::ui::Widget::TouchEventType
             }
             else
             {
+#ifndef IGNORE_LOGIN_REQUEST
+				aMessenger->StopReceiving();
+#endif
+				
                 auto scene = Scene::create();
                 auto layer = IMLoad::create();
                 if(layer) {
@@ -214,7 +227,7 @@ void HelloWorld::enterRoomStandAlone()
 #elif (DEBUG_ENTRANCE==4)
 
 #elif (DEBUG_ENTRANCE==5)
-    _showErrorMessage("error message");
+    ErrorManager::getInstance()->notify_error(new std::string(errorMessage));
 #else
     layer->CreateRace(LOCAL_GAME);
     Director::getInstance()->replaceScene(scene);
@@ -392,12 +405,5 @@ void HelloWorld::_showVersionUpgrade(bool forceUpgrade) {
     Layer* prompt = new VersionUpgrade(forceUpgrade);
     prompt->setVisible(true);
     this->addChild(prompt,99);
-}
-
-#include "SystemMessageHint.h"
-void HelloWorld::_showErrorMessage(std::string errorMessage) {
-    Layer* prompt = new SystemMessageHint(errorMessage,mes_Hint_Ensure_Only);
-    prompt->setVisible(true);
-    this->addChild(prompt,98);
 }
 

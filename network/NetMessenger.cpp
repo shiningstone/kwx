@@ -35,8 +35,10 @@ void NetMessenger::SetHandler(MsgHandler_t func) {
     _handle_msg = func;
 }
 
-void NetMessenger::Start(const char *serverIp,int port) {
-	_socket->Start(serverIp,port);
+bool NetMessenger::Start(const char *serverIp,int port) {
+	if(!_socket->Start(serverIp,port)) {
+        return false;
+    }
 
     if(!_keepListen) {
         _keepListen = true;
@@ -49,6 +51,8 @@ void NetMessenger::Start(const char *serverIp,int port) {
 	    std::thread autoDetect(&NetMessenger::_collect_packages,this);
 	    autoDetect.detach();
     }
+
+    return true;
 }
 
 int NetMessenger::Send(const INT8U *buf,int len) {
@@ -101,6 +105,8 @@ void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
 	}
 
 	_outStart = (_outStart + pkgLen) % BUFF_SIZE;  
+    LOGGER_WRITE("outStart increate %d, inStart %d,outStart %d",pkgLen,_inStart,_outStart);
+
     _isFull   = false;
 }
 
@@ -128,12 +134,13 @@ void NetMessenger::_collect_bytes() {
         if ( _socket->Recv(inBuf, &inLen, availLen)>0 ) {
             if(inLen>(BUFF_SIZE-_inStart)) {
                 memcpy(_pkgBuf+_inStart, inBuf, BUFF_SIZE-_inStart);
-                memcpy(_pkgBuf, inBuf+BUFF_SIZE-_inStart, inLen-(BUFF_SIZE-_inStart))
+                memcpy(_pkgBuf, inBuf+BUFF_SIZE-_inStart, inLen-(BUFF_SIZE-_inStart));
             } else {
                 memcpy(_pkgBuf+_inStart, inBuf, inLen);
             }
             
             _inStart = (_inStart+inLen) % BUFF_SIZE;
+            LOGGER_WRITE("content increate %d, inStart %d,outStart %d",inLen,_inStart,_outStart);
             
             if(_inStart==_outStart) {
                 _isFull = true;
@@ -182,7 +189,10 @@ int NetMessenger::_get_available_pkg_len() {
     int usedLen = _usedLen();
     
 	if ( _is_kwx_exist() && usedLen>DnHeader::DN_HEADER_LEN  ) {
-		int pkgLen = _ntohs((*(INT16U *)(_pkgBuf + (_outStart+DnHeader::SIZE)%BUFF_SIZE)));
+        INT8U  SizeHigh =  *(_pkgBuf + (_outStart+DnHeader::SIZE)%BUFF_SIZE);
+        INT8U  SizeLow  =  *(_pkgBuf + (_outStart+DnHeader::SIZE+1)%BUFF_SIZE);
+        INT16U pkgLen   = (SizeHigh<<8) + SizeLow;
+        
 		if ( usedLen>=pkgLen ) {
 			return pkgLen;
 		}

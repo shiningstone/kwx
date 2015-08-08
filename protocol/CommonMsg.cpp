@@ -167,6 +167,9 @@ DsInstruction *DsMsg::_GenerateInstruction() {
         case REQ_GAME_SEND_LEAVE_ROOM:
             return new LeaveResponse();
 
+        case REQ_LOGOUT:
+            return new LogoutResponse();
+
         default:
             return (DsInstruction *)KWX_INVALID_PCHC;
     }

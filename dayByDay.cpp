@@ -77,7 +77,6 @@ void dayAward::LingQucallBack(cocos2d::Ref* pSender,Widget::TouchEventType type)
             bMessenger->Send(REQ_GET_DAILY_PRIZE);
 
             if(bMessenger->_response!=REQUEST_ACCEPTED) {
-                _showErrorMessage(DescErr(bMessenger->_response));
                 return;
             }            
             #endif
@@ -121,7 +120,7 @@ bool dayAward::init()
     #if 0
 	ReceiveTime=UserDefault::getInstance()->getIntegerForKey("load_days");
     #else 
-    ReceiveTime=EnvVariable::getInstance()->_dailyLogin.continuousDays + 1;
+    ReceiveTime=EnvVariable::getInstance()->_dailyLogin.continuousDays;
     #endif
     
 	auto InkScroll=Sprite::createWithSpriteFrameName("juanzhou.png");//卷轴
@@ -289,11 +288,3 @@ bool dayAward::init()
 
 	return true;
 }
-
-#include "SystemMessageHint.h"
-void dayAward::_showErrorMessage(std::string errorMessage) {
-    Layer* prompt = new SystemMessageHint(errorMessage,mes_Hint_Ensure_Only);
-    prompt->setVisible(true);
-    this->addChild(prompt,98);
-}
-

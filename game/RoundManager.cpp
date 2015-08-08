@@ -215,6 +215,7 @@ void RoundManager::RecvQi() {
 
 void RoundManager::RecvHandout(int idx,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
+    _uiManager->stop_timer();
 
 	if(_isMingTime) {
 		_isMingTime=false;
@@ -760,9 +761,35 @@ void RoundManager::SetWin(WinKind_t kind,int player) {
         _lastWin.giver  = (PlayerDir_t)player;
     } else if(kind==NONE_WIN) {/*BAO ZHUANG*/
         _lastWin.giver  = (PlayerDir_t)_firstMingNo;
+
+        if(_firstMingNo!=INVALID) {
+            _lastWin.specWin = BAO_ZHUANG;
+            _lastWin.specWinner = _lastWin.giver;
+        }
     } else {
         _lastWin.winner = (PlayerDir_t)player;
         _lastWin.giver  = (PlayerDir_t)_curPlayer;
+
+        if(IsMing(_lastWin.winner) && !IsMing(_lastWin.giver)) {
+            _lastWin.specWin = BAO_HU;
+            _lastWin.specWinner = _lastWin.giver;
+        }
+    }
+}
+
+PlayerDir_t RoundManager::GetBaoHu() const {
+    if(_lastWin.specWin==BAO_HU) {
+        return _lastWin.specWinner;
+    } else {
+        return INVALID_DIR;
+    }
+}
+
+PlayerDir_t RoundManager::GetBaoZhuang() const {
+    if(_lastWin.specWin==BAO_ZHUANG) {
+        return _lastWin.specWinner;
+    } else {
+        return INVALID_DIR;
     }
 }
 

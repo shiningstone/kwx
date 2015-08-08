@@ -67,7 +67,7 @@ int CSocket::Recv(char *buf,int *len,int bufSize) {
 	ServerSocket
 ******************************************************/
 #ifdef __UNIT_TEST__
-void ServerSocket::Start(const char *serverIp,int port) {
+bool ServerSocket::Start(const char *serverIp,int port) {
 	Init();
 
     SOCKET serSocket=socket(AF_INET,SOCK_STREAM,0);
@@ -81,6 +81,7 @@ void ServerSocket::Start(const char *serverIp,int port) {
 	    listen( serSocket, 5 );
 	} else {
 		LOGGER_WRITE("%s : bind() error!\n",__FUNCTION__);
+        return false;
 	}
   
 	sockaddr client = {0};
@@ -88,13 +89,16 @@ void ServerSocket::Start(const char *serverIp,int port) {
     _connection = accept( serSocket, (sockaddr*)&client, &len );
 	if( _connection==INVALID_SOCKET ) {
 		LOGGER_WRITE("%s : accept() error!\n",__FUNCTION__);
+        return false;
 	}
+
+    return true;
 }
 #endif
 /******************************************************
 	ClientSocket
 ******************************************************/
-void ClientSocket::Start(const char *serverIp,int port) {
+bool ClientSocket::Start(const char *serverIp,int port) {
 	Init();
 
 	_keepAlive   = false;
@@ -103,6 +107,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
 	_connection = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);  
     if(_connection == INVALID_SOCKET) {  
         Stop();  
+        return false;
     }  
 
 	// …Ë÷√SOCKETŒ™KEEPALIVE
@@ -110,6 +115,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
         int optval=1;  
         if(setsockopt(_connection, SOL_SOCKET, SO_KEEPALIVE, (char *) &optval, sizeof(optval))) {  
             Stop();  
+            return false;
         }  
     }  
 
@@ -118,6 +124,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
     DWORD nMode = 1;  
     if (ioctlsocket(_connection, FIONBIO, &nMode) == SOCKET_ERROR) {  
         Stop();  
+        return false;
     }  
 #else   
     fcntl(_connection, F_SETFL, O_NONBLOCK);  
@@ -133,6 +140,7 @@ void ClientSocket::Start(const char *serverIp,int port) {
         if (hasError()) {  
             LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
             Stop();  
+            return false;
         }  else  {// WSAWOLDBLOCK   
             timeval timeout;  
             timeout.tv_sec  = _blockSecond;  
@@ -147,16 +155,21 @@ void ClientSocket::Start(const char *serverIp,int port) {
             if (ret == 0 || ret < 0) {  
                 LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
                 Stop();  
+                return false;
             } else  {  
                 if( FD_ISSET(_connection, &exceptset) ) {    // or (!FD_ISSET(m_sockClient, &writeset)   
                     LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
                     Stop();  
+                    return false;
                 }  
             }  
         }  
 	} else {
 		LOGGER_WRITE("%s : connect() error!\n",__FUNCTION__);
+        return false;
   	}
+
+    return true;
 }
 
 bool CSocket::hasError()  

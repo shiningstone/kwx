@@ -100,6 +100,8 @@ public:
     void SetWin(WinKind_t kind,int player);
     const WinInfo_t &GetWin();
     bool IsWinner(int no);
+    PlayerDir_t GetBaoHu() const;
+    PlayerDir_t GetBaoZhuang() const;
 
     virtual void CreateRace(RaceLayer *uiManager);
     virtual void StartGame();

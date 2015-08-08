@@ -24,7 +24,7 @@ public:
 	NetMessenger();
 	~NetMessenger();
 
-	void Start(const char *serverIp,int port);
+	bool Start(const char *serverIp,int port);
     void SetHandler(MsgHandler_t func);
 	bool Recv(INT8U *buf,int &len);
     bool Recv(INT8U *buf,int &len,INT16U request);

@@ -198,6 +198,11 @@ public:
     int Set();
 };
 
+class LogoutResponse : public DsInstruction {
+public:
+    virtual int  Construct(const DsMsg &msg);
+};
+
 class LoginConflictNotif : public DsInstruction {
 public:
     virtual int  Construct(const DsMsg &msg);

@@ -60,13 +60,6 @@ typedef struct {						//陌生人&&附近玩家
 	int _id;
 }OtherPlayers_Info;
 
-typedef struct {						//主页面需要的数据
-	std::string photoFileName;
-	std::string NikeName;
-	int GoldNum;
-	int QuanNum;
-}MainLayer_myInfo;
-
 typedef struct {						//排行榜
 	std::string photoFileName;
 	std::string NikeName;
@@ -130,9 +123,6 @@ public:
 	/**************************/
 	void set__dailyLogin();
 
-	void set_personalSimple();		//主页面个人信息
-	MainLayer_myInfo get_personalSimple();
-
 	void set_MyFriendList();		//好友列表
 	std::vector <Friend_Info> get_MyFriendList();
 
@@ -186,7 +176,6 @@ private:
 	std::vector <OtherPlayers_Info> NearyPeopleList;			//附近玩家..
 	std::vector <OtherPlayers_Info> StrangersList;				//陌生人..
 	std::vector <Backpack_Item> myBackpack;						//我的背包..
-	MainLayer_myInfo personalSimple;							//主页面个人数据..
 	std::vector <TheCharts> RaningList_DayGain;					//日盈利..
 	std::vector <TheCharts> RaningList_Riches;					//财富榜..
 	std::vector <TheCharts> RaningList_MaxType;					//最大番型..

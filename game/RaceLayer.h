@@ -152,6 +152,7 @@ public:
     void GuiJinBiShow(PlayerDir_t dir, int gold);
 
 	void start_timer(int time,PlayerDir_t direction);
+    void stop_timer();
     void UpdateClock(float dt);
     void HideClock();
     void ListenToCardTouch();
@@ -295,7 +296,7 @@ public:
 	void _AnGangEffect(PlayerDir_t dir,Card_t card,int gang[]=NULL);//me--暗杠效果
 	void _MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card,int gang[]=NULL);//me--明杠效果
 	void _QiEffect(PlayerDir_t dir);//me--弃牌效果
-	void _CardInHandUpdateEffect(PlayerDir_t dir);
+	void _CardInHandUpdateEffect(PlayerDir_t dir,bool ignoreTingSignBtn = false);
 	void _CardRiverUpdateEffect(PlayerDir_t dir);
 	void showall();
     void GuiHideReady();
@@ -314,6 +315,7 @@ public:
 	void ming_winCards_Hint(Point curPosition);
 	void _UpdateTingNum(PlayerDir_t dir);
 	void _TingHintCreate(Point curPos,int CardPlace);
+    void _TingHintUpdate();
 	void TingHintBarOfOthers(int curNo,int CardPlace);
 	virtual bool init();
 	int Hu_cardOut_place;

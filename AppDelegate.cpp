@@ -1,10 +1,15 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 #include "VersionUpgrade.h"
+#include "SystemMessageHint.h"
+#include "hall/ErrorManager.h"
 
 #include "IMLoadScene.h"
 
 USING_NS_CC;
+
+#include <string>
+using namespace std;
 
 AppDelegate::AppDelegate() {
 
@@ -37,6 +42,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	//scene->addChild(layer);
 	//============================2a¨º?==========================//
 
+    ErrorInfoHandle *aHandle = new ErrorInfoHandle;
+    ErrorManager::getInstance()->set_handle(aHandle);
+
      //create a scene. it's an autorelease object
 	auto scene = Scene::create();
 	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("systemprompt.plist");
@@ -62,3 +70,21 @@ void AppDelegate::applicationWillEnterForeground() {
     // if you use SimpleAudioEngine, it must resume here
     // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
 }
+
+void ErrorInfoHandle::HandleMsg(void *aMsg) {
+    Layer* prompt = NULL;
+    
+    std::string *err = static_cast<std::string *>(aMsg);
+    
+    if(!strcmp(err->c_str(),"RECONNECT_REQUIRED")) {
+        prompt = new SystemMessageHint(*err,mes_Hint_Choose);
+    } else {
+        prompt = new SystemMessageHint(*err,mes_Hint_Ensure_Only);
+    }
+    
+    delete err;
+    
+    prompt->setVisible(true);
+    Director::getInstance()->getRunningScene()->addChild(prompt,99);
+}
+

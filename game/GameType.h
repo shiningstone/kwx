@@ -102,7 +102,9 @@ typedef enum {
     aQIANG_GANG= 0xfd,
     aTING      = 0xfe,
 
-    aLIU_JU    = 0x80000
+    aLIU_JU    = 0x80000,
+    aBAO_ZHUANG= 0x100000,
+    aBAO_HU    = 0x200000,
 }ActionId_t;
 
 typedef enum {
@@ -166,10 +168,19 @@ typedef enum {
     NONE_WIN,
 }WinKind_t;
 
+typedef enum {
+    NO_SPEC_WIN,
+    BAO_HU,
+    BAO_ZHUANG,
+}SpecWin_t;
+
 typedef struct {
     WinKind_t    kind;
     PlayerDir_t  winner;
     PlayerDir_t  giver;
+    
+    SpecWin_t    specWin;
+    PlayerDir_t  specWinner;
 }WinInfo_t;
 
 typedef enum {

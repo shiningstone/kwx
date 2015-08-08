@@ -337,6 +337,43 @@ public:
     }
 };
 
+class TestRecvActionNotif_Liuju : public CTestCase {
+public:
+    virtual int Execute() {
+        INT8U msgInNetwork[] = {
+            'K','W','X',           //KWX
+            0x00,0x3b,             //request code
+            7,                     //package level
+            0x00,0x51,             //package size
+            0,0,0,0,0,0,0,0,0,0,0,0, //reserved(12)
+
+            5,
+            60,1,                  //seatId
+            61,1,                  //who show card
+            62,1,                  //next player
+            131,0,4,0,0x10,0,0,    //action : Åö
+            0x84,0x00,0x2c, 
+            0x74,0x74,0x74,0x74,0x6b,0x6b,0x6b,0x6b,0x27,0x27,0x27,0x06,0x06,0x0f,0x0f,0xff, 
+            0x52,0x52,0x52,0x52,0x28,0x28,0x28,0x01,0x09,0x09,0x04,0x02,0x03,0x00,0xff, 
+            0x06,0x06,0x05,0x07,0x01,0x0f,0x0f,0x09,0x09,0x04,0x08,0x02,0x03, 
+
+        };
+        INT8U buf[MSG_MAX_LEN] = {0};
+        int   len = 0;
+
+        DsMsg *aMsg = DsMsg::getInstance();
+        len = aMsg->Deserialize(msgInNetwork);
+
+        ActionNotif action;
+        action.Construct(*aMsg);
+
+        assert(len==sizeof(msgInNetwork));
+        assert( aMsg->GetRequestCode()==REQ_GAME_DIST_DECISION );
+
+        return 0;
+    }
+};
+
 class TestRecvDistCard_MingGang4tiao : public CTestCase {
 public:
     virtual int Execute() {
@@ -1042,6 +1079,8 @@ void testGameActions() {
     aCase = new TestRecvActionResponse_waitRight();
     aCase->Execute();
     aCase = new TestRecvActionNotif();
+    aCase->Execute();
+    aCase = new TestRecvActionNotif_Liuju();
     aCase->Execute();
 
     

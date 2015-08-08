@@ -186,6 +186,10 @@ void show(char *buf,int len) {
     printf("\n");
 }
 
+int ExtractLineNumber(char *buf) {
+    return atoi(buf);
+}
+
 int GetLine(char *buf,int line=1) {
     FILE * fsend = fopen(SEND_DATA_FILE,"r");
     assert(fsend!=NULL);
@@ -198,6 +202,8 @@ int GetLine(char *buf,int line=1) {
         } else {
             if(!strncmp(buf,"//",2)) {
                 continue;
+            } else if(line==ExtractLineNumber(buf)) {
+                return 0;
             } else {
                 i++;
             }
@@ -1012,26 +1018,17 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } else if(handout==0 && recvBuf[16]==REQ_GAME_SEND_START) {
         handout++;
         SendLine(SERVER,6);
-        SendLine(SERVER,7);
+        SendLine(SERVER,10);
+        SendLine(SERVER,11);
     } else if(handout==1) {
         handout++;
-        SendLine(SERVER,8);
-        SendLine(SERVER,9);
-        SendLine(SERVER,10);
-    } else if(handout==2) {
-        handout++;
-        SendLine(SERVER,11);
         SendLine(SERVER,12);
-    } else if(handout==3) {
-        handout++;
-        for(int i=13;i<=27;i++) {
-            SendLine(SERVER,i);
-        }
-    } else if(handout==4) {
-        handout++;
-        for(int i=28;i<=32;i++) {
-            SendLine(SERVER,i);
-        }
+        SendLine(SERVER,13);
+        SendLine(SERVER,14);
+        SendLine(SERVER,15);
+        SendLine(SERVER,34);
+        SendLine(SERVER,35);
+        SendLine(SERVER,36);
     }
 }
 

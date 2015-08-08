@@ -24,6 +24,7 @@ public:
     VersionCode_t   getNewVerCode() const;
     string          getNewVerName() const;
     float           getNewVerSize() const;
+	int				requestUpdate();
     int             upgrade();
     bool            get_download_status(float &Kbps,float &percentage);
 private:
@@ -33,7 +34,6 @@ private:
     VersionManager();
     ~VersionManager();
 
-    int _requestUpdate();
     int _download();
     int _update();
     int _recordVersion();

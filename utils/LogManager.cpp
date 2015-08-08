@@ -2,6 +2,8 @@
 #include "UtilBasic.h"
 #include "LogManager.h"
 
+#include "DebugCtrl.h"
+
 #ifdef __DISABLE_LOGGER__
 
 //BLANK INTENTIONALLY

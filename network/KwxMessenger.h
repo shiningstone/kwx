@@ -27,7 +27,7 @@ public:
     static KwxMessenger *_instances[MSG_TYPE_MAX];
     
     /* auto receive */
-    void StartReceiving();
+    bool StartReceiving();
     void StopReceiving();
 
     int Send(UsMsg &aMsg,bool rspRequired=true);/* why cannot declare as const UsMsg??? */
@@ -52,7 +52,7 @@ private:
     static int WaitQueueFind(RequestId_t req);
 
     friend class TestKwxAutoRecv;
-    void StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
+    bool StartReceiving(MsgHandler_t handle);//this method should only be referenced by test cases.
 
     INT8U       _serverIp[32];
     int         _port;

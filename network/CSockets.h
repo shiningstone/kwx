@@ -30,7 +30,7 @@ public:
     CSocket();
     ~CSocket();
 
-    virtual void Start(const char *serverIp,int port) = 0;
+    virtual bool Start(const char *serverIp,int port) = 0;
     void Stop();
 
 	static void Init();
@@ -61,12 +61,12 @@ protected:
 
 class ServerSocket : public CSocket {
 public:
-	virtual void Start(const char *serverIp,int port);
+	virtual bool Start(const char *serverIp,int port);
 };
 
 class ClientSocket : public CSocket {
 public:
-	virtual void Start(const char *serverIp,int port);
+	virtual bool Start(const char *serverIp,int port);
 };
 
 #endif

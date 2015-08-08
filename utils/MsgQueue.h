@@ -27,8 +27,12 @@ private:
 
 class MsgHandle {
 public:
+    friend class ErrorManager;
+    
     virtual void RecvMsg(void *val);
     virtual void HandleMsg(void *aMsg) = 0;
+
+    bool _readyToReceive;/* used to control time-consuming actions */
 protected:
     MsgHandle();
     

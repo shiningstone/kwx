@@ -1,6 +1,9 @@
 #include "SystemMessageHint.h"
 #include "HelloWorldScene.h"
 
+#include "game/RaceLayer.h"
+#include "network/KwxMessenger.h"
+
 SystemMessageHint::SystemMessageHint(std::string str,MES_HINT_ACTION curAct)
 {
 	NoticeMessage=str;
@@ -109,6 +112,22 @@ void SystemMessageHint::ChooseEnsure(cocos2d::Ref* pSender,ui::Widget::TouchEven
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
 		break;
 	case cocos2d::ui::Widget::TouchEventType::ENDED:
+        {
+            KwxMessenger *bMessenger = KwxMessenger::getInstance(MSG_GAME);
+
+            if(bMessenger->StartReceiving()) {
+                bMessenger->Send(REQ_GAME_SEND_RECONNECT);
+            } else {
+                return;
+            }
+#if 0
+            auto scene = Scene::create();
+            RaceLayer *layer = RaceLayer::create();
+            scene->addChild(layer);
+            layer->CreateRace(NETWORK_GAME);
+            Director::getInstance()->replaceScene(scene);
+#endif
+        }
 		break;
 	case cocos2d::ui::Widget::TouchEventType::CANCELED:
 		break;

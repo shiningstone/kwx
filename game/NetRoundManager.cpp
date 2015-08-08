@@ -1,5 +1,8 @@
 
 #include <stdlib.h>
+#include <string>
+
+using namespace std;
 
 #include "cocos2d.h"
 USING_NS_CC;
@@ -8,9 +11,12 @@ USING_NS_CC;
 #include "./../protocol/DsInstruction.h"
 #include "./../protocol/KwxMsgLogin.h"
 #include "./../protocol/UsRequest.h"
+#include "./../protocol/DbgRequestDesc.h"
 
 #include "./../network/KwxEnv.h"
 #include "./../network/KwxMessenger.h"
+
+#include "./../hall/ErrorManager.h"
 
 #include "CardCollection.h"
 #include "Player.h"
@@ -55,7 +61,7 @@ NetRoundManager::NetRoundManager(RaceLayer *uiManager)
     InitPlayers();
 
     _HandoutNotify = false;
-    _ignoreDaoJiShi = false;
+    _isAfterMing = false;
 
     _logger = LOGGER_REGISTER("NetRoundManager");
 }
@@ -131,6 +137,9 @@ void NetRoundManager::HandleMsg(void * aMsg) {
         case REQ_GAME_DIST_HU_CALCULATE:
             _DiRecv((HuInfoNotif *)di);
             break;
+        case REQ_GAME_GET_TINGINFO:
+            _DiRecv((TingInfoResponse *)di);
+            break;
 
         case REQ_GAME_SEND_AGENT:
             _DiRecv((TuoGuanResponse *)di);
@@ -171,6 +180,10 @@ void NetRoundManager::HandleMsg(void * aMsg) {
             break;
         case REQ_GAME_SEND_LEAVE_ROOM:
             break;
+        case REQ_GAME_RESTART:
+            break;
+        case REQ_LOGOUT:
+            break;
 
         default:
             LOGGER_WRITE("%s undefined request code %d\n",__FUNCTION__,di->request);
@@ -185,6 +198,8 @@ void NetRoundManager::RecordError(void *aError) {
 
     _messenger->_response = di->failure;
 
+    ErrorManager::getInstance()->notify_error(new std::string(DescErr(_messenger->_response)));
+    
     if(_messenger->_response==RECONNECT_REQUIRED) {
         EnvVariable::getInstance()->SetReconnect(true);
         SeatInfo::getInstance()->Set(di->reconnectInfo);
@@ -196,6 +211,8 @@ void NetRoundManager::RecordError(void *aError) {
 }
 
 void NetRoundManager::HandleError() {
+    ErrorManager::getInstance()->notify_error(new std::string(DescErr(_messenger->_response)));
+    
     switch(_messenger->_response) {
         case RECONNECT_REQUIRED:
             SendReconnect();
@@ -209,6 +226,13 @@ void NetRoundManager::SendReconnect() {
     RETURN_IF_FAIL(_messenger->_response);
 
     _uiManager->reload();
+}
+
+void NetRoundManager::query_ting_info(TingInfo_t *ting) {
+    _messenger->Send(REQ_GAME_GET_TINGINFO,false);
+    RETURN_IF_FAIL(_messenger->_response);
+
+    ting = _players[MIDDLE]->_cards->_ting;
 }
 
 void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind) {
@@ -262,7 +286,7 @@ void NetRoundManager::ServerDistributeTo(PlayerDir_t dir,Card_t card) {
         distInfo.newCard  = card;
         distInfo.remain   = TOTAL_CARD_NUM - _distributedNum;
 
-        LOGGER_WRITE("Distribute %s to %s",DescPlayer(dir),DescCard(card));
+        LOGGER_WRITE("Distribute %s to %s, total %d",DescPlayer(dir),DescCard(card),distInfo.cardsLen);
         _uiManager->_DistributeEvent(DISTRIBUTE_DONE_EVENT_TYPE,&distInfo);
     } else {
 		_uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
@@ -298,6 +322,9 @@ void NetRoundManager::StartGame() {
     } else {
         _isGameStart = false;
 
+        _gRiver->clear();
+        _distributedNum = 0;
+
         for(int i=0;i<PLAYER_NUM;i++) {
             _players[i]->restart();
         }
@@ -323,6 +350,8 @@ void NetRoundManager::StopGame() {
 }
 
 Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
+    _uiManager->stop_timer();
+
     Card_t kind = LastHandout();
     
     if(dir==MIDDLE) {
@@ -337,11 +366,16 @@ Card_t NetRoundManager::RecvPeng(PlayerDir_t dir) {
     } else {
         _players[dir]->_cards->push_back(kind);
         _players[dir]->_cards->_IncludingOthersCard = true;
-        return RoundManager::RecvPeng(dir);
+        Card_t card = RoundManager::RecvPeng(dir);
+        _players[dir]->_cards->_IncludingOthersCard = false;
+        
+        return card;
     }
 }
 
 void NetRoundManager::RecvHu(PlayerDir_t dir) {
+    _uiManager->stop_timer();
+
     if(dir==MIDDLE) {
         _messenger->Send(aHU);
         RETURN_IF_FAIL(_messenger->_response);
@@ -349,11 +383,15 @@ void NetRoundManager::RecvHu(PlayerDir_t dir) {
 }
 
 Card_t NetRoundManager::RecvGang(PlayerDir_t dir) {
+    _uiManager->stop_timer();
+
     _players[dir]->_strategy->scan_gang(_isNewDistributed);
     return RoundManager::RecvGang(dir);
 }
 
 Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
+    _uiManager->stop_timer();
+
     CardInHand *cards   = _players[dir]->_cards;
     int*        gangIdx = new int[4];
     ActionId_t  action  = aNULL;
@@ -407,6 +445,8 @@ Card_t NetRoundManager::RecvGangConfirm(PlayerDir_t dir) {
 }
 
 void NetRoundManager::RecvQi() {
+    _uiManager->stop_timer();
+
     _players[MIDDLE]->_cards->_alter->clear();
     
     _messenger->Send(aQi);
@@ -426,6 +466,9 @@ void NetRoundManager::_NotifyHandout() {
 
             _messenger->Send(aQi);
             RETURN_IF_FAIL(_messenger->_response);
+        } else if(_actCtrl.decision==aMING_CONFIRM) {
+            _messenger->Wait(REQ_GAME_DIST_DAOJISHI);/* BUG : 有可能在Wait之前，倒计时就已经收到了*/
+            RETURN_IF_FAIL(_messenger->_response);
         }
         
         RequestShowCard aReq;
@@ -437,9 +480,8 @@ void NetRoundManager::_NotifyHandout() {
 
 void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
     _actCtrl.handoutAllow = false;
+    _uiManager->stop_timer();
 
-    _HandoutNotify = true;
-    
     Card_t handingout = _players[MIDDLE]->_cards->get_kind(chosen);
     RecordOutCard(handingout);
 
@@ -457,20 +499,23 @@ void NetRoundManager::RecvHandout(int chosen,Vec2 touch,int mode) {
 
         _messenger->WaitQueueAdd(REQ_GAME_DIST_DECISION);
         _messenger->Send(aMING_CONFIRM);
-        _ignoreDaoJiShi = true;
+        _isAfterMing = true;
         RETURN_IF_FAIL(_messenger->_response);
 
         _players[LEFT]->refresh(_mingBuf.cards[LEFT], _mingBuf.num[LEFT]);
         _players[RIGHT]->refresh(_mingBuf.cards[RIGHT], _mingBuf.num[RIGHT]);
 
-        _actCtrl.choices = 0;
+        _uiManager->_CardInHandUpdateEffect(MIDDLE,true);
 
-        _uiManager->_CardInHandUpdateEffect(MIDDLE);
+        _actCtrl.choices = 0;
+        _actCtrl.decision = aMING_CONFIRM;
     }
     
     _uiManager->MyHandoutEffect(chosen,touch,mode,turnToMing);
 
     _isNewDistributed = false;
+
+    _HandoutNotify = true;
     WaitForResponse(MIDDLE);
 }
 
@@ -555,13 +600,18 @@ void NetRoundManager::WaitForOthersChoose() {
 }
 
 void NetRoundManager::WaitForResponse(PlayerDir_t dir) {
-	_NotifyHandout();
+    if(dir==MIDDLE) {
+        std::thread t1(&NetRoundManager::_NotifyHandout,this);
+        t1.detach();
+    }
 }
 
 void NetRoundManager::DistributeTo(PlayerDir_t dir,Card_t card) {
+    _readyToReceive = true;
 }
 
 void NetRoundManager::ActionAfterGang(PlayerDir_t dir) {
+    _readyToReceive = true;
 }
 
 ActionMask_t NetRoundManager::judge_action_again(PlayerDir_t dir) {
@@ -782,6 +832,10 @@ void NetRoundManager::_DiRecv(RemindInfo *info) {
         _isNewDistributed = false;
     }
 
+    if(_actCtrl.choices&aMING || _actCtrl.choices&aMING_CONFIRM) {
+        _isNewDistributed = true;
+    }
+
     ServerWaitForMyAction();
 }
 
@@ -815,8 +869,9 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
             {
                 if(!_isNewDistributed) {
                     _curPlayer = whoGive;
-                    
-                    _players[whoGive]->_river->pop_back();
+					
+					if(whoGive!=SERVER)
+						_players[whoGive]->_river->pop_back();
 			        RecordOutCard(card);
 			        RecordOutCard(card);
 			        RecordOutCard(card);
@@ -827,6 +882,8 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
                 }
 
                 SetDecision(dir,aGANG);
+
+                _readyToReceive = false;
                 _uiManager->_MingGangEffect(dir,whoGive,card);
             }
             break;
@@ -834,6 +891,8 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
         case aAN_GANG:
             {
                 SetDecision(dir,aGANG);
+
+                _readyToReceive = false;
                 _uiManager->_AnGangEffect(dir,card);
             }
             break;
@@ -855,11 +914,23 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
 
             }
             break;
+        case aLIU_JU:
+        case aBAO_ZHUANG:
         case aHU:
             {
                 PlayerDir_t zhuang = GetLastWinner();
                 for(int i=0;i<PLAYER_NUM;i++) {
                     _players[(zhuang+i)%PLAYER_NUM]->refresh(info->huCards[i], info->huCardsNum[i], 0);
+                }
+
+                if(_actCtrl.decision==aBAO_ZHUANG) {
+                    _firstMingNo = dir;
+                    _uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
+                } 
+
+                if(_actCtrl.decision==aLIU_JU) {
+                    _firstMingNo = INVALID_DIR;
+                    _uiManager->_DistributeEvent(NOONE_WIN_EVENT_TYPE,NULL);
                 }
             }
             break;
@@ -868,7 +939,7 @@ void NetRoundManager::_DiRecv(ActionNotif *info) {
     delete info;
 }
 
-void NetRoundManager::_UpdateWin(HuInfo_t *player) {
+bool NetRoundManager::_UpdateWin(HuInfo_t *player) {
     int winnerNum = 0;
     int winner = 0;
     int loser = 0;
@@ -887,13 +958,17 @@ void NetRoundManager::_UpdateWin(HuInfo_t *player) {
 
     if(winnerNum==1) {
         SetWin(SINGLE_WIN,winner);
-    } else {
+    } else if(winnerNum==2) {
         SetWin(DOUBLE_WIN,loser);
+    } else {
+        return false;
     }
+
+    return true;
 }
 
 void NetRoundManager::_DiRecv(HuInfoNotif *info) {
-    _UpdateWin(info->hu);
+    bool hu = _UpdateWin(info->hu);
 
     for(int i=0;i<PLAYER_NUM;i++) {
         if(info->hu[i].status==ZI_MO || info->hu[i].status==HU_PAI) {
@@ -911,7 +986,24 @@ void NetRoundManager::_DiRecv(HuInfoNotif *info) {
 
     delete info;
 
-    _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
+    if(hu) {
+        _uiManager->HuEffect(_lastWin, _isQiangGangAsking);
+    }
+}
+
+void NetRoundManager::_DiRecv(TingInfoResponse *info) {
+    if(!_players[MIDDLE]->_cards->_ting) {
+        TingInfo_t *ting = new TingInfo_t;
+        _players[MIDDLE]->_cards->_ting = ting;
+
+        ting->kindNum = info->info.kindNum;
+        ting->cardNum = info->info.cardNum;
+        ting->cards = new TingItem_t[ting->kindNum];
+
+        for(int i=0;i<ting->kindNum;i++) {
+            ting->cards[i] = info->info.cards[i];
+        }
+    }
 }
 
 void NetRoundManager::_DiRecv(EnterRoomResponse *info) {
@@ -949,12 +1041,10 @@ void NetRoundManager::_DiRecv(EnterRoomNotif *info) {
 }
 
 void NetRoundManager::_DiRecv(CounterNotif *info) {
-    if(_ignoreDaoJiShi) {
-        _ignoreDaoJiShi = false;
-        _NotifyHandout();
+    if(_isAfterMing) {
+        _isAfterMing = false;
     } else {
         _uiManager->start_timer(info->count,(PlayerDir_t)info->seat);
-        
         
         if(info->seat==MIDDLE) {
             WaitForMyChoose();
