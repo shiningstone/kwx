@@ -3513,7 +3513,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 		} else {
             auto Pengsize = _object->RectSize(PENG_CARD);
             
-			baseCard = _GetCardInHand(MIDDLE,cards->last()-4-1);/*include others' card*/
+			baseCard = _GetCardInHand(MIDDLE,cards->last()-4);/*include others' card*/
 			basePos  = baseCard->getPosition();
 
             if( cards->FreeStart>0 )
