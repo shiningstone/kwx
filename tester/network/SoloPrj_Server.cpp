@@ -1044,6 +1044,48 @@ void temp_handle_requests(ServerSocket SERVER,char *recvBuf,int len) {
     } else if(handout==6) {
         handout++;
         SendLines(SERVER,167,170);
+    } else if(handout==7) {
+        handout++;
+        SendLines(SERVER,171,179);
+    } else if(handout==8) {
+        handout++;
+        SendLines(SERVER,180,193);
+    } else if(handout==9) {
+        handout++;
+        SendLines(SERVER,194,195);
+    } else if(handout==10) {
+        handout++;
+        SendLines(SERVER,196,204);
+    } else if(handout==11) {
+        handout++;
+        SendLines(SERVER,205,212);
+    } else if(handout==12) {
+        handout++;
+        SendLines(SERVER,213,218);
+    } else if(handout==13) {
+        handout++;
+        SendLines(SERVER,219,227);
+    } else if(handout==14) {
+        handout++;
+        SendLines(SERVER,228,236);
+    } else if(handout==15) {
+        handout++;
+        SendLines(SERVER,237,246);
+    } else if(handout==16) {
+        handout++;
+        SendLines(SERVER,247,248);
+    } else if(handout==17) {
+        handout++;
+        SendLines(SERVER,249,256);
+    } else if(handout==18) {
+        handout++;
+        SendLines(SERVER,257,258);
+    } else if(handout==19) {
+        handout++;
+        SendLines(SERVER,259,269);
+    } else if(handout==20) {
+        handout++;
+        SendLines(SERVER,270,271);
     }
 }
 
