@@ -253,23 +253,30 @@ void NetRoundManager::UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t act
     }
 }
 
-void NetRoundManager::ServerWaitForMyAction() {
-    _uiManager->start_timer(TIME_LIMIT,MIDDLE);
-
-    if(_players[MIDDLE]->_cards->HasKou) {
-        _actCtrl.choices &= ~aMING;
-    }
-    
-    _uiManager->ShowActionButtons(_actCtrl.choices);
-
-	if(_actCtrl.choices!=0 && !_isMingTime) {
-		_actCtrl.decision = aNULL;
-	}
-
-	if(_isNewDistributed) {
-        _players[MIDDLE]->_cards->_IncludingOthersCard = false;
+bool NetRoundManager::ServerWaitForMyAction() {
+    if( (_isTuoGuan) || (IsMing(MIDDLE)) ) {
+        ForceAction();
+        return false;
     } else {
-        _players[MIDDLE]->_cards->_IncludingOthersCard = true;
+        _uiManager->start_timer(TIME_LIMIT,MIDDLE);
+        
+        if(_players[MIDDLE]->_cards->HasKou) {
+            _actCtrl.choices &= ~aMING;
+        }
+        
+        _uiManager->ShowActionButtons(_actCtrl.choices);
+        
+        if(_actCtrl.choices!=0 && !_isMingTime) {
+            _actCtrl.decision = aNULL;
+        }
+        
+        if(_isNewDistributed) {
+            _players[MIDDLE]->_cards->_IncludingOthersCard = false;
+        } else {
+            _players[MIDDLE]->_cards->_IncludingOthersCard = true;
+        }
+        
+        return true;
     }
 }
 
@@ -632,7 +639,11 @@ void NetRoundManager::WaitForFirstAction(PlayerDir_t zhuang) {
     }
 }
 
-
+void NetRoundManager::ForceAction() {
+    if(_actCtrl.choices&aHU) {
+        RecvHu(MIDDLE);
+    }
+}
 /*************************************
         response wait
 *************************************/
@@ -770,10 +781,10 @@ void NetRoundManager::_DiRecv(DistCardInfo *info) {
     _players[MIDDLE]->_cards->push_back(card);
     _players[MIDDLE]->_cards->_IncludingOthersCard = false;
 
-    ServerWaitForMyAction();
-    _actCtrl.handoutAllow = true;
-
-    _uiManager->ListenToCardTouch();
+    if( ServerWaitForMyAction() ) {
+        _actCtrl.handoutAllow = true;
+        _uiManager->ListenToCardTouch();
+    }
 }
 
 void NetRoundManager::_DiRecv(ShowCardResponse *info) {

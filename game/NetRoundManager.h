@@ -60,7 +60,7 @@ public:
     void _DiRecv(ReconnectResponse *info);
     void _DiRecv(ReconnectNotif *info);
 
-    void ServerWaitForMyAction();
+    bool ServerWaitForMyAction();
     void ServerDistributeTo(PlayerDir_t dir,Card_t card);
     
     virtual void UpdateCards(PlayerDir_t dir,ARRAY_ACTION action,Card_t actKind = CARD_UNKNOWN);
@@ -78,6 +78,7 @@ public:
     void _restoreRemindInfo(const Reminds_t &remind);
     void _order_small_to_big(Card_t kinds[],int num);
 
+    void ForceAction();
 
     typedef struct _MingDecisionBuf_t {
         CardNode_t       cards[PLAYER_NUM][18]; /* this struct is used for buffering the cards received by ming decision */
