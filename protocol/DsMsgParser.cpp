@@ -146,7 +146,7 @@ int DsMsgParser::_load_ting_info(TingInfo_t &ting,const INT8U *inMsg) {
         
         int i = 0;
         int num = 0;
-        while(num<ting.kindNum) {
+        while(i<ting.kindNum) {
             ting.cards[i].kind   = (Card_t)p[0+4*i];
             ting.cards[i].remain = p[1+4*i];
             ting.cards[i].fan    = _ntohs( *((INT16U *)(p+2+4*i)) );
@@ -192,7 +192,7 @@ int DsMsgParser::_load_ting_remind(TingInfo_t &ting,const INT8U *inMsg) {
 
 int DsMsgParser::_unload(TingInfo_t &ting) {
     if(ting.kindNum>0) {
-        delete []ting.cards;
+        delete [](ting.cards);
 
         ting.cards = NULL;
         ting.kindNum = 0;
