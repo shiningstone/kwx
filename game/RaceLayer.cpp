@@ -2046,6 +2046,7 @@ void RaceLayer::_RaceBeginPrepare() {
                     FadeOut::create(0.5),NULL),NULL));
 
     _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
+    _CreateResidueCards();
 	_UpdateResidueCards(TOTAL_CARD_NUM);
 
     int lastWinner = _roundManager->GetLastWinner();
