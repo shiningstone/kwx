@@ -80,7 +80,9 @@ void RaceLayer::CreateRace(GameMode_t mode)
     _CreateHeadImage();
 
 	this->addChild(_object->CreateMicIcon(),1,MIC_TAG_ID);
-	this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
+    if(mode==LOCAL_GAME) {
+        this->addChild(_object->CreateModeFont(LOCAL_GAME),1,SINGLE_PLAY_TAG_ID);
+    }
 
     for(int i=0;i<4;i++) {
         auto mapai = _object->CreateMaPai(i);
@@ -96,8 +98,6 @@ void RaceLayer::CreateRace(GameMode_t mode)
     StartButton->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnStartHandler,this));
 #endif
     this->addChild(StartButton,2,START_GAME_TAG_ID);
-
-	_UpdateResidueCards(TOTAL_CARD_NUM);
 
     if(mode==LOCAL_GAME) {
         _roundManager = RoundManager::getInstance();
@@ -1181,26 +1181,27 @@ void RaceLayer::_UpdateResidueCards(int no)
         
 		if(no<=3&&no>=0)
 		{
-			(this->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+5))->runAction(Sequence::create(ScaleTo::create(0,1),Blink::create(1,4),ScaleTo::create(0,0),NULL));
+			(this->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+5))->runAction(Sequence::create(
+                ScaleTo::create(0,1),Blink::create(1,4),ScaleTo::create(0,0),NULL));
+
 			switch (no)
 			{
 			case 3:				
 				str_card_NUM->runAction(Blink::create(1,4));
 				break;
 			case 2:
-				if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+2))
-					residue_card_bkg->removeChildByTag(RESERVED_BKG_CHILD_TAG_ID+2,true);
+                _Remove(residue_card_bkg,RESERVED_BKG_CHILD_TAG_ID+2);
 				str_card_NUM->runAction(Blink::create(1,4));
 				break;
 			case 1:
-				if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+3))
-					residue_card_bkg->removeChildByTag(RESERVED_BKG_CHILD_TAG_ID+3,true);
+                _Remove(residue_card_bkg,RESERVED_BKG_CHILD_TAG_ID+3);
 				str_card_NUM->runAction(Blink::create(1,4));
 				break;
 			case 0:
 				if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+4))
 				{
 					residue_card_bkg->removeChildByTag(RESERVED_BKG_CHILD_TAG_ID+4,true);
+                    
 					if(residue_card_bkg->getChildByTag(RESERVED_BKG_CHILD_TAG_ID+1))
 					{
 						residue_card_bkg->removeChildByTag(RESERVED_BKG_CHILD_TAG_ID+1);
@@ -2045,6 +2046,7 @@ void RaceLayer::_RaceBeginPrepare() {
                     FadeOut::create(0.5),NULL),NULL));
 
     _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
+	_UpdateResidueCards(TOTAL_CARD_NUM);
 
     int lastWinner = _roundManager->GetLastWinner();
     _ShowZhuang((PlayerDir_t)lastWinner);
@@ -6174,9 +6176,6 @@ void RaceLayer::BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type) 
 		{
 			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(GAMEBACK_MENU_BUTTON))->setTouchEnabled(true);
 			((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setHighlighted(false);
-            
-            _InitResidueCards();
-			_UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);
 		}
 		break;
 	case cocos2d::ui::Widget::TouchEventType::MOVED:
