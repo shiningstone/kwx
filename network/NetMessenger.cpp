@@ -8,7 +8,8 @@ Logger *NetMessenger::_logger = 0;
 
 NetMessenger::NetMessenger() {
 	_socket = new ClientSocket();
-    
+
+    _socketStarted = false;
 	_keepListen = false;
     _running    = false;
     _handle_msg = 0;
@@ -36,23 +37,33 @@ void NetMessenger::SetHandler(MsgHandler_t func) {
 }
 
 bool NetMessenger::Start(const char *serverIp,int port) {
-	if(!_socket->Start(serverIp,port)) {
-        return false;
-    }
+    if(_socketStarted) {
+        LOGGER_WRITE("socket %s:%d is already running:listening %d, handleing %d ",
+            serverIp, port, _keepListen, (_handle_msg!=0)&&_running );
+        return true;
+    } else {
+        if(!_socket->Start(serverIp,port)) {
+            return false;
+        }
 
-    if(!_keepListen) {
-        _keepListen = true;
-	    std::thread t1(&NetMessenger::_collect_bytes,this);
-	    t1.detach();
+        _socketStarted = true;
+        
+        if(!_keepListen) {
+            _keepListen = true;
+            std::thread t1(&NetMessenger::_collect_bytes,this);
+            t1.detach();
+            LOGGER_WRITE("Thread NetMessenger::_collect_bytes start");
+        }
+        
+        if(_handle_msg && !_running) {
+            _running = true;
+            std::thread autoDetect(&NetMessenger::_collect_packages,this);
+            autoDetect.detach();
+            LOGGER_WRITE("Thread NetMessenger::_collect_packages start");
+        }
+        
+        return true;
     }
-
-    if(_handle_msg && !_running) {
-        _running = true;
-	    std::thread autoDetect(&NetMessenger::_collect_packages,this);
-	    autoDetect.detach();
-    }
-
-    return true;
 }
 
 int NetMessenger::Send(const INT8U *buf,int len) {
@@ -105,7 +116,7 @@ void NetMessenger::_get_pkg_from_buffer(INT8U *pkg,int pkgLen) {
 	}
 
 	_outStart = (_outStart + pkgLen) % BUFF_SIZE;  
-    LOGGER_WRITE("outStart increate %d, inStart %d,outStart %d",pkgLen,_inStart,_outStart);
+    //LOGGER_WRITE("outStart increate %d, inStart %d,outStart %d",pkgLen,_inStart,_outStart);
 
     _isFull   = false;
 }
@@ -140,13 +151,15 @@ void NetMessenger::_collect_bytes() {
             }
             
             _inStart = (_inStart+inLen) % BUFF_SIZE;
-            LOGGER_WRITE("content increate %d, inStart %d,outStart %d",inLen,_inStart,_outStart);
+            //LOGGER_WRITE("content increate %d, inStart %d,outStart %d",inLen,_inStart,_outStart);
             
             if(_inStart==_outStart) {
                 _isFull = true;
             }
         }
 	}
+
+    LOGGER_WRITE("Thread %s quit",__FUNCTION__);
 }
 
 int NetMessenger::_usedLen() {
@@ -216,4 +229,6 @@ void NetMessenger::_collect_packages() {
             }
         }
     }
+
+    LOGGER_WRITE("Thread %s quit",__FUNCTION__);
 }

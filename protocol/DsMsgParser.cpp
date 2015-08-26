@@ -170,10 +170,11 @@ int DsMsgParser::_load_ting_remind(TingInfo_t &ting,const INT8U *inMsg) {
         return 0;
     } else {
         _TingItem_t cards[9];
+
         
         int idx = 0;
         int num = 0;
-        while(num<ting.cardNum) {
+        while(_ntohl(*(INT32U *)(p+idx*4))!=0xffffffff) {
             cards[idx].kind   = (Card_t)p[0+4*idx];
             cards[idx].remain = p[1+4*idx];
             cards[idx].fan    = _ntohs( *((INT16U *)(p+2+4*idx)) );

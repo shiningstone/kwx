@@ -83,6 +83,11 @@ typedef enum {
     REQ_GAME_SEND_MSG           = 46,
     REQ_GAME_RECV_MSG           = 73,
     
+    /*********************************************
+        需要等待执行完成的REQUEST
+    *********************************************/
+    RES_GAME_DIST_REMIND        = 100 + REQ_GAME_DIST_REMIND,
+
     REQ_INVALID                 = 0xff,
 }RequestId_t;
 

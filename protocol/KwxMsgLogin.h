@@ -259,29 +259,6 @@ public:
     HostString    _content;
 };
 
-class CSocket;
-class KwxHeart {
-public:
-    static KwxHeart *getInstance(int second=15);
-    static void      destroyInstance();
-
-    void Resume();
-    void Pause();
-
-private:
-    KwxHeart(int second);
-    ~KwxHeart();
-
-    void    _Beats();
-
-    CSocket *_socket;
-    int      _rate;
-    bool     _running;
-    int      _duration;
-
-    static KwxHeart *_instance;
-};
-
 class RequestHeartBeat : public UsMsg {
 public:
     int Set();

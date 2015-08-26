@@ -113,13 +113,14 @@ typedef enum {
 	sMING_GANG  = 2,
 	sAN_GANG    = 4,
     sSHOU_GANG  = 0x20,
-	sMING_KOU,
-	sKOU_ENABLE,
-    sGANG_ENABLE,
+	sMING_KOU   = 0x40, 
+	sKOU_ENABLE = 0x80,
+    sGANG_ENABLE= 0x100,
     sGANG       = sMING_GANG|sAN_GANG|sSHOU_GANG,
 	sUNDEFINDED=0xff,
-}CardStatus_t;
+}CardStatus_e;
 
+typedef INT32U CardStatus_t;
 typedef INT32U ActionMask_t;
 
 typedef enum {

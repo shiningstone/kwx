@@ -15,6 +15,8 @@ public:
     virtual void load_card_sequence(Card_t cards[84]) = 0;
 
     void get_ending_gold(int gold[PLAYER_NUM]);
+
+    int  _roundHuGold[3];
 /***************************************
         singleton
 ***************************************/
@@ -23,7 +25,6 @@ public:
     static void  destroyInstance();
 
 protected:
-    int  _roundHuGold[3];
     
     RoundManager *_rm;
 

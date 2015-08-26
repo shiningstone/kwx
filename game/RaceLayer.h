@@ -37,8 +37,11 @@ public:
     void KouCancelEffect(ActionId_t action,CardInHand *cards);
     void KouConfirmEffect();
     void MingCancelEffect();
+    
 	void QueryKouCards();
 	void QueryMingOutCard();
+
+    void _RemoveBtn(int tag);
     void _SwitchCancelBtn(int tag);
 
     void QueryGangCards();
@@ -58,10 +61,11 @@ protected:
     GraphicEffect  *_effect;
     GObjectFactory *_object;
 private:
-    
     typedef struct {
         PlayerDir_t curPlayer;
         int         count;
+        bool        pause;
+        bool        ignore;                 /* in case handout without pressing Qi */
     }TimerInfo_t;
 
     TimerInfo_t    _timer;
@@ -153,10 +157,14 @@ public:
 
 	void start_timer(int time,PlayerDir_t direction);
     void stop_timer();
+    void pause_timer();
+    void resume_timer();
+    void skip_timer();
     void UpdateClock(float dt);
     void HideClock();
     void ListenToCardTouch();
     
+	int  _myTouchedCard;  //only used in ListenToCardTouch
 private:
 	float s_scale;
 	int s_no;
@@ -174,7 +182,6 @@ private:
 	bool ifTuoGuan;
     
 	bool ifChosed;   //only used in ListenToCardTouch
-	int  _myTouchedCard;  //only used in ListenToCardTouch
     int  _myChosenCard;
 
 	CARD_KIND cur_effect_cardKind;
@@ -220,7 +227,7 @@ private:
 	void AccountShows(LayerColor* BarOfPlayer,int no);
 	void AccountHuKind(LayerColor* BarOfPlayer,int num);
 	//void show_win_card(account *lastLayer,int no,cocos2d::Vec2 pos,CARD_ARRAY list);
-	void _RaceBeginPrepare();//牌局开始效果
+    void _ShowStartAnimation();
 	Spawn* simple_tip_effect(Vec2 v,std::string act_name);//机器人碰杠胡效果=-=
 	void display_callback(cocos2d::Ref* pSender);//功能--看（空）
 	void BtnRestartHandler(Ref* pSender,ui::Widget::TouchEventType type);
@@ -314,7 +321,7 @@ public:
 	void GuiUpdateGoldAccounts(int GoldNum[3]);
 	void ming_winCards_Hint(Point curPosition);
 	void _UpdateTingNum(PlayerDir_t dir);
-	void _TingHintCreate(Point curPos,int CardPlace);
+	bool _TingHintCreate(Point curPos,int CardPlace);
     void _TingHintUpdate();
 	void TingHintBarOfOthers(int curNo,int CardPlace);
 	virtual bool init();

@@ -199,7 +199,9 @@ StrategyRm *StrategyRm::getInstance(RoundManager *rm) {
 }
 
 void StrategyRm::destroyInstance() {
-    delete _instance;
-    _instance = NULL;
+    if(_instance) {
+        delete _instance;
+        _instance = NULL;
+    }
 }
 

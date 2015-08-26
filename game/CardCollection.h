@@ -46,6 +46,7 @@ public:
     ~CardInHand();
     
     void   init(Card_t *cards,int len);
+    void   clear();
     void   delete_card(int from,int len=1);
     void   insert_card(CardNode_t data,int times=1,bool isZimo=true);
     void   lock_all_cards(bool lock);
@@ -147,6 +148,7 @@ public:
 
     bool scan_ming(const CardList *river = NULL/*if don't care about remain number*/);
     void load_ming_info(const MingInfo_t &info);/* for MIDDLE only*/
+    void clear_ming_info();
     void set_ting_info(const TingInfo_t &ting);/*for others only*/
     void set_ting_info(int tingNum,Card_t tingCards[]);
     void update_ting_num(const CardList *river);
@@ -154,7 +156,6 @@ public:
     int  get_ting_num(Card_t kind);
     void get_hu_cards(CARD_KIND cards[],int *len);
     bool can_handout(int idx) const;
-    bool get_ming_info(MRES *res) const;
     TingInfo_t *get_ting_info(int idx);
 
     INT32U      _mingChoicesMask;             /* NOTE : this mask starts with FreeStart, not 0 */
@@ -184,7 +185,8 @@ public:
     void refresh();
     void active_all(Card_t handingout=CARD_IGNORE);
     void clear();
-
+    void clear_kou();
+    
     int  get_activated_kinds(Card_t kinds[]) const;
     Card_t get_activated_cards(int idx[],ActionId_t *action = NULL) const;
     ActionMask_t get_actions() const;

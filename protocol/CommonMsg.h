@@ -35,8 +35,7 @@ public:
 class DsInstruction;
 class DsMsg : public CommonMsg, public DsMsgIntf {
 public:
-	static DsMsg *getInstance();
-	static void      destroyInstance();
+    DsMsg();
 
     int Dispatch(const INT8U *inMsg,int inLen);
     virtual int Deserialize(const INT8U *inMsg);
@@ -48,10 +47,6 @@ public:
     INT16U      GetItemBufLen(int idx) const;
     void        GetString(int idx,INT8U *utf8string) const;
     void        GetString(int idx,std::string &utf8string) const;
-
-private:
-	static DsMsg *_instance;
-    DsMsg();
 };
 
 /****************************************************
@@ -75,6 +70,30 @@ protected:
 /* this is for test use */
 public:
     friend class TestFullUpMsg;
+};
+
+class CSocket;
+class KwxHeart {
+public:
+    static KwxHeart *getInstance(int second=5);
+    static void      destroyInstance();
+
+    void Resume();
+    void Pause();
+
+private:
+    KwxHeart(int second);
+    ~KwxHeart();
+
+    void    _Beats();
+
+    CSocket *_socket;
+    int      _rate;
+    bool     _running;
+    int      _duration;
+
+    static KwxHeart *_instance;
+    static Logger   *_logger;
 };
 
 #define KWX_INVALID_PCHC          -1

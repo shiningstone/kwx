@@ -69,11 +69,9 @@ void Player::restart() {
     _aimDone = 0;
     _fan     = 0;
 	_score   = 0;
+    _isReady = false;
 
     _cards->clear();
-    _cards->IsMing    = false;
-	_cards->FreeStart = 0;
-    
     _river->clear();
 }
 

@@ -105,7 +105,7 @@ void RoundManager::StartGame() {
     _isRestart   = false;
     
     _players[MIDDLE]->_isReady = true;
-	_uiManager->GuiShowReady(MIDDLE);
+	//_uiManager->GuiShowReady(MIDDLE);
 
     Shuffle();
 
@@ -126,10 +126,6 @@ void RoundManager::StopGame() {
 ***********************************************************/
 Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
     SetDecision(dir,aPENG);
-
-    if(dir==MIDDLE) {
-        _actCtrl.handoutAllow = true;
-    }
     
     Card_t pengCard = _players[_curPlayer]->_river->get_kind(_players[_curPlayer]->_river->last());
     _players[_curPlayer]->_river->pop_back();
@@ -140,6 +136,10 @@ Card_t RoundManager::RecvPeng(PlayerDir_t dir) {
     TurnTo(dir);
 
     _uiManager->PengEffect((PlayerDir_t)_curPlayer,_prevPlayer,pengCard);
+
+    if(dir==MIDDLE) {
+        _actCtrl.handoutAllow = true;
+    }
 
 	return pengCard;
 }
@@ -265,7 +265,6 @@ void RoundManager::RecvMingCancel() {
     _actCtrl.decision = aQi;
     
     _players[MIDDLE]->_cards->cancel_ming();
-    /*!!!BUG MAYBE HERE : should clear MingInfo_t of cardsInHand*/
 
     _uiManager->MingCancelEffect();
 }
@@ -301,13 +300,28 @@ void RoundManager::RecvMing(bool isFromKouStatus) {
 }
 
 void RoundManager::ForceHandout() {
+    LOGGER_WRITE("%s",__FUNCTION__);
+
     if(_players[MIDDLE]->_cards->_IncludingOthersCard) {
         RecvQi();
     } else {
-        int last = _players[MIDDLE]->_cards->last();
+        int handout = 0;
+
+        if(_isMingTime) {
+            int idx[4] = {0};
+            _players[MIDDLE]->_cards->find_free_cards(
+                idx,
+                _players[MIDDLE]->_cards->_ming.handouts[0].kind
+            );
+
+            handout = idx[0];
+        } else {
+            handout = _players[MIDDLE]->_cards->last();
+        }
         
-        Vec2 location = _uiManager->GetCardPositionInHand(last);
-        RecvHandout(last,location,2);
+        Vec2 location = _uiManager->GetCardPositionInHand(handout);
+        _uiManager->_myTouchedCard = handout;
+        RecvHandout(handout,location,2);
         
         _prevPlayer = MIDDLE;
     }
@@ -388,9 +402,15 @@ void RoundManager::WaitForMyAction() {
 
 void RoundManager::WaitForMyChoose() {
 	if(_isNewDistributed) {/* is this judgement neccessary??? */
-		if( (_isTuoGuan) || (IsMing(MIDDLE) && !player_can_gang()) ) {
+        if(_isTuoGuan) {
             ForceHandout();
-		} else {
+        } else if(IsMing(MIDDLE)) {
+            LOGGER_WRITE("%s",__FUNCTION__);
+
+            if(!player_can_gang()) {
+                ForceHandout();
+            }
+        } else {
 			_actCtrl.handoutAllow = true;
         }
 	}
@@ -708,7 +728,7 @@ void RoundManager::SetDecision(PlayerDir_t dir,ActionId_t act) {
 
     _lastActionSource = dir;
 
-    _actCtrl.choices = 0;
+    //_actCtrl.choices = 0;
 }
 
 void RoundManager::UpdateGold(int gold[PLAYER_NUM]) {
@@ -886,7 +906,8 @@ RoundManager *RoundManager::getInstance() {
 void RoundManager::destroyInstance() {
     delete _instance[LOCAL_GAME];
     _instance[LOCAL_GAME] = NULL;
-    StrategyRm::destroyInstance();
+
+    //StrategyRm::destroyInstance();
 }
 
 /*************************************

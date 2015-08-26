@@ -34,6 +34,10 @@ public:
 
     KwxMessenger   *_messenger;
 
+    bool _isHandoutThreadStarted;
+    void StartHandoutThread();
+    void StopHandoutThread();
+
     bool _isAfterMing;
 
     void _DiRecv(GameStartResponse *info);

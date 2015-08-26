@@ -31,13 +31,17 @@ public:
 	int  Send(const INT8U *buf,int len);
 
     void ClearRecvBuf();
+
+protected:
+    bool         _running;
+
 private:
     CSocket      *_socket;
-	bool         _keepListen;
+    bool         _socketStarted;
+    bool         _keepListen;
     MsgHandler_t _handle_msg;
 
 
-    bool         _running;
     int          _sendCnt;
     int          _recvCnt;
     

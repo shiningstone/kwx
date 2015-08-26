@@ -78,7 +78,7 @@ bool KwxMessenger::StartReceiving() {
 }
 
 void KwxMessenger::StopReceiving() {
-    SetHandler(0);
+    _running = false;
 }
 
 int KwxMessenger::Send(UsMsg &aMsg, bool rspRequired) {
@@ -113,6 +113,11 @@ int KwxMessenger::WaitQueueFind(RequestId_t req) {
     }
 
     return INVALID;
+}
+
+void KwxMessenger::StopHeartBeat()
+{
+	KwxHeart::getInstance()->Pause();
 }
 
 bool KwxMessenger::IsWaiting(RequestId_t req) {
@@ -179,8 +184,10 @@ void KwxMessenger::destroyInstances() {
 }
 
 int _HANDLE_DS_PACKAGES(const INT8U *pkg, int &len) {
-    DsMsg *aMsg = DsMsg::getInstance();
+    DsMsg *aMsg = new DsMsg();
     aMsg->Dispatch(pkg,len);
+    delete aMsg;
+    
 	return 0;
 }
 

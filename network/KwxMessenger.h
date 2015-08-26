@@ -35,6 +35,8 @@ public:
     int Send(ActionId_t action,Card_t card = CARD_IGNORE,bool rspRequired=true);
     int Send(ActionId_t code,int kindNum,Card_t kinds[],bool rspRequired=true);
 
+	void StopHeartBeat();
+
     static bool IsWaiting(RequestId_t req = REQ_INVALID);
     static bool Wait(RequestId_t req);
     static void Resume(RequestId_t req = REQ_INVALID);

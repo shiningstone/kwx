@@ -137,9 +137,8 @@ void CardList::push_back(CardNode_t *node) {
 void CardList::pop_back() {
     if(size()>0) {
         CardNode_t *last = back();
-        delete last;
-        
         vector::pop_back();
+		delete last;
         DBG_SHOW();
     }
 }
@@ -197,10 +196,17 @@ void CardInHand::init(Card_t *cards,int len) {
 	for(INT8U i=0;i<len;i++) {
 		push_back(cards[i]);
 	}
+}
+
+void CardInHand::clear() {
+    CardList::clear();
 
     IsMing    = false;
     HasKou    = false;
 	FreeStart = 0;
+
+    memset(&_ming,0,sizeof(MingInfo_t));
+    _ting = NULL;
 
     _ClearStats();
 }
@@ -343,7 +349,7 @@ void CardInHand::refresh(CardNode_t cards[],int len) {
             i+=3;
         } else if(cards[i].status==sMING_KOU) {
             CardNode_t *node = new CardNode_t;
-            *node = cards[i];
+			memcpy(node,&cards[i],sizeof(CardNode_t));
             push_back(node);
         } else {
             insert_card(cards[i]);
@@ -367,13 +373,14 @@ void CardInHand::_AnGang(Card_t card) {
     gangCard.status  = sAN_GANG;
     gangCard.canPlay = false;
 
+    if(get_status(cardIdx[0])==sMING_KOU) {
+        FreeStart -= 3;
+    }
+
     for(int i=3;i>=0;i--) {
-        if(get_status(cardIdx[i])!=sFREE) {
-            FreeStart--;
-        }
-        
         delete_card(cardIdx[i]);
     }
+
     insert_card(gangCard,4);
     
     FreeStart += 4;
@@ -420,7 +427,7 @@ void CardInHand::_MingGang(Card_t kind,bool isZimo) {
 	{
 		for(int i=last();i>=0;i--) {
 			if(get_kind(i)==kind) {
-				if(get_status(i)==sPENG || (get_status(i)==sMING_KOU && i!=last())) {/*the status of last card will be modified to sMING_KOU after scan/clear*/
+				if(get_status(i)==sPENG || (get_status(i)&sMING_KOU && i!=last())) {/*the status of last card will be modified to sMING_KOU after scan/clear*/
 					FreeStart--;
 				}
 				delete_card(i,1);
@@ -667,16 +674,24 @@ int CardInHand::_FindInsertPoint(CardNode_t data,bool isZimo) const {
         }
 
 		for(int i=FreeStart;i>0;i--) {
-			if(data.status==sMING_GANG&&isZimo)
+			if(data.status==sMING_GANG&&isZimo)   /* peng zhuan gang*/
 			{
-				if(get_kind(i-1)==data.kind)
-					return i;
+                if(get_kind(i-1)==data.kind)
+                    return i;
 			}
 			else
 			{
 				if(get_status(i-1)!=sMING_KOU) {
 					return i;
-				} else if(data.kind>get_kind(i-1)) {
+                } else if(data.status==sMING_GANG) { /* kou zhuan gang */
+                    int kouNum = 0;
+                    for(int i=FreeStart;i>0;i--) {
+                        if(get_status(i-1)==sMING_KOU) {
+                            kouNum++;
+                        }
+                    }
+                    return FreeStart - kouNum;
+                } else if(data.kind>get_kind(i-1)) {
 					return i;
 				}
 			}
@@ -725,6 +740,9 @@ void CardInHand::set_ming(int handout) {
 void CardInHand::cancel_ming() {
     IsMing = false;
     lock_all_cards(false);
+
+    _ting = NULL;;
+    clear_ming_info();
 }
 
 /***************************************************
@@ -1141,7 +1159,7 @@ bool CardInHand::scan_ming(const CardList *river) {
 
 void CardInHand::load_ming_info(const MingInfo_t &ming) {
     if(ming.choiceNum>0) {
-        _mingChoicesMask = 0;
+        cancel_ming();
         
         _ting = NULL;
 
@@ -1173,8 +1191,28 @@ void CardInHand::load_ming_info(const MingInfo_t &ming) {
     }
 }
 
+void CardInHand::clear_ming_info() {
+    _mingChoicesMask = 0;
+
+    for(int i=0;i<_ming.choiceNum;i++) {
+        delete [](_ming.handouts[i].ting.cards);
+        _ming.handouts[i].ting.cards = NULL;
+    }
+    _ming.choiceNum = 0;
+
+    if(_ming.handouts) {
+        delete [](_ming.handouts);
+        _ming.handouts = NULL;
+    }
+}
+
 /* NOTE : memory release should be pay more attention, since _ting may refer to _ming in SINGLE_GAME */
 void CardInHand::set_ting_info(const TingInfo_t &ting) {
+    if(_ting!=NULL) {
+        delete [](_ting->cards);
+        delete _ting;
+    }
+    
     _ting = new TingInfo_t;
     _ting->kindNum = ting.kindNum;
     _ting->cards = new TingItem_t[9];
@@ -1213,25 +1251,6 @@ void CardInHand::get_hu_cards(CARD_KIND cards[],int *len) {
         }
     } else {
         *len = 0;
-    }
-}
-
-bool CardInHand::get_ming_info(MRES *res) const {
-	if(_ming.choiceNum>0) {
-		res->hu_places_num = _ming.choiceNum;
-		res->hu_places     = _mingChoicesMask;
-
-        for(INT8U i=0;i<_ming.choiceNum;i++) {
-            MingChoice_t *handout = _ming.handouts + i;
-            
-			res->hu_cards_num[i] = handout->ting.kindNum;
-			for(INT8U j=0;j<res->hu_cards_num[i];j++)
-				res->hu_cards[i][j] = (CARD_KIND)(handout->ting.cards+j)->kind;
-        }
-
-        return true;
-	} else {
-        return false;
     }
 }
 
@@ -1722,7 +1741,7 @@ void Alternatives::load_gang_info(ActionMask_t actions,const Card_t kinds[],int 
         for(int i=0;i<num;i++) {
             int cardIdx[4] = {0};
             int cardNum = _cards->find_cards(kinds[i],cardIdx);
-        
+
             if(actions & aAN_GANG) {
                 AddGroup(4,cardIdx,sAN_GANG,sGANG_ENABLE);
             } else if(actions & aMING_GANG) {
@@ -1811,7 +1830,11 @@ Card_t Alternatives::GetKind(int gIdx) const {
 
 void Alternatives::SetStatus(int gIdx,CardStatus_t status) const {
     for(int i=0;i<_group[gIdx].cardNum;i++) {
-        _cards->set_status(get_card_idx(gIdx,i),status);
+        if(_cards->get_status(get_card_idx(gIdx,i)) & sMING_KOU) {
+            _cards->set_status(get_card_idx(gIdx,i),status|sMING_KOU);
+        } else {
+            _cards->set_status(get_card_idx(gIdx,i),status);
+        }
     }
 }
 
@@ -1890,6 +1913,19 @@ void Alternatives::clear() {
     _groupNum = 0;
 }
 
+void Alternatives::clear_kou() {
+    for(INT8U gIdx=0;gIdx<_groupNum;gIdx++) {
+        for(int i=0;i<_group[gIdx].cardNum;i++) {
+            if(_cards->get_status(get_card_idx(gIdx,i))==sMING_KOU) {
+                _cards->set_status(get_card_idx(gIdx,i),sFREE);
+            }
+        }
+    }
+
+    _groupNum = 0;
+}
+
+/* Note: this function can only be used before the cards sequence changed. */
 int Alternatives::get_activated_kinds(Card_t kinds[]) const {
     int num = 0;
     

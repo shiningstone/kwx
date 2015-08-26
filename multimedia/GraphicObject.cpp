@@ -684,7 +684,7 @@ LayerColor *GObjectFactory::CreateTingInfoBar(Vec2 &referPoint, Card_t *cards,in
 
         auto remainNum = _createNumberSign(remainingNum[i]);
         remainNum->setPosition(Vec2(78,24));
-        SignForCards->addChild(remainNum,1,1);
+        SignForCards->addChild(remainNum,1,2);
 
 		auto zhangFont=Sprite::createWithSpriteFrameName("zhang.png");
 		zhangFont->setAnchorPoint(Vec2(0.5,0.5));

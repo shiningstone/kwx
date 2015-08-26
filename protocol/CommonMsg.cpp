@@ -39,24 +39,6 @@ CommonMsg::~CommonMsg() {
 /**********************************************************
 	Downstream
 ***********************************************************/
-/*******************************************************
-        µ¥ÀýÄ£Ê½ 
-*******************************************************/
-DsMsg * DsMsg::_instance   = 0;
-
-DsMsg * DsMsg::getInstance() {
-    if(_instance==0) {
-        _instance = new DsMsg();
-    }
-
-    return _instance;
-}
-
-void DsMsg::destroyInstance() {
-    delete _instance;
-    _instance = 0;
-}
-
 DsMsg::DsMsg()
 :CommonMsg(DOWN_STREAM){
 }
@@ -298,3 +280,84 @@ int UsMsg::AddSeatInfo() {
     return 0;
 }
 
+/*************************************************
+    Heart beat
+*************************************************/
+#include "./../network/CSockets.h"
+#include <thread>
+
+KwxHeart::KwxHeart(int second) {
+    EnvVariable *env = EnvVariable::getInstance();
+
+    _socket = new ClientSocket;
+    _socket->_dbgInfo = false;
+    _socket->Start(env->_roomServer.ipaddr,env->_roomServer.port);
+
+    _rate = second;
+    _running = true;
+    Resume();
+
+    _logger = LOGGER_REGISTER("CommonMsg");
+
+    std::thread t1(&KwxHeart::_Beats,this);
+    t1.detach();
+    LOGGER_WRITE("Thread KwxHeart::_Beats start");
+}
+
+void KwxHeart::Resume() {
+    _duration = 5*60/_rate;     /*5 minutes*/
+}
+
+void KwxHeart::Pause() {
+    _duration = 0;
+}
+
+KwxHeart::~KwxHeart() {
+    _duration = 0;
+    _running =  false;
+    
+    _delay(_rate*2*100);        /* to make sure the last send executed successfully */
+    
+    _socket->Stop();
+    delete _socket;
+
+    LOGGER_DEREGISTER(_logger);
+}
+
+void KwxHeart::_Beats() {
+#ifndef NO_HEART_BEAT
+    INT8U buf[MSG_MAX_LEN] = {0};
+    int   len = 0;
+    
+    RequestHeartBeat aBeat;
+    aBeat.Set();
+    len = aBeat.Serialize(buf);
+
+    while(_running) {
+        if(_duration>0) {
+            _socket->Send((char *)buf,len);
+            //_duration--;
+        }
+
+        _delay(_rate*1000);
+    }
+
+    LOGGER_WRITE("Thread KwxHeart::_Beats quit");    
+#endif
+}
+
+Logger *KwxHeart::_logger = NULL;
+KwxHeart* KwxHeart::_instance = NULL;
+
+KwxHeart *KwxHeart::getInstance(int second) {
+    if (_instance==NULL) {
+        _instance = new KwxHeart(second);
+    }
+
+    return _instance;
+}
+
+void KwxHeart::destroyInstance() {
+    delete _instance;
+    _instance = NULL;
+}

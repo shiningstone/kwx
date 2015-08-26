@@ -7,8 +7,8 @@
 #include "KwxMsgBasic.h"
 #include "MsgIntf.h"
 
-#define ITEM_BUF_LEN   128
-#define ITEM_MAX_NUM   128
+#define ITEM_BUF_LEN   256
+#define ITEM_MAX_NUM   16
 
 typedef enum {
     PURE_ID,

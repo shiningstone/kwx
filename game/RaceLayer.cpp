@@ -20,6 +20,8 @@ USING_NS_CC;
 RaceLayer::RaceLayer()
 :PREMIUM_LEAST(200)
 {
+	_eventDispatcher->removeAllEventListeners();
+
 	s_scale = 1.189;
 	s_no    = 1;
 
@@ -62,7 +64,7 @@ bool RaceLayer::init() {
 void RaceLayer::CreateRace(GameMode_t mode)
 {
 #ifndef NO_HEART_BEAT
-    KwxHeart::getInstance()->Pause();
+    KwxHeart::getInstance()->Resume();
 #endif
 
 	_isResoucePrepared=false;
@@ -161,11 +163,14 @@ void RaceLayer::StartGame()
 	ifEffectTime=false;
     _myChosenCard = INVALID;
     _myTouchedCard = INVALID;
+    _timer.ignore = false;
     
 	//ifPengAction=false;
 	//ifGangAction=false;
 
-	_RaceBeginPrepare();
+    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
+    _CreateResidueCards();
+	_UpdateResidueCards(TOTAL_CARD_NUM);
 
     _roundManager->StartGame();
 }
@@ -179,12 +184,15 @@ void RaceLayer::reload() {
         GuiPlayerShow(dir);
     }
 
+    _timer.ignore = false;
     _UpdateResidueCards(TOTAL_CARD_NUM - _roundManager->_distributedNum);       
     _ShowZhuang(_roundManager->GetLastWinner());
 }
 
 void RaceLayer::WaitForFirstAction(PlayerDir_t zhuang)
 {
+    resume_timer();
+    
     ListenToCardTouch();
     ((Button*)this->getChildByTag(MENU_BKG_TAG_ID)->getChildByTag(TUOGUAN_MENU_BUTTON))->setTouchEnabled(true);
 
@@ -526,16 +534,17 @@ void RaceLayer::_CardInHandUpdateEffect(PlayerDir_t dir,bool ignoreTingSignBtn)
 			auto Ting_Sign = _object->CreateTingSign();
 			myframe->addChild(Ting_Sign,1,TING_SING_BUTTON);
 
-            //while(myframe->getChildByTag(TING_SING_BAR))
-				//myframe->removeChildByTag(TING_SING_BAR);
+            while(myframe->getChildByTag(TING_SING_BAR))
+				myframe->removeChildByTag(TING_SING_BAR);
 
-            _TingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place);
-            myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
-			ifTingSignBarVisible=false;
-			ListenToTingButton();
-
-            _CardInHandUpdateEffect(LEFT);
-			_CardInHandUpdateEffect(RIGHT);
+            if( _TingHintCreate(Ting_Sign->getPosition(),Hu_cardOut_place) ) {
+                myframe->getChildByTag(TING_SING_BAR)->setVisible(false);
+                ifTingSignBarVisible=false;
+                ListenToTingButton();
+                
+                _CardInHandUpdateEffect(LEFT);
+                _CardInHandUpdateEffect(RIGHT);
+            }
 		}
 	}
     
@@ -731,7 +740,12 @@ void RaceLayer::_RightBatchDistribute(int batchIdx, float delayRef, int cardLen)
 }
 
 void RaceLayer::FirstRoundDistributeEffect(PlayerDir_t zhuang) {
-	auto VoiceEffect=_voice->Speak("sort.ogg");	
+    _ShowStartAnimation();
+
+    int lastWinner = _roundManager->GetLastWinner();
+    _ShowZhuang((PlayerDir_t)lastWinner);
+
+    auto VoiceEffect=_voice->Speak("sort.ogg"); 
 
 	float timeXH[PLAYER_NUM];
 	timeXH[zhuang] = 0.7;
@@ -1284,46 +1298,66 @@ void RaceLayer::HideClock() {
 }
 
 void RaceLayer::UpdateClock(float dt) {
-    Node* indicator[4] = {0};
-    
-    indicator[LEFT]   = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
-    indicator[MIDDLE] = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
-    indicator[RIGHT]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
-    indicator[3]      = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
-    
-    for(int i=0;i<4;i++) {
-        if( !indicator[i] ) {
-            return;
+    if(!_timer.pause) {
+        Node* indicator[4] = {0};
+        
+        indicator[LEFT]   = this->getChildByTag(ALARM_CLOCK_INDICATE_LEFT_TAG_ID);
+        indicator[MIDDLE] = this->getChildByTag(ALARM_CLOCK_INDICATE_DOWN_TAG_ID);
+        indicator[RIGHT]  = this->getChildByTag(ALARM_CLOCK_INDICATE_RIGHT_TAG_ID);
+        indicator[3]      = this->getChildByTag(ALARM_CLOCK_INDICATOR_TAG_ID);
+        
+        for(int i=0;i<4;i++) {
+            if( !indicator[i] ) {
+                return;
+            }
         }
-    }
-
-    indicator[3]->setVisible(true);
-    _Remove(indicator[3],ALARM_CLOCK_CHILD_NUM_TAG_ID);
-    _ClockAddTime((Sprite *)indicator[3],_timer.count--);
-
-    indicator[_timer.curPlayer]->setVisible(true);
-    indicator[(_timer.curPlayer+1)%3]->setVisible(false);
-    indicator[(_timer.curPlayer+2)%3]->setVisible(false);
-
-    if(_timer.count<0) {
-        unschedule(schedule_selector(RaceLayer::UpdateClock));
-
-        if(_timer.curPlayer==MIDDLE) {
-            #ifndef TIMER_FREE
-            _roundManager->ForceHandout();
-            #endif
+        
+        indicator[3]->setVisible(true);
+        _Remove(indicator[3],ALARM_CLOCK_CHILD_NUM_TAG_ID);
+        _ClockAddTime((Sprite *)indicator[3],_timer.count--);
+        
+        indicator[_timer.curPlayer]->setVisible(true);
+        indicator[(_timer.curPlayer+1)%3]->setVisible(false);
+        indicator[(_timer.curPlayer+2)%3]->setVisible(false);
+        
+        if(_timer.count<0) {
+            unschedule(schedule_selector(RaceLayer::UpdateClock));
+        
+            if(_timer.curPlayer==MIDDLE) {
+        #ifndef TIMER_FREE
+                _roundManager->ForceHandout();
+        #endif
+            }
         }
     }
 }
 
+void RaceLayer::pause_timer() {
+    _timer.pause     = true;
+}
+
+void RaceLayer::resume_timer() {
+    _timer.pause     = false;
+}
+
+void RaceLayer::skip_timer() {
+    _timer.ignore    = true;
+}
+
 void RaceLayer::start_timer(int time,PlayerDir_t dir){
-    _timer.curPlayer = dir;
-    _timer.count     = time;
-
-    unschedule(schedule_selector(RaceLayer::UpdateClock));
-
-    UpdateClock(0);
-    schedule(schedule_selector(RaceLayer::UpdateClock), 1.0f, kRepeatForever, 0);
+    if(!_timer.ignore) {
+        _timer.curPlayer = dir;
+        _timer.count     = time;
+        _timer.pause     = false;
+        _timer.ignore    = false;
+        
+        unschedule(schedule_selector(RaceLayer::UpdateClock));
+        
+        UpdateClock(0);
+        schedule(schedule_selector(RaceLayer::UpdateClock), 1.0f, kRepeatForever, 0);
+    } else {
+        _timer.ignore    = false;
+    }
 }
 
 void RaceLayer::stop_timer() {
@@ -1972,7 +2006,7 @@ void RaceLayer::_CreateHeadImage() {
     this->addChild(_layout->_playerBkg[1],1,MID_IMG_BKG_TAG_ID);
 }
 
-void RaceLayer::_RaceBeginPrepare() {
+void RaceLayer::_ShowStartAnimation() {
     _Remove(this,READY_INDICATE_LEFT_TAG_ID);
     _Remove(this,READY_INDICATE_RIGHT_TAG_ID);
     _Remove(this,READY_INDICATE_MID_TAG_ID);
@@ -2044,13 +2078,6 @@ void RaceLayer::_RaceBeginPrepare() {
                 Spawn::create(
                     ScaleTo::create(0.5,8,0),
                     FadeOut::create(0.5),NULL),NULL));
-
-    _Show(this,SHOWCARD_INDICATOR_TAG_ID,false);
-    _CreateResidueCards();
-	_UpdateResidueCards(TOTAL_CARD_NUM);
-
-    int lastWinner = _roundManager->GetLastWinner();
-    _ShowZhuang((PlayerDir_t)lastWinner);
 }
 
 void RaceLayer::_ShowZhuang(PlayerDir_t dir) {
@@ -3648,7 +3675,7 @@ void RaceLayer::_MingGangEffect(PlayerDir_t dir,PlayerDir_t prevDir, Card_t card
 		Vector<FiniteTimeAction *>gang_list_seq;
         
 		if(_roundManager->_isNewDistributed) {
-			for(int i=actionStartPlace; i<=gang[0]; i++) {/* right shift */
+			for(int i=actionStartPlace; i<gang[0]; i++) {/* right shift */
 				auto curPos=myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i)->getPosition();
 
 				auto action=TargetedAction::create(myframe->getChildByTag(HAND_IN_CARDS_TAG_ID+dir*20+i),
@@ -4060,7 +4087,7 @@ void RaceLayer::TingHintBarOfOthers(int curNo,int outCardIdx) {
     }
 }
 
-void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
+bool RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
 {
     Hu_cardOut_place = CardPlace;
 
@@ -4082,6 +4109,10 @@ void RaceLayer::_TingHintCreate(Point curPos,int CardPlace)
         auto tingSignBar = _object->CreateTingInfoBar(
             curPos,huCards,ting->kindNum,times,remains);
         myframe->addChild(tingSignBar, 30, TING_SING_BAR);
+
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -4170,13 +4201,14 @@ void RaceLayer::BtnGangConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget:
         ming
 ****************************************/
 void RaceLayer::KouCancelEffect(ActionId_t action,CardInHand *cards) {
+    Node *button = myframe->getChildByTag(MING_KOU_CANCEL);
+    Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(button,true);
+    
     for(int i=cards->FreeStart;i<cards->size();i++) {
         Sprite *card = _GetCardInHand(MIDDLE,i);
         _Remove(card,MING_KOU);
     }
 
-    Node *button = myframe->getChildByTag(MING_KOU_CANCEL);
-    
     myframe->_ID = MIDDLE;
     myframe->runAction(
         Sequence::create(
@@ -4187,6 +4219,7 @@ void RaceLayer::KouCancelEffect(ActionId_t action,CardInHand *cards) {
 
 void RaceLayer::KouConfirmEffect() {
     auto button = myframe->getChildByTag(MING_KOU_ENSURE);
+    Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(button,true);
 
     myframe->_ID = MIDDLE;
     myframe->runAction(Sequence::create(CCCallFunc::create([=]() {
@@ -4197,14 +4230,26 @@ void RaceLayer::KouConfirmEffect() {
 
 void RaceLayer::MingCancelEffect() {
     auto button = myframe->getChildByTag(MING_CANCEL);
+    Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(button,true);
     
     myframe->_ID = MIDDLE;
+
+    _Show(myframe,TING_SING_BAR,false);
+
     myframe->runAction(Sequence::create(TargetedAction::create(
         button,ScaleTo::create(0,0)),CCCallFunc::create([=]() {
         _CardInHandUpdateEffect(MIDDLE);}),CCCallFunc::create(this,callfunc_selector(
         RaceLayer::_DeleteActionTip)),CallFunc::create([=](){
         _roundManager->_actCtrl.choices = _roundManager->judge_action_again(MIDDLE);
         _roundManager->WaitForMyAction();}),NULL));
+}
+
+void RaceLayer::_RemoveBtn(int tag) {
+    auto button = myframe->getChildByTag(tag);
+    if(button) {
+        Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(button,true);
+        _Remove(myframe,tag);
+    }
 }
 
 void RaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::TouchEventType type)
@@ -4220,7 +4265,7 @@ void RaceLayer::BtnKouCancelHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::T
 		{
             Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
 
-			_Remove(myframe,MING_KOU_ENSURE);			
+			_RemoveBtn(MING_KOU_ENSURE);			
 			_Remove(myframe,MING_KOU_SIGN);
 			curButton->setTouchEnabled(false);
 
@@ -4247,6 +4292,7 @@ void RaceLayer::BtnKouConfirmHandler(cocos2d::Ref* pSender,cocos2d::ui::Widget::
 		{
 			Director::getInstance()->getEventDispatcher()->removeEventListenersForTarget(myframe,true);
             
+			_RemoveBtn(MING_KOU_CANCEL);			
             _Remove(myframe,MING_KOU_SIGN);
 			curButton->setTouchEnabled(false);
 
@@ -4397,12 +4443,12 @@ void RaceLayer::ListenToKou(int no) {
 }
 
 void RaceLayer::_SwitchCancelBtn(int tag) {
-    _Remove(myframe,MING_KOU_CANCEL);
-    _Remove(myframe,MING_CANCEL);
-    _Remove(myframe,GANG_CANCEL);
+    _RemoveBtn(MING_KOU_CANCEL);
+    _RemoveBtn(MING_CANCEL);
+    _RemoveBtn(GANG_CANCEL);
 
     auto btn = _object->CreateButton(BTN_CANCEL);
-
+    
     switch(tag) {
         case MING_KOU_CANCEL:
             btn->addTouchEventListener(CC_CALLBACK_2(RaceLayer::BtnKouCancelHandler,this));
@@ -4417,6 +4463,7 @@ void RaceLayer::_SwitchCancelBtn(int tag) {
     
     myframe->addChild(btn,20,tag);
 }
+
 void RaceLayer::_GangChooseUpdate()
 {
 	CardInHand *cards=_roundManager->_players[MIDDLE]->_cards;
@@ -4528,6 +4575,8 @@ void RaceLayer::QueryGangCards() {
 }
 
 void RaceLayer::QueryKouCards() {
+    _eventDispatcher->removeEventListenersForTarget(myframe,true);
+    
     myframe->addChild(_object->CreateMingKouSign(),20,MING_KOU_SIGN);
     
     auto ChooseEnsure = _object->CreateButton(BTN_OK);
@@ -4536,14 +4585,13 @@ void RaceLayer::QueryKouCards() {
     myframe->addChild(ChooseEnsure,20,MING_KOU_ENSURE);
     
     _SwitchCancelBtn(MING_KOU_CANCEL);
+
     MaskNon(sKOU_ENABLE);
     ListenToKou(MIDDLE);
 }
 
 void RaceLayer::QueryMingOutCard() {
-    _Remove(myframe,MING_KOU_ENSURE);
     _Remove(myframe,MING_KOU_SIGN);
-    _Remove(myframe,MING_KOU_CANCEL);
     
     _SwitchCancelBtn(MING_CANCEL);
     
@@ -6307,14 +6355,14 @@ void RaceLayer::BtnBackConfirmHandler(Ref* pSender,ui::Widget::TouchEventType ty
             GameMode_t mode = _roundManager->_MODE;
 
             _roundManager->StopGame();
-            _roundManager->destroyInstance();
 
             auto scene = Scene::create();
             if(mode==LOCAL_GAME) {
+                _roundManager->destroyInstance();
                 scene->addChild(HelloWorld::create());
             } else {
                 #ifndef NO_HEART_BEAT
-                KwxHeart::getInstance()->Resume();
+                KwxHeart::getInstance()->Pause();
                 #endif
                 scene->addChild(EnterRoom::create());
             }

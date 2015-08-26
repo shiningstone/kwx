@@ -29,10 +29,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	glview->setDesignResolutionSize(1218 ,716 ,kResolutionExactFit);
 	//glview->setDesignResolutionSize(1218,716,kResolutionShowAll);//kResolutionFixedHeight
     // turn on display FPS
-    director->setDisplayStats(true);
+    //director->setDisplayStats(true);
 
     // set FPS. the default value is 1.0/60 if you don't call this
-    director->setAnimationInterval(1.0 / 60);
+    //director->setAnimationInterval(1.0 / 60);
 
 	//============================2a¨º?==========================//
 	//auto scene = Scene::create();
